@@ -2919,6 +2919,38 @@ ErrCode MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
     return RET_OK;
 }
 
+ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    bool isPointerDevice = INPUT_DEV_MGR->HasPointerDevice();
+    if (!isPointerDevice) {
+        MMI_HILOGE("There hasn't any pointer device");
+        return ERROR_DEVICE_NO_POINTER;
+    }
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        return ERROR_APP_NOT_FOCUSED;
+    }
+    int32_t clientPid = GetCallingPid();
+    int32_t focusePid = WIN_MGR->GetFocusPid();
+    if (clientPid != focusePid) {
+        return ERROR_APP_NOT_FOCUSED;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [&displayId, &displayX, &displayY] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->GetPointerLocation(
+                displayId, displayX, displayY);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer location failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
 void MMIService::OnDelegateTask(epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {

@@ -231,6 +231,7 @@ public:
     bool IsMouseInCastWindow();
     bool IsCaptureMode();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+    int32_t GetFocusPid();
 
 private:
     bool NeedTouchTracking(PointerEvent &event) const;

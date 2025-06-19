@@ -2801,6 +2801,34 @@ Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
     return INPUT_SUCCESS;
 }
 
+Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, double *displayY)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(displayId, INPUT_PARAMETER_ERROR);
+    CHKPR(displayX, INPUT_PARAMETER_ERROR);
+    CHKPR(displayY, INPUT_PARAMETER_ERROR);
+    int32_t tmpDisplayId = 0;
+    double tmpX = 0;
+    double tmpY = 0;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetPointerLocation(tmpDisplayId, tmpX, tmpY);
+    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,tmpStatus:%{public}d", ret, tmpStatus);
+    if (ret != RET_OK) {
+        if (ret == OHOS::MMI::ERROR_DEVICE_NO_POINTER) {
+            MMI_HILOGE("The device has no pointer");
+            return INPUT_DEVICE_NO_POINTER;
+        }
+        if (ret == OHOS::MMI::ERROR_APP_NOT_FOCUSED) {
+            MMI_HILOGE("The app is not the focused app");
+            return INPUT_APP_NOT_FOCUSED;
+        }
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    *displayId = tmpDisplayId;
+    *displayX = tmpX;
+    *displayY = tmpY;
+    return INPUT_SUCCESS;
+}
+
 static void TransformTouchActionDown(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent,
     OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
 {

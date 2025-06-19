@@ -188,6 +188,7 @@ public:
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();
     virtual bool GetHardCursorEnabled() = 0;
+    virtual int32_t GetFocusPid() = 0;
 
 private:
     static std::mutex mutex_;

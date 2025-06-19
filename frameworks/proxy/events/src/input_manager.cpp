@@ -568,6 +568,11 @@ int32_t InputManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId
     return InputMgrImpl.SetPointerLocation(x, y, displayId);
 }
 
+int32_t InputManager::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
+{
+    return InputMgrImpl.SetPointerLocation(displayId, displayX, displayY);
+}
+
 int32_t InputManager::EnterCaptureMode(int32_t windowId)
 {
     return InputMgrImpl.EnterCaptureMode(windowId);

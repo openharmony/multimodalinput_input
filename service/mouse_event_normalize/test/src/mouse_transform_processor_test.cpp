@@ -284,6 +284,23 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
 }
 
 /**
+ * @tc.name: MouseTransformProcessorTest_GetPointerLocation_001
+ * @tc.desc: Test GetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerLocation_001, TestSize.Level1)
+{
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    int32_t displayId = -1;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    int32_t ret = processor.SetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_009
  * @tc.desc: Test GetPointerSpeed
  * @tc.type: FUNC
