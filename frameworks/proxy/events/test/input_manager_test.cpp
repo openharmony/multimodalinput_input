@@ -2120,6 +2120,21 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerLocation_002, TestSize.Lev
 }
 
 /**
+ * @tc.name: InputManagerTest_GetPointerLocation_001
+ * @tc.desc: Get pointer location
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = -1;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetPointerLocation(displayId, displayX, displayY));
+}
+
+/**
  * @tc.name: InputManagerTest_GetTouchpadRightClickType_001
  * @tc.desc: Get touchpad right click type
  * @tc.type: FUNC

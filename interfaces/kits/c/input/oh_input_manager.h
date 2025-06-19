@@ -277,6 +277,16 @@ typedef enum Input_Result {
      * @since 20
      */
     INPUT_INJECTION_AUTHORIZED_OTHERS = 3900008,
+    /**
+     * @error The app is not the focused app
+     * @since 20
+     */
+    INPUT_APP_NOT_FOCUSED = 3900009,
+    /**
+     * @error The device has no pointer
+     * @since 20
+     */
+    INPUT_DEVICE_NO_POINTER = 3900010,
 } Input_Result;
 
 /**
@@ -2032,6 +2042,22 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback);
  * @since 20
  */
 Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status);
+
+/**
+ * @brief Get pointer location.
+ *
+ * @param displayId The displayId for the pointer location.
+ * @param displayX The displayX for the pointer location.
+ * @param displayY The displayY for the pointer location.
+ * @return OH_Input_GetPointerLocation function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null pointer;
+ *         {@link INPUT_APP_NOT_FOCESED} if the app is not the focused app;
+ *         {@link INPUT_DEVICE_NO_POINTER} if the device has no pointer;
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
+ * @since 20
+ */
+Input_Result OH_Input_GetPointerLocation(int32_t* displayId, double *displayX, double *displayY);
 #ifdef __cplusplus
 }
 #endif
