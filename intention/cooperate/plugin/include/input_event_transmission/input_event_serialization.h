@@ -62,7 +62,7 @@ private:
     static void ReadFunctionKeys(NetPacket &pkt, std::shared_ptr<MMI::KeyEvent> key);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_PART
-    static constexpr uint32_t MAX_HMAC_SIZE = 64;
+    static constexpr uint32_t MAX_HMAC_SIZE = 160;
     struct SecCompPointEvent {
         double touchX;
         double touchY;
