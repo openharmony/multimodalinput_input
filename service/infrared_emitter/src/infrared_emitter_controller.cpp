@@ -16,7 +16,7 @@
 #include "infrared_emitter_controller.h"
 
 #include <dlfcn.h>
-
+#include "idevmgr_hdi.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -27,23 +27,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const char* IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
+const std::string CONSUMER_NAME = "consumerir_service";
 std::mutex mutex_;
 }
-using namespace OHOS::HDI::V1_0;
+
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
 InfraredEmitterController::InfraredEmitterController() {}
 
-InfraredEmitterController::~InfraredEmitterController()
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    irInterface_ = nullptr;
-    if (soIrHandle_ != nullptr) {
-        dlclose(soIrHandle_);
-        soIrHandle_ = nullptr;
-    }
-}
+InfraredEmitterController::~InfraredEmitterController() {}
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
 {
@@ -51,51 +42,38 @@ InfraredEmitterController *InfraredEmitterController::GetInstance()
     return instance_;
 }
 
-void InfraredEmitterController::InitInfraredEmitter()
+sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
-    if (irInterface_ != nullptr) {
-        return;
-    }
-    if (soIrHandle_ == nullptr) {
-        soIrHandle_ = dlopen(IR_WRAPPER_PATH, RTLD_NOW);
-        if (soIrHandle_ == nullptr) {
-            MMI_HILOGE("Loaded %{public}s failed:%{public}s", IR_WRAPPER_PATH, dlerror());
-            return;
-        }
-    }
-    typedef ConsumerIr* (*funCreate_ptr) (void);
-    funCreate_ptr fnCreate = nullptr;
-    fnCreate = (funCreate_ptr)dlsym(soIrHandle_, "ConsumerIrImplGetInstance");
-    const char *dlsymError = dlerror();
-    if (dlsymError != nullptr) {
-        MMI_HILOGE("Loaded ConsumerIrImplGetInstance failed:%{public}s", dlsymError);
-        dlclose(soIrHandle_);
-        soIrHandle_ = nullptr;
-        return;
-    }
-    if (fnCreate == nullptr) {
-        MMI_HILOGE("Loaded ConsumerIrImplGetInstance is null");
-        dlclose(soIrHandle_);
-        soIrHandle_ = nullptr;
-        return;
-    }
     MMI_HILOGI("Infrared emitter call ConsumerIr:fnCreate begin");
-    irInterface_ = (ConsumerIr *)fnCreate();
-    if (irInterface_ == nullptr) {
-        MMI_HILOGE("Infrared emitter init fail irInterface_ is nullptr");
-        dlclose(soIrHandle_);
-        soIrHandle_ = nullptr;
-        return;
+    sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> consumerIr =
+        OHOS::HDI::Consumerir::V1_0::ConsumerIr::Get(CONSUMER_NAME);
+    if (consumerIr != nullptr) {
+        return consumerIr;
     }
+    auto devmgr = OHOS::HDI::DeviceManager::V1_0::IDeviceManager::Get();
+    if (devmgr == nullptr) {
+        MMI_HILOGE("devmgr is null.");
+        return nullptr;
+    }
+    if (devmgr->LoadDevice(CONSUMER_NAME) != 0) {
+        MMI_HILOGE("LoadDevice(%{public}s) failed.", CONSUMER_NAME.c_str());
+        return nullptr;
+    }
+    consumerIr = OHOS::HDI::Consumerir::V1_0::ConsumerIr::Get(CONSUMER_NAME);
+    if (consumerIr == nullptr) {
+        MMI_HILOGE("Infrared emitter init fail consumerIr is nullptr");
+        return nullptr;
+    }
+    return consumerIr;
 }
 
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    InitInfraredEmitter();
-    CHKPF(irInterface_);
+    sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> consumerIr = InitInfraredEmitter();
+    CHKPF(consumerIr);
     int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
     std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
@@ -104,11 +82,11 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(per) + ";";
         tempPattern.push_back(per);
     }
-    MMI_HILOGI("irInterface_->Transmit params:%{public}s", context.c_str());
+    MMI_HILOGI("consumerIr->Transmit params:%{public}s", context.c_str());
 
     bool outRet = false;
-    int32_t ret = irInterface_->Transmit(tempCarrierFreq, tempPattern, outRet);
-    MMI_HILOGI("irInterface_->Transmit ret:%{public}d", ret);
+    int32_t ret = consumerIr->Transmit(tempCarrierFreq, tempPattern, outRet);
+    MMI_HILOGI("consumerIr->Transmit ret:%{public}d", ret);
     if (ret < 0) {
         MMI_HILOGE("Infrared emitter transmit failed:%{public}d", ret);
         return false;
@@ -124,16 +102,13 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    InitInfraredEmitter();
-    if (!irInterface_) {
-        MMI_HILOGE("Infrared emitter not init");
-        return false;
-    }
+    sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> consumerIr = InitInfraredEmitter();
+    CHKPF(consumerIr);
     bool outRet = false;
-    std::vector<ConsumerIrFreqRange> outRange;
-    MMI_HILOGI("irInterface_->GetCarrierFreqs");
-    int32_t ret = irInterface_->GetCarrierFreqs(outRet, outRange);
-    MMI_HILOGI("irInterface_->GetCarrierFreqs ret:%{public}d", ret);
+    std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange> outRange;
+    MMI_HILOGI("consumerIr->GetCarrierFreqs");
+    int32_t ret = consumerIr->GetCarrierFreqs(outRet, outRange);
+    MMI_HILOGI("consumerIr->GetCarrierFreqs ret:%{public}d", ret);
     if (ret < 0) {
         MMI_HILOGE("Infrared emitter GetCarrierFreqs failed:%{public}d", ret);
         return false;
@@ -151,6 +126,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
         item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);
     }
+    MMI_HILOGD("consumerIr->GetCarrierFreqs context:%{public}s", context.c_str());
     return true;
 }
 } // namespace MMI
