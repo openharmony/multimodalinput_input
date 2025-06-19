@@ -186,7 +186,12 @@ typedef bool (*GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE)();
 GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE gaussiankeyboard_isFloatingKeyboard_ = nullptr;
 typedef bool (*VKEYBOARD_ISSHOWN)();
 VKEYBOARD_ISSHOWN vkeyboard_isShown_ = nullptr;
-
+typedef int32_t (*GET_LIBINPUT_EVENT_FOR_VKEYBOARD_TYPE)(
+    libinput_event_touch *touch, int32_t& delayMs, std::vector<libinput_event*>& events);
+GET_LIBINPUT_EVENT_FOR_VKEYBOARD_TYPE getLibinputEventForVKeyboard_ = nullptr;
+typedef int32_t (*GET_LIBINPUT_EVENT_FOR_VTRACKPAD_TYPE)(
+    libinput_event_touch *touch, std::vector<libinput_event*>& events);
+GET_LIBINPUT_EVENT_FOR_VTRACKPAD_TYPE getLibinputEventForVTrackpad_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -4175,16 +4180,6 @@ void MMIService::InitVKeyboardFuncHandler()
         g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
         if (g_VKeyboardHandle != nullptr) {
             handleTouchPoint_ = (HANDLE_TOUCHPOINT_TYPE)dlsym(g_VKeyboardHandle, "HandleTouchPoint");
-            statemachineMessageQueue_getLibinputMessage_ = (STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "StateMachineMessageQueueGetLibinputMessage");
-            trackPadEngine_getAllTouchMessage_ = (TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineGetAllTouchMessage");
-            trackPadEngine_clearTouchMessage_ = (TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineClearTouchMessage");
-            trackPadEngine_getAllKeyMessage_ = (TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineGetAllKeyMessage");
-            trackPadEngine_clearKeyMessage_ = (TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)dlsym(
-                g_VKeyboardHandle, "TrackPadEngineClearKeyMessage");
             vkeyboard_hardwareKeyEventDetected_ = (VKEYBOARD_HARDWAREKEYEVENTDETECTED_TYPE)dlsym(
                 g_VKeyboardHandle, "HardwareKeyEventDetected");
             vkeyboard_getKeyboardActivationState_ = (VKEYBOARD_GETKEYBOARDACTIVATIONSTATE_TYPE)dlsym(
@@ -4192,17 +4187,17 @@ void MMIService::InitVKeyboardFuncHandler()
             gaussiankeyboard_isFloatingKeyboard_ = (GAUSSIANKEYBOARD_ISFLOATINGKEYBOARD_TYPE)dlsym(
                 g_VKeyboardHandle, "IsFloatingKeyboard");
             vkeyboard_isShown_ = (VKEYBOARD_ISSHOWN)dlsym(g_VKeyboardHandle, "IsVKeyboardShown");
-
+            getLibinputEventForVKeyboard_ = (GET_LIBINPUT_EVENT_FOR_VKEYBOARD_TYPE)dlsym(
+                g_VKeyboardHandle, "GetLibinputEventForVKeyboard");
+            getLibinputEventForVTrackpad_ = (GET_LIBINPUT_EVENT_FOR_VTRACKPAD_TYPE)dlsym(
+                g_VKeyboardHandle, "GetLibinputEventForVTrackpad");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
-                statemachineMessageQueue_getLibinputMessage_,
-                trackPadEngine_getAllTouchMessage_,
-                trackPadEngine_clearTouchMessage_,
-                trackPadEngine_getAllKeyMessage_,
-                trackPadEngine_clearKeyMessage_,
                 vkeyboard_hardwareKeyEventDetected_,
                 vkeyboard_getKeyboardActivationState_,
                 gaussiankeyboard_isFloatingKeyboard_,
-                vkeyboard_isShown_);
+                vkeyboard_isShown_,
+                getLibinputEventForVKeyboard_,
+                getLibinputEventForVTrackpad_);
         }
     }
 }
