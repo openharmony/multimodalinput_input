@@ -48,7 +48,6 @@ void WindowUtilsTest::ClearTestWindow()
 {
     CALL_DEBUG_ENTER;
     CHKPV(testWindow_);
-    testWindow_->Destroy();
 }
 
 bool WindowUtilsTest::DrawTestWindow()
