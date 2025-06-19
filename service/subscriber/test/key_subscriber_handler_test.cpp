@@ -2635,7 +2635,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_DumpSubscriber, Test
     keyOption->SetFinalKeyUpDelay(100);
     std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
         std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
-    int32_t fd = 100;
+    int32_t fd = 1;
     EXPECT_NO_FATAL_FAILURE(handler.DumpSubscriber(fd, subscriber));
 
     std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
