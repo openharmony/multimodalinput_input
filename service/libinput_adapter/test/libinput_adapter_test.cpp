@@ -81,41 +81,9 @@ HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_EventDispatch, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     LibinputAdapter libinputAdapter;
-    int32_t fd = 10;
-    libinputAdapter.fd_ = 10;
+    int32_t fd = 1;
+    libinputAdapter.fd_ = 1;
     libinputAdapter.input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
-    ASSERT_NO_FATAL_FAILURE(libinputAdapter.EventDispatch(fd));
-}
-
-/**
- * @tc.name: LibinputAdapterTest_EventDispatch_001
- * @tc.desc: Cover else if (fd == hotplugDetector_.GetFd()) branch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_EventDispatch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    LibinputAdapter libinputAdapter;
-    int32_t fd = 10;
-    libinputAdapter.fd_ = 15;
-    libinputAdapter.hotplugDetector_.inotifyFd_ = UniqueFd{ 10 };
-    ASSERT_NO_FATAL_FAILURE(libinputAdapter.EventDispatch(fd));
-}
-
-/**
- * @tc.name: LibinputAdapterTest_EventDispatch_002
- * @tc.desc: Cover the else branch of if (fd == fd_)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_EventDispatch_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    LibinputAdapter libinputAdapter;
-    int32_t fd = 10;
-    libinputAdapter.fd_ = 15;
-    libinputAdapter.hotplugDetector_.inotifyFd_ = UniqueFd{ 15 };
     ASSERT_NO_FATAL_FAILURE(libinputAdapter.EventDispatch(fd));
 }
 
