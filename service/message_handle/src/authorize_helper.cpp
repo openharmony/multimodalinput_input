@@ -185,17 +185,17 @@ void AuthorizeHelper::NoticeRequestInjectionResult(const int32_t reqId, const in
     auto object =  clientDeathHandler_->GetClientProxy(callingPid);
     sptr<IInputBinderClient> pClientProxy = iface_cast<IInputBinderClient>(object);
     if (!pClientProxy) {
-        MMI_HILOGE("clientDeathHandler is nullptr");
+        MMI_HILOGE("pClientProxy is nullptr");
         return;
     }
-    auto sendStatus = AUTHORIZE_QUERY_STATE::UNAUTHORIZE;
+    auto sendStatus = AUTHORIZE_QUERY_STATE::UNAUTHORIZED;
     if (state_ == AuthorizeState::STATE_AUTHORIZE) {
         if (pid_ == callingPid) {
             sendStatus = AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED;
         }
     }
     MMI_HILOGD("result callback! pid_:%{public}d,sendStatus:%{public}d,state_:%{public}d,mapId:%{public}d",
-        pid_, sendStatus, pid_, callingPid);
+        pid_, sendStatus, state_, callingPid);
     pClientProxy->NoticeRequestInjectionResult(reqId, static_cast<int32_t>(sendStatus));
 }
 
