@@ -58,7 +58,7 @@ private:
     static bool DeserializeSettings(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    static constexpr uint32_t MAX_HMAC_SIZE = 64;
+    static constexpr uint32_t MAX_HMAC_SIZE = 160;
     struct SecCompPointEvent {
         double touchX;
         double touchY;
