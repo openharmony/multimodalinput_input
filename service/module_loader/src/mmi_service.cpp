@@ -2931,7 +2931,7 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
     bool isPointerDevice = INPUT_DEV_MGR->HasPointerDevice();
     if (!isPointerDevice) {
         MMI_HILOGE("There hasn't any pointer device");
-        return ERROR_DEVICE_NO_POINTER;
+        return ERROR_APP_NOT_FOCUSED;
     }
     int32_t clientPid = GetCallingPid();
     int32_t focusPid = WIN_MGR->GetFocusPid();
