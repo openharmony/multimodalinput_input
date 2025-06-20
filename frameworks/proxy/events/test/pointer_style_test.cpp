@@ -148,5 +148,33 @@ HWTEST_F(PointerStyleTest, PointerStyleTest_CustomCursorParcel_Unmarshalling_001
     auto ret = cusCor.Unmarshalling(out);
     ASSERT_EQ(ret, nullptr);
 }
+
+/**
+ * @tc.name: PointerStyleTest_PointerStyle_ReadFromParcel_001
+ * @tc.desc: Test ReadFromParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerStyleTest, PointerStyleTest_PointerStyle_ReadFromParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerStyle pointerStyle;
+    Parcel parcel;
+    ASSERT_NO_FATAL_FAILURE(pointerStyle.ReadFromParcel(parcel));
+}
+
+/**
+ * @tc.name: PointerStyleTest_PointerStyle_Unmarshalling_001
+ * @tc.desc: Test Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerStyleTest, PointerStyleTest_PointerStyle_Unmarshalling_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerStyle pointerStyle;
+    Parcel parcel;
+    ASSERT_NO_FATAL_FAILURE(pointerStyle.Unmarshalling(parcel));
+}
 } // namespace MMI
 } // namespace OHOS
