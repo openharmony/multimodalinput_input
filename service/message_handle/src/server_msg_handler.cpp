@@ -1276,7 +1276,7 @@ int32_t ServerMsgHandler::RequestInjection(const int32_t callingPid, int32_t &st
         MMI_HILOGE("QueryAuthorizedStatus,ret:%{public}d, callingPid:%{public}d", ret, callingPid);
         return ret;
     }
-    if (static_cast<AUTHORIZE_QUERY_STATE>(status) != AUTHORIZE_QUERY_STATE::UNAUTHORIZE) {
+    if (static_cast<AUTHORIZE_QUERY_STATE>(status) != AUTHORIZE_QUERY_STATE::UNAUTHORIZED) {
         return ERR_OK;
     }
     if (CheckForRequestInjectionFrequentAccess(callingPid, QUERY_AUTHORIZE_MAX_INTERVAL_TIME)) {
@@ -1296,7 +1296,7 @@ int32_t ServerMsgHandler::QueryAuthorizedStatus(const int32_t callingPid, int32_
     CALL_DEBUG_ENTER;
     auto state = AUTHORIZE_HELPER->GetAuthorizeState();
     if (state == AuthorizeState::STATE_UNAUTHORIZE) {
-        status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::UNAUTHORIZE);
+        status = static_cast<int32_t>(AUTHORIZE_QUERY_STATE::UNAUTHORIZED);
         return ERR_OK;
     }
     int32_t curAuthPid = AUTHORIZE_HELPER->GetAuthorizePid();

@@ -47,10 +47,10 @@ public:
 protected:
     void OnClientDeath(int32_t pid);
     void AuthorizeProcessExit();
+private:
     void NotifyRequestInjectionResult();
     void NoticeRequestInjectionResult(const int32_t reqId, const int32_t callingPid);
     void ClearRequestInjectionCallback(int32_t callingPid);
-private:
     int32_t pid_;
     AuthorizeState state_ { AuthorizeState::STATE_UNAUTHORIZE };
     std::atomic_bool isInit_ { false };
