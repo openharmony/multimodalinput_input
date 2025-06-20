@@ -62,7 +62,7 @@ const char* DEVICE_TYPE_M_PC { "M_PC" };
 const char* DEVICE_TYPE_M_TABLET1 { "MRDI" };
 const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
 const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
-const char* DEVICE_TYPE_Q_TABLET { "Q_TABLET" };
+const char* DEVICE_TYPE_Q_TABLET { "QXS" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
