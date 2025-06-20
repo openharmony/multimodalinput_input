@@ -42,6 +42,7 @@ extern "C" {
         DEVICE_M_PC = 6,
         DEVICE_FOLD_PC_VIRT = 7,
         DEVICE_M_TABLET = 8,
+        DEVICE_Q_TABLET = 9,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
