@@ -2803,6 +2803,13 @@ public:
     static const int32_t KEYCODE_KEY_PEN_END_DOUBLE_CLICK;
 
     /**
+     * KEYCODE_PEN_AI
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_KEY_PEN_MODE_SWITCH;
+
+    /**
      * Left Knob roll-up
      * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN},
      * this key is used to roll the left knob upwards. The knob function is scenario-specific,
