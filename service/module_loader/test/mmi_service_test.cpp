@@ -1115,6 +1115,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_GetPointerLocation_001, TestSize.Level1)
     double displayX = 0.0;
     double displayY = 0.0;
     int32_t ret = mmiService.GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(ret, ERROR_APP_NOT_FOCUSED);
 }
 } // namespace MMI
 } // namespace OHOS
