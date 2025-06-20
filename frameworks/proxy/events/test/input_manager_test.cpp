@@ -6039,5 +6039,33 @@ HWTEST_F(InputManagerTest, InputManagerTest_QueryPointerRecord_005, TestSize.Lev
     std::vector<std::shared_ptr<PointerEvent>> pointerList;
     EXPECT_EQ(InputManager::GetInstance()->QueryPointerRecord(count, pointerList), RET_OK);
 }
+
+/*
+ * @tc.name: InputManagerTest_InsertRequestInjectionCallback_001
+ * @tc.desc: InsertRequestInjectionCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_InsertRequestInjectionCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t reqId = 1;
+    std::function<void(int32_t)> callback;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->InsertRequestInjectionCallback(reqId, callback));
+}
+
+/*
+ * @tc.name: InputManagerTest_RequestInjectionCallback_001
+ * @tc.desc: RequestInjectionCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RequestInjectionCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t reqId = -1;
+    int32_t status = 0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RequestInjectionCallback(reqId, status));
+}
 } // namespace MMI
 } // namespace OHOS

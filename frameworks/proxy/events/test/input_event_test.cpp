@@ -264,5 +264,33 @@ HWTEST_F(InputEventTest, InputEventTest_Unmarshalling_001, TestSize.Level1)
     auto ret = InputEvent->Unmarshalling(in);
     ASSERT_TRUE(ret == nullptr);
 }
+
+/**
+ * @tc.name: InputEventTest_DisplayBindInfo_ReadFromParcel_001
+ * @tc.desc: Test ReadFromParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_DisplayBindInfo_ReadFromParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayBindInfo info;
+    Parcel in;
+    ASSERT_NO_FATAL_FAILURE(info.ReadFromParcel(in));
+}
+
+/**
+ * @tc.name: InputEventTest_DisplayBindInfo_Unmarshalling_001
+ * @tc.desc: Test Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_DisplayBindInfo_Unmarshalling_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayBindInfo info;
+    Parcel in;
+    ASSERT_NO_FATAL_FAILURE(info.Unmarshalling(in));
+}
 } // namespace MMI
 } // namespace OHOS
