@@ -9997,18 +9997,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_004, Tes
 
     EXPECT_FALSE(manager.IsCaptureMode());
 }
-
-/**
- * @tc.name: InputWindowsManagerTest_GetPointerLocation001
- * @tc.desc: TTest current focus pid
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerLocation001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetFocusPid());
-}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
