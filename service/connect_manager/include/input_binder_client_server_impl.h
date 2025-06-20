@@ -26,7 +26,6 @@ class InputBinderClientServerImpl final: public InputBinderClientStub {
 public:
     InputBinderClientServerImpl() = default;
     ~InputBinderClientServerImpl() = default;
-public:
      ErrCode NoticeRequestInjectionResult(int32_t reqId, int32_t status) override;
 };
 } // namespace MMI

@@ -823,7 +823,7 @@ void InputManager::RequestInjectionCallback(int32_t reqId, int32_t status)
 void InputManager::InsertRequestInjectionCallback(int32_t reqId, std::function<void(int32_t)> fun)
 {
     std::lock_guard<std::mutex> lock(mutexMapCallBack_);
-    mapCallBack_.insert(std::make_pair(reqId, fun));
+    mapCallBack_[reqId] = fun;
 }
 
 int32_t InputManager::HasIrEmitter(bool &hasIrEmitter)
