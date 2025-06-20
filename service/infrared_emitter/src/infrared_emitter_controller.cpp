@@ -44,7 +44,6 @@ InfraredEmitterController *InfraredEmitterController::GetInstance()
 
 sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> InfraredEmitterController::InitInfraredEmitter()
 {
-    CALL_DEBUG_ENTER;
     MMI_HILOGI("Infrared emitter call ConsumerIr:fnCreate begin");
     sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> consumerIr =
         OHOS::HDI::Consumerir::V1_0::ConsumerIr::Get(CONSUMER_NAME);
