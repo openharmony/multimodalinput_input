@@ -28,6 +28,6 @@ enum FingerprintAction : i32 {
 
 struct FingerprintEvent {
   action: FingerprintAction;
-  distanceX: i32;
-  distanceY: i32;
+  distanceX: f64;
+  distanceY: f64;
 }

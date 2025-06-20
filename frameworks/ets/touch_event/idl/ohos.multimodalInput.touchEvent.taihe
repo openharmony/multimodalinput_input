@@ -50,12 +50,12 @@ enum FixedMode : i32 {
 
 struct Touch {
   id: i32;
-  pressedTime: i32;
+  pressedTime: i64;
   screenX: i32;
   screenY: i32;
   windowX: i32;
   windowY: i32;
-  pressure: i32;
+  pressure: f64;
   width: i32;
   height: i32;
   tiltX: i32;
