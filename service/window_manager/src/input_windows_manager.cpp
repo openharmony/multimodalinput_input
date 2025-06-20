@@ -7357,18 +7357,18 @@ int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
 int32_t InputWindowsManager::GetFocusPid()
 {
     CALL_DEBUG_ENTER;
-    int32_t focuscWindowId = GetFocusWindowId(MAIN_GROUPID);
-    int32_t focuscPid = GetPidByWindowId(focuscWindowId);
+    int32_t focusWindowId = GetFocusWindowId(MAIN_GROUPID);
+    int32_t focusPid = GetPidByWindowId(focusWindowId);
     if (udsServer_ == nullptr) {
         MMI_HILOGW("The udsServer is nullptr");
         return RET_ERR;
     }
-    SessionPtr sess = udsServer_->GetSessionByPid(focuscPid);
+    SessionPtr sess = udsServer_->GetSessionByPid(focusPid);
     if (sess == nullptr) {
         MMI_HILOGW("The sess is nullptr");
         return RET_ERR;
     }
-    return focuscPid;
+    return focusPid;
 }
 } // namespace MMI
 } // namespace OHOS

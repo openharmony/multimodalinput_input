@@ -296,7 +296,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerLoca
     int32_t displayId = -1;
     double displayX = 0.0;
     double displayY = 0.0;
-    int32_t ret = processor.SetPointerLocation(displayId, displayX, displayY);
+    int32_t ret = processor.GetPointerLocation(displayId, displayX, displayY);
     EXPECT_EQ(ret, RET_OK);
 }
 

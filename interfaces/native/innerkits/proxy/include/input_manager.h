@@ -683,7 +683,7 @@ public:
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1);
 
     /**
-     * @brief Gets the absolute coordinate of mouse.
+     * @brief Query pointer location.
      * @param displayId The displayId for the pointer location.
      * @param displayX The displayX for the pointer location.
      * @param displayY The displayY for the pointer location.
