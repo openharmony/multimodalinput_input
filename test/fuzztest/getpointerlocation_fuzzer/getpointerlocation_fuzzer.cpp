@@ -42,10 +42,11 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
 void GetPointerLocationFuzzTest(const uint8_t* data, size_t size)
 {
     size_t startPos = 0;
+    int32_t displayId = 0;
     double displayX = 0.0;
-    startPos += GetObject<int32_t>(displayX, data + startPos, size - startPos);
+    startPos += GetObject<double>(displayX, data + startPos, size - startPos);
     double displayY = 0.0;
-    startPos += GetObject<int32_t>(displayY, data + startPos, size - startPos);
+    startPos += GetObject<double>(displayY, data + startPos, size - startPos);
     MMI_HILOGD("Call InputManager::GetPointerLocation");
     InputManager::GetInstance()->GetPointerLocation(displayId, displayX, displayY);
 }
