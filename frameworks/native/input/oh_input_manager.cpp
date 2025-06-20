@@ -2756,7 +2756,7 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
     if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
         return INPUT_INJECTION_AUTHORIZED;
     }
-    if (recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZE) {
+    if (recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZED) {
         MMI_HILOGD("RequestInjection ok reqId:%{public}d", reqId);
         OHOS::MMI::InputManager::GetInstance()->InsertRequestInjectionCallback(reqId,
             [callback, reqId](int32_t status) {
@@ -2788,7 +2788,7 @@ Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
     AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(tmpStatus);
     if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION
         || recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED
-        || recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZE) {
+        || recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZED) {
             *status = Input_InjectionStatus::UNAUTHORIZED;
     } else if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION) {
         *status = Input_InjectionStatus::AUTHORIZING;
