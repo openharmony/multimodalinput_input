@@ -29,8 +29,8 @@ inline constexpr int32_t ERROR_NOT_SYSAPI { 202 };
 inline constexpr int32_t ERROR_DEVICE_NOT_EXIST { 3900001 };
 inline constexpr int32_t ERROR_OPERATION_FREQUENT { -1001 };
 inline constexpr int32_t ERROR_DEVICE_NOT_SUPPORTED { -1002 };
-inline constexpr int32_t ERROR_APP_NOT_FOCUSED { 3900009 };
-inline constexpr int32_t ERROR_DEVICE_NO_POINTER { 3900010 };
+inline constexpr int32_t ERROR_APP_NOT_FOCUSED { 39000009 };
+inline constexpr int32_t ERROR_DEVICE_NO_POINTER { 39000010 };
 
 enum class AUTHORIZE_QUERY_STATE : int32_t {
     OTHER_PID_IN_AUTHORIZATION_SELECTION = 0,

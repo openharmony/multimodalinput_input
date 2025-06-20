@@ -2808,11 +2808,11 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
     CHKPR(displayX, INPUT_PARAMETER_ERROR);
     CHKPR(displayY, INPUT_PARAMETER_ERROR);
     int32_t tmpDisplayId = 0;
-    double tmpX = 0;
-    double tmpY = 0;
+    double tmpX = 0.0;
+    double tmpY = 0.0;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetPointerLocation(tmpDisplayId, tmpX, tmpY);
-    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,tmpStatus:%{public}d", ret, tmpStatus);
     if (ret != RET_OK) {
+        MMI_HILOGE("Query pointer location failed, error:%{public}d", ret);
         if (ret == OHOS::MMI::ERROR_DEVICE_NO_POINTER) {
             MMI_HILOGE("The device has no pointer");
             return INPUT_DEVICE_NO_POINTER;

@@ -2131,7 +2131,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerLocation_001, TestSize.Lev
     int32_t displayId = -1;
     double displayX = 0.0;
     double displayY = 0.0;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetPointerLocation(displayId, displayX, displayY));
+    int32_t ret = InputManager::GetInstance()->GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(ret,RET_OK);
 }
 
 /**
