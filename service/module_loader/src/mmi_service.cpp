@@ -45,9 +45,9 @@
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #include "gesturesense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_RTOS_EXTRA
 #include "infrared_emitter_controller.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_RTOS_EXTRA
 #include "ipc_skeleton.h"
 #include "i_pointer_drawing_manager.h"
 #include "i_preference_manager.h"
@@ -4061,7 +4061,7 @@ ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         MMI_HILOGE("Infrared permission check failed");
         return ERROR_NO_PERMISSION;
     }
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_RTOS_EXTRA
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
@@ -4081,7 +4081,7 @@ ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("Data from hdf context:%{public}s", context.c_str());
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_RTOS_EXTRA
     return RET_OK;
 }
 
@@ -4092,7 +4092,7 @@ ErrCode MMIService::TransmitInfrared(int64_t number, const std::vector<int64_t>&
         MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
     }
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_RTOS_EXTRA
     std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
@@ -4103,7 +4103,7 @@ ErrCode MMIService::TransmitInfrared(int64_t number, const std::vector<int64_t>&
         MMI_HILOGE("Failed to transmit");
         return RET_ERR;
     }
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_RTOS_EXTRA
     return RET_OK;
 }
 
