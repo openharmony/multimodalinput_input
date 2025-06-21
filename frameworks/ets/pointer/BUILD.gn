@@ -28,9 +28,9 @@ config("pointer_config") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_pointer = "$taihe_file_path/out/$subsystem_name/$part_name/pointer"
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_pointer}"
   deps = [ ":pointer_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.pointer.ani.cpp",
@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
   ]
 }
 taihe_shared_library("Pointer") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_pointer}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
@@ -70,8 +70,8 @@ taihe_shared_library("Pointer") {
   }
 }
 generate_static_abc("pointer") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.pointer.ets" ]
+  base_url = "${taihe_generated_file_path_pointer}"
+  files = [ "${taihe_generated_file_path_pointer}/@ohos.multimodalInput.pointer.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/pointer.abc"
   dependencies = [ ":run_taihe" ]
