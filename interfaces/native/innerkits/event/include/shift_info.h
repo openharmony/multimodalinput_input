@@ -47,7 +47,6 @@ struct ShiftWindowParam : public Parcelable {
             return false;
         }
         if (!out.WriteInt32(sourceType)) {
-            
         }
         return true;
     }

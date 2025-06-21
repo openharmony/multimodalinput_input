@@ -129,7 +129,7 @@ public:
      *
        * @since 19
       */
-      static constexpr uint32_t EVENT_FLAG_KEYBOARD_ENTER_FOCUS = 0x00002000;
+    static constexpr uint32_t EVENT_FLAG_KEYBOARD_ENTER_FOCUS = 0x00002000;
      /**
       * The multimodal input event for device exit focus flag.
      *

@@ -480,7 +480,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     if (!sysUid.empty()) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
         NotifyDevRemoveCallbackExt(deviceId);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG  
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, sysUid, "remove");
         MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:remove",
