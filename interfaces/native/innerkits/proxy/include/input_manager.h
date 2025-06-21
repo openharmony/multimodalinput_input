@@ -683,6 +683,16 @@ public:
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1);
 
     /**
+     * @brief Query pointer location.
+     * @param displayId The displayId for the pointer location.
+     * @param displayX The displayX for the pointer location.
+     * @param displayY The displayY for the pointer location.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 20
+     */
+    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
+
+    /**
      * @brief 进入捕获模式
      * @param windowId 窗口id.
      * @return 进入捕获模式成功或失败.

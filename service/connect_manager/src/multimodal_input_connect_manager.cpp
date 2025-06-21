@@ -607,6 +607,13 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y, 
     return multimodalInputConnectService_->SetPointerLocation(x, y, displayId);
 }
 
+int32_t MultimodalInputConnectManager::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetPointerLocation(displayId, displayX, displayY);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;

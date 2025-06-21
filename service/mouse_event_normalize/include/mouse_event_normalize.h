@@ -45,6 +45,7 @@ public:
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t dispiayId);
+    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
     int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const;
     void GetTouchpadScrollSwitch(bool &switchFlag) const;
     int32_t SetTouchpadScrollDirection(bool state) const;

@@ -119,6 +119,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void GetFunctionKeyState([in] int funckey, [out] boolean state);
     void SetFunctionKeyState([in] int funcKey, [in] boolean enable);
     void SetPointerLocation([in] int x, [in] int y, [in] int displayId);
+    void GetPointerLocation([out] int displayId, [out] double displayX, [out] double displayY);
     void ClearWindowPointerStyle([in] int pid, [in] int windowId);
     void SetMouseCaptureMode([in] int windowId, [in] boolean isCaptureMode);
     void GetWindowPid([in] int windowId, [out] int windowPid);

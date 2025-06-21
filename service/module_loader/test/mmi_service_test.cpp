@@ -1100,5 +1100,22 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnAppDebugStoped_01, TestSize.Level1)
     listener.appDebugPid_ = 4;
     ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
 }
+
+/**
+ * @tc.name: MMIServerTest_GetPointerLocation_001
+ * @tc.desc: Test the function GetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetPointerLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    int32_t ret = mmiService.GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(ret, ERROR_APP_NOT_FOCUSED);
+}
 } // namespace MMI
 } // namespace OHOS

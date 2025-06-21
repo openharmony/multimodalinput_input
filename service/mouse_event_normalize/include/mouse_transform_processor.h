@@ -171,6 +171,7 @@ public:
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
     static int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId);
+    static int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
     static int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag);
     static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);

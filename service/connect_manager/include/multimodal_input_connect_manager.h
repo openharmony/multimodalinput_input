@@ -115,6 +115,7 @@ public:
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId);
+    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     int32_t GetWindowPid(int32_t windowId);
     int32_t AppendExtraData(const ExtraData& extraData);

@@ -2023,6 +2023,21 @@ int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y, int32_t displ
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerLocation(displayId, displayX, displayY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get Pointer Location failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
 int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
 {
     CALL_INFO_TRACE;
