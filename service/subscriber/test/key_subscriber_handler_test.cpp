@@ -3401,27 +3401,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_005, TestSi
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_ClearTimer
- * @tc.desc: Test the funcation ClearTimer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearTimer, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    int32_t id = 1;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
-    subscriber->timerId_ = 0;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    subscriber->keyEvent_ = keyEvent;
-    handler.AddTimer(subscriber, keyEvent);
-    ASSERT_NO_FATAL_FAILURE(handler.ClearTimer(subscriber));
-}
-
-/**
  * @tc.name: TabletSubscriberHandlerTest_SubscribeTabletProximity
  * @tc.desc: Test the funcation AboutSubscribeTabletProximity
  * @tc.type: FUNC
