@@ -9931,7 +9931,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_00
 
 /**
  * @tc.name: InputWindowsManagerTest_IsCaptureMode_001
- * @tc.desc: est case for IsCaptureMode when screenshot window exists
+ * @tc.desc: Test case for IsCaptureMode when screenshot window exists
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_001, TestSize.Level1)
@@ -9983,7 +9983,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_003, Tes
 
 /**
  * @tc.name: InputWindowsManagerTest_IsCaptureMode_004
- * @tc.desc: TTest case for IsCaptureMode when no special windows exist
+ * @tc.desc: Test case for IsCaptureMode when no special windows exist
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_004, TestSize.Level1)
