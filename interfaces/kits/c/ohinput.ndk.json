@@ -514,7 +514,7 @@
     {
         "first_introduced": "20",
         "name": "OH_Input_QueryAuthorizedStatus"
-    }
+    },
     {
         "first_introduced": "20",
         "name": "OH_Input_GetPointerLocation"
