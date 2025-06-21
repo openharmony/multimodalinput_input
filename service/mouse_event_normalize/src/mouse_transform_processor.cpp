@@ -1279,6 +1279,17 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_
     return RET_OK;
 }
 
+int32_t MouseTransformProcessor::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
+{
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    displayId = mouseInfo.displayId;
+    displayX = mouseInfo.physicalX;
+    displayY = mouseInfo.physicalY;
+    MMI_HILOGD("Cursor pointer location displayId:%{public}d, displayX:%{private}f, displayY:%{private}f",
+        displayId, displayX, displayY);
+    return RET_OK;
+}
+
 #ifndef OHOS_BUILD_ENABLE_WATCH
 void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
