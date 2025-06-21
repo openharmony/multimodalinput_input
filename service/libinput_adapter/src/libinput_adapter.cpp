@@ -156,8 +156,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         } else {
             id = std::stoi(match[0]);
         }
-        MMI_HILOGWK("Libinput .open_restricted id:%{public}d, fd:%{public}d, errno:%{public}d",
-            id, fd, errNo);
+        MMI_HILOGWK("Libinput .open_restricted id:%{public}d, fd:%{public}d, errno:%{public}d", id, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
@@ -873,6 +872,5 @@ void LibinputAdapter::OnDeviceRemoved(std::string path)
         OnEventHandler();
     }
 }
-///add
 } // namespace MMI
 } // namespace OHOS

@@ -1240,7 +1240,7 @@ void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &curs
     InputHandler->GetFilterHandler()->HandlePointerEvent(pointerBackCenterEvent);
 }
 
-CursorPosition  InputWindowsManager::ResetCursorPos(const DisplayGroupInfo &displayGroupInfo)
+CursorPosition InputWindowsManager::ResetCursorPos(const DisplayGroupInfo &displayGroupInfo)
 {
     int32_t groupId = displayGroupInfo.groupId;
     if (!displayGroupInfo.displaysInfo.empty()) {
@@ -1590,7 +1590,7 @@ void InputWindowsManager::CancelMouseEvent()
             lastPointerEventCopy->UpdatePointerItem(pointerId, item);
         }
         MMI_HILOGI("Cancel mouse event for valid display change,pointerId:%{public}d action:%{public}d->%{public}d "
-                   "isItemExist=%{public}d",
+            "isItemExist=%{public}d",
             pointerId,
             originAction,
             action,
@@ -1873,8 +1873,8 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     if (cursorPosCur.displayDirection != displayInfo->displayDirection) {
         MMI_HILOGI("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
-        "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
-        "dpi:%{public}d, name:%{public}s, uniq:%{public}s, direction:%{public}d, displayDirection:%{public}d",
+            "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
+            "dpi:%{public}d, name:%{public}s, uniq:%{public}s, direction:%{public}d, displayDirection:%{public}d",
             cursorPosCur.displayId, cursorPosCur.cursorPos.x,
             cursorPosCur.cursorPos.y, cursorPosCur.direction,
             displayInfo->id, displayInfo->x, displayInfo->y, displayInfo->width, displayInfo->height,
@@ -2041,7 +2041,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     for (auto displayInfo : displayGroupInfo.displaysInfo) {
         if (displayInfo.uniqueId == currentDisplayInfo.uniqueId && displayInfo.dpi != currentDisplayInfo.dpi) {
             MMI_HILOGD("dpi changed, current displayId: %{public}d, dpi: %{public}d, "
-            "latest displayId: %{public}d, dpi: %{public}d",
+                "latest displayId: %{public}d, dpi: %{public}d",
             currentDisplayInfo.uniqueId, currentDisplayInfo.dpi, displayInfo.uniqueId, displayInfo.dpi);
             auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
             if (drawNewDpiRes != RET_OK) {
@@ -2492,7 +2492,7 @@ void InputWindowsManager::PrintEnterEventInfo(std::shared_ptr<PointerEvent> poin
         pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
         auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent->GetDeviceId());
         CHKPV(device);
-        MMI_HILOGE("leave-window type:%{public}d,id:%{public}d,pointerid:%{public}d,action:%{public}d by:%{public}s",
+        MMI_HILOGE("leave-window type:%{public}d, id:%{public}d, pointerid:%{public}d, action:%{public}d by:%{public}s",
             pointerEvent->GetSourceType(), pointerEvent->GetId(), pointerEvent->GetPointerId(),
             pointerAc, device->GetName().c_str());
     }
@@ -2606,10 +2606,10 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
     std::string window;
     window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
-            "area.x:%d,area.y:%d,area.width:%{public}d,area.height:%{public}d,"
-            "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
+        MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, uid:%{public}d,"
+            "area.x:%d,area.y:%d,area.width:%{public}d, area.height:%{public}d,"
+            "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu,"
+            "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d,"
             "zOrder:%{public}f, privacyMode:%{public}d",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
@@ -2654,7 +2654,7 @@ void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGrou
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
+    MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d, displayId:%{public}d",
         windowGroupInfo.focusWindowId, windowGroupInfo.displayId);
     PrintWindowInfo(windowGroupInfo.windowsInfo);
 }
@@ -2664,8 +2664,8 @@ void InputWindowsManager::PrintDisplayGroupInfo(const DisplayGroupInfo displayGr
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d,"
-               "windowsInfosNum:%{public}zu,displayInfosNum:%{public}zu",
+    MMI_HILOGD("logicalInfo, width:%{public}d, height:%{public}d, focusWindowId:%{public}d,"
+               "windowsInfosNum:%{public}zu, displayInfosNum:%{public}zu",
         displayGroupInfo.width,
         displayGroupInfo.height,
         displayGroupInfo.focusWindowId,
@@ -2682,12 +2682,12 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("displayInfo{id:%{public}d,name:%{public}s,uniq:%{public}s "
+    MMI_HILOGD("displayInfo{id:%{public}d, name:%{public}s, uniq:%{public}s "
                "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
                "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
-               "direction:%{public}d,displayDirection:%{public}d,fixedDirection:%{public}d} "
+               "direction:%{public}d, displayDirection:%{public}d, fixedDirection:%{public}d} "
                "oneHandXY:{%{private}d %{private}d},"
-               "pointerActiveWidth:%{private}d,pointerActiveHeight:%{private}d",
+               "pointerActiveWidth:%{private}d, pointerActiveHeight:%{private}d",
         displayInfo.id,
         displayInfo.name.c_str(),
         displayInfo.uniq.c_str(),
@@ -2739,7 +2739,7 @@ const std::shared_ptr<DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(
             }
         }
     }
-    MMI_HILOGD("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
+    MMI_HILOGD("Failed to search for Physical, uniq:%{public}s", uniq.c_str());
     DisplayGroupInfo displayGroupInfo;
     auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end()) {
@@ -3546,7 +3546,7 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
     for (const auto &item : rects) {
         if (item.width == 0 || item.height == 0) {
             MMI_HILOGD("The width or height of hotArea is 0, width: %{public}d, height: %{public}d, "
-            "areaNum: %{public}d", item.width, item.height, areaNum);
+                "areaNum: %{public}d", item.width, item.height, areaNum);
             areaNum++;
             continue;
         }
@@ -3851,7 +3851,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
     for (const auto& item : WindowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
-                       "window:%{public}d, flags:%{public}d", item.id, item.flags);
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
             return std::make_optional(item);
@@ -4101,8 +4101,8 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
             if (device != nullptr) {
                 deviceName = device->GetName();
             }
-            MMI_HILOGE("Not mouse event id:%{public}d,PI:%{public}d,AC:%{public}d,wid:%{public}d by:%{public}s,"
-                " SI:%{public}s,PC:%{public}zu, LastEvent id:%{public}d,PI:%{public}d,AC:%{public}d,wid:%{public}d",
+            MMI_HILOGE("Not mouse event id:%{public}d, PI:%{public}d, AC:%{public}d, wid:%{public}d by:%{public}s,"
+                " SI:%{public}s, PC:%{public}zu, LastEvent id:%{public}d, PI:%{public}d, AC:%{public}d, wid:%{public}d",
                 pointerEvent->GetId(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction(),
                 pointerEvent->GetTargetWindowId(), deviceName.c_str(), isSimulate.c_str(), pointerIds.size(),
                 lastPointerEvent_->GetId(), lastPointerEvent_->GetPointerId(), lastPointerEvent_->GetPointerAction(),
@@ -4539,11 +4539,11 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
         }
         if (inputDevice != nullptr) {
             MMI_HILOGD("name:%{public}s type:%{public}d bus:%{public}d, "
-                       "version:%{public}d product:%{public}d vendor:%{public}d, "
-                       "phys:%{public}s uniq:%{public}s",
-                       inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
-                       inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
-                       inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
+                "version:%{public}d product:%{public}d vendor:%{public}d, "
+                "phys:%{public}s uniq:%{public}s",
+                inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
+                inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
         }
         if (inputDevice != nullptr && inputDevice->GetBus() == BUS_USB) {
             return true;
@@ -4650,7 +4650,7 @@ void InputWindowsManager::HandleOneHandMode(const DisplayInfo &displayInfo,
 {
     pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     MMI_HILOG_DISPATCHD("displayInfo.oneHandX=%{private}d, displayInfo.oneHandY=%{private}d, "
-                        "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
+        "expandHeight=%{public}d,scalePercent=%{public}d, fixedModeStr=%{public}s",
         displayInfo.oneHandX, displayInfo.oneHandY, displayInfo.expandHeight, displayInfo.scalePercent,
         pointerEvent->GetFixedModeStr().c_str());
     double fixedDisplayX = pointerItem.GetDisplayXPos();
@@ -5562,7 +5562,6 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
     pointerEvent->SetTargetWindowId(windowInfo->id);
     pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOG_DISPATCHD("focusWindow:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
-
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
@@ -5738,7 +5737,7 @@ bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, double
     bool isInside = (physicalX >= 0 && physicalX < physicalRect.x) && (physicalY >= 0 && physicalY < physicalRect.y);
     PrintDisplayInfo(displayInfo);
     MMI_HILOGD("isInside:%{public}d physicalXY={%{private}f %{private}f} "
-               "physicalRect={%{public}d %{public}d} useDirection:%{public}d}",
+        "physicalRect={%{public}d %{public}d} useDirection:%{public}d}",
         static_cast<int32_t>(isInside),
         physicalX,
         physicalY,
@@ -5947,7 +5946,7 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
 {
     const Direction direction = info.direction;
     MMI_HILOGD("X:%{private}.2f, Y:%{private}.2f, offsetXY={%{private}d %{private}d},"
-               "info.WH:{%{private}d %{private}d} info.validWH:{%{private}d %{private}d}",
+        "info.WH:{%{private}d %{private}d} info.validWH:{%{private}d %{private}d}",
         x,
         y,
         info.offsetX,
@@ -6118,7 +6117,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         physicalY = posMap->second.cursorPos.y;
     }
     MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{public}d, %{public}d}, "
-               "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{private}.2f}",
+        "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{private}.2f}",
         static_cast<int32_t>(isRealData), displayId, mouseLocationTmp.physicalX,
         mouseLocationTmp.physicalY, oldX, oldY, physicalX, physicalY);
 }
@@ -6146,7 +6145,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
             curMouseLocation = iter->second;
         }
         MMI_HILOGD("Mouselocation displayinfo: displayId:%{public}d, W:%{public}d, H:%{public}d",
-        displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
+            displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
         return curMouseLocation;
     }
     MMI_HILOGD("Mouselocation next: displayId:%{public}d, X:%{public}d, Y:%{public}d",
@@ -6316,15 +6315,15 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<DisplayI
     mprintf(fd, "displayInfos,num:%zu", displaysInfo.size());
     for (const auto &item : displaysInfo) {
         mprintf(fd, "\t displayInfos: uniqueId:%d | screenCombination:%d id:%d | x:%d"
-                    "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
-                    "| displayDirection:%d | displayMode:%u \t",
-                    item.uniqueId, item.screenCombination, item.id, item.x, item.y, item.width,
-                    item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
-                    item.displayDirection, item.displayMode);
+            "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
+            "| displayDirection:%d | displayMode:%u \t",
+            item.uniqueId, item.screenCombination, item.id, item.x, item.y, item.width,
+            item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
+            item.displayDirection, item.displayMode);
         if (item.transform.size() == MATRIX3_SIZE) {
             mprintf(fd, "\t transform: scaleX:%f | scaleY:%f | anchorPointX:%f | anchorPointY:%f \t",
-                    item.transform[SCALE_X], item.transform[SCALE_Y], item.transform[ANCHOR_POINT_X],
-                    item.transform[ANCHOR_POINT_Y]);
+                item.transform[SCALE_X], item.transform[SCALE_Y], item.transform[ANCHOR_POINT_X],
+                item.transform[ANCHOR_POINT_Y]);
         }
     }
 }
@@ -6352,19 +6351,19 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "windowsInfos,num:%zu", windowsInfo.size());
     for (const auto &item : windowsInfo) {
         mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
-                "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
-                "| action:%d | displayId:%d | zOrder:%f \t",
-                item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
-                item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-                item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
+            "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
+            "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
+            "| action:%d | displayId:%d | zOrder:%f \t",
+            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
         for (const auto &win : item.defaultHotAreas) {
             mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                    win.x, win.y, win.width, win.height);
+                win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
             mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                    pointer.x, pointer.y, pointer.width, pointer.height);
+                pointer.x, pointer.y, pointer.width, pointer.height);
         }
 
         std::string dump;
@@ -6956,7 +6955,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
             for (const auto& item : iter->second.windowsInfo) {
                 CHKCC(item.id == windowId &&
                     (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) != WindowInfo::FLAG_BIT_UNTOUCHABLE &&
-                    transparentWins_.find(item.id) == transparentWins_.end());    
+                    transparentWins_.find(item.id) == transparentWins_.end());
                 return std::make_optional(item);
             }
         }
@@ -7099,7 +7098,7 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
 int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     MMI_HILOGI("Start shift pointer event, sourceWindowId:%{public}d, targetWindowId:%{public}d,"
-               "x:%{private}d, y:%{private}d, autoGenDown:%{public}d",
+        "x:%{private}d, y:%{private}d, autoGenDown:%{public}d",
         param.sourceWindowId, param.targetWindowId, param.x, param.y, static_cast<int32_t>(autoGenDown));
     std::optional<WindowInfo> sourceWindowInfo = GetWindowInfoById(param.sourceWindowId);
     std::optional<WindowInfo> targetWindowInfo = GetWindowInfoById(param.targetWindowId);

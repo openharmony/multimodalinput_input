@@ -48,7 +48,7 @@ public:
 HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor  deviceEventMonitor;
+    DeviceEventMonitor deviceEventMonitor;
     deviceEventMonitor.hasInit_ = true;
     EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.InitCommonEventSubscriber());
 }
@@ -61,7 +61,7 @@ HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_001, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor  deviceEventMonitor;
+    DeviceEventMonitor deviceEventMonitor;
     deviceEventMonitor.hasInit_ = false;
     EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.InitCommonEventSubscriber());
 }

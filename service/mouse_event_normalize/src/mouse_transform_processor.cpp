@@ -802,7 +802,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     if (PRODUCT_TYPE == DEVICE_TYPE_M_PC) {
         deviceType = DeviceType::DEVICE_M_PC;
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2 || 
+    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2 ||
         PRODUCT_TYPE == DEVICE_TYPE_M_TABLET3) {
         deviceType = DeviceType::DEVICE_M_TABLET;
     }
@@ -1201,8 +1201,7 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     CHKPV(pointerEvent_);
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
     mprintf(fd, "Mouse device state information:\t");
-    mprintf(fd,
-            "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
+    mprintf(fd, "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
             "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
