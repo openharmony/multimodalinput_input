@@ -1095,6 +1095,5 @@ HWTEST_F(InputManagerImplTest, SubscribeInputActive_Test001, TestSize.Level1)
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 }
-
 } // namespace MMI
 } // namespace OHOS
