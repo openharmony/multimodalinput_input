@@ -2394,7 +2394,6 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     DrawManager();
     auto surfaceNodePtr = GetSurfaceNode();
     if (!hasPointerDevice_ && (surfaceNodePtr != nullptr)) {
-        currentMouseStyle_.id = MOUSE_ICON::TRANSPARENT_ICON;
         if (GetHardCursorEnabled()) {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto sp : screenPointers_) {
@@ -2406,7 +2405,6 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         MMI_HILOGD("Pointer window destroy start");
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
-        lastMouseStyle_.id = MOUSE_ICON::TRANSPARENT_ICON;
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
@@ -2547,7 +2545,6 @@ void PointerDrawingManager::UpdatePointerVisible()
         MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}d",
             mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
-        currentMouseStyle_.id = MOUSE_ICON::TRANSPARENT_ICON;
         if (GetHardCursorEnabled()) {
             PostSoftCursorTask([this]() {
                 SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
@@ -2555,7 +2552,6 @@ void PointerDrawingManager::UpdatePointerVisible()
             HideHardwareCursors();
         }
         surfaceNodePtr->SetVisible(false);
-        lastMouseStyle_.id = MOUSE_ICON::TRANSPARENT_ICON;
         MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}d",
             mouseDisplayState_ ? "true" : "false", displayId_);
     }
