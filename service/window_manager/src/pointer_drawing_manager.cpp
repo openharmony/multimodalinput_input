@@ -1123,16 +1123,12 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         return;
     }
     if (!IsPointerVisible() || !mouseDisplayState_) {
-        MMI_HILOGE("Mouse is hide, stop vsync");
+        MMI_HILOGE("Mouse is hide, stop request vsync");
         return;
     }
     PostTask([this]() -> void {
         if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
             MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
-            return;
-        }
-        if (!IsPointerVisible() || !mouseDisplayState_) {
-            MMI_HILOGE("Mouse is hide, no need to draw");
             return;
         }
 
