@@ -2142,12 +2142,12 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
-    int32_t pid, bool isNativeInject, bool isShell)
+    int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell);
+    return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell, useCoordinate);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -2165,7 +2165,7 @@ int32_t MMIService::CheckTouchPadEvent(const std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject)
+ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -2186,8 +2186,8 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
     ret = InjectPointerEventExt(pointerEventPtr, pid, isNativeInject, isShell);
 #else
     ret = delegateTasks_.PostSyncTask(
-        [this, pointerEventPtr, pid, isNativeInject, isShell] {
-            return this->CheckInjectPointerEvent(pointerEventPtr, pid, isNativeInject, isShell);
+        [this, pointerEventPtr, pid, isNativeInject, isShell, useCoordinate] {
+            return this->CheckInjectPointerEvent(pointerEventPtr, pid, isNativeInject, isShell, useCoordinate);
         }
         );
 #endif // OHOS_BUILD_ENABLE_ANCO

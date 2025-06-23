@@ -255,20 +255,15 @@ struct EventJoyStickAxis {
     EventJoyStickAxisAbsInfo abs_wheel;
 };
 
-struct NormalizedCoords {
-    double x {};
-    double y {};
+struct MMICoordinate2D  {
+    double x { 0.0f };
+    double y { 0.0f };
 };
 
-struct PhysicalCoordinate {
-    double x {};
-    double y {};
-};
-
-struct LogicalCoordinate {
-    int32_t x {};
-    int32_t y {};
-};
+using NormalizedCoords = MMICoordinate2D;
+using PhysicalCoordinate = MMICoordinate2D;
+using LogicalCoordinate = MMICoordinate2D;
+using GlobalCoords = MMICoordinate2D;
 
 struct LogicalRectangle {
     LogicalCoordinate point;
@@ -403,6 +398,7 @@ struct EventTouch {
     int32_t seatSlot {};
     PhysicalCoordinate coordF {};
     LogicalCoordinate point {};
+    GlobalCoords globalCoord {}; // 全局坐标
     LogicalRectangle toolRect {};
     DEVICE_TYPE deviceType { DEVICE_TYPE::DEVICE_TYPE_UNKNOWN };
     double pressure {};

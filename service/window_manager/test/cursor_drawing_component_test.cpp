@@ -120,7 +120,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawPointer_001,
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateDisplayInfo_001, TestSize.Level1)
 {
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.x =1;
     displayInfo.y = 1;
@@ -128,7 +128,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateDisplayInf
     displayInfo.height = 2;
     displayInfo.dpi = 240;
     displayInfo.name = "pp";
-    displayInfo.uniq = "pp";
     displayInfo.direction = DIRECTION0;
     displayInfo.displayMode = DisplayMode::FULL;
     EXPECT_NO_FATAL_FAILURE(instance_->UpdateDisplayInfo(displayInfo));
@@ -156,12 +155,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_OnWindowInfo_001
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_OnDisplayInfo_001, TestSize.Level1)
 {
-    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 0;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.x =1;
     displayInfo.y = 1;

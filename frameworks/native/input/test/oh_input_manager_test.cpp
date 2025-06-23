@@ -1944,7 +1944,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_QueryMaxTouchPoints_002, TestSiz
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_MouseEventGlobalCoordinates, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchMouseGlobalCoordinates, TestSize.Level1)
 {
     Input_MouseEvent mouseEvent;
     OH_Input_SetMouseEventGlobalX(&mouseEvent, DEFAULT_GLOBAL_X);

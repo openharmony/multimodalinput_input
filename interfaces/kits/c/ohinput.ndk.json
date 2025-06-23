@@ -566,5 +566,13 @@
     {
         "first_introduced": "20",
         "name": "OH_Input_GetAxisEventGlobalY"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_InjectMouseEventGlobal"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_InjectTouchEventGlobal"
     }
 ]

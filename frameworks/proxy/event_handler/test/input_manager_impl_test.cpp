@@ -411,9 +411,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_01, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo {};
-    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
-    EXPECT_TRUE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.empty());
-    EXPECT_TRUE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.empty());
+    InputMgrImpl.userScreenInfo_.displayGroups.push_back(displayGroupInfo);
+    EXPECT_TRUE(InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].windowsInfo.empty());
+    EXPECT_TRUE(InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 
@@ -427,20 +427,20 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_02, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo {};
-    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].width = 50;
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].height = 60;
+    InputMgrImpl.userScreenInfo_.displayGroups.push_back(displayGroupInfo);
+    DisplayInfo displayInfo;
+    displayInfo.width = 50;
+    displayInfo.height = 60;
+    InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.pid = 2;
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.empty());
-
-    DisplayInfo displayInfo;
+    InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].windowsInfo.empty());
     displayInfo.width = 10;
     displayInfo.height = 20;
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.empty());
+    InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
+    EXPECT_FALSE(InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.empty());
 
     EXPECT_TRUE(InputMgrImpl.anrObservers_.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
@@ -459,9 +459,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_03, TestSize.Lev
     displayInfo.width = 10;
     displayInfo.height = 20;
     DisplayGroupInfo displayGroupInfo {};
-    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].displaysInfo.empty());
+    InputMgrImpl.userScreenInfo_.displayGroups.push_back(displayGroupInfo);
+    InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
+    EXPECT_FALSE(InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 
@@ -475,14 +475,16 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_04, TestSize.Lev
 {
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo {};
-    InputMgrImpl.displayGroupInfoArray_.push_back(displayGroupInfo);
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].width = 50;
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].height = 60;
+    InputMgrImpl.userScreenInfo_.displayGroups.push_back(displayGroupInfo);
+    DisplayInfo displayInfo;
+    displayInfo.width = 50;
+    displayInfo.height = 60;
+    InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].displaysInfo.push_back(displayInfo);
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.pid = 2;
-    InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(InputMgrImpl.displayGroupInfoArray_[DEFAULT_GROUP_ID].windowsInfo.empty());
+    InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(InputMgrImpl.userScreenInfo_.displayGroups[DEFAULT_GROUP_ID].windowsInfo.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 
@@ -736,24 +738,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeLongPressEvent, T
     CALL_TEST_DEBUG;
     int32_t subscriberId = 0;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UnsubscribeLongPressEvent(subscriberId));
-}
-
-/**
- * @tc.name  : PrintForemostThreeWindowInfo_WhenMoreThanThreeWindowsExist
- * @tc.desc  : Test PrintForemostThreeWindowInfo method when there are more than three windows
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerImplTest, PrintForemostThreeWindowInfo_WhenMoreThanThreeWindowsExist, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::vector<WindowInfo> windowsInfo;
-    for (int i = 0; i < 5; i++) {
-        WindowInfo windowInfo;
-        windowInfo.action = WINDOW_UPDATE_ACTION::UNKNOWN;
-        windowsInfo.push_back(windowInfo);
-    }
-    InputMgrImpl.PrintForemostThreeWindowInfo(windowsInfo);
 }
 
 /**

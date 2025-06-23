@@ -52,8 +52,7 @@ public:
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
-    int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
-    int32_t UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo);
+    int32_t UpdateDisplayInfo(const UserScreenInfo &userScreenInfo);
     int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
@@ -102,7 +101,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t PackDisplayData(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
+    int32_t PackDisplayData(NetPacket &pkt, const UserScreenInfo &userScreenInfo);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
@@ -126,7 +125,8 @@ public:
     int32_t RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
-    int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
+    int32_t SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false,
+        int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
@@ -259,15 +259,20 @@ public:
     int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
 
 private:
-    int32_t PackWindowInfo(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo);
+    int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
+    int32_t PackDisplayGroupsInfo(NetPacket &pkt, const std::vector<DisplayGroupInfo> &displayGroups);
+    int32_t PackDisplaysInfo(NetPacket &pkt, const std::vector<DisplayInfo>& displaysInfo);
+    int32_t PackWindowInfo(NetPacket &pkt, const std::vector<WindowInfo> &windowsInfo);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
-    int32_t PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+
     int32_t PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void PrintWindowGroupInfo();
-    int32_t SendDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void PrintDisplayInfo(const UserScreenInfo &userScreenInfo);
+    void PrintScreens(const std::vector<ScreenInfo>& screens);
+    void PrintDisplayGroups(const std::vector<DisplayGroupInfo>& displayGroups);
+    void PrintDisplaysInfo(const std::vector<DisplayInfo>& displaysInfo);
+    int32_t SendDisplayInfo(const UserScreenInfo &userScreenInfo);
     int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
@@ -312,7 +317,7 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::function<void(int32_t, int32_t)> windowStatecallback_;
     bool knuckleSwitch_ { true };
-    std::vector<DisplayGroupInfo> displayGroupInfoArray_;
+    UserScreenInfo userScreenInfo_;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

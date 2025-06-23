@@ -137,7 +137,6 @@ DisplayInfo InputManagerUpdateDisplayInfoTest::CreateDisplayInfo(int32_t id) con
     displayinfo.height = DISPLAYINFO_HEIGHT;
     displayinfo.dpi = DISPLAYINFO_DPI;
     displayinfo.name = "pp";
-    displayinfo.uniq = "pp";
     displayinfo.direction = DIRECTION0;
     return displayinfo;
 }
@@ -157,8 +156,8 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     ASSERT_NE(pixelMap, nullptr);
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     DisplayInfo displayinfo = CreateDisplayInfo(0);
     displayGroupInfo.displaysInfo.push_back(displayinfo);
     WindowInfo info;
@@ -176,7 +175,22 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     info.displayId = 0;
     info.pixelMap = pixelMap.get();
     displayGroupInfo.windowsInfo.push_back(info);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+
+    UserScreenInfo userScreenInfo;
+    ScreenInfo screenInfo;
+    screenInfo.screenType =(ScreenType)info.windowType;
+    screenInfo.dpi = displayinfo.dpi;
+    screenInfo.height = info.area.height;
+    screenInfo.width = info.area.width;
+    screenInfo.physicalWidth = dgw;
+    screenInfo.physicalHeight = dgh;
+    screenInfo.id = displayinfo.id;
+    screenInfo.rotation = Rotation::ROTATION_0;
+    screenInfo.tpDirection = Direction::DIRECTION0;
+    screenInfo.uniqueId = displayinfo.name;
+    userScreenInfo.screens.push_back(screenInfo);
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 
 /**
@@ -198,8 +212,8 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     ASSERT_NE(pixelMap, nullptr);
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     DisplayInfo displayinfo = CreateDisplayInfo(0);
     displayGroupInfo.displaysInfo.push_back(displayinfo);
     WindowInfo info;
@@ -219,7 +233,23 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     int32_t displayX = width / 2;
     int32_t displayY = height / 2;
     CheckMaskDisplayPoint(pixelMap.get(), displayX, displayY);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+
+    UserScreenInfo userScreenInfo;
+    ScreenInfo screenInfo;
+    screenInfo.screenType =(ScreenType)info.windowType;
+    screenInfo.dpi = displayinfo.dpi;
+    screenInfo.height = info.area.height;
+    screenInfo.width = info.area.width;
+    screenInfo.physicalWidth = dgw;
+    screenInfo.physicalHeight = dgh;
+    screenInfo.id = displayinfo.id;
+    screenInfo.rotation = Rotation::ROTATION_0;
+    screenInfo.tpDirection = Direction::DIRECTION0;
+    screenInfo.uniqueId = displayinfo.name;
+    userScreenInfo.screens.push_back(screenInfo);
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 
 /**
@@ -233,8 +263,8 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 0;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     DisplayInfo displayinfo = CreateDisplayInfo(0);
     displayinfo.direction = DIRECTION0;
     displayinfo.displayMode = DisplayMode::FULL;
@@ -242,6 +272,7 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     std::vector<std::vector<int32_t>> maskSizeMatrix = { { 100, 300 }, { 30, 30 }, { 50, 50 }, { 80, 80 }, { 10, 8 },
         { 5, 20 }, { 6, 10 }, { 30, 30 }, { 20, 30 }, { 40, 10 } };
     std::vector<std::shared_ptr<OHOS::Media::PixelMap>> vecPixelMap;
+    std::vector<ScreenInfo> screenInfos;
     for (uint32_t i = 0; i < maskSizeMatrix.size(); i++) {
         ASSERT_EQ(maskSizeMatrix[i].size(), 2);
         ASSERT_GE(maskSizeMatrix[i][0], 2);
@@ -276,8 +307,23 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
         int32_t displayX = maskSizeMatrix[i][0] / 2;
         int32_t displayY = maskSizeMatrix[i][1] / 2;
         CheckMaskDisplayPoint(pixelMap.get(), displayX, displayY);
+        ScreenInfo screenInfo;
+        screenInfo.screenType =(ScreenType)info.windowType;
+        screenInfo.dpi = displayinfo.dpi;
+        screenInfo.height = info.area.height;
+        screenInfo.width = info.area.width;
+        screenInfo.physicalWidth = dgw;
+        screenInfo.physicalHeight = dgh;
+        screenInfo.id = displayinfo.id;
+        screenInfo.rotation = Rotation::ROTATION_0;
+        screenInfo.tpDirection = Direction::DIRECTION0;
+        screenInfo.uniqueId = displayinfo.name;
+        screenInfos.push_back(screenInfo);
     }
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    userScreenInfo.screens = screenInfos;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 
 /**
@@ -291,9 +337,10 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     std::vector<std::shared_ptr<OHOS::Media::PixelMap>> vecPixelMap;
+    std::vector<ScreenInfo> screenInfos;
     std::vector<std::vector<int32_t>> maskSizeMatrix = { { 800, 600 }, { 1024, 1024 } };
     for (uint32_t i = 0; i < maskSizeMatrix.size(); i++) {
         DisplayInfo displayinfo = CreateDisplayInfo(i);
@@ -324,8 +371,26 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
         int32_t displayX = maskSizeMatrix[i][1] / 2;
         int32_t displayY = maskSizeMatrix[i][0] / 2;
         CheckMaskDisplayPoint(pixelMap.get(), displayX, displayY);
+                
+        ScreenInfo screenInfo;
+        screenInfo.screenType =(ScreenType)info.windowType;
+        screenInfo.dpi = displayGroupInfo.displaysInfo[i].dpi;
+        screenInfo.height = displayGroupInfo.displaysInfo[i].height;
+        screenInfo.width = displayGroupInfo.displaysInfo[i].width;
+        screenInfo.physicalWidth = dgw;
+        screenInfo.physicalHeight = dgh;
+        screenInfo.id = displayGroupInfo.displaysInfo[i].id;
+        screenInfo.rotation = Rotation::ROTATION_0;
+        screenInfo.tpDirection = Direction::DIRECTION0;
+        screenInfo.uniqueId = displayGroupInfo.displaysInfo[i].name;
+        screenInfos.push_back(screenInfo);
     }
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    userScreenInfo.screens = screenInfos;
+    InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 } // namespace MMI
 } // namespace OHOS

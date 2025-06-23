@@ -61,7 +61,7 @@ public:
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
+    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject, int32_t useCoordinate);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,

@@ -17,6 +17,7 @@
 #define POINTER_EVENT_H
 
 #include <array>
+#include <cfloat>
 #include <list>
 #include <set>
 #include <unordered_map>
@@ -221,6 +222,14 @@ public:
     static constexpr int32_t TOUCH_ACTION_PINCH_CLOSEED = 105;
 
     static constexpr int32_t TOUCH_ACTION_GESTURE_END = 106;
+
+    /**
+     *
+     * @since 20
+     */
+    static constexpr int32_t DISPLAY_COORDINATE = 0;
+
+    static constexpr int32_t GLOBAL_COORDINATE = 1;
 
     enum AxisType {
         /**
@@ -891,6 +900,13 @@ public:
          * @since 20
          */
         double GetGlobalY() const;
+
+        /**
+         * @brief Whether the global coordinates are valid.
+         * @return bool
+         * @since 20
+         */
+        bool IsValidGlobalXY() const;
         /**
          * @brief Obtains the width of the pressed area.
          * @return Returns the width.
@@ -1318,8 +1334,8 @@ public:
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
-        double globalX_ { 0.0f };
-        double globalY_ { 0.0f };
+        double globalX_ { DBL_MAX };
+        double globalY_ { DBL_MAX };
         int32_t fixedDisplayX_ {};
         int32_t fixedDisplayY_ {};
         int32_t windowX_ {};

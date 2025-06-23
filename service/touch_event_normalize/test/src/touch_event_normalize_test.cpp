@@ -73,7 +73,7 @@ void TouchEventNormalizeTest::TearDown()
 
 /**
  * @tc.name: TouchTransformProcessorTest_UpdatePointerItemProperties
- * @tc.desc: Test UpdatePointerItemProperties
+ * @tc.desc: Test UpdatePointerItemByTouchInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -90,7 +90,7 @@ HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_UpdatePointerI
     touchInfo.toolRect.point.y = 600;
     touchInfo.toolRect.width = 720;
     touchInfo.toolRect.height = 1000;
-    ASSERT_NO_FATAL_FAILURE(touchTransformProcessor.UpdatePointerItemProperties(item, touchInfo));
+    ASSERT_NO_FATAL_FAILURE(touchTransformProcessor.UpdatePointerItemByTouchInfo(item, touchInfo));
 }
 
 /**

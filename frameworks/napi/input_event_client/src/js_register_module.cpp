@@ -371,12 +371,24 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
         MMI_HILOGE("toolType:%{public}d is less 0, can not process", toolType);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "toolType must be greater than or equal to 0");
     }
+    int32_t globalX = INT_MAX;
+    if (GetNamedPropertyInt32(env, mouseHandle, "globalX", globalX) != RET_OK) {
+        MMI_HILOGD("No globaX");
+    }
+    int32_t globalY = INT_MAX;
+    if (GetNamedPropertyInt32(env, mouseHandle, "globalY", globalY) != RET_OK) {
+        MMI_HILOGD("No globaY");
+    }
     pointerEvent->SetSourceType(toolType);
     item.SetPointerId(0);
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
     item.SetDisplayXPos(screenX);
     item.SetDisplayYPos(screenY);
+    if (globalX != INT_MAX && globalY != INT_MAX) {
+        item.SetGlobalX(globalX);
+        item.SetGlobalY(globalY);
+    }
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
 }
@@ -413,6 +425,8 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseEvent", "object");
         return nullptr;
     }
+    bool useGlobalCoordinate = false;
+    GetNamedPropertyBool(env, argv[0], "useGlobalCoordinate", useGlobalCoordinate);
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
     CHKPP(pointerEvent);
@@ -420,7 +434,12 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
     HandleMouseAction(env, mouseHandle, pointerEvent, item);
     HandleMousePropertyInt32(env, mouseHandle, pointerEvent, item);
     HandleMousePressedButtons(env, mouseHandle, pointerEvent, item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
+    if (useGlobalCoordinate) {
+        MMI_HILOGD("useGlobalCoordinate");
+        useCoordinate = PointerEvent::GLOBAL_COORDINATE;
+    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, true, useCoordinate);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
@@ -504,6 +523,15 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     if (GetNamedPropertyDouble(env, touchObject, "pressure", pressure) != RET_OK) {
         MMI_HILOGE("Get pressure failed");
     }
+    int32_t globalX = INT_MAX;
+    if (GetNamedPropertyInt32(env, touchObject, "globalX", globalX) != RET_OK) {
+        MMI_HILOGD("No globaX");
+    }
+    int32_t globalY = INT_MAX;
+    if (GetNamedPropertyInt32(env, touchObject, "globalY", globalY) != RET_OK) {
+        MMI_HILOGD("No globaY");
+    }
+
     pointerItem.SetDisplayX(screenX);
     pointerItem.SetDisplayY(screenY);
     pointerItem.SetDisplayXPos(screenX);
@@ -511,6 +539,10 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     pointerItem.SetPointerId(pointerId);
     pointerItem.SetToolType(toolType);
     pointerItem.SetPressure(pressure);
+    if (globalX != INT_MAX && globalY != INT_MAX) {
+        pointerItem.SetGlobalX(globalX);
+        pointerItem.SetGlobalY(globalY);
+    }
     if (isTouch) {
         pointerEvent->SetPointerId(pointerId);
         pointerEvent->SetActionTime(pressedTime);
@@ -627,6 +659,8 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchEvent", "object");
         return nullptr;
     }
+    bool useGlobalCoordinate = false;
+    GetNamedPropertyBool(env, argv[0], "useGlobalCoordinate", useGlobalCoordinate);
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
     CHKPP(pointerEvent);
@@ -635,7 +669,13 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     if (!HandleTouchPropertyInt32(env, touchHandle, pointerEvent, item, action)) {
         return nullptr;
     }
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen());
+    int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
+    if (useGlobalCoordinate) {
+        MMI_HILOGD("useGlobalCoordinate");
+        useCoordinate = PointerEvent::GLOBAL_COORDINATE;
+    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen(),
+        useCoordinate);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
