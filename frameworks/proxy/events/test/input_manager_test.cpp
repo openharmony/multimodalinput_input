@@ -1376,10 +1376,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 0;
-    displayGroupInfo.width = 0;
-    displayGroupInfo.height = 0;
-    InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
-    ASSERT_TRUE(displayGroupInfo.displaysInfo.empty());
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo);
+    if (!userScreenInfo.displayGroups.empty()) {
+        ASSERT_TRUE(userScreenInfo.displayGroups[0].displaysInfo.empty());
+    }
 }
 
 /**
@@ -1393,8 +1395,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo001, TestSize.Level
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.x =1;
@@ -1403,7 +1405,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo001, TestSize.Level
     displayInfo.height = 2;
     displayInfo.dpi = 240;
     displayInfo.name = "pp";
-    displayInfo.uniq = "pp";
     displayInfo.direction = DIRECTION0;
     displayGroupInfo.displaysInfo.push_back(displayInfo);
     WindowInfo info;
@@ -1419,7 +1420,26 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo001, TestSize.Level
     info.flags = 0;
     info.displayId = 0;
     displayGroupInfo.windowsInfo.push_back(info);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+
+    std::vector<ScreenInfo> screenInfos;
+    ScreenInfo screenInfo;
+    screenInfo.screenType =(ScreenType)info.windowType;
+    screenInfo.dpi = displayInfo.dpi;
+    screenInfo.height = displayInfo.height;
+    screenInfo.width = displayInfo.width;
+    screenInfo.physicalWidth = dgw;
+    screenInfo.physicalHeight = dgh;
+    screenInfo.id =info.id;
+    screenInfo.rotation = Rotation::ROTATION_0;
+    screenInfo.tpDirection = Direction::DIRECTION0;
+    screenInfo.uniqueId = displayInfo.name;
+    screenInfos.push_back(screenInfo);
+
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    userScreenInfo.screens = screenInfos;
+    InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 
 /**
@@ -1433,8 +1453,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo002, TestSize.Level
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 0;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.x =1;
@@ -1443,10 +1463,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo002, TestSize.Level
     displayInfo.height = 2;
     displayInfo.dpi = 240;
     displayInfo.name = "pp";
-    displayInfo.uniq = "pp";
     displayInfo.direction = DIRECTION0;
     displayInfo.displayMode = DisplayMode::FULL;
     displayGroupInfo.displaysInfo.push_back(displayInfo);
+    std::vector<ScreenInfo> screenInfos;
     for (uint32_t i = 0; i < MAX_WINDOW_NUMS; i++) {
         WindowInfo info;
         info.id = i + 1;
@@ -1462,8 +1482,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo002, TestSize.Level
         info.displayId = 0;
         info.zOrder = static_cast<float>(MAX_WINDOW_NUMS - i);
         displayGroupInfo.windowsInfo.push_back(info);
+        ScreenInfo screenInfo;
+        screenInfo.screenType =(ScreenType)info.windowType;
+        screenInfo.dpi = displayInfo.dpi;
+        screenInfo.height = displayInfo.height;
+        screenInfo.width = displayInfo.width;
+        screenInfo.physicalWidth = dgw;
+        screenInfo.physicalHeight = dgh;
+        screenInfo.id =info.id;
+        screenInfo.rotation = Rotation::ROTATION_0;
+        screenInfo.tpDirection = Direction::DIRECTION0;
+        screenInfo.uniqueId = displayInfo.name;
+        screenInfos.push_back(screenInfo);
     }
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    userScreenInfo.screens = screenInfos;
+    InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 
 /**
@@ -1477,9 +1513,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo003, TestSize.Level
     CALL_TEST_DEBUG;
     DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
-    displayGroupInfo.width = 1000;
-    displayGroupInfo.height = 2000;
+    int32_t dgw = 1000;
+    int32_t dgh = 2000;
     DisplayInfo displayInfo;
+    std::vector<ScreenInfo> screenInfos;
     for (uint32_t i = 0; i < 2; i++) { // one is default-display and another is simulate display
         displayInfo.id = i;
         displayInfo.x =1;
@@ -1488,7 +1525,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo003, TestSize.Level
         displayInfo.height = 2;
         displayInfo.dpi = 240;
         displayInfo.name = "pp";
-        displayInfo.uniq = "pp";
         displayInfo.direction = DIRECTION0;
         displayGroupInfo.displaysInfo.push_back(displayInfo);
     }
@@ -1502,8 +1538,25 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo003, TestSize.Level
         info.flags = 0;
         info.displayId = i;
         displayGroupInfo.windowsInfo.push_back(info);
+
+        displayInfo = displayGroupInfo.displaysInfo[i];
+        ScreenInfo screenInfo;
+        screenInfo.screenType =(ScreenType)info.windowType;
+        screenInfo.dpi = displayInfo.dpi;
+        screenInfo.height = displayInfo.height;
+        screenInfo.width = displayInfo.width;
+        screenInfo.physicalWidth = dgw;
+        screenInfo.physicalHeight = dgh;
+        screenInfo.id =info.id;
+        screenInfo.rotation = Rotation::ROTATION_0;
+        screenInfo.tpDirection = Direction::DIRECTION0;
+        screenInfo.uniqueId = displayInfo.name;
+        screenInfos.push_back(screenInfo);
     }
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    userScreenInfo.screens = screenInfos;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo));
 }
 
 /**

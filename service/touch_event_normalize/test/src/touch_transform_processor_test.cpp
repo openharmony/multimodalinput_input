@@ -127,7 +127,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchDown_001, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_UpdatePointerItemProperties_001
- * @tc.desc: Test the funcation UpdatePointerItemProperties
+ * @tc.desc: Test the funcation UpdatePointerItemByTouchInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -143,7 +143,7 @@ HWTEST_F(TouchTransformProcessorTest, UpdatePointerItemProperties_001, TestSize.
     touchInfo.toolRect.height = 60;
     int32_t deviceId = 6;
     TouchTransformProcessor processor(deviceId);
-    processor.UpdatePointerItemProperties(item, touchInfo);
+    processor.UpdatePointerItemByTouchInfo(item, touchInfo);
     ASSERT_EQ(item.GetDisplayX(), touchInfo.point.x);
     ASSERT_EQ(item.GetDisplayY(), touchInfo.point.y);
     ASSERT_EQ(item.GetDisplayXPos(), touchInfo.point.x);

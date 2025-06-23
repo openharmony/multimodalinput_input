@@ -274,6 +274,12 @@ double PointerEvent::PointerItem::GetGlobalY() const
     return globalY_;
 }
 
+bool PointerEvent::PointerItem::IsValidGlobalXY() const
+{
+    return globalX_ > DBL_MIN && globalX_ < DBL_MAX &&
+        globalY_ > DBL_MIN && globalY_ < DBL_MAX;
+}
+
 int32_t PointerEvent::PointerItem::GetToolWidth() const
 {
     return toolWidth_;

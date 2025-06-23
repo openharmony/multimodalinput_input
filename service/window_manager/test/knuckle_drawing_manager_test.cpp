@@ -46,7 +46,7 @@ public:
     static void TearDownTestCase(void) {};
     void SetUp(void)
     {
-        DisplayInfo info;
+        OLD::DisplayInfo info;
         info.id = 1;
         info.x =1;
         info.y = 1;
@@ -55,7 +55,6 @@ public:
         int32_t displayDpi = 240;
         info.dpi = displayDpi;
         info.name = "display";
-        info.uniq = "xx";
         if (knuckleDrawMgr_ == nullptr) {
             knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
         }
@@ -706,7 +705,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RotationCanvasNode
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.direction = Direction::DIRECTION90;
     displayInfo.displayDirection = Direction::DIRECTION0;
     auto canvasNode = Rosen::RSCanvasNode::Create();

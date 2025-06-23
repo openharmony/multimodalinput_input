@@ -1717,12 +1717,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_001, T
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    DisplayInfo displaysInfo;
-    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displaysInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
     displayGroupInfo.focusWindowId = 0;
-    displayGroupInfo.width = 0;
-    displayGroupInfo.height = 0;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1742,12 +1740,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_002, T
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    DisplayInfo displaysInfo;
-    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displaysInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
     displayGroupInfo.focusWindowId = 0;
-    displayGroupInfo.width = 0;
-    displayGroupInfo.height = 0;
     pointerDrawingManager.surfaceNode_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.OnDisplayInfo(displayGroupInfo));
 }

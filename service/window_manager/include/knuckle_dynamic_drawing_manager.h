@@ -28,12 +28,12 @@ public:
     KnuckleDynamicDrawingManager();
     ~KnuckleDynamicDrawingManager() = default;
     void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent, int32_t displayId = -1);
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     void SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr);
 
 private:
     void StartTouchDraw(std::shared_ptr<PointerEvent> pointerEvent);
-    void CreateTouchWindow(const int32_t displayId);
+    void CreateTouchWindow(const int32_t rsId);
     void CreateCanvasNode();
     int32_t DrawGraphic(std::shared_ptr<PointerEvent> pointerEvent);
 
@@ -50,7 +50,7 @@ private:
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
-    DisplayInfo displayInfo_ {};
+    OLD::DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     Rosen::Drawing::Brush brush_;
     Rosen::Drawing::Pen pen_;

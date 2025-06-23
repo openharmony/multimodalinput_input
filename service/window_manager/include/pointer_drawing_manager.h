@@ -73,10 +73,10 @@ public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     ~PointerDrawingManager();
-    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    void DrawPointer(int32_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) override;
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
-    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
+    void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) override;
+    void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
@@ -111,14 +111,14 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
-    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
-    std::vector<std::vector<std::string>> GetDisplayInfo(DisplayInfo &di);
+    void DrawMovePointer(int32_t rsId, int32_t physicalX, int32_t physicalY) override;
+    std::vector<std::vector<std::string>> GetDisplayInfo(OLD::DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
     void SubscribeScreenModeChange() override;
-    DisplayInfo GetCurrentDisplayInfo() override;
+    OLD::DisplayInfo GetCurrentDisplayInfo() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -138,7 +138,7 @@ public:
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
 int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
-    int32_t displayId, int32_t physicalX, int32_t physicalY) override;
+    int32_t physicalX, int32_t physicalY) override;
 
 private:
     struct PixelMapInfo {
@@ -151,9 +151,9 @@ private:
     void GetPreferenceKey(std::string &name);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
-    void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
-    int32_t CreatePointerWindowForScreenPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
-    int32_t CreatePointerWindowForNoScreenPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    void CreatePointerWindow(int32_t rsId, int32_t physicalX, int32_t physicalY, Direction direction);
+    int32_t CreatePointerWindowForScreenPointer(int32_t rsId, int32_t physicalX, int32_t physicalY);
+    int32_t CreatePointerWindowForNoScreenPointer(int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
     sptr<OHOS::SurfaceBuffer> RetryGetSurfaceBuffer(sptr<OHOS::Surface> layer);
@@ -183,8 +183,8 @@ private:
     int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
-    bool IsWindowRotation(const DisplayInfo *displayInfo);
-    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
+    bool IsWindowRotation(const OLD::DisplayInfo *displayInfo);
+    Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
@@ -201,8 +201,8 @@ private:
     void ForceClearPointerVisiableStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
-    bool SetCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
-    void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    bool SetCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    void SetHardwareCursorPosition(int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
@@ -219,7 +219,7 @@ private:
     void PostMoveRetryTask(std::function<void()> task);
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
-    void UpdateBindDisplayId(int32_t displayId);
+    void UpdateBindDisplayId(int32_t rsId);
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
@@ -236,13 +236,13 @@ private:
     void ResetMoveRetryTimer();
     int32_t HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
     void HideHardwareCursors();
-    int32_t GetMainScreenDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
-        DisplayInfo &mainScreenDisplayInfo) const;
+    int32_t GetMainScreenDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
+        OLD::DisplayInfo &mainScreenDisplayInfo) const;
     int32_t DrawDynamicHardwareCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     int32_t DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
     void HardwareCursorDynamicRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle);
-    void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, DisplayInfo displayInfo);
+    void UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, OLD::DisplayInfo displayInfo);
     void AttachAllSurfaceNode() override;
     void DetachAllSurfaceNode() override;
     int32_t CheckHwcReady() override;
@@ -257,7 +257,7 @@ private:
         bool visible { false };
     };
     bool hasDisplay_ { false };
-    DisplayInfo displayInfo_ {};
+    OLD::DisplayInfo displayInfo_ {};
     bool hasPointerDevice_ { false };
     int32_t lastPhysicalX_ { -1 };
     int32_t lastPhysicalY_ { -1 };

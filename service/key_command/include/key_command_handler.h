@@ -16,7 +16,7 @@
 #ifndef KEY_COMMAND_HANDLER_H
 #define KEY_COMMAND_HANDLER_H
 
-#include "window_info.h"
+#include "old_display_info.h"
 
 #include "i_input_event_handler.h"
 #include "input_handler_type.h"
@@ -290,7 +290,7 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
-    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);

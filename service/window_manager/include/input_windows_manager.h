@@ -68,14 +68,15 @@ public:
     void PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
-    void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsFocusedSession(int32_t session) const;
-    void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
-    void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
+    void UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
+    void ProcessInjectEventGlobalXY(std::shared_ptr<PointerEvent> pointerEvent, int32_t useCoordinate);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    void DumpDisplayInfo(int32_t fd, const std::vector<DisplayInfo>& displaysInfo);
+    void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
@@ -89,7 +90,7 @@ public:
     ExtraData GetExtraData() const;
     const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
-    std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
+    std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info, double logicX, double logicY) const;
     int32_t GetCurrentUserId();
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
     void SetFoldState ();
@@ -114,7 +115,7 @@ public:
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    const DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
+    const OLD::DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
     int32_t SetHoverScrollState(bool state);
     bool GetHoverScrollState() const;
     bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
@@ -138,23 +139,24 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
+    void AdjustDisplayCoordinate(const OLD::DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
-    void ReverseRotateDisplayScreen(const DisplayInfo& info, const double x, const double y,
+    void ReverseRotateScreen(const OLD::DisplayInfo& info, const double x, const double y,
         Coordinate2D& cursorPos) const;
-    void ScreenRotateAdjustDisplayXY(const DisplayInfo& info, PhysicalCoordinate& coord) const;
-    void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
-    void RotateDisplayScreen(const DisplayInfo& info, PhysicalCoordinate& coord);
+    void ReverseRotateDisplayScreen(const OLD::DisplayInfo& info, const double x, const double y,
+        Coordinate2D& cursorPos) const;
+    void ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void RotateScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void RotateDisplayScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId);
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord);
-    const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const;
+    const std::shared_ptr<OLD::DisplayInfo> GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
@@ -163,10 +165,10 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    void UpdateWindowInfoExt(const WindowGroupInfo &windowGroupInfo, const DisplayGroupInfo &displayGroupInfo);
-    void UpdateOneHandDataExt(const DisplayInfo &displayInfo);
+    void UpdateWindowInfoExt(const WindowGroupInfo &windowGroupInfo, const OLD::DisplayGroupInfo &displayGroupInfo);
+    void UpdateOneHandDataExt(const OLD::DisplayInfo &displayInfo);
     void UpdateShellWindow(const WindowInfo &window);
-    void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayInfoExt(const OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
     bool IsAncoWindow(const WindowInfo &window) const;
     bool IsAncoWindowFocus(const WindowInfo &window) const;
@@ -174,7 +176,7 @@ public:
     void DumpAncoWindows(std::string& out) const;
     void CleanShellWindowIds();
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
-    void SendOneHandData(onst DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
+    void SendOneHandData(const OLD::DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
     bool IsAncoGameActive();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
@@ -183,8 +185,9 @@ public:
     void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id) const;
-    const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id, const DisplayGroupInfo &displayGroupInfo) const;
+    const std::shared_ptr<OLD::DisplayInfo> GetPhysicalDisplay(int32_t id) const;
+    const std::shared_ptr<OLD::DisplayInfo> GetPhysicalDisplay(int32_t id,
+        const OLD::DisplayGroupInfo &displayGroupInfo) const;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerChangeAreas();
@@ -209,12 +212,12 @@ public:
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
 
     void CleanInvalidPiexMap(int32_t groupId = DEFAULT_GROUP_ID);
-    void HandleWindowPositionChange(const DisplayGroupInfo &displayGroupInfo);
+    void HandleWindowPositionChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     void SendCancelEventWhenWindowChange(int32_t pointerId, int32_t groupId = DEFAULT_GROUP_ID);
     bool GetHardCursorEnabled();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
-    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
+    Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
@@ -222,7 +225,7 @@ public:
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventforGesture_; };
-    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void SwitchTouchTracking(bool touchTracking);
@@ -243,19 +246,19 @@ private:
         int32_t targetWindowId, int32_t logicalX, int32_t logicalY);
     void PrintZorderInfo(const WindowInfo &windowInfo, std::string &window);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
-    void PrintDisplayGroupInfo(const DisplayGroupInfo displayGroupInfo);
-    void PrintDisplayInfo(const DisplayInfo displayInfo);
+    void PrintDisplayGroupInfo(const OLD::DisplayGroupInfo displayGroupInfo);
+    void PrintDisplayInfo(const OLD::DisplayInfo displayInfo);
     void PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo);
     void PrintWindowNavbar(int32_t groupId = DEFAULT_GROUP_ID);
-    void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
+    void CheckFocusWindowChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
         const std::vector<WindowInfo> &newWindowsInfo);
     void UpdateDisplayIdAndName();
     void UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle);
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
-    void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, DisplayGroupInfo &displayGroupInfo);
-    void UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, OLD::DisplayGroupInfo &displayGroupInfo);
+    void UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
     bool IsValidZorderWindow(const WindowInfo &window, const std::shared_ptr<PointerEvent>& pointerEvent);
     bool SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent, const bool &isSkip);
@@ -267,12 +270,13 @@ private:
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
-    void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height, bool isRealData = true);
+    void GetWidthAndHeight(const OLD::DisplayInfo* displayInfo, int32_t &width, int32_t &height,
+        bool isRealData = true);
     void UpdateCurrentDisplay(int32_t displayId) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
-    void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
+    void PrintChangedWindowBySync(const OLD::DisplayGroupInfo &newDisplayInfo);
     bool IsMouseDrawing(int32_t currentAction);
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
@@ -283,7 +287,7 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    std::vector<int32_t> HandleHardwareCursor(std::shared_ptr<DisplayInfo> &physicalDisplayInfo,
+    std::vector<int32_t> HandleHardwareCursor(std::shared_ptr<OLD::DisplayInfo> &physicalDisplayInfo,
         int32_t physicalX, int32_t physicalY);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
@@ -292,7 +296,7 @@ private:
     void OnSessionLost(SessionPtr session);
     void InitPointerStyle(int32_t groupId = DEFAULT_GROUP_ID);
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
-    const std::vector<DisplayInfo>& GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
+    const std::vector<OLD::DisplayInfo>& GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     const std::vector<WindowInfo>& GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetLogicalPositionX(int32_t id);
@@ -314,19 +318,20 @@ private:
     void CheckUIExtentionWindowPointerHotArea(int32_t logicalX, int32_t logicalY,
         const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
     std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY, int32_t groupId = DEFAULT_GROUP_ID);
-    bool IsInsideDisplay(const DisplayInfo& displayInfo, double physicalX, double physicalY);
-    bool CalculateLayout(const DisplayInfo& displayInfo, const Vector2D<double> &physical, Vector2D<double>& layout);
-    void FindPhysicalDisplay(const DisplayInfo& displayInfo, double& physicalX,
+    bool IsInsideDisplay(const OLD::DisplayInfo& displayInfo, double physicalX, double physicalY);
+    bool CalculateLayout(const OLD::DisplayInfo& displayInfo, const Vector2D<double> &physical,
+        Vector2D<double>& layout);
+    void FindPhysicalDisplay(const OLD::DisplayInfo& displayInfo, double& physicalX,
         double& physicalY, int32_t& displayId);
-    bool AcrossDisplay(const DisplayInfo &displayInfoDes, const DisplayInfo &displayInfoOri, Vector2D<double> &logical,
-        Vector2D<double> &layout, const AcrossDirection &acrossDirection);
-    AcrossDirection CalculateAcrossDirection(const DisplayInfo &displayInfo, const Vector2D<double> &layout);
+    bool AcrossDisplay(const OLD::DisplayInfo &displayInfoDes, const OLD::DisplayInfo &displayInfoOri,
+        Vector2D<double> &logical, Vector2D<double> &layout, const AcrossDirection &acrossDirection);
+    AcrossDirection CalculateAcrossDirection(const OLD::DisplayInfo &displayInfo, const Vector2D<double> &layout);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void InitMouseDownInfo();
     bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
-    void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
+    void UpdatePointerChangeAreas(const OLD::DisplayGroupInfo &displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void AdjustDisplayRotation(int32_t groupId = DEFAULT_GROUP_ID);
     void SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent);
@@ -336,17 +341,18 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo, bool isDisplayRemoved = false);
+    void PointerDrawingManagerOnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
+        bool isDisplayRemoved = false);
 void DrawPointer(bool isDisplayRemoved);
 bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-    void UpdateFixedXY(const DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
+    void UpdateFixedXY(const OLD::DisplayInfo& displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-void UpdatePointerItemInOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
-void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const DisplayInfo &displayInfo,
+void UpdatePointerItemInOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
+void UpdateDisplayXYInOneHandMode(double& physicalX, double& physicalY, const OLD::DisplayInfo &displayInfo,
     float oneHandScale);
-void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent,
+void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent,
     PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
@@ -364,16 +370,16 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     bool IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
-        const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo);
+        const std::vector<WindowInfo>& windowsInfo, const OLD::DisplayInfo& displayInfo);
     void HandlePullEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
-    const std::shared_ptr<DisplayInfo> FindPhysicalDisplayInfo(const std::string& uniq) const;
+    const std::shared_ptr<OLD::DisplayInfo> FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
-        const DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
+        const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
     void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
@@ -407,46 +413,48 @@ void HandleOneHandMode(const DisplayInfo &displayInfo, std::shared_ptr<PointerEv
     int32_t UpdateCrownTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
     void UpdateDisplayMode(int32_t groupId = DEFAULT_GROUP_ID);
-    void HandleValidDisplayChange(const DisplayGroupInfo &displayGroupInfo);
-    void ResetPointerPositionIfOutValidDisplay(const DisplayGroupInfo &displayGroupInfo);
+    void HandleValidDisplayChange(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void ResetPointerPositionIfOutValidDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
     void CancelMouseEvent();
     bool IsPositionOutValidDisplay(
-        Coordinate2D &position, const DisplayInfo &currentDisplay, bool isPhysicalPos = false);
-    void CancelTouchScreenEventIfValidDisplayChange(const DisplayGroupInfo &displayGroupInfo);
-    bool IsValidDisplayChange(const DisplayInfo &displayInfo);
+        Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos = false);
+    void CancelTouchScreenEventIfValidDisplayChange(const OLD::DisplayGroupInfo &displayGroupInfo);
+    bool IsValidDisplayChange(const OLD::DisplayInfo &displayInfo);
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
-    bool OnDisplayRemovedOrCombinationChanged(const DisplayGroupInfo &displayGroupInfo);
+    bool OnDisplayRemovedOrCombinationChanged(const OLD::DisplayGroupInfo &displayGroupInfo);
     void ChangeWindowArea(int32_t x, int32_t y, WindowInfo &windowInfo);
-    void ResetPointerPosition(const DisplayGroupInfo &displayGroupInfo);
-    int32_t GetMainScreenDisplayInfo(const std::vector<DisplayInfo> &displaysInfo,
-        DisplayInfo &mainScreenDisplayInfo) const;
-    bool IsPointerOnCenter(const CursorPosition &currentPos, const DisplayInfo &currentDisplay);
+    void ResetPointerPosition(const OLD::DisplayGroupInfo &displayGroupInfo);
+    int32_t GetMainScreenDisplayInfo(const std::vector<OLD::DisplayInfo> &displaysInfo,
+        OLD::DisplayInfo &mainScreenDisplayInfo) const;
+    bool IsPointerOnCenter(const CursorPosition &currentPos, const OLD::DisplayInfo &currentDisplay);
     void SendBackCenterPointerEevent(const CursorPosition &cursorPos);
-    WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
+    WINDOW_UPDATE_ACTION UpdateWindowInfo(OLD::DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
     int32_t ShiftAppMousePointerEvent(const ShiftWindowInfo &shiftWindowInfo, bool autoGenDown);
     int32_t ShiftAppTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo);
     int32_t ShiftAppSimulateTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo);
-    CursorPosition GetCursorPos(const DisplayGroupInfo &displayGroupInfo);
-    CursorPosition ResetCursorPos(const DisplayGroupInfo &displayGroupInfo);
+    CursorPosition GetCursorPos(const OLD::DisplayGroupInfo &displayGroupInfo);
+    CursorPosition ResetCursorPos(const OLD::DisplayGroupInfo &displayGroupInfo);
+    GlobalCoords DisplayCoords2GlobalCoords(const Coordinate2D &displayCoords, int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     bool CancelTouch(int32_t touch);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    bool IsPointerActiveRectValid(const DisplayInfo &currentDisplay);
+    bool IsPointerActiveRectValid(const OLD::DisplayInfo &currentDisplay);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsAccessibilityEventWithZorderInjected(std::shared_ptr<PointerEvent> pointerEvent);
 private:
-    DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
+    OLD::DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
     int32_t FindDisplayGroupId(int32_t displayId) const;
-    DisplayGroupInfo& GetMainDisplayGroupInfo();
-    const DisplayGroupInfo& GetConstMainDisplayGroupInfo() const;
-    const DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
-    void RotateScreen90(const DisplayInfo& info, PhysicalCoordinate& coord) const;
-    void InitDisplayGroupInfo(DisplayGroupInfo &displayGroupInfo);
+    const OLD::DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
+    OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo();
+    const OLD::DisplayGroupInfo& GetConstMainDisplayGroupInfo() const;
+    void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -474,12 +482,12 @@ private:
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     std::weak_ptr<TouchGestureManager> touchGestureMgr_;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    std::map<int32_t, DisplayGroupInfo> displayGroupInfoMap_;
-    std::map<int32_t, DisplayGroupInfo> displayGroupInfoMapTmp_;
+    std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap_;
+    std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMapTmp_;
     bool mainGroupExisted_;
     DisplayGroupInfo displayGroupInfoTmp_;
     std::mutex tmpInfoMutex_;
-    DisplayGroupInfo displayGroupInfo_;
+    OLD::DisplayGroupInfo displayGroupInfo_;
     DisplayGroupInfo displayGroupInfoCurr_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap_;

@@ -767,7 +767,7 @@ bool KeyCommandHandler::IsValidAction(int32_t action)
     return false;
 }
 
-std::pair<int32_t, int32_t> KeyCommandHandler::CalcDrawCoordinate(const DisplayInfo& displayInfo,
+std::pair<int32_t, int32_t> KeyCommandHandler::CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
     PointerEvent::PointerItem pointerItem)
 {
     CALL_DEBUG_ENTER;

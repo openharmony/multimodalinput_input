@@ -49,8 +49,8 @@ struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX;
-    int32_t globalY;
+    int32_t globalX { INT_MAX  };
+    int32_t globalY { INT_MAX  };
     int32_t button { -1 };
     int32_t axisType { -1 };
     float axisValue { 0.0f };
@@ -64,8 +64,8 @@ struct Input_TouchEvent {
     int32_t id;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX;
-    int32_t globalY;
+    int32_t globalX { INT_MAX  };
+    int32_t globalY { INT_MAX  };;
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -508,6 +508,12 @@ static int32_t HandleMouseProperty(const struct Input_MouseEvent* mouseEvent,
     item.SetDisplayY(screenY);
     item.SetDisplayXPos(screenX);
     item.SetDisplayYPos(screenY);
+    int32_t globalX = mouseEvent->globalX;
+    int32_t globalY = mouseEvent->globalY;
+    if (globalX != INT_MAX && globalY != INT_MAX) {
+        item.SetGlobalX(globalX);
+        item.SetGlobalY(globalY);
+    }
     g_mouseEvent->SetPointerId(0);
     g_mouseEvent->UpdatePointerItem(g_mouseEvent->GetPointerId(), item);
     return INPUT_SUCCESS;
@@ -539,7 +545,46 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
         return result;
     }
     g_mouseEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_mouseEvent, true);
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_mouseEvent,
+        true, PointerEvent::DISPLAY_COORDINATE);
+    if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
+        MMI_HILOGE("Permission denied or occupied by other");
+        return result;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEvent)
+{
+    MMI_HILOGD("Input_MouseEvent global");
+    CHKPR(mouseEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(g_mouseEvent, INPUT_PARAMETER_ERROR);
+    g_mouseEvent->ClearFlag();
+    g_mouseEvent->ClearAxisValue();
+    g_mouseEvent->SetTargetDisplayId(0);
+    int64_t time = mouseEvent->actionTime;
+    if (time < 0) {
+        time = OHOS::MMI::GetSysClockTime();
+    }
+    g_mouseEvent->SetActionTime(time);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    int32_t pointerId = 10000;
+    g_mouseEvent->GetPointerItem(pointerId, item);
+    item.SetDownTime(time);
+    int32_t result = HandleMouseAction(mouseEvent, item);
+    if (result != 0) {
+        return result;
+    }
+    result = HandleMouseProperty(mouseEvent, item);
+    if (result != 0) {
+        return result;
+    }
+    if (!item.IsValidGlobalXY()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_mouseEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_mouseEvent,
+        true, PointerEvent::GLOBAL_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
         return result;
@@ -795,6 +840,12 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     item.SetDisplayY(screenY);
     item.SetDisplayXPos(screenX);
     item.SetDisplayYPos(screenY);
+    int32_t globalX = touchEvent->globalX;
+    int32_t globalY = touchEvent->globalY;
+    if (globalX != INT_MAX && globalY != INT_MAX) {
+        item.SetGlobalX(globalX);
+        item.SetGlobalY(globalY);
+    }
     item.SetPointerId(id);
     g_touchEvent->SetPointerId(id);
     g_touchEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -822,7 +873,40 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent)
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true);
+    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
+        PointerEvent::DISPLAY_COORDINATE);
+    if (touchEvent->action == TOUCH_ACTION_UP) {
+        g_touchEvent->RemovePointerItem(g_touchEvent->GetPointerId());
+        MMI_HILOGD("This touch event is up remove this finger");
+        if (g_touchEvent->GetPointerIds().empty()) {
+            MMI_HILOGD("This touch event is final finger up remove this finger");
+            g_touchEvent->Reset();
+        }
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEvent)
+{
+    MMI_HILOGD("injectTouchEvent global");
+    CHKPR(touchEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(g_touchEvent, INPUT_PARAMETER_ERROR);
+    g_touchEvent->ClearFlag();
+    OHOS::MMI::PointerEvent::PointerItem item;
+    int32_t result = HandleTouchAction(touchEvent, item);
+    if (result != 0) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    result = HandleTouchProperty(touchEvent, item);
+    if (result != 0) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    if (!item.IsValidGlobalXY()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
+    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
+        PointerEvent::GLOBAL_COORDINATE);
     if (touchEvent->action == TOUCH_ACTION_UP) {
         g_touchEvent->RemovePointerItem(g_touchEvent->GetPointerId());
         MMI_HILOGD("This touch event is up remove this finger");

@@ -237,7 +237,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-    bool isNativeInject, bool isShell)
+    bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -248,7 +248,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return checkReturn;
         }
     }
-    return OnInjectPointerEventExt(pointerEvent, isShell);
+    return OnInjectPointerEventExt(pointerEvent, isShell, useCoordinate);
 }
 
 int32_t ServerMsgHandler::OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
@@ -329,7 +329,8 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
+    int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -345,7 +346,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return RET_ERR;
             }
             DealGesturePointers(pointerEvent);
-            MMI_HILOGI("Check : prepare to send inject pointer event");
+            WIN_MGR->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate);
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(IsCastInject(pointerEvent->GetDeviceId())) &&
@@ -369,6 +370,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return ret;
             }
             UpdatePointerEvent(pointerEvent);
+            WIN_MGR->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
@@ -742,40 +744,6 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
-{
-    uint32_t num = 0;
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform >> info.ppi
-            >> info.offsetX >> info.offsetY >> info.isCurrentOffScreenRendering >> info.screenRealWidth
-            >> info.screenRealHeight >> info.screenRealPPI >> info.screenRealDPI >> info.screenCombination
-            >> info.validWidth >> info.validHeight >> info.fixedDirection
-            >> info.physicalWidth >> info.physicalHeight >> info.scalePercent >> info.expandHeight >> info.uniqueId;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-        pkt >> info.oneHandX >> info.oneHandY;
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        pkt >> info.pointerActiveWidth >> info.pointerActiveHeight;
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
-            info.uniq = "default" + std::to_string(info.id);
-        }
-        displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 bool ServerMsgHandler::IsCastInject(int32_t deviceid)
 {
     return (deviceid == CAST_INPUT_DEVICEID || deviceid == CAST_SCREEN_DEVICEID);
@@ -791,36 +759,90 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
         return RET_ERR;
     }
-    DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.groupId >> displayGroupInfo.isMainGroup >> displayGroupInfo.width >>
-        displayGroupInfo.height >> displayGroupInfo.focusWindowId >> displayGroupInfo.currentUserId;
+    UserScreenInfo userScreenInfo;
+    oldDisplayGroupInfos_.clear();
+    pkt >> userScreenInfo.userId;
+    if (ReadScreensInfo(pkt, userScreenInfo) != RET_OK) {
+        return RET_ERR;
+    }
+    if (ReadDisplayGroupsInfo(pkt, userScreenInfo) != RET_OK) {
+        return RET_ERR;
+    }
+    if (!ChangeToOld(userScreenInfo)) {
+        return RET_ERR;
+    }
+    for (auto &displayGroupInfo : oldDisplayGroupInfos_) {
+        WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::ReadScreensInfo(NetPacket &pkt, UserScreenInfo &userScreenInfo)
+{
     uint32_t num = 0;
     pkt >> num;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
+    if (num > MAX_SCREEN_SIZE) {
+        MMI_HILOGE("Too many screens, num:%{public}u", num);
         return RET_ERR;
     }
     for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        int32_t byteCount = 0;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> info.windowType
-            >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
+        ScreenInfo info;
+        pkt >> info.id >> info.uniqueId >> info.screenType >> info.width >> info.height >> info.physicalWidth
+            >> info.physicalHeight >> info.tpDirection >> info.dpi >> info.ppi >> info.rotation;
+        userScreenInfo.screens.push_back(info);
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Read screens info error");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 
-        OnUiExtentionWindowInfo(pkt, info);
-        pkt >> info.rectChangeBySystem;
-        displayGroupInfo.windowsInfo.push_back(info);
+int32_t ServerMsgHandler::ReadDisplayGroupsInfo(NetPacket &pkt, UserScreenInfo &userScreenInfo)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    if (num > MAX_DISPLAY_GROUP_SIZE) {
+        MMI_HILOGE("Too many display groups, num:%{public}u", num);
+        return RET_ERR;
+    }
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayGroupInfo info;
+        OLD::DisplayGroupInfo oldInfo;
+        pkt >> info.id >> info.name >> info.type >> info.mainDisplayId >> info.focusWindowId;
+        if (ReadDisplaysInfo(pkt, info) != RET_OK) {
+            return RET_ERR;
+        }
+        if (ReadWindowsInfo(pkt, info, oldInfo) != RET_OK) {
+            return RET_ERR;
+        }
+        userScreenInfo.displayGroups.push_back(info);
+        oldDisplayGroupInfos_.push_back(oldInfo);
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    if (num > MAX_DISPLAY_SIZE) {
+        MMI_HILOGE("Too many displays, num:%{public}u", num);
+        return RET_ERR;
+    }
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
+            >> info.direction >> info.displayDirection >> info.displayMode >> info.transform
+            >> info.scalePercent >> info.expandHeight >> info.isCurrentOffScreenRendering
+            >> info.displaySourceMode >> info.oneHandX >> info.oneHandY >> info.screenArea >> info.rsId
+            >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight;
+        displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
             return RET_ERR;
         }
     }
-    if (ReadDisplayInfo(pkt, displayGroupInfo) != RET_OK) {
-        return RET_ERR;
-    }
-    WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
     return RET_OK;
 }
 
@@ -1000,6 +1022,165 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR
 
+int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo,
+    OLD::DisplayGroupInfo &oldDisplayGroupInfo)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+            WindowInfo info;
+            int32_t byteCount = 0;
+            pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+                >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
+                >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+                >> info.windowInputType >> info.privacyMode >> info.windowType
+                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
+
+            OnUiExtentionWindowInfo(pkt, info);
+            pkt >> info.rectChangeBySystem;
+            displayGroupInfo.windowsInfo.push_back(info);
+            oldDisplayGroupInfo.windowsInfo.push_back(info);
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("read window info failed");
+                return RET_ERR;
+            }
+        }
+    return RET_OK;
+}
+
+bool ServerMsgHandler::ChangeToOld(const UserScreenInfo& userScreenInfo)
+{
+    if (userScreenInfo.displayGroups.size() != oldDisplayGroupInfos_.size()) {
+        MMI_HILOGE("ChangeToOld size inconsistent, new size:%{public}zu, old size:%{public}zu",
+            userScreenInfo.displayGroups.size(), oldDisplayGroupInfos_.size());
+        return false;
+    }
+    size_t num = 0;
+    for (auto &displayGroupInfo : userScreenInfo.displayGroups) {
+        if (num >= oldDisplayGroupInfos_.size()) {
+            MMI_HILOGE("num:%{public}zu", num);
+            break;
+        }
+        oldDisplayGroupInfos_[num].groupId = displayGroupInfo.id;
+        oldDisplayGroupInfos_[num].type = displayGroupInfo.type;
+        oldDisplayGroupInfos_[num].mainDisplayId = displayGroupInfo.mainDisplayId;
+        oldDisplayGroupInfos_[num].focusWindowId = displayGroupInfo.focusWindowId;
+        oldDisplayGroupInfos_[num].currentUserId = userScreenInfo.userId;
+        ChangeToOld(num, displayGroupInfo.displaysInfo, userScreenInfo.screens);
+        num++;
+    }
+    return true;
+}
+
+void ServerMsgHandler::ChangeToOld(size_t num, const std::vector<DisplayInfo>& displaysInfo,
+    const std::vector<ScreenInfo>& screens)
+{
+    for (auto &display : displaysInfo) {
+        OLD::DisplayInfo oldDisplay;
+        oldDisplay = {
+            .id = display.id,
+            .x = display.x,
+            .y = display.y,
+            .dpi = display.dpi,
+            .name = display.name,
+            .direction = display.direction,
+            .displayDirection = display.displayDirection,
+            .displayMode = display.displayMode,
+            .transform = display.transform,
+            .offsetX = display.offsetX,
+            .offsetY = display.offsetY,
+            .scalePercent = display.scalePercent,
+            .expandHeight = display.expandHeight,
+            .isCurrentOffScreenRendering = display.isCurrentOffScreenRendering,
+            .displaySourceMode = display.displaySourceMode,
+            .oneHandX = display.oneHandX,
+            .oneHandY = display.oneHandY,
+            .validWidth = display.width,
+            .validHeight = display.height,
+            .pointerActiveWidth = display.pointerActiveWidth,
+            .pointerActiveHeight = display.pointerActiveHeight,
+            .rsId = display.rsId,
+        };
+        for (auto &screen : screens) {
+            if (screen.id == display.screenArea.id) {
+                oldDisplay.uniq = screen.uniqueId;
+                oldDisplay.ppi = screen.ppi;
+                oldDisplay.screenRealWidth = screen.width;
+                oldDisplay.screenRealHeight = screen.height;
+                oldDisplay.screenRealDPI = screen.dpi;
+                oldDisplay.fixedDirection = screen.tpDirection;
+                oldDisplay.physicalWidth = screen.physicalWidth;
+                oldDisplay.physicalHeight = screen.physicalHeight;
+                if (display.screenArea.area.width > 0 && display.screenArea.area.height > 0) {
+                    if (oldDisplay.direction == Direction::DIRECTION0
+                        || oldDisplay.direction == Direction::DIRECTION180) {
+                        oldDisplay.width = static_cast<int32_t>(static_cast<double>(display.width) /
+                            static_cast<double>(display.screenArea.area.width) * static_cast<double>(screen.width));
+                        oldDisplay.height = static_cast<int32_t>(static_cast<double>(display.height) /
+                            static_cast<double>(display.screenArea.area.height) * static_cast<double>(screen.height));
+                    }
+                    if (oldDisplay.direction == Direction::DIRECTION90
+                        || oldDisplay.direction == Direction::DIRECTION270) {
+                        oldDisplay.width = static_cast<int32_t>(static_cast<double>(display.width) /
+                            static_cast<double>(display.screenArea.area.height) *static_cast<double>(screen.height));
+                        oldDisplay.height = static_cast<int32_t>(static_cast<double>(display.height) /
+                            static_cast<double>(display.screenArea.area.width) * static_cast<double>(screen.width));
+                    }
+                }
+                break;
+            }
+        }
+        if (num >= oldDisplayGroupInfos_.size()) {
+            MMI_HILOGE("num:%{public}zu", num);
+            break;
+        }
+        oldDisplayGroupInfos_[num].displaysInfo.emplace_back(oldDisplay);
+    }
+}
+
+void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
+{
+    MMI_HILOGD("userScreenInfo-----------");
+    MMI_HILOGD("userId:%{public}d, ", userScreenInfo.userId);
+    size_t num = 0;
+    for (const auto &item : userScreenInfo.screens) {
+        MMI_HILOGD("screen%{public}zu, id:%{public}d, uniqueId:%{public}s, screenType:%{public}d, width:%{public}d, "
+                   "height:%{public}d, physicalWidth:%{public}d, physicalHeight:%{public}d, tpDirection:%{public}d, "
+                   "dpi%{public}d, ppi%{public}d, rotation%{public}d", num, item.id, item.uniqueId.c_str(),
+                   item.screenType, item.width, item.height, item.physicalWidth, item.physicalHeight, item.tpDirection,
+                   item.dpi, item.ppi, item.rotation);
+        num++;
+    }
+    num = 0;
+    for (const auto &item : userScreenInfo.displayGroups) {
+        MMI_HILOGD("displayGroups%{public}zu,id:%{public}d,name:%{public}s,type:%{public}d, mainDisplayId:%{public}d,"
+            "focusWindowId:%{public}d",
+            num, item.id, item.name.c_str(), item.type, item.mainDisplayId, item.focusWindowId);
+        size_t numDisplayInfo = 0;
+        for (const auto &itemDisplay : item.displaysInfo) {
+            MMI_HILOGD("displays%{public}zu,id:%{public}d,x:%{public}d,y:%{public}d,width:%{public}d,"
+                "height:%{public}d,dpi:%{public}d,name:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
+                "displayMode:%{public}d,scalePercent:%{public}d, expandHeight:%{public}d,"
+                "isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d,oneHandX:%{public}d,"
+                "oneHandY:%{public}d, screenArea:{%{public}d:{%{public}d,%{public}d,%{public}d,%{public}d},"
+                "rsId:%{public}d},offsetX:%{public}d,offsetY:%{public}d,pointerActiveWidth:%{public}d,"
+                "pointerActiveHeight:%{public}d,transform:",
+                numDisplayInfo, itemDisplay.id, itemDisplay.x, itemDisplay.y, itemDisplay.width, itemDisplay.height,
+                itemDisplay.dpi, itemDisplay.name.c_str(), itemDisplay.direction, itemDisplay.displayDirection,
+                itemDisplay.displayMode, itemDisplay.scalePercent, itemDisplay.expandHeight,
+                itemDisplay.isCurrentOffScreenRendering, itemDisplay.displaySourceMode, itemDisplay.oneHandX,
+                itemDisplay.oneHandY, itemDisplay.screenArea.id, itemDisplay.screenArea.area.x,
+                itemDisplay.screenArea.area.y, itemDisplay.screenArea.area.width, itemDisplay.screenArea.area.height,
+                itemDisplay.rsId, itemDisplay.offsetX, itemDisplay.offsetY,
+                itemDisplay.pointerActiveWidth, itemDisplay.pointerActiveHeight);
+            for (auto& transform : itemDisplay.transform) {
+                MMI_HILOGD("%{public}f,", transform);
+            }
+            numDisplayInfo++;
+        }
+        num++;
+    }
+}
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
