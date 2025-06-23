@@ -245,7 +245,10 @@ group("mmi_tests") {
   }
 
   if (drivers_interface_rtos_extra_enable) {
-    deps += [ "service:InfraredEmitterTest" ]
+    deps += [
+      "service:InfraredEmitterEXTest",
+      "service:InfraredEmitterTest",
+    ]
   }
 }
 
