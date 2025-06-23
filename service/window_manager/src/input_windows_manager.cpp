@@ -2606,10 +2606,10 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
     std::string window;
     window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
-        MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, uid:%{public}d,"
-            "area.x:%d,area.y:%d,area.width:%{public}d, area.height:%{public}d,"
-            "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu,"
-            "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d,"
+        MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, uid:%{public}d, "
+            "area.x:%d, area.y:%d, area.width:%{public}d, area.height:%{public}d, "
+            "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu, "
+            "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d, "
             "zOrder:%{public}f, privacyMode:%{public}d",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
@@ -2664,7 +2664,7 @@ void InputWindowsManager::PrintDisplayGroupInfo(const DisplayGroupInfo displayGr
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("logicalInfo, width:%{public}d, height:%{public}d, focusWindowId:%{public}d,"
+    MMI_HILOGD("logicalInfo, width:%{public}d, height:%{public}d, focusWindowId:%{public}d, "
                "windowsInfosNum:%{public}zu, displayInfosNum:%{public}zu",
         displayGroupInfo.width,
         displayGroupInfo.height,
