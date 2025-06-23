@@ -218,6 +218,7 @@ group("mmi_tests") {
     "service/fingerprint_event_processor/test:FingerprintEventProcessorTest",
     "service/fingerprint_event_processor/test:XKeyEventProcessorTest",
     "service/module_loader/test:ModuleLoaderTests",
+    "service/mouse_event_normalize/test:MouseEventNormalizeEXTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
     "service/subscriber/test:mmi_subscriber_tests",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
