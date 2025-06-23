@@ -2683,11 +2683,11 @@ void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo)
         return;
     }
     MMI_HILOGD("displayInfo{id:%{public}d, name:%{public}s, uniq:%{public}s "
-               "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
-               "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
-               "direction:%{public}d, displayDirection:%{public}d, fixedDirection:%{public}d} "
-               "oneHandXY:{%{private}d %{private}d},"
-               "pointerActiveWidth:%{private}d, pointerActiveHeight:%{private}d",
+        "XY:{%{private}d %{private}d} offsetXY:{%{private}d %{private}d} "
+        "WH:{%{private}d %{private}d} validWH:{%{private}d %{private}d} "
+        "direction:%{public}d, displayDirection:%{public}d, fixedDirection:%{public}d} "
+        "oneHandXY:{%{private}d %{private}d},"
+        "pointerActiveWidth:%{private}d, pointerActiveHeight:%{private}d",
         displayInfo.id,
         displayInfo.name.c_str(),
         displayInfo.uniq.c_str(),
