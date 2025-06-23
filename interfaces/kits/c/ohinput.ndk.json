@@ -518,5 +518,53 @@
     {
         "first_introduced": "20",
         "name": "OH_Input_GetPointerLocation"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_SetMouseEventGlobalX"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_GetMouseEventGlobalX"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_SetMouseEventGlobalY"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_GetMouseEventGlobalY"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_SetTouchEventGlobalX"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_GetTouchEventGlobalX"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_SetTouchEventGlobalY"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_GetTouchEventGlobalY"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_SetAxisEventGlobalX"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_GetAxisEventGlobalX"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_SetAxisEventGlobalY"
+    },
+    {
+        "first_introduced": "20",
+        "name": "OH_Input_GetAxisEventGlobalY"
     }
 ]
