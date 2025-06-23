@@ -54,6 +54,7 @@ ohos_unittest("MouseEventNormalizeTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "preferences:native_preferences",
+    "googletest:gmock_main",
   ]
 }
 
