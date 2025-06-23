@@ -2932,7 +2932,8 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     pointerEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     if (touchEvent->action == TOUCH_ACTION_DOWN) {
         pointerEvent->AddPointerItem(item);
-    } else if ((touchEvent->action == TOUCH_ACTION_MOVE) || (touchEvent->action == TOUCH_ACTION_UP)) {
+    } else if ((touchEvent->action == TOUCH_ACTION_MOVE) || (touchEvent->action == TOUCH_ACTION_UP) ||
+        (touchEvent->action == TOUCH_ACTION_CANCEL)) {
         pointerEvent->UpdatePointerItem(id, item);
     }
     return INPUT_SUCCESS;
