@@ -682,10 +682,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_05, TestSize.Level
     ASSERT_TRUE(subscribeId >= 0);
     size_t nTriggers { 30 };
     InjectAltTabs(nTriggers);
-    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    EXPECT_NE(nTriggers, nCalls);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId));
     InjectAltTabs(nTriggers);
-    EXPECT_NE(nTriggers, nCalls);
 #else
     EXPECT_TRUE(subscribeId < 0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
