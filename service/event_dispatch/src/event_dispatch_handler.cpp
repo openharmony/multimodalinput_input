@@ -346,8 +346,6 @@ void EventDispatchHandler::UpdateDisplayXY(const std::shared_ptr<PointerEvent> &
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
             pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
             pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
-            pointerItem.SetDisplayXPos(pointerItem.GetFixedDisplayX());
-            pointerItem.SetDisplayYPos(pointerItem.GetFixedDisplayY());
             point->UpdatePointerItem(pointerId, pointerItem);
         } else {
             MMI_HILOGI("targetDisplayId=%{private}d, targetWindowId=%{private}d, windowInputType=%{private}d, "
