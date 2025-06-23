@@ -1097,8 +1097,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
-        MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f",
-            it.first, cfg.dpi);
+        MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f", it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
                 cfg.rotationFocusX = GetFocusCoordinates();
@@ -1852,9 +1851,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
 {
     CALL_DEBUG_ENTER;
     CHKPV(addr);
-
     const uint32_t addrSize = width * height * CURSOR_STRIDE;
-
     currentFrame_ = 0;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
@@ -2567,16 +2564,14 @@ bool PointerDrawingManager::IsPointerVisible()
     if (!hapPidInfos_.empty()) {
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
-                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
-                    item.pid, item.visible ? "true" : "false");
+                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s", item.pid, item.visible ? "true" : "false");
                 return item.visible;
             }
         }
         if (!(INPUT_DEV_MGR->HasPointerDevice() || WIN_MGR->IsMouseSimulate() ||
         INPUT_DEV_MGR->HasVirtualPointerDevice()) || pid_ == 0) {
             auto info = hapPidInfos_.back();
-            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s",
-                info.pid, info.visible ? "true" : "false");
+            MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s", info.pid, info.visible ? "true" : "false");
             return info.visible;
         }
     }
@@ -2634,8 +2629,7 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
     if (count == 0 && !hapPidInfos_.empty()) {
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
-                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
-                    item.pid, item.visible ? "true" : "false");
+                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s", item.pid, item.visible ? "true" : "false");
                 count++;
                 ret = item.visible;
                 break;

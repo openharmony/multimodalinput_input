@@ -116,7 +116,7 @@ static void AddPreMonitor(napi_env env, napi_callback_info info, napi_value napi
         return;
     }
     if (!JS_INPUT_MONITOR_MGR.GetKeysArray(env, napiKeys, keysLength, keys)) {
-        THROWERR_CUSTOM(env, PRE_KEY_NOT_SUPPORTED, "Event listening not  supported for the key");
+        THROWERR_CUSTOM(env, PRE_KEY_NOT_SUPPORTED, "Event listening not supported for the key");
         return;
     }
     if (keys.size() != keysLength) {

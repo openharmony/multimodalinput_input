@@ -260,8 +260,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                 int32_t ppx = 0;
                 int32_t ppy = 0;
-                auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent)
-                {
+                auto simulateMouseEvent = [&ppx, &ppy](std::shared_ptr<PointerEvent> pointerEvent) {
                     PointerEvent::PointerItem item;
                     pointerEvent->GetPointerItem(0, item);
                     int32_t x = item.GetDisplayX();
@@ -498,8 +497,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                scrollValue);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL, scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             simulateMouseEvent(pointerEvent);
 
@@ -509,8 +507,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                scrollValue);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL, scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             simulateMouseEvent(pointerEvent);
 
@@ -520,8 +517,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                scrollValue);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL, scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             simulateMouseEvent(pointerEvent);
                             break;
@@ -2286,12 +2282,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     return SwipeActionEvent(startX, startY, endX, endY);
 }
 
-std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(
-    int32_t id,
-    int32_t type,
-    int32_t pointerId,
-    int32_t sourceType,
-    int32_t fingerCount)
+std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(int32_t id, int32_t type, int32_t pointerId,
+    int32_t sourceType, int32_t fingerCount)
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
@@ -2304,12 +2296,8 @@ std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(
     return pointerEvent;
 }
 
-void InputManagerCommand::FillPointerItem(
-    PointerEvent::PointerItem &item,
-    int32_t pointX,
-    int32_t pointY,
-    int32_t id,
-    bool press)
+void InputManagerCommand::FillPointerItem(PointerEvent::PointerItem &item, int32_t pointX, int32_t pointY,
+    int32_t id, bool press)
 {
     item.SetDisplayX(pointX);
     item.SetDisplayY(pointY);
