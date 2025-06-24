@@ -102,8 +102,7 @@
         "ipc",
         "sensor",
         "idl_tool",
-        "runtime_core",
-        "drivers_interface_rtos_extra"
+        "runtime_core"
       ],
       "third_party": [
         "libuv",
