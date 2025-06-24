@@ -6083,5 +6083,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_RequestInjectionCallback_001, TestSi
     int32_t status = 0;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RequestInjectionCallback(reqId, status));
 }
+
+/*
+ * @tc.name: InputManagerTest_SetInputDeviceConsumer
+ * @tc.desc: SetInputDeviceConsumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceConsumer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> deviceNames;
+    deviceNames.push_back("test1");
+    deviceNames.push_back("test2");
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    EXPECT_NE(inputManager->SetInputDeviceConsumer(deviceNames, consumer), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
