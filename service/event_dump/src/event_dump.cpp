@@ -18,7 +18,6 @@
 #include <getopt.h>
 
 #include "event_statistic.h"
-#include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -31,6 +30,7 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#include "cursor_drawing_component.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
@@ -191,7 +191,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             }
             case 'c': {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-                IPointerDrawingManager::GetInstance()->Dump(fd, args);
+                CursorDrawingComponent::GetInstance().Dump(fd, args);
 #else
                 mprintf(fd, "Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

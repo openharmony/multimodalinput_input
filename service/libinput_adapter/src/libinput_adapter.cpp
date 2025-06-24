@@ -176,9 +176,9 @@ public:
         : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
     {
     }
- 
+
     virtual ~BootStatusReceiver() = default;
- 
+
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         LibinputAdapter::SetBootCompleted();
@@ -557,21 +557,17 @@ void LibinputAdapter::HandleHWKeyEventForVKeyboard(libinput_event* event)
 
 void LibinputAdapter::ShowMouseCursor()
 {
-    MMI_HILOGD("Check cursor state function valid = %{public}d",
-        IPointerDrawingManager::GetInstance() != nullptr);
-    if (IPointerDrawingManager::GetInstance() != nullptr &&
-        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+    if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         MMI_HILOGI("Found hidden mouse cursor during trackpad operation, show it.");
-        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     }
 }
 
 void LibinputAdapter::HideMouseCursorTemporary()
 {
     MMI_HILOGI("VKeyboard hide mouse.");
-    if (IPointerDrawingManager::GetInstance() != nullptr &&
-        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
+        CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
     }
 }
 

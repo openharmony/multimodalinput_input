@@ -17,6 +17,7 @@
 #include <fstream>
 #include <gmock/gmock.h>
 
+#include "cursor_drawing_component.h"
 #include "event_filter_handler.h"
 #include "fingersense_wrapper.h"
 #include "i_pointer_drawing_manager.h"
@@ -3631,7 +3632,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     inputWindowsManager.lastPointerEvent_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
     inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
@@ -4016,7 +4017,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     inputWindowsManager.SetHoverScrollState(true);
     std::map<int32_t, PointerStyle> styleMap;
     PointerStyle pointerStyle;
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
     inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;
@@ -4075,7 +4076,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     inputWindowsManager.SetHoverScrollState(true);
     std::map<int32_t, PointerStyle> styleMap;
     PointerStyle pointerStyle;
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
     inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
     UDSServer udsServer;

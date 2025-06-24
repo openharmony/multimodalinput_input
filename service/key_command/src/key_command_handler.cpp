@@ -26,10 +26,8 @@
 #include "key_command_handler_util.h"
 #include "key_event_normalize.h"
 #include "long_press_subscriber_handler.h"
+#include "cursor_drawing_component.h"
 #include "pull_throw_subscriber_handler.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "pointer_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
@@ -2652,7 +2650,7 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
         MMI_HILOGI("Force make pointer visible");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
+        CursorDrawingComponent::GetInstance().ForceClearPointerVisiableStatus();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
     lastKeyEventCode_ = keyEvent->GetKeyCode();
@@ -3074,7 +3072,7 @@ int32_t KeyCommandHandler::CheckTwoFingerGesture(int32_t pid)
         return RET_ERR;
     }
     if (timeOut > SCREEN_TIME_OUT) {
-        MMI_HILOGE("Start application timeout, startTime:%{public}" PRId64 
+        MMI_HILOGE("Start application timeout, startTime:%{public}" PRId64
         ", millisecond:%{public}" PRId64 ", timeOut:%{public}" PRId64,
             twoFingerGesture_.startTime, milliseconds, timeOut);
         return RET_ERR;
@@ -3153,7 +3151,7 @@ int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType
         enable);
     return RET_OK;
 }
- 
+
 bool KeyCommandHandler::HasScreenCapturePermission(uint32_t permissionType)
 {
     bool hasScreenCapturePermission = ((screenCapturePermission_ & permissionType) == permissionType);

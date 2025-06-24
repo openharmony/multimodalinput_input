@@ -49,13 +49,13 @@
 #include "infrared_emitter_controller.h"
 #endif // OHOS_BUILD_ENABLE_RTOS_EXTRA
 #include "ipc_skeleton.h"
-#include "i_pointer_drawing_manager.h"
 #include "i_preference_manager.h"
 #include "key_auto_repeat.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "permission_helper.h"
+#include "cursor_drawing_component.h"
 #include "touch_event_normalize.h"
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "touch_gesture_manager.h"
@@ -406,7 +406,7 @@ int32_t MMIService::Init()
     ANRMgr->Init(*this);
     MMI_HILOGI("PointerDrawingManager Init");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!IPointerDrawingManager::GetInstance()->Init()) {
+    if (!CursorDrawingComponent::GetInstance().Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
@@ -484,7 +484,7 @@ void MMIService::OnStart()
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    IPointerDrawingManager::GetInstance()->InitPointerObserver();
+    CursorDrawingComponent::GetInstance().InitPointerObserver();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     InitPreferences();
 #if OHOS_BUILD_ENABLE_POINTER
@@ -715,7 +715,7 @@ void MMIService::OnDisconnected(SessionPtr s)
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
+    CursorDrawingComponent::GetInstance().DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -784,7 +784,7 @@ ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, in
     }
     ret = delegateTasks_.PostSyncTask(std::bind(
         [curPixelMap, pid, windowId, focusX, focusY] {
-            return IPointerDrawingManager::GetInstance()->SetCustomCursor(curPixelMap,
+            return CursorDrawingComponent::GetInstance().SetCustomCursor(curPixelMap,
                 pid, windowId, focusX, focusY);
         }
         ));
@@ -817,7 +817,7 @@ ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixe
     }
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, curPixelMap] {
-            return IPointerDrawingManager::GetInstance()->SetMouseIcon(pid, windowId, curPixelMap);
+            return CursorDrawingComponent::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
         }
         ));
     if (ret != RET_OK) {
@@ -851,7 +851,7 @@ ErrCode MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
     }
     ret = delegateTasks_.PostSyncTask(
         [pid, windowId, hotSpotX, hotSpotY] {
-            return IPointerDrawingManager::GetInstance()->SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+            return CursorDrawingComponent::GetInstance().SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
         }
         );
     if (ret != RET_OK) {
@@ -930,7 +930,7 @@ ErrCode MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [size] {
-            return IPointerDrawingManager::GetInstance()->SetPointerSize(size);
+            return CursorDrawingComponent::GetInstance().SetPointerSize(size);
         }
         );
     if (ret != RET_OK) {
@@ -944,7 +944,7 @@ ErrCode MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerSize(int32_t &size)
 {
-    size = IPointerDrawingManager::GetInstance()->GetPointerSize();
+    size = CursorDrawingComponent::GetInstance().GetPointerSize();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -990,7 +990,7 @@ ErrCode MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto ret = delegateTasks_.PostSyncTask(
         [&surfaceId] {
-            return IPointerDrawingManager::GetInstance()->GetCursorSurfaceId(surfaceId);
+            return CursorDrawingComponent::GetInstance().GetCursorSurfaceId(surfaceId);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("GetCursorSurfaceId fail, error:%{public}d", ret);
@@ -1068,7 +1068,7 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, visible, priority, isHap] {
-            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority, isHap);
+            return CursorDrawingComponent::GetInstance().SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
     if (ret != RET_OK) {
@@ -1083,7 +1083,7 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
     WIN_MGR->UpdatePointerDrawingManagerWindowInfo();
-    visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
+    visible = CursorDrawingComponent::GetInstance().IsPointerVisible();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1141,7 +1141,7 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [color] {
-            return IPointerDrawingManager::GetInstance()->SetPointerColor(color);
+            return CursorDrawingComponent::GetInstance().SetPointerColor(color);
         }
         );
     if (ret != RET_OK) {
@@ -1155,7 +1155,7 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerColor(int32_t &color)
 {
-    color = IPointerDrawingManager::GetInstance()->GetPointerColor();
+    color = CursorDrawingComponent::GetInstance().GetPointerColor();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1272,7 +1272,7 @@ ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointe
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, pointerStyle, isUiExtension] {
-            return IPointerDrawingManager::GetInstance()->SetPointerStyle(
+            return CursorDrawingComponent::GetInstance().SetPointerStyle(
                 clientPid, windowId, pointerStyle, isUiExtension);
         }
         );
@@ -1299,7 +1299,7 @@ ErrCode MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
     }
     ret = delegateTasks_.PostSyncTask(
         [pid, windowId] {
-            return IPointerDrawingManager::GetInstance()->ClearWindowPointerStyle(pid, windowId);
+            return CursorDrawingComponent::GetInstance().ClearWindowPointerStyle(pid, windowId);
         }
         );
     if (ret != RET_OK) {
@@ -1317,7 +1317,7 @@ ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, &pointerStyle, isUiExtension] {
-            return IPointerDrawingManager::GetInstance()->GetPointerStyle(
+            return CursorDrawingComponent::GetInstance().GetPointerStyle(
                 clientPid, windowId, pointerStyle, isUiExtension);
         }
         );
@@ -2292,13 +2292,13 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
-        IPointerDrawingManager::GetInstance()->InitPointerCallback();
+        CursorDrawingComponent::GetInstance().InitPointerCallback();
     }
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
-        IPointerDrawingManager::GetInstance()->InitScreenInfo();
+        CursorDrawingComponent::GetInstance().InitScreenInfo();
     }
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
-        IPointerDrawingManager::GetInstance()->SubscribeScreenModeChange();
+        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
@@ -2310,7 +2310,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
-            IPointerDrawingManager::GetInstance()->InitPointerObserver();
+            CursorDrawingComponent::GetInstance().InitPointerObserver();
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -2725,7 +2725,7 @@ ErrCode MMIService::SubscribeLongPressEvent(int32_t subscribeId, const LongPress
     }
     return RET_OK;
 }
- 
+
 ErrCode MMIService::UnsubscribeLongPressEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
@@ -4196,7 +4196,7 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
 
     vkeyboard_onFuncKeyEvent_ = (VKEYBOARD_ONFUNCKEYEVENT_TYPE)dlsym(
         g_VKeyboardHandle, "OnFuncKeyEvent");
-    
+
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (vkeyboard_onFuncKeyEvent_ != nullptr) {
@@ -4441,7 +4441,7 @@ ErrCode MMIService::EnableHardwareCursorStats(bool enable)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid, enable] {
-            return IPointerDrawingManager::GetInstance()->EnableHardwareCursorStats(pid, enable);
+            return CursorDrawingComponent::GetInstance().EnableHardwareCursorStats(pid, enable);
         }
         );
     if (ret != RET_OK) {
@@ -4465,7 +4465,7 @@ ErrCode MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid, &frameCount, &vsyncCount] {
-            return IPointerDrawingManager::GetInstance()->GetHardwareCursorStats(pid, frameCount, vsyncCount);
+            return CursorDrawingComponent::GetInstance().GetHardwareCursorStats(pid, frameCount, vsyncCount);
         }
         );
     if (ret != RET_OK) {
@@ -4654,7 +4654,7 @@ ErrCode MMIService::SkipPointerLayer(bool isSkip)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [isSkip] {
-            return IPointerDrawingManager::GetInstance()->SkipPointerLayer(isSkip);
+            return CursorDrawingComponent::GetInstance().SkipPointerLayer(isSkip);
         }
         );
     if (ret != RET_OK) {
@@ -4882,7 +4882,7 @@ ErrCode MMIService::SetCustomCursor(int32_t windowId,
 #if defined OHOS_BUILD_ENABLE_POINTER
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, cursor, options] {
-            return IPointerDrawingManager::GetInstance()->SetCustomCursor(pid, windowId, cursor, options);
+            return CursorDrawingComponent::GetInstance().SetCustomCursor(pid, windowId, cursor, options);
         }
         ));
     if (ret != RET_OK) {

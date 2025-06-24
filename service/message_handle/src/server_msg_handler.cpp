@@ -27,7 +27,6 @@
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "i_pointer_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "key_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
@@ -37,6 +36,7 @@
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "time_cost_chk.h"
+#include "cursor_drawing_component.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
@@ -293,11 +293,11 @@ int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<Pointer
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
         } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
             (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
-            !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-            IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
+            !CursorDrawingComponent::GetInstance().IsPointerVisible()) {
+            CursorDrawingComponent::GetInstance().SetPointerVisible(getpid(), true, 0, false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     } else {
@@ -374,11 +374,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
                 break;
             } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+                CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
-                !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
+                !CursorDrawingComponent::GetInstance().IsPointerVisible()) {
+                CursorDrawingComponent::GetInstance().SetPointerVisible(getpid(), true, 0, false);
             }
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
