@@ -15,6 +15,7 @@
 
 #include <cstdio>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "general_mouse.h"
 #include "general_touchpad.h"
@@ -25,15 +26,23 @@
 #include "input_windows_manager.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+using namespace testing;
 constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
 constexpr int32_t HARD_PC_PRO_DEVICE_WIDTH = 2880;
 constexpr int32_t HARD_PC_PRO_DEVICE_HEIGHT = 1920;
 }
+class MockPreferenceManager : public MultiModalInputPreferencesManager {
+public:
+    MOCK_METHOD(int32_t, SetPreValue, (const std::string &, const std::string &,
+        const NativePreferences::PreferencesValue &));
+};
+
 class MouseTransformProcessorTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -57,6 +66,7 @@ private:
     bool preScrollSwitch_ { true };
     bool preScrollDirection_ { true };
     bool preTapSwitch_ { true };
+    std::shared_ptr<MockPreferenceManager> mockPreferencesMgr;
 };
 
 GeneralMouse MouseTransformProcessorTest::vMouse_;
@@ -105,6 +115,7 @@ void MouseTransformProcessorTest::SetUp()
     prePointerSpeed_ = g_processor_.GetPointerSpeed();
     prePrimaryButton_ = g_processor_.GetMousePrimaryButton();
     preScrollRows_ = g_processor_.GetMouseScrollRows();
+    mockPreferencesMgr = std::make_shared<MockPreferenceManager>();
     g_processor_.GetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
     g_processor_.GetTouchpadRightClickType(preRightClickType_);
     g_processor_.GetTouchpadScrollSwitch(preScrollSwitch_);
@@ -533,17 +544,35 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadPoi
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_SetTouchpadRightClickType_024
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadRightClickType_001
  * @tc.desc: Test SetTouchpadRightClickType
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadRightClickType_024, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadRightClickType_001, TestSize.Level1)
 {
     int32_t deviceId = 6;
     MouseTransformProcessor processor(deviceId);
     int32_t type = 2;
     ASSERT_TRUE(processor.SetTouchpadRightClickType(type) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadRightClickType_002
+ * @tc.desc: Test SetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadRightClickType_002, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    auto originInstance = PREFERENCES_MGR;
+    MouseTransformProcessor processor(deviceId);
+    EXPECT_CALL(*mockPreferencesMgr, SetPreValue(_, _, _)).WillOnce(Return(RET_ERR));
+    PREFERENCES_MGR->SetInstanceForTesting(mockPreferencesMgr);
+    int32_t result = processor.SetTouchpadRightClickType(1);
+    PREFERENCES_MGR->SetInstanceForTesting(originInstance);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**

@@ -23,8 +23,6 @@
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultiModalInputPreferencesManager"
-#define RIGHT_MENU_TYPE_INDEX_V1 0
-#define RIGHT_MENU_TYPE_INDEX_V2 1
 
 namespace OHOS {
 namespace MMI {
@@ -54,6 +52,8 @@ constexpr int32_t MAGIC_POINTER_SIZE { 1 };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t POINTER_STYLE { 0 };
 constexpr int32_t ERROR_DELAY_VALUE { -1000 };
+constexpr int32_t RIGHT_MENU_TYPE_INDEX_V1 { 0 };
+constexpr int32_t RIGHT_MENU_TYPE_INDEX_V2 { 1 };
 constexpr bool BOOL_DEFAULT { true };
 const std::string PATH { "/data/service/el1/public/multimodalinput/" };
 const std::string SHORT_KEY_FILE_NAME { "Settings.xml" };
@@ -75,6 +75,11 @@ std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
         }
     }
     return instance_;
+}
+
+void IPreferenceManager::SetInstanceForTesting(std::shared_ptr<IPreferenceManager> instance)
+{
+    instance_ = instance;
 }
 
 int32_t MultiModalInputPreferencesManager::InitPreferences()
@@ -108,7 +113,7 @@ int32_t MultiModalInputPreferencesManager::GetRightClickTypeVal(
         TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON : TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON;
 
     clickType = touchpadPref->GetInt(strTouchpadRightClickType_, 0);
-    if (clickType) {
+    if (clickType != 0) {
         clickTypeVect[RIGHT_MENU_TYPE_INDEX_V1] = clickType;
         touchpadPref->Delete(strTouchpadRightClickType_);
         touchpadPref->Put(strTouchpadRightClickType_, clickTypeVect);
@@ -257,8 +262,20 @@ void MultiModalInputPreferencesManager::UpdatePreferencesMap(const std::string &
 int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, const std::string &setFile,
     int32_t setValue)
 {
+    auto iter = preferencesMap_.find(key);
     std::string filePath = "";
-    UpdatePreferencesMap(key, setFile, setValue, filePath);
+    if (iter == preferencesMap_.end()) {
+        preferencesMap_[key] = {setFile, setValue};
+        filePath = PATH + setFile;
+    } else {
+        auto [fileName, value] = iter->second;
+        if (value == setValue) {
+            MMI_HILOGD("The set value is same");
+            return RET_OK;
+        }
+        filePath = PATH + fileName;
+        preferencesMap_[key].second = setValue;
+    }
 
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
@@ -281,8 +298,20 @@ int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, c
 int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, const std::string &setFile,
     bool setValue)
 {
+    auto iter = preferencesMap_.find(key);
     std::string filePath = "";
-    UpdatePreferencesMap(key, setFile, static_cast<int32_t>(setValue), filePath);
+    if (iter == preferencesMap_.end()) {
+        preferencesMap_[key] = {setFile, static_cast<int32_t>(setValue)};
+        filePath = PATH + setFile;
+    } else {
+        auto [fileName, value] = iter->second;
+        if (static_cast<bool>(value) == setValue) {
+            MMI_HILOGD("The set value is same");
+            return RET_OK;
+        }
+        filePath = PATH + fileName;
+        preferencesMap_[key].second = setValue;
+    }
 
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =

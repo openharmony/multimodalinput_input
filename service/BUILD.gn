@@ -1818,6 +1818,7 @@ ohos_unittest("ModuleLoaderTest") {
     "module_loader/test/mmi_service_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
+    "module_loader/test/multimodal_input_preferences_manager_test.cpp",
   ]
 
   deps = [
