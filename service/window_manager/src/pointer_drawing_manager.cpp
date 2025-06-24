@@ -32,7 +32,6 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
-#include "mmi_service.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "ipc_skeleton.h"
@@ -143,6 +142,7 @@ std::atomic<bool> g_isRsRestart { false };
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
 #endif // OHOS_BUILD_PC_PRIORITY
+const int32_t MULTIMODAL_INPUT_SERVICE_ID = 3101;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -581,8 +581,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     // Listening enabling cursor deformation and color inversion
     SettingObserver::UpdateFunc func = [](const std::string& key) {
         bool statusValue = false;
-        auto ret = SettingDataShare::GetInstance(
-            MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID).GetBoolValue(key, statusValue);
+        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;

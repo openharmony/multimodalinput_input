@@ -18,9 +18,9 @@
 #include "delegate_interface.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
-#include "i_pointer_drawing_manager.h"
 #include "input_event_handler.h"
 #include "key_subscriber_handler.h"
+#include "cursor_drawing_component.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 
@@ -109,7 +109,7 @@ public:
             MMI_HILOGI("Received data share ready event");
             if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
                 MMI_HILOGI("Data share has readyed");
-                IPointerDrawingManager::GetInstance()->InitPointerObserver();
+                CursorDrawingComponent::GetInstance().InitPointerObserver();
                 auto keySubscriberHandler = InputHandler->GetSubscriberHandler();
                 CHKPV(keySubscriberHandler);
                 keySubscriberHandler->InitDataShareListener();
