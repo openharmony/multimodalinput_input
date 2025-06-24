@@ -283,7 +283,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::vector<int32_t> HandleHardwareCursor(std::shared_ptr<DisplayInfo> &physicalDisplayInfo,
-    int32_t physicalX, int32_t physicalY);
+        int32_t physicalX, int32_t physicalY);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
