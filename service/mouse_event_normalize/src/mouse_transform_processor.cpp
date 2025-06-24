@@ -53,8 +53,6 @@ constexpr int32_t SOFT_PC_PRO_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_PC_PRO_DEVICE_HEIGHT { 2080 };
 constexpr int32_t TABLET_DEVICE_WIDTH { 2880 };
 constexpr int32_t TABLET_DEVICE_HEIGHT { 1920 };
-constexpr int32_t FOLD_PC_WIDTH { 2472 };
-constexpr int32_t FOLD_PC_HEIGHT { 3296 };
 const char* DEVICE_TYPE_FOLD_PC { "FOLD_PC" };
 const char* DEVICE_TYPE_TABLET { "TABLET"};
 const char* DEVICE_TYPE_PC_PRO { "PC_PRO" };
