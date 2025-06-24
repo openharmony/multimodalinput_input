@@ -233,11 +233,13 @@ ohos_unittest("MouseEventNormalizeEXTest") {
   ]
  
   external_deps = [
+    "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwsutils",
