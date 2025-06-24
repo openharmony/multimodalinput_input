@@ -803,6 +803,12 @@
             "finalKey": 2012,
             "longPressTime": 0,
             "triggerType": "down"
+        },
+        {
+            "preKeys": [],
+            "finalKey": 18,
+            "longPressTime": 1200,
+            "triggerType": "down"
         }
     ]
 }
