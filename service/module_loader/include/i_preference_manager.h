@@ -43,6 +43,7 @@ public:
         const NativePreferences::PreferencesValue &setValue) = 0;
 
     static std::shared_ptr<IPreferenceManager> GetInstance();
+    static void SetInstanceForTesting(std::shared_ptr<IPreferenceManager> instance);
 
 private:
     static std::mutex mutex_;
