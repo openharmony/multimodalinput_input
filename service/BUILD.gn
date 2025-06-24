@@ -2179,6 +2179,55 @@ ohos_unittest("InfraredEmitterTest") {
   }
 }
 
+ohos_unittest("InfraredEmitterEXTest") {
+  module_out_path = module_output_path
+ 
+  include_dirs = [
+    "infrared_emitter/include",
+    "infrared_emitter/test",
+  ]
+ 
+  configs = [ "${mmi_path}:coverage_flags" ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
+ 
+  sources = [
+    "infrared_emitter/src/infrared_emitter_controller.cpp",
+    "infrared_emitter/test/infrared_emitter_controller_ex_test.cpp",
+    "infrared_emitter/test/mock.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+ 
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+  ]
+ 
+  if (drivers_interface_rtos_extra_enable) {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
+  }
+}
+
 ohos_unittest("InterceptorTest") {
   module_out_path = module_output_path
 
