@@ -19,6 +19,7 @@
 #include "app_state_observer.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
+#include "key_auto_repeat.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 #include "key_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
@@ -358,7 +359,8 @@ void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output
 
 bool KeyGestureManager::LongPressCombinationKey::RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) {
+    if ((keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) &&
+        (keyEvent->GetKeyCode() != KeyRepeat->GetRepeatKeyCode())) {
         firstDownTime_ = GetSysClockTime();
     }
     int64_t now = GetSysClockTime();
