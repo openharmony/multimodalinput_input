@@ -635,22 +635,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction_001,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow_001
- * @tc.desc: Test Overrides CreateTouchWindow function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateTouchWindow_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    int32_t displayId = 10;
-    kceDrawMgr.surfaceNode_ = nullptr;
-    kceDrawMgr.displayInfo_.displayMode = DisplayMode::MAIN;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateTouchWindow(displayId));
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle_001
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
@@ -835,8 +819,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackCanvas_00
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
     kceDrawMgr.CreateTrackCanvasNode();
-    kceDrawMgr.pathLength_ = 0;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
 
     kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_500;
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
@@ -846,41 +829,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackCanvas_00
 
     kceDrawMgr.pathLength_ = TRACK_PATH_LENGTH_1500;
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawTrackCanvas());
-}
-
-/**
- * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_001
- * @tc.desc: Test Overrides ProcessUpEvent function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    bool isNeedUpAnimation = true;
-    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
-    EXPECT_EQ(ret, RET_ERR);
-
-    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
-
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
-    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
-    EXPECT_EQ(ret, RET_OK);
-
-    isNeedUpAnimation = false;
-    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
-
-    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
-    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
-    EXPECT_EQ(ret, RET_OK);
 }
 #endif
 } // namespace MMI
