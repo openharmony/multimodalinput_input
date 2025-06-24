@@ -4340,5 +4340,182 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionW
     isSkip = false;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+/**
+ * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest001
+ * @tc.desc: Test the funcation HandleHardWareCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTest001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<DisplayInfo> physicalDisplayInfo = std::make_shared<DisplayInfo>();
+    ASSERT_NE(physicalDisplayInfo, nullptr);
+    physicalDisplayInfo->direction = Direction::DIRECTION0;
+    physicalDisplayInfo->displayDirection = Direction::DIRECTION0;
+    physicalDisplayInfo->validWidth = 1024;
+    physicalDisplayInfo->validHeight = 768;
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
+    std::vector<int32_t> result = inputWindowsManager->HandleHardwareCursor(physicalDisplayInfo, 512, 384);
+    EXPECT_EQ(result[0], 512);
+    EXPECT_EQ(result[1], 384);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest002
+ * @tc.desc: Test the funcation HandleHardWareCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTest002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<DisplayInfo> physicalDisplayInfo = std::make_shared<DisplayInfo>();
+    ASSERT_NE(physicalDisplayInfo, nullptr);
+    physicalDisplayInfo->direction = Direction::DIRECTION90;
+    physicalDisplayInfo->displayDirection = Direction::DIRECTION0;
+    physicalDisplayInfo->validWidth = 1024;
+    physicalDisplayInfo->validHeight = 768;
+
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    std::vector<int32_t> result = inputWindowsManager->HandleHardwareCursor(physicalDisplayInfo, 512, 384);
+}
+
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest015
+ * @tc.desc: Test the funcation UpdateMouseTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 1024;
+    displayInfo.height = 768;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.direction = Direction::DIRECTION180;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(300);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    EXPECT_CALL(*messageParcelMock_, UpdateDisplayId(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, SelectWindowInfo(_, _, _)).WillOnce(Return(std::nullopt));
+    EXPECT_CALL(*messageParcelMock_, GetHardCursorEnabled()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_EQ(inputWindowsManager->UpdateMouseTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest016
+ * @tc.desc: Test the funcation UpdateMouseTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest016, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 1024;
+    displayInfo.height = 768;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.direction = Direction::DIRECTION180;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(300);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    EXPECT_CALL(*messageParcelMock_, UpdateDisplayId(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, SelectWindowInfo(_, _, _)).WillOnce(Return(std::nullopt));
+    EXPECT_CALL(*messageParcelMock_, GetHardCursorEnabled()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_EQ(inputWindowsManager->UpdateMouseTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest017
+ * @tc.desc: Test the funcation UpdateMouseTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest017, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 1024;
+    displayInfo.height = 768;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.direction = Direction::DIRECTION180;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(300);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    EXPECT_CALL(*messageParcelMock_, UpdateDisplayId(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, SelectWindowInfo(_, _, _)).WillOnce(Return(std::nullopt));
+    EXPECT_CALL(*messageParcelMock_, GetHardCursorEnabled()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, HandleHardwareCursor(_, _, _)).WillOnce(Return(std::vector<int32_t>({ 1 })));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_EQ(inputWindowsManager->UpdateMouseTarget(pointerEvent), RET_ERR);
+}
+
+#endif /* OHOS_BUILD_ENABLE_POINTER */
+
 } // namespace MMI
 } // namespace OHOS
