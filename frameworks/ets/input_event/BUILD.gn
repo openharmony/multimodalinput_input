@@ -18,9 +18,9 @@ copy_taihe_idl("input_event_taihe") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_inputEvent = "$taihe_file_path/out/$subsystem_name/$part_name/inputEvent"
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_inputEvent}"
   deps = [ ":input_event_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputEvent.ani.cpp",
@@ -28,8 +28,8 @@ ohos_taihe("run_taihe") {
   ]
 }
 generate_static_abc("input_event") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputEvent.ets" ]
+  base_url = "${taihe_generated_file_path_inputEvent}"
+  files = [ "${taihe_generated_file_path_inputEvent}/@ohos.multimodalInput.inputEvent.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/input_event.abc"
   dependencies = [ ":run_taihe" ]
