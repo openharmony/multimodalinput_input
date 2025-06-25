@@ -20,11 +20,10 @@
 
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "pointer_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 #include "util_ex.h"
 #include "dfx_hisysevent_device.h"
+#include "cursor_drawing_component.h"
+#include "parameters.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -896,7 +895,7 @@ void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool e
     if (addNewPointerDevice && !existEnabledPointerDevice) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         NotifyPointerDevice(true, true, true);
@@ -908,7 +907,7 @@ void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool e
         WIN_MGR->UpdatePointerChangeAreas();
     }
     if (addNewPointerDevice && !existEnabledPointerDevice &&
-        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -918,7 +917,7 @@ void InputDeviceManager::NotifyRemovePointerDevice(bool removePointerDevice)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (removePointerDevice && !HasPointerDevice() && !HasVirtualPointerDevice() &&
-        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

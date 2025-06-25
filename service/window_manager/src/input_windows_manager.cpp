@@ -18,9 +18,9 @@
 
 #include "display_manager.h"
 #include "event_log_helper.h"
-#include "i_pointer_drawing_manager.h"
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
+#include "cursor_drawing_component.h"
 #include "scene_board_judgement.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
@@ -298,7 +298,7 @@ const std::vector<WindowInfo> InputWindowsManager::GetWindowGroupInfoByDisplayId
     }
     std::map<int32_t, WindowGroupInfo>& windowsPerDisplay =
         const_cast<std::map<int32_t, WindowGroupInfo> &>(windowsPerDisplay_);
-    
+
     const auto& iter = windowsPerDisplayMap_.find(groupId);
     windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
     const auto& it = windowsPerDisplay.find(displayId);
@@ -325,7 +325,7 @@ const std::vector<WindowInfo>& InputWindowsManager::GetWindowGroupInfoByDisplayI
     }
     std::map<int32_t, WindowGroupInfo>& windowsPerDisplay =
         const_cast<std::map<int32_t, WindowGroupInfo> &>(windowsPerDisplay_);
-    
+
     const auto& iter = windowsPerDisplayMap_.find(groupId);
     windowsPerDisplay = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
     const auto& it = windowsPerDisplay.find(displayId);
@@ -465,7 +465,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     if (windowInfo == nullptr) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
             dragPointerStyle_.id = DEFAULT_POINTER_STYLE;
-            IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+            CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
         }
         MMI_HILOG_DISPATCHD("window info is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEAVE_WINDOW ||
@@ -570,7 +570,6 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 
 DisplayGroupInfo& InputWindowsManager::FindTargetDisplayGroupInfo(int32_t displayId)
 {
-    
     for (auto& it : displayGroupInfoMap_) {
         for (const auto& item : it.second.displaysInfo) {
             if (item.id == displayId) {
@@ -1005,9 +1004,9 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         bool pointDrawFlag = NeedUpdatePointDrawFlag(windowGroupInfoTmp.windowsInfo);
         pointerDrawFlagMap_[displayGroupInfo.groupId] = pointDrawFlag;
-        
+
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
- 
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
         UpdateWindowInfoExt(windowGroupInfoTmp, displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1106,7 +1105,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
         });
     }
     std::map<int32_t, WindowGroupInfo>& windowsPerDisplayTmp = windowsPerDisplay_;
-   
+
     const auto& iter = windowsPerDisplayMap_.find(groupId);
     windowsPerDisplayTmp = (iter != windowsPerDisplayMap_.end()) ? iter->second : windowsPerDisplay_;
     for (const auto &item : windowsPerDisplay) {
@@ -1115,7 +1114,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
             CheckZorderWindowChange(windowsPerDisplayTmp[displayId].windowsInfo, item.second.windowsInfo);
         }
     }
-   
+
     windowsPerDisplayMap_[groupId] = windowsPerDisplay;
     windowsPerDisplay_ = windowsPerDisplay;
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -1379,7 +1378,7 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const DisplayGro
                 }
                 auto displayInfo = GetPhysicalDisplay(displayId);
                 CHKPV(displayInfo);
-                IPointerDrawingManager::GetInstance()->SetPointerLocation(
+                CursorDrawingComponent::GetInstance().SetPointerLocation(
                     static_cast<int32_t>(cursorPosx),
                     static_cast<int32_t>(cursorPosy), displayInfo->uniqueId);
             }
@@ -1692,7 +1691,7 @@ void InputWindowsManager::SendCancelEventWhenWindowChange(int32_t pointerId, int
 {
     MMI_HILOGD("Dispatch cancel event pointerId:%{public}d", pointerId);
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChangeTmp = lastPointerEventforWindowChange_;
-    
+
     const auto iter = lastPointerEventforWindowChangeMap_.find(groupId);
     if (iter != lastPointerEventforWindowChangeMap_.end()) {
         lastPointerEventforWindowChangeTmp = iter->second;
@@ -1833,7 +1832,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
     InitPointerStyle(displayGroupInfo.groupId);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    
+
     const auto iter = pointerDrawFlagMap_.find(groupId);
     bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
     if (!displayGroupInfo.displaysInfo.empty() && bFlag) {
@@ -1844,7 +1843,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
             PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
         }
     }
-    
+
     lastDpiMap_[groupId] = displayGroupInfoTemp.displaysInfo.empty() ? DEFAULT_DPI :
     displayGroupInfoTemp.displaysInfo[0].dpi;
     if (INPUT_DEV_MGR->HasPointerDevice() && bFlag) {
@@ -1858,7 +1857,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
 {
     CursorPosition cursorPosCur;
-   
+
     const auto iter = cursorPosMap_.find(groupId);
     if (iter == cursorPosMap_.end()) {
         cursorPosMap_[groupId]  = cursorPosCur;
@@ -1883,7 +1882,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
         if (cursorPosCur.direction == displayInfo->direction) {
             ScreenRotateAdjustDisplayXY(*displayInfo, coord);
         }
-        
+
         const auto iter = cursorPosMap_.find(groupId);
         if (iter != cursorPosMap_.end()) {
             cursorPosMap_[groupId].direction = displayInfo->direction;
@@ -1894,15 +1893,15 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
             (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
             AdjustDragPosition(groupId);
         }
-        IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
+        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*displayInfo);
         int32_t displayId = -1;
-       
+
         if (iter != cursorPosMap_.end()) {
             displayId = iter->second.displayId;
         }
         auto displayInfoTmp = GetPhysicalDisplay(displayId);
         CHKPV(displayInfoTmp);
-        IPointerDrawingManager::GetInstance()->SetPointerLocation(
+        CursorDrawingComponent::GetInstance().SetPointerLocation(
             static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), displayInfoTmp->uniqueId);
     }
 }
@@ -1914,7 +1913,7 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
     int32_t displayId = -1;
     int32_t physicalX = 0;
     int32_t physicalY = 0;
-  
+
     auto iter = mouseLocationMap_.find(groupId);
     if (iter != mouseLocationMap_.end()) {
         displayId = iter->second.displayId;
@@ -1954,7 +1953,7 @@ DisplayMode InputWindowsManager::GetDisplayMode() const
     const auto iter = displayModeMap_.find(MAIN_GROUPID);
     if (iter != displayModeMap_.end()) {
         return iter->second;
-    } 
+    }
     return displayMode_;
 }
 
@@ -2005,9 +2004,9 @@ void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 {
     if (DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
         if (!isDisplayRemoved) {
-            IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+            CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
         } else {
-            IPointerDrawingManager::GetInstance()->DrawScreenCenterPointer(dragPointerStyle_);
+            CursorDrawingComponent::GetInstance().DrawScreenCenterPointer(dragPointerStyle_);
         }
     }
 }
@@ -2015,8 +2014,8 @@ void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
     bool isDisplayRemoved)
 {
-    auto currentDisplayInfo = IPointerDrawingManager::GetInstance()->GetCurrentDisplayInfo();
-    IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
+    auto currentDisplayInfo = CursorDrawingComponent::GetInstance().GetCurrentDisplayInfo();
+    CursorDrawingComponent::GetInstance().OnDisplayInfo(displayGroupInfo);
     int32_t groupId = displayGroupInfo.groupId;
     int32_t newId = 0;
     int32_t &lastDpiTmp = lastDpi_;
@@ -2043,7 +2042,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             MMI_HILOGD("dpi changed, current displayId: %{public}d, dpi: %{public}d, "
                 "latest displayId: %{public}d, dpi: %{public}d",
             currentDisplayInfo.uniqueId, currentDisplayInfo.dpi, displayInfo.uniqueId, displayInfo.dpi);
-            auto drawNewDpiRes = IPointerDrawingManager::GetInstance()->DrawNewDpiPointer();
+            auto drawNewDpiRes = CursorDrawingComponent::GetInstance().DrawNewDpiPointer();
             if (drawNewDpiRes != RET_OK) {
                 MMI_HILOGE("Draw New Dpi pointer failed.");
             }
@@ -2106,7 +2105,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         CHKFRV(windowInfo, "The windowInfo is nullptr");
         int32_t windowPid = GetWindowPid(windowInfo->id);
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
-        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
+        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
         PointerStyle pointerStyle;
         GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
         MMI_HILOGD("Get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
@@ -2185,7 +2184,7 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
     int32_t displayId = MouseEventHdr->GetDisplayId();
     int32_t groupId = FindDisplayGroupId(displayId);
     int32_t newId = 0;
-    
+
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         if (iter->second.displaysInfo.empty()) {
@@ -2223,7 +2222,7 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
         Direction displayDirection = Direction::DIRECTION0;
         double cursorPosx = 0.0;
         double cursorPosy = 0.0;
-        
+
         const auto iter = cursorPosMap_.find(groupId);
         if (iter != cursorPosMap_.end()) {
             direction = iter->second.direction;
@@ -2244,7 +2243,7 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
     CHKFRV(windowInfo, "The windowInfo is nullptr");
     int32_t windowPid = GetWindowPid(windowInfo->id);
     WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
-    IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
+    CursorDrawingComponent::GetInstance().OnWindowInfo(info);
 }
 
 void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent)
@@ -2367,7 +2366,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() && !HasMouseHideFlag()) {
+    if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() && !HasMouseHideFlag()) {
         MMI_HILOGI("The mouse is hide");
         return;
     }
@@ -2417,7 +2416,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         int32_t displayId = 0;
         double cursorPosx = 0.0;
         double cursorPosy = 0.0;
-        
+
         const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
         if (iter != mouseLocationMap_.end()) {
             displayId = iter->second.displayId;
@@ -2809,7 +2808,7 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
         int32_t groupId = FindDisplayGroupId(info.id);
         Direction directiontemp = Direction::DIRECTION0 ;
         Direction displaydirectiontemp = Direction::DIRECTION0 ;
-        
+
         const auto iter = cursorPosMap_.find(groupId);
         if (iter != cursorPosMap_.end()) {
             directiontemp = iter->second.direction;
@@ -3250,7 +3249,7 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     CALL_DEBUG_ENTER;
     CHKPV(session);
     int32_t pid = session->GetPid();
-    IPointerDrawingManager::GetInstance()->OnSessionLost(pid);
+    CursorDrawingComponent::GetInstance().OnSessionLost(pid);
     auto it = pointerStyle_.find(pid);
     if (it != pointerStyle_.end()) {
         pointerStyle_.erase(it);
@@ -4192,19 +4191,19 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || (mouseDownInfo_.id == -1 &&
             axisBeginWindowInfo_ == std::nullopt)) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
-            if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+            if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
                 IsMouseDrawing(pointerEvent->GetPointerAction()) &&
                 pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
                     MMI_HILOGD("Turn the mouseDisplay from false to true");
-                    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+                    CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             }
             int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) &&
             pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
-                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+                CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
             } else {
-                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+                CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             }
             if (GetHardCursorEnabled()) {
                 std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
@@ -4212,10 +4211,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                     MMI_HILOGW("cursorPos is invalid");
                     return RET_ERR;
                 }
-                IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
+                CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->uniqueId,
                     cursorPos[0], cursorPos[1]);
             } else {
-                IPointerDrawingManager::GetInstance()->DrawMovePointer(physicalDisplayInfo->uniqueId,
+                CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->uniqueId,
                     physicalX, physicalY);
             }
             MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
@@ -4260,39 +4259,39 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = DEFAULT_VALUE;
         }
-        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+        if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
             IsMouseDrawing(pointerEvent->GetPointerAction()) &&
             pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
         }
-        pointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
+        pointerStyle = CursorDrawingComponent::GetInstance().GetLastMouseStyle();
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
             pointerStyle.id, lastPointerStyle_.id);
-        IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
+        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
+        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
     } else {
         if (timerId_ != DEFAULT_VALUE) {
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = DEFAULT_VALUE;
         }
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+        if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
             pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
-        IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
+        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
+        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_EMULATOR
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN &&
-        !IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+        !CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
         pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
-        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     }
 #endif
     GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
@@ -4340,21 +4339,21 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) ||
             pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
         } else {
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
         }
         if (extraData_.drawCursor) {
             MMI_HILOGD("Cursor must be default, pointerStyle:%{public}d globalStyle:%{public}d",
                 dragPointerStyle_.id, globalStyle_.id);
             dragPointerStyle_ = globalStyle_;
         }
-        IPointerDrawingManager::GetInstance()->DrawPointer(physicalDisplayInfo->uniqueId, physicalX, physicalY,
+        CursorDrawingComponent::GetInstance().DrawPointer(physicalDisplayInfo->uniqueId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     Direction lastRotation;
-  
+
     auto iter = cursorPosMap_.find(groupId);
     if (iter != cursorPosMap_.end()) {
         cursorPosMap_[groupId].direction = physicalDisplayInfo->direction;
@@ -4364,7 +4363,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
         MMI_HILOGW("Rs process timeout");
     }
-    
+
     auto itr = captureModeInfoMap_.find(groupId);
     if (itr != captureModeInfoMap_.end()) {
         if (itr->second.isCaptureMode&& (touchWindow->id != itr->second.windowId)) {
@@ -4397,7 +4396,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #elif defined(OHOS_BUILD_EMULATOR)
-    if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+    if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -4453,7 +4452,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         ClearExtraData();
     }
     if (pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
-        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
     }
     return ERR_OK;
 }
@@ -4849,7 +4848,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(double logicalX, doubl
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::HandleGestureInjection(bool gestureInject) {
     if (!gestureInject) {
-        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
     }
 }
 
@@ -5283,8 +5282,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && (defined(OHOS_BUILD_ENABLE_POINTER_DRAWING) || defined(OHOS_BUILD_EMULATOR))
     if (IsNeedDrawPointer(pointerItem)) {
-        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             if (touchWindow->id != lastWindowInfo_.id) {
                 lastWindowInfo_ = *touchWindow;
             }
@@ -5292,12 +5291,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         PointerStyle pointerStyle;
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicDisplayInfo);
+        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
-        IPointerDrawingManager::GetInstance()->DrawPointer(physicDisplayInfo->uniqueId,
+        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
+        CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->uniqueId,
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
-    } else if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+    } else if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
@@ -5806,7 +5805,7 @@ bool InputWindowsManager::AcrossDisplay(const DisplayInfo &displayInfoDes, const
     bool re = false;
     layoutX = layout.x;
     layoutY = layout.y;
-    IPointerDrawingManager::GetInstance()->GetPointerImageSize(pointerWidth, pointerHeight);
+    CursorDrawingComponent::GetInstance().GetPointerImageSize(pointerWidth, pointerHeight);
     if (!AddInt32(displayInfoDes.x, displayInfoDes.validWidth, layoutMax.x)) {
         MMI_HILOGE("The addition of layoutMax.x overflows");
         return false;
@@ -6096,7 +6095,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
             mouseLocationMap_[groupId].physicalY = integerY;
         }
         CursorPosition cursorPosCur = {};
-        
+
         const auto it = cursorPosMap_.find(groupId);
         if (it != cursorPosMap_.end()) {
             cursorPosCur = it->second;
@@ -6332,7 +6331,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<DelegateInterface> delegateProxy =
-        IPointerDrawingManager::GetInstance()->GetDelegateProxy();
+        CursorDrawingComponent::GetInstance().GetDelegateProxy();
     CHKPV(delegateProxy);
     std::vector<DisplayInfo> displaysInfo;
     std::vector<WindowInfo> windowsInfo;
@@ -6871,7 +6870,7 @@ void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyE
         windowsPerDisplayTmp = iter->second;
     }
     for (const auto &item : windowsPerDisplayTmp) {
-    
+
         if (item.second.focusWindowId == focusWindowId) {
             keyEvent->SetTargetDisplayId(item.second.displayId);
             hasFound = true;
@@ -6909,7 +6908,7 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const DisplayGrou
 
 bool InputWindowsManager::GetHardCursorEnabled()
 {
-    return IPointerDrawingManager::GetInstance()->GetHardCursorEnabled();
+    return CursorDrawingComponent::GetInstance().GetHardCursorEnabled();
 }
 
 int32_t InputWindowsManager::GetCurrentUserId()

@@ -17,7 +17,7 @@
 
 #include "display_event_monitor.h"
 #include "input_event_handler.h"
-#include "i_pointer_drawing_manager.h"
+#include "cursor_drawing_component.h"
 #include "property_reader.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
@@ -39,7 +39,7 @@ void DelegateInterface::Init()
     DISPLAY_MONITOR->SetDelegateProxy(shared_from_this());
 #endif // #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    IPointerDrawingManager::GetInstance()->SetDelegateProxy(shared_from_this());
+    CursorDrawingComponent::GetInstance().SetDelegateProxy(shared_from_this());
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     PropReader->SetDelegateProxy(shared_from_this());
 }

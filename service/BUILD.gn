@@ -94,11 +94,7 @@ config("libmmi_server_config") {
   ]
 
   if (input_feature_product != "watch") {
-    include_dirs += [
-      "hardware_cursor_pointer_manager/include",
-      "infrared_emitter/include",
-      "${mmi_service_path}/hardware_cursor_pointer_manager/include",
-    ]
+    include_dirs += [ "infrared_emitter/include" ]
   }
 
   if (input_ext_feature_keyboard_ext_flag) {
@@ -118,15 +114,6 @@ config("libmmi_server_config") {
     include_dirs += [
       "${mmi_ext_path}/anco_uds_manager/include",
       "${mmi_path}/common/anco/comm/include",
-    ]
-  }
-
-  if (input_ext_feature_magiccursor) {
-    include_dirs += [
-      "${mmi_ext_path}/magic_cursor/include",
-      "${g2d_ext_path}/sdf/include",
-      "${surface_path}/interfaces/inner_api/surface",
-      "${g2d_path}/rosen/modules/render_service_base/src",
     ]
   }
 
@@ -163,6 +150,116 @@ ohos_rust_unittest("rust_mmi_test") {
   part_name = "input"
 }
 
+ohos_shared_library("libcursor_drawing_adapter") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "connect_manager/include",
+    "delegate_task/include/",
+    "device_config/include",
+    "device_manager/include/",
+    "dfx/include",
+    "event_handler/include",
+    "hardware_cursor_pointer_manager/include",
+    "module_loader/include/",
+    "mouse_event_normalize/include",
+    "timer_manager/include/",
+    "touch_event_normalize/include",
+    "key_command/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include/",
+    "${mmi_path}/util/socket/include/",
+    "window_manager/include"
+  ]
+
+  if (input_ext_feature_magiccursor) {
+    include_dirs += [
+      "${mmi_ext_path}/magic_cursor/include",
+      "${g2d_ext_path}/sdf/include",
+      "${surface_path}/interfaces/inner_api/surface",
+      "${g2d_path}/rosen/modules/render_service_base/src",
+    ]
+  }
+
+  if (input_feature_pointer_drawing) {
+    sources = [
+      "window_manager/src/cursor_drawing_adapter.cpp",
+      "window_manager/src/pointer_drawing_manager.cpp",
+      "window_manager/src/pointer_renderer.cpp",
+      "window_manager/src/screen_pointer.cpp",
+      "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
+    ]
+  } else {
+    sources = [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
+  }
+
+  deps = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "common_event_service:cesfwk_innerkits",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "ffrt:libffrt",
+    "graphic_surface:surface",
+    "hisysevent:libhisysevent",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libdm_lite",
+    "window_manager:libwsutils",
+  ]
+
+  if (input_feature_pointer_drawing) {
+    external_deps += [ "window_manager:libwm_lite" ]
+  }
+
+  if (input_ext_feature_magiccursor) {
+    external_deps += [ "eventhandler:libeventhandler" ]
+  }
+
+  if (input_feature_product != "watch") {
+    deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
+    external_deps += [
+      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+      "drivers_interface_display:libdisplay_composer_proxy_1.0",
+      "graphic_2d:libcomposer",
+      "graphic_2d:librender_service_base",
+      "graphic_2d:librender_service_client",
+      "hilog:libhilog",
+      "image_framework:image_native",
+      "init:libbeget_proxy",
+      "init:libbegetutil",
+      "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+    ]
+  }
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
+
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
+
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
+
 ohos_shared_library("libmmi-server") {
   sources = libmmi_service_sources
   branch_protector_ret = "pac_ret"
@@ -172,10 +269,17 @@ ohos_shared_library("libmmi-server") {
     debug = false
   }
   version_script = "libmmi-server-map"
-  include_dirs = [ "${mmi_path}/frameworks/proxy/events/include" ]
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/events/include",
+    "window_manager/include"
+  ]
 
-  sources += [ "account_manager/src/account_manager.cpp" ]
-  sources += [ "subscriber/src/tablet_subscriber_handler.cpp" ]
+  sources += [
+    "account_manager/src/account_manager.cpp",
+    "subscriber/src/tablet_subscriber_handler.cpp",
+    "window_manager/src/cursor_drawing_component.cpp",
+  ]
+
   if (input_feature_keyboard) {
     sources += [
       "display_state_manager/src/display_event_monitor.cpp",
@@ -221,15 +325,6 @@ ohos_shared_library("libmmi-server") {
         "mouse_event_normalize/src/mouse_transform_processor.cpp",
         "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
-      if (input_feature_pointer_drawing) {
-        sources += [
-          "window_manager/src/pointer_drawing_manager.cpp",
-          "window_manager/src/pointer_renderer.cpp",
-          "window_manager/src/screen_pointer.cpp",
-        ]
-      } else {
-        sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
-      }
     }
     if (input_feature_touchscreen) {
       sources += [
@@ -1032,10 +1127,12 @@ ohos_unittest("PointerDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
+  include_dirs = [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
@@ -1090,10 +1187,12 @@ ohos_unittest("PointerDrawingManagerExTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
+  include_dirs = [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
   sources = [ "window_manager/test/pointer_drawing_manager_ex_test.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
@@ -1196,6 +1295,7 @@ ohos_unittest("TouchDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
+  include_dirs = [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
   sources = [
     "window_manager/test/pointer_renderer_test.cpp",
     "window_manager/test/screen_pointer_test.cpp",
@@ -1203,6 +1303,7 @@ ohos_unittest("TouchDrawingManagerTest") {
   ]
 
   deps = [
+    "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
@@ -1337,7 +1438,10 @@ ohos_unittest("InputWindowsManagerTest") {
     "-Dprotected=public",
   ]
 
-  include_dirs = [ "${mmi_path}/service/event_handler/include" ]
+  include_dirs = [
+    "hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/event_handler/include",
+  ]
 
   sources = [
     "window_manager/test/input_windows_manager_test.cpp",
@@ -1345,6 +1449,7 @@ ohos_unittest("InputWindowsManagerTest") {
   ]
 
   deps = [
+    "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1461,6 +1566,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager/test",
     "${mmi_path}/libudev/include",
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
   ]
 
   configs = [
