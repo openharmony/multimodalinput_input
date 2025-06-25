@@ -5967,25 +5967,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_subscribeInputActive, TestSize.Level
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeInputActive(subscriberId));
 }
 
-/**
- * @tc.name: InputManagerTest_SwitchTouchTracking_001
- * @tc.desc: SwitchTouchTracking called
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SwitchTouchTracking_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-    bool switchFlag = true;
-    int32_t ret = InputManager::GetInstance()->SwitchTouchTracking(switchFlag);
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
-        EXPECT_EQ(ret, CAPABILITY_NOT_SUPPORTED);
-    } else {
-        EXPECT_NE(ret, CAPABILITY_NOT_SUPPORTED);
-    }
-}
-
 /*
  * @tc.name: InputManagerTest_QueryPointerRecord_001
  * @tc.desc: QueryPointerRecord

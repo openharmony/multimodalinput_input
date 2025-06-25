@@ -877,16 +877,6 @@ int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetP
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::SwitchTouchTracking(bool touchTracking)
-{
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet")) {
-        MMI_HILOGW("Does not support touch-tracking on %{public}s", PRODUCT_TYPE.c_str());
-        return CAPABILITY_NOT_SUPPORTED;
-    }
-    WIN_MGR->SwitchTouchTracking(touchTracking);
-    return RET_OK;
-}
-
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
 {

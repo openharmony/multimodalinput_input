@@ -970,11 +970,6 @@ void InputManager::UnsubscribeInputActive(int32_t subscribeId)
     InputMgrImpl.UnsubscribeInputActive(subscribeId);
 }
 
-int32_t InputManager::SwitchTouchTracking(bool touchTracking)
-{
-    return InputMgrImpl.SwitchTouchTracking(touchTracking);
-}
-
 int32_t InputManager::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable)
 {
     return InputMgrImpl.SetMouseAccelerateMotionSwitch(deviceId, enable);

@@ -400,8 +400,6 @@ public:
         return RET_OK;
     };
 
-    int32_t SwitchTouchTracking(bool touchTracking) override { return RET_OK; }
-
     int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override
     {
         return RET_OK;
