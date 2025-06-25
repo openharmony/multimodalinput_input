@@ -433,7 +433,6 @@ if (input_feature_product == "watch") {
     "device_config/src/device_config_file_parser.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
     "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
-    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
   ]
 
   if (input_new_knuckle_dynamic_enabled) {
