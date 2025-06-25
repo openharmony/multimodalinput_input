@@ -1140,7 +1140,6 @@ void JsInputConsumer::NotifyKeyMonitor(uv_work_t *work, int32_t status)
     std::lock_guard guard(mutex_);
     auto pwIter = pendingWorks_.find(work);
     if (pwIter == pendingWorks_.end()) {
-        MMI_HILOGW("Not a pending work(%{private}p)", work);
         return;
     }
     auto keyMonitorId = pwIter->second->keyMonitorId_;
