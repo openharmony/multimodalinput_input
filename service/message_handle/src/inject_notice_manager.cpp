@@ -118,7 +118,6 @@ void InjectNoticeManager::InjectNoticeConnection::OnAbilityConnectDone(const App
         remoteObject_ = remoteObject;
     }
     isConnected_ = true;
-    MMI_HILOGI("InjectNotice connected,remoteObject_:%{private}p", &remoteObject_);
 }
 
 void InjectNoticeManager::InjectNoticeConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName& element,
@@ -127,7 +126,6 @@ void InjectNoticeManager::InjectNoticeConnection::OnAbilityDisconnectDone(const 
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     isConnected_ = false;
-    MMI_HILOGI("InjectNotice disconnected,remoteObject_:%{private}p", &remoteObject_);
     remoteObject_ = nullptr;
 }
 
