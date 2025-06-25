@@ -239,10 +239,7 @@ group("mmi_tests") {
   }
 
   if (input_feature_touch_drawing) {
-    deps += [
-      "service:TouchDrawingManagerAiTest",
-      "service:TouchDrawingManagerTest",
-    ]
+    deps += [ "service:TouchDrawingManagerTest" ]
   }
 
   if (drivers_interface_rtos_extra_enable) {

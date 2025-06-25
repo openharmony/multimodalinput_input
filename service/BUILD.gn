@@ -1124,57 +1124,6 @@ ohos_unittest("PointerDrawingManagerExTest") {
   ]
 }
 
-ohos_unittest("TouchDrawingManagerAiTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  sources = [ "window_manager/test/touch_drawing_manager_ai_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
-    "window_manager:libwsutils",
-  ]
-}
-
 ohos_unittest("TouchDrawingManagerTest") {
   module_out_path = module_output_path
 
