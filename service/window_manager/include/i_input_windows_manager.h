@@ -183,7 +183,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     virtual std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) = 0;
-        virtual void SwitchTouchTracking(bool touchTracking) = 0;
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

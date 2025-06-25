@@ -1964,8 +1964,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTrac
     pointerItem.SetDisplayYPos(0.0);
     WindowInfo targetWindow;
     targetWindow.id = 1;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    inputWindowsManager->touchTracking_ = true;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
     pointerEvent->targetWindowId_ = 1;
     pointerEvent->pointers_.clear();
     pointerItem.SetPointerId(1);

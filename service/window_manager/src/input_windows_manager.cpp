@@ -7292,21 +7292,12 @@ bool InputWindowsManager::IsAccessibilityEventWithZorderInjected(std::shared_ptr
     return false;
 }
 
-void InputWindowsManager::SwitchTouchTracking(bool touchTracking)
-{
-    MMI_HILOGI("Switch touch tracking:%{public}d", touchTracking);
-    touchTracking_ = touchTracking;
-}
-
 bool InputWindowsManager::NeedTouchTracking(PointerEvent &event) const
 {
-    if (!touchTracking_) {
+    if (!event.HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         return false;
     }
-    if (event.HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-        return false;
-    }
-    if (event.GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+    if (event.GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE) {
         return false;
     }
     return (event.GetPointerCount() == SINGLE_TOUCH);
@@ -7327,7 +7318,7 @@ void InputWindowsManager::ProcessTouchTracking(std::shared_ptr<PointerEvent> eve
     }
     pointerItem.SetPressed(false);
     event->UpdatePointerItem(event->GetPointerId(), pointerItem);
-    event->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
 
     auto normalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(normalizeHandler);
@@ -7335,7 +7326,7 @@ void InputWindowsManager::ProcessTouchTracking(std::shared_ptr<PointerEvent> eve
 
     pointerItem.SetPressed(true);
     event->UpdatePointerItem(event->GetPointerId(), pointerItem);
-    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
 }
 
 int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
