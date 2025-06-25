@@ -24,9 +24,8 @@ config("libmmi_client_config") {
 
   include_dirs = [
     "${mmi_path}/interfaces/kits/c/input",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "event_handler/include",
     "events/include",
     "module_loader/include",
@@ -60,6 +59,12 @@ config("libmmi_test_util") {
 }
 
 ohos_source_set("libmmi-common") {
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/common/include",
+  ]
+
   sources = libmmi_common_sources
   public_configs = [ ":libmmi_client_config" ]
   visibility = [ "${mmi_path}/*" ]
