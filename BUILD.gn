@@ -149,6 +149,7 @@ group("input_jsapi_group") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/native/input:OHInputManagerEXTest",
     "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputDeviceImplTest",
     "frameworks/proxy:InputHandlerManagerTest",
@@ -221,6 +222,7 @@ group("mmi_tests") {
     "service/module_loader/test:ModuleLoaderTests",
     "service/mouse_event_normalize/test:MouseEventNormalizeEXTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
+    "service/mouse_event_normalize/test:MouseTransformProcessorEXTest",
     "service/subscriber/test:mmi_subscriber_tests",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
     "service/touch_event_normalize/test:TouchGestureAdapterTest",
