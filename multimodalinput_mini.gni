@@ -62,6 +62,7 @@ declare_args() {
   input_ext_feature_keyboard_ext_flag = false
   input_feature_watch_cfg_source = false
   drivers_interface_rtos_extra_enable = false
+  input_feature_upgrade_skia = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
