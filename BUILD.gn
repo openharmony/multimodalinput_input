@@ -92,6 +92,7 @@ group("multimodalinput_mmi_service") {
   deps = [
     "service:libcursor_drawing_adapter",
     "service:libmmi-server",
+    "service/window_manager:mmi_touch_drawing_handler",
     "tools/inject_event:uinput",
     "util/screen_capture:libmmi-screen_capture",
   ]
@@ -242,7 +243,10 @@ group("mmi_tests") {
   }
 
   if (input_feature_touch_drawing) {
-    deps += [ "service:TouchDrawingManagerTest" ]
+    deps += [
+      "service/window_manager:TouchDrawingHandlerTest",
+      "service:TouchDrawingManagerTest",
+    ]
   }
 
   if (drivers_interface_rtos_extra_enable) {

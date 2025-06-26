@@ -40,6 +40,7 @@ const static Rosen::Drawing::Color LABELS_RED_COLOR = Rosen::Drawing::Color::Col
 const static Rosen::Drawing::Color TRACKER_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 96, 255);
 const static Rosen::Drawing::Color POINTER_RED_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 255, 0, 0);
 const static Rosen::Drawing::Color CROSS_HAIR_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 0, 192);
+constexpr int32_t SINGLE_TOUCH { 1 };
 constexpr int32_t DENSITY_BASELINE { 160 };
 constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
 constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
@@ -67,8 +68,6 @@ constexpr float TEXT_SCALE { 1.0f };
 constexpr float TEXT_SKEW { 0.0f };
 constexpr float INNER_CIRCLE_TRANSPARENCY { 0.6f };
 constexpr float OUT_CIRCLE_TRANSPARENCY { 0.1f };
-const std::string SHOW_CURSOR_SWITCH_NAME { "settings.input.show_touch_hint" };
-const std::string POINTER_POSITION_SWITCH_NAME { "settings.developer.show_touch_track" };
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
@@ -145,15 +144,15 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-void TouchDrawingHandler::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
-    if (displayInfo.screenCombination != displayInfo_.screenCombination ||
-        displayInfo.uniqueId != displayInfo_.uniqueId) {
+    if (displayInfo.displaySourceMode != displayInfo_.displaySourceMode ||
+        displayInfo.rsId != displayInfo_.rsId) {
         if (surfaceNode_ != nullptr) {
             surfaceNode_->ClearChildren();
             surfaceNode_.reset();
@@ -211,14 +210,13 @@ void TouchDrawingHandler::UpdateBubbleData(bool isOn)
 {
     CALL_DEBUG_ENTER;
     bubbleMode_.isShow = isOn;
-    if (bubbleMode_.isShow) {
-        return;
+    if (!bubbleMode_.isShow) {
+        CHKPV(surfaceNode_);
+        surfaceNode_->RemoveChild(bubbleCanvasNode_);
+        bubbleCanvasNode_.reset();
+        DestoryTouchWindow();
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
-    CHKPV(surfaceNode_);
-    surfaceNode_->RemoveChild(bubbleCanvasNode_);
-    bubbleCanvasNode_.reset();
-    DestoryTouchWindow();
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingHandler::RotationScreen()
@@ -262,11 +260,11 @@ void TouchDrawingHandler::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
-    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.uniqueId)) {
+    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.rsId)) {
         return;
     }
-    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.uniqueId);
-    screenId_ = static_cast<uint64_t>(displayInfo_.uniqueId);
+    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.rsId);
+    screenId_ = static_cast<uint64_t>(displayInfo_.rsId);
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
@@ -353,7 +351,7 @@ void TouchDrawingHandler::CreateTouchWindow()
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    screenId_ = static_cast<uint64_t>(displayInfo_.uniqueId);
+    screenId_ = static_cast<uint64_t>(displayInfo_.rsId);
     if (windowScreenId_ == screenId_) {
         screenId_ = displayNodeScreenId_;
     }
@@ -640,7 +638,7 @@ void TouchDrawingHandler::UpdatePointerPosition()
     int32_t pointerAction = pointerEvent_->GetPointerAction();
     int32_t pointerId = pointerEvent_->GetPointerId();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
-        if (lastPointerItem_.empty()) {
+        if (pointerEvent_->GetPointerCount() == SINGLE_TOUCH) {
             InitLabels();
         }
         maxPointerCount_ = ++currentPointerCount_;
@@ -726,6 +724,7 @@ void TouchDrawingHandler::InitLabels()
     currentPointerId_ = 0;
     xVelocity_ = 0.0;
     yVelocity_ = 0.0;
+    lastPointerItem_.clear();
 }
 
 bool TouchDrawingHandler::IsValidAction(const int32_t action)
@@ -797,7 +796,7 @@ void TouchDrawingHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 }
 
 std::pair<int32_t, int32_t> TouchDrawingHandler::CalcDrawCoordinate(
-    const DisplayInfo& displayInfo, const PointerEvent::PointerItem &pointerItem)
+    const OLD::DisplayInfo& displayInfo, const PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
     double physicalX = pointerItem.GetRawDisplayX();
@@ -811,7 +810,7 @@ std::pair<int32_t, int32_t> TouchDrawingHandler::CalcDrawCoordinate(
 }
 
 std::pair<double, double> TouchDrawingHandler::TransformDisplayXY(
-    const DisplayInfo &info, double logicX, double logicY) const
+    const OLD::DisplayInfo &info, double logicX, double logicY) const
 {
     Matrix3f transform(info.transform);
     if (info.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {

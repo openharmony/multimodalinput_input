@@ -123,7 +123,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_UpdateDisplayInfo_001,
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawMgr;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.direction = Direction::DIRECTION0;
     touchDrawMgr.displayInfo_.direction = Direction::DIRECTION0;
     displayInfo.width = 700;
@@ -149,7 +149,7 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_UpdateDisplayInfo_002,
 {
     CALL_TEST_DEBUG;
     TouchDrawingHandler touchDrawingHandler;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.direction = Direction::DIRECTION0;
     touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION0;
     displayInfo.width = 700;
@@ -161,16 +161,23 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_UpdateDisplayInfo_002,
     displayInfo.direction = Direction::DIRECTION270;
     touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
-    displayInfo.screenCombination = ScreenCombination::SCREEN_MAIN;
-    touchDrawingHandler.displayInfo_.screenCombination = ScreenCombination::SCREEN_MAIN;
+    displayInfo.displaySourceMode = DisplaySourceMode::SCREEN_MAIN;
+    touchDrawingHandler.displayInfo_.displaySourceMode = DisplaySourceMode::SCREEN_MAIN;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
-    displayInfo.uniqueId = 1;
-    touchDrawingHandler.displayInfo_.uniqueId = 2;
+    displayInfo.rsId = 1;
+    touchDrawingHandler.displayInfo_.rsId = 2;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     touchDrawingHandler.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
+    touchDrawingHandler.isChangedMode_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
+    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.UpdateDisplayInfo(displayInfo));
 }
 
@@ -394,6 +401,35 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_009, Te
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
 
     touchDrawingHandler.pointerMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_010
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationScreen_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.isChangedRotation_ = true;
+    touchDrawingHandler.isChangedMode_ = false;
+    touchDrawingHandler.pointerMode_.isShow = true;
+    touchDrawingHandler.bubbleMode_.isShow = true;
+    touchDrawingHandler.stopRecord_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
+    touchDrawingHandler.stopRecord_ = false;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    touchDrawingHandler.lastPointerItem_.emplace_back(item);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
+    touchDrawingHandler.stopRecord_ = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
+    touchDrawingHandler.stopRecord_ = false;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.RotationScreen());
 }
 
