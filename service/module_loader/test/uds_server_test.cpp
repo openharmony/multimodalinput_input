@@ -1222,5 +1222,364 @@ HWTEST_F(UDSServerTest, DelSession_004, TestSize.Level1)
     udsServer.sessionsMap_.insert(std::make_pair(fd, session));
     ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fds));
 }
+
+/**
+ * @tc.name: UdsStop_003
+ * @tc.desc: Test the function WhenEpollFdIsValid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UdsStop_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    udsServer.epollFd_ = 2;
+    udsServer.UdsStop();
+    EXPECT_EQ(udsServer.epollFd_, -1);
+}
+
+/**
+ * @tc.name: UdsStop_004
+ * @tc.desc: Test the function WhenEpollFdIsInvalid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UdsStop_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    udsServer.epollFd_ = -1;
+    udsServer.UdsStop();
+    EXPECT_EQ(udsServer.epollFd_, -1);
+}
+
+/**
+ * @tc.name: UdsStop_005
+ * @tc.desc: Test the function WhenSessionMapIsNotEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(UDSServerTest, UdsStop_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 2;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    udsServer.UdsStop();
+    EXPECT_TRUE(udsServer.GetSessionMapCopy().empty());
+}
+
+/**
+ * @tc.name: UdsStop_006
+ * @tc.desc: Test the function WhenSessionMapIsEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UdsStop_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    udsServer.ClearSessionMap();
+    udsServer.UdsStop();
+    EXPECT_TRUE(udsServer.GetSessionMapCopy().empty());
+}
+
+/**
+ * @tc.name: SetFdProperty_003
+ * @tc.desc: Test the function SetFdProperty_ShouldReturnRET_ERR_WhenSetServerFdSendBufferFails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t tokenType = 1;
+    int32_t serverFd = -1;
+    const std::string programName = "program";
+    int32_t toReturnClientFd = 1;
+    bool readOnly = false;
+    int32_t ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: SetFdProperty_004
+ * @tc.desc: Test the function SetFdProperty_WhenSetServerFdRecvBufferFails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t tokenType = 1;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    int32_t toReturnClientFd = -1;
+    bool readOnly = false;
+    int32_t ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: SetFdProperty_005
+ * @tc.desc: Test the function SetFdProperty_WhenSetClientFdSendBufferFailsForNativeToken
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t tokenType = TokenType::TOKEN_NATIVE;
+    int32_t serverFd = -1;
+    const std::string programName = "program";
+    int32_t toReturnClientFd = 1;
+    bool readOnly = false;
+    int32_t ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: SetFdProperty_006
+ * @tc.desc: Test the function SetFdProperty_WhenSetClientFdRecvBufferFailsForNativeToken
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t tokenType = TokenType::TOKEN_NATIVE;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    int32_t toReturnClientFd = -1;
+    bool readOnly = false;
+    int32_t ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: SetFdProperty_007
+ * @tc.desc: Test the function SetFdProperty_WhenProgramNameNotInWhitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t tokenType = 1;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    int32_t toReturnClientFd = 1;
+    bool readOnly = false;
+    int32_t ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_FALSE(readOnly);
+}
+
+/**
+ * @tc.name: SetFdProperty_008
+ * @tc.desc: Test the function SetFdProperty_WhenProgramNameIsInWhitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t tokenType = 1;
+    int32_t serverFd = 1;
+    const std::string programName = "com.ohos.sceneboard";
+    int32_t toReturnClientFd = 1;
+    bool readOnly = false;
+    int32_t ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd, programName, readOnly);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_FALSE(readOnly);
+}
+
+/**
+ * @tc.name: Dump_001
+ * @tc.desc: Test the function Dump_WhenSessionMapIsEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(UDSServerTest, Dump_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    std::vector<std::string> args;
+    udsServer.GetSessionMapCopy();
+    ASSERT_NO_FATAL_FAILURE(udsServer.Dump(fd, args));
+}
+
+/**
+ * @tc.name: Dump_002
+ * @tc.desc: Test the function Dump_WhenSessionMapIsNotEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(UDSServerTest, Dump_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    std::map<int, std::shared_ptr<UDSSession>> sessionMap;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    int32_t tokenType =0;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+
+    sessionMap[1] = session;
+    udsServer.GetSessionMapCopy();
+    ASSERT_NO_FATAL_FAILURE(udsServer.Dump(fd, args));
+}
+
+/**
+ * @tc.name: DumpSession_003
+ * @tc.desc: Test the function DumpSession_WhenSessionMapNotEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, DumpSession_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer UDS_server;
+    std::string title = "test_title";
+    int32_t fd =  2;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    UDS_server.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_NO_FATAL_FAILURE(UDS_server.DumpSession(title));
+}
+
+/**
+ * @tc.name: DumpSession_005
+ * @tc.desc: The DumpSession function WhenTitleIsEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, DumpSession_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    std::string title = "";
+    ASSERT_NO_FATAL_FAILURE(udsServer.DumpSession(title));
+}
+
+/**
+ * @tc.name: GetSessionMapCopy_001
+ * @tc.desc: The GetSessionMapCopy function WhenSessionMapIsEmpty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetSessionMapCopy_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    auto result = udsServer.GetSessionMapCopy();
+    EXPECT_EQ(udsServer.GetSessionSize(), 0);
+}
+
+/**
+ * @tc.name: GetSessionMapCopy_002
+ * @tc.desc: The GetSessionMapCopy function WhenSessionMapHasMultipleSessions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetSessionMapCopy_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd = 150;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    auto result = udsServer.GetSessionMapCopy();
+    EXPECT_EQ(udsServer.GetSessionSize(), 1);
+}
+
+/**
+ * @tc.name: GetSessionMapCopy_003
+ * @tc.desc: The GetSessionMapCopy function WhenSessionMapHasMultipleSessions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetSessionMapCopy_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd1 = 150;
+    int32_t fd2 = 200;
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd1, session1));
+    udsServer.sessionsMap_.insert(std::make_pair(fd2, session2));
+    auto result = udsServer.GetSessionMapCopy();
+    udsServer.sessionsMap_[2] = session2;
+    EXPECT_EQ(result.size(), 2);
+}
+
+/**
+ * @tc.name: UDSServerTest_GetClientFd_001
+ * @tc.desc: Test Get InvalidFd_WhenPidNotExistsAndPidNotEqual
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetClientFd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t pid = 1000;
+    int32_t fd = INVALID_FD;
+    udsServer.idxPidMap_.insert(std::make_pair(pid, fd));
+    int result = udsServer.GetClientFd(pid);
+    ASSERT_EQ(result, fd);
+}
+
+/**
+ * @tc.name: UDSServerTest_GetClientFd_002
+ * @tc.desc: Test Get InvalidFd_WhenPidNotExistsAndPidEqual
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetClientFd_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t pid = 1000;
+    int32_t fd = INVALID_FD;
+    udsServer.pid_ = 1000;
+    udsServer.idxPidMap_.insert(std::make_pair(pid, fd));
+    int result = udsServer.GetClientFd(pid);
+    ASSERT_EQ(result, fd);
+    EXPECT_EQ(udsServer.pid_, 1000);
+}
+
+/**
+ * @tc.name: UDSServerTest_GetClientPid_001
+ * @tc.desc: Test Get ShouldReturnInvalidPid_WhenSessionIsNull
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetClientPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t fd =  INVALID_FD;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_EQ(udsServer.GetClientPid(fd), UDS_PID);
+}
 } // namespace MMI
 } // namespace OHOS
