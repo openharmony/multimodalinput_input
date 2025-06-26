@@ -63,7 +63,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
     int64_t time = 123456789;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     ANRMgr->TriggerANR(eventType, time, sess);
-    anrMgr.isTriggerANR_ = true;
 
     ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
 }
@@ -86,7 +85,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_003, TestSize.Level1)
     int64_t time = 123456789;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     ANRMgr->TriggerANR(eventType, time, sess);
-    anrMgr.isTriggerANR_ = true;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
 
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
@@ -95,7 +93,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_003, TestSize.Level1)
     eventId = 457;
     time = 123456789;
     ANRMgr->TriggerANR(eventType, time, sess);
-    anrMgr.isTriggerANR_ = false;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
 
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
@@ -104,7 +101,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_003, TestSize.Level1)
     eventId = 457;
     time = 1000;
     ANRMgr->TriggerANR(eventType, time, sess);
-    anrMgr.isTriggerANR_ = true;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
 
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
@@ -113,8 +109,23 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_003, TestSize.Level1)
     eventId = 457;
     time = 1000;
     ANRMgr->TriggerANR(eventType, time, sess);
-    anrMgr.isTriggerANR_ = false;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
+}
+
+HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_004, TestSize.Level1) {
+
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    ANRManager anrMgr;
+    ASSERT_NO_FATAL_FAILURE(anrMgr.Init(udsServer));
+    int32_t pid = 123;
+    std::string programName = "foundation";
+    SessionPtr sess = std::make_shared<UDSSession>(programName, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.AddSession(sess);
+    int32_t targetEventId = 456;
+    anrMgr.anrEventId_ = targetEventId;
+    int32_t eventType = 1;
+    ASSERT_NO_FATAL_FAILURE(anrMgr.MarkProcessed(pid, eventType, targetEventId));
 }
 
 /**
@@ -225,7 +236,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
     int32_t type = 1;
     int32_t id = 1001;
     int64_t currentTime = 123456789;
-    anrMgr.isTriggerANR_ = false;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 }
@@ -243,7 +253,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_002, TestSize.Level1)
     int32_t type = -1;
     int32_t id = -2;
     int64_t currentTime = 123456789;
-    anrMgr.isTriggerANR_ = true;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 }
