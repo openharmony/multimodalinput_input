@@ -293,19 +293,10 @@ static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOptio
     MMI::SetNamedProperty(env, result, "isRepeat", static_cast<int32_t>(keyOption->IsRepeat()));
 }
 
-void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
+void UvQueueWorkAsyncCallback(sptr<KeyEventMonitorInfo> dataWorker)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(work);
-    if (work->data == nullptr) {
-        DeletePtr<uv_work_t *>(work);
-        MMI_HILOGE("Check data is nullptr");
-        return;
-    }
-    (void)status;
-    sptr<KeyEventMonitorInfo> dataWorker(static_cast<KeyEventMonitorInfo *>(work->data));
-    DeletePtr<uv_work_t *>(work);
-    dataWorker->DecStrongRef(nullptr);
+    CHKPV(dataWorker);
     std::lock_guard<std::mutex> lock(dataWorker->envMutex_);
     CHKPV(dataWorker->env);
     napi_handle_scope scope = nullptr;
@@ -338,22 +329,13 @@ void EmitAsyncCallbackWork(sptr<KeyEventMonitorInfo> reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
-    uv_loop_s *loop = nullptr;
     std::lock_guard<std::mutex> lock(reportEvent->envMutex_);
+    auto task = [reportEvent] () { UvQueueWorkAsyncCallback(reportEvent); };
     CHKPV(reportEvent->env);
-    CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
-    reportEvent->IncStrongRef(nullptr);
-    work->data = reportEvent.GetRefPtr();
-    int32_t ret = uv_queue_work_with_qos(
-        loop, work,
-        [](uv_work_t *work) {
-            MMI_HILOGD("uv_queue_work callback function is called");
-        },
-        UvQueueWorkAsyncCallback, uv_qos_user_initiated);
+    int32_t ret = napi_send_event(reportEvent->env, task, napi_eprio_vip);
     if (ret != 0) {
-        DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("napi_send_event failed");
+        return;
     }
 }
 
