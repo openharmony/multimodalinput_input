@@ -1331,6 +1331,61 @@ ohos_unittest("TouchDrawingManagerTest") {
   ]
 }
 
+ohos_unittest("CursorDrawingComponentTest") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+  ]
+  sources = [ "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libcursor_drawing_adapter",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("KnuckleDrawingManagerTest") {
   module_out_path = module_output_path
 
