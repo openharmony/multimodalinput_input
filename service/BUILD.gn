@@ -385,6 +385,7 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/util:libmmi-util",
   ]
 
