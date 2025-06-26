@@ -54,6 +54,12 @@ public:
     virtual bool IsWindowRotation() = 0;
     virtual int32_t GetDisplayId() = 0;
     virtual std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) = 0;
+    virtual std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
+        const std::shared_ptr<PointerEvent>& pointerEvent) = 0;
+    virtual bool UpdateDisplayId(int32_t& displayId) = 0;
+    virtual bool GetHardCursorEnabled() = 0;
+    virtual std::vector<int32_t> HandleHardwareCursor(std::shared_ptr<DisplayInfo> &physicalDisplayInfo,
+        int32_t physicalX, int32_t physicalY) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -71,6 +77,12 @@ public:
     MOCK_METHOD0(IsSceneBoardEnabled, bool());
     MOCK_METHOD0(IsWindowRotation, bool());
     MOCK_METHOD0(GetDisplayId, int32_t());
+    MOCK_METHOD3(SelectWindowInfo, std::optional<WindowInfo>(int32_t logicalX, int32_t logicalY,
+        const std::shared_ptr<PointerEvent>& pointerEvent));
+    MOCK_METHOD1(UpdateDisplayId, bool(int32_t& displayId));
+    MOCK_METHOD0(GetHardCursorEnabled, bool());
+    MOCK_METHOD3(HandleHardwareCursor, std::vector<int32_t>(std::shared_ptr<DisplayInfo> &physicalDisplayInfo,
+        int32_t physicalX, int32_t physicalY));
 };
 } // namespace MMI
 } // namespace OHOS
