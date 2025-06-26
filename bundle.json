@@ -44,7 +44,8 @@
       "input_feature_dfx_radar_enable",
       "input_feature_one_hand_mode_enable",
       "input_feature_touch_drawing",
-      "input_feature_watch_cfg_source"
+      "input_feature_watch_cfg_source",
+      "input_feature_upgrade_skia"
     ],
     "adapted_system_type": [
       "standard"
