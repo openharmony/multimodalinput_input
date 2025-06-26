@@ -661,7 +661,6 @@ HWTEST_F(KeyGestureManagerTest, AddHandler_Success, TestSize.Level1)
     EXPECT_GT(id1, 0);
     EXPECT_EQ(myKeyGesture->handlers_.size(), 1);
 
-
     int32_t id2 = myKeyGesture->AddHandler(20, 1000, myCallback);
     EXPECT_GT(id2, id1);
     EXPECT_EQ(myKeyGesture->handlers_.size(), 2);
@@ -716,7 +715,6 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_KeyGesture_ResetTimers, Te
     EXPECT_TRUE(resultfailed1);
     bool resultfailed2 = myKeyGesture->RemoveHandler(id2);
     EXPECT_TRUE(resultfailed2);
-
 }
 
 /**
