@@ -16,8 +16,8 @@
 #ifndef I_TOUCH_DRAWING_HANDLER_H
 #define I_TOUCH_DRAWING_HANDLER_H
 
+#include "old_display_info.h"
 #include "pointer_event.h"
-#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -26,7 +26,7 @@ public:
     ITouchDrawingHandler() = default;
     virtual ~ITouchDrawingHandler() = default;
 
-    virtual void UpdateDisplayInfo(const DisplayInfo &displayInfo) = 0;
+    virtual void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo) = 0;
     virtual void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void RotationScreen() = 0;
     virtual void UpdateLabels(bool isOn) = 0;

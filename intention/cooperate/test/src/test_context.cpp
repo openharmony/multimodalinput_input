@@ -17,7 +17,7 @@
 
 #include "dsoftbus_adapter.h"
 #include "fi_log.h"
-#include "plugin_manager.h"
+#include "component_manager.h"
 
 #undef LOG_TAG
 #define LOG_TAG "IntentionServiceTest"

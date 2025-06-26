@@ -200,14 +200,6 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
     int32_t &physicalX, int32_t &physicalY)
 {}
 
-bool TouchDrawingManager::IsWindowRotation()
-{
-    if (DfsMessageParcel::messageParcel == nullptr) {
-        return false;
-    }
-    return DfsMessageParcel::messageParcel->IsWindowRotation();
-}
-
 PointerDrawingManager::PointerDrawingManager() {}
 
 PointerDrawingManager::~PointerDrawingManager() {}

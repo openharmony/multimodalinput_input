@@ -29,7 +29,6 @@
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #include "timer_manager.h"
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-#include "touch_drawing_manager.h"
 #include <system_ability_definition.h>
 
 #undef MMI_LOG_TAG

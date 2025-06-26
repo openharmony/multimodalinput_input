@@ -123,8 +123,8 @@ IComponent* ComponentManager::Component<IComponent>::GetInstance()
     CreateComponent<IComponent> create =
         reinterpret_cast<CreateComponent<IComponent>>(::dlsym(handle_, "CreateInstance"));
     if (auto err = ::dlerror(); err != nullptr) {
-        MMI_HILOGE("dlsym('DestroyInstance') fail: %{public}s", err);
-        return;
+        MMI_HILOGE("dlsym('CreateInstance') fail: %{public}s", err);
+        return nullptr;
     }
     instance_ = create(context_);
     return instance_;
@@ -167,13 +167,7 @@ std::unique_ptr<IComponent, ComponentManager::Component<IComponent>> ComponentMa
         MMI_HILOGE("libPath is null");
         return { nullptr, ComponentManager::Component<IComponent>(nullptr, nullptr) };
     }
-    auto realPath = ::realpath(libPath, nullptr);
-    if (realPath == nullptr) {
-        MMI_HILOGE("Not real path: %{public}s", libPath);
-        return { nullptr, ComponentManager::Component<IComponent>(nullptr, nullptr) };
-    }
-    void *handle = ::dlopen(realPath, RTLD_NOW);
-    ::free(realPath);
+    void *handle = ::dlopen(libPath, RTLD_NOW);
     if (handle == nullptr) {
         if (auto err = ::dlerror(); err != nullptr) {
             MMI_HILOGE("dlopen fail for %{public}s: %{public}s", libPath, err);
