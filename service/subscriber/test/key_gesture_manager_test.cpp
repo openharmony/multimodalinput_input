@@ -922,7 +922,6 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManager_Dump, TestSize.Level1)
     CALL_TEST_DEBUG;
     KeyGestureManager keyGestureManager;
     ASSERT_NO_FATAL_FAILURE(keyGestureManager.Dump());
-
 }
 
 /**
