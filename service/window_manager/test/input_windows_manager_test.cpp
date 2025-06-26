@@ -9893,7 +9893,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_00
 
 /**
  * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_002
- * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information but no window of the CAST_WINDOW_TYPE type.
+ * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information
+ * but no window of the CAST_WINDOW_TYPE type.
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -9909,7 +9910,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_00
 
 /**
  * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_003
- * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information and window of the CAST_WINDOW_TYPE type.
+ * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information and
+ * window of the CAST_WINDOW_TYPE type.
  * @tc.type: FUNC
  * @tc.require:
  */
