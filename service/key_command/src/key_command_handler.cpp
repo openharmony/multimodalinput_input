@@ -2982,7 +2982,8 @@ bool KeyCommandHandler::MenuClickHandle(std::shared_ptr<KeyEvent> event)
             return false;
         }
     } else {
-        return false;
+        MMI_HILOGI("Menu key is pressed and has not been lifted. This key will not be distributed for now");
+        return true;
     }
 }
 
