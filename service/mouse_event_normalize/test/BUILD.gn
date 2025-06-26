@@ -50,6 +50,7 @@ ohos_unittest("MouseEventNormalizeTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
@@ -223,6 +224,50 @@ ohos_unittest("MouseEventNormalizeEXTest") {
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
  
   sources = [
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_event_normalize.cpp",
+    "src/mouse_event_normalize_ex_test.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+ 
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
+ohos_unittest("MouseTransformProcessorEXTest") {
+  module_out_path = module_output_path
+ 
+  include_dirs = [ "src/test" ]
+ 
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
+ 
+  sources = [
     "src/mock.cpp",
     "src/mouse_transform_processor_ex_test.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
@@ -236,13 +281,14 @@ ohos_unittest("MouseEventNormalizeEXTest") {
   external_deps = [
     "c_utils:utils",
     "googletest:gmock_main",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
-    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "window_manager:libwm",
     "window_manager:libwsutils",
   ]
 }
