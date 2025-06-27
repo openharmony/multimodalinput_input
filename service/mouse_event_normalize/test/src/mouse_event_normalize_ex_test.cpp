@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,12 +28,12 @@ using namespace testing::ext;
 }
 class MouseEventNormalizeEXTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
-    static void TearDownTestCase(void) {};
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 };
  
 /**
- * @tc.name: MouseTransformProcessorTest_HandleTouchpadLeftButton_001
+ * @tc.name: MouseEventNormalizeEXTest_GetPointerLocation_001
  * @tc.desc: Test GetPointerLocation
  * @tc.type: FUNC
  * @tc.require:
