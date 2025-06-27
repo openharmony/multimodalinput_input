@@ -112,6 +112,7 @@ ohos_unittest("OHInputManagerTest") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/permission_helper/include",
+    "${mmi_path}/frameworks/native/input/test/",
   ]
   sources = [
     "${mmi_path}/frameworks/native/input/oh_input_device_listener.cpp",
