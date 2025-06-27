@@ -51,7 +51,6 @@ ohos_unittest("MouseEventNormalizeTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
-    "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
@@ -240,6 +239,7 @@ ohos_unittest("MouseEventNormalizeEXTest") {
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwsutils",
@@ -277,6 +277,7 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "googletest:gmock_main",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -285,7 +286,6 @@ ohos_unittest("MouseTransformProcessorEXTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libwm",
     "window_manager:libwsutils",
   ]
 }
