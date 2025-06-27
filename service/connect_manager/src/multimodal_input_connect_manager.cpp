@@ -562,12 +562,12 @@ int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyE
 }
 
 int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
-    bool isNativeInject)
+    bool isNativeInject, int32_t useCoordinate)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     CHKPR(pointerEvent, ERR_INVALID_VALUE);
-    return multimodalInputConnectService_->InjectPointerEvent(*pointerEvent, isNativeInject);
+    return multimodalInputConnectService_->InjectPointerEvent(*pointerEvent, isNativeInject, useCoordinate);
 }
 
 int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent,

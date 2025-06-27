@@ -113,7 +113,7 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
 }
 
 #ifdef OHOS_BUILD_EMULATOR
-static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const DisplayInfo &displayInfo)
+static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const OLD::DisplayInfo &displayInfo)
 {
     auto direction = displayInfo.displayDirection;
     auto width = displayInfo.width;
@@ -204,7 +204,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
+int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo* displayInfo, Offset &offset,
     double &abs_x, double &abs_y, int32_t deviceType)
 {
     CHKPR(displayInfo, ERROR_NULL_POINTER);
@@ -261,7 +261,7 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const DisplayInfo* disp
     }
 }
 
-int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo,
+int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayInfo* displayInfo,
     struct libinput_event* event, Offset &offset, double &abs_x, double &abs_y, int32_t deviceType)
 {
     CHKPR(displayInfo, ERROR_NULL_POINTER);
@@ -410,7 +410,7 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
     MMI_HILOGI("Mouse write end , ret:%{public}d", ret);
 }
 
-bool MouseTransformProcessor::IsWindowRotation(const DisplayInfo* displayInfo)
+bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayInfo)
 {
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
@@ -430,7 +430,7 @@ bool MouseTransformProcessor::IsWindowRotation(const DisplayInfo* displayInfo)
         (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
 }
 
-Direction MouseTransformProcessor::GetDisplayDirection(const DisplayInfo *displayInfo)
+Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     Direction displayDirection = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
@@ -448,7 +448,7 @@ Direction MouseTransformProcessor::GetDisplayDirection(const DisplayInfo *displa
     return displayDirection;
 }
 
-void MouseTransformProcessor::CalculateOffset(const DisplayInfo *displayInfo, Offset &offset)
+void MouseTransformProcessor::CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset)
 {
 #ifndef OHOS_BUILD_EMULATOR
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {

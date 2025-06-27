@@ -34,8 +34,8 @@ public:
 
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
-    void UpdateDisplayInfo(const DisplayInfo &displayInfo);
-    void OnDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
+    void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo);
     void OnWindowInfo(const WinInfo &info);
     bool Init();
     void DeletePointerVisible(int32_t pid);
@@ -69,7 +69,7 @@ public:
     void InitScreenInfo();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable);
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount);
-    DisplayInfo GetCurrentDisplayInfo();
+    OLD::DisplayInfo GetCurrentDisplayInfo();
     void ForceClearPointerVisiableStatus();
     void InitPointerObserver();
     void OnSessionLost(int32_t pid);

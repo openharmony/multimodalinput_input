@@ -142,7 +142,7 @@ public:
     ErrCode UnsubscribetabletProximity(int32_t subscribeId) override;
     ErrCode SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest) override;
     ErrCode UnsubscribeLongPressEvent(int32_t subscribeId) override;
-    ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject) override;
+    ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate) override;
     ErrCode InjectTouchPadEvent(const PointerEvent& pointerEvent, const TouchpadCDG& touchpadCDG,
         bool isNativeInject) override;
     ErrCode SetAnrObserver() override;
@@ -298,7 +298,7 @@ protected:
     int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::unordered_map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
-        int32_t pid, bool isNativeInject, bool isShell);
+        int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate);
     int32_t CheckTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
     bool InitLibinputService();

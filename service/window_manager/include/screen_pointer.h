@@ -20,7 +20,7 @@
 
 #include "hardware_cursor_pointer_manager.h"
 #include "pointer_renderer.h"
-#include "window_info.h"
+#include "old_display_info.h"
 
 namespace OHOS::MMI {
 using hwcmgr_ptr_t = std::shared_ptr<HardwareCursorPointerManager>;
@@ -36,7 +36,7 @@ uint32_t GetScreenInfoHeight(const screen_info_ptr_t);
 class ScreenPointer final {
 public:
     DISALLOW_COPY_AND_MOVE(ScreenPointer);
-    ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, const DisplayInfo &di);
+    ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, const OLD::DisplayInfo &di);
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, screen_info_ptr_t si);
     ~ScreenPointer() = default;
 
@@ -44,7 +44,7 @@ public:
     bool InitSurface();
     void UpdateScreenInfo(screen_info_ptr_t si);
     bool UpdatePadding(uint32_t mainWidth, uint32_t mainHeight);
-    void OnDisplayInfo(const DisplayInfo &di, bool isWindowRotation);
+    void OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotation);
 
     buffer_ptr_t GetDefaultBuffer();
     buffer_ptr_t GetTransparentBuffer();

@@ -182,15 +182,15 @@ void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void TouchDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
-    if (displayInfo.screenCombination != displayInfo_.screenCombination ||
-        displayInfo.uniqueId != displayInfo_.uniqueId) {
+    if (displayInfo.displaySourceMode != displayInfo_.displaySourceMode ||
+        displayInfo.rsId != displayInfo_.rsId) {
         if (surfaceNode_ != nullptr) {
             surfaceNode_->ClearChildren();
             surfaceNode_.reset();
@@ -400,11 +400,11 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
-    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.uniqueId)) {
+    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.rsId)) {
         return;
     }
-    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.uniqueId);
-    screenId_ = static_cast<uint64_t>(displayInfo_.uniqueId);
+    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.rsId);
+    screenId_ = static_cast<uint64_t>(displayInfo_.rsId);
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
@@ -490,11 +490,12 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    screenId_ = static_cast<uint64_t>(displayInfo_.uniqueId);
+    screenId_ = static_cast<uint64_t>(displayInfo_.rsId);
     if (windowScreenId_ == screenId_) {
         screenId_ = displayNodeScreenId_;
     }
     surfaceNode_->AttachToDisplay(screenId_);
+    MMI_HILOGI("TouchDrawingManager::CreateTouchWindow:%" PRIu64, screenId_);
     MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId_, surfaceNode_->GetId());
 }
 

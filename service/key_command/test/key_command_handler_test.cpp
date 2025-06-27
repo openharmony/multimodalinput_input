@@ -1075,7 +1075,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[1].y = 10;
     handler.twoFingerGesture_.touches[1].downTime = 100000;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 150;
     displayInfo.height = 300;
@@ -1122,7 +1122,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[1].y = 170;
     handler.twoFingerGesture_.touches[1].downTime = 100000;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 150;
     displayInfo.height = 300;
@@ -1194,7 +1194,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
 
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 10;
     displayInfo.height = 30;
@@ -1296,7 +1296,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_004, TestSiz
     KeyCommandHandler handler;
     int32_t vp = 10;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = -10;
     displayInfo.uniq = "default0";
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
@@ -4052,7 +4052,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_002, TestSiz
     ASSERT_EQ(ret, 0);
     vp = 5;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;
@@ -4079,7 +4079,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_003, TestSiz
     KeyCommandHandler handler;
     int32_t vp = 5;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;
@@ -4114,7 +4114,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[1].y = -400;
     handler.twoFingerGesture_.touches[1].downTime = 50000;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;
@@ -4149,7 +4149,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[1].y = 400;
     handler.twoFingerGesture_.touches[1].downTime = 50000;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;
@@ -4184,7 +4184,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[1].y = 20;
     handler.twoFingerGesture_.touches[1].downTime = 50000;
     InputWindowsManager inputWindowsManager;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;
@@ -5597,7 +5597,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     KeyCommandHandler handler;
     handler.gameForbidFingerKnuckle_ = false;
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     WindowInfo windowInfo;
     windowInfo.id = 0;
@@ -5636,7 +5636,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[0].downTime = 0;
     handler.twoFingerGesture_.touches[1].downTime = 1;
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 1260;
     displayInfo.height = 2720;
@@ -5649,7 +5649,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     IInputWindowsManager::instance_ = inputWindowsManager;
     handler.twoFingerGesture_.touches[0].x = 600;
     handler.twoFingerGesture_.touches[0].y = 600;
-    
+
     handler.twoFingerGesture_.touches[1].x = 800;
     handler.twoFingerGesture_.touches[1].y = 600;
     ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
@@ -5697,7 +5697,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_006, TestSiz
 {
     CALL_TEST_DEBUG;
     int32_t vp = 5;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;
@@ -5738,7 +5738,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_001,
     handler.gameForbidFingerKnuckle_ = false;
     handler.singleKnuckleGesture_.state = false;
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     WindowInfo windowInfo;
@@ -5796,7 +5796,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckKnuckleCondition_002,
     handler.gameForbidFingerKnuckle_ = false;
     handler.singleKnuckleGesture_.state = false;
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     WindowInfo windowInfo;
@@ -5844,7 +5844,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     touchEvent->SetPointerId(0);
     touchEvent->SetTargetDisplayId(0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -5893,7 +5893,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     touchEvent->SetPointerId(0);
     touchEvent->SetTargetDisplayId(0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -5942,7 +5942,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     touchEvent->SetPointerId(0);
     touchEvent->SetTargetDisplayId(0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -5988,7 +5988,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     touchEvent->SetPointerId(0);
     touchEvent->SetTargetDisplayId(0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -6037,7 +6037,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     touchEvent->SetPointerId(0);
     touchEvent->SetTargetDisplayId(0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -6085,7 +6085,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     touchEvent->SetPointerId(0);
     touchEvent->SetTargetDisplayId(0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     displayInfo.direction = DIRECTION0;
     auto inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -6102,7 +6102,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     handler.isStartBase_ = true;
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = false;
-    
+
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchMove(touchEvent));
 }
 

@@ -750,6 +750,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     GetConsumerInfos(pointerEvent, deviceTags, consumerInfos);
     for (auto iter = consumerInfos.begin(); iter != consumerInfos.end(); ++iter) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
+        PointerEvent::PointerItem pointerItem;
+        tempEvent->GetPointerItem(tempEvent->GetPointerId(), pointerItem);
         if (std::next(iter) == consumerInfos.end()) {
             tempEvent->SetProcessedCallback(monitorCallbackConsume_);
         } else {

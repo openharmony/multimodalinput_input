@@ -39,7 +39,7 @@ public:
     static void TearDownTestCase(void) {};
     void SetUp(void)
     {
-        DisplayInfo info;
+        OLD::DisplayInfo info;
         info.id = 1;
         info.x =1;
         info.y = 1;
@@ -1166,7 +1166,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo, Tes
 {
     CALL_TEST_DEBUG;
     TouchDrawingManager touchDrawingMgr;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.direction = Direction::DIRECTION0;
     touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
     displayInfo.width = 700;
@@ -1321,7 +1321,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo001, 
 {
     CALL_TEST_DEBUG;
     TouchDrawingManager touchDrawingMgr;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.direction = Direction::DIRECTION0;
     touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
     displayInfo.width = 700;
@@ -1333,11 +1333,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo001, 
     displayInfo.direction = Direction::DIRECTION270;
     touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
-    displayInfo.screenCombination = ScreenCombination::SCREEN_MAIN;
-    touchDrawingMgr.displayInfo_.screenCombination = ScreenCombination::SCREEN_MAIN;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
-    displayInfo.uniqueId = 1;
-    touchDrawingMgr.displayInfo_.uniqueId = 2;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
@@ -1356,7 +1352,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo002, 
 {
     CALL_TEST_DEBUG;
     TouchDrawingManager touchDrawingMgr;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.direction = Direction::DIRECTION0;
     touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
     displayInfo.width = 700;
@@ -1368,11 +1364,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo002, 
     displayInfo.direction = Direction::DIRECTION270;
     touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
-    displayInfo.screenCombination = ScreenCombination::SCREEN_MAIN;
-    touchDrawingMgr.displayInfo_.screenCombination = ScreenCombination::SCREEN_MAIN;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
-    displayInfo.uniqueId = 1;
-    touchDrawingMgr.displayInfo_.uniqueId = 2;
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";

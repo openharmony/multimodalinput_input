@@ -99,10 +99,11 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void DealGesturePointers(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-        bool isNativeInject, bool isShell);
+        bool isNativeInject, bool isShell, int32_t useCoordinate);
     int32_t OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
-    int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
+    int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
+        int32_t useCoordinate);
     int32_t OnInjectTouchPadEventExt(const std::shared_ptr<PointerEvent> pointerEvent,
         const TouchpadCDG &touchpadCDG, bool isShell);
     int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
@@ -161,8 +162,16 @@ private:
     bool CloseInjectNotice(int32_t pid);
     bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t NativeInjectCheck(int32_t pid);
-    int32_t ReadDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+    int32_t ReadScreensInfo(NetPacket &pkt, UserScreenInfo &userScreenInfo);
+    int32_t ReadDisplayGroupsInfo(NetPacket &pkt, UserScreenInfo &userScreenInfo);
+    int32_t ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo);
+    int32_t ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo,
+        OLD::DisplayGroupInfo &oldDisplayGroupInfo);
     bool IsCastInject(int32_t deviceid);
+    bool ChangeToOld(const UserScreenInfo& userScreenInfo);
+    void ChangeToOld(size_t num, const std::vector<DisplayInfo>& displaysInfo,
+        const std::vector<ScreenInfo>& screens);
+    void Printf(const UserScreenInfo& userScreenInfo);
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
@@ -179,6 +188,7 @@ private:
     ClientDeathHandler clientDeathHandler_;
     std::mutex mutexMapQueryAuthorizeLastTimestamp_;
     std::map<int32_t, int64_t> mapQueryAuthorizeLastTimestamp_;
+    std::vector<OLD::DisplayGroupInfo> oldDisplayGroupInfos_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -1342,8 +1342,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_OnDisplayInfo,
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
-    DisplayInfo displayInfo;
-    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
     displayInfo.id = 10;
     displayInfo.width = 600;
     displayInfo.height = 600;

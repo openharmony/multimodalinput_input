@@ -21,7 +21,7 @@
 #include "ui/rs_surface_node.h"
 
 #include "pointer_event.h"
-#include "window_info.h"
+#include "old_display_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,16 +37,16 @@ struct ScreenReadState {
 
 class KnuckleDrawingManager {
 public:
-    void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId = -1);
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t rsId = -1);
+    void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
-    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
+    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const OLD::DisplayInfo& displayInfo);
     std::string GetScreenReadState();
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 private:
     bool IsValidAction(int32_t action);
-    void CreateTouchWindow(int32_t displayId);
+    void CreateTouchWindow(int32_t rsId);
     void StartTouchDraw(std::shared_ptr<PointerEvent> touchEvent);
     int32_t DrawGraphic(std::shared_ptr<PointerEvent> touchEvent);
     int32_t GetPointerPos(std::shared_ptr<PointerEvent> touchEvent);
@@ -87,7 +87,7 @@ private:
     std::vector<PointerInfo> pointerInfos_;
     Rosen::Drawing::Paint paint_;
     Rosen::Drawing::Path path_;
-    DisplayInfo displayInfo_ {};
+    OLD::DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
     bool isNeedInitParticleEmitter_ { true };

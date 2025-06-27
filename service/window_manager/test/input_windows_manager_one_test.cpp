@@ -69,7 +69,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t w
     return std::nullopt;
 }
 
-void InputWindowsManager::PrintDisplayInfo(const DisplayInfo displayInfo) {}
+void InputWindowsManager::PrintDisplayInfo(const OLD::DisplayInfo displayInfo) {}
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
 {
@@ -111,7 +111,7 @@ public:
 HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdjustDisplayXY_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo info;
+    OLD::DisplayInfo info;
     info.direction = DIRECTION90;
     info.validWidth = 0;
     info.validHeight = 0;
@@ -154,7 +154,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdju
 HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo info;
+    OLD::DisplayInfo info;
     info.direction = DIRECTION0;
     info.displayDirection = Direction::DIRECTION0;
     info.validWidth = 0;
@@ -197,7 +197,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_001
 HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo info;
+    OLD::DisplayInfo info;
     info.direction = DIRECTION0;
     info.displayDirection = Direction::DIRECTION0;
     info.validWidth = 0;
@@ -833,7 +833,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SkipPrivacyProte
 HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_HandleOneHandMode_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem pointerItem;
@@ -857,7 +857,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_HandleOneHandMod
 HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdatePointerItemInOneHandMode_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -882,7 +882,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdatePointerIte
 HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdatePointerItemInOneHandMode_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -914,7 +914,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<WindowInfo> windowsInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
     int32_t pointerId = 0;
@@ -942,7 +942,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<WindowInfo> windowsInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
     int32_t pointerId = 0;
@@ -972,7 +972,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<WindowInfo> windowsInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
     int32_t pointerId = 0;
@@ -1002,7 +1002,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<WindowInfo> windowsInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
     int32_t pointerId = 0;
@@ -1032,7 +1032,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<WindowInfo> windowsInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
     int32_t pointerId = 0;
@@ -1072,7 +1072,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<WindowInfo> windowsInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
     int32_t pointerId = 0;
@@ -1138,7 +1138,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CalculateAcrossD
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     Vector2D<double> layout;
     displayInfo.x = 1;
     displayInfo.y = 1;
@@ -1159,8 +1159,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AcrossDisplay_00
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo displayInfoDes;
-    DisplayInfo displayInfoOri;
+    OLD::DisplayInfo displayInfoDes;
+    OLD::DisplayInfo displayInfoOri;
     Vector2D<double> logical;
     Vector2D<double> layout;
     AcrossDirection acrossDirection = AcrossDirection::RIGHTWARDS;
@@ -1196,12 +1196,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindPhysicalDisp
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     double physicalX = 0.0f;
     double physicalY = 0.0f;
     int32_t displayId = 0;
 
-    DisplayInfo displayInfo1;
+    OLD::DisplayInfo displayInfo1;
     displayInfo1.id = 0;
     displayInfo1.dpi = -10;
     displayInfo1.uniq = "default0";
@@ -1230,7 +1230,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReverseRotateDis
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo info;
+    OLD::DisplayInfo info;
     double x = 0.0f;
     double y = 0.0f;
     Coordinate2D cursorPos = { 0.0, 0.0 };
@@ -1253,7 +1253,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReverseRotateDis
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo info;
+    OLD::DisplayInfo info;
     double x = 0.0f;
     double y = 0.0f;
     Coordinate2D cursorPos = { 0.0, 0.0 };
@@ -1495,7 +1495,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CalcDrawCoordina
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     PointerEvent::PointerItem pointerItem;
     pointerItem.rawDisplayX_ = 0;
     pointerItem.rawDisplayY_ = 0;
@@ -1537,7 +1537,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDispla
     InputWindowsManager inputWindowsManager;
     WindowGroupInfo windowGroupInfo;
     int32_t displayId = 1;
-    DisplayInfo displayInfo1;
+    OLD::DisplayInfo displayInfo1;
     displayInfo1.id = 0;
     displayInfo1.dpi = -10;
     displayInfo1.uniq = "default0";
@@ -1654,7 +1654,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDispla
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
     int32_t displayId = 0;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
@@ -1676,7 +1676,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPointerOnCente
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.validWidth = 1;
     displayInfo.validHeight = 1;
@@ -1830,8 +1830,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateDisplayInf
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    DisplayGroupInfo displayGroupInfo;
-    DisplayInfo displayInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
     displayGroupInfo.displaysInfo.push_back(displayInfo);
     displayGroupInfo.groupId = -1;
     bool needUpdateDisplayExt = true;
@@ -1848,12 +1848,10 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetMainScreenDis
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    std::vector<DisplayInfo> displaysInfo;
-    DisplayInfo mainScreenDisplayInfo;
+    std::vector<OLD::DisplayInfo> displaysInfo;
+    OLD::DisplayInfo mainScreenDisplayInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
-    mainScreenDisplayInfo.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_ALONE;
     displaysInfo.push_back(mainScreenDisplayInfo);
-    mainScreenDisplayInfo.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_MAIN;
     displaysInfo.push_back(mainScreenDisplayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
 }
@@ -1868,12 +1866,10 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetPointerPosi
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
-    DisplayInfo currentDisplay;
-    currentDisplay.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_ALONE;
+    OLD::DisplayInfo currentDisplay;
     displayGroupInfo.displaysInfo.push_back(currentDisplay);
-    currentDisplay.screenCombination = OHOS::MMI::ScreenCombination::SCREEN_MAIN;
     displayGroupInfo.displaysInfo.push_back(currentDisplay);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
 }
@@ -1888,7 +1884,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPointerOnCente
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    DisplayInfo currentDisplay;
+    OLD::DisplayInfo currentDisplay;
     currentDisplay.validHeight = 2;
     currentDisplay.validWidth = 2;
     CursorPosition currentPos;
@@ -1911,9 +1907,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetCursorPos, 
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayGroupInfo displayGroupInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetCursorPos(displayGroupInfo));
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayGroupInfo.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetCursorPos(displayGroupInfo));
 }
@@ -1928,7 +1924,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPositionOutVal
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    DisplayInfo currentDisplay;
+    OLD::DisplayInfo currentDisplay;
     currentDisplay.validHeight = 2;
     currentDisplay.validWidth = 2;
     currentDisplay.height = 2;

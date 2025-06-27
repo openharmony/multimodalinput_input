@@ -25,6 +25,9 @@ inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 
 inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
 inline constexpr int32_t DEFAULT_GROUP_ID = 0;
+constexpr uint32_t MAX_DISPLAY_GROUP_SIZE = 100;
+constexpr uint32_t MAX_DISPLAY_SIZE = 1000;
+constexpr uint32_t MAX_SCREEN_SIZE = 1000;
 
 enum SecureFlag {
     DEFAULT_MODE = 0,
@@ -354,81 +357,123 @@ struct WindowInfo {
  *
  * @since 9
  */
-enum class ScreenCombination : uint32_t {
+enum class DisplaySourceMode : uint32_t {
     SCREEN_ALONE,
     SCREEN_EXPAND,
+
+    /**
+     * mirror screen
+     *
+     * @since 20
+     */
     SCREEN_MIRROR,
+
+    /**
+     * different source screen
+     *
+     * @since 20
+     */
     SCREEN_UNIQUE,
+
+    /**
+     * extend screen
+     *
+     * @since 20
+     */
     SCREEN_EXTEND,
+
+    /**
+     * main screen
+     *
+     * @since 20
+     */
     SCREEN_MAIN
+};
+
+/**
+* The area of ​​the logical screen on the physical screen
+* Based on screen 0°, not affected by display rotation angle
+* @since 20
+*/
+struct ScreenArea {
+    /**
+     * The unique ID of the physical screen.
+     *
+     * @since 20
+     */
+    int32_t id;
+    /**
+     * The area of ​​the logical screen on the physical screen
+     * The upper left corner of the screen is the origin
+     * Based on screen 0°, not affected by display rotation angle
+     * @since 20
+     */
+    Rect area;
 };
 
 struct DisplayInfo {
     /**
-     * Unique ID of the physical display
+     * Unique ID of the logical display, this value is greater than or equal to 0 and is unique in user space.
      *
-     * @since 9
+     * @since 20
      */
     int32_t id;
 
     /**
-     * X coordinate of the upper left corner on the logical screen
-     *
-     * @since 9
+     * The x offset of the upper left corner of the current rotation angle of the screen relative to the upper
+     * left corner of the main screen, in px, changes with the rotation
+     * @since 20
      */
     int32_t x;
 
     /**
-     * Y coordinate of the upper left corner on the logical screen
+     * The y offset of the upper left corner of the current rotation angle of the screen relative to the upper
+     * left corner of the main screen, changes with the rotation. in px.
      *
-     * @since 9
+     * @since 20
      */
     int32_t y;
 
     /**
      * Display width, which is the logical width of the original screen when the rotation angle is 0.
-     * The value remains unchanged even if the display screen is rotated.
+     * The value changed if the display screen is rotated. in px.
      *
-     * @since 9
+     * @since 20
      */
     int32_t width;
 
     /**
      * Display height, which is the logical height of the original screen when the rotation angle is 0.
-     * The value remains unchanged even if the display screen is rotated.
+     * The value changed if the display screen is rotated. in px.
      *
      * @since 9
      */
     int32_t height;
 
     /**
-     * Pixel density, which indicates the number of pixels in an inch
+     * Pixel density, which indicates the number of pixels in an inch,changes with resolution adjustment
      *
      * @since 10
      */
     int32_t dpi;
 
     /**
-     * Name of the physical display, which is used for debugging
+     * Name of the logical display, which is used for debugging
      *
      * @since 9
      */
     std::string name;
-
     /**
-     * Unique screen ID, which is used to associate the corresponding touchscreen. The default value is default0.
+     * The angle increment from the logical screen orientation of 0° clockwise to the current screen orientation.
      *
-     * @since 9
-     */
-    std::string uniq;
-
-    /**
-     * Orientation of the physical display
-     *
-     * @since 9
+     * @since 20
      */
     Direction direction;
-
+    /**
+     * The angle increment from the current rotation angle of the logical screen to the rotation angle of
+     * its window content display clockwise.
+     * @since 20
+     */
     Direction displayDirection;
 
     /**
@@ -446,14 +491,6 @@ struct DisplayInfo {
      */
     std::vector<float> transform;
 
-    /**
-     * Orientation of the physical display
-     *
-     * @since 12
-     */
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    float ppi;
     /**
      * Coordinate of the upper left corner of the virtual screen in one-hand mode.
      * If oneHandX is 0, the virtual screen is in the lower left corner.
@@ -477,47 +514,38 @@ struct DisplayInfo {
      * @since 12
      */
     bool isCurrentOffScreenRendering = false;
-    int32_t screenRealWidth = 0;
-    int32_t screenRealHeight = 0;
-    float screenRealPPI = 0.0f;
-    int32_t screenRealDPI = 0;
-    ScreenCombination screenCombination = ScreenCombination::SCREEN_MAIN;
 
     /**
-     * Width of the effective area of the screen. When the screen is rotated, the value changes accordingly.
+     * logical screen mode
+     *
+     * @since 12 20
+     */
+    DisplaySourceMode displaySourceMode = DisplaySourceMode::SCREEN_MAIN;
+
+    /**
+    * The area of the logical screen on the physical screen
+    * Based on screen 0°, not affected by display rotation angle
+    * @since 20
+    */
+    ScreenArea screenArea;
+    /**
+     * rs id.
+     *
+     * @since 20
+     */
+    int32_t rsId;
+    /**
+     * The x coordinate of the valid area relative to the entire logical screen
+     *
+     * @since 20
+     */
+    int32_t offsetX = 0;
+    /**
+     * The y coordinate of the valid area relative to the entire logical screen
      *
      * @since 12
      */
-    int32_t validWidth = 0;
-
-    /**
-     * Height of the effective area of the screen. When the screen is rotated, the value changes accordingly.
-     *
-     * @since 12
-     */
-    int32_t validHeight = 0;
-
-    /**
-     * Rotation angle of the TP patch offset correction.
-     *
-     * @since 12
-     */
-    Direction fixedDirection;
-    
-    /**
-     * The physical width of the screen, in millimeters.
-     *
-     * @since 12
-     */
-    int32_t physicalWidth { 0 };
-
-    /**
-     * The physical height of the screen, in millimeters.
-     *
-     * @since 12
-     */
-    int32_t physicalHeight { 0 };
-
+    int32_t offsetY = 0;
     /**
      * The Pointer Active Width
      *
@@ -531,56 +559,178 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t pointerActiveHeight { 0 };
+};
+/**
+* Screen type.
+*
+* @since 20
+*/
+enum class ScreenType : uint32_t {
+    UNDEFINED,
 
-    /** Unique ID of the physical display
+    /**
+     * real screen.
      *
-     * @since 12
+     * @since 20
      */
-    int32_t uniqueId { 0 };
+    REAL,
+
+    /**
+     * virtual screen.
+     *
+     * @since 20
+     */
+    VIRTUAL
+};
+/**
+* The angle of the physical screen relative to the sensor 0 degrees.
+*
+* @since 20
+*/
+enum class Rotation : uint32_t {
+    ROTATION_0,
+    ROTATION_90,
+    ROTATION_180,
+    ROTATION_270,
+};
+/**
+ * physical screen information
+ *
+ * @since 20
+ */
+struct ScreenInfo {
+    /**
+     * The unique ID of the physical screen.
+     *
+     * @since 20
+     */
+    int32_t id;
+    /**
+     * Unique screen ID, which is used to associate the corresponding touchscreen.
+     * The default value is default0.
+     *
+     * @since 20
+     */
+    std::string uniqueId;
+    /**
+     * Screen type.
+     *
+     * @since 20
+     */
+    ScreenType screenType { ScreenType::REAL };
+    /**
+     * The width of the physical screen, in px. Does not follow rotation. Does not change for
+     * the same physical screen.
+     *
+     * @since 20
+     */
+    int32_t width;
+    /**
+     * The height of the physical screen, in px. Does not follow rotation. Does not change for
+     * the same physical screen.
+     *
+     * @since 20
+     */
+    int32_t height;
+    /**
+     * The width of the physical screen, in mm. Does not follow the rotation. Does not change for
+     * the same physical screen.
+     *
+     * @since 20
+     */
+    int32_t physicalWidth;
+    /**
+     * The width of the physical height, in mm. Does not follow the rotation. Does not change for
+     *  the same physical screen.
+     *
+     * @since 20
+     */
+    int32_t physicalHeight;
+    /**
+     * The angle from the screen default origin to the TP origin clockwise.
+     *
+     * @since 20
+     */
+    Direction tpDirection;
+    /**
+     * Physical pixel density does not change with resolution.
+     *
+     * @since 20
+     */
+    int32_t dpi;
+    /**
+     * The number of pixels per inch is a physical property and does not change.
+     *
+     * @since 20
+     */
+    int32_t ppi;
+    /**
+     * The angle of the physical screen relative to the sensor 0 degrees.
+     *
+     * @since 20
+     */
+    Rotation rotation;
 };
 
 /**
+ * Logical screen group type
+ *
+ * @since 20
+ */
+enum GroupType {
+    /**
+    * The default group, the group that receives input events. This group can only have one
+    *
+    * @since 20
+    */
+    GROUP_DEFAULT = 0,
+
+    /**
+    * The special group, the group can have multiple.
+    *
+    * @since 20
+    */
+    GROUP_SPECIAL = 1,
+};
+/**
  * Logical screen information
  *
- * @since 9
+ * @since 20
  */
 struct DisplayGroupInfo {
     /**
-     * index of group. default=-1
+     * Logical screen group id, at least the user space level guarantees uniqueness.
+     * The range is greater than or equal to 0
      *
-     * @since 16
+     * @since 20
      */
-    int32_t groupId { DEFAULT_GROUP_ID };
+    int32_t id;
+    /**
+     * Logical screen group name
+     *
+     * @since 20
+     */
+    std::string name;
+    /**
+     * Logical screen group type
+     *
+     * @since 20
+     */
+    GroupType type;
+    /**
+     * The main logical screen ID. The logical screen with this ID must be in the displaysInfo.
+     *
+     * @since 20
+     */
+    int32_t mainDisplayId;
 
     /**
-     * main group flag. default=true
+     * ID of the focus window, The value -1 indicates that there is no focused window in the current screen group.
+     * The default screen group must have a focused window.
      *
-     * @since 16
-     */
-    bool isMainGroup { false };
-
-    /**
-     * Width of the logical display
-     *
-     * @since 9
-     */
-    int32_t width;
-
-    /**
-     * Height of the logical display
-     *
-     * @since 9
-     */
-    int32_t height;
-
-    /**
-     * ID of the focus window
-     *
-     * @since 9
+     * @since 20
      */
     int32_t focusWindowId;
-
-    int32_t currentUserId { -1 };
 
     /**
      * List of window information of the logical display arranged in Z order, with the top window at the top
@@ -590,11 +740,37 @@ struct DisplayGroupInfo {
     std::vector<WindowInfo> windowsInfo;
 
     /**
-     * Physical screen information list
+     * logical screen information list
      *
-     * @since 9
+     * @since 20
      */
     std::vector<DisplayInfo> displaysInfo;
+};
+
+/**
+ * user's screen information
+ *
+ * @since 20
+ */
+struct UserScreenInfo {
+    /**
+     * user id.
+     *
+     * @since 20
+     */
+    int32_t userId;
+    /**
+     * Physical screen information.
+     *
+     * @since 20
+     */
+    std::vector<ScreenInfo> screens;
+    /**
+     * Logical screen information.
+     *
+     * @since 20
+     */
+    std::vector<DisplayGroupInfo> displayGroups;
 };
 
 struct WindowGroupInfo {

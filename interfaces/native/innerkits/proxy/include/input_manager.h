@@ -52,11 +52,11 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
 
     /**
-     * @brief Updates the screen and window information.
-     * @param displayGroupInfo Indicates the logical screen information.
-     * @since 9
+     * @brief Updates the screen、display and window information array.
+     * @param userScreenInfo Indicates the user screen、display and window information.
+     * @since 20
      */
-    int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t UpdateDisplayInfo(const UserScreenInfo &userScreenInfo);
 
     /**
      * @brief Updates the screen and window information array.
@@ -360,10 +360,12 @@ public:
      * or mouse device input event to simulate.
      * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
      * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
+     * @param useCoordinate Which coordinates to use for injecting events.
      * @return void
      * @since 9
      */
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen = true,
+        int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
 
     /**
      * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
@@ -373,11 +375,12 @@ public:
      * @param zOrder Indicates the point event will inject to the window whose index value is less than the zOrder
      * @param isAutoToVirtualScreen In one-handed mode, true indicates that the data is automatically injected to
      * the virtual screen, and false indicates that the data is not automatically injected to the virtual screen.
+     * @param useCoordinate Which coordinates to use for injecting events.
      * @return void
      * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
-        bool isAutoToVirtualScreen = true);
+        bool isAutoToVirtualScreen = true, int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE);
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
 
     /**

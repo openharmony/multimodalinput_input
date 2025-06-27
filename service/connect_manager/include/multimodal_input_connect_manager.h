@@ -108,7 +108,8 @@ public:
     int32_t UnsubscribetabletProximity(int32_t subscribeId);
     int32_t SubscribeLongPressEvent(int32_t subscribeId, const LongPressRequest &longPressRequest);
     int32_t UnsubscribeLongPressEvent(int32_t subscribeId);
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject,
+        int32_t useCoordinate);
     int32_t InjectTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG,
         bool isNativeInject);
     int32_t SetAnrObserver();

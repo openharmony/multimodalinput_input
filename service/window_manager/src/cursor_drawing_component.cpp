@@ -124,13 +124,13 @@ void CursorDrawingComponent::DrawPointer(int32_t displayId, int32_t physicalX, i
     pointerInstance_->DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction);
 }
 
-void CursorDrawingComponent::UpdateDisplayInfo(const DisplayInfo &displayInfo)
+void CursorDrawingComponent::UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->UpdateDisplayInfo(displayInfo);
 }
 
-void CursorDrawingComponent::OnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->OnDisplayInfo(displayGroupInfo);
@@ -348,11 +348,11 @@ int32_t CursorDrawingComponent::GetHardwareCursorStats(int32_t pid, uint32_t &fr
     return pointerInstance_->GetHardwareCursorStats(pid, frameCount, vsyncCount);
 }
 
-DisplayInfo CursorDrawingComponent::GetCurrentDisplayInfo()
+OLD::DisplayInfo CursorDrawingComponent::GetCurrentDisplayInfo()
 {
     if (!isLoaded_ || (pointerInstance_ == nullptr)) {
         MMI_HILOGE("%{public}s is closed", MULTIMODAL_PATH_NAME);
-        return DisplayInfo();
+        return OLD::DisplayInfo();
     }
     return pointerInstance_->GetCurrentDisplayInfo();
 }
@@ -418,7 +418,7 @@ int32_t CursorDrawingComponent::UpdateMouseLayer(
     const PointerStyle &pointerStyle, int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->UpdateMouseLayer(pointerStyle, displayId, physicalX, physicalY);
+    return pointerInstance_->UpdateMouseLayer(pointerStyle, physicalX, physicalY);
 }
 
 int32_t CursorDrawingComponent::DrawNewDpiPointer()

@@ -32,7 +32,7 @@
 #include "touch_gesture_manager.h"
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "uds_server.h"
-#include "window_info.h"
+#include "old_display_info.h"
 #include "shift_info.h"
 
 namespace OHOS {
@@ -75,8 +75,9 @@ public:
     virtual void PrintEnterEventInfo(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual bool IsFocusedSession(int32_t session) const = 0;
-    virtual void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo) = 0;
-    virtual void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
+    virtual void UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupInfo) = 0;
+    virtual void UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
+    virtual void ProcessInjectEventGlobalXY(std::shared_ptr<PointerEvent> pointerEvent, int32_t useCoordinate) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
@@ -91,7 +92,7 @@ public:
     virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
-    virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
+    virtual std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info,
         double logicX, double logicY) const = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
     virtual int32_t GetCurrentUserId() = 0;
@@ -139,7 +140,7 @@ public:
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) = 0;
-    virtual const std::shared_ptr<DisplayInfo> GetDefaultDisplayInfo() const = 0;
+    virtual const std::shared_ptr<OLD::DisplayInfo> GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void SendCancelEventWhenLock() = 0;
@@ -148,7 +149,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent) = 0;
-    virtual const std::shared_ptr<DisplayInfo> GetPhysicalDisplay(int32_t id) const = 0;
+    virtual const std::shared_ptr<OLD::DisplayInfo> GetPhysicalDisplay(int32_t id) const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -172,7 +173,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
-    virtual Direction GetDisplayDirection(const DisplayInfo *displayInfo) = 0;
+    virtual Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     virtual void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr) = 0;
@@ -181,7 +182,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    virtual std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    virtual std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) = 0;
         virtual void SwitchTouchTracking(bool touchTracking) = 0;
 

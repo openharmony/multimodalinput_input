@@ -224,11 +224,12 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
+int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject,
+    int32_t useCoordinate)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
