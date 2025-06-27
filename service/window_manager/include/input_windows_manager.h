@@ -230,7 +230,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void SwitchTouchTracking(bool touchTracking);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    bool IsPointInsideGuideWindow(double x, double y);
+    bool IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const;
+    bool IsPointInsideSpecialWindow(double x, double y);
     bool IsMouseInCastWindow();
     bool IsCaptureMode();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD

@@ -48,7 +48,7 @@ constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr int32_t NUMBER_TWO { 2 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
+constexpr uint32_t WINDOW_NAME_TYPE_SCREENSHOT { 1 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
 constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
@@ -9780,43 +9780,43 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandlePullEvent_001, T
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 /**
- * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_001
- * @tc.desc: Test that IsPointInsideGuideWindow should return false when there is no window information
+ * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_001
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return false when there is no window information
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
-    EXPECT_FALSE(inputWindowsManager.IsPointInsideGuideWindow(0, 0));
+    EXPECT_FALSE(inputWindowsManager.IsPointInsideSpecialWindow(0, 0));
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_002
- * @tc.desc: Test that IsPointInsideGuideWindow should return false when the window type is not guide window
+ * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_002
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return false when the window type is not guide window
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     WindowInfo windowInfo;
     windowInfo.windowType = GUIDE_WINDOW_TYPE + 1;
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(inputWindowsManager.IsPointInsideGuideWindow(0, 0));
+    EXPECT_FALSE(inputWindowsManager.IsPointInsideSpecialWindow(0, 0));
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_003
- * @tc.desc: Test that IsPointInsideGuideWindow should return false
+ * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_003
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return false
     when the window type is guide window, but the point is not within it
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     WindowInfo testWindow;
@@ -9827,18 +9827,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWind
     InputWindowsManager manager;
     manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
 
-    bool result = manager.IsPointInsideGuideWindow(TEST_WINDOW_START -1, TEST_WINDOW_START -1);
+    bool result = manager.IsPointInsideSpecialWindow(TEST_WINDOW_START -1, TEST_WINDOW_START -1);
     EXPECT_FALSE(result);
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsPointInsideGuideWindow_004
- * @tc.desc: Test that IsPointInsideGuideWindow should return true
+ * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_004
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return true
     when the window type is guide window, abd the point is within it
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWindow_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     WindowInfo testWindow;
@@ -9849,10 +9849,104 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideGuideWind
     InputWindowsManager manager;
     manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
 
-    bool result = manager.IsPointInsideGuideWindow(0, 0);
+    bool result = manager.IsPointInsideSpecialWindow(0, 0);
     EXPECT_TRUE(result);
 }
 
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_005
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return false
+    when the window zorder is xiaoyi voice input window, but the point is not within it
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.zOrder = 4000;
+    testWindow.area.x = TEST_WINDOW_START;
+    testWindow.area.y = TEST_WINDOW_START;
+    testWindow.area.width = TEST_WINDOW_END;
+    testWindow.area.height = TEST_WINDOW_END;
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsPointInsideSpecialWindow(TEST_WINDOW_START -1, TEST_WINDOW_START -1);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_006
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return true
+    when the window zorder is xiaoyi voice input window, and the point is within it
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.zOrder = 4000;
+    testWindow.area.x = TEST_WINDOW_START;
+    testWindow.area.y = TEST_WINDOW_START;
+    testWindow.area.width = TEST_WINDOW_END;
+    testWindow.area.height = TEST_WINDOW_END;
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsPointInsideSpecialWindow(0, 0);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideWindowArea_001
+ * @tc.desc: Test that IsPointInsideWindowArea should return false
+    when the point is not within the window area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideWindowArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.area.x = TEST_WINDOW_START;
+    testWindow.area.y = TEST_WINDOW_START;
+    testWindow.area.width = TEST_WINDOW_END;
+    testWindow.area.height = TEST_WINDOW_END;
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsPointInsideWindowArea(TEST_WINDOW_START -1, TEST_WINDOW_START -1,\
+        manager.displayGroupInfo_.windowsInfo[0]);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsPointInsideWindowArea_002
+ * @tc.desc: Test that IsPointInsideWindowArea should return true
+    when the point is within the window area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideWindowArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo testWindow;
+    testWindow.area.x = TEST_WINDOW_START;
+    testWindow.area.y = TEST_WINDOW_START;
+    testWindow.area.width = TEST_WINDOW_END;
+    testWindow.area.height = TEST_WINDOW_END;
+
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+
+    bool result = manager.IsPointInsideWindowArea(0, 0, manager.displayGroupInfo_.windowsInfo[0]);
+    EXPECT_TRUE(result);
+}
 /**
  * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_001
  * @tc.desc: Test that IsMouseInCastWindow should return false when there is no window information
@@ -9918,7 +10012,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_001, Tes
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
     WindowInfo screenshotWindow;
-    screenshotWindow.windowNameType = WINDOW_NAME_TYPE_SCHREENSHOT;
+    screenshotWindow.windowNameType = WINDOW_NAME_TYPE_SCREENSHOT;
     manager.displayGroupInfo_.windowsInfo.push_back(screenshotWindow);
 
     EXPECT_FALSE(manager.IsCaptureMode());
@@ -9970,7 +10064,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_004, Tes
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
     WindowInfo normalWindow;
-    normalWindow.windowNameType = WINDOW_NAME_TYPE_SCHREENSHOT + 1;
+    normalWindow.windowNameType = WINDOW_NAME_TYPE_SCREENSHOT + 1;
     normalWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER - 1;
     manager.displayGroupInfo_.windowsInfo.push_back(normalWindow);
 
