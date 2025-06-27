@@ -688,7 +688,7 @@ void LibinputAdapter::OnEventHandler()
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
         static int32_t downCount = 0;
-        bool isInsideGuideWindow = false;
+        bool isInsideWindow = false;
 
         // confirm boot completed msg in case of mmi restart.
         UpdateBootFlag();
@@ -731,7 +731,7 @@ void LibinputAdapter::OnEventHandler()
                     touchPoints_[touchId] = std::pair<double, double>(x, y);
 
                     InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
-                    isInsideGuideWindow = inputWindowsManager->IsPointInsideGuideWindow(x, y);
+                    isInsideWindow = inputWindowsManager->IsPointInsideSpecialWindow(x, y);
                 }
             } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
                 auto pos = touchPoints_.find(touchId);
@@ -755,8 +755,8 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
                 longAxis,
                 shortAxis);
 
-            if (!isInsideGuideWindow && handleTouchPoint_ != nullptr &&
-                handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure) == 0) {
+            if (!isInsideWindow && handleTouchPoint_ != nullptr &&
+                handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure, longAxis, shortAxis) == 0) {
                 MMI_HILOGD("Inside vkeyboard area");
                 HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
             } else {
