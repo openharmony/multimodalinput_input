@@ -152,7 +152,7 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_006, Test
     int32_t displayId = 0;
     double displayY = 0.0;
     
-    Input_Result result = OH_Input_GetPointerLocation(&displayId, nullptr double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, nullptr, &displayY);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
 }
 
