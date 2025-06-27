@@ -44,6 +44,7 @@ ohos_unittest("MouseEventNormalizeTest") {
 
   external_deps = [
     "c_utils:utils",
+    "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
@@ -53,9 +54,8 @@ ohos_unittest("MouseEventNormalizeTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
-    "window_manager:libwm",
     "preferences:native_preferences",
-    "googletest:gmock_main",
+    "window_manager:libwm",
   ]
 }
 
@@ -206,33 +206,33 @@ ohos_unittest("MouseTransformProcessorMockTest") {
 
 ohos_unittest("MouseEventNormalizeEXTest") {
   module_out_path = module_output_path
- 
+
   include_dirs = [ "src/test" ]
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
- 
+
   sources = [
     "${mmi_path}/service/mouse_event_normalize/src/mouse_event_normalize.cpp",
     "src/mouse_event_normalize_ex_test.cpp",
   ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "c_utils:utils",
     "googletest:gmock_main",
@@ -250,34 +250,34 @@ ohos_unittest("MouseEventNormalizeEXTest") {
 
 ohos_unittest("MouseTransformProcessorEXTest") {
   module_out_path = module_output_path
- 
+
   include_dirs = [ "src/test" ]
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
- 
+
   sources = [
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
     "src/mock.cpp",
     "src/mouse_transform_processor_ex_test.cpp",
-    "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
   ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "c_utils:utils",
     "googletest:gmock_main",

@@ -165,8 +165,8 @@ ohos_unittest("OHInputManagerEXTest") {
     "${mmi_path}/frameworks/native/input/oh_input_device_listener.cpp",
     "${mmi_path}/frameworks/native/input/oh_input_interceptor.cpp",
     "${mmi_path}/frameworks/native/input/oh_input_manager.cpp",
-    "${mmi_path}/frameworks/native/input/test/oh_input_manager_ex_test.cpp",
     "${mmi_path}/frameworks/native/input/test/mock.cpp",
+    "${mmi_path}/frameworks/native/input/test/oh_input_manager_ex_test.cpp",
     "${mmi_path}/service/permission_helper/src/permission_helper.cpp",
   ]
 
