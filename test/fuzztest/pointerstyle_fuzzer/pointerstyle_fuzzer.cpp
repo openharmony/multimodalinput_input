@@ -75,8 +75,10 @@ void UpdateDisplayInfo(const uint8_t *data, size_t size, int32_t windowId)
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
     size_t stringSize = 4;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
+    int32_t displayWidth = 0;
+    int32_t displayHeight = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayWidth);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayHeight);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
     std::vector<WindowInfo> windowsInfo;
     std::vector<DisplayInfo> displaysInfo;
@@ -103,11 +105,26 @@ void UpdateDisplayInfo(const uint8_t *data, size_t size, int32_t windowId)
     displayInfo.name = name;
     char uniq[] = "uniq";
     GetString(data + startPos, size - startPos, uniq, stringSize);
-    displayInfo.uniq = uniq;
     displaysInfo.push_back(displayInfo);
     displayGroupInfo.windowsInfo = windowsInfo;
     displayGroupInfo.displaysInfo = displaysInfo;
-    InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
+ 
+    UserScreenInfo userScreenInfo;
+    ScreenInfo screenInfo;
+    screenInfo.screenType =(ScreenType)windowInfo.windowType;
+    screenInfo.dpi = displayInfo.dpi;
+    screenInfo.height =  windowInfo.area.height;
+    screenInfo.width = windowInfo.area.width;
+    screenInfo.physicalWidth = displayWidth;
+    screenInfo.physicalHeight = displayHeight;
+    screenInfo.id = displayInfo.id;
+    screenInfo.rotation = Rotation::ROTATION_0;
+    screenInfo.tpDirection = Direction::DIRECTION0;
+    screenInfo.uniqueId = uniq;
+    userScreenInfo.screens.push_back(screenInfo);
+
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo);
 }
 
 void PointerStyleFuzzTest(const uint8_t *data, size_t size)

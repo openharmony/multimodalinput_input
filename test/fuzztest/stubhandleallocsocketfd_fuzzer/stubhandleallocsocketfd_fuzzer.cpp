@@ -54,6 +54,7 @@ int32_t g_tmpDate = 1;
 void* g_pixelMapPtr = &g_tmpDate;
 bool g_isAuthorize = true;
 bool g_isNativeInject = true;
+bool g_useCoordinate = PointerEvent::DISPLAY_COORDINATE;
 bool g_switchFlag = true;
 bool g_enableFlag = true;
 bool g_rotateSwitchFlag = true;
@@ -110,7 +111,7 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->InjectKeyEvent(*keyEvent.get(), g_isNativeInject);
     MMIService::GetInstance()->CheckInjectKeyEvent(keyEvent, tmpfd, g_isNativeInject);
     MMIService::GetInstance()->OnGetKeyState(vecInt, mpInt);
-    MMIService::GetInstance()->InjectPointerEvent(*pointerEvent.get(), g_isNativeInject);
+    MMIService::GetInstance()->InjectPointerEvent(*pointerEvent.get(), g_isNativeInject, g_useCoordinate);
     MMIService::GetInstance()->OnAddSystemAbility(tmpfd, "deviceId");
     MMIService::GetInstance()->SubscribeKeyEvent(tmpfd, *p_option.get());
     MMIService::GetInstance()->UnsubscribeKeyEvent(tmpfd);

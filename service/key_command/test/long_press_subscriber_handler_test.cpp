@@ -1038,7 +1038,7 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_StartFinge
     int32_t ret = LONG_PRESS_EVENT_HANDLER->SubscribeLongPressEvent(sess, subscribeId, longPressRequest);
     EXPECT_TRUE(ret >= 0);
 
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 1260;
     displayInfo.height = 2720;
@@ -1069,7 +1069,7 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 1260;
     displayInfo.height = 2720;
@@ -1118,7 +1118,7 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 1260;
     displayInfo.height = 2720;
@@ -1169,7 +1169,7 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_CheckFinge
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.dpi = 320;
     displayInfo.width = 1260;
     displayInfo.height = 2720;
@@ -1246,7 +1246,7 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_ConvertVPT
 {
     CALL_TEST_DEBUG;
     int32_t vp = 5;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.x = 2;
     displayInfo.y = 3;

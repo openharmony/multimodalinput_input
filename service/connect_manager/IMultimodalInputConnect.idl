@@ -102,7 +102,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void UnsubscribetabletProximity([in] int subscribeId);
     void SubscribeLongPressEvent([in] int subscribeId, [in] LongPressRequest longPressRequest);
     void UnsubscribeLongPressEvent([in] int subscribeId);
-    void InjectPointerEvent([in] PointerEvent pointerEvent, [in] boolean isNativeInject);
+    void InjectPointerEvent([in] PointerEvent pointerEvent, [in] boolean isNativeInject, [in] int useCoordinate);
     void InjectTouchPadEvent([in] PointerEvent pointerEvent, [in] TouchpadCDG touchpadCDG, [in] boolean isNativeInject);
     void SetAnrObserver();
     void GetDisplayBindInfo([out] DisplayBindInfo[] infos);

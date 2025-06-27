@@ -42,7 +42,7 @@ public:
     static void TearDownTestCase(void) {};
     void SetUp(void)
     {
-        DisplayInfo displayInfo = { .id = 1, .x = 1, .y = 1, .width = 1, .height = 1,
+        OLD::DisplayInfo displayInfo = { .id = 1, .x = 1, .y = 1, .width = 1, .height = 1,
             .dpi = 240, .name = "display", .uniq = "xx" };
         if (knuckleDynamicDrawingMgr == nullptr) {
             knuckleDynamicDrawingMgr = std::make_shared<KnuckleDynamicDrawingManager>();
@@ -451,7 +451,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
 HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo = { .id = 1, .x = 1, .y = 1, .width = 1, .height = 1,
+    OLD::DisplayInfo displayInfo = { .id = 1, .x = 1, .y = 1, .width = 1, .height = 1,
         .dpi = 240, .name = "display", .uniq = "xx" };
     knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
     EXPECT_EQ(knuckleDynamicDrawingMgr->displayInfo_.width, 1);
@@ -466,7 +466,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
 HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_UpdateDisplayInfo_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayInfo displayInfo;
+    OLD::DisplayInfo displayInfo;
     knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
     EXPECT_EQ(knuckleDynamicDrawingMgr->displayInfo_.width, 0);
 }

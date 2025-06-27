@@ -17,7 +17,7 @@
 #define I_POINTER_DRAWING_MANAGER_H
 
 #include "pointer_style.h"
-#include "window_info.h"
+#include "old_display_info.h"
 #include "delegate_interface.h"
 
 namespace OHOS {
@@ -28,10 +28,10 @@ public:
     virtual ~IPointerDrawingManager() = default;
 
     static IPointerDrawingManager* GetInstance();
-    virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    virtual void DrawPointer(int32_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) {}
-    virtual void UpdateDisplayInfo(const DisplayInfo& displayInfo) {}
-    virtual void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) {}
+    virtual void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
+    virtual void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
     virtual void OnWindowInfo(const WinInfo &info) {}
     virtual bool Init()
     {
@@ -128,7 +128,7 @@ public:
     {
         return 0;
     }
-    virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
+    virtual void DrawMovePointer(int32_t rsId, int32_t physicalX, int32_t physicalY) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
     virtual void InitPointerCallback() {}
     virtual void InitScreenInfo() {}
@@ -140,7 +140,7 @@ public:
     {
         return 0;
     }
-    virtual DisplayInfo GetCurrentDisplayInfo()
+    virtual OLD::DisplayInfo GetCurrentDisplayInfo()
     {
         return {};
     }
@@ -166,7 +166,7 @@ public:
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
     virtual void SubscribeScreenModeChange() {}
     virtual int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
-        int32_t displayId, int32_t physicalX, int32_t physicalY)
+        int32_t physicalX, int32_t physicalY)
     {
         return 0;
     }

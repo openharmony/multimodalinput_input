@@ -349,7 +349,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
     // delay the event destroy.
     bool delayDestroy = false;
     int32_t confirmedDelayMs(0);
-	
+
     if (getLibinputEventForVKeyboard_ == nullptr || getLibinputEventForVTrackpad_ == nullptr) {
         return;
     }
@@ -375,7 +375,7 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
         }
         HandleVKeyboardMessage(eventType, keyEvents, frameTime);
     }
-    
+
 	// handle trackpad messages.
     while (true) {
         std::vector<libinput_event*> events;

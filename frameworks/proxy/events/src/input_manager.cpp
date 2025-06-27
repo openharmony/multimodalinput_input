@@ -65,14 +65,9 @@ int32_t InputManager::GetWindowPid(int32_t windowId)
     return InputMgrImpl.GetWindowPid(windowId);
 }
 
-int32_t InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManager::UpdateDisplayInfo(const UserScreenInfo &userScreenInfo)
 {
-    return InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
-}
-
-int32_t InputManager::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfo)
-{
-    return InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
+    return InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
 }
 
 int32_t InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
@@ -271,7 +266,8 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
-void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen)
+void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen,
+    int32_t useCoordinate)
 {
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
@@ -287,11 +283,11 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     } else {
         MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
     }
-    InputMgrImpl.SimulateInputEvent(pointerEvent);
+    InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
-    bool isAutoToVirtualScreen)
+    bool isAutoToVirtualScreen, int32_t useCoordinate)
 {
     CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -310,7 +306,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s", zOrder,
             isAutoToVirtualScreen ? "true" : "false");
     }
-    InputMgrImpl.SimulateInputEvent(pointerEvent);
+    InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
 }
 
 void InputManager::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,

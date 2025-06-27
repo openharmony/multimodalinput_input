@@ -32,7 +32,7 @@
 #endif // USE_ROSEN_DRAWING
 
 #include "pointer_event.h"
-#include "window_info.h"
+#include "old_display_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -61,7 +61,7 @@ public:
     void SetupSettingObserver(int32_t nRetries);
     void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateLabels();
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
     int32_t UpdateBubbleData();
@@ -116,7 +116,7 @@ private:
     std::shared_ptr<Rosen::RSCanvasNode> trackerCanvasNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> crosshairCanvasNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> labelsCanvasNode_ { nullptr };
-    DisplayInfo displayInfo_ {};
+    OLD::DisplayInfo displayInfo_ {};
     Bubble bubble_;
     Rosen::Drawing::Point firstPt_;
     Rosen::Drawing::Point currentPt_;

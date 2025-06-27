@@ -22,7 +22,7 @@
 #include "timer_manager.h"
 #include "pointer_event.h"
 #include "touchpad_control_display_gain.h"
-#include "window_info.h"
+#include "old_display_info.h"
 #include <preferences_value.h>
 
 namespace OHOS {
@@ -120,9 +120,9 @@ private:
     bool HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
     void HandleTouchPadButton(enum libinput_button_state state, int32_t type);
-    int32_t UpdateMouseMoveLocation(const DisplayInfo* displayInfo, Offset &offset,
+    int32_t UpdateMouseMoveLocation(const OLD::DisplayInfo* displayInfo, Offset &offset,
         double &abs_x, double &abs_y, int32_t deviceType);
-    int32_t UpdateTouchpadMoveLocation(const DisplayInfo* displayInfo, struct libinput_event* event,
+    int32_t UpdateTouchpadMoveLocation(const OLD::DisplayInfo* displayInfo, struct libinput_event* event,
         Offset &offset, double &abs_x, double &abs_y, int32_t deviceType);
 #ifndef OHOS_BUILD_ENABLE_WATCH
     void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
@@ -135,9 +135,9 @@ private:
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
     double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
-    void CalculateOffset(const DisplayInfo* displayInfo, Offset &offset);
-    bool IsWindowRotation(const DisplayInfo* displayInfo);
-    Direction GetDisplayDirection(const DisplayInfo *displayInfo);
+    void CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset);
+    bool IsWindowRotation(const OLD::DisplayInfo* displayInfo);
+    Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
     void HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap);
     void CalculateMouseResponseTimeProbability(struct libinput_event *event);
     std::map<std::string, std::map<long long, int32_t>> mouseResponseMap = {};

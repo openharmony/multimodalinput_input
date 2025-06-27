@@ -134,56 +134,42 @@ int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
     return MULTIMODAL_INPUT_CONNECT_MGR->GetWindowPid(windowId);
 }
 
-int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::UpdateDisplayInfo(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    {
-        std::lock_guard<std::mutex> guard(mtx_);
-        if (displayGroupInfo.windowsInfo.size() < MAX_WINDOW_SIZE) {
-            windowGroupInfo_.windowsInfo.clear();
-        }
-        displayGroupInfoArray_.clear();
-        displayGroupInfoArray_.emplace_back(displayGroupInfo);
+    if (userScreenInfo.displayGroups.size() > MAX_DISPLAY_GROUP_SIZE ||
+        userScreenInfo.screens.size() > MAX_SCREEN_SIZE) {
+        MMI_HILOGE("display groups size:%{public}zu, screen size:%{public}zu",
+            userScreenInfo.displayGroups.size(), userScreenInfo.screens.size());
+        return RET_ERR;
     }
-    int32_t ret = SendDisplayInfo(displayGroupInfo);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to send display information to service");
-        return ret;
+    size_t numDisplay = 0;
+    for (const auto &group : userScreenInfo.displayGroups) {
+        numDisplay += group.displaysInfo.size();
     }
-    PrintDisplayInfo(displayGroupInfo);
-    return RET_OK;
-}
-
-int32_t InputManagerImpl::UpdateDisplayInfo(const std::vector<DisplayGroupInfo> &displayGroupInfos)
-{
-    CALL_DEBUG_ENTER;
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Failed to initialize MMI client");
+    if (numDisplay > MAX_DISPLAY_SIZE) {
+        MMI_HILOGE("display size:%{public}zu", numDisplay);
         return RET_ERR;
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        displayGroupInfoArray_.clear();
+        userScreenInfo_ = userScreenInfo;
         auto cnt = 0;
-        for (auto &it : displayGroupInfos) {
-            displayGroupInfoArray_.emplace_back(it);
+        for (const auto &it : userScreenInfo.displayGroups) {
             cnt += it.windowsInfo.size();
         }
         if (cnt < static_cast<size_t>(MAX_WINDOW_SIZE)) {
             windowGroupInfo_.windowsInfo.clear();
         }
     }
-    for (const auto &item : displayGroupInfos) {
-        int32_t ret = SendDisplayInfo(item);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Failed to send display information to service");
-            return ret;
-        }
-        PrintDisplayInfo(item);
+    int32_t ret = SendDisplayInfo(userScreenInfo);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send user screen info, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -667,20 +653,23 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
-    pkt << displayGroupInfo.groupId << displayGroupInfo.isMainGroup << displayGroupInfo.width << displayGroupInfo.height
-        << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId;
+    pkt << userScreenInfo.userId;
+    if (PackScreensInfo(pkt, userScreenInfo.screens) != RET_OK) {
+        MMI_HILOGE("Packet write screens info failed");
+        return RET_ERR;
+    }
+    if (PackDisplayGroupsInfo(pkt, userScreenInfo.displayGroups) != RET_OK) {
+        MMI_HILOGE("Packet write display group failed");
+        return RET_ERR;
+    }
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write logical data failed");
+        MMI_HILOGE("Pack display data failed");
         return RET_ERR;
     }
-    if (PackWindowInfo(pkt, displayGroupInfo) != RET_OK) {
-        MMI_HILOGE("Packet write windows info failed");
-        return RET_ERR;
-    }
-    return PackDisplayInfo(pkt, const_cast<DisplayGroupInfo &>(displayGroupInfo));
+    return RET_OK;
 }
 
 int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
@@ -752,13 +741,71 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
     return RET_OK;
 }
 
-int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
-    const DisplayGroupInfo &displayGroupInfo) __attribute__((no_sanitize("cfi")))
+int32_t InputManagerImpl::PackScreensInfo(NetPacket &pkt,
+    const std::vector<ScreenInfo>& screens) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
-    uint32_t num = static_cast<uint32_t>(displayGroupInfo.windowsInfo.size());
+    uint32_t num = static_cast<uint32_t>(screens.size());
     pkt << num;
-    for (const auto &item : displayGroupInfo.windowsInfo) {
+    for (const auto &item : screens) {
+        pkt << item.id << item.uniqueId << item.screenType << item.width << item.height << item.physicalWidth
+            << item.physicalHeight << item.tpDirection << item.dpi << item.ppi << item.rotation;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write screens data failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::PackDisplayGroupsInfo(NetPacket &pkt,
+    const std::vector<DisplayGroupInfo>& displayGroups) __attribute__((no_sanitize("cfi")))
+{
+    CALL_DEBUG_ENTER;
+    uint32_t num = static_cast<uint32_t>(displayGroups.size());
+    pkt << num;
+    for (const auto &item : displayGroups) {
+        pkt << item.id << item.name << item.type << item.mainDisplayId << item.focusWindowId;
+        if (PackDisplaysInfo(pkt, item.displaysInfo) != RET_OK
+                || PackWindowInfo(pkt, item.windowsInfo) != RET_OK) {
+            return RET_ERR;
+        }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write display groups data failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::PackDisplaysInfo(NetPacket &pkt,
+    const std::vector<DisplayInfo>& displaysInfo) __attribute__((no_sanitize("cfi")))
+{
+    CALL_DEBUG_ENTER;
+    uint32_t num = static_cast<uint32_t>(displaysInfo.size());
+    pkt << num;
+    for (const auto &item : displaysInfo) {
+        pkt << item.id << item.x << item.y << item.width << item.height
+            << item.dpi << item.name << item.direction << item.displayDirection
+            << item.displayMode << item.transform << item.scalePercent << item.expandHeight
+            << item.isCurrentOffScreenRendering << item.displaySourceMode << item.oneHandX
+            << item.oneHandY << item.screenArea << item.rsId << item.offsetX << item.offsetY
+            << item.pointerActiveWidth << item.pointerActiveHeight;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write displays data failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
+    const std::vector<WindowInfo> &windowsInfo) __attribute__((no_sanitize("cfi")))
+{
+    CALL_DEBUG_ENTER;
+    uint32_t num = static_cast<uint32_t>(windowsInfo.size());
+    pkt << num;
+    for (const auto &item : windowsInfo) {
         int32_t byteCount = 0;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
@@ -842,47 +889,6 @@ bool InputManagerImpl::IsGRLOrHopper()
     return false;
 }
 
-int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt, DisplayGroupInfo &displayGroupInfo)
-{
-    CALL_DEBUG_ENTER;
-    uint32_t num = static_cast<uint32_t>(displayGroupInfo.displaysInfo.size());
-    pkt << num;
-    int32_t hprId = 999;
-    for (auto &item : displayGroupInfo.displaysInfo) {
-        if (!IsGRLOrHopper() || !(item.id == 0 || item.id == hprId) || item.validWidth == 0 || item.validHeight == 0) {
-            int32_t validW = item.validWidth;
-            int32_t validH = item.validHeight;
-            item.validWidth = item.width;
-            item.validHeight = item.height;
-            MMI_HILOGD("id:%{private}d not grl or hopper, "
-                       "change validWH:{%{private}d %{private}d}->{%{private}d %{private}d}",
-                item.id,
-                validW,
-                validH,
-                item.validWidth,
-                item.validHeight);
-        }
-        pkt << item.id << item.x << item.y << item.width
-            << item.height << item.dpi << item.name << item.uniq << item.direction
-            << item.displayDirection << item.displayMode << item.transform << item.ppi << item.offsetX
-            << item.offsetY << item.isCurrentOffScreenRendering << item.screenRealWidth
-            << item.screenRealHeight << item.screenRealPPI << item.screenRealDPI << item.screenCombination
-            << item.validWidth << item.validHeight << item.fixedDirection
-            << item.physicalWidth << item.physicalHeight << item.scalePercent << item.expandHeight << item.uniqueId;
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-            pkt << item.oneHandX << item.oneHandY;
-#endif
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        pkt << item.pointerActiveWidth << item.pointerActiveHeight;
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write display data failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
@@ -924,65 +930,61 @@ void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInf
     }
 }
 
-void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo)
+void InputManagerImpl::PrintDisplayInfo(const UserScreenInfo &userScreenInfo)
 {
-    uint8_t times = 0;
-    for (const auto &item : windowsInfo) {
-        if (times > LOOP_COND) {
-            return;
-        }
-        MMI_HILOGD("WindowInfo[%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}f]",
-            item.id, item.pid, item.area.x, item.area.y, item.area.width, item.area.height, item.zOrder);
-        for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                pointer.x, pointer.y, pointer.width, pointer.height);
-        }
-        times++;
-    }
-}
-
-void InputManagerImpl::PrintDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
-{
-    MMI_HILOGD("displayGroupId:%{public}d,windowsInfos,num:%{public}zu,focusWindowId:%{public}d",
-        displayGroupInfo.groupId, displayGroupInfo.windowsInfo.size(),
-        displayGroupInfo.focusWindowId);
-    PrintForemostThreeWindowInfo(displayGroupInfo.windowsInfo);
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
-        displayGroupInfo.width, displayGroupInfo.height, displayGroupInfo.focusWindowId);
-    PrintWindowInfo(displayGroupInfo.windowsInfo);
+    MMI_HILOGD("userId:%{private}d", userScreenInfo.userId);
+    PrintScreens(userScreenInfo.screens);
+    PrintDisplayGroups(userScreenInfo.displayGroups);
+}
 
-    MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo.displaysInfo.size());
-    for (const auto &item : displayGroupInfo.displaysInfo) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
-                   "dpi:%{public}d,name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
-                   "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,scalePercent:%{public}d,"
-                   "expandHeight:%{public}d,validWH:{%{private}d %{private}d},fixedDirection:%{public}d,"
-                   "physicalWH:{%{private}d %{private}d},pActiveWH:{%{private}d %{private}d}",
-            item.id,
-            item.x,
-            item.y,
-            item.width,
-            item.height,
-            item.dpi,
-            item.name.c_str(),
-            item.uniq.c_str(),
-            item.direction,
-            item.displayDirection,
-            item.displayMode,
-            item.oneHandX,
-            item.oneHandY,
-            item.scalePercent,
-            item.expandHeight,
-            item.validWidth,
-            item.validHeight,
-            item.fixedDirection,
-            item.physicalWidth,
-            item.physicalHeight,
-            item.pointerActiveWidth,
-            item.pointerActiveHeight);
+void InputManagerImpl::PrintScreens(const std::vector<ScreenInfo>& screens)
+{
+    MMI_HILOGD("screens size:%{public}zu", screens.size());
+    int32_t i = 0;
+    for (const auto &item : screens) {
+        MMI_HILOGD("screen %{public}d: id:%{public}d, uniqueId:%{public}s, screenType:%{public}d,width:%{private}d,"
+            "height:%{private}d, physicalWidth:%{private}d, physicalHeight:%{private}d,tpDirection:%{public}d"
+            "dpi:%{public}d, ppi:%{public}d",
+            i, item.id, item.uniqueId.c_str(), item.screenType, item.width, item.height, item.physicalWidth,
+            item.physicalHeight, item.tpDirection, item.dpi, item.ppi);
+        i++;
+    }
+}
+
+void InputManagerImpl::PrintDisplayGroups(const std::vector<DisplayGroupInfo>& displayGroups)
+{
+    MMI_HILOGD("displayGroups size:%{public}zu", displayGroups.size());
+    int32_t i = 0;
+    for (const auto &item : displayGroups) {
+        MMI_HILOGD("displayGroups %{public}d: id:%{public}d, name:%{public}s, type:%{public}d,"
+            "mainDisplayId:%{public}d, focusWindowId:%{public}d",
+            i, item.id, item.name.c_str(), item.type, item.mainDisplayId, item.focusWindowId);
+        PrintDisplaysInfo(item.displaysInfo);
+        PrintWindowInfo(item.windowsInfo);
+        i++;
+    }
+}
+
+void InputManagerImpl::PrintDisplaysInfo(const std::vector<DisplayInfo>& displaysInfo)
+{
+    MMI_HILOGD("displaysInfo size:%{public}zu", displaysInfo.size());
+    int32_t i = 0;
+    for (const auto &item : displaysInfo) {
+        MMI_HILOGD("displayInfos %{public}d,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,"
+            "height:%{public}d,dpi:%{public}d,name:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
+            "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,scalePercent:%{public}d,"
+            "expandHeight:%{public}d,isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d"
+            "screenArea{id:%{public}d, x:%{private}d, y:%{private}d, width:%{private}d, height:%{private}d},"
+            "rsId:%{public}d",
+            i, item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(), item.direction,
+            item.displayDirection, item.displayMode, item.oneHandX, item.oneHandY, item.scalePercent,
+            item.expandHeight, item.isCurrentOffScreenRendering, item.displaySourceMode, item.screenArea.id,
+            item.screenArea.area.x, item.screenArea.area.y, item.screenArea.area.width, item.screenArea.area.height,
+            item.rsId);
+        i++;
     }
 }
 
@@ -1235,7 +1237,8 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     }
 }
 
-int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
+int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject,
+    int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -1249,6 +1252,7 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
         MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
     }
+
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
@@ -1269,7 +1273,7 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
     HandleSimulateInputEvent(pointerEvent);
-    if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject) != RET_OK) {
+    if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
         return INPUT_PERMISSION_DENIED;
     }
@@ -1285,7 +1289,7 @@ void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> point
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        if (MMIEventHdl.InjectPointerEvent(pointerEvent, false) != RET_OK) {
+        if (MMIEventHdl.InjectPointerEvent(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE) != RET_OK) {
             MMI_HILOGE("Failed to inject pointer event to touchPad");
         }
     }
@@ -1630,14 +1634,7 @@ void InputManagerImpl::OnConnected()
     ReAddInputEventFilter();
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        for (auto &iter : displayGroupInfoArray_) {
-            if (!iter.windowsInfo.empty() && !iter.displaysInfo.empty()) {
-                MMI_HILOGD("displayGroupInfo: windowsInfo size:%{public}zu, displaysInfo size:%{public}zu",
-                    iter.windowsInfo.size(), iter.displaysInfo.size());
-                SendDisplayInfo(iter);
-                PrintDisplayInfo(iter);
-            }
-        }
+        SendDisplayInfo(userScreenInfo_);
         if (!windowGroupInfo_.windowsInfo.empty()) {
             MMI_HILOGD("windowGroupInfo_: windowsInfo size:%{public}zu", windowGroupInfo_.windowsInfo.size());
             SendWindowInfo();
@@ -1737,13 +1734,13 @@ void InputManagerImpl::OnDisconnected()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t InputManagerImpl::SendDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::SendDisplayInfo(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    int32_t ret = PackDisplayData(pkt, displayGroupInfo);
+    int32_t ret = PackDisplayData(pkt, userScreenInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Pack display info failed");
         return ret;

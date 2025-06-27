@@ -40,7 +40,7 @@ private:
     int32_t GetTouchToolType(struct libinput_device *device);
     void TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem);
     void NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType);
-    void UpdatePointerItemProperties(PointerEvent::PointerItem &item, EventTouch &touchInfo);
+    void UpdatePointerItemByTouchInfo(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
     bool DumpInner();
 private:

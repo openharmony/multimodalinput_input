@@ -33,9 +33,9 @@ public:
         IInputEventConsumer() = default;
         virtual ~IInputEventConsumer() = default;
 
-        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<KeyEvent> event) const;
-        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<PointerEvent> event) const;
-        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<AxisEvent> event) const;
+        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<KeyEvent> event) const = 0;
+        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<PointerEvent> event) const = 0;
+        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<AxisEvent> event) const = 0;
     };
     IInputEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);

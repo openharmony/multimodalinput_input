@@ -187,7 +187,7 @@ TouchDrawingManager::TouchDrawingManager() {}
 
 TouchDrawingManager::~TouchDrawingManager() {}
 
-void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void TouchDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {}
 
 void TouchDrawingManager::RotationScreen()
@@ -223,8 +223,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 {}
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction) {}
-void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo) {}
-void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) {}
+void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
+void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info) {}
 bool PointerDrawingManager::Init()
 {
@@ -440,7 +440,7 @@ int32_t MouseEventNormalize::GetDisplayId() const
 KnuckleDrawingManager::KnuckleDrawingManager()
 {}
 
-void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void KnuckleDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {}
 
 void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId)
@@ -449,7 +449,7 @@ void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> tou
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
 {}
 
-void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {}
 
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent,

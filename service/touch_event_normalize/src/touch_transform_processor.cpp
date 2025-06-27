@@ -116,7 +116,7 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
     item.SetPressed(true);
-    UpdatePointerItemProperties(item, touchInfo);
+    UpdatePointerItemByTouchInfo(item, touchInfo);
     item.SetDeviceId(deviceId_);
     int32_t toolType = GetTouchToolType(touch, device);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -135,11 +135,13 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     return true;
 }
 
-void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerItem &item, EventTouch &touchInfo)
+void TouchTransformProcessor::UpdatePointerItemByTouchInfo(PointerEvent::PointerItem &item, EventTouch &touchInfo)
 {
     CALL_DEBUG_ENTER;
     item.SetDisplayX(touchInfo.point.x);
     item.SetDisplayY(touchInfo.point.y);
+    item.SetGlobalX(touchInfo.globalCoord.x);
+    item.SetGlobalY(touchInfo.globalCoord.y);
     item.SetDisplayXPos(touchInfo.coordF.x);
     item.SetDisplayYPos(touchInfo.coordF.y);
     item.SetRawDisplayX(touchInfo.point.x);
@@ -221,16 +223,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
-    item.SetDisplayX(touchInfo.point.x);
-    item.SetDisplayY(touchInfo.point.y);
-    item.SetDisplayXPos(touchInfo.coordF.x);
-    item.SetDisplayYPos(touchInfo.coordF.y);
-    item.SetRawDisplayX(touchInfo.point.x);
-    item.SetRawDisplayY(touchInfo.point.y);
-    item.SetToolDisplayX(touchInfo.toolRect.point.x);
-    item.SetToolDisplayY(touchInfo.toolRect.point.y);
-    item.SetToolWidth(touchInfo.toolRect.width);
-    item.SetToolHeight(touchInfo.toolRect.height);
+    UpdatePointerItemByTouchInfo(item, touchInfo);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);

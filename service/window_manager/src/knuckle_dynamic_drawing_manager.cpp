@@ -110,17 +110,17 @@ void KnuckleDynamicDrawingManager::UpdateTrackColors()
 }
 
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent,
-    int32_t displayId)
+    int32_t rsId)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (!IsSingleKnuckle(pointerEvent)) {
         return;
     }
-    if (displayId == DEFAULT_VALUE) {
-        displayId = pointerEvent->GetTargetDisplayId();
+    if (rsId == DEFAULT_VALUE) {
+        rsId = pointerEvent->GetTargetDisplayId();
     }
-    CreateTouchWindow(displayId);
+    CreateTouchWindow(rsId);
     if (CheckPointerAction(pointerEvent)) {
         StartTouchDraw(pointerEvent);
     }
@@ -300,7 +300,7 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
     }
 }
 
-void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
+void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     if (displayInfo_.direction != displayInfo.direction) {
@@ -347,7 +347,7 @@ int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
+void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t rsId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
@@ -372,7 +372,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif // USE_ROSEN_DRAWING
 
-    screenId_ = static_cast<uint64_t>(displayId);
+    screenId_ = static_cast<uint64_t>(rsId);
     surfaceNode_->SetRotation(0);
 
     CreateCanvasNode();
@@ -382,6 +382,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
+    MMI_HILOGD("KnuckleDynamicDrawingManager screenId_:%{private}" PRIu64, screenId_);
     CHKPV(knuckleDrawMgr_);
     knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);

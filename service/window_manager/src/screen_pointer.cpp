@@ -67,10 +67,10 @@ uint32_t GetScreenInfoHeight(screen_info_ptr_t si)
     return modes[modeId]->height_;
 }
 
-ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const DisplayInfo &di)
+ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const OLD::DisplayInfo &di)
     : hwcMgr_(hwcMgr), handler_(handler)
 {
-    screenId_ = di.uniqueId;
+    screenId_ = di.rsId;
     width_ = di.width;
     height_ = di.height;
     rotation_ = static_cast<rotation_t>(di.direction);
@@ -311,9 +311,9 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
-void ScreenPointer::OnDisplayInfo(const DisplayInfo &di, bool isWindowRotation)
+void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotation)
 {
-    if (screenId_ != uint32_t(di.uniqueId)) {
+    if (screenId_ != uint32_t(di.rsId)) {
         return;
     }
 

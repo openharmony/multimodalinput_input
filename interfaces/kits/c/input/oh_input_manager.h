@@ -637,6 +637,18 @@ int32_t OH_Input_GetKeyEventDisplayId(const struct Input_KeyEvent* keyEvent);
 int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent);
 
 /**
+ * @brief Inject mouse event using global coordinate.
+ *
+ * @param mouseEvent - the mouse event to be injected, set up effective globalX globalY.
+ * @return OH_Input_InjectMouseEventGlobal function result code.
+ *         {@link INPUT_SUCCESS} inject mouseEvent success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ * @since 20
+ */
+int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEvent);
+
+/**
  * @brief Creates a mouse event object.
  *
  * @return Returns an {@link Input_MouseEvent} pointer object if the operation is successful.
@@ -887,6 +899,17 @@ int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
  * @since 12
  */
 int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Inject touch event using global coordinate.
+ *
+ * @param touchEvent - the touch event to be injected, set up effective globalX globalY.
+ * @return OH_Input_InjectTouchEventGlobal function result code.
+ *         {@link INPUT_SUCCESS} inject touchEvent success.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ * @since 20
+ */
+int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEvent);
 
 /**
  * @brief Creates a touch event object.

@@ -196,7 +196,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
     ASSERT_NE(pointerEvent, nullptr);
     int32_t pid = 1;
     bool isNativeInject = true;
-    int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false);
+    int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false,
+        PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
 }
 
@@ -542,19 +543,19 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt_001,
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
-    int32_t ret = handler.OnInjectPointerEventExt(pointerEvent, false);
+    int32_t ret = handler.OnInjectPointerEventExt(pointerEvent, false, false);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
     pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
-    ret = handler.OnInjectPointerEventExt(pointerEvent, false);
+    ret = handler.OnInjectPointerEventExt(pointerEvent, false, false);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
     sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false, false));
     sourceType = PointerEvent::SOURCE_TYPE_JOYSTICK;
-    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false, false));
     sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
-    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false));
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false, false));
 }
 
 /**
@@ -1378,22 +1379,22 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, false), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, false), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, false), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, false), RET_OK);
 }
 
 /**
@@ -1570,7 +1571,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_002, Te
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNAUTHORIZED));
-    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), COMMON_PERMISSION_CHECK_ERROR);
+    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false,
+        PointerEvent::DISPLAY_COORDINATE), COMMON_PERMISSION_CHECK_ERROR);
 }
 
 /**
@@ -1593,7 +1595,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_003, Te
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_NE(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false,
+        PointerEvent::DISPLAY_COORDINATE), RET_OK);
 }
 
 /**
@@ -1614,7 +1617,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_004, Te
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_NE(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false,
+        PointerEvent::DISPLAY_COORDINATE), RET_OK);
 }
 
 /**
@@ -1830,14 +1834,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo, TestSize.Leve
     int32_t num = 1;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    DisplayGroupInfo displayGroupInfo {
-        .width = 100,
-        .height = 100,
+    OLD::DisplayGroupInfo displayGroupInfo {
         .focusWindowId = 10,
         .currentUserId = 20,
     };
-    pkt << displayGroupInfo.width << displayGroupInfo.height
-        << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
+    pkt << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_WRITE;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
@@ -2195,14 +2196,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_001, TestSize.
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     sess->SetTokenType(TOKEN_HAP);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    DisplayGroupInfo displayGroupInfo {
-    .width = 100,
-    .height = 100,
+    OLD::DisplayGroupInfo displayGroupInfo {
     .focusWindowId = 10,
     .currentUserId = 20,
     };
-    pkt << displayGroupInfo.width << displayGroupInfo.height
-    << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
+    pkt << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_WRITE;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
@@ -2221,14 +2219,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_002, TestSize.
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     sess->SetTokenType(TOKEN_NATIVE);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    DisplayGroupInfo displayGroupInfo {
-    .width = 100,
-    .height = 100,
+    OLD::DisplayGroupInfo displayGroupInfo {
     .focusWindowId = 10,
     .currentUserId = 20,
     };
-    pkt << displayGroupInfo.width << displayGroupInfo.height
-    << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
+    pkt << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
@@ -2247,14 +2242,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_003, TestSize.
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     sess->SetTokenType(TOKEN_SYSTEM_HAP);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    DisplayGroupInfo displayGroupInfo {
-    .width = 100,
-    .height = 100,
+    OLD::DisplayGroupInfo displayGroupInfo {
     .focusWindowId = 10,
     .currentUserId = 20,
     };
-    pkt << displayGroupInfo.width << displayGroupInfo.height
-    << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
+    pkt << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
@@ -2274,14 +2266,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_004, TestSize.
     sess->SetTokenType(TOKEN_SHELL);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
-    DisplayGroupInfo displayGroupInfo {
-    .width = 100,
-    .height = 100,
+    OLD::DisplayGroupInfo displayGroupInfo {
     .focusWindowId = 10,
     .currentUserId = 20,
     };
-    pkt << displayGroupInfo.width << displayGroupInfo.height
-    << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
+    pkt << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     Rect rec = { 1, 1, 1, 1 };
     std::vector recVec = { rec, rec };
     std::vector<int32_t> pChangeAreas = { 1, 1, 1 };
@@ -2619,7 +2608,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_005, Te
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    int32_t result = msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false);
+    int32_t result = msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false,
+        PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
 }
 
@@ -2984,22 +2974,22 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, false));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, false));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, false));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, false));
 }
 
 /**
