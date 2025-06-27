@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,13 +23,12 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManagerEXTest"
 
-static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace testing::_;
-using namespace testing::Return;
+using ::testing::_;
+using ::testing::Return;
 } // namespace
 
 class OHInputManagerEXTest : public testing::Test {
@@ -48,7 +47,7 @@ void OHInputManagerEXTest::SetUpTestCase(void)
     MessageParcelMock::messageParcel = messageParcelMock_;
 }
 
-void OHInputManagerEXTest::TearDownTestCase()
+void OHInputManagerEXTest::TearDownTestCase(void)
 {
     MessageParcelMock::messageParcel = nullptr;
     messageParcelMock_ = nullptr;
@@ -67,9 +66,9 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_001, Test
     double displayX = 0.0;
     double displayY = 0.0;
     
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
+    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _))
         .WillOnce(Return(INPUT_DEVICE_NO_POINTER));
-    Input_Result result = OH_Input_GetPointerLocation(&displayId, double &displayX, double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, &displayX, &displayY);
     EXPECT_EQ(result, INPUT_DEVICE_NO_POINTER);
 }
 
@@ -85,9 +84,9 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_002, Test
     double displayX = 0.0;
     double displayY = 0.0;
     
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
+    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _))
         .WillOnce(Return(INPUT_APP_NOT_FOCUSED));
-    Input_Result result = OH_Input_GetPointerLocation(&displayId, double &displayX, double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, &displayX, &displayY);
     EXPECT_EQ(result, INPUT_APP_NOT_FOCUSED);
 }
 
@@ -103,9 +102,9 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_003, Test
     double displayX = 0.0;
     double displayY = 0.0;
     
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
+    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _))
         .WillOnce(Return(INPUT_SERVICE_EXCEPTION));
-    Input_Result result = OH_Input_GetPointerLocation(&displayId, double &displayX, double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, &displayX, &displayY);
     EXPECT_EQ(result, INPUT_SERVICE_EXCEPTION);
 }
 
@@ -121,9 +120,9 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_004, Test
     double displayX = 0.0;
     double displayY = 0.0;
     
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
+    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _))
         .WillOnce(Return(INPUT_SUCCESS));
-    Input_Result result = OH_Input_GetPointerLocation(&displayId, double &displayX, double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, &displayX, &displayY);
     EXPECT_EQ(result, INPUT_SUCCESS);
 }
 
@@ -138,9 +137,7 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_005, Test
     double displayX = 0.0;
     double displayY = 0.0;
     
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
-        .WillOnce(Return(INPUT_SUCCESS));
-    Input_Result result = OH_Input_GetPointerLocation(nullptr, double &displayX, double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(nullptr, &displayX, &displayY);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
 }
 
@@ -155,9 +152,7 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_006, Test
     int32_t displayId = 0;
     double displayY = 0.0;
     
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
-        .WillOnce(Return(INPUT_SUCCESS));
-    Input_Result result = OH_Input_GetPointerLocation(nullptr, nullptr double &displayY);
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, nullptr double &displayY);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
 }
 
@@ -171,10 +166,8 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_007, Test
 {
     int32_t displayId = 0;
     double displayX = 0.0;
-    
-    EXPECT_CALL(*messageParcelMock_, GetPointerLocation(_, _, _)).
-        .WillOnce(Return(INPUT_SUCCESS));
-    Input_Result result = OH_Input_GetPointerLocation(nullptr, double &displayX, nullptr);
+
+    Input_Result result = OH_Input_GetPointerLocation(&displayId, &displayX, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
 }
 } // namespace MMI

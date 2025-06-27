@@ -236,14 +236,12 @@ ohos_unittest("MouseEventNormalizeEXTest") {
   external_deps = [
     "c_utils:utils",
     "googletest:gmock_main",
-    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libwm",
     "window_manager:libwsutils",
   ]
 }
@@ -279,7 +277,6 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   ]
 
   external_deps = [
-    "c_utils:utils",
     "googletest:gmock_main",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

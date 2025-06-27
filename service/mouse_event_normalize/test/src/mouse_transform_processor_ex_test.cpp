@@ -104,13 +104,12 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
  */
 HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetPointerLocation_001, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 0;
+    int32_t deviceId = 1;
     MouseTransformProcessor processor(deviceId);
     int32_t displayId = 0;
     double displayX = 0.0;
     double displayY = 0.0;
-    int ret = processor.GetPointerLocation(displayId, displayX, displayY);
+    int32_t ret = processor.GetPointerLocation(displayId, displayX, displayY);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(displayId, -1);
     EXPECT_EQ(displayX, 0);

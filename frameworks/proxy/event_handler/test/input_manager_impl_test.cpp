@@ -1111,6 +1111,5 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation001, TestS
     double displayY = 0.0;
     EXPECT_EQ(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), ERROR_APP_NOT_FOCUSED);
 }
-
 } // namespace MMI
 } // namespace OHOS

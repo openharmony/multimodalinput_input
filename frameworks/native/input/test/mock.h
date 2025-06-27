@@ -33,7 +33,7 @@ public:
 
 class MessageParcelMock : public DfsMessageParcel {
 public:
-    MOCK_METHOD3(GetPointerLocation, int32_t(&displayId, double &displayX, double &displayY));
+    MOCK_METHOD3(GetPointerLocation, int32_t(int32_t &displayId, double &displayX, double &displayY));
 };
 } // namespace MMI
 } // namespace OHOS
