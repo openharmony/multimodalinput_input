@@ -777,6 +777,7 @@ static const std::vector<int32_t> specialKeyCodes = {
     KeyEvent::KEYCODE_KEY_PEN_AI,
     KeyEvent::KEYCODE_KEY_PEN_END_CLICK,
     KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK,
+    KeyEvent::KEYCODE_KEY_PEN_MODE_SWITCH,
     KeyEvent::KEYCODE_REMOTE_POWER
 };
 
