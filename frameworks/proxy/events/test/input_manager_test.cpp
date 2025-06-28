@@ -25,6 +25,7 @@
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
+#include "error_multimodal.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerTest"
@@ -2230,7 +2231,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerLocation_001, TestSize.Lev
     double displayX = 0.0;
     double displayY = 0.0;
     int32_t ret = InputManager::GetInstance()->GetPointerLocation(displayId, displayX, displayY);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, ERROR_APP_NOT_FOCUSED);
 }
 
 /**

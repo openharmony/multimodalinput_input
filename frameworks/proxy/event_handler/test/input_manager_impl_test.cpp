@@ -19,6 +19,7 @@
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "error_multimodal.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"
@@ -1078,6 +1079,21 @@ HWTEST_F(InputManagerImplTest, SubscribeInputActive_Test001, TestSize.Level1)
         std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerLocation001
+ * @tc.desc: Test GetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    EXPECT_EQ(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), ERROR_APP_NOT_FOCUSED);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -95,5 +95,25 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
     ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadLeftButton(data, eventType, button));
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetPointerLocation_001
+ * @tc.desc: Test the funcation GetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetPointerLocation_001, TestSize.Level1)
+{
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    int32_t ret = processor.GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(displayId, -1);
+    EXPECT_EQ(displayX, 0);
+    EXPECT_EQ(displayY, 0);
+}
 }
 }
