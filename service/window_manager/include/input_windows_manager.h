@@ -156,7 +156,7 @@ public:
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId);
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord);
-    const std::shared_ptr<OLD::DisplayInfo> GetDefaultDisplayInfo() const;
+    const OLD::DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
@@ -185,8 +185,8 @@ public:
     void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    const std::shared_ptr<OLD::DisplayInfo> GetPhysicalDisplay(int32_t id) const;
-    const std::shared_ptr<OLD::DisplayInfo> GetPhysicalDisplay(int32_t id,
+    const OLD::DisplayInfo *GetPhysicalDisplay(int32_t id) const;
+    const OLD::DisplayInfo *GetPhysicalDisplay(int32_t id,
         const OLD::DisplayGroupInfo &displayGroupInfo) const;
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -287,7 +287,7 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    std::vector<int32_t> HandleHardwareCursor(std::shared_ptr<OLD::DisplayInfo> &physicalDisplayInfo,
+    std::vector<int32_t> HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
         int32_t physicalX, int32_t physicalY);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
@@ -377,7 +377,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
-    const std::shared_ptr<OLD::DisplayInfo> FindPhysicalDisplayInfo(const std::string& uniq) const;
+    const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
     void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
