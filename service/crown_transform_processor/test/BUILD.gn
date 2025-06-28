@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -31,10 +31,16 @@ ohos_unittest("CrownTransformProcessorTest") {
     "-Dprotected=public",
   ]
 
+  include_dirs = [
+    "${mmi_path}/test/facility/libinput_interface/include",
+    "${mmi_path}/test/facility/mock/include",
+  ]
+
   sources = [ "src/crown_transform_processor_test.cpp" ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
@@ -43,6 +49,7 @@ ohos_unittest("CrownTransformProcessorTest") {
   external_deps = [
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
