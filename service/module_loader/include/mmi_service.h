@@ -23,7 +23,7 @@
 #include "cJSON.h"
 #include "input_event_handler.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
-#include "knuckle_drawing_manager.h"
+#include "knuckle_drawing_component.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
@@ -386,9 +386,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     std::atomic_bool isHPR_ { false };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace MMI
 } // namespace OHOS

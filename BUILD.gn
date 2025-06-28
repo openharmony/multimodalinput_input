@@ -91,6 +91,7 @@ group("multimodalinput_mmi_frameworks") {
 group("multimodalinput_mmi_service") {
   deps = [
     "service:libcursor_drawing_adapter",
+    "service:libmmi-knuckle",
     "service:libmmi-server",
     "tools/inject_event:uinput",
     "util/screen_capture:libmmi-screen_capture",
@@ -198,7 +199,9 @@ group("mmi_tests") {
     "service:KeyUnicodeTransformationTest",
     "service:KeymapMgrTest",
     "service:KnuckleDivergentPointTest",
+    "service:KnuckleDrawingComponentTest",
     "service:KnuckleDrawingManagerTest",
+    "service:KnuckleDrawingTest",
     "service:KnuckleDynamicDrawingManagerTest",
     "service:KnuckleGlowPointTest",
     "service:KnuckleGlowTraceSystemTest",
