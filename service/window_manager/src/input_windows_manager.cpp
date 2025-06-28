@@ -4095,7 +4095,7 @@ void InputWindowsManager::HandlePullEvent(std::shared_ptr<PointerEvent> pointerE
         }
         return;
     }
-    if (originPullId != pullId) {
+    if (originPullId != pullId || originPullId == -1) {
         MMI_HILOGD("Not the same drag instance, originPullId:%{public}d, pullId:%{public}d", originPullId, pullId);
         return;
     }
