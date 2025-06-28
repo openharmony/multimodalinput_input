@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -102,7 +102,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(bool, TouchPointToDisplayPoint, (int32_t, struct libinput_event_touch*, EventTouch&, int32_t&, bool));
     MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&));
-    MOCK_METHOD(const std::shared_ptr<OLD::DisplayInfo>, GetDefaultDisplayInfo, (), (const));
+    MOCK_METHOD(const OLD::DisplayInfo *, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
     MOCK_METHOD(void, SendCancelEventWhenLock, ());
     MOCK_METHOD(void, FoldScreenRotation, (std::shared_ptr<PointerEvent>));
@@ -111,7 +111,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void DrawTouchGraphic(std::shared_ptr<PointerEvent>) override {}
     MOCK_METHOD(int32_t, UpdateTargetPointer, (std::shared_ptr<PointerEvent>));
-    MOCK_METHOD(const std::shared_ptr<OLD::DisplayInfo>, GetPhysicalDisplay, (int32_t), (const));
+    MOCK_METHOD(const OLD::DisplayInfo *, GetPhysicalDisplay, (int32_t), (const));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
