@@ -57,7 +57,7 @@ public:
     ~TouchDrawingHandler() = default;
     DISALLOW_COPY_AND_MOVE(TouchDrawingHandler);
 
-    void UpdateDisplayInfo(const DisplayInfo &displayInfo) override;
+    void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo) override;
     void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent) override;
     void RotationScreen() override;
     void UpdateLabels(bool isOn) override;
@@ -95,8 +95,8 @@ private:
     bool IsValidAction(const int32_t action);
     void Snapshot();
     std::pair<int32_t, int32_t> CalcDrawCoordinate(
-        const DisplayInfo& displayInfo, const PointerEvent::PointerItem &pointerItem);
-    std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
+        const OLD::DisplayInfo& displayInfo, const PointerEvent::PointerItem &pointerItem);
+    std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info, double logicX, double logicY) const;
     void StartTrace(int32_t pointerId);
     void StopTrace();
 
@@ -106,7 +106,7 @@ private:
     std::shared_ptr<Rosen::RSCanvasNode> trackerCanvasNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> crosshairCanvasNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> labelsCanvasNode_ { nullptr };
-    DisplayInfo displayInfo_ {};
+    OLD::DisplayInfo displayInfo_ {};
     Bubble bubble_;
     Rosen::Drawing::Point firstPt_;
     Rosen::Drawing::Point currentPt_;

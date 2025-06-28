@@ -528,6 +528,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
 
   deps = [
     "${mmi_path}/common/anco/comm:anco_channel_interface",
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service/connect_manager:multimodal_input_interface",
     "${mmi_path}/service/filter:event_filter_interface",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
