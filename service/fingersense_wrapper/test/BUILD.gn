@@ -1,0 +1,110 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("../../../multimodalinput_mini.gni")
+
+module_output_path = "input/input"
+
+ohos_unittest("FingersenseWrapperTest") {
+  module_out_path = module_output_path
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+  }
+
+  defines = input_default_defines
+  defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/service/fingerprint_event_processor/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/test/facility/event_monitor_handler_interface/include",
+    "${mmi_path}/test/facility/mock/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/service/monitor/include/event_monitor_handler.h",
+    "${mmi_path}/service/monitor/include/event_pre_monitor_handler.h",
+    "${mmi_path}/util/common/include/input_event_data_transformation.h",
+    "${mmi_path}/test/unittest/standalone/include/",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/util/socket/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
+
+  sources = [
+    "${mmi_path}/frameworks/proxy/events/src/input_event.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/pointer_event.cpp",
+    "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
+    "${mmi_path}/service/fingerprint_event_processor/src/fingerprint_event_processor.cpp",
+    "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/monitor/src/event_pre_monitor_handler.cpp",
+    "${mmi_path}/service/subscriber/src/input_active_subscriber_handler.cpp",
+    "${mmi_path}/util/common/src/input_event_data_transformation.cpp",
+    "${mmi_path}/util/network/src/stream_buffer.cpp",
+    "src/fingersense_wrapper_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "ffrt:libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "init:libbeget_proxy",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+}
