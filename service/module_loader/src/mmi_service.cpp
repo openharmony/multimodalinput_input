@@ -2934,12 +2934,12 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
         return ERROR_DEVICE_NO_POINTER;
     }
     int32_t clientPid = GetCallingPid();
-    bool focusPid = WIN_MGR->CheckAppFocused(clientPid);
-    if (!focusPid) {
-        return ERROR_APP_NOT_FOCUSED;
-    }
     int32_t ret = delegateTasks_.PostSyncTask(
-        [&displayId, &displayX, &displayY] {
+        [this, &displayId, &displayX, &displayY, clientPid] {
+            bool focusPid = WIN_MGR->CheckAppFocused(clientPid);
+            if (!focusPid) {
+                return ERROR_APP_NOT_FOCUSED;
+            }
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->GetPointerLocation(displayId,
                 displayX, displayY);
         });
