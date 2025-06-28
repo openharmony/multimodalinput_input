@@ -31,6 +31,8 @@
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
 
+#include "i_touch_drawing_handler.h"
+#include "component_manager.h"
 #include "pointer_event.h"
 #include "old_display_info.h"
 
@@ -38,118 +40,53 @@ namespace OHOS {
 namespace MMI {
 class DelegateInterface;
 class TouchDrawingManager {
-private:
-struct Bubble {
-    int32_t innerCircleRadius { 0 };
-    int32_t outerCircleRadius { 0 };
-    float outerCircleWidth { 0 };
-};
-struct DevMode {
-    std::string SwitchName;
-    bool isShow { false };
-};
-#ifndef USE_ROSEN_DRAWING
-    using RosenCanvas = Rosen::RSRecordingCanvas;
-#else
-    using RosenCanvas = Rosen::Drawing::RecordingCanvas;
-#endif
+    struct DevMode {
+        std::string SwitchName;
+        bool isShow { false };
+    };
 
     DECLARE_DELAYED_SINGLETON(TouchDrawingManager);
+
 public:
     DISALLOW_COPY_AND_MOVE(TouchDrawingManager);
     void Initialize();
-    void SetupSettingObserver(int32_t nRetries);
     void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t UpdateLabels();
     void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
-    int32_t UpdateBubbleData();
     void RotationScreen();
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    bool IsWindowRotation();
-    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
-    {
-        delegateProxy_ = proxy;
-    }
-    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId)
-    {
-        windowScreenId_ = screenId;
-        displayNodeScreenId_ = displayNodeScreenId;
-    };
+    bool IsWindowRotation() const;
+    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy);
+    void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
 
 private:
+    void SetupSettingObserver(int32_t nRetries);
     bool HasDisplayInfo() const;
     void CreateObserver();
-    void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
-        bool isNeedRotate = true);
-    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
-    void ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
-    void RotationCanvas(RosenCanvas *canvas, Direction direction);
-    void CreateTouchWindow();
-    void DestoryTouchWindow();
-    void DrawBubbleHandler();
-    void DrawBubble();
-    void DrawPointerPositionHandler();
-    void DrawTracker(int32_t x, int32_t y, int32_t pointerId);
-    void DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y);
-    void DrawLabels();
-    void DrawRectItem(RosenCanvas* canvas, const std::string &text,
-        Rosen::Drawing::Rect &rect, const Rosen::Drawing::Color &color);
-    void UpdatePointerPosition();
-    void RecordLabelsInfo();
-    void UpdateLastPointerItem(PointerEvent::PointerItem &pointerItem);
-    void RemovePointerPosition();
-    void ClearTracker();
-    void InitLabels();
+    int32_t UpdateLabels();
+    int32_t UpdateBubbleData();
     template <class T>
     void CreateBubbleObserver(T& item);
     template <class T>
     void CreatePointerObserver(T& item);
-    template <class T>
-    std::string FormatNumber(T number, int32_t precision);
-    bool IsValidAction(const int32_t action);
-    void Snapshot();
+    ITouchDrawingHandler* LoadTouchDrawingHandler();
+    ITouchDrawingHandler* GetTouchDrawingHandler() const;
+    void UnloadTouchDrawingHandler();
+
 private:
-    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> trackerCanvasNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> crosshairCanvasNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> labelsCanvasNode_ { nullptr };
     OLD::DisplayInfo displayInfo_ {};
-    Bubble bubble_;
-    Rosen::Drawing::Point firstPt_;
-    Rosen::Drawing::Point currentPt_;
-    Rosen::Drawing::Point lastPt_;
     DevMode bubbleMode_;
     DevMode pointerMode_;
-    int32_t currentPointerId_ { 0 };
-    int32_t maxPointerCount_ { 0 };
-    int32_t currentPointerCount_ { 0 };
-    int32_t rectTopPosition_ { 0 };
-    int32_t scaleW_ { 0 };
-    int32_t scaleH_ { 0 };
-    int64_t lastActionTime_ { 0 };
-    uint64_t screenId_ { -1 };
-    double xVelocity_ { 0.0 };
-    double yVelocity_ { 0.0 };
-    double pressure_ { 0.0 };
-    double itemRectW_ { 0.0 };
     bool hasBubbleObserver_{ false };
     bool hasPointerObserver_{ false };
-    bool isFirstDownAction_ { false };
-    bool isDownAction_ { false };
-    bool isFirstDraw_ { true };
-    bool isChangedRotation_ { false };
-    bool isChangedMode_ { false };
-    bool stopRecord_ { false };
-    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
-    std::shared_ptr<DelegateInterface> delegateProxy_ {nullptr};
-    std::list<PointerEvent::PointerItem> lastPointerItem_ { };
-    std::mutex mutex_;
     uint64_t windowScreenId_ { 0 };
     uint64_t displayNodeScreenId_ { 0 };
+    std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
+    std::unique_ptr<ITouchDrawingHandler, ComponentManager::Component<ITouchDrawingHandler>> touchDrawingHandler_ {
+        nullptr, ComponentManager::Component<ITouchDrawingHandler>(nullptr, nullptr) };
 };
+
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
