@@ -69,9 +69,8 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
         }
     }
 
-    int64_t currentTime = GetSysClockTime();
-    if (!(ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) && isTriggerANR_) {
-        isTriggerANR_ = false;
+    if (anrEventId_ == eventId) {
+        anrEventId_ = -1;
         MMI_HILOGI("Exit anr state");
     }
     return RET_OK;
@@ -127,7 +126,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         CHKPV(sess);
         if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
-            isTriggerANR_ = true;
+            anrEventId_ = id;
             DfxHisysevent::ApplicationBlockInput(sess);
             MMI_HILOG_FREEZEE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
                 sess->GetPid(), type, id);
