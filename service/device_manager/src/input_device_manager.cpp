@@ -240,7 +240,9 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
     if (determineKbType[KeyEvent::KEYCODE_HOME] && GetKeyboardBusMode(deviceId) == BUS_BLUETOOTH) {
         keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
         MMI_HILOGD("The keyboard type is remote control:%{public}d", keyboardType);
-    } else if (determineKbType[KeyEvent::KEYCODE_NUMPAD_1] && !determineKbType[KeyEvent::KEYCODE_Q]) {
+    } else if (determineKbType[KeyEvent::KEYCODE_NUMPAD_1] &&
+               !determineKbType[KeyEvent::KEYCODE_CTRL_LEFT] &&
+               !determineKbType[KeyEvent::KEYCODE_Q]) {
         keyboardType = KEYBOARD_TYPE_DIGITALKEYBOARD;
         MMI_HILOGD("The keyboard type is digital keyboard:%{public}d", keyboardType);
     } else if (determineKbType[KeyEvent::KEYCODE_Q]) {
