@@ -91,6 +91,9 @@ if (is_arkui_x) {
       "${mmi_path}/frameworks/proxy/events/include",
     ]
 
+    if (input_feature_upgrade_skia) {
+      defines += [ "USE_M133_SKIA" ]
+    }
     if (target_os == "android") {
       defines += [ "ANDROID_PLATFORM" ]
     } else if (target_os == "ios") {
