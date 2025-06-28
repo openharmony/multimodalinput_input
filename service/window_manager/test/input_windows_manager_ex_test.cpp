@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -4362,7 +4362,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTe
     physicalDisplayInfo->validHeight = 768;
 
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
-    std::vector<int32_t> result = inputWindowsManager->HandleHardwareCursor(physicalDisplayInfo, 512, 384);
+    std::vector<int32_t> result = inputWindowsManager->HandleHardwareCursor(physicalDisplayInfo.get(), 512, 384);
     EXPECT_EQ(result[0], 512);
     EXPECT_EQ(result[1], 384);
 }
@@ -4387,7 +4387,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTe
     physicalDisplayInfo->validHeight = 768;
 
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
-    std::vector<int32_t> result = inputWindowsManager->HandleHardwareCursor(physicalDisplayInfo, 512, 384);
+    std::vector<int32_t> result = inputWindowsManager->HandleHardwareCursor(physicalDisplayInfo.get(), 512, 384);
 }
 
 

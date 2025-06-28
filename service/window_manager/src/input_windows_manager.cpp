@@ -2746,20 +2746,20 @@ void InputWindowsManager::PrintDisplayInfo(const OLD::DisplayInfo displayInfo)
         displayInfo.pointerActiveHeight);
 }
 
-const std::shared_ptr<OLD::DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id) const
+const OLD::DisplayInfo *InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
     int32_t groupId = FindDisplayGroupId(id);
     const auto iter = displayGroupInfoMap_.find(groupId);
     if (iter != displayGroupInfoMap_.end()) {
         for (auto &it : iter->second.displaysInfo) {
             if (it.id == id) {
-                return std::make_shared<OLD::DisplayInfo>(it);
+                return &it;
             }
         }
     } else {
         for (auto &it : displayGroupInfo_.displaysInfo) {
             if (it.id == id) {
-                return std::make_shared<OLD::DisplayInfo>(it);
+                return &it;
             }
         }
     }
@@ -2768,12 +2768,12 @@ const std::shared_ptr<OLD::DisplayInfo> InputWindowsManager::GetPhysicalDisplay(
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-const std::shared_ptr<OLD::DisplayInfo> InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
+const OLD::DisplayInfo *InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
 {
     for (const auto &item : displayGroupInfoMap_) {
         for (const auto &it : item.second.displaysInfo) {
             if (it.uniq == uniq) {
-                return std::make_shared<OLD::DisplayInfo>(it);
+                return &it;
             }
         }
     }
@@ -2782,13 +2782,13 @@ const std::shared_ptr<OLD::DisplayInfo> InputWindowsManager::FindPhysicalDisplay
     auto iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end()) {
         if (iter->second.displaysInfo.size() > 0) {
-            return std::make_shared<OLD::DisplayInfo>(iter->second.displaysInfo[0]);
+            return &iter->second.displaysInfo[0];
         }
     }
     return nullptr;
 }
 
-const std::shared_ptr<OLD::DisplayInfo> InputWindowsManager::GetDefaultDisplayInfo() const
+const OLD::DisplayInfo *InputWindowsManager::GetDefaultDisplayInfo() const
 {
     return FindPhysicalDisplayInfo("default0");
 }
@@ -4173,13 +4173,16 @@ bool InputWindowsManager::GetHoverScrollState() const
     return state;
 }
 
-std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(std::shared_ptr<OLD::DisplayInfo> &physicalDisplayInfo,
+std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
     int32_t physicalX, int32_t physicalY)
 {
     std::vector<int32_t> cursorPos = {DEFAULT_POSITION, DEFAULT_POSITION};
+    if (physicalDisplayInfo == nullptr) {
+        return cursorPos;
+    }
     Direction direction = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        direction = GetDisplayDirection(physicalDisplayInfo.get());
+        direction = GetDisplayDirection(physicalDisplayInfo);
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
     }
@@ -4369,7 +4372,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     Direction direction = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        direction = GetDisplayDirection(physicalDisplayInfo.get());
+        direction = GetDisplayDirection(physicalDisplayInfo);
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
@@ -6149,7 +6152,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     int32_t width = 0;
     int32_t height = 0;
-    GetWidthAndHeight(displayInfo.get(), width, height, isRealData);
+    GetWidthAndHeight(displayInfo, width, height, isRealData);
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -6575,7 +6578,7 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
 std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
-    std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(displayId);
+    const std::vector<WindowInfo> &windowInfos = GetWindowGroupInfoByDisplayId(displayId);
     for (const auto &item : windowInfos) {
         if (windowId == item.id) {
             return std::make_optional(item);
@@ -7029,12 +7032,12 @@ void InputWindowsManager::SetFoldState()
     BytraceAdapter::StopFoldState();
 }
 
-const std::shared_ptr<OLD::DisplayInfo> InputWindowsManager::GetPhysicalDisplay(int32_t id,
+const OLD::DisplayInfo *InputWindowsManager::GetPhysicalDisplay(int32_t id,
     const OLD::DisplayGroupInfo &displayGroupInfo) const
 {
     for (const auto &it : displayGroupInfo.displaysInfo) {
         if (it.id == id) {
-            return std::make_shared<OLD::DisplayInfo>(it);
+            return &it;
         }
     }
     MMI_HILOGW("Failed to obtain physical(%{public}d) display", id);

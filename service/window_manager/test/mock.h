@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,7 @@ public:
         const std::shared_ptr<PointerEvent>& pointerEvent) = 0;
     virtual bool UpdateDisplayId(int32_t& displayId) = 0;
     virtual bool GetHardCursorEnabled() = 0;
-    virtual std::vector<int32_t> HandleHardwareCursor(std::shared_ptr<DisplayInfo> &physicalDisplayInfo,
+    virtual std::vector<int32_t> HandleHardwareCursor(const DisplayInfo *physicalDisplayInfo,
         int32_t physicalX, int32_t physicalY) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
@@ -81,7 +81,7 @@ public:
         const std::shared_ptr<PointerEvent>& pointerEvent));
     MOCK_METHOD1(UpdateDisplayId, bool(int32_t& displayId));
     MOCK_METHOD0(GetHardCursorEnabled, bool());
-    MOCK_METHOD3(HandleHardwareCursor, std::vector<int32_t>(std::shared_ptr<DisplayInfo> &physicalDisplayInfo,
+    MOCK_METHOD3(HandleHardwareCursor, std::vector<int32_t>(const DisplayInfo *physicalDisplayInfo,
         int32_t physicalX, int32_t physicalY));
 };
 } // namespace MMI
