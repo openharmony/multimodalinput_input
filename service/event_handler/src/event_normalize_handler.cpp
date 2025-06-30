@@ -328,12 +328,12 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
         KeyRepeat->SetRepeatKeyCode(keyEvent->GetKeyCode());
         MMI_HILOGD("keyCode:%{private}d, keyAction:%{private}d, IsRepeat:%{public}d",
             keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), keyEvent->IsRepeat());
+        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     }
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
         keyEvent->SetRepeat(false);
     }
-    keyEvent->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     DfxHisysevent::CalcKeyDispTimes();
     DfxHisysevent::ReportDispTimes();
 }
