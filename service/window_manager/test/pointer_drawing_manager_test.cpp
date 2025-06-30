@@ -2840,7 +2840,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateMirrorScreens_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    DisplayInfo displaysInfo;
+    OLD::DisplayInfo displaysInfo;
     displaysInfo.uniqueId = 102;
     displaysInfo.direction = DIRECTION0;
     displaysInfo.displayDirection = DIRECTION0;
