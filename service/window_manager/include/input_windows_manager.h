@@ -446,6 +446,10 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsAccessibilityEventWithZorderInjected(std::shared_ptr<PointerEvent> pointerEvent);
+    void GetActiveWindowTypeById(int32_t windowId, WindowInputType &windowTypeTemp);
+    void AddActiveWindow(int32_t windowId, int32_t pointerId);
+    void RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent);
+    void ClearActiveWindow();
 private:
     OLD::DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
     int32_t FindDisplayGroupId(int32_t displayId) const;
@@ -535,6 +539,14 @@ private:
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_WATCH
     bool mouseFlag_ {false};
+    struct ActiveTouchWin {
+        WindowInputType windowInputType{WindowInputType::NORMAL};
+        std::set<int32_t> pointerSet;
+        explicit ActiveTouchWin(WindowInputType windowInputType, std::set<int32_t> pointerSet = {})
+            : windowInputType(windowInputType), pointerSet(pointerSet)
+        {}
+    };
+    std::map<int32_t, ActiveTouchWin> activeTouchWinTypes_;
     std::map<int32_t, std::vector<int32_t>> targetTouchWinIds_;
     std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };

@@ -1734,7 +1734,8 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
 {
     auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (auto &item : WindowsInfo) {
-        if (item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
+        if (item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE ||
+            item.windowInputType == WindowInputType::DUALTRIGGER_TOUCH) {
             std::string dump;
             dump += StringPrintf("%d|%d|%d|%d|%d|%zu(", item.id, item.area.x, item.area.y, item.area.width,
                 item.area.height, item.defaultHotAreas.size());
@@ -2606,6 +2607,7 @@ void InputWindowsManager::PrintHighZorder(const std::vector<WindowInfo> &windows
         if (MMI_GNE(windowInfo.zOrder, targetWindow.zOrder) && !windowInfo.flags &&
             pointerAction == PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
             windowInfo.windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInfo.windowInputType != WindowInputType::DUALTRIGGER_TOUCH &&
             windowInfo.windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE &&
             windowInfo.windowInputType != WindowInputType::TRANSMIT_ALL) {
             if (IsInHotArea(logicalX, logicalY, windowInfo.pointerHotAreas, windowInfo)) {
@@ -3786,6 +3788,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
                 if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE ||
+                    item.windowInputType == WindowInputType::DUALTRIGGER_TOUCH ||
                     item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) &&
                     ((pointerEvent->GetPressedButtons().empty()) ||
                     (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
@@ -4641,6 +4644,7 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
 {
     MMI_HILOGD("windowType:%{public}d, toolType:%{public}d", static_cast<int32_t>(windowType), toolType);
     if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+        windowType != WindowInputType::DUALTRIGGER_TOUCH &&
         windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
@@ -4677,6 +4681,7 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
 bool InputWindowsManager::IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY)
 {
     return (touchWindow.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE ||
+            touchWindow.windowInputType == WindowInputType::DUALTRIGGER_TOUCH ||
             touchWindow.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) &&
             IsInHotArea(static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY),
             touchWindow.defaultHotAreas, touchWindow);
@@ -4953,6 +4958,7 @@ void InputWindowsManager::ProcessInjectEventGlobalXY(std::shared_ptr<PointerEven
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    RemoveActiveWindow(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         MMI_HILOG_DISPATCHD("Abort UpdateTouchScreenTarget due to POINTER_ACTION_CANCEL");
@@ -5010,6 +5016,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     static std::unordered_map<int32_t, WindowInfo> winMap;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         ClearTargetWindowId(pointerId);
+        if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) && pointerEvent->GetPointerCount() == 1) {
+            ClearActiveWindow();
+        }
     }
     for (auto &item : windowsInfo) {
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
@@ -5111,6 +5120,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 }
             }
             touchWindow = &item;
+            AddActiveWindow(touchWindow->id, pointerEvent->GetPointerId());
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
@@ -5476,6 +5486,7 @@ void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(std::pair<int32_t
             if (windowinfo.id == uiExtentionWindowId) {
                 *touchWindow = &windowinfo;
                 MMI_HILOG_DISPATCHD("uiExtentionWindowid:%{public}d", uiExtentionWindowId);
+                AddActiveWindow(windowinfo.id, pointerEvent->GetPointerId());
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), uiExtentionWindowId);
                 break;
             }
@@ -5557,6 +5568,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     if (isOneHand) {
         WindowInputType windowInputType = lastTouchWindowInfo_.windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInputType != WindowInputType::DUALTRIGGER_TOUCH &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
             if (!(lastTouchWindowInfo_.transform.empty())) {
                 auto windowXY = TransformWindowXY(lastTouchWindowInfo_, lastTouchLogicX_, lastTouchLogicY_);
@@ -6545,11 +6557,17 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
     }
     [[ maybe_unused ]] int32_t toolType = item.GetToolType();
     [[ maybe_unused ]] int32_t sourceType = pointerEvent->GetSourceType();
-    switch (window.windowInputType)
+    WindowInputType windowTypeTemp = window.windowInputType;
+    if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        GetActiveWindowTypeById(window.id, windowTypeTemp);
+    }
+    switch (windowTypeTemp)
     {
         case WindowInputType::NORMAL:
             return false;
         case WindowInputType::TRANSMIT_ALL:
+            return true;
+        case WindowInputType::DUALTRIGGER_TOUCH:
             return true;
         case WindowInputType::TRANSMIT_EXCEPT_MOVE: {
             auto pointerAction = pointerEvent->GetPointerAction();
@@ -7453,6 +7471,76 @@ int32_t InputWindowsManager::ClearMouseHideFlag(int32_t eventId)
         return RET_OK;
     }
     return RET_ERR;
+}
+
+void InputWindowsManager::GetActiveWindowTypeById(int32_t windowId, WindowInputType &windowTypeTemp)
+{
+    auto it = activeTouchWinTypes_.find(windowId);
+    if (it != activeTouchWinTypes_.end()) {
+        windowTypeTemp = it->second.windowInputType;
+        MMI_HILOGD("GetActiveWindowTypeById success: windowId:%{public}d, windowTypeTemp:%{public}hhu",
+            windowId,
+            it->second.windowInputType);
+    }
+}
+
+void InputWindowsManager::AddActiveWindow(int32_t windowId, int32_t pointerId)
+{
+    auto it = activeTouchWinTypes_.find(windowId);
+    if (it != activeTouchWinTypes_.end()) {
+        it->second.pointerSet.emplace(pointerId);
+        MMI_HILOGD("AddActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
+                   "pointerId:%{public}d, pointerSet:%{public}lu",
+            windowId,
+            it->second.windowInputType,
+            pointerId,
+            it->second.pointerSet.size());
+    } else {
+        std::optional<WindowInfo> info = GetWindowInfoById(windowId);
+        if (!info) {
+            MMI_HILOGE("Failed to add active window: windowInfo with windowId:%{public}d not found", windowId);
+            return;
+        }
+        activeTouchWinTypes_.emplace(windowId, ActiveTouchWin{(*info).windowInputType, { pointerId }});
+    }
+}
+
+void InputWindowsManager::RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    auto pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc == PointerEvent::POINTER_ACTION_UP || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP ||
+        pointerAc == PointerEvent::POINTER_ACTION_CANCEL || pointerAc == PointerEvent::POINTER_ACTION_PULL_THROW) {
+        auto pointerId = pointerEvent->GetPointerId();
+        for (auto it = activeTouchWinTypes_.begin(); it != activeTouchWinTypes_.end();) {
+            auto pointerIter = it->second.pointerSet.find(pointerId);
+            if (pointerIter != it->second.pointerSet.end()) {
+                it->second.pointerSet.erase(pointerIter);
+                MMI_HILOGD("RemoveActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
+                           "pointerId:%{public}d, "
+                           "pointerSet:%{public}lu "
+                           "isInject:%{public}d",
+                    it->first,
+                    it->second.windowInputType,
+                    pointerId,
+                    it->second.pointerSet.size(),
+                    pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+            }
+            if (it->second.pointerSet.empty()) {
+                MMI_HILOGD("RemoveActiveWindow success: erase windowId:%{public}d, windowType:%{public}hhu",
+                    it->first,
+                    it->second.windowInputType);
+                it = activeTouchWinTypes_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+}
+
+void InputWindowsManager::ClearActiveWindow()
+{
+    activeTouchWinTypes_.clear();
+    MMI_HILOGD("ClearActiveWindow success");
 }
 } // namespace MMI
 } // namespace OHOS
