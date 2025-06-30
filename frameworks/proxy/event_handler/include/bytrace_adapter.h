@@ -94,7 +94,7 @@ public:
     static void StartDataShare(const std::string &key);
     static void StopDataShare();
 
-    static void StartRsSurfaceNode(int32_t displayId);
+    static void StartRsSurfaceNode(uint64_t rsId);
     static void StopRsSurfaceNode();
 
     static void StartFoldState(bool state);

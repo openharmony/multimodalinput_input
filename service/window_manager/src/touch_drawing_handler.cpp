@@ -260,11 +260,11 @@ void TouchDrawingHandler::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
-    if (canvasNode != nullptr && screenId_ == static_cast<uint64_t>(displayInfo_.rsId)) {
+    if (canvasNode != nullptr && screenId_ == displayInfo_.rsId) {
         return;
     }
-    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}d", screenId_, displayInfo_.rsId);
-    screenId_ = static_cast<uint64_t>(displayInfo_.rsId);
+    MMI_HILOGI("Screen from:%{public}" PRIu64 " to :%{public}" PRIu64, screenId_, displayInfo_.rsId);
+    screenId_ = displayInfo_.rsId;
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
@@ -351,7 +351,7 @@ void TouchDrawingHandler::CreateTouchWindow()
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    screenId_ = static_cast<uint64_t>(displayInfo_.rsId);
+    screenId_ = displayInfo_.rsId;
     if (windowScreenId_ == screenId_) {
         screenId_ = displayNodeScreenId_;
     }

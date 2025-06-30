@@ -75,7 +75,7 @@ public:
     void AddInputDevice(int32_t id, const std::string &name);
     void RemoveInputDevice(int32_t id);
     bool IsDisplayAdd(int32_t id, const std::string &name);
-    std::set<std::pair<int32_t, std::string>> GetDisplayIdNames() const;
+    std::set<std::pair<uint64_t, std::string>> GetDisplayIdNames() const;
     void AddDisplay(int32_t id, const std::string &name);
     void AddLocalDisplay(int32_t id, const std::string &name);
     void RemoveDisplay(int32_t id);

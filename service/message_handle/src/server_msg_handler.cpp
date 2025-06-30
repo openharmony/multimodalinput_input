@@ -1163,7 +1163,7 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 "displayMode:%{public}d,scalePercent:%{public}d, expandHeight:%{public}d,"
                 "isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d,oneHandX:%{public}d,"
                 "oneHandY:%{public}d, screenArea:{%{public}d:{%{public}d,%{public}d,%{public}d,%{public}d},"
-                "rsId:%{public}d},offsetX:%{public}d,offsetY:%{public}d,pointerActiveWidth:%{public}d,"
+                "rsId:%{public}" PRIu64 "},offsetX:%{public}d,offsetY:%{public}d,pointerActiveWidth:%{public}d,"
                 "pointerActiveHeight:%{public}d,transform:",
                 numDisplayInfo, itemDisplay.id, itemDisplay.x, itemDisplay.y, itemDisplay.width, itemDisplay.height,
                 itemDisplay.dpi, itemDisplay.name.c_str(), itemDisplay.direction, itemDisplay.displayDirection,

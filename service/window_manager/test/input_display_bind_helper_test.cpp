@@ -294,7 +294,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdNames_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    using IdNames = std::set<std::pair<int32_t, std::string>>;
+    using IdNames = std::set<std::pair<uint64_t, std::string>>;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>think 123\nkeyboard<=>hp 223\n");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
