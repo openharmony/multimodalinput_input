@@ -110,6 +110,7 @@ private:
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
+    void FillInputDeviceWithVirtualCapability(std::shared_ptr<InputDevice> inputDevice, const char *devName) const;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice);
     void NotifyDevRemoveCallback(int32_t deviceId, const InputDeviceInfo &deviceInfo);
@@ -127,9 +128,11 @@ private:
     void NotifyDevCallbackExt(int32_t deviceId, struct libinput_device *inputDevice);
     void NotifyDevRemoveCallbackExt(int32_t deviceId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+    int32_t GetTouchscreenKeyboardType(struct libinput_device *inputDevice, int32_t &keyboardType);
+    int32_t GetVirtualKeyboardType(int32_t deviceId, int32_t &keyboardType);
 
 private:
-    std::mutex inputDeviceMutex_;
+    mutable std::mutex inputDeviceMutex_;
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<int32_t, int32_t> recoverList_;
     std::map<int32_t, std::shared_ptr<InputDevice>> virtualInputDevices_;
