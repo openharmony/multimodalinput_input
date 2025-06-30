@@ -118,6 +118,7 @@ public:
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
     void SubscribeScreenModeChange() override;
+    void RegisterDisplayStatusReceiver() override;
     OLD::DisplayInfo GetCurrentDisplayInfo() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
@@ -228,6 +229,7 @@ private:
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint32_t screenId);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
+    Direction CalculateRenderDirection(const bool isHard, const bool isWindowRotation);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
@@ -327,6 +329,7 @@ private:
     int32_t focusX_ { 0 };
     int32_t focusY_ { 0 };
     std::atomic<bool> initEventhandlerFlag_ { false };
+    std::atomic<bool> initDisplayStatusReceiverFlag_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

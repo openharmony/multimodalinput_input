@@ -380,7 +380,8 @@ void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
     if (IsMirror() && (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
         std::swap(width, height);
     }
-    if (IsMain() && isWindowRotation_ && (displayDirection_ == DIRECTION90 || displayDirection_ == DIRECTION270)) {
+    if ((IsMain() || IsMirror()) && isWindowRotation_ &&
+        (displayDirection_ == DIRECTION90 || displayDirection_ == DIRECTION270)) {
         std::swap(width, height);
     }
 
@@ -400,7 +401,14 @@ void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
 {
     x = x * scale_;
     y = y * scale_;
-    Rotate(rotation_, x, y);
+    Direction direction = DIRECTION0;
+    if (isWindowRotation_) {
+        direction = static_cast<Direction>((((static_cast<Direction>(rotation_) - displayDirection_) * 
+            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    } else {
+        direction = static_cast<Direction>(rotation_);
+    }
+    Rotate(rotation_t(direction), x, y);
 
     x += paddingLeft_;
     y += paddingTop_;

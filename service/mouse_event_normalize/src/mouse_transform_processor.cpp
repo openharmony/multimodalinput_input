@@ -414,6 +414,7 @@ bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayIn
 {
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    CHKPF(displayInfo);
 
     bool foldableDevicePolicyMain = false;
     bool foldableDevicePolicyFull = false;
@@ -433,6 +434,7 @@ bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayIn
 Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     Direction displayDirection = DIRECTION0;
+    CHKPR(displayInfo, DIRECTION0);
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = static_cast<Direction>((
             ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
