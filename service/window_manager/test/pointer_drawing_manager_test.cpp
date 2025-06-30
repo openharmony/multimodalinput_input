@@ -2841,12 +2841,12 @@ HWTEST_F(PointerDrawingManagerTest, UpdateMirrorScreens_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
     OLD::DisplayInfo displaysInfo;
-    displaysInfo.uniqueId = 102;
+    displaysInfo.rsId = 102;
     displaysInfo.direction = DIRECTION0;
     displaysInfo.displayDirection = DIRECTION0;
     displaysInfo.width = 400;
     displaysInfo.height = 300;
-    pointerDrawingManager->displayInfo_.uniqueId = 100;
+    pointerDrawingManager->displayInfo_.rsId = 100;
     pointerDrawingManager->displayInfo_.direction = DIRECTION0;
     pointerDrawingManager->displayInfo_.displayDirection = DIRECTION0;
     pointerDrawingManager->displayInfo_.width = 600;
@@ -2857,7 +2857,7 @@ HWTEST_F(PointerDrawingManagerTest, UpdateMirrorScreens_001, TestSize.Level1)
         pointerDrawingManager->handler_, pointerDrawingManager->displayInfo_);
     spMirror->mode_ = mode_t::SCREEN_MIRROR;
     spMirror->displayDirection_ = DIRECTION0;
-    pointerDrawingManager->screenPointers_[displaysInfo.uniqueId] = spMirror;
+    pointerDrawingManager->screenPointers_[displaysInfo.rsId] = spMirror;
     pointerDrawingManager->screenPointers_[101] = nullptr;
     EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->UpdateMirrorScreens(spMain, pointerDrawingManager->displayInfo_));
     pointerDrawingManager->displayInfo_.direction = DIRECTION90;
