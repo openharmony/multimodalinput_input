@@ -2290,7 +2290,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         WIN_MGR->InitializeAnco();
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    IPointerDrawingManager::GetInstance()->RegisterDisplayStatusReceiver();
+    CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

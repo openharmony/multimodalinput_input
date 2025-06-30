@@ -80,6 +80,7 @@ public:
     void DestroyPointerWindow();
     void DrawScreenCenterPointer(const PointerStyle &pointerStyle);
     void SubscribeScreenModeChange();
+    void RegisterDisplayStatusReceiver();
     int32_t UpdateMouseLayer(
         const PointerStyle &pointerStyle, int32_t displayId, int32_t physicalX, int32_t physicalY);
     int32_t DrawNewDpiPointer();
