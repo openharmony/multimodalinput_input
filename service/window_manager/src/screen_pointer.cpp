@@ -403,7 +403,7 @@ void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
     y = y * scale_;
     Direction direction = DIRECTION0;
     if (isWindowRotation_) {
-        direction = static_cast<Direction>((((static_cast<Direction>(rotation_) - displayDirection_) * 
+        direction = static_cast<Direction>((((static_cast<Direction>(rotation_) - displayDirection_) *
             ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     } else {
         direction = static_cast<Direction>(rotation_);
