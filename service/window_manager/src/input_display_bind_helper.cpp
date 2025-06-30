@@ -360,10 +360,10 @@ bool InputDisplayBindHelper::IsDisplayAdd(int32_t id, const std::string &name)
     return false;
 }
 
-std::set<std::pair<int32_t, std::string>> InputDisplayBindHelper::GetDisplayIdNames() const
+std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdNames() const
 {
     CALL_DEBUG_ENTER;
-    std::set<std::pair<int32_t, std::string>> idNames;
+    std::set<std::pair<uint64_t, std::string>> idNames;
     const auto &infos = infos_->GetInfos();
     for (const auto &info : infos) {
         if (info.GetDisplayId() != -1) {

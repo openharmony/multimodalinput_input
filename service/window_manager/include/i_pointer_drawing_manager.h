@@ -28,7 +28,7 @@ public:
     virtual ~IPointerDrawingManager() = default;
 
     static IPointerDrawingManager* GetInstance();
-    virtual void DrawPointer(int32_t rsId, int32_t physicalX, int32_t physicalY,
+    virtual void DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) {}
     virtual void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
     virtual void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
@@ -73,7 +73,7 @@ public:
     {
         return false;
     }
-    virtual void SetPointerLocation(int32_t x, int32_t y, int32_t displayId) {}
+    virtual void SetPointerLocation(int32_t x, int32_t y, uint64_t rsId) {}
     virtual void SetMouseDisplayState(bool state) {}
     virtual bool GetMouseDisplayState() const
     {
@@ -128,7 +128,7 @@ public:
     {
         return 0;
     }
-    virtual void DrawMovePointer(int32_t rsId, int32_t physicalX, int32_t physicalY) {}
+    virtual void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
     virtual void InitPointerCallback() {}
     virtual void InitScreenInfo() {}

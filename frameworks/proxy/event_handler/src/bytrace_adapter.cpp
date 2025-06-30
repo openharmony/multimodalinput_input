@@ -458,9 +458,9 @@ void BytraceAdapter::StopDataShare()
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT);
 }
 
-void BytraceAdapter::StartRsSurfaceNode(int32_t displayId)
+void BytraceAdapter::StartRsSurfaceNode(uint64_t rsId)
 {
-    std::string traceInfo = "pointerWindow displayId:" + std::to_string(displayId);
+    std::string traceInfo = "pointerWindow rsId:" + std::to_string(rsId);
     StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, traceInfo.c_str(), "");
 }
 

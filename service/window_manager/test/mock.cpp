@@ -47,9 +47,9 @@ std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inpu
     return DfsMessageParcel::messageParcel->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
-std::set<std::pair<int32_t, std::string>> InputDisplayBindHelper::GetDisplayIdNames() const
+std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdNames() const
 {
-    std::set<std::pair<int32_t, std::string>> idNames;
+    std::set<std::pair<uint64_t, std::string>> idNames;
     return idNames;
 }
 
@@ -213,7 +213,7 @@ IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible,
     bool isHotPlug)
 {}
-void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction) {}
 void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
 void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
@@ -258,7 +258,7 @@ bool PointerDrawingManager::IsPointerVisible()
 {
     return false;
 }
-void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId) {}
+void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t displayId) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {
@@ -305,7 +305,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
 {
     return 0;
 }
-void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
+void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) {}
 void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args) {}
 int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)
 {

@@ -501,7 +501,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_001,
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager manager;
-    int32_t displayId = 1;
+    uint64_t displayId = 1;
     int32_t physicalX = 2;
     int32_t physicalY = 3;
     PointerStyle pointerStyle;
@@ -730,7 +730,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerLocation_0
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    int32_t displayId = 0;
+    uint64_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
@@ -1413,7 +1413,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerLocation_0
     PointerDrawingManager pointerDrawingManager;
     int32_t x = 100;
     int32_t y = 100;
-    int32_t displayId = 0;
+    uint64_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
@@ -2312,7 +2312,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateBindDisplayI
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     pointerDrawingManager.lastDisplayId_ = 0;
-    int32_t displayId = 0;
+    uint64_t displayId = 0;
     pointerDrawingManager.UpdateBindDisplayId(displayId);
     EXPECT_EQ(pointerDrawingManager.lastDisplayId_, 0);
     EXPECT_EQ(pointerDrawingManager.screenId_, 0);
@@ -2452,7 +2452,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002,
     PointerDrawingManager pointerDrawingManager;
     int32_t physicalX = 1;
     int32_t physicalY = 2;
-    int32_t displayId = 3;
+    uint64_t displayId = 3;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";

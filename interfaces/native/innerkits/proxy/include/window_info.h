@@ -533,7 +533,7 @@ struct DisplayInfo {
      *
      * @since 20
      */
-    int32_t rsId;
+    uint64_t rsId;
     /**
      * The x coordinate of the valid area relative to the entire logical screen
      *

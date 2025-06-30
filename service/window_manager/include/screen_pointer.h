@@ -57,7 +57,7 @@ public:
     void CalculatePositionForMirror(int32_t x, int32_t y, int32_t* px, int32_t* py);
     bool SetInvisible();
 
-    uint32_t GetScreenId() const
+    uint64_t GetScreenId() const
     {
         return screenId_;
     }
@@ -165,7 +165,7 @@ private:
 private:
     std::mutex mtx_;
 
-    uint32_t screenId_{0};
+    uint64_t screenId_{0};
     uint32_t width_{0};
     uint32_t height_{0};
     mode_t mode_{mode_t::SCREEN_MAIN};
