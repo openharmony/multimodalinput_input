@@ -2741,5 +2741,128 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpac
     colorSpace = Media::ColorSpace::ACES;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.ConvertToColorSpace(colorSpace));
 }
+ 
+/**
+ * @tc.name: PointerDrawingManagerTest_RegisterDisplayStatusReceiver_001
+ * @tc.desc: Test RegisterDisplayStatusReceiver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, RegisterDisplayStatusReceiver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->initDisplayStatusReceiverFlag_ = true;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->RegisterDisplayStatusReceiver());
+}
+ 
+/**
+ * @tc.name: PointerDrawingManagerTest_RegisterDisplayStatusReceiver_002
+ * @tc.desc: Test RegisterDisplayStatusReceiver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, RegisterDisplayStatusReceiver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->initDisplayStatusReceiverFlag_ = false;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->RegisterDisplayStatusReceiver());
+}
+ 
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_001
+ * @tc.desc: Test CalculateRenderDirection
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, CalculateRenderDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
+    pointerDrawingManager->displayInfo_.direction = DIRECTION90;
+    bool isHard = true;
+    bool isWindowRotate = true;
+    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION90);
+    isHard = true;
+    isWindowRotate = false;
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION90);
+    isHard = false;
+    isWindowRotate = true;
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION180);
+    isHard = false;
+    isWindowRotate = false;
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION0);
+}
+ 
+/**
+ * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_002
+ * @tc.desc: Test CalculateRenderDirection
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, CalculateRenderDirection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
+    pointerDrawingManager->displayInfo_.direction = DIRECTION90;
+    bool isHard = true;
+    bool isWindowRotate = true;
+    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION90);
+    isHard = true;
+    isWindowRotate = false;
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION90);
+    isHard = false;
+    isWindowRotate = true;
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION180);
+    isHard = false;
+    isWindowRotate = false;
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ASSERT_EQ(ret, DIRECTION0);
+}
+ 
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateMirrorScreens_001
+ * @tc.desc: Test UpdateMirrorScreens
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateMirrorScreens_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    DisplayInfo displaysInfo;
+    displaysInfo.uniqueId = 102;
+    displaysInfo.direction = DIRECTION0;
+    displaysInfo.displayDirection = DIRECTION0;
+    displaysInfo.width = 400;
+    displaysInfo.height = 300;
+    pointerDrawingManager->displayInfo_.uniqueId = 100;
+    pointerDrawingManager->displayInfo_.direction = DIRECTION0;
+    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION0;
+    pointerDrawingManager->displayInfo_.width = 600;
+    pointerDrawingManager->displayInfo_.height = 400;
+    auto spMirror = std::make_shared<ScreenPointer>(pointerDrawingManager->hardwareCursorPointerManager_,
+        pointerDrawingManager->handler_, displaysInfo);
+    auto spMain = std::make_shared<ScreenPointer>(pointerDrawingManager->hardwareCursorPointerManager_,
+        pointerDrawingManager->handler_, pointerDrawingManager->displayInfo_);
+    spMirror->mode_ = mode_t::SCREEN_MIRROR;
+    spMirror->displayDirection_ = DIRECTION0;
+    pointerDrawingManager->screenPointers_[displaysInfo.uniqueId] = spMirror;
+    pointerDrawingManager->screenPointers_[101] = nullptr;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->UpdateMirrorScreens(spMain, pointerDrawingManager->displayInfo_));
+    pointerDrawingManager->displayInfo_.direction = DIRECTION90;
+    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->UpdateMirrorScreens(spMain, pointerDrawingManager->displayInfo_));
+}
 } // namespace MMI
 } // namespace OHOS

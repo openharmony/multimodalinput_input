@@ -6005,6 +6005,7 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
 
 Direction InputWindowsManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
+    CHKPR(displayInfo, DIRECTION0);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     if (GetHardCursorEnabled()) {

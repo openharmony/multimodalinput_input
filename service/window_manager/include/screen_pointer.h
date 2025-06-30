@@ -143,6 +143,31 @@ public:
         return rotation_;
     }
 
+    void SetDisplayDirection(const Direction displayDirection)
+    {
+        switch (displayDirection) {
+            case DIRECTION0:
+            case DIRECTION90:
+            case DIRECTION180:
+            case DIRECTION270:
+                displayDirection_ = displayDirection;
+                break;
+            default: {
+                break;
+            }
+        }
+    }
+ 
+    Direction GetDisplayDirection()
+    {
+        return displayDirection_;
+    }
+ 
+    void SetIsWindowRotation(bool isWindowRotation)
+    {
+        isWindowRotation_ = isWindowRotation;
+    }
+
     bool IsPositionOutScreen(int32_t x, int32_t y);
 
     uint32_t GetBufferId()
