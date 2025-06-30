@@ -205,7 +205,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_002, TestSize.Level1)
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
-    DisplayInfo di;
+    OLD::DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     PointerRenderer renderer;
@@ -347,7 +347,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_004, TestSize.Level1)
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
     ASSERT_NE(hwcmgr, nullptr);
     handler_ptr_t handler = nullptr;
-    DisplayInfo di;
+    OLD::DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     int32_t x = 0;
