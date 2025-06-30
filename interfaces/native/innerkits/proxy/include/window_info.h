@@ -183,7 +183,8 @@ enum class WindowInputType : uint8_t {
     MIX_LEFT_RIGHT_ANTI_AXIS_MOVE = 18,
     MIX_BUTTOM_ANTI_AXIS_MOVE = 19,
     SLID_TOUCH_WINDOW = 40,
-    TRANSMIT_ANTI_AXIS_MOVE = 50
+    TRANSMIT_ANTI_AXIS_MOVE = 50,
+    DUALTRIGGER_TOUCH = 60
 };
 
 struct WindowInfo {
