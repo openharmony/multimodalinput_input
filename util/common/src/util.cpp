@@ -594,6 +594,13 @@ void StringReplace(std::string &str, const std::string &oldStr, const std::strin
     str = std::regex_replace(str, re, newStr);
 }
 
+bool IsInteger(const char *target)
+{
+    CHKPF(target);
+    std::regex pattern("^\\s*-?(0|([1-9]\\d*))\\s*$");
+    return std::regex_match(target, pattern);
+}
+
 bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::string &record)
 {
     constexpr int32_t oneSecond = 1000;

@@ -1,0 +1,53 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../multimodalinput_mini.gni")
+
+module_output_path = "input/input"
+
+ohos_unittest("UtilCommonTest") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  defines = input_default_defines
+
+  include_dirs = [ "${mmi_path}/util/common/include" ]
+
+  sources = [
+    "${mmi_path}/util/common/src/util.cpp",
+    "${mmi_path}/util/common/test/util_common_test.cpp",
+  ]
+
+  deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+  ]
+}

@@ -234,6 +234,7 @@ group("mmi_tests") {
     "test/unittest/interfaces:InputNativeTest",
     "tools/inject_event:InjectEventTest",
     "util:UdsClientTest",
+    "util/common:UtilCommonTest",
   ]
 
   if (input_feature_switch) {
