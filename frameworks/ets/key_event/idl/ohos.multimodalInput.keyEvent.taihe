@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.keyEvent", "keyEvent")
+@!namespace("@ohos.multimodalInput.keyEvent")
 from ohos.multimodalInput.inputEvent use InputEvent;
 from ohos.multimodalInput.keyCode use KeyCode;
 @!sts_inject("""
-static { loadLibrary("KeyEvent.z") }
+  loadLibrary("KeyEvent.z")
 """)
 
 enum Action : i32 {
