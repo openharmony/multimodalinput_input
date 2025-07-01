@@ -324,5 +324,10 @@ int32_t KeyAutoRepeat::GetConfigDataFromDatabase(std::string &key, int32_t &valu
     value = PREFERENCES_MGR->GetIntValue(key, value);
     return RET_OK;
 }
+
+void KeyAutoRepeat::SetRepeatKeyCode(int32_t code)
+{
+    repeatKeyCode_ = code;
+}
 } // namespace MMI
 } // namespace OHOS

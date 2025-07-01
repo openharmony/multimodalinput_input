@@ -117,6 +117,7 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
 };
 constexpr int32_t MAX_N_PRESSED_KEYS { 10 };
 constexpr int32_t POINTER_MOVEFLAG = { 7 };
+constexpr int32_t INVALID_KEY_CODE { -1 };
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -323,6 +324,12 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
     UpdateKeyEventHandlerChain(keyEvent);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        KeyRepeat->SetRepeatKeyCode(keyEvent->GetKeyCode());
+        MMI_HILOGD("keyCode:%{private}d, keyAction:%{private}d, IsRepeat:%{public}d",
+            keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), keyEvent->IsRepeat());
+        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    }
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
         keyEvent->SetRepeat(false);
@@ -469,6 +476,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
 #endif // SHORTCUT_KEY_RULES_ENABLED
     KeyRepeat->SelectAutoRepeat(keyEvent);
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        KeyRepeat->SetRepeatKeyCode(INVALID_KEY_CODE);
+        MMI_HILOGD("repeatKey:%{private}d", KeyRepeat->GetRepeatKeyCode());
+    }
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {

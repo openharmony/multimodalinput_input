@@ -39,6 +39,7 @@ public:
     int32_t GetKeyboardRepeatDelay(int32_t &delay);
     int32_t GetKeyboardRepeatRate(int32_t &rate);
     int32_t GetRepeatKeyCode() const;
+    void SetRepeatKeyCode(int32_t code);
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
     DeviceConfig GetAutoSwitch(int32_t deviceId);
