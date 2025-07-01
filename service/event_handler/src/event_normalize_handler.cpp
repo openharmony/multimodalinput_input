@@ -478,7 +478,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     KeyRepeat->SelectAutoRepeat(keyEvent);
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         KeyRepeat->SetRepeatKeyCode(INVALID_KEY_CODE);
-        MMI_HILOGD("repeatKey:%{public}d", KeyRepeat->GetRepeatKeyCode());
+        MMI_HILOGD("repeatKey:%{private}d", KeyRepeat->GetRepeatKeyCode());
     }
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
