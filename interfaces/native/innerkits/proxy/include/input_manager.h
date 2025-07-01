@@ -1232,8 +1232,6 @@ public:
     */
     void UnsubscribeInputActive(int32_t subscribeId);
 
-    int32_t SwitchTouchTracking(bool touchTracking);
-
     /**
     * @brief Enables or disables the mouse acceleration feature.
     * @note Only users with specific shell permissions are allowed to call this interface.

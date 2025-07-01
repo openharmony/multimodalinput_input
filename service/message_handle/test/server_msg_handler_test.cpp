@@ -3030,21 +3030,5 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_008, TestS
     handler.nativeTargetWindowIds_[0] = -1;
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
 }
-
-/**
-@tc.name: ServerMsgHandlerTest_SwitchTouchTracking
-@tc.desc: Test SwitchTouchTracking
-@tc.type: FUNC
-@tc.require:
-*/
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SwitchTouchTracking, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    bool touchTracking = true;
-    ASSERT_NO_FATAL_FAILURE(handler.SwitchTouchTracking(touchTracking));
-    touchTracking = false;
-    ASSERT_NO_FATAL_FAILURE(handler.SwitchTouchTracking(touchTracking));
-}
 } // namespace MMI
 } // namespace OHOS
