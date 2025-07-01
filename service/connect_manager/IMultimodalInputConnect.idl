@@ -179,7 +179,6 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void ClearInputDeviceConsumer([in] String[] deviceNames);
     void SubscribeInputActive([in] int subscribeId, [in] long interval);
     void UnsubscribeInputActive([in] int subscribeId);
-    void SwitchTouchTracking([in] boolean touchTracking);
     void SetMouseAccelerateMotionSwitch([in] int deviceId, [in] boolean enable);
     void SwitchScreenCapturePermission([in] unsigned int permissionType, [in] boolean enable);
     void ClearMouseHideFlag([in] int eventId);

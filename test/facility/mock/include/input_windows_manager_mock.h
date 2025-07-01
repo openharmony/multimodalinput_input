@@ -150,7 +150,6 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEventForGesture, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    void SwitchTouchTracking(bool touchTracking) override {}
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();

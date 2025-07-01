@@ -228,7 +228,6 @@ public:
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    void SwitchTouchTracking(bool touchTracking);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const;
     bool IsPointInsideSpecialWindow(double x, double y);
@@ -556,7 +555,6 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool IsFoldable_ { false };
-    bool touchTracking_ { false };
     int32_t timerId_ { -1 };
     int32_t lastDpi_ { 0 };
     std::map<int32_t, int32_t> lastDpiMap_;

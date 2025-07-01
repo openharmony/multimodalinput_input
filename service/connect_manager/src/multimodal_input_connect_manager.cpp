@@ -1198,13 +1198,6 @@ int32_t MultimodalInputConnectManager::UnsubscribeInputActive(int32_t subscribeI
     return multimodalInputConnectService->UnsubscribeInputActive(subscribeId);
 }
 
-int32_t MultimodalInputConnectManager::SwitchTouchTracking(bool touchTracking)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SwitchTouchTracking(touchTracking);
-}
-
 int32_t MultimodalInputConnectManager::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable)
 {
     std::lock_guard<std::mutex> guard(lock_);

@@ -190,7 +190,6 @@ public:
     void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
 #endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     ErrCode HasIrEmitter(bool &hasIrEmitter) override;
     ErrCode GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
     ErrCode TransmitInfrared(int64_t number, const std::vector<int64_t>& pattern) override;
@@ -244,7 +243,6 @@ public:
     ErrCode GetMaxMultiTouchPointNum(int32_t &pointNum) override;
     ErrCode SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
     ErrCode UnsubscribeInputActive(int32_t subscribeId) override;
-    ErrCode SwitchTouchTracking(bool touchTracking) override;
     ErrCode SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override;
     ErrCode SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
     ErrCode ClearMouseHideFlag(int32_t eventId) override;
@@ -350,7 +348,6 @@ private:
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void SetupTouchGestureHandler();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    void OnRemoveAccessibility();
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
