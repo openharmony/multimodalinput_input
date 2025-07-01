@@ -175,7 +175,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateMouseStyle_0
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t displayId = 1;
+    uint64_t displayId = 1;
     int32_t physicalX = 100;
     int32_t physicalY = 150;
     PointerDrawingManager pointerDrawingManager;
@@ -196,7 +196,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_01
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t displayId = 2;
+    uint64_t displayId = 2;
     int32_t physicalX = 60;
     int32_t physicalY = 80;
     PointerDrawingManager pointerDrawingManager;
@@ -213,7 +213,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_02
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_04, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t displayId = 2;
+    uint64_t displayId = 2;
     int32_t physicalX = 60;
     int32_t physicalY = 80;
     PointerStyle pointerStyle;
@@ -304,7 +304,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
     int32_t x = 100;
     int32_t y = 100;
     pointerDrawingManager.surfaceNode_ = nullptr;
-    int32_t displayId = 0;
+    uint64_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 
@@ -325,7 +325,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    int32_t displayId = 0;
+    uint64_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
 }
 

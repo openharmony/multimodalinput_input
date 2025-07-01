@@ -388,7 +388,7 @@ int32_t PointerDrawingManager::UpdateMouseLayer(const PointerStyle& pointerStyle
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::DrawMovePointer(int32_t rsId, int32_t physicalX, int32_t physicalY,
+int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
     CHKPR(GetSurfaceNode(), RET_ERR);
@@ -430,7 +430,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t rsId, int32_t physicalX, 
         UpdatePointerVisible();
     }
     mouseIconUpdate_ = false;
-    MMI_HILOGD("Leave, rsId:%{public}d, physicalX:%{private}d, physicalY:%{private}d",
+    MMI_HILOGD("Leave, rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
     return RET_OK;
 }
@@ -452,12 +452,12 @@ int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_
     return RET_ERR;
 }
 
-void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
+void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
-    displayId_ = displayId;
+    displayId_ = rsId;
     if (GetHardCursorEnabled()) {
-        UpdateBindDisplayId(displayId);
+        UpdateBindDisplayId(rsId);
     }
     if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
@@ -481,11 +481,11 @@ void PointerDrawingManager::SetHardwareCursorPosition(int32_t physicalX, int32_t
     }
 }
 
-void PointerDrawingManager::DrawPointer(int32_t rsId, int32_t physicalX, int32_t physicalY,
+void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("rsId:%{public}d, physicalX:%{private}d, physicalY:%{private}d, pointerStyle:%{public}d",
+    MMI_HILOGD("rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d, pointerStyle:%{public}d",
         rsId, physicalX, physicalY, pointerStyle.id);
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
@@ -519,7 +519,7 @@ void PointerDrawingManager::DrawPointer(int32_t rsId, int32_t physicalX, int32_t
     }
     UpdatePointerVisible();
     SetHardwareCursorPosition(physicalX, physicalY, lastMouseStyle_);
-    MMI_HILOGI("Leave, rsId:%{private}d, physicalX:%{private}d, physicalY:%{private}d",
+    MMI_HILOGI("Leave, rsId:%{private}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
 }
 
@@ -995,7 +995,7 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
         };
     }
 
-    MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}u, style = %{public}d",
+    MMI_HILOGI("DrawDynamicHardwareCursor on ScreenPointer success, screenId = %{public}" PRIu64 ", style = %{public}d",
         sp->GetScreenId(), cfg.style_);
     auto sret = buffer->FlushCache();
     if (sret != RET_OK) {
@@ -1007,7 +1007,7 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
 
 void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
@@ -1027,7 +1027,7 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         cfg.dpi = it.second->GetDPI() * it.second->GetScale();
         cfg.direction = it.second->IsMirror() ? DIRECTION0 : displayInfo_.direction;
-        MMI_HILOGD("HardwareCursorRender, screen = %{public}u, dpi = %{public}f",
+        MMI_HILOGD("HardwareCursorRender, screen = %{public}" PRIu64 ", dpi = %{public}f",
             it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
@@ -1077,7 +1077,7 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
 
 void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
@@ -1096,7 +1096,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
-        MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}u, dpi = %{public}f", it.first, cfg.dpi);
+        MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}" PRIu64 ", dpi = %{public}f", it.first, cfg.dpi);
         if (it.second->IsMirror() || it.first == screenId_) {
             if (mouseStyle == MOUSE_ICON::LOADING) {
                 cfg.rotationFocusX = GetFocusCoordinates();
@@ -1641,14 +1641,14 @@ void PointerDrawingManager::CreateCanvasNode()
     surfaceNodePtr->AddChild(canvasNode_, DEFAULT_VALUE);
 }
 
-int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t rsId,
+int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId,
     int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
     // suface node init
     std::shared_ptr<ScreenPointer> sp = nullptr;
     {
-        if (screenPointers_.count(static_cast<size_t>(rsId))) {
+        if (screenPointers_.count(rsId)) {
             sp = screenPointers_[rsId];
             if (!g_isRsRestart) {
                 for (auto it : screenPointers_) {
@@ -1668,13 +1668,13 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(int32_t rsId,
             CHKPR(sp, RET_ERR);
             screenPointers_[displayInfo_.rsId] = sp;
             if (!sp->Init(pointerRenderer_)) {
-                MMI_HILOGE("ScreenPointer %{public}d init failed", displayInfo_.rsId);
+                MMI_HILOGE("ScreenPointer %{public}" PRIu64 " init failed", displayInfo_.rsId);
                 return RET_ERR;
             }
             if (rsId == displayInfo_.rsId) {
                 SetSurfaceNode(sp->GetSurfaceNode());
             }
-            MMI_HILOGI("ScreenPointer rsId %{public}d displayInfo_.rsId %{public}d",
+            MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
                 rsId, displayInfo_.rsId);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
@@ -1706,7 +1706,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t phy
     return RET_OK;
 }
 
-void PointerDrawingManager::CreatePointerWindow(int32_t rsId, int32_t physicalX, int32_t physicalY,
+void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     Direction direction)
 {
     CALL_DEBUG_ENTER;
@@ -1724,7 +1724,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t rsId, int32_t physicalX,
         }
     }
     MMI_HILOGI("CreatePointerWindow The screenId_:%{public}" PRIu64, screenId_);
-    screenId_ = static_cast<uint64_t>(rsId);
+    screenId_ = rsId;
     AttachToDisplay();
     lastDisplayId_ = rsId;
     MMI_HILOGI("CreatePointerWindow The screenId_:%{public}" PRIu64, screenId_);
@@ -2357,7 +2357,7 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
-    MMI_HILOGD("rsId:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
+    MMI_HILOGD("rsId:%{public}" PRIu64 ", displayWidth_:%{public}d, displayHeight_:%{public}d",
         displayInfo_.rsId, displayInfo_.validWidth, displayInfo_.validHeight);
 }
 
@@ -2420,17 +2420,17 @@ void PointerDrawingManager::AttachAllSurfaceNode()
         }
         auto screenId = sp.second->GetScreenId();
         if (screenId == screenId_ && GetSurfaceNode() == nullptr) {
-            MMI_HILOGI("surfaceNode_ is nullptr skip screenId:%{public}u", screenId);
+            MMI_HILOGI("surfaceNode_ is nullptr skip screenId:%{public}" PRIu64, screenId);
             continue;
         }
-        MMI_HILOGI("Attach screenId:%{public}u", screenId);
+        MMI_HILOGI("Attach screenId:%{public}" PRIu64, screenId);
         surfaceNode->AttachToDisplay(screenId);
     }
     if (GetSurfaceNode() == nullptr) {
         for (auto sp : screenPointers_) {
             if (sp.second != nullptr && sp.second->IsMirror()) {
                 sp.second->SetInvisible();
-                MMI_HILOGI("surfaceNode_ is nullptr, hide mirror pointer screenId:%{public}u",
+                MMI_HILOGI("surfaceNode_ is nullptr, hide mirror pointer screenId:%{public}" PRIu64,
                     sp.second->GetScreenId());
             }
         }
@@ -2446,7 +2446,7 @@ void PointerDrawingManager::DetachAllSurfaceNode()
             auto surfaceNode = sp.second->GetSurfaceNode();
             if (surfaceNode != nullptr) {
                 auto screenId = sp.second->GetScreenId();
-                MMI_HILOGI("Detach screenId:%{public}u", screenId);
+                MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId);
                 surfaceNode->DetachToDisplay(screenId);
             }
         }
@@ -2538,7 +2538,7 @@ void PointerDrawingManager::UpdatePointerVisible()
                 MMI_HILOGE("SetCursorLocation fail");
             }
         }
-        MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}d",
+        MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}" PRIu64,
             mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
         if (GetHardCursorEnabled()) {
@@ -2548,7 +2548,7 @@ void PointerDrawingManager::UpdatePointerVisible()
             HideHardwareCursors();
         }
         surfaceNodePtr->SetVisible(false);
-        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}d",
+        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}" PRIu64,
             mouseDisplayState_ ? "true" : "false", displayId_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -2693,7 +2693,7 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
     return RET_OK;
 }
 
-void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
+void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t rsId)
 {
     CALL_DEBUG_ENTER;
     FixCursorPosition(x, y);
@@ -2702,7 +2702,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, int32_t dis
     MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
-    displayId_ = displayId;
+    displayId_ = rsId;
     if (GetHardCursorEnabled()) {
         if (!SetCursorLocation(x, y, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             MMI_HILOGE("SetCursorLocation fail");
@@ -3177,12 +3177,12 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
     dprintf(fd, dumpInfo.c_str());
 }
 
-void PointerDrawingManager::UpdateBindDisplayId(int32_t rsId)
+void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
 {
     if (lastDisplayId_ == rsId) {
         return;
     }
-    MMI_HILOGI("Mouse traversal occurs, lastDisplayId_:%{public}d, rsId:%{public}d",
+    MMI_HILOGI("Mouse traversal occurs, lastDisplayId_:%{public}" PRIu64 ", rsId:%{public}" PRIu64,
         lastDisplayId_, rsId);
 
     if (GetHardCursorEnabled()) {
@@ -3194,7 +3194,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t rsId)
         Rosen::RSTransaction::FlushImplicitTransaction();
 
         // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_
-        screenId_ = static_cast<uint64_t>(rsId);
+        screenId_ = rsId;
         MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
         AttachToDisplay();
 
@@ -3204,7 +3204,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t rsId)
 
     // 绑定新屏幕 SurfaceNode 到全局 surfaceNode_
     MMI_HILOGI("UpdateBindDisplayId The screenId_:%{public}" PRIu64, screenId_);
-    screenId_ = static_cast<uint64_t>(rsId);
+    screenId_ = rsId;
     MMI_HILOGI("The screenId_:%{public}" PRIu64, screenId_);
     AttachToDisplay();
 
@@ -3220,7 +3220,7 @@ void PointerDrawingManager::UpdateBindDisplayId(int32_t rsId)
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
     MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}zu", screens.size());
-    std::set<uint32_t> sids;
+    std::set<uint64_t> sids;
     uint32_t mainWidth = 0;
     uint32_t mainHeight = 0;
     rotation_t mainRotation = static_cast<rotation_t>(DIRECTION0);
@@ -3228,14 +3228,17 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
-            MMI_HILOGI("Got screen, RsId:%{public}llu, shape=(%{public}u,%{public}u), rotation=%{public}u, "
+            MMI_HILOGI("Got screen, RsId:%{public}" PRIu64 ", shape=(%{public}u,%{public}u), rotation=%{public}u, "
                 "dpi=%{public}f", si->GetRsId(), GetScreenInfoWidth(si), GetScreenInfoHeight(si),
                 si->GetRotation(), si->GetVirtualPixelRatio());
-            if (si->GetType() != OHOS::Rosen::ScreenType::REAL) {
+            if (si->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
                 continue;
             }
-
-            uint32_t sid = si->GetRsId();
+            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+                continue;
+            }
+            uint64_t sid = si->GetRsId();
             sids.insert(sid);
 
             if (si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
@@ -3247,15 +3250,15 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             auto it = screenPointers_.find(sid);
             if (it != screenPointers_.end()) {
                 // ScreenPointer already exist
-                MMI_HILOGI("OnScreenModeChange screen %{public}u info update", sid);
+                MMI_HILOGI("OnScreenModeChange screen %{public}" PRIu64 " info update", sid);
                 it->second->UpdateScreenInfo(si);
             } else {
                 // Create & Init ScreenPointer
-                MMI_HILOGI("OnScreenModeChange got new screen %{public}u", sid);
+                MMI_HILOGI("OnScreenModeChange got new screen %{public}" PRIu64, sid);
                 auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, si);
                 screenPointers_[sid] = sp;
                 if (!sp->Init(pointerRenderer_)) {
-                    MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}u", sid);
+                    MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}" PRIu64, sid);
                 }
             }
         }
@@ -3263,7 +3266,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         // delete ScreenPointers that disappeared
         for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
             if (!sids.count(it->first)) {
-                MMI_HILOGI("OnScreenModeChange, delete screen %{public}u", it->first);
+                MMI_HILOGI("OnScreenModeChange, delete screen %{public}" PRIu64, it->first);
                 it = screenPointers_.erase(it);
             } else {
                 it++;
@@ -3308,7 +3311,7 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
 
 void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
@@ -3318,7 +3321,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, true);
-        MMI_HILOGI("screen:%{public}u, mode:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
+        MMI_HILOGI("screen:%{public}" PRIu64 ", mode:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
             it.first, it.second->GetMode(), cfg.dpi, screenId_);
         if (it.second->IsMirror() || it.first == screenId_) {
             if (DrawHardCursor(it.second, cfg) != RET_OK) {
@@ -3335,7 +3338,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
 
 void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
@@ -3345,8 +3348,9 @@ void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
         CHKPV(it.second);
         RenderConfig cfg;
         CreateRenderConfig(cfg, it.second, mouseStyle, false);
-        MMI_HILOGI("SoftwareCursorRender, screen:%{public}u, mode:%{public}u, dpi:%{public}f, direction:%{public}d,"
-            "screenId_:%{public}" PRIu64, it.first, it.second->GetMode(), cfg.dpi, cfg.direction, screenId_);
+        MMI_HILOGI("SoftwareCursorRender, screen:%{public}" PRIu64 ", mode:%{public}u,"
+                   " dpi:%{public}f, direction:%{public}d, screenId_:%{public}" PRIu64,
+                   it.first, it.second->GetMode(), cfg.dpi, cfg.direction, screenId_);
         if (!it.second->IsMirror() && it.first != screenId_) {
             cfg.style_ = MOUSE_ICON::TRANSPARENT_ICON;
             cfg.align_ = MouseIcon2IconType(cfg.style_);
@@ -3412,7 +3416,7 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
         BytraceAdapter::StopHardPointerRender();
     }
 
-    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}u, style=%{public}d",
+    MMI_HILOGI("DrawHardCursor on ScreenPointer success, screenId=%{public}" PRIu64 ", style=%{public}d",
         sp->GetScreenId(), cfg.style_);
     auto sret = buffer->FlushCache();
     if (sret != RET_OK) {
@@ -3458,7 +3462,7 @@ std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScre
     return mirrors;
 }
 
-std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint32_t sid)
+std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint64_t sid)
 {
     std::lock_guard<std::mutex> lock(mtx_);
     if (screenPointers_.count(sid)) {
@@ -3475,9 +3479,9 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
     CHKPR(sp, RET_ERR);
     if (!sp->Move(x, y, align)) {
         ret = RET_ERR;
-        MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", displayId_);
+        MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, displayId_);
     }
-    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers;
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
     {
         std::lock_guard<std::mutex> lock(mtx_);
         screenPointers = screenPointers_;
@@ -3486,12 +3490,12 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         if (it.second->IsMirror()) {
             if (!it.second->Move(x, y, align)) {
                 ret = RET_ERR;
-                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
+                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, it.first);
             }
-        } else if (static_cast<int32_t>(it.first) != displayId_) {
+        } else if (it.first != displayId_) {
             if (!it.second->Move(0, 0, align)) {
                 ret = RET_ERR;
-                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}u", it.first);
+                MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, it.first);
             }
         }
     }
@@ -3506,12 +3510,12 @@ int32_t PointerDrawingManager::CheckHwcReady()
     while (sp != nullptr && !sp->Move(lastPhysicalX_, lastPhysicalY_, ICON_TYPE::ANGLE_NW)) {
         failCount++;
         if (failCount > MAX_FAIL_COUNT) {
-            MMI_HILOGE("CheckHwcReady failed, screenId: %{public}u", displayId_);
+            MMI_HILOGE("CheckHwcReady failed, screenId: %{public}" PRIu64, displayId_);
             return RET_ERR;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(CHECK_SLEEP_TIME));
     }
-    MMI_HILOGI("CheckHwcReady success, screenId: %{public}u, check counts: %{public}d", displayId_, failCount);
+    MMI_HILOGI("CheckHwcReady success, screenId: %{public}" PRIu64 ", check counts: %{public}d", displayId_, failCount);
     return RET_OK;
 }
 

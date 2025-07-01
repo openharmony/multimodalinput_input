@@ -73,7 +73,7 @@ public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     ~PointerDrawingManager();
-    void DrawPointer(int32_t rsId, int32_t physicalX, int32_t physicalY,
+    void DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) override;
     void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) override;
@@ -96,7 +96,7 @@ public:
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
-    void SetPointerLocation(int32_t x, int32_t y, int32_t displayId) override;
+    void SetPointerLocation(int32_t x, int32_t y, uint64_t rsId) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
@@ -111,7 +111,7 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
-    void DrawMovePointer(int32_t rsId, int32_t physicalX, int32_t physicalY) override;
+    void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) override;
     std::vector<std::vector<std::string>> GetDisplayInfo(OLD::DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
@@ -151,8 +151,8 @@ private:
     void GetPreferenceKey(std::string &name);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
-    void CreatePointerWindow(int32_t rsId, int32_t physicalX, int32_t physicalY, Direction direction);
-    int32_t CreatePointerWindowForScreenPointer(int32_t rsId, int32_t physicalX, int32_t physicalY);
+    void CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY, Direction direction);
+    int32_t CreatePointerWindowForScreenPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY);
     int32_t CreatePointerWindowForNoScreenPointer(int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer);
@@ -173,7 +173,7 @@ private:
     int32_t UpdateCursorProperty(CursorPixelMap curPixelMap, const int32_t &focusX, const int32_t &focusY);
     int32_t UpdateCursorProperty(CustomCursor cursor);
     void RotateDegree(Direction direction);
-    int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    int32_t DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle, Direction direction);
     void AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -219,14 +219,14 @@ private:
     void PostMoveRetryTask(std::function<void()> task);
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
-    void UpdateBindDisplayId(int32_t rsId);
+    void UpdateBindDisplayId(uint64_t rsId);
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
     int32_t DrawSoftCursor(std::shared_ptr<Rosen::RSSurfaceNode> sn, const RenderConfig &cfg);
     int32_t DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
-    std::shared_ptr<ScreenPointer> GetScreenPointer(uint32_t screenId);
+    std::shared_ptr<ScreenPointer> GetScreenPointer(uint64_t screenId);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
@@ -292,7 +292,7 @@ private:
     bool hasInitObserver_ { false };
     int32_t frameCount_ { DEFAULT_FRAME_RATE };
     int32_t currentFrame_ { 0 };
-    int32_t displayId_ { INVALID_DISPLAY_ID };
+    uint64_t displayId_ { 0 };
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
@@ -302,7 +302,7 @@ private:
     std::mutex mtx_;
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
     sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
-    std::unordered_map<uint32_t, std::shared_ptr<ScreenPointer>> screenPointers_;
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers_;
     PointerRenderer pointerRenderer_;
     bool userIconFollowSystem_ { false };
     std::shared_ptr<AppExecFwk::EventRunner> softCursorRunner_ { nullptr };
@@ -318,7 +318,7 @@ private:
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
-    int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
+    uint64_t lastDisplayId_ { 0 };
     std::map<MOUSE_ICON, PixelMapInfo> mousePixelMap_;
     std::mutex mousePixelMapMutex_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };

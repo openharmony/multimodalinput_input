@@ -79,7 +79,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
         std::swap(width_, height_);
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
-    MMI_HILOGI("Construct with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
+    MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
@@ -92,7 +92,7 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
-    MMI_HILOGI("Construct with ScreenInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
+    MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
@@ -268,7 +268,7 @@ bool ScreenPointer::InitSurface()
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->AttachToDisplay(screenId_);
     surfaceNode_->SetBounds(0, 0, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
-    MMI_HILOGI("AttachToDisplay %{public}d completed", screenId_);
+    MMI_HILOGI("AttachToDisplay %{public}" PRIu64 " completed", screenId_);
 
     // create canvas node
     canvasNode_ = Rosen::RSCanvasNode::Create();
@@ -307,13 +307,13 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     dpi_ = si->GetVirtualPixelRatio();
     surfaceNode_->AttachToDisplay(screenId_);
     Rosen::RSTransaction::FlushImplicitTransaction();
-    MMI_HILOGI("Update with ScreenInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
+    MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
 void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotation)
 {
-    if (screenId_ != uint32_t(di.rsId)) {
+    if (screenId_ != di.rsId) {
         return;
     }
 
@@ -324,7 +324,7 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotat
     }
     displayDirection_ = di.displayDirection;
     isWindowRotation_ = isWindowRotation;
-    MMI_HILOGD("Update with DisplayInfo, id=%{public}u, shape=(%{public}u, %{public}u), mode=%{public}u, "
+    MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
     if (isCurrentOffScreenRendering_) {
         screenRealDPI_ = di.screenRealDPI;
@@ -341,7 +341,7 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotat
 bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
 {
     if (!IsMirror()) {
-        MMI_HILOGI("UpdatePadidng, reset padding, screenId=%{public}u, scale=%{public}f, "
+        MMI_HILOGI("UpdatePadidng, reset padding, screenId=%{public}" PRIu64 ", scale=%{public}f, "
             "paddingTop_=%{public}u, paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
         scale_ = 1.0;
         paddingTop_ = 0;
@@ -360,8 +360,8 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
     scale_ = fmin(float(width_) / mainWidth, float(height_) / mainHeight);
     paddingTop_ = (height_ - mainHeight * scale_) / NUM_TWO;
     paddingLeft_ = (width_ - mainWidth * scale_) / NUM_TWO;
-    MMI_HILOGI("UpdatePadding, screenId=%{public}u, scale=%{public}f, paddingTop_=%{public}u, paddingLeft_=%{public}u",
-        screenId_, scale_, paddingTop_, paddingLeft_);
+    MMI_HILOGI("UpdatePadding, screenId=%{public}" PRIu64 ", scale=%{public}f, paddingTop_=%{public}u,"
+               " paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
     return true;
 }
 
@@ -443,7 +443,7 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     auto ret = hwcMgr_->SetPosition(screenId_, px, py, bh);
     BytraceAdapter::StopHardPointerMove();
     if (ret != RET_OK) {
-        MMI_HILOGE("SetPosition failed, screenId=%{public}u, pos=(%{public}d, %{public}d)", screenId_, px, py);
+        MMI_HILOGE("SetPosition failed, screenId=%{public}" PRIu64 ", pos=(%{public}d, %{public}d)", screenId_, px, py);
         return false;
     }
     return true;
@@ -497,10 +497,10 @@ bool ScreenPointer::SetInvisible()
     CHKPF(bh);
     auto ret = hwcMgr_->SetPosition(screenId_, 0, 0, bh);
     if (ret != RET_OK) {
-        MMI_HILOGE("SetLocation failed, screenId=%{public}u, loc=(%{public}d, %{public}d)", screenId_, 0, 0);
+        MMI_HILOGE("SetLocation failed, screenId=%{public}" PRIu64 ", loc=(%{public}d, %{public}d)", screenId_, 0, 0);
         return false;
     }
-    MMI_HILOGI("SetInvisible success, screenId=%{public}u", screenId_);
+    MMI_HILOGI("SetInvisible success, screenId=%{public}" PRIu64, screenId_);
     return true;
 }
 
