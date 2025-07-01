@@ -4391,7 +4391,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetActiveWindowTypeByI
 
 /**
  * @tc.name: InputWindowsManagerTest_AddActiveWindow_001
- * @tc.desc: Test the funcation AddActiveWindow_001 
+ * @tc.desc: Test the function AddActiveWindow_001 
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4411,7 +4411,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_001, T
 
 /**
  * @tc.name: InputWindowsManagerTest_AddActiveWindow_002
- * @tc.desc: Test the funcation AddActiveWindow_002
+ * @tc.desc: Test the function AddActiveWindow_002
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4438,7 +4438,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_002, T
 
 /**
  * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_001
- * @tc.desc: Test the funcation RemoveActiveWindow_001
+ * @tc.desc: Test the function RemoveActiveWindow_001
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4466,7 +4466,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_001
 
 /**
  * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_002
- * @tc.desc: Test the funcation RemoveActiveWindow_002
+ * @tc.desc: Test the function RemoveActiveWindow_002
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4495,7 +4495,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_002
 #ifdef OHOS_BUILD_ENABLE_POINTER
 /**
  * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest001
- * @tc.desc: Test the funcation HandleHardWareCursor
+ * @tc.desc: Test the function HandleHardWareCursor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4520,7 +4520,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTe
 
 /**
  * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest002
- * @tc.desc: Test the funcation HandleHardWareCursor
+ * @tc.desc: Test the function HandleHardWareCursor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4544,7 +4544,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTe
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest015
- * @tc.desc: Test the funcation UpdateMouseTarget
+ * @tc.desc: Test the function UpdateMouseTarget
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4585,7 +4585,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest0
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest016
- * @tc.desc: Test the funcation UpdateMouseTarget
+ * @tc.desc: Test the function UpdateMouseTarget
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4626,7 +4626,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest0
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest017
- * @tc.desc: Test the funcation UpdateMouseTarget
+ * @tc.desc: Test the function UpdateMouseTarget
  * @tc.type: FUNC
  * @tc.require:
  */
