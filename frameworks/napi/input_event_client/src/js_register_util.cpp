@@ -204,5 +204,23 @@ int32_t GetNamedPropertyArrayInt32(const napi_env& env, const napi_value& object
     }
     return RET_OK;
 }
+
+int32_t GetNamedPropertyBoolOptional(const napi_env& env, const napi_value& object, const std::string& name, bool& ret)
+{
+    napi_value napiValue = {};
+    CHKRF(napi_get_named_property(env, object, name.c_str(), &napiValue), GET_NAMED_PROPERTY);
+    if (napiValue == nullptr) {
+        MMI_HILOGE("The value is null");
+        return RET_ERR;
+    }
+    napi_valuetype tmpType = napi_undefined;
+    CHKRF(napi_typeof(env, napiValue, &tmpType), TYPEOF);
+    if (tmpType != napi_boolean) {
+        MMI_HILOGE("The name:%{public}s is not bool", name.c_str());
+        return RET_ERR;
+    }
+    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
