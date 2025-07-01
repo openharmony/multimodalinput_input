@@ -372,11 +372,11 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "toolType must be greater than or equal to 0");
     }
     int32_t globalX = INT_MAX;
-    if (GetNamedPropertyInt32(env, mouseHandle, "globalX", globalX) != RET_OK) {
+    if (GetNamedPropertyInt32(env, mouseHandle, "globalX", globalX, false) != RET_OK) {
         MMI_HILOGD("No globaX");
     }
     int32_t globalY = INT_MAX;
-    if (GetNamedPropertyInt32(env, mouseHandle, "globalY", globalY) != RET_OK) {
+    if (GetNamedPropertyInt32(env, mouseHandle, "globalY", globalY, false) != RET_OK) {
         MMI_HILOGD("No globaY");
     }
     pointerEvent->SetSourceType(toolType);
@@ -426,7 +426,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
         return nullptr;
     }
     bool useGlobalCoordinate = false;
-    GetNamedPropertyBool(env, argv[0], "useGlobalCoordinate", useGlobalCoordinate);
+    GetNamedPropertyBoolOptional(env, argv[0], "useGlobalCoordinate", useGlobalCoordinate);
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
     CHKPP(pointerEvent);
@@ -524,11 +524,11 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pressure failed");
     }
     int32_t globalX = INT_MAX;
-    if (GetNamedPropertyInt32(env, touchObject, "globalX", globalX) != RET_OK) {
+    if (GetNamedPropertyInt32(env, touchObject, "globalX", globalX, false) != RET_OK) {
         MMI_HILOGD("No globaX");
     }
     int32_t globalY = INT_MAX;
-    if (GetNamedPropertyInt32(env, touchObject, "globalY", globalY) != RET_OK) {
+    if (GetNamedPropertyInt32(env, touchObject, "globalY", globalY, false) != RET_OK) {
         MMI_HILOGD("No globaY");
     }
 
@@ -660,7 +660,7 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
         return nullptr;
     }
     bool useGlobalCoordinate = false;
-    GetNamedPropertyBool(env, argv[0], "useGlobalCoordinate", useGlobalCoordinate);
+    GetNamedPropertyBoolOptional(env, argv[0], "useGlobalCoordinate", useGlobalCoordinate);
     auto pointerEvent = PointerEvent::Create();
     PointerEvent::PointerItem item;
     CHKPP(pointerEvent);
