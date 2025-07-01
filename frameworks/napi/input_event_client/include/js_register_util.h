@@ -30,6 +30,8 @@ bool IsArray(const napi_env& env, const napi_value& value);
 bool ParseInt32(const napi_env& env, const napi_value& value, int32_t& result);
 int32_t GetNamedPropertyArrayInt32(const napi_env& env, const napi_value& object, const std::string &name,
     std::vector<int32_t>& result);
+int32_t GetNamedPropertyBoolOptional(const napi_env& env, const napi_value& object, const std::string& name,
+    bool& ret);
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_UTIL_H
