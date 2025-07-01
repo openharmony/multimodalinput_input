@@ -5879,6 +5879,31 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_015
+ * @tc.desc: This test verifies the functionality of updating the touch screen target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+
+    pointerEvent->RemovePointerItem(item.GetPointerId());
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_001
  * @tc.desc: Test the funcation SendCancelEventWhenLock
  * @tc.type: FUNC
@@ -9508,6 +9533,26 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowNavbar_001,
     WindowInfo windowInfo;
     windowInfo.id = 20;
     windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PrintWindowNavbar());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PrintWindowNavbar_002
+ * @tc.desc: Test the funcation PrintWindowNavbar
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowNavbar_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 21;
+    windowInfo.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
