@@ -1778,7 +1778,10 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
             GET_REFERENCE_VALUE, scope, pointerEventItem);
         napi_value result = nullptr;
-        CHKPV(monitor_);
+        if (monitor_ == nullptr) {
+            napi_close_handle_scope(jsEnv_, scope);
+            return;
+        }
         if (monitor_->GetRectTotal() == 0
             || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectArea())) {
             CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
