@@ -92,10 +92,11 @@ constexpr int32_t DEFAULT_DPI { 0 };
 constexpr int32_t DEFAULT_POSITION { 0 };
 constexpr int32_t MAIN_GROUPID { 0 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-constexpr uint32_t WINDOW_NAME_TYPE_SCHREENSHOT { 1 };
+constexpr uint32_t WINDOW_NAME_TYPE_SCREENSHOT { 1 };
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
 constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
 constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
+constexpr uint32_t VOICE_WINDOW_ZORDER { 4000.0 };
 #define SCREEN_RECORD_WINDOW_WIDTH 400
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1509,17 +1510,25 @@ bool InputWindowsManager::IsPointerActiveRectValid(const OLD::DisplayInfo &curre
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
 }
 
-bool InputWindowsManager::IsPointInsideGuideWindow(double pointX, double pointY)
+bool InputWindowsManager::IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const {
+    return (x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
+        (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height));
+}
+
+bool InputWindowsManager::IsPointInsideSpecialWindow(double pointX, double pointY)
 {
     auto &WindowsInfo = GetWindowInfoVector();
     for (const auto& windowItem : WindowsInfo) {
+        int32_t x = static_cast<int32_t>(pointX);
+        int32_t y = static_cast<int32_t>(pointY);
         if (windowItem.windowType == GUIDE_WINDOW_TYPE) {
             for (const auto &win : windowItem.defaultHotAreas) {
-                int32_t x = static_cast<int32_t>(pointX);
-                int32_t y = static_cast<int32_t>(pointY);
                 return ((x > win.x && x < (win.x + win.width)) &&
                     (y > win.y && y < (win.y + win.height)));
             }
+        }
+        if (windowItem.zOrder == VOICE_WINDOW_ZORDER) {
+            return IsPointInsideWindowArea(x, y, windowItem);
         }
     }
     return false;
@@ -1530,13 +1539,10 @@ bool InputWindowsManager::IsMouseInCastWindow()
     auto &WindowsInfo = GetWindowInfoVector();
     for (const auto& windowItem : WindowsInfo) {
         if (windowItem.windowType == CAST_WINDOW_TYPE) {
-            auto &mouseInfo = GetMouseInfo();
+            const auto &mouseInfo = GetMouseInfo();
             int32_t x = mouseInfo.physicalX;
             int32_t y = mouseInfo.physicalY;
-            if ((x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
-                (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height))) {
-                return true;
-            }
+            return IsPointInsideWindowArea(x, y, windowItem);
         }
     }
 
@@ -1546,23 +1552,16 @@ bool InputWindowsManager::IsMouseInCastWindow()
 bool InputWindowsManager::IsCaptureMode()
 {
     auto &WindowsInfo = GetWindowInfoVector();
-    auto &screenshotWindow = std::find_if(WindowsInfo.begin(),
-        WindowsInfo.end(), [](const WindowInfo& windowItem) {
-            return windowItem.windowNameType == WINDOW_NAME_TYPE_SCHREENSHOT;
-        });
-    if (screenshotWindow != WindowsInfo.end()) {
+    for (const auto& window : WindowsInfo) {
+        if (window.windowNameType == WINDOW_NAME_TYPE_SCREENSHOT) {
             return false;
+        }
+        if (window.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER) {
+            return (window.area.width > SCREEN_RECORD_WINDOW_WIDTH ||
+                    window.area.height > SCREEN_RECORD_WINDOW_HEIGHT);
+        }
     }
-
-    auto &captureWindow = std::find_if(WindowsInfo.begin(),
-        WindowsInfo.end(), [](const WindowInfo& windowItem) {
-            return windowItem.zOrder == SCREEN_CAPTURE_WINDOW_ZORDER;
-        });
-    if (captureWindow != WindowsInfo.end()) {
-        return (captureWindow->area.width > SCREEN_RECORD_WINDOW_WIDTH ||
-                             captureWindow->area.height > SCREEN_RECORD_WINDOW_HEIGHT);
-    }
-
+    
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
