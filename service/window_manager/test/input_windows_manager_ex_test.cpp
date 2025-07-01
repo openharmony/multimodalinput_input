@@ -2572,7 +2572,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
 
 /**
  * @tc.name: InputWindowsManagerTest_GetPhysicalDisplayCoord_001
- * @tc.desc: Test the funcation GetPhysicalDisplayCoord
+ * @tc.desc: Test the function GetPhysicalDisplayCoord
  * @tc.type: FUNC
  * @tc.require:
  */
