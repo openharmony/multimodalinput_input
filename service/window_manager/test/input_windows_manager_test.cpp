@@ -9542,7 +9542,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowNavbar_001,
 
 /**
  * @tc.name: InputWindowsManagerTest_PrintWindowNavbar_002
- * @tc.desc: Test the funcation PrintWindowNavbar
+ * @tc.desc: Test the function PrintWindowNavbar
  * @tc.type: FUNC
  * @tc.require:
  */
