@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.touchEvent", "touchEvent")
+@!namespace("@ohos.multimodalInput.touchEvent")
 from ohos.multimodalInput.inputEvent use InputEvent;
 @!sts_inject("""
-static { loadLibrary("TouchEvent.z") }
+  loadLibrary("TouchEvent.z")
 """)
 
 enum Action : i32 {

@@ -487,6 +487,10 @@ int32_t AddEventHotkeyCallback(Callbacks &callbacks, std::shared_ptr<KeyEventMon
         MMI_HILOGE("Register listener failed");
         return RET_ERR;
     }
+    if (result == ETS_CALLBACK_EVENT_EXIST) {
+        MMI_HILOGE("Callback already exist");
+        return RET_ERR;
+    }
     if (result == ETS_CALLBACK_EVENT_SUCCESS) {
         hotkeyCallbacks[event->eventType].push_back(event);
     }

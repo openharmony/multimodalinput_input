@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.intentionCode", "intentionCode")
+@!namespace("@ohos.multimodalInput.intentionCode")
 @!sts_inject("""
-static { loadLibrary("IntentionCode.z") }
+  { loadLibrary("IntentionCode.z") }
 """)
 
 enum IntentionCode : i32 {

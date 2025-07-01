@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.inputEvent", "inputEvent")
+@!namespace("@ohos.multimodalInput.inputEvent")
 
 struct InputEvent {
   id: i32;
