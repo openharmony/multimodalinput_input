@@ -158,7 +158,7 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const UserScreenInfo &userScreenInfo
     {
         std::lock_guard<std::mutex> guard(mtx_);
         userScreenInfo_ = userScreenInfo;
-        auto cnt = 0;
+        size_t cnt = 0;
         for (const auto &it : userScreenInfo.displayGroups) {
             cnt += it.windowsInfo.size();
         }
@@ -978,7 +978,7 @@ void InputManagerImpl::PrintDisplaysInfo(const std::vector<DisplayInfo>& display
             "displayMode:%{public}d,oneHandX:%{private}d,oneHandY:%{private}d,scalePercent:%{public}d,"
             "expandHeight:%{public}d,isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d"
             "screenArea{id:%{public}d, x:%{private}d, y:%{private}d, width:%{private}d, height:%{private}d},"
-            "rsId:%{public}d",
+            "rsId:%{public}" PRIu64,
             i, item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(), item.direction,
             item.displayDirection, item.displayMode, item.oneHandX, item.oneHandY, item.scalePercent,
             item.expandHeight, item.isCurrentOffScreenRendering, item.displaySourceMode, item.screenArea.id,

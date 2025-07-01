@@ -890,7 +890,7 @@ void InputWindowsManager::CheckZorderWindowChange(const std::vector<WindowInfo> 
 void InputWindowsManager::UpdateDisplayIdAndName()
 {
     CALL_DEBUG_ENTER;
-    using IdNames = std::set<std::pair<int32_t, std::string>>;
+    using IdNames = std::set<std::pair<uint64_t, std::string>>;
     IdNames newInfo;
     auto &DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
     for (const auto &item : DisplaysInfo) {
@@ -910,7 +910,7 @@ void InputWindowsManager::UpdateDisplayIdAndName()
     }
     for (const auto &item : newInfo) {
         if (item.first >= HICAR_MIN_DISPLAY_ID) {
-            MMI_HILOGI("Displayinfo id:%{public}d name:%{public}s", item.first, item.second.c_str());
+            MMI_HILOGI("Displayinfo id:%{public}" PRIu64 ", name:%{public}s", item.first, item.second.c_str());
             continue;
         }
         if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
@@ -1297,7 +1297,7 @@ void InputWindowsManager::ResetPointerPosition(const OLD::DisplayGroupInfo &disp
         if ((currentDisplay.displaySourceMode == OHOS::MMI::DisplaySourceMode::SCREEN_MAIN)) {
             auto displayInfo = GetPhysicalDisplay(oldPtrPos.displayId);
             CHKPV(displayInfo);
-            MMI_HILOGI("CurDisplayId:%{public}d, oldDisplayId:%{public}d",
+            MMI_HILOGI("CurDisplayId:%{public}" PRIu64 ", oldDisplayId:%{public}" PRIu64,
                 currentDisplay.rsId, displayInfo->rsId);
             if ((displayInfo->rsId != currentDisplay.rsId) || (!IsPointerOnCenter(oldPtrPos, currentDisplay))) {
                 cursorPos = ResetCursorPos(displayGroupInfo);
@@ -2058,8 +2058,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
     }
     for (auto displayInfo : displayGroupInfo.displaysInfo) {
         if (displayInfo.rsId == currentDisplayInfo.rsId && displayInfo.dpi != currentDisplayInfo.dpi) {
-            MMI_HILOGD("dpi changed, current displayId: %{public}d, dpi: %{public}d, "
-            "latest displayId: %{public}d, dpi: %{public}d",
+            MMI_HILOGD("dpi changed, current rsId: %{public}" PRIu64 ", dpi: %{public}d, "
+            "latest rsId: %{public}" PRIu64 ", dpi: %{public}d",
             currentDisplayInfo.rsId, currentDisplayInfo.dpi, displayInfo.rsId, displayInfo.dpi);
             auto drawNewDpiRes = CursorDrawingComponent::GetInstance().DrawNewDpiPointer();
             if (drawNewDpiRes != RET_OK) {
@@ -4231,7 +4231,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         axisBeginWindowInfo_ = touchWindow;
     }
     if (!touchWindow) {
-        MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
+        MMI_HILOGI("UpdateMouseTarget rsId:%{public}" PRIu64 ", logicalX:%{public}d, logicalY:%{public}d,"
             "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->rsId, logicalX, logicalY,
             physicalX, physicalY);
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || (mouseDownInfo_.id == -1 &&
@@ -4263,7 +4263,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
                     physicalX, physicalY);
             }
-            MMI_HILOGI("UpdateMouseTarget id:%{public}d, logicalX:%{public}d, logicalY:%{public}d,"
+            MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{public}d, logicalY:%{public}d,"
                 "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -6998,7 +6998,7 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const OLD::Displa
     OLD::DisplayInfo oldMainDisplayInfo;
     (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, newMainDisplayInfo);
     (void)GetMainScreenDisplayInfo(displaysInfoVector, oldMainDisplayInfo);
-    MMI_HILOGI("newMainDisplayInfo:%{public}d, oldMainDisplayInfo:%{public}d",
+    MMI_HILOGI("newMainDisplayInfo:%{public}" PRIu64 ", oldMainDisplayInfo:%{public}" PRIu64,
         newMainDisplayInfo.rsId, oldMainDisplayInfo.rsId);
     if (displayGroupInfo.displaysInfo.size() == displaysInfoVector.size() &&
         newMainDisplayInfo.rsId != oldMainDisplayInfo.rsId) {

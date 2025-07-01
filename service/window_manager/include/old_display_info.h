@@ -196,7 +196,7 @@ struct DisplayInfo {
      *
      * @since 18
      */
-    int32_t rsId { 0 };
+    uint64_t rsId { 0 };
 };
 
 struct DisplayGroupInfo {
