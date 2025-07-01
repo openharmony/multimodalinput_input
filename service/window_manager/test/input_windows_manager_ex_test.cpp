@@ -2630,7 +2630,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006
 
 /**
 @tc.name: InputWindowsManagerTest_UpdateTransformDisplayXY_001
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
