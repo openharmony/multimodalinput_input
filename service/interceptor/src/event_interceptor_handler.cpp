@@ -208,6 +208,9 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
 {
     CHKPV(keyEvent);
     CHKPV(session_);
+    if (session_->GetUid() == ACCESSIBILITY_UID) {
+        keyEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    }
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     pkt << handlerType_ << deviceTags_;
     if (pkt.ChkRWError()) {
