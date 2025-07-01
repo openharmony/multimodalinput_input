@@ -1017,6 +1017,10 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
 {
     uint32_t num = 0;
     pkt >> num;
+    if (num > MAX_WINDOWS_SIZE) {
+        MMI_HILOGE("Too many windows, num:%{public}u", num);
+        return RET_ERR;
+    }
     for (uint32_t i = 0; i < num; i++) {
             WindowInfo info;
             int32_t byteCount = 0;
