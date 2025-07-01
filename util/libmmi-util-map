@@ -59,6 +59,7 @@
             OHOS::MMI::ReadFile*;
             OHOS::MMI::IntToHexRGB*;
             OHOS::MMI::StringReplace*;
+            OHOS::MMI::IsInteger*;
         };
     local:
         *;
