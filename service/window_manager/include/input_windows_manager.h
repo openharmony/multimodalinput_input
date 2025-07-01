@@ -540,7 +540,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_WATCH
     bool mouseFlag_ {false};
     struct ActiveTouchWin {
-        WindowInputType windowInputType{WindowInputType::NORMAL};
+        WindowInputType windowInputType{ WindowInputType::NORMAL };
         std::set<int32_t> pointerSet;
         explicit ActiveTouchWin(WindowInputType windowInputType, std::set<int32_t> pointerSet = {})
             : windowInputType(windowInputType), pointerSet(pointerSet)

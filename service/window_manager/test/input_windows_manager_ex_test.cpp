@@ -2457,6 +2457,33 @@ HWTEST_F(InputWindowsManagerTest, HandleWindowInputType_012, TestSize.Level1)
 }
 
 /**
+ * @tc.name: HandleWindowInputType_013
+ * @tc.desc: Test the function HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, HandleWindowInputType_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    WindowInfo window;
+    window.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleWindowInputType(window, pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
  * @tc.name: DrawTouchGraphic_001
  * @tc.desc: Test the function DrawTouchGraphic
  * @tc.type: FUNC
@@ -4339,6 +4366,130 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionW
     EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
     isSkip = false;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetActiveWindowTypeById
+ * @tc.desc: Test the funcation GetActiveWindowTypeById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetActiveWindowTypeById, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = 1;
+    int32_t pointerId = 0;
+    auto windowTypeTemp = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetActiveWindowTypeById(windowId, windowTypeTemp));
+
+    inputWindowsManager->activeTouchWinTypes_.emplace(
+        windowId, InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }});
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetActiveWindowTypeById(windowId, windowTypeTemp));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AddActiveWindow_001
+ * @tc.desc: Test the funcation AddActiveWindow_001 
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = 1;
+    int32_t pointerId = 0;
+    auto windowTypeTemp = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    inputWindowsManager->activeTouchWinTypes_.emplace(
+        windowId, InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }});
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AddActiveWindow_002
+ * @tc.desc: Test the funcation AddActiveWindow_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = 1;
+    int32_t pointerId = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId));
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    inputWindowsManager->AddActiveWindow(windowId, pointerId);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_001
+ * @tc.desc: Test the funcation RemoveActiveWindow_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_THROW);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_002
+ * @tc.desc: Test the funcation RemoveActiveWindow_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    int32_t windowId = 1;
+    int32_t pointerIdA = 0;
+    int32_t pointerIdB = 1;
+    auto windowTypeTemp = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    inputWindowsManager->activeTouchWinTypes_.emplace(
+        windowId, InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerIdA }});
+
+    pointerEvent->SetPointerId(pointerIdB);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+    pointerEvent->SetPointerId(pointerIdA);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER

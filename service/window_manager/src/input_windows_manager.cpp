@@ -7490,7 +7490,7 @@ void InputWindowsManager::AddActiveWindow(int32_t windowId, int32_t pointerId)
     if (it != activeTouchWinTypes_.end()) {
         it->second.pointerSet.emplace(pointerId);
         MMI_HILOGD("AddActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
-                   "pointerId:%{public}d, pointerSet:%{public}lu",
+                   "pointerId:%{public}d, pointerSet:%{public}zu",
             windowId,
             it->second.windowInputType,
             pointerId,
@@ -7508,31 +7508,30 @@ void InputWindowsManager::AddActiveWindow(int32_t windowId, int32_t pointerId)
 void InputWindowsManager::RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto pointerAc = pointerEvent->GetPointerAction();
-    if (pointerAc == PointerEvent::POINTER_ACTION_UP || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP ||
-        pointerAc == PointerEvent::POINTER_ACTION_CANCEL || pointerAc == PointerEvent::POINTER_ACTION_PULL_THROW) {
-        auto pointerId = pointerEvent->GetPointerId();
-        for (auto it = activeTouchWinTypes_.begin(); it != activeTouchWinTypes_.end();) {
-            auto pointerIter = it->second.pointerSet.find(pointerId);
-            if (pointerIter != it->second.pointerSet.end()) {
-                it->second.pointerSet.erase(pointerIter);
-                MMI_HILOGD("RemoveActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
-                           "pointerId:%{public}d, "
-                           "pointerSet:%{public}lu "
-                           "isInject:%{public}d",
-                    it->first,
-                    it->second.windowInputType,
-                    pointerId,
-                    it->second.pointerSet.size(),
-                    pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
-            }
-            if (it->second.pointerSet.empty()) {
-                MMI_HILOGD("RemoveActiveWindow success: erase windowId:%{public}d, windowType:%{public}hhu",
-                    it->first,
-                    it->second.windowInputType);
-                it = activeTouchWinTypes_.erase(it);
-            } else {
-                ++it;
-            }
+    if (pointerAc != PointerEvent::POINTER_ACTION_UP && pointerAc != PointerEvent::POINTER_ACTION_PULL_UP &&
+        pointerAc != PointerEvent::POINTER_ACTION_CANCEL && pointerAc != PointerEvent::POINTER_ACTION_PULL_THROW) {
+        return;
+    }
+    auto pointerId = pointerEvent->GetPointerId();
+    for (auto it = activeTouchWinTypes_.begin(); it != activeTouchWinTypes_.end();) {
+        auto pointerIter = it->second.pointerSet.find(pointerId);
+        if (pointerIter != it->second.pointerSet.end()) {
+            it->second.pointerSet.erase(pointerIter);
+            MMI_HILOGD("RemoveActiveWindow success: windowId:%{public}d, windowType:%{public}hhu, "
+                       "pointerId:%{public}d, pointerSet:%{public}zu, isInject:%{public}d",
+                it->first,
+                it->second.windowInputType,
+                pointerId,
+                it->second.pointerSet.size(),
+                pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+        }
+        if (it->second.pointerSet.empty()) {
+            MMI_HILOGD("RemoveActiveWindow success: erase windowId:%{public}d, windowType:%{public}hhu",
+                it->first,
+                it->second.windowInputType);
+            it = activeTouchWinTypes_.erase(it);
+        } else {
+            ++it;
         }
     }
 }
