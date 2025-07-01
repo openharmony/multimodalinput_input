@@ -4391,7 +4391,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetActiveWindowTypeByI
 
 /**
  * @tc.name: InputWindowsManagerTest_AddActiveWindow_001
- * @tc.desc: Test the function AddActiveWindow_001 
+ * @tc.desc: Test the function AddActiveWindow_001
  * @tc.type: FUNC
  * @tc.require:
  */
