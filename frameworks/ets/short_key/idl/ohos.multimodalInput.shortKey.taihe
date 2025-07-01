@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.shortKey", "shortKey")
+@!namespace("@ohos.multimodalInput.shortKey")
 @!sts_inject("""
-static { loadLibrary("ShortKey.z") }
+  loadLibrary("ShortKey.z")
 """)
 
 enum FingerprintAction : i32 {

@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.gestureEvent", "gestureEvent")
+@!namespace("@ohos.multimodalInput.gestureEvent")
 from ohos.multimodalInput.touchEvent use Touch;
 @!sts_inject("""
-static { loadLibrary("GestureEvent.z") }
+  loadLibrary("GestureEvent.z")
 """)
 
 struct Pinch {

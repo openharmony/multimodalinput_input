@@ -64,10 +64,10 @@ struct InfraredFrequency {
 """)
 @!sts_inject("""
     function on(type: 'keyPressed', options: KeyPressedConfig,
-        callback: (info: ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
+        callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
         return onKeyPressed(options, callback, callback);
     }
-    function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.keyEvent.KeyEvent) => void) {
+    function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
         return offKeyPressed(callback);
     }
 """)
