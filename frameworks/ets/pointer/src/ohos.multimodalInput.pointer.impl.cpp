@@ -103,6 +103,11 @@ void SetPointerVisibleSync(bool visible)
 PointerStyle GetPointerStyleSync(int32_t windowId)
 {
     OHOS::MMI::PointerStyle pointerStyle;
+    if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
+        MMI_HILOGE("Invalid windowId");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "windowId is invalid");
+        return PointerStyle::key_t::DEFAULT;
+    }
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default GetPointerStyle!");
