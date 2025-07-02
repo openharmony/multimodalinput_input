@@ -343,6 +343,7 @@ void EventDispatchHandler::UpdateDisplayXY(const std::shared_ptr<PointerEvent> &
     if (opt && point->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
         WindowInputType windowInputType = opt.value().windowInputType;
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+            windowInputType != WindowInputType::DUALTRIGGER_TOUCH &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
             pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
             pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
