@@ -5310,7 +5310,7 @@ ErrCode MMIService::QueryPointerRecord(int32_t count, std::vector<std::shared_pt
         }
     );
     if (ret != RET_OK) {
-        MMI_HILOGE("query poniterRecord failed, return:%{public}d", ret);
+        MMI_HILOGE("query pointerRecord failed, return:%{public}d", ret);
         return ret;
     }
     return RET_OK;
