@@ -25,6 +25,7 @@
 #include "proto.h"
 #include "tablet_event_input_subscribe_manager.h"
 #include "pre_monitor_manager.h"
+#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -311,6 +312,18 @@ static void ReadMaxMultiTouchPointNum(cJSON *productCfg, int32_t &maxMultiTouchP
     cJSON *jsonMaxNumOfTouches = cJSON_GetObjectItemCaseSensitive(jsonTouchscreen, "MaxTouchPoints");
     if (!cJSON_IsNumber(jsonMaxNumOfTouches)) {
         MMI_HILOGE("The jsonMaxNumOfTouches is not number");
+        return;
+    }
+    char *sMaxNumOfTouches = cJSON_Print(jsonMaxNumOfTouches);
+    if (sMaxNumOfTouches == nullptr) {
+        MMI_HILOGE("The sMaxNumOfTouches is null");
+        return;
+    }
+    MMI_HILOGI("Config of touchscreen.MaxTouchPoints:%{public}s", sMaxNumOfTouches);
+    bool isInteger = IsInteger(sMaxNumOfTouches);
+    cJSON_free(sMaxNumOfTouches);
+    if (!isInteger) {
+        MMI_HILOGE("Config of touchscreen.MaxTouchPoints is not integer");
         return;
     }
     auto num = static_cast<int32_t>(cJSON_GetNumberValue(jsonMaxNumOfTouches));

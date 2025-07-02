@@ -182,6 +182,8 @@ std::enable_if_t<IsStreamable<T>::value, std::string> DumpSet(const std::set<T> 
     }
     return std::move(sItems).str();
 }
+
+bool IsInteger(const char *target);
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H
