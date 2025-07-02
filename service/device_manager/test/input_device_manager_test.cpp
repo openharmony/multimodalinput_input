@@ -1131,9 +1131,9 @@ HWTEST_F(InputDeviceManagerTest, SetInputStatusChangeCallback_Test_001, TestSize
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    using InputDeviceCallback = std::function<void(int, std::string, std::string)>;
-    InputDeviceCallback callback = [](int status, const std::string& deviceName, const std::string& deviceId) {
-    };
+    using InputDeviceCallback = std::function<void(int, std::string, std::string, std::string)>;
+    InputDeviceCallback callback =
+        [] (int status, std::string nodeName, const std::string& deviceName, const std::string& deviceId) {};
     ASSERT_NO_FATAL_FAILURE(inputDevice.SetInputStatusChangeCallback(callback));
 }
 
@@ -1287,8 +1287,10 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyDevCallback_001, T
     int32_t deviceid = 1;
     inDevice.isTouchableDevice = true;
     inDevice.sysUid = "123456";
-    using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
-    inputDeviceCallback callback = [](int32_t deviceId, std::string devName, std::string devStatus) {};
+    using inputDeviceCallback =
+        std::function<void(int32_t deviceId, std::string nodeName, std::string devName, std::string devStatus)>;
+    inputDeviceCallback callback =
+        [] (int32_t deviceId, std::string nodeName, std::string devName, std::string devStatus) {};
     inputDevice.SetInputStatusChangeCallback(callback);
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceid, inDevice));
     inDevice.sysUid.clear();

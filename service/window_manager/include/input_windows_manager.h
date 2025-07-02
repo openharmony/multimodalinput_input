@@ -81,7 +81,8 @@ public:
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
-    void DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus);
+    void DeviceStatusChanged(int32_t deviceId, std::string &name, const std::string &sysUid,
+        const std::string devStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t AppendExtraData(const ExtraData& extraData);

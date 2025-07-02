@@ -90,7 +90,8 @@ public:
     void NotifyRemovePointerDevice(bool removePointerDevice);
     bool HasTouchDevice();
     const std::string& GetScreenId(int32_t deviceId) const;
-    using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
+    using inputDeviceCallback =
+        std::function<void(int32_t deviceId, std::string nodeName, std::string devName, std::string devStatus)>;
     void SetInputStatusChangeCallback(inputDeviceCallback callback);
     VendorConfig GetVendorConfig(int32_t deviceId) const;
     int32_t OnEnableInputDevice(bool enable);
