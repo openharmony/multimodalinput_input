@@ -951,7 +951,6 @@ void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &display
     if (captureModeInfo.isCaptureMode && !WindowInfo.empty() &&
         ((focusWindowId != displayGroupInfo.focusWindowId) ||
         (WindowInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
-        CaptureModeInfo captureModeInfo;
         captureModeInfoMap_[displayGroupInfo.groupId].isCaptureMode = false;
     }
 }
@@ -1885,8 +1884,6 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
     };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPosCur.displayId);
     CHKPV(displayInfo);
-    const Direction displayDirection = static_cast<Direction>((
-        ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     if (cursorPosCur.displayDirection != displayInfo->displayDirection) {
         MMI_HILOGI("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
             "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
@@ -4401,7 +4398,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             dragPointerStyle_, direction);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    Direction lastRotation;
 
     auto iter = cursorPosMap_.find(groupId);
     if (iter != cursorPosMap_.end()) {
@@ -4750,7 +4746,6 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const OLD::DisplayInfo 
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         return;
     }
-    bool autoToVirtualScreen = pointerEvent->GetAutoToVirtualScreen();
     if (displayInfo.scalePercent > 0 && displayInfo.scalePercent < 100) {
         HandleOneHandMode(displayInfo, pointerEvent, pointerItem);
     } else {
