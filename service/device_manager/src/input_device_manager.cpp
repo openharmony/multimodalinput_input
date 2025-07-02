@@ -59,8 +59,6 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
 
 constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
 constexpr size_t EXPECTED_SUBMATCH{ 1 };
-
-const std::string TOUCHSCREEN_DEV_NAME { "input_mt_wrapper" };
 } // namespace
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
@@ -100,6 +98,9 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
     FillInputDevice(inputDevice, inputDeviceOrigin);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    FillInputDeviceWithVirtualCapability(inputDevice, iter->second);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
@@ -145,10 +146,6 @@ void InputDeviceManager::FillInputDevice(std::shared_ptr<InputDevice> inputDevic
             inputDevice->AddCapability(second);
         }
     }
-
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    FillInputDeviceWithVirtualCapability(inputDevice, name);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
@@ -287,7 +284,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
         return RET_OK;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    if (GetTouchscreenKeyboardType(iter->second.inputDeviceOrigin, keyboardType) == RET_OK) {
+    if (GetTouchscreenKeyboardType(iter->second, keyboardType) == RET_OK) {
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1159,11 +1156,10 @@ bool InputDeviceManager::IsLocalDevice(int32_t deviceId)
 }
 
 void InputDeviceManager::FillInputDeviceWithVirtualCapability(
-    std::shared_ptr<InputDevice> inputDevice, const char *devName) const
+    std::shared_ptr<InputDevice> inputDevice, const InputDeviceInfo &deviceInfo) const
 {
     CHKPV(inputDevice);
-    CHKPV(devName);
-    if (devName != TOUCHSCREEN_DEV_NAME) {
+    if (!deviceInfo.isTouchableDevice) {
         // not adding capability from virtual devices for devices other than the touch screen.
         return;
     }
@@ -1171,19 +1167,17 @@ void InputDeviceManager::FillInputDeviceWithVirtualCapability(
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsKeyboardDevice(it->second)) {
             inputDevice->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
-            MMI_HILOGD("add virtual keyboard capability for dev=%{public}s", devName);
+            MMI_HILOGD("add virtual keyboard capability for touchscreen dev");
         } else if (IsPointerDevice(it->second)) {
             inputDevice->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
-            MMI_HILOGD("add virtual trackpad capability for dev=%{public}s", devName);
+            MMI_HILOGD("add virtual trackpad capability for touchscreen dev");
         }
     }
 }
 
-int32_t InputDeviceManager::GetTouchscreenKeyboardType(struct libinput_device *inputDevice, int32_t &keyboardType)
+int32_t InputDeviceManager::GetTouchscreenKeyboardType(const InputDeviceInfo &deviceInfo, int32_t &keyboardType)
 {
-    CHKPR(inputDevice, RET_ERR);
-    std::string devName = libinput_device_get_name(inputDevice);
-    if (devName != TOUCHSCREEN_DEV_NAME) {
+    if (!deviceInfo.isTouchableDevice) {
         return RET_ERR;
     }
     bool hasVirtualKeyboard = false;
@@ -1202,8 +1196,7 @@ int32_t InputDeviceManager::GetTouchscreenKeyboardType(struct libinput_device *i
         } else {
             keyboardType = KEYBOARD_TYPE_DIGITALKEYBOARD;
         }
-        MMI_HILOGI("Touchscreen used as virtual keyboard:%{public}s, type:%{public}d",
-            devName.c_str(), keyboardType);
+        MMI_HILOGI("Touchscreen used as virtual keyboard, type=%{public}d", keyboardType);
         return RET_OK;
     }
     return RET_ERR;
