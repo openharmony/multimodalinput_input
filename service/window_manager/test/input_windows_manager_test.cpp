@@ -313,11 +313,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetDisplayBind_009, Te
     CALL_TEST_DEBUG;
     UDSServer udsServer;
     WIN_MGR->Init(udsServer);
+    std::string name = "mouse";
     std::string sysUid = "james";
     std::string devStatus = "add";
-    WIN_MGR->DeviceStatusChanged(2, sysUid, devStatus);
+    WIN_MGR->DeviceStatusChanged(2, name, sysUid, devStatus);
     devStatus = "remove";
-    WIN_MGR->DeviceStatusChanged(2, sysUid, devStatus);
+    WIN_MGR->DeviceStatusChanged(2, name, sysUid, devStatus);
     std::string msg = "There is in InputWindowsManagerTest_GetDisplayIdNames_009";
     ASSERT_EQ(WIN_MGR->SetDisplayBind(-1, 1, msg), -1);
 }
@@ -9656,13 +9657,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_00
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 0;
+    std::string name = "mouse";
     std::string sysUid = "";
     std::string devStatus = "add";
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    ASSERT_NO_FATAL_FAILURE(inputWindowsManager->DeviceStatusChanged(deviceId, sysUid, devStatus));
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager->DeviceStatusChanged(deviceId, name, sysUid, devStatus));
 
     devStatus = "test";
-    ASSERT_NO_FATAL_FAILURE(inputWindowsManager->DeviceStatusChanged(deviceId, sysUid, devStatus));
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager->DeviceStatusChanged(deviceId, name, sysUid, devStatus));
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH

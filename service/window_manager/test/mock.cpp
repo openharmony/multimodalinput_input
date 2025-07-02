@@ -70,7 +70,7 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
 void InputDisplayBindHelper::RemoveInputDevice(int32_t id)
 {}
 
-void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &name)
+void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
 {}
 
 UDSServer::~UDSServer() {}
