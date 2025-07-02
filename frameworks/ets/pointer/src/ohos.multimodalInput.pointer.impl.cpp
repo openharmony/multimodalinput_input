@@ -112,9 +112,9 @@ PointerStyle GetPointerStyleSync(int32_t windowId)
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default GetPointerStyle!");
         MMI_HILOGE("failed to get default GetPointerStyle!");
-            return PointerStyle::key_t::DEFAULT;
+        return PointerStyle::key_t::DEFAULT;
     }
-        return ConvertPointerStyle(pointerStyle.id);
+    return ConvertPointerStyle(pointerStyle.id);
 }
 
 void SetPointerStyleSync(int32_t windowId, PointerStyle pointerStyle)
