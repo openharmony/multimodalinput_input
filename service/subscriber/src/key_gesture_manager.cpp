@@ -359,8 +359,7 @@ void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output
 
 bool KeyGestureManager::LongPressCombinationKey::RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if ((keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) &&
-        (keyEvent->GetKeyCode() != KeyRepeat->GetRepeatKeyCode())) {
+    if ((keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) && !keyEvent->IsRepeatKey()) {
         firstDownTime_ = GetSysClockTime();
     }
     int64_t now = GetSysClockTime();
