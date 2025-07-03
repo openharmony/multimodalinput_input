@@ -1095,5 +1095,112 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation001, TestS
     double displayY = 0.0;
     EXPECT_EQ(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), ERROR_APP_NOT_FOCUSED);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: EventDispatchTest_UpdateDisplayXY_001
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
+}
+ 
+/**
+ * @tc.name: EventDispatchTest_UpdateDisplayXY_002
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(2);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
+}
+ 
+/**
+ * @tc.name: EventDispatchTest_UpdateDisplayXY_003
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    int32_t displayId = 1;
+    int32_t windowId = 2;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerItem.SetTargetWindowId(windowId);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
+}
+ 
+/**
+ * @tc.name: EventDispatchTest_UpdateDisplayXY_004
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    int32_t displayId = 1;
+    int32_t windowId = 2;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerItem.SetTargetWindowId(windowId);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
+}
+ 
+/**
+ * @tc.name: EventDispatchTest_UpdateDisplayXY_005
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerId = 3;
+    int32_t displayId = 1;
+    int32_t windowId = 2;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerItem.SetTargetWindowId(windowId);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS
