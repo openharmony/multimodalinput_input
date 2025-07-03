@@ -340,7 +340,7 @@ static napi_value JsQueryTouchEvents(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc != 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }

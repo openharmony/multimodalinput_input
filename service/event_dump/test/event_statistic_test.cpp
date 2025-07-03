@@ -26,6 +26,7 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t EVENT_OUT_SIZE { 30 };
+constexpr int32_t POINTER_RECORD_MAX_SIZE { 100 };
 } // namespace
 
 class EventStatisticTest : public testing::Test {
@@ -376,6 +377,114 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_ConvertSwitchTypeToString, TestS
 
     switchType = -1;
     ASSERT_STREQ(eventStatistic.ConvertSwitchTypeToString(switchType), "unknown");
+}
+
+/**
+ * @tc.name: EventDumpTest_PushPointerRecord
+ * @tc.desc: Event dump PushPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_PushPointerRecord, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    auto pointerEvent = PointerEvent::Create();
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPressure(0);
+    pointerItem.SetTiltX(0);
+    pointerItem.SetTiltY(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(eventStatistic.PushPointerRecord(pointerEvent));
+    for (auto i = 0; i <= POINTER_RECORD_MAX_SIZE; ++i) {
+        auto pointerEvent = PointerEvent::Create();
+        eventStatistic.PushPointerRecord(pointerEvent);
+    }
+    EXPECT_EQ(eventStatistic.pointerRecordDeque_.size(), POINTER_RECORD_MAX_SIZE);
+}
+
+/**
+ * @tc.name: EventDumpTest_QueryPointerRecord_001
+ * @tc.desc: Event dump QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int32_t count = -1;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    eventStatistic.pointerRecordDeque_.clear();
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/**
+ * @tc.name: EventDumpTest_QueryPointerRecord_002
+ * @tc.desc: Event dump QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int32_t count = 0;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    auto pointerEvent = PointerEvent::Create();
+    eventStatistic.PushPointerRecord(pointerEvent);
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/**
+ * @tc.name: EventDumpTest_QueryPointerRecord_003
+ * @tc.desc: Event dump QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int32_t count = 30;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    eventStatistic.pointerRecordDeque_.clear();
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/**
+ * @tc.name: EventDumpTest_QueryPointerRecord_004
+ * @tc.desc: Event dump QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int32_t count = 100;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    auto pointerEvent = PointerEvent::Create();
+    eventStatistic.PushPointerRecord(pointerEvent);
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
+}
+
+/**
+ * @tc.name: EventDumpTest_QueryPointerRecord_005
+ * @tc.desc: Event dump QueryPointerRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    int32_t count = 101;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    eventStatistic.PushPointerRecord(pointerEvent);
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(count, pointerList), RET_OK);
 }
 } // OHOS
 } // MMI
