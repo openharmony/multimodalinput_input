@@ -62,7 +62,10 @@ private:
     bool CheckFingerValidation(std::shared_ptr<PointerEvent> touchEvent) const;
     bool CheckProgressValid(std::shared_ptr<PointerEvent> touchEvent);
     bool CheckThrowAngleValid(double angle);
+    bool CheckThrowDirection(double angle, int32_t posY);
     void UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent);
+    void UpdatePositionHistory(double x, double y, double time);
+    bool CheckSuddenStop() const; // 检测是否有急停动作
  
 private:
     FingerGesture fingerGesture_;
@@ -70,19 +73,34 @@ private:
     bool gestureInProgress_ = false;
     double triggerTime_ = 0.0; // 触发时间，单位毫秒
     bool alreadyTouchDown_ = false;
+    
+    // 存储历史位置和时间，用于计算加速度
+    struct PositionRecord {
+        double x { 0.0 };
+        double y { 0.0 };
+        double time { 0.0 }; // 时间戳，单位毫秒
+    };
+    std::vector<PositionRecord> positionHistory_; // 存储最近的位置记录
+    static constexpr size_t MAX_HISTORY_SIZE = 10; // 历史记录最大数量
+    static constexpr size_t MIN_HISTORY_SIZE = 3; // 历史记录最小数量
+    
     static constexpr double THRES_SPEED = 0.6; // 阈值，单位像素/秒
-    static constexpr int64_t MIN_THRES_DIST = 5; // 阈值，单位像素
+    static constexpr int64_t MIN_THRES_DIST = 50; // 阈值，单位像素
+    static constexpr double MAX_DECELERATION = 0.0; // 最大减速度阈值，单位像素/秒²，负值表示减速
     static constexpr int32_t FIRST_TOUCH_FINGER = 0; // 单指触摸抛甩
+    
     static constexpr double ANGLE_DOWN_MIN {45.0};
     static constexpr double ANGLE_DOWN_MAX {135.0};
     static constexpr double ANGLE_UP_MIN {225.0};
     static constexpr double ANGLE_UP_MAX {315.0};
     static constexpr double FULL_CIRCLE_DEGREES {360.0};
-    static constexpr double ANGLE_EPSILON {1e-9};
+    static constexpr double NUM_EPSILON {1e-3};
     static constexpr double SPIN_UP_AREA_Y = 600;
     static constexpr double SPIN_DOWN_AREA_Y = 2400; // 靠近转轴区域的坐标Y值
+    static constexpr double UP_SCREEN_AREA_Y = 1600; // 上半屏区域的坐标Y值
+    static constexpr double DOWN_SCREEN_AREA_Y = 1700; // 下半屏区域的坐标Y值
     static constexpr double SPEED_SCALE = 2.0; // 速度加成系数
-    const int64_t WINDOW_TIME_INTERVAL = 0.5e6; // 采样窗口，单位u秒
+    const int64_t WINDOW_TIME_INTERVAL = 0.20e6; // 采样窗口，单位u秒
 };
 #define PULL_THROW_EVENT_HANDLER ::OHOS::DelayedSingleton<PullThrowSubscriberHandler>::GetInstance()
 } // namespace MMI
