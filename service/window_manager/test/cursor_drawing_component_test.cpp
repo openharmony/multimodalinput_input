@@ -567,6 +567,17 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SubscribeScreenM
 }
 
 /**
+ * @tc.name: CursorDrawingComponentTest_RegisterDisplayStatusReceiver_001
+ * @tc.desc: Test RegisterDisplayStatusReceiver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayStatusReceiver_001, TestSize.Level1)
+{
+    EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
+}
+
+/**
  * @tc.name: CursorDrawingComponentTest_UpdateMouseLayer_001
  * @tc.desc: Test UpdateMouseLayer
  * @tc.type: FUNC

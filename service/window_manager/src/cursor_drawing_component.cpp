@@ -414,6 +414,12 @@ void CursorDrawingComponent::SubscribeScreenModeChange()
     pointerInstance_->SubscribeScreenModeChange();
 }
 
+void CursorDrawingComponent::RegisterDisplayStatusReceiver()
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->RegisterDisplayStatusReceiver();
+}
+
 int32_t CursorDrawingComponent::UpdateMouseLayer(
     const PointerStyle &pointerStyle, int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
