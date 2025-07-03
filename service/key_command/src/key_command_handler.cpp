@@ -1142,7 +1142,7 @@ void KeyCommandHandler::PrintExcludeKeys()
 {
     size_t keysSize = excludeKeys_.size();
     for (size_t i = 0; i < keysSize; i++) {
-        MMI_HILOGD("keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
+        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
                    excludeKeys_[i].keyCode, excludeKeys_[i].keyAction, excludeKeys_[i].delay);
     }
 }
@@ -1154,7 +1154,7 @@ void KeyCommandHandler::PrintSeq()
     for (const auto &item : sequences_) {
         MMI_HILOGI("row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGI("keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("keyCode:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
         MMI_HILOGI("bundleName:%{public}s, abilityName:%{public}s",
@@ -1192,9 +1192,11 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 
     if (IsExcludeKey(key)) {
         if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+            MMI_HILOGD("ExcludekeyCode:%{private}d, ExcludekeyAction:%{public}d",
+                key->GetKeyCode(), key->GetKeyAction());
         } else {
-            MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+            MMI_HILOGD("ExcludekeyCode:%{private}d, ExcludekeyAction:%{public}d",
+                key->GetKeyCode(), key->GetKeyAction());
         }
         auto items = key->GetKeyItems();
         MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
@@ -1293,9 +1295,11 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("KeyEvent occured. keyCode:%d, keyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
+            key->GetKeyCode(), key->GetKeyAction());
     } else {
-        MMI_HILOGD("KeyEvent occured. keyCode:%d, keyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
+            key->GetKeyCode(), key->GetKeyAction());
     }
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
@@ -1376,8 +1380,6 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGI("Handle power key DownStart:%{public}d", isDownStart_);
     }
     if (key->GetKeyCode() != repeatKey_.keyCode && key->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-        MMI_HILOGI("Combination key currentKey:%{public}d, repeatKey:%{public}d",
-            key->GetKeyCode(), repeatKey_.keyCode);
         isDownStart_ = false;
     }
     if (!isDownStart_) {
@@ -1896,7 +1898,7 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     for (size_t i = keys_.size(); i > 0; --i) {
         if (keys_[i-1].keyCode == sequenceKey.keyCode) {
             if (keys_[i-1].keyAction == sequenceKey.keyAction) {
-                MMI_HILOGI("Is repeat key, keyCode:%d", sequenceKey.keyCode);
+                MMI_HILOGI("Is repeat key, keyCode:%{private}d", sequenceKey.keyCode);
                 return true;
             }
             MMI_HILOGI("Is not repeat key");
@@ -2111,7 +2113,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     }
     std::ostringstream oss;
     oss << sequence;
-    MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
+    MMI_HILOGI("SequenceKey matched:%{private}s", oss.str().c_str());
     if (keysSize == sequenceKeysSize) {
         return HandleMatchedSequence(sequence, isLaunchAbility);
     }
@@ -2502,7 +2504,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "Sequence: count = %zu", sequences_.size());
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
-            mprintf(fd, "keyCode: %d | keyAction: %s",
+            mprintf(fd, "keyCode: %{private}d | keyAction: %s",
                 sequenceKey.keyCode, ConvertKeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
@@ -2511,13 +2513,14 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
     mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
-        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str());
+        mprintf(fd, "keyCode: %{private}d | keyAction: %s", item.keyCode,
+            ConvertKeyActionToString(item.keyAction).c_str());
     }
     mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
     mprintf(fd, "RepeatKey: count = %zu", repeatKeys_.size());
     for (const auto &item : repeatKeys_) {
         mprintf(fd,
-            "KeyCode: %d | KeyAction: %s | Times: %d"
+            "KeyCode: %{private}d | KeyAction: %s | Times: %d"
             "| StatusConfig: %s | StatusConfigValue: %s | BundleName: %s | AbilityName: %s"
             "| Action:%s \t", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str(), item.times,
             item.statusConfig.c_str(), item.statusConfigValue ? "true" : "false",

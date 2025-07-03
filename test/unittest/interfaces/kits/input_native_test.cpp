@@ -1292,7 +1292,7 @@ static void KeyEventCallback(const struct Input_KeyEvent* keyEvent)
     EXPECT_NE(keyEvent, nullptr);
     int32_t action = OH_Input_GetKeyEventAction(keyEvent);
     int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
-    MMI_HILOGI("KeyEventCallback, action:%{public}d, keyCode:%{public}d,", action, keyCode);
+    MMI_HILOGI("KeyEventCallback, action:%{public}d, keyCode:%{private}d,", action, keyCode);
 }
 
 static void MouseEventCallback(const struct Input_MouseEvent* mouseEvent)
