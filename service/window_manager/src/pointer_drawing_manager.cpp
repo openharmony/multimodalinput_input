@@ -15,7 +15,6 @@
 
 #include "pointer_drawing_manager.h"
 
-#include <charconv>
 #include <parameters.h>
 #include <regex>
 #include <utility>
@@ -53,8 +52,6 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 
-#include "param/sys_param.h"
-
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 #undef MMI_LOG_TAG
@@ -77,7 +74,6 @@ const char* POINTER_SIZE { "pointerSize" };
 const char* MAGIC_POINTER_COLOR { "magicPointerColor" };
 const char* MAGIC_POINTER_SIZE { "magicPointerSize"};
 const char* POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
-const std::vector<std::string> DEVICE_TYPES = {};
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
@@ -149,15 +145,15 @@ const int32_t MULTIMODAL_INPUT_SERVICE_ID = 3101;
 
 namespace OHOS {
 namespace MMI {
-class DisplyStatusReceiver : public EventFwk::CommonEventSubscriber {
+class DisplayStatusReceiver : public EventFwk::CommonEventSubscriber {
 public:
-    explicit DisplyStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+    explicit DisplayStatusReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
         : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
     {
-        MMI_HILOGI("DisplyStatusReceiver register");
+        MMI_HILOGI("DisplayStatusReceiver register");
     }
 
-    virtual ~DisplyStatusReceiver() = default;
+    virtual ~DisplayStatusReceiver() = default;
 
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
@@ -230,13 +226,10 @@ void PointerDrawingManager::InitPointerCallback()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (GetHardCursorEnabled() && !initEventhandlerFlag_.load()) {
-        std::string productType = OHOS::system::GetParameter("const.build.product", "HYM");
-        if (std::find(DEVICE_TYPES.begin(), DEVICE_TYPES.end(), productType) != DEVICE_TYPES.end()) {
-            renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
-            softCursorRenderThread_ =
-                std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
-            moveRetryThread_ = std::make_unique<std::thread>([this] { this->MoveRetryThreadLoop(); });
-        }
+        renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
+        softCursorRenderThread_ =
+            std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
+        moveRetryThread_ = std::make_unique<std::thread>([this] { this->MoveRetryThreadLoop(); });
         initEventhandlerFlag_.store(true);
     }
 }
@@ -1492,6 +1485,7 @@ bool PointerDrawingManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo
 {
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    CHKPF(displayInfo);
 
     bool foldableDevicePolicyMain = false;
     bool foldableDevicePolicyFull = false;
@@ -1510,6 +1504,7 @@ bool PointerDrawingManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo
 
 Direction PointerDrawingManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
+    CHKPR(displayInfo, DIRECTION0);
     Direction direction = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     if (GetHardCursorEnabled()) {
@@ -3009,13 +3004,24 @@ void PointerDrawingManager::SubscribeScreenModeChange()
         return;
     }
     MMI_HILOGI("SubscribeScreenModeChange success");
-
+}
+ 
+void PointerDrawingManager::RegisterDisplayStatusReceiver()
+{
+    if (!GetHardCursorEnabled()) {
+        return;
+    }
+    if (initDisplayStatusReceiverFlag_) {
+        MMI_HILOGE("Display status receiver has subscribed");
+        return;
+    }
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
-    OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
-        std::make_shared<DisplyStatusReceiver>(commonEventSubscribeInfo));
+    initDisplayStatusReceiverFlag_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
+        std::make_shared<DisplayStatusReceiver>(commonEventSubscribeInfo));
+    MMI_HILOGI("Register display status receiver result:%{public}d", initDisplayStatusReceiverFlag_.load());
 }
 
 void PointerDrawingManager::InitStyle()
@@ -3285,6 +3291,18 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     UpdatePointerVisible();
 }
 
+Direction PointerDrawingManager::CalculateRenderDirection(const bool isHard, const bool isWindowRotation)
+{
+    Direction direction = DIRECTION0;
+    if (isHard) {
+        direction = displayInfo_.direction;
+    } else if (isWindowRotation) {
+        direction = static_cast<Direction>((((displayInfo_.direction - displayInfo_.displayDirection) *
+            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    }
+    return direction;
+}
+
 void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
     MOUSE_ICON mouseStyle, bool isHard)
 {
@@ -3297,7 +3315,8 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.isHard = isHard;
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
-    cfg.direction = sp->IsMirror() ? DIRECTION0 : displayInfo_.direction;
+    Direction direction = CalculateRenderDirection(isHard, IsWindowRotation(&displayInfo_));
+    cfg.direction = sp->IsMirror() ? DIRECTION0 : direction;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
         cfg.userIconPixelMap = GetUserIconCopy();
@@ -3428,6 +3447,7 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
 
 void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, OLD::DisplayInfo displayInfo)
 {
+    CHKPV(sp);
     uint32_t mainWidth = sp->GetScreenWidth();
     uint32_t mainHeight = sp->GetScreenHeight();
     std::lock_guard<std::mutex> lock(mtx_);
@@ -3437,10 +3457,21 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
         }
         if (it.second->IsMirror()) {
             auto& mirrorScreen = it.second;
+            mirrorScreen->SetIsWindowRotation(IsWindowRotation(&displayInfo));
+            bool isDirectionChanged = false;
             if (mirrorScreen->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
-                MMI_HILOGI("update rotation of mirror screen from %{public}u to %{public}d",
+                MMI_HILOGI("update mirror screen, rotation from %{public}u to %{public}d,",
                     mirrorScreen->GetRotation(), displayInfo.direction);
                 mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
+                isDirectionChanged = true;
+            }
+            if (mirrorScreen->GetDisplayDirection() != displayInfo.displayDirection) {
+                MMI_HILOGI("update mirror screen, displayDirection from %{public}d to %{public}d",
+                    mirrorScreen->GetDisplayDirection(), displayInfo.displayDirection);
+                mirrorScreen->SetDisplayDirection(displayInfo.displayDirection);
+                isDirectionChanged = true;
+            }
+            if (isDirectionChanged) {
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
             }
             MMI_HILOGD("update mirror screen dpi, mainScreen dpi: %{public}f, original mirrorScreen dpi: %{public}f",
@@ -3779,20 +3810,6 @@ void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction directi
     }
 }
 
-int ConvertToInt(const char *originValue, int defaultValue)
-{
-    if (originValue == nullptr) {
-        return defaultValue;
-    }
-    int value;
-    auto result = std::from_chars(originValue, originValue + std::strlen(originValue), value);
-    if (result.ec == std::errc()) {
-        return value;
-    } else {
-        return defaultValue;
-    }
-}
-
 bool PointerDrawingManager::GetHardCursorEnabled()
 {
     bool isHardCursorEnabled = true;
@@ -3801,12 +3818,6 @@ bool PointerDrawingManager::GetHardCursorEnabled()
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
     if (!hardwareCursorPointerManager_->IsSupported()) {
-        isHardCursorEnabled = false;
-    }
-    static CachedHandle g_handle = CachedParameterCreate("rosen.hardCursor.enabled", "1");
-    int changed = 0;
-    const char *enable = CachedParameterGetChanged(g_handle, &changed);
-    if (ConvertToInt(enable, 1) == 0) {
         isHardCursorEnabled = false;
     }
     return isHardCursorEnabled;

@@ -143,7 +143,7 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     if (cfg.direction) {
-        int32_t directionFlag = cfg.isHard ? -1 : 0;
+        int32_t directionFlag = -1;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         canvas.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
