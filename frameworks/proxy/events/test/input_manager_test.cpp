@@ -978,7 +978,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_14, TestSize.Level
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+        MMI_HILOGD("Subscribe key event %{private}d down trigger callback", keyEvent->GetKeyCode());
     });
     EXPECT_TRUE(subscribeId >= 0);
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
@@ -1017,7 +1017,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_15, TestSize.Level
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+        MMI_HILOGD("Subscribe key event %{private}d down trigger callback", keyEvent->GetKeyCode());
     });
     EXPECT_TRUE(subscribeId >= 0);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
@@ -1043,7 +1043,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_020, TestSize.Leve
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+        MMI_HILOGD("Subscribe key event %{private}d down trigger callback", keyEvent->GetKeyCode());
     });
     EXPECT_TRUE(subscribeId >= 0);
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
@@ -1082,7 +1082,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_021, TestSize.Leve
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-        MMI_HILOGD("Subscribe key event %{public}d down trigger callback", keyEvent->GetKeyCode());
+        MMI_HILOGD("Subscribe key event %{private}d down trigger callback", keyEvent->GetKeyCode());
     });
     EXPECT_TRUE(subscribeId >= 0);
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();

@@ -189,7 +189,7 @@ void KeyShortcutManager::UnregisterHotKey(int32_t shortcutId)
 bool KeyShortcutManager::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    MMI_HILOGI("Handle key event(No.%{public}d,KC:%{public}d,KA:%{public}d,PressedKeys:[%{public}s])",
+    MMI_HILOGI("Handle key event(No.%{public}d,KC:%{private}d,KA:%{public}d,PressedKeys:[%{public}s])",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), FormatPressedKeys(keyEvent).c_str());
     ResetTriggering(keyEvent);
     if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
@@ -605,7 +605,7 @@ bool KeyShortcutManager::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent)
             continue;
         }
         MMI_HILOGI("Matched shortcut[No.%{public}d]"
-            "(0x%{public}x,%{public}d,%{public}d,%{public}d,SESSION:%{public}d)",
+            "(0x%{public}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
             item.first, shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime,
             shortcut.triggerType, shortcut.session);
         TriggerDown(keyEvent, item.first, shortcut);
