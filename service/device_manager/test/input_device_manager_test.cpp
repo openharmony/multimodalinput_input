@@ -434,6 +434,78 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardType_005, Tes
 }
 
 /**
+ * @tc.name: InputDeviceManagerTest_GetKeyboardType_006
+ * @tc.desc: Test the function GetKeyboardType with virtual device id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardType_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1000;
+    int32_t keyboardType = 0;
+    auto inputDevice = std::make_shared<InputDevice>();
+    inputDeviceManager.virtualInputDevices_[deviceId] = inputDevice;
+    EXPECT_EQ(inputDeviceManager.GetKeyboardType(deviceId, keyboardType), RET_OK);
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_NONE);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetKeyboardType_007
+ * @tc.desc: Test the function GetKeyboardType with touchscreen id without virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardType_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    info.enable = true;
+    inputDeviceManager.inputDevice_.insert(std::make_pair(deviceId, info));
+    int32_t keyboardType = 0;
+    EXPECT_EQ(inputDeviceManager.GetKeyboardType(deviceId, keyboardType), RET_OK);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetKeyboardType_008
+ * @tc.desc: Test the function GetKeyboardType with touchscreen id with virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardType_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    info.enable = true;
+    inputDeviceManager.inputDevice_.insert(std::make_pair(deviceId, info));
+    int32_t keyboardType = 0;
+ 
+    int32_t deviceId1 = 1000;
+    auto device1 = std::make_shared<InputDevice>();
+    device1->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId1] = device1;
+ 
+    int32_t deviceId2 = 1001;
+    auto device2 = std::make_shared<InputDevice>();
+    device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
+ 
+    EXPECT_EQ(inputDeviceManager.GetKeyboardType(deviceId, keyboardType), RET_OK);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_ALPHABETICKEYBOARD);
+#else // OHOS_BUILD_ENABLE_VKEYBOARD
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_UNKNOWN);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+}
+
+/**
  * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_001
  * @tc.desc: Test the function OnEnableInputDevice
  * @tc.type: FUNC
@@ -1680,6 +1752,285 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsLocalDevice_Test_01, T
 
     isLocalDevice = inputDevice.IsLocalDevice(MIN_VIRTUAL_INPUT_DEVICE_ID);
     ASSERT_EQ(isLocalDevice, false);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchscreenKeyboardType_001
+ * @tc.desc: Test the function GetTouchscreenKeyboardType, non-touchscreen case.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchscreenKeyboardType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = false;
+    int32_t keyboardType = 0;
+    EXPECT_EQ(inputDeviceManager.GetTouchscreenKeyboardType(info, keyboardType), RET_ERR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchscreenKeyboardType_002
+ * @tc.desc: Test the function GetTouchscreenKeyboardType, touchscreen with no virtual devices.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchscreenKeyboardType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    int32_t keyboardType = 0;
+    EXPECT_EQ(inputDeviceManager.GetTouchscreenKeyboardType(info, keyboardType), RET_ERR);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchscreenKeyboardType_003
+ * @tc.desc: Test the function GetTouchscreenKeyboardType, touchscreen with floating keyboard.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchscreenKeyboardType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    int32_t keyboardType = 0;
+ 
+    int32_t deviceId = 1;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId] = device;
+ 
+    EXPECT_EQ(inputDeviceManager.GetTouchscreenKeyboardType(info, keyboardType), RET_OK);
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_DIGITALKEYBOARD);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchscreenKeyboardType_004
+ * @tc.desc: Test the function GetTouchscreenKeyboardType, touchscreen with full keyboard.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchscreenKeyboardType_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    int32_t keyboardType = 0;
+ 
+    int32_t deviceId = 1;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId] = device;
+ 
+    int32_t deviceId2 = 2;
+    auto device2 = std::make_shared<InputDevice>();
+    device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
+ 
+    EXPECT_EQ(inputDeviceManager.GetTouchscreenKeyboardType(info, keyboardType), RET_OK);
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_ALPHABETICKEYBOARD);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetVirtualKeyboardType_001
+ * @tc.desc: Test the function GetVirtualKeyboardType with empty virtual device list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    int32_t keyboardType = 0;
+    EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId, keyboardType), RET_ERR);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetVirtualKeyboardType_002
+ * @tc.desc: Test the function GetVirtualKeyboardType with non-keyboard virtual device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    int32_t keyboardType = 0;
+    inputDeviceManager.virtualInputDevices_[deviceId] = std::make_shared<InputDevice>();
+    EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId, keyboardType), RET_OK);
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_NONE);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetVirtualKeyboardType_003
+ * @tc.desc: Test the function GetVirtualKeyboardType with floating virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    int32_t keyboardType = 0;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId] = device;
+    EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId, keyboardType), RET_OK);
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_DIGITALKEYBOARD);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_GetVirtualKeyboardType_004
+ * @tc.desc: Test the function GetVirtualKeyboardType with full virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    int32_t keyboardType = 0;
+    auto device1 = std::make_shared<InputDevice>();
+    device1->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId] = device1;
+ 
+    int32_t deviceId2 = 2;
+    int32_t keyboardType2 = 0;
+    auto device2 = std::make_shared<InputDevice>();
+    device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
+    EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId, keyboardType), RET_OK);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_ALPHABETICKEYBOARD);
+#else // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_DIGITALKEYBOARD);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+ 
+    EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId2, keyboardType2), RET_OK);
+    EXPECT_EQ(keyboardType2, KEYBOARD_TYPE_NONE);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_001
+ * @tc.desc: Test the function FillInputDeviceWithVirtualCapability with non-touchscreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto inputDevice = std::make_shared<InputDevice>();
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = false;
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.FillInputDeviceWithVirtualCapability(inputDevice, info));
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), false);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_002
+ * @tc.desc: Test the function FillInputDeviceWithVirtualCapability with touchscreen but no virtual devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto inputDevice = std::make_shared<InputDevice>();
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.FillInputDeviceWithVirtualCapability(inputDevice, info));
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), false);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_003
+ * @tc.desc: Test the function FillInputDeviceWithVirtualCapability with touchscreen and floating virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto inputDevice = std::make_shared<InputDevice>();
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+ 
+    int32_t deviceId2 = 2;
+    auto device2 = std::make_shared<InputDevice>();
+    device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
+ 
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.FillInputDeviceWithVirtualCapability(inputDevice, info));
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), false);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_004
+ * @tc.desc: Test the function FillInputDeviceWithVirtualCapability with touchscreen and virtual trackpad
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto inputDevice = std::make_shared<InputDevice>();
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+ 
+    int32_t deviceId2 = 2;
+    auto device2 = std::make_shared<InputDevice>();
+    device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
+ 
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.FillInputDeviceWithVirtualCapability(inputDevice, info));
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_005
+ * @tc.desc: Test the function FillInputDeviceWithVirtualCapability with touchscreen and full virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtualCapability_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto inputDevice = std::make_shared<InputDevice>();
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+ 
+    int32_t deviceId2 = 2;
+    auto device2 = std::make_shared<InputDevice>();
+    device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
+ 
+    int32_t deviceId3 = 3;
+    auto device3 = std::make_shared<InputDevice>();
+    device3->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    inputDeviceManager.virtualInputDevices_[deviceId3] = device3;
+ 
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.FillInputDeviceWithVirtualCapability(inputDevice, info));
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
 }
 } // namespace MMI
 } // namespace OHOS
