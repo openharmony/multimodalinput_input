@@ -313,7 +313,6 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.isPointerDevice) {
             return true;
@@ -324,7 +323,6 @@ bool InputDeviceManager::HasPointerDevice()
 
 bool InputDeviceManager::HasVirtualPointerDevice()
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsPointerDevice(it->second)) {
             return true;
@@ -337,7 +335,6 @@ bool InputDeviceManager::HasVirtualPointerDevice()
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 bool InputDeviceManager::HasVirtualKeyboardDevice()
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsKeyboardDevice(it->second)) {
             return true;
@@ -350,7 +347,6 @@ bool InputDeviceManager::HasVirtualKeyboardDevice()
 bool InputDeviceManager::HasTouchDevice()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.isTouchableDevice) {
             return true;
@@ -782,7 +778,6 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
 bool InputDeviceManager::CheckDuplicateInputDevice(struct libinput_device *inputDevice)
 {
     CHKPF(inputDevice);
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
@@ -800,7 +795,6 @@ bool InputDeviceManager::CheckDuplicateInputDevice(struct libinput_device *input
 bool InputDeviceManager::CheckDuplicateInputDevice(std::shared_ptr<InputDevice> inputDevice)
 {
     CHKPF(inputDevice);
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (const auto &item: virtualInputDevices_) {
         CHKPC(item.second);
         if (item.second->GetName() == inputDevice->GetName()) {
@@ -813,13 +807,11 @@ bool InputDeviceManager::CheckDuplicateInputDevice(std::shared_ptr<InputDevice> 
 
 void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const struct InputDeviceInfo& info)
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     inputDevice_[deviceId] = info;
 }
 
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     virtualInputDevices_[deviceId] = inputDevice;
 }
 
@@ -827,7 +819,6 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
     struct libinput_device *inputDevice, int32_t &deviceId, bool &enable)
 {
     CHKPV(inputDevice);
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin == inputDevice) {
             deviceId = it->first;
@@ -845,7 +836,6 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
 
 int32_t InputDeviceManager::RemoveVirtualInputDeviceInner(int32_t deviceId, struct InputDeviceInfo& info)
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     auto iter = virtualInputDevices_.find(deviceId);
     if (iter == virtualInputDevices_.end()) {
         MMI_HILOGE("No virtual deviceId:%{public}d existed", deviceId);
@@ -862,7 +852,6 @@ int32_t InputDeviceManager::RemoveVirtualInputDeviceInner(int32_t deviceId, stru
 
 bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (const auto &item : inputDevice_) {
         if ((!item.second.isRemote && item.second.isPointerDevice) ||
             (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
@@ -1150,7 +1139,6 @@ bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
 
 bool InputDeviceManager::IsLocalDevice(int32_t deviceId)
 {
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     auto iter = inputDevice_.find(deviceId);
     return (iter != inputDevice_.end());
 }
@@ -1163,7 +1151,6 @@ void InputDeviceManager::FillInputDeviceWithVirtualCapability(
         // not adding capability from virtual devices for devices other than the touch screen.
         return;
     }
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsKeyboardDevice(it->second)) {
             inputDevice->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
@@ -1182,7 +1169,6 @@ int32_t InputDeviceManager::GetTouchscreenKeyboardType(const InputDeviceInfo &de
     }
     bool hasVirtualKeyboard = false;
     bool hasVirtualTrackpad = false;
-    std::lock_guard<std::mutex> guard(inputDeviceMutex_);
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsKeyboardDevice(it->second)) {
             hasVirtualKeyboard = true;

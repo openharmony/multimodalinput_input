@@ -133,7 +133,6 @@ private:
     int32_t GetVirtualKeyboardType(int32_t deviceId, int32_t &keyboardType);
 
 private:
-    mutable std::mutex inputDeviceMutex_;
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<int32_t, int32_t> recoverList_;
     std::map<int32_t, std::shared_ptr<InputDevice>> virtualInputDevices_;
