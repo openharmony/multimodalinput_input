@@ -83,7 +83,7 @@ bool EventInterceptorHandler::KeyInterceptByHostOSWhiteList(int32_t keyCode)
     std::string keyString = std::to_string(keyCode);
     keyString += ";";
     bool isIntercept = keyevent_intercept_whitelist->find(keyString) != std::string::npos;
-    MMI_HILOGD("Received key event is %{public}d isIntercept is %{public}d", keyCode, isIntercept);
+    MMI_HILOGD("Received key event is %{private}d isIntercept is %{public}d", keyCode, isIntercept);
     return isIntercept;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
