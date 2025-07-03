@@ -249,7 +249,7 @@ static bool MatchCombinationKey(KeyOption &combinationKeyOption, KeyEvent &keyEv
     int32_t infoFinalKey = combinationKeyOption.GetFinalKey();
     int32_t keyEventFinalKey = keyEvent.GetKeyCode();
     bool isFinalKeydown = combinationKeyOption.IsFinalKeyDown();
-    MMI_HILOGD("InfoFinalKey:%{public}d,keyEventFinalKey:%{public}d,isFinalKeydown:%{public}d",
+    MMI_HILOGD("InfoFinalKey:%{private}d,keyEventFinalKey:%{private}d,isFinalKeydown:%{public}d",
         infoFinalKey, keyEventFinalKey, isFinalKeydown);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
         !IsMatchKeyAction(isFinalKeydown, keyEvent.GetKeyAction())) {
