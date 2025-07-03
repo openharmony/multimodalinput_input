@@ -678,7 +678,11 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         }
     } else {
         pointerEvent->RemovePointerItem(pointerId);
-        pointerId += DEFAULT_POINTER_ID;
+        if (IsCastInject(pointerEvent->GetDeviceId())) {
+            pointerId += CAST_POINTER_ID;
+        } else {
+            pointerId += DEFAULT_POINTER_ID;
+        }
         pointerItem.SetPointerId(pointerId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetPointerId(pointerId);
