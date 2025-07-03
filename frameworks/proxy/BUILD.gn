@@ -767,6 +767,7 @@ ohos_unittest("InputDeviceImplTest") {
   sources = [
     #"event_handler/src/input_device_impl.cpp",
     "event_handler/test/input_device_impl_test.cpp",
+    "event_handler/test/client_msg_handler_test.cpp",
   ]
 
   configs = [

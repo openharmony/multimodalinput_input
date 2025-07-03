@@ -81,9 +81,9 @@ bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
 
 namespace MMI {
 namespace {
-constexpr int32_t CAST_INPUT_DEVICEID{ 0xAAAAAAFF };
-constexpr int32_t CAST_SCREEN_DEVICEID{ 0xAAAAAAFE };
-}  // namespace
+constexpr int32_t CAST_INPUT_DEVICEID {0xAAAAAAFF};
+constexpr int32_t CAST_SCREEN_DEVICEID {0xAAAAAAFE};
+} // namespace
 
 std::string ReadJsonFile(const std::string &filePath)
 {
@@ -95,10 +95,10 @@ std::string ReadJsonFile(const std::string &filePath)
 
 class InputWindowsManagerOneTest : public testing::Test {
 public:
-    static void SetUpTestCase(void){};
-    static void TearDownTestCase(void){};
-    void SetUp(void){};
-    void SetDown(void){};
+    static void SetUpTestCase(void) {};
+    static void TearDownTestCase(void) {};
+    void SetUp(void) {};
+    void SetDown(void) {};
 };
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -433,7 +433,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = 0;
-    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.pointerHotAreas = {
+        {0, 0, 30, 40}
+    };
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -474,7 +476,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = 0;
-    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.pointerHotAreas = {
+        {0, 0, 30, 40}
+    };
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -516,7 +520,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = 0;
-    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.pointerHotAreas = {
+        {0, 0, 30, 40}
+    };
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -537,7 +543,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->pressedButtons_.insert(1);
-    Rect rect{
+    Rect rect {
         .x = 100,
         .y = 100,
         .width = 300,
@@ -575,7 +581,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = 0;
-    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.pointerHotAreas = {
+        {0, 0, 30, 40}
+    };
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     windowInfo.uiExtentionWindowInfo.clear();
@@ -618,7 +626,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = 0;
-    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.pointerHotAreas = {
+        {0, 0, 30, 40}
+    };
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     windowInfo.uiExtentionWindowInfo.clear();
@@ -756,7 +766,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     std::optional<WindowInfo> result1 = inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent);
     EXPECT_FALSE(result1.has_value());
 }
-#endif  // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 /* *
@@ -772,7 +782,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPositionDispl
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     EXPECT_EQ(inputWindowsManager->GetPositionDisplayDirection(id), Direction::DIRECTION0);
 }
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateCustomStyle_001
@@ -790,7 +800,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateCustomStyl
     PointerStyle pointerStyle1;
     pointerStyle1.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     pointerStyle1.size = 11;
-    std::map<int32_t, PointerStyle> tmpPointerStyle = { { windowId + 1, pointerStyle1 } };
+    std::map<int32_t, PointerStyle> tmpPointerStyle = {
+        {windowId + 1, pointerStyle1}
+    };
     inputWindowsManager->pointerStyle_.insert(std::make_pair(1, tmpPointerStyle));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateCustomStyle(windowId, pointerStyle));
 
@@ -1048,7 +1060,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     WindowInfo info;
     info.id = 50;
     info.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
-    Rect rect{
+    Rect rect {
         .x = 0,
         .y = 0,
         .width = 300,
@@ -1090,7 +1102,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     WindowInfo info;
     info.id = 0;
     info.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
-    Rect rect{
+    Rect rect {
         .x = 0,
         .y = 0,
         .width = 300,
@@ -1233,7 +1245,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReverseRotateDis
     OLD::DisplayInfo info;
     double x = 0.0f;
     double y = 0.0f;
-    Coordinate2D cursorPos = { 0.0, 0.0 };
+    Coordinate2D cursorPos = {0.0, 0.0};
     info.direction = Direction::DIRECTION90;
     info.displayDirection = Direction::DIRECTION0;
     info.width = 0;
@@ -1256,7 +1268,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReverseRotateDis
     OLD::DisplayInfo info;
     double x = 0.0f;
     double y = 0.0f;
-    Coordinate2D cursorPos = { 0.0, 0.0 };
+    Coordinate2D cursorPos = {0.0, 0.0};
     info.direction = Direction::DIRECTION180;
     info.displayDirection = Direction::DIRECTION0;
     info.width = 0;
@@ -1283,7 +1295,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePoi
     inputWindowsManager->lastPointerEvent_ = pointerEvent;
     EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
 }
-#endif  // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_AppendExtraData_001
@@ -1542,8 +1554,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDispla
     displayInfo1.dpi = -10;
     displayInfo1.uniq = "default0";
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager.displayGroupInfoMap_.end())
-    {
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displayInfo1);
     }
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
@@ -1588,8 +1599,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPoi
     auto ret = inputWindowsManager->ShiftAppTouchPointerEvent(info);
     ASSERT_EQ(ret, RET_ERR);
 }
-#endif  // OHOS_BUILD_ENABLE_TOUCH
-
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_PrintHighZorder_001
@@ -1606,7 +1616,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintHighZorder_
     WindowInfo windowInfo;
     windowInfo.id = 2;
     windowInfo.flags = 0;
-    windowInfo.pointerHotAreas = { { 0, 0, 30, 40 } };
+    windowInfo.pointerHotAreas = {
+        {0, 0, 30, 40}
+    };
     windowInfo.windowInputType = WindowInputType::NORMAL;
     std::vector<WindowInfo> windowsInfo = {windowInfo};
     pointerEvent->SetZOrder(1.0f);
@@ -2057,5 +2069,135 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerTest_SendCancelEventWhen
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(1);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
 }
-}  // namespace MMI
-}  // namespace OHOS
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ProcessInjectEventGlobalXY
+ * @tc.desc: Test the funcation ProcessInjectEventGlobalXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessInjectEventGlobalXY, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetGlobalX(DBL_MAX);
+    pointerItem.SetGlobalY(DBL_MAX);
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->ClearFlag();
+    int32_t useCoordinate = 0;
+    auto pointerId = 1;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.offsetX = 0;
+    displayInfo.offsetY = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+    useCoordinate = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+
+    pointerItem.SetPointerId(pointerId);
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_EQ(pointerEvent->GetPointerCount(), pointerId);
+    pointerEvent->SetPointerId(pointerId);
+    EXPECT_TRUE(pointerEvent->GetPointerItem(pointerId, pointerItem));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+
+    auto globalValue = 15.00;
+    pointerEvent->pointers_.clear();
+    pointerItem.SetGlobalX(globalValue);
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+
+    pointerEvent->pointers_.clear();
+    pointerItem.SetGlobalX(globalValue);
+    pointerItem.SetGlobalY(globalValue);
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+
+    globalValue = -15.00;
+    pointerEvent->pointers_.clear();
+    pointerItem.SetGlobalX(globalValue);
+    pointerEvent->pointers_.push_back(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_GetMainScreenDisplayInfo_001
+ * @tc.desc: Test GetMainScreenDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetMainScreenDisplayInfo_001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::vector<OLD::DisplayInfo> displaysInfo;
+    OLD::DisplayInfo mainScreenDisplayInfo;
+    mainScreenDisplayInfo.id = 100;
+    mainScreenDisplayInfo.uniq = "uniq";
+    mainScreenDisplayInfo.validHeight = 2;
+    mainScreenDisplayInfo.validWidth = 2;
+    mainScreenDisplayInfo.height = 2;
+    mainScreenDisplayInfo.width = 2;
+    mainScreenDisplayInfo.offsetX = 0;
+    mainScreenDisplayInfo.offsetY = 0;
+    mainScreenDisplayInfo.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MIRROR;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
+    displaysInfo.push_back(mainScreenDisplayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
+    displaysInfo.clear();
+    mainScreenDisplayInfo.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MAIN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetMainScreenDisplayInfo(displaysInfo, mainScreenDisplayInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ResetPointerPosition_001
+ * @tc.desc: Test ResetPointerPosition
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetPointerPosition_001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo currentDisplay;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(currentDisplay);
+    }
+    displayGroupInfo.displaysInfo.push_back(currentDisplay);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
+    currentDisplay.id = 1;
+    currentDisplay.width = 500;
+    currentDisplay.height = 500;
+    currentDisplay.displayDirection = DIRECTION0;
+    currentDisplay.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MIRROR;
+    displayGroupInfo.displaysInfo.clear();
+    it->second.displaysInfo.clear();
+    displayGroupInfo.displaysInfo.push_back(currentDisplay);
+    it->second.displaysInfo.push_back(currentDisplay);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
+    displayGroupInfo.displaysInfo.clear();
+    it->second.displaysInfo.clear();
+    CursorPosition cursorPosCur;
+    cursorPosCur.cursorPos.x = 1;
+    cursorPosCur.cursorPos.y = 1;
+    inputWindowsMgr.cursorPosMap_[0] = cursorPosCur;
+    currentDisplay.displayDirection = DIRECTION90;
+    currentDisplay.displaySourceMode = OHOS::MMI::DisplaySourceMode::SCREEN_MAIN;
+    currentDisplay.rsId = 1;
+    it->second.displaysInfo.push_back(currentDisplay);
+    currentDisplay.rsId = 0;
+    displayGroupInfo.displaysInfo.push_back(currentDisplay);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
+}
+} // namespace MMI
+} // namespace OHOS
