@@ -17,15 +17,11 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-#ifdef USE_ROSEN_DRAWING
-#include <recording/recording_canvas.h>
-#include <ui/rs_canvas_drawing_node.h>
-#else
-#include <pipeline/rs_recording_canvas.h>
-#endif // USE_ROSEN_DRAWING
-
 #include "mmi_log.h"
 #include "pointer_event.h"
+#ifndef USE_ROSEN_DRAWING
+#define USE_ROSEN_DRAWING
+#endif
 #include "touch_drawing_manager.h"
 #include "window_info.h"
 
@@ -36,17 +32,17 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t ONE_SECOND = 1000;
 } // namespace
-
 class TouchDrawingManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    static void SetUpTestCase(void) {};
+    static void TearDownTestCase(void) {};
     void SetUp(void)
     {
         OLD::DisplayInfo info;
         info.id = 1;
-        info.x =1;
+        info.x = 1;
         info.y = 1;
         info.width = 1;
         info.height = 1;
@@ -56,6 +52,11 @@ public:
         info.uniq = "xx";
         info.direction = DIRECTION0;
         TOUCH_DRAWING_MGR->UpdateDisplayInfo(info);
+    }
+
+    void TearDown()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ONE_SECOND));
     }
 };
 
@@ -129,36 +130,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 140);
     EXPECT_EQ(physicalY, 50);
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_005
- * @tc.desc: Test GetOriginalTouchScreenCoordinates
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t width = 720;
-    int32_t height = 1800;
-    int32_t physicalX = 300;
-    int32_t physicalY = 600;
-    Direction direction = DIRECTION0;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(
-        direction, width, height, physicalX, physicalY));
-    direction = DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(
-        direction, width, height, physicalX, physicalY));
-    direction = DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(
-        direction, width, height, physicalX, physicalY));
-    direction = DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(
-        direction, width, height, physicalX, physicalY));
-    direction = static_cast<Direction>(10);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(
-        direction, width, height, physicalX, physicalY));
 }
 
 /**

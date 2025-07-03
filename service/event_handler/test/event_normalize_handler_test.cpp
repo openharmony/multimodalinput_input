@@ -33,13 +33,19 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t POINTER_MOVEFLAG { 7 };
+constexpr int32_t POINTER_MOVEFLAG {7};
+constexpr int32_t ONE_SECOND = 1000;
 } // namespace
 
 class EventNormalizeHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
+
+    void TearDown()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ONE_SECOND));
+    }
 
 private:
     static void SetupTouchpad();
@@ -49,7 +55,7 @@ private:
     static GeneralUwbRemoteControl vUwbRemoteControl_;
     static GeneralTouchpad vTouchpad_;
     static LibinputWrapper libinput_;
-    int32_t trackingID_ { 0 };
+    int32_t trackingID_ {0};
 };
 
 GeneralUwbRemoteControl EventNormalizeHandlerTest::vUwbRemoteControl_;
@@ -120,7 +126,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
 {
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
-    libinput_event* event = new (std::nothrow) libinput_event;
+    libinput_event *event = new (std::nothrow) libinput_event;
     ASSERT_NE(event, nullptr);
     event->type = LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN;
     handler.HandleEvent(event, frameTime);
@@ -176,7 +182,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
 {
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
-    libinput_event* event = nullptr;
+    libinput_event *event = nullptr;
     EventResampleHdr->pointerEvent_ = PointerEvent::Create();
     bool ret = handler.ProcessNullEvent(event, frameTime);
     ASSERT_FALSE(ret);
@@ -400,7 +406,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
 {
     EventNormalizeHandler handler;
     int64_t frameTime = 100;
-    libinput_event* event = nullptr;
+    libinput_event *event = nullptr;
     EventResampleHdr->pointerEvent_ = PointerEvent::Create();
     MMISceneBoardJudgement judgement;
     judgement.IsSceneBoardEnabled();
@@ -851,7 +857,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
     std::cout << "varMoveFlag: " << POINTER_MOVEFLAG << std::endl;
     for (int32_t index = 1; index < POINTER_MOVEFLAG; ++index) {
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
-        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + index*30);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + index * 30);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_PRESSURE, 321);
         vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_MOVEFLAG, varMoveFlag);
@@ -863,7 +869,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
         vUwbRemoteControl_.SendEvent(EV_KEY, BTN_TOUCH, 0);
         vUwbRemoteControl_.SendEvent(EV_SYN, SYN_REPORT, 0);
     }
-    libinput_event* event = libinput_.Dispatch();
+    libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
     while (event != nullptr) {
         auto type = libinput_event_get_type(event);

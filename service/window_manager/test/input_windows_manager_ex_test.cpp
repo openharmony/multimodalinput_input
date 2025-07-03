@@ -20,7 +20,6 @@
 #include "input_windows_manager.h"
 #include "mmi_matrix3.h"
 #include "mock.h"
-#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {

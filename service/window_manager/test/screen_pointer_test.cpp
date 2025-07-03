@@ -35,6 +35,30 @@ public:
 };
 
 /**
+ * @tc.name: ScreenPointerTest_UpdateScreenInfo_001
+ * @tc.desc: Test UpdateScreenInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdateScreenInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, screenInfo);
+    ASSERT_NE(screenpointer, nullptr);
+    auto ret = screenpointer->InitSurface();
+    EXPECT_EQ(ret, true);
+    uint32_t width = screenpointer->GetScreenWidth();
+    EXPECT_EQ(width, 0);
+    uint32_t height = screenpointer->GetScreenHeight();
+    EXPECT_EQ(height, 0);
+    EXPECT_NO_FATAL_FAILURE(screenpointer->UpdateScreenInfo(screenInfo));
+}
+
+/**
  * @tc.name: ScreenPointerTest_GetRenderDPI_001
  * @tc.desc: Test GetRenderDPI
  * @tc.type: Function
@@ -485,6 +509,45 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_001, TestSize.Level1
     };
     ASSERT_NE(screenpointer->RequestBuffer(cfg, isCommonBuffer), nullptr);
     ASSERT_FALSE(isCommonBuffer);
+    ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
+    delete screenpointer;
+}
+
+/**
+ * @tc.name: ScreenPointerTest_RequestBuffer_002
+ * @tc.desc: Test RequestBuffer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
+    screenpointer->bufferId_ = 5;
+    RenderConfig defaultCursorCfg {
+        .style_ = MOUSE_ICON::DEFAULT,
+        .align_ = ICON_TYPE::ANGLE_NW,
+        .path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg",
+        .color = 0,
+        .size = 1,
+        .direction = Direction::DIRECTION0,
+        .dpi = screenpointer->GetDPI() * screenpointer->GetScale(),
+        .isHard = true,
+    };
+    if (OHOS::system::GetParameter("const.build.product", "HYM") == "HPR") {
+        defaultCursorCfg.size = 2;
+    }
+    bool isCommoBuffer;
+    ASSERT_TRUE(screenpointer->IsDefaultCfg(defaultCursorCfg));
+    ASSERT_NE(screenpointer->RequestBuffer(defaultCursorCfg, isCommoBuffer), nullptr);
+    ASSERT_FALSE(isCommoBuffer);
     ASSERT_NE(screenpointer->GetCurrentBuffer(), nullptr);
     delete screenpointer;
 }
