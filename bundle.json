@@ -103,7 +103,8 @@
         "ipc",
         "sensor",
         "idl_tool",
-        "runtime_core"
+        "runtime_core",
+        "jsoncpp"
       ],
       "third_party": [
         "libuv",
