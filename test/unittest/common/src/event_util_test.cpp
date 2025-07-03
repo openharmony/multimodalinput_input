@@ -265,14 +265,14 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(pointerEvent);
-    MMI_HILOGD("before:%{public}s", before.c_str());
+    MMI_HILOGD("before:%{private}s", before.c_str());
     strEventDump_.clear();
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     std::string result = DumpInputEvent(pointerEvent);
-    MMI_HILOGD("result:%{public}s", result.c_str());
+    MMI_HILOGD("result:%{private}s", result.c_str());
     return result == after;
 }
 
