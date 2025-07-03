@@ -504,15 +504,9 @@ static ani_object CreatAxisRangesObj(ani_env *env, const std::string &sourceType
 {
     ani_object AxisRangesObj = nullptr;
 
-    ani_namespace ns{};
-    if (ANI_OK != env->FindNamespace("L@ohos/multimodalInput/inputDevice/inputDevice;", &ns)) {
-        MMI_HILOGE("Not found namespace 'LinputDevice'");
-        return AxisRangesObj;
-    }
-
-    static const char *className = "LAxisRangeImpl;";
+    static const char *className = "@ohos.multimodalInput.inputDevice.inputDevice.AxisRangeImpl";
     ani_class cls;
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
+    if (ANI_OK != env->FindClass(className, &cls)) {
         MMI_HILOGE("Not found className %{public}s.", className);
         return AxisRangesObj;
     }
@@ -580,15 +574,9 @@ static ani_object SetCreateArrayAxisRangesObj(ani_env *env, std::shared_ptr<Inpu
 
 static ani_object CreateDeviceInfoObj(ani_env *env, std::shared_ptr<InputDevice> &inputDevice)
 {
-    ani_namespace ns{};
-    if (ANI_OK != env->FindNamespace("L@ohos/multimodalInput/inputDevice/inputDevice;", &ns)) {
-        MMI_HILOGE("Not found namespace 'LinputDevice'");
-        return nullptr;
-    }
-
-    static const char *className = "LInputDeviceDataImpl;";
+    static const char *className = "@ohos.multimodalInput.inputDevice.inputDevice.InputDeviceDataImpl";
     ani_class cls;
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
+    if (ANI_OK != env->FindClass(className, &cls)) {
         MMI_HILOGE("Not found className %{public}s.", className);
         return nullptr;
     }
