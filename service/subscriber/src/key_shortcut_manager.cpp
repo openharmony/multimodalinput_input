@@ -209,10 +209,10 @@ void KeyShortcutManager::LoadSystemKeys()
     char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
 
     if (cfgPath == nullptr) {
-        MMI_HILOGE("No '%{public}s' was found", cfgName);
+        MMI_HILOGE("No '%{private}s' was found", cfgName);
         return;
     }
-    MMI_HILOGI("Config of system keys:%{public}s", cfgPath);
+    MMI_HILOGI("Config of system keys:%{private}s", cfgPath);
     ReadSystemKeys(std::string(cfgPath));
 }
 
@@ -297,7 +297,7 @@ void KeyShortcutManager::LoadExceptionalSystemKeys()
         MMI_HILOGE("GetoneCfgFile failed");
         return;
     }
-    MMI_HILOGI("Config of exceptional system keys:%{public}s", cfgPath);
+    MMI_HILOGI("Config of exceptional system keys:%{private}s", cfgPath);
     ReadExceptionalSystemKeys(std::string(cfgPath));
 }
 
@@ -913,10 +913,10 @@ void KeyShortcutManager::LoadHotkeys()
     char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
 
     if ((cfgPath == nullptr) || (cfgPath[0] == '\0') || (strlen(cfgPath) > MAX_PATH_LEN)) {
-        MMI_HILOGE("No '%{public}s' was found", cfgPath);
+        MMI_HILOGE("No '%{private}s' was found", cfgPath);
         return;
     }
-    MMI_HILOGI("Config of hotkey:%{public}s", cfgPath);
+    MMI_HILOGI("Config of hotkey:%{private}s", cfgPath);
     ReadHotkeys(std::string(cfgPath));
 }
 

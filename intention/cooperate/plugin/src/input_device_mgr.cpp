@@ -213,7 +213,7 @@ void InputDeviceMgr::RemoveAllRemoteInputDevice(const std::string &networkId)
 void InputDeviceMgr::DispDeviceInfo(std::shared_ptr<IDevice> device)
 {
     CHKPV(device);
-    FI_HILOGI("  device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
+    FI_HILOGI("  device %{public}d:%{private}s", device->GetId(), device->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{private}s\"", device->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", device->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", device->GetVendor());

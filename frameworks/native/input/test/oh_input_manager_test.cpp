@@ -1464,7 +1464,7 @@ static void MouseEventCallback(const struct Input_MouseEvent* mouseEvent)
     int32_t action = OH_Input_GetMouseEventAction(mouseEvent);
     int32_t displayX = OH_Input_GetMouseEventDisplayX(mouseEvent);
     int32_t displayY = OH_Input_GetMouseEventDisplayY(mouseEvent);
-    MMI_HILOGI("MouseEventCallback, action:%{public}d, displayX:%{public}d, displayY:%{public}d",
+    MMI_HILOGI("MouseEventCallback, action:%{public}d, displayX:%{private}d, displayY:%{private}d",
         action, displayX, displayY);
 }
 

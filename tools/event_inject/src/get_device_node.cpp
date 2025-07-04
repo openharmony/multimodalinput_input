@@ -87,12 +87,12 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
 {
     char realPath[PATH_MAX] = {};
     if (realpath(DEVICES_INFO_PATH.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("The path is error, path:%{public}s", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGE("The path is error, path:%{private}s", DEVICES_INFO_PATH.c_str());
         return {};
     }
     FILE* fp = fopen(DEVICES_INFO_PATH.c_str(), "r");
     if (fp == nullptr) {
-        MMI_HILOGW("Open file:%{public}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("Open file:%{private}s failed", DEVICES_INFO_PATH.c_str());
         return {};
     }
     char buf[READ_CMD_BUFF_SIZE] = {};
@@ -101,7 +101,7 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
         deviceStrs.push_back(buf);
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("Close file:%{public}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("Close file:%{private}s failed", DEVICES_INFO_PATH.c_str());
     }
     return deviceStrs;
 }

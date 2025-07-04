@@ -39,7 +39,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
-            MMI_HILOGWK("The error path is %{public}s", path);
+            MMI_HILOGWK("The error path is %{private}s", path);
             return RET_ERR;
         }
         int32_t fd = 0;

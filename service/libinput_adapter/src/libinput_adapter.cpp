@@ -134,7 +134,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
-            MMI_HILOGWK("The error path is %{public}s", path);
+            MMI_HILOGWK("The error path is %{private}s", path);
             return RET_ERR;
         }
         int32_t fd = 0;
@@ -832,7 +832,7 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
     }
 
     DTaskCallback cb = [this, path] {
-        MMI_HILOGI("OnDeviceAdded, path:%{public}s", path.c_str());
+        MMI_HILOGI("OnDeviceAdded, path:%{private}s", path.c_str());
         udev_device_record_devnode(path.c_str());
         libinput_device* device = libinput_path_add_device(input_, path.c_str());
         if (device != nullptr) {

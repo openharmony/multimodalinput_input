@@ -5965,10 +5965,10 @@ void InputManagerTest::ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
     char buf[MAX_PATH_LEN] {};
     char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
     if (cfgPath == nullptr) {
-        MMI_HILOGE("No '%{public}s' was found", cfgName);
+        MMI_HILOGE("No '%{private}s' was found", cfgName);
         return;
     }
-    std::cout << "Input product config:%{public}s" << cfgPath << std::endl;
+    std::cout << "Input product config:%{private}s" << cfgPath << std::endl;
     ReadMaxMultiTouchPointNum(std::string(cfgPath), maxMultiTouchPointNum);
 }
 

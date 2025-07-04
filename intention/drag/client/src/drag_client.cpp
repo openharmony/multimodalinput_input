@@ -49,7 +49,7 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
         FI_HILOGE("Start drag, invalid argument, dragNum:%{public}d, bufferSize:%{public}zu, "
-            "displayX:%{public}d, displayY:%{public}d",
+            "displayX:%{private}d, displayY:%{private}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }

@@ -102,7 +102,7 @@ int32_t Monitor::EnableReceiving()
     CALL_DEBUG_ENTER;
     devWd_ = inotify_add_watch(inotifyFd_, DEV_INPUT_PATH.c_str(), IN_CREATE | IN_DELETE);
     if (devWd_ < 0) {
-        FI_HILOGE("Watching (\'%{public}s\') failed, errno:%{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
+        FI_HILOGE("Watching (\'%{private}s\') failed, errno:%{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
