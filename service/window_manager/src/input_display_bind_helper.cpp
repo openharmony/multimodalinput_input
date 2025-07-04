@@ -560,7 +560,7 @@ void InputDisplayBindHelper::Store()
     }
     std::ofstream ofs(realPath, std::ios::trunc | std::ios::out | std::ios_base::binary);
     if (!ofs) {
-        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", realPath, errno);
+        MMI_HILOGE("Open file fail.%{private}s, errno:%{public}d", realPath, errno);
         return;
     }
     ofs << *infos_;
@@ -672,9 +672,9 @@ void InputDisplayBindHelper::Load()
         return;
     }
     std::ifstream ifs(realPath);
-    MMI_HILOGEK("Open file end:%{public}s", realPath);
+    MMI_HILOGEK("Open file end:%{private}s", realPath);
     if (!ifs) {
-        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", realPath, errno);
+        MMI_HILOGE("Open file fail.%{private}s, errno:%{public}d", realPath, errno);
         return;
     }
     ifs >> *configFileInfos_;

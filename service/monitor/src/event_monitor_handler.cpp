@@ -650,7 +650,7 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         int32_t displayX1 = pointerItem1.GetDisplayX();
         int32_t displayY1 = pointerItem1.GetDisplayY();
         if (displayX != displayX1 || displayY != displayY1) {
-            MMI_HILOGW("Display coord changed %{public}d, %{public}d, %{public}d, %{public}d, %{public}d",
+            MMI_HILOGW("Display coord changed %{public}d, %{private}d, %{private}d, %{private}d, %{private}d",
                 pointerId, displayX, displayY, displayX1, displayY1);
         }
     }

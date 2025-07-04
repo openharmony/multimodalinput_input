@@ -484,7 +484,7 @@ void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, c
         CHKPC(listener);
         listener->OnMouseLocationEvent(networkId, event);
         FI_HILOGD("Trigger listener for networkId:%{public}s,"
-                  "displayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
+                  "displayX:%{private}d, displayY:%{private}d, displayWidth:%{public}d, displayHeight:%{public}d",
             Utility::Anonymize(networkId).c_str(), event.displayX, event.displayY, event.displayWidth,
             event.displayHeight);
     }

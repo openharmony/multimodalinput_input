@@ -136,7 +136,7 @@ void IInputWindowsManager::DestroyInstance()
 
 InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 {
-    MMI_HILOGI("Bind cfg file name:%{public}s", BIND_CFG_FILE_NAME.c_str());
+    MMI_HILOGI("Bind cfg file name:%{private}s", BIND_CFG_FILE_NAME.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     lastWindowInfo_.id = -1;
     lastWindowInfo_.pid = -1;
@@ -1239,7 +1239,7 @@ void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &curs
     } else if (lastPointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
         pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
     }
-    MMI_HILOGD("pointerBackCenterEvent status: %{public}s", pointerBackCenterEvent->ToString().c_str());
+    MMI_HILOGD("pointerBackCenterEvent status: %{private}s", pointerBackCenterEvent->ToString().c_str());
     InputHandler->GetFilterHandler()->HandlePointerEvent(pointerBackCenterEvent);
 }
 
@@ -1962,7 +1962,7 @@ void InputWindowsManager::AdjustDragPosition(int32_t groupId)
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPV(filterHandler);
     filterHandler->HandlePointerEvent(pointerEvent);
-    MMI_HILOGI("pointerEvent: %{public}s", pointerEvent->ToString().c_str());
+    MMI_HILOGI("pointerEvent: %{private}s", pointerEvent->ToString().c_str());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -3062,7 +3062,7 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
     auto displayInfo = FindPhysicalDisplayInfo("default0");
     CHKPF(displayInfo);
     MMI_HILOGD("PhysicalDisplay.width:%{public}d, PhysicalDisplay.height:%{public}d, "
-               "PhysicalDisplay.topLeftX:%{public}d, PhysicalDisplay.topLeftY:%{public}d",
+               "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d",
                displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y);
     displayId = displayInfo->id;
     auto width = displayInfo->width;
@@ -4232,8 +4232,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         axisBeginWindowInfo_ = touchWindow;
     }
     if (!touchWindow) {
-        MMI_HILOGI("UpdateMouseTarget rsId:%{public}" PRIu64 ", logicalX:%{public}d, logicalY:%{public}d,"
-            "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->rsId, logicalX, logicalY,
+        MMI_HILOGI("UpdateMouseTarget rsId:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
+            "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
             physicalX, physicalY);
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || (mouseDownInfo_.id == -1 &&
             axisBeginWindowInfo_ == std::nullopt)) {
@@ -4264,8 +4264,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
                     physicalX, physicalY);
             }
-            MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{public}d, logicalY:%{public}d,"
-                "displayX:%{public}d, displayY:%{public}d", physicalDisplayInfo->rsId, logicalX, logicalY,
+            MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
+                "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
             int64_t endTime = GetSysClockTime();
@@ -6238,7 +6238,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     if (iter != mouseLocationMap_.end()) {
         curMouseLocation = iter->second;
     }
-    MMI_HILOGD("Mouselocation start: displayId:%{public}d, X:%{public}d, Y:%{public}d",
+    MMI_HILOGD("Mouselocation start: displayId:%{public}d, X:%{private}d, Y:%{private}d",
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
     if ((curMouseLocation.displayId < 0) && !displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
