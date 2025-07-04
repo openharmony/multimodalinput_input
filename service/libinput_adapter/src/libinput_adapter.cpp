@@ -32,6 +32,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+#include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -217,7 +218,26 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
-    funInputEvent_ = funInputEvent;
+
+    auto callback = [funInputEvent](libinput_event *event, int64_t frameTime) {
+        funInputEvent(static_cast<void *>(event), frameTime);
+    };
+    auto manager = InputPluginManager::GetInstance();
+    if (manager != nullptr) {
+        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
+    }
+    funInputEvent_ = [manager, callback](void *event, int64_t frameTime) {
+        if (manager != nullptr) {
+            int32_t result = manager->HandleEvent(static_cast<libinput_event *>(event),
+                frameTime,
+                InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
+            if (result != 0) {
+                return;
+            }
+        }
+        callback(static_cast<libinput_event *>(event), frameTime);
+    };
+    
     input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
     CHKPF(input_);
     libinput_log_set_handler(input_, &HiLogFunc);
