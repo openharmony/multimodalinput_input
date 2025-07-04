@@ -120,7 +120,7 @@ image_ptr_t PointerRenderer::UserIconScale(uint32_t width, uint32_t height, cons
 int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg)
 {
     CHKPR(addr, RET_ERR);
-    MMI_HILOGD("Render cfg:%{public}s, width:%{public}u, height:%{public}u", cfg.ToString().c_str(), width, height);
+    MMI_HILOGD("Render cfg:%{private}s, width:%{public}u, height:%{public}u", cfg.ToString().c_str(), width, height);
 
     uint32_t addrSize = width * height * RENDER_STRIDE;
     if (cfg.style_ == MOUSE_ICON::TRANSPARENT_ICON) {

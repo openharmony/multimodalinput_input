@@ -525,7 +525,7 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
     tempEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     tempEvent->SetPointerId(ANCO_KNUCKLE_POINTER_ID);
     tempEvent->SetAgentWindowId(tempEvent->GetTargetWindowId());
-    MMI_HILOGW("Event is %{public}s", tempEvent->ToString().c_str());
+    MMI_HILOGW("Event is %{private}s", tempEvent->ToString().c_str());
     auto fd = WIN_MGR->GetClientFd(tempEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);

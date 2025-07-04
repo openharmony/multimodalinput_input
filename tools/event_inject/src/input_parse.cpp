@@ -270,7 +270,7 @@ DeviceItems DataInit(const std::string& fileData, bool logStatus)
         }
         deviceItems.push_back(deviceItem);
         if (logStatus) {
-            MMI_HILOGW("deviceItem[%{public}d]:%{public}s", i, deviceItem.ToString().c_str());
+            MMI_HILOGW("deviceItem[%{public}d]:%{private}s", i, deviceItem.ToString().c_str());
         }
     }
     return deviceItems;
