@@ -124,8 +124,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_001, TestSize.Le
     // 多模初始化
     bindInfo.Load();
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
     bindInfo.AddDisplay(0, "hp 223");
     bindInfo.AddDisplay(2, "think 123");
@@ -146,8 +146,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_002, TestSize.Le
     // 多模初始化
     bindInfo.Load();
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
     bindInfo.AddDisplay(0, "hp 223");
     bindInfo.AddDisplay(2, "think 123");
@@ -168,8 +168,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_003, TestSize.Le
     // 多模初始化
     bindInfo.Load();
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
     bindInfo.AddDisplay(0, "think 123");
     bindInfo.AddDisplay(2, "hp 223");
@@ -190,8 +190,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_004, TestSize.Le
     // 多模初始化
     bindInfo.Load();
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
     bindInfo.AddDisplay(0, "hp 223");
     bindInfo.AddDisplay(2, "think 123");
@@ -206,9 +206,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_004, TestSize.Le
     bindInfo.AddDisplay(0, "hp 223");
     bindInfo.AddDisplay(2, "think 123");
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
-    bindInfo.AddInputDevice(3, "keyboard88");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
+    bindInfo.AddInputDevice(3, "keyboard88", "keyboard88");
 
     bindInfo.Store();
     bindInfo.Load();
@@ -236,8 +236,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     // 多模初始化
     bindInfo.Load();
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
     bindInfo.AddDisplay(0, "think 123");
     bindInfo.AddDisplay(2, "hp 223");
@@ -273,8 +273,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006
     ASSERT_FALSE(bindInfo.IsDisplayAdd(1, "think 123"));
     ASSERT_EQ(bindInfo.Dumps(), std::string());
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
     // 窗口同步信息
     bindInfo.AddDisplay(0, "think 123");
     bindInfo.AddDisplay(2, "hp 223");
@@ -306,8 +306,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
 
     // 检测到触摸板设备
-    bindInfo.AddInputDevice(1, "mouse");
-    bindInfo.AddInputDevice(2, "keyboard");
+    bindInfo.AddInputDevice(1, "mouse", "mouse");
+    bindInfo.AddInputDevice(2, "keyboard", "keyboard");
 
     // 窗口同步信息
     bindInfo.AddDisplay(0, "think 123");
@@ -434,7 +434,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.inputDeviceName_ = "mouse";
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse", "mouse"));
 }
 
 /**
@@ -448,7 +448,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.inputDeviceId_ = 1;
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse", "mouse"));
 }
 
 /**
@@ -463,7 +463,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
     BindInfo bindInfo;
     bindInfo.inputDeviceId_ = 1;
     bindInfo.inputDeviceName_ = "mouse";
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
+    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse", "mouse"));
 }
 
 /**
