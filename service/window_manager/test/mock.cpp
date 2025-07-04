@@ -170,7 +170,7 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::fun
     return 0;
 }
 
-int32_t TimerManager::RemoveTimer(int32_t timerId)
+int32_t TimerManager::RemoveTimer(int32_t timerId, const std::string &name)
 {
     return 0;
 }

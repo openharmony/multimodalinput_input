@@ -1922,12 +1922,15 @@ ohos_unittest("ModuleLoaderTest") {
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
     "module_loader/test/multimodal_input_preferences_manager_test.cpp",
+    "module_loader/test/multimodal_input_plugin_manager_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
   ]
 
   external_deps = [
