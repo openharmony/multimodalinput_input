@@ -335,7 +335,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
     if (IsActive()) {
         Reset();
     }
-    return false;
+    return UpdateConsumed(keyEvent);
 }
 
 void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output) const
@@ -355,6 +355,25 @@ void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output
         }
     }
     output << "}";
+}
+
+void KeyGestureManager::LongPressCombinationKey::MarkKeyConsumed()
+{
+    consumedKeys_.insert(keys_.cbegin(), keys_.cend());
+}
+
+bool KeyGestureManager::LongPressCombinationKey::UpdateConsumed(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (((keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_UP) &&
+         (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_CANCEL)) ||
+        (keys_.find(keyEvent->GetKeyCode()) == keys_.cend())) {
+        return false;
+    }
+    if (auto iter = consumedKeys_.find(keyEvent->GetKeyCode()); iter != consumedKeys_.cend()) {
+        consumedKeys_.erase(iter);
+        return true;
+    }
+    return false;
 }
 
 bool KeyGestureManager::LongPressCombinationKey::RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent)
@@ -403,7 +422,13 @@ bool KeyGestureManager::PullUpAccessibility::IsWorking()
 int32_t KeyGestureManager::PullUpAccessibility::AddHandler(int32_t pid,
     int32_t longPressTime, std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    return KeyGesture::AddHandler(pid, ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout(), callback);
+    return KeyGesture::AddHandler(pid, ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout(),
+        [this, callback](std::shared_ptr<KeyEvent> keyEvent) {
+            MarkKeyConsumed();
+            if (callback != nullptr) {
+                callback(keyEvent);
+            }
+        });
 }
 
 void KeyGestureManager::PullUpAccessibility::OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent)

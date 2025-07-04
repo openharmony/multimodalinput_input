@@ -128,6 +128,8 @@ private:
 
     protected:
         virtual void OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent) {}
+        void MarkKeyConsumed();
+        bool UpdateConsumed(std::shared_ptr<KeyEvent> keyEvent);
 
     private:
         bool RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent);
@@ -135,6 +137,7 @@ private:
 
         int64_t firstDownTime_ {};
         std::set<int32_t> keys_;
+        std::set<int32_t> consumedKeys_;
     };
 
     class PullUpAccessibility final : public LongPressCombinationKey {
