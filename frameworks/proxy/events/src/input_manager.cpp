@@ -277,7 +277,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     PointerEvent::PointerItem pointerItem;
     if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         MMI_HILOGD("isAutoToVirtualScreen=%{public}s, DX=%{private}d, DY=%{private}d, "
-            "FDX=%{private}d, FDY=%{private}d",
+            "FDX=%{private}.5f, FDY=%{private}.5f",
             isAutoToVirtualScreen ? "true" : "false", pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
             pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
     } else {
@@ -299,7 +299,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     PointerEvent::PointerItem pointerItem;
     if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         MMI_HILOGD("zOrder=%{public}f, isAutoToVirtualScreen=%{public}s, DX=%{private}d, DY=%{private}d, "
-            "FDX=%{private}d, FDY=%{private}d",
+            "FDX=%{private}.5f, FDY=%{private}.5f",
             zOrder, isAutoToVirtualScreen ? "true" : "false", pointerItem.GetDisplayX(), pointerItem.GetDisplayY(),
             pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
     } else {
