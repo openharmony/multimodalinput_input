@@ -1095,5 +1095,63 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation001, TestS
     double displayY = 0.0;
     EXPECT_EQ(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), ERROR_APP_NOT_FOCUSED);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXY_001
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+ 
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXY_002
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXY_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(pointerId);
+    double xY = 30.00;
+    pointerItem.SetFixedDisplayX(xY);
+    pointerItem.SetFixedDisplayX(xY);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+ 
+/**
+ * @tc.name: InputManagerImplTest_UpdateDisplayXY_003
+ * @tc.desc: Test the function UpdateDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateDisplayXY_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
+    int32_t pointerId = 3;
+    pointerEvent->SetPointerId(pointerId);
+    PointerEvent::PointerItem pointerItem;
+    pointerId = 2;
+    pointerItem.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.UpdateDisplayXYInOneHandMode(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 } // namespace MMI
 } // namespace OHOS

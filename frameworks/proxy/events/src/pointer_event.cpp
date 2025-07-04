@@ -154,22 +154,22 @@ void PointerEvent::PointerItem::SetWindowYPos(double y)
     windowYPos_ = y;
 }
 
-int32_t PointerEvent::PointerItem::GetFixedDisplayX() const
+double PointerEvent::PointerItem::GetFixedDisplayX() const
 {
     return fixedDisplayX_;
 }
 
-void PointerEvent::PointerItem::SetFixedDisplayX(int32_t fixedDisplayX)
+void PointerEvent::PointerItem::SetFixedDisplayX(double fixedDisplayX)
 {
     fixedDisplayX_ = fixedDisplayX;
 }
 
-int32_t PointerEvent::PointerItem::GetFixedDisplayY() const
+double PointerEvent::PointerItem::GetFixedDisplayY() const
 {
     return fixedDisplayY_;
 }
 
-void PointerEvent::PointerItem::SetFixedDisplayY(int32_t fixedDisplayY)
+void PointerEvent::PointerItem::SetFixedDisplayY(double fixedDisplayY)
 {
     fixedDisplayY_ = fixedDisplayY;
 }
@@ -501,8 +501,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(windowYPos_) &&
         out.WriteInt32(blobId_) &&
         out.WriteInt32(twist_) &&
-        out.WriteInt32(fixedDisplayX_) &&
-        out.WriteInt32(fixedDisplayY_) &&
+        out.WriteDouble(fixedDisplayX_) &&
+        out.WriteDouble(fixedDisplayY_) &&
         out.WriteDouble(globalX_) &&
         out.WriteDouble(globalY_)
     );
@@ -545,8 +545,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(windowYPos_) &&
         in.ReadInt32(blobId_) &&
         in.ReadInt32(twist_) &&
-        in.ReadInt32(fixedDisplayX_) &&
-        in.ReadInt32(fixedDisplayY_) &&
+        in.ReadDouble(fixedDisplayX_) &&
+        in.ReadDouble(fixedDisplayY_) &&
         in.ReadDouble(globalX_) &&
         in.ReadDouble(globalY_)
     );

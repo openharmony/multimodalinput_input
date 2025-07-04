@@ -645,8 +645,8 @@ int32_t JsInputMonitor::GetJsPointerItem(napi_env env, const PointerEvent::Point
     CHKRR(SetNameProperty(env, value, "rawX", item.GetRawDx()), "Set rawX", RET_ERR);
     CHKRR(SetNameProperty(env, value, "rawY", item.GetRawDy()), "Set rawY", RET_ERR);
     CHKRR(SetNameProperty(env, value, "toolType", item.GetToolType()), "Set toolType", RET_ERR);
-    CHKRR(SetNameProperty(env, value, "fixedDisplayX", item.GetFixedDisplayX()), "Set fixedDisplayX", RET_ERR);
-    CHKRR(SetNameProperty(env, value, "fixedDisplayY", item.GetFixedDisplayY()), "Set fixedDisplayY", RET_ERR);
+    CHKRR(SetNameProperty(env, value, "fixedDisplayX", static_cast<int32_t>(item.GetFixedDisplayX())), "Set fixedDisplayX", RET_ERR);
+    CHKRR(SetNameProperty(env, value, "fixedDisplayY", static_cast<int32_t>(item.GetFixedDisplayY())), "Set fixedDisplayY", RET_ERR);
     return RET_OK;
 }
 

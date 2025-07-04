@@ -632,6 +632,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
         }
     }
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    UpdateDisplayXYInOneHandMode(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
         if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
@@ -651,6 +654,29 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
         pointerEvent->GetPointerId());
 }
+
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+void InputManagerImpl::UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetFixedMode() != PointerEvent::FixedMode::AUTO) {
+        MMI_HILOG_DISPATCHD("pointerEvent fixedMode=%{public}d, fixedModeStr=%{public}s",
+            pointerEvent->GetFixedMode(), pointerEvent->GetFixedModeStr().c_str());
+        return;
+    }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetDisplayX(static_cast<int32_t>(pointerItem.GetFixedDisplayX()));
+    pointerItem.SetDisplayY(static_cast<int32_t>(pointerItem.GetFixedDisplayY()));
+    pointerItem.SetDisplayXPos(pointerItem.GetFixedDisplayX());
+    pointerItem.SetDisplayYPos(pointerItem.GetFixedDisplayY());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+}
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const UserScreenInfo &userScreenInfo)

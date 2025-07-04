@@ -1296,26 +1296,26 @@ public:
         /**
          * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          */
-        int32_t GetFixedDisplayX() const;
+        double  GetFixedDisplayX() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          * @param fixedDisplayX Indicates the x coordinate to set.
          * @return void
          */
-        void SetFixedDisplayX(int32_t fixedDisplayX);
+        void SetFixedDisplayX(double  fixedDisplayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          */
-        int32_t GetFixedDisplayY() const;
+        double  GetFixedDisplayY() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          * @param fixedDisplayY Indicates the y coordinate to set.
          * @return void
          */
-        void SetFixedDisplayY(int32_t fixedDisplayY);
+        void SetFixedDisplayY(double  fixedDisplayY);
 
         /**
          * @brief Sets the orientation of the physical display.
@@ -1336,8 +1336,8 @@ public:
         int32_t displayY_ {};
         double globalX_ { DBL_MAX };
         double globalY_ { DBL_MAX };
-        int32_t fixedDisplayX_ {};
-        int32_t fixedDisplayY_ {};
+        double  fixedDisplayX_ {};
+        double  fixedDisplayY_ {};
         int32_t windowX_ {};
         int32_t windowY_ {};
         double displayXPos_ {};
