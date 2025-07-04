@@ -1446,7 +1446,7 @@ int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerE
         MMI_HILOGW("Set distanceY property failed");
         return RET_ERR;
     }
-    MMI_HILOGD("jsfingerprint key:%{public}d, x:%{public}f, y:%{public}f", actionValue,
+    MMI_HILOGD("jsfingerprint key:%{public}d, x:%{private}f, y:%{private}f", actionValue,
         pointerEvent->GetFingerprintDistanceX(), pointerEvent->GetFingerprintDistanceY());
     return RET_OK;
 }

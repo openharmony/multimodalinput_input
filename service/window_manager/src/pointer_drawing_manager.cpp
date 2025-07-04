@@ -1980,8 +1980,8 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CursorPixelMap curPixelMap,
     userIconHotSpotX_ = static_cast<int32_t>((float)newFocusX * xAxis);
     userIconHotSpotY_ = static_cast<int32_t>((float)newFocusY * yAxis);
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
-        "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
-        "userIconHotSpotY_:%{public}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
+        "focusX:%{private}d, focuxY:%{private}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{private}d,"
+        "userIconHotSpotY_:%{private}d", cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
         newFocusX, newFocusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
     return RET_OK;
 }
@@ -2694,7 +2694,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t rs
     FixCursorPosition(x, y);
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
-    MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
+    MMI_HILOGD("Pointer window move, x:%{private}d, y:%{private}d", lastPhysicalX_, lastPhysicalY_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     displayId_ = rsId;
@@ -2738,7 +2738,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         } else {
             newIconPath = iconPath.at(MOUSE_ICON(pointerStyle.id)).iconPath;
         }
-        MMI_HILOGD("Default path has changed from %{public}s to %{public}s",
+        MMI_HILOGD("Default path has changed from %{private}s to %{private}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
         UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), newIconPath);
     }
@@ -3757,7 +3757,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     focusY_ = cursor.focusY;
     userIconHotSpotX_ = cursor.focusX;
     userIconHotSpotY_ = cursor.focusY;
-    MMI_HILOGI("imageWidth:%{public}d, imageHeight:%{public}d, focusX:%{public}d, focusY:%{public}d",
+    MMI_HILOGI("imageWidth:%{public}d, imageHeight:%{public}d, focusX:%{private}d, focusY:%{private}d",
         imageInfo.size.width, imageInfo.size.height, cursor.focusX, cursor.focusY);
     return RET_OK;
 }

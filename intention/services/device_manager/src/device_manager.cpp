@@ -181,19 +181,19 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
         return nullptr;
     }
     if (!S_ISCHR(statbuf.st_mode)) {
-        FI_HILOGD("Not character device:%{public}s", devPath.c_str());
+        FI_HILOGD("Not character device:%{private}s", devPath.c_str());
         return nullptr;
     }
 
     int32_t deviceId = ParseDeviceId(devNode);
     if (deviceId < 0) {
-        FI_HILOGE("Parsing device name failed:%{public}s", devNode.c_str());
+        FI_HILOGE("Parsing device name failed:%{private}s", devNode.c_str());
         return nullptr;
     }
 
     std::shared_ptr<IDevice> dev = FindDevice(devPath);
     if (dev != nullptr) {
-        FI_HILOGD("Already exists:%{public}s", devPath.c_str());
+        FI_HILOGD("Already exists:%{private}s", devPath.c_str());
         return dev;
     }
 
@@ -208,7 +208,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     dev->SetDevPath(devPath);
     dev->SetSysPath(std::string(rpath));
     if (dev->Open() != RET_OK) {
-        FI_HILOGE("Unable to open \'%{public}s\'", devPath.c_str());
+        FI_HILOGE("Unable to open \'%{private}s\'", devPath.c_str());
         return nullptr;
     }
     auto ret = devices_.insert_or_assign(dev->GetId(), dev);
@@ -242,7 +242,7 @@ std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    FI_HILOGI("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
+    FI_HILOGI("Add device %{private}d:%{private}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{private}s\"", dev->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());

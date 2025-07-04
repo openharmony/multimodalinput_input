@@ -143,17 +143,17 @@ void InputEventHandler::UpdateDwtTouchpadRecord(libinput_event *event)
         if (touchpadEventDownAbsX_ > TOUCHPAD_EDGE_WIDTH &&
             touchpadEventDownAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH) {
             isDwtEdgeAreaForTouchpadMotionActing_ = false;
-            MMI_HILOGD("Pointer edge dwt unlocked, coordX = %{public}f", touchpadEventDownAbsX_);
+            MMI_HILOGD("Pointer edge dwt unlocked, coordX = %{private}f", touchpadEventDownAbsX_);
         }
         if (touchpadEventDownAbsX_ > TOUCHPAD_EDGE_WIDTH_FOR_BUTTON &&
             touchpadEventDownAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH_FOR_BUTTON) {
             isDwtEdgeAreaForTouchpadButtonActing_ = false;
-            MMI_HILOGD("Button edge dwt unlocked, coordX = %{public}f", touchpadEventDownAbsX_);
+            MMI_HILOGD("Button edge dwt unlocked, coordX = %{private}f", touchpadEventDownAbsX_);
         }
         if (touchpadEventDownAbsX_ > TOUCHPAD_EDGE_WIDTH_FOR_TAP &&
             touchpadEventDownAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH_FOR_TAP) {
             isDwtEdgeAreaForTouchpadTapActing_ = false;
-            MMI_HILOGD("Tap edge dwt unlocked, coordX = %{public}f", touchpadEventDownAbsX_);
+            MMI_HILOGD("Tap edge dwt unlocked, coordX = %{private}f", touchpadEventDownAbsX_);
         }
     }
     if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
@@ -164,7 +164,7 @@ void InputEventHandler::UpdateDwtTouchpadRecord(libinput_event *event)
             touchpadEventAbsX_ < touchpadSizeX - TOUCHPAD_EDGE_WIDTH_RELEASE &&
             toolType != MT_TOOL_PALM) {
             isDwtEdgeAreaForTouchpadMotionActing_ = false;
-            MMI_HILOGD("Pointer edge dwt unlocked, coordX = %{public}f", touchpadEventDownAbsX_);
+            MMI_HILOGD("Pointer edge dwt unlocked, coordX = %{private}f", touchpadEventDownAbsX_);
         }
     }
 }

@@ -259,7 +259,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_HILOGE("Open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
+        MMI_HILOGE("Open device node:%{private}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
         return RET_ERR;
     }
     struct timeval tm;

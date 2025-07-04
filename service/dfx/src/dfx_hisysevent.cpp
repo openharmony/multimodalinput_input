@@ -77,7 +77,7 @@ static std::string GetVendorInfo(const char* nodePath)
     }
     std::ifstream file(realPath);
     if (!file.is_open()) {
-        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath, errno);
+        MMI_HILOGE("Unable to open file:%{private}s, error:%{public}d", nodePath, errno);
         return "";
     }
     std::string vendorInfo;
