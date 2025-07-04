@@ -1993,6 +1993,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_002, TestSize.Leve
     CALL_TEST_DEBUG;
     EventDispatchHandler handler;
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     int32_t pointerId = 3;
     pointerEvent->SetPointerId(pointerId);
     PointerEvent::PointerItem pointerItem;
@@ -2012,6 +2013,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_003, TestSize.Leve
     CALL_TEST_DEBUG;
     EventDispatchHandler handler;
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     int32_t pointerId = 3;
     int32_t displayId = 1;
     int32_t windowId = 2;
@@ -2035,6 +2037,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_004, TestSize.Leve
     CALL_TEST_DEBUG;
     EventDispatchHandler handler;
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     int32_t pointerId = 3;
     int32_t displayId = 1;
     int32_t windowId = 2;
@@ -2059,6 +2062,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_005, TestSize.Leve
     CALL_TEST_DEBUG;
     EventDispatchHandler handler;
     auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
     int32_t pointerId = 3;
     int32_t displayId = 1;
     int32_t windowId = 2;
