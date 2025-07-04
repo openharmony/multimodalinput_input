@@ -446,6 +446,7 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
 
     std::string inputNode = GetInputNode(inputNodeName);
     if (inputNode.empty()) {
+        CHKPO(infos_);
         const auto &infos = infos_->GetInfos();
         for (const auto &item : infos) {
             if (inputNodeName == item.GetInputNodeName()) {
