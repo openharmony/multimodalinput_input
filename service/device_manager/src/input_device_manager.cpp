@@ -400,7 +400,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     if (!inDevice.sysUid.empty()) {
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, inDevice.sysUid, "add");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{public}s,"
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s,"
             "system uid:%s, status:add", deviceId, name.c_str(), inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
@@ -490,7 +490,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         std::string name = libinput_device_get_name(inputDevice);
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{public}s, system uid:%s, "
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s, system uid:%s, "
             "status:remove", deviceId, name.c_str(), sysUid.c_str());
     }
 
@@ -993,7 +993,7 @@ void InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDe
         }
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, name, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, deivceId:%{public}d, name:%{public}s, status:remove",
+        MMI_HILOGI("Send device info to window manager, deivceId:%{public}d, name:%{private}s, status:remove",
             deviceId, name.c_str());
     }
 }
