@@ -389,10 +389,15 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
         MMI_HILOGI("The device is not touchable device already existent");
         return;
     }
+    std::string name = "null";
+    if (inDevice.inputDeviceOrigin != nullptr) {
+        name = libinput_device_get_name(inDevice.inputDeviceOrigin);
+    }
     if (!inDevice.sysUid.empty()) {
-        devCallbacks_(deviceId, inDevice.sysUid, "add");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:add",
-            deviceId, inDevice.sysUid.c_str());
+        CHKPV(devCallbacks_);
+        devCallbacks_(deviceId, name, inDevice.sysUid, "add");
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s,"
+            "system uid:%s, status:add", deviceId, name.c_str(), inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
     }
@@ -478,10 +483,11 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
         NotifyDevRemoveCallbackExt(deviceId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+        std::string name = libinput_device_get_name(inputDevice);
         CHKPV(devCallbacks_);
-        devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:remove",
-            deviceId, sysUid.c_str());
+        devCallbacks_(deviceId, name, sysUid, "remove");
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, name:%{private}s, system uid:%s, "
+            "status:remove", deviceId, name.c_str(), sysUid.c_str());
     }
 
     NotifyRemovePointerDevice(IsPointerDevice(inputDevice));
@@ -970,8 +976,14 @@ void InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDe
 {
     CALL_DEBUG_ENTER;
     if (auto sysUid = deviceInfo.sysUid; !sysUid.empty()) {
-        devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, deivceId:%{public}d, status:remove", deviceId);
+        std::string name = "null";
+        if (deviceInfo.inputDeviceOrigin != nullptr) {
+            name = libinput_device_get_name(deviceInfo.inputDeviceOrigin);
+        }
+        CHKPV(devCallbacks_);
+        devCallbacks_(deviceId, name, sysUid, "remove");
+        MMI_HILOGI("Send device info to window manager, deivceId:%{public}d, name:%{private}s, status:remove",
+            deviceId, name.c_str());
     }
 }
 

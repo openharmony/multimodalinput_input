@@ -186,11 +186,12 @@ InputWindowsManager::~InputWindowsManager()
     CALL_INFO_TRACE;
 }
 
-void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus)
+void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
+    const std::string devStatus)
 {
     CALL_INFO_TRACE;
     if (devStatus == "add") {
-        bindInfo_.AddInputDevice(deviceId, sysUid);
+        bindInfo_.AddInputDevice(deviceId, name, sysUid);
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
     }
@@ -206,8 +207,8 @@ void InputWindowsManager::Init(UDSServer& udsServer)
     InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
     INPUT_DEV_MGR->SetInputStatusChangeCallback(
-        [this] (int32_t deviceId, const std::string &sysUid, const std::string devStatus) {
-            return this->DeviceStatusChanged(deviceId, sysUid, devStatus);
+        [this] (int32_t deviceId, const std::string name, const std::string &sysUid, const std::string devStatus) {
+            return this->DeviceStatusChanged(deviceId, name, sysUid, devStatus);
         }
         );
 }

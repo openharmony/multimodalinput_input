@@ -26,13 +26,14 @@ namespace MMI {
 class BindInfo {
 public:
     int32_t GetInputDeviceId() const;
+    std::string GetInputNodeName() const;
     std::string GetInputDeviceName() const;
     int32_t GetDisplayId() const;
     std::string GetDisplayName() const;
     bool IsUnbind() const;
     bool InputDeviceNotBind() const;
     bool DisplayNotBind() const;
-    bool AddInputDevice(int32_t deviceId, const std::string &deviceName);
+    bool AddInputDevice(int32_t deviceId, const std::string &nodeName, const std::string &deviceName);
     void RemoveInputDevice();
     bool AddDisplay(int32_t id, const std::string &name);
     void RemoveDisplay();
@@ -43,6 +44,7 @@ public:
 
 private:
     int32_t inputDeviceId_ { -1 };
+    std::string inputNodeName_;
     std::string inputDeviceName_;
     int32_t displayId_ { -1 };
     std::string displayName_;
@@ -72,7 +74,7 @@ class InputDisplayBindHelper {
 public:
     InputDisplayBindHelper(const std::string bindCfgFile);
     std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
-    void AddInputDevice(int32_t id, const std::string &name);
+    void AddInputDevice(int32_t id, const std::string &name, const std::string &sysUid);
     void RemoveInputDevice(int32_t id);
     bool IsDisplayAdd(int32_t id, const std::string &name);
     std::set<std::pair<uint64_t, std::string>> GetDisplayIdNames() const;

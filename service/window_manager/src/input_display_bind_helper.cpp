@@ -52,6 +52,11 @@ int32_t BindInfo::GetInputDeviceId() const
     return inputDeviceId_;
 }
 
+std::string BindInfo::GetInputNodeName() const
+{
+    return inputNodeName_;
+}
+
 std::string BindInfo::GetInputDeviceName() const
 {
     return inputDeviceName_;
@@ -82,12 +87,13 @@ bool BindInfo::DisplayNotBind() const
     return (displayId_ == -1);
 }
 
-bool BindInfo::AddInputDevice(int32_t deviceId, const std::string &deviceName)
+bool BindInfo::AddInputDevice(int32_t deviceId, const std::string &nodeName, const std::string &deviceName)
 {
-    if ((inputDeviceId_ != -1) || !inputDeviceName_.empty()) {
+    if ((inputDeviceId_ != -1) || !inputNodeName_.empty() || !inputDeviceName_.empty()) {
         return false;
     }
     inputDeviceId_ = deviceId;
+    inputNodeName_ = nodeName;
     inputDeviceName_ = deviceName;
     return true;
 }
@@ -331,13 +337,13 @@ std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inpu
     return infos_->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
-void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &name)
+void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
-    auto displayName = configFileInfos_->GetDisplayNameByInputDevice(name);
+    MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
+    auto displayName = configFileInfos_->GetDisplayNameByInputDevice(sysUid);
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
-    info.AddInputDevice(id, name);
+    info.AddInputDevice(id, nodeName, sysUid);
     infos_->Add(info);
     Store();
 }
@@ -440,6 +446,13 @@ std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
 
     std::string inputNode = GetInputNode(inputNodeName);
     if (inputNode.empty()) {
+        CHKPO(infos_);
+        const auto &infos = infos_->GetInfos();
+        for (const auto &item : infos) {
+            if (inputNodeName == item.GetInputNodeName()) {
+                return item.GetInputDeviceName();
+            }
+        }
         return "";
     }
 
@@ -617,14 +630,16 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
     infos_->UnbindDisplay(bindByDisplay.GetDisplayId());
 
     BindInfo info1;
-    info1.AddInputDevice(bindByDevice.GetInputDeviceId(), bindByDevice.GetInputDeviceName());
+    info1.AddInputDevice(bindByDevice.GetInputDeviceId(), bindByDevice.GetInputNodeName(),
+        bindByDevice.GetInputDeviceName());
     info1.AddDisplay(bindByDisplay.GetDisplayId(), bindByDisplay.GetDisplayName());
     infos_->Add(info1);
 
     if ((bindByDevice.GetDisplayId() != -1) && (bindByDisplay.GetInputDeviceId() != -1)) {
         MMI_HILOGD("Both display id and input device id are invalid");
         BindInfo info2;
-        info2.AddInputDevice(bindByDisplay.GetInputDeviceId(), bindByDisplay.GetInputDeviceName());
+        info2.AddInputDevice(bindByDisplay.GetInputDeviceId(), bindByDisplay.GetInputNodeName(),
+            bindByDisplay.GetInputDeviceName());
         info2.AddDisplay(bindByDevice.GetDisplayId(), bindByDevice.GetDisplayName());
         infos_->Add(info2);
         return RET_OK;
@@ -638,7 +653,8 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
 
     if (bindByDisplay.GetInputDeviceId() != -1) {
         MMI_HILOGD("The input device id is invalid");
-        AddInputDevice(bindByDisplay.GetInputDeviceId(), bindByDisplay.GetInputDeviceName());
+        AddInputDevice(bindByDisplay.GetInputDeviceId(), bindByDisplay.GetInputNodeName(),
+            bindByDisplay.GetInputDeviceName());
         return RET_OK;
     }
 
