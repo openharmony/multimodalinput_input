@@ -5987,14 +5987,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_001, 
     InputWindowsManager inputWindowsMgr;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsMgr.knuckleDrawMgr_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
-    inputWindowsMgr.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    ASSERT_NE(inputWindowsMgr.knuckleDrawMgr_, nullptr);
-    inputWindowsMgr.knuckleDynamicDrawingManager_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
-    inputWindowsMgr.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
-    ASSERT_NE(inputWindowsMgr.knuckleDynamicDrawingManager_, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
 }
 
@@ -6341,8 +6333,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic, Test
     InputWindowsManager inputWindowsMgr;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsMgr.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    inputWindowsMgr.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
     pointerEvent->SetTargetDisplayId(100);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
 }

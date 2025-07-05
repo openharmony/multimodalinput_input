@@ -176,7 +176,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include/",
     "${mmi_path}/util/socket/include/",
-    "window_manager/include"
+    "window_manager/include",
   ]
 
   if (input_ext_feature_magiccursor) {
@@ -190,11 +190,11 @@ ohos_shared_library("libcursor_drawing_adapter") {
 
   if (input_feature_pointer_drawing) {
     sources = [
+      "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
       "window_manager/src/cursor_drawing_adapter.cpp",
       "window_manager/src/pointer_drawing_manager.cpp",
       "window_manager/src/pointer_renderer.cpp",
       "window_manager/src/screen_pointer.cpp",
-      "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
     ]
   } else {
     sources = [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
@@ -208,9 +208,9 @@ ohos_shared_library("libcursor_drawing_adapter") {
   ]
 
   external_deps = [
-    "common_event_service:cesfwk_innerkits",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "graphic_surface:surface",
@@ -271,7 +271,7 @@ ohos_shared_library("libmmi-server") {
   version_script = "libmmi-server-map"
   include_dirs = [
     "${mmi_path}/frameworks/proxy/events/include",
-    "window_manager/include"
+    "window_manager/include",
   ]
 
   sources += [
@@ -383,9 +383,9 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":mmi_rust",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
-    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -396,9 +396,7 @@ ohos_shared_library("libmmi-server") {
   deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
 
   if (input_ext_feature_keyboard_ext_flag) {
-    include_dirs += [
-      "${mmi_ext_path}/keyboard_ext_flag/inc",
-    ]
+    include_dirs += [ "${mmi_ext_path}/keyboard_ext_flag/inc" ]
 
     deps += [ ":keyboard_ext_flag.json" ]
   }
@@ -469,13 +467,7 @@ ohos_shared_library("libmmi-server") {
   ]
 
   if (input_feature_product != "watch") {
-    sources += [
-      "window_manager/src/knuckle_divergent_point.cpp",
-      "window_manager/src/knuckle_drawing_manager.cpp",
-      "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
-      "window_manager/src/knuckle_glow_point.cpp",
-      "window_manager/src/knuckle_glow_trace_system.cpp",
-    ]
+    sources += [ "window_manager/src/knuckle_drawing_component.cpp" ]
 
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
 
@@ -521,6 +513,93 @@ ohos_shared_library("libmmi-server") {
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
+
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
+
+config("libmmi_knuckle_config") {
+  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
+      enhanced_opt) {
+    cflags = []
+    if (input_feature_enable_pgo && input_feature_product != "default") {
+      cflags += [
+        "-fprofile-use=" +
+            rebase_path("${input_feature_pgo_path}/libmmi-server.profdata",
+                        root_build_dir),
+        "-Wno-error=backend-plugin",
+        "-Wno-profile-instr-out-of-date",
+        "-Wno-profile-instr-unprofiled",
+        "-Oz",
+      ]
+    }
+    if (input_feature_product == "pc" && target_cpu == "arm64") {
+      cflags += [
+        "-moutline-atomics",
+        "-Oz",
+      ]
+    }
+  }
+}
+
+ohos_shared_library("libmmi-knuckle") {
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/timer_manager/include",
+  ]
+
+  sources = [
+    "window_manager/src/knuckle_divergent_point.cpp",
+    "window_manager/src/knuckle_drawing.cpp",
+    "window_manager/src/knuckle_drawing_manager.cpp",
+    "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
+    "window_manager/src/knuckle_glow_point.cpp",
+    "window_manager/src/knuckle_glow_trace_system.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_knuckle_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "libinput:libinput-third-mmi",
+    "samgr:samgr_proxy",
+    "window_manager:libwm_lite",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  cflags_cc = [ "-Wno-unused-private-field" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -967,7 +1046,7 @@ ohos_unittest("KnuckleGlowPointTest") {
   sources = [ "window_manager/test/knuckle_glow_point_test.cpp" ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-knuckle",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1018,7 +1097,7 @@ ohos_unittest("KnuckleDivergentPointTest") {
   sources = [ "window_manager/test/knuckle_divergent_point_test.cpp" ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-knuckle",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1068,7 +1147,7 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
   sources = [ "window_manager/test/knuckle_glow_trace_system_test.cpp" ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-knuckle",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1119,7 +1198,8 @@ ohos_unittest("PointerDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs = [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs =
+      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
 
   deps = [
@@ -1150,10 +1230,10 @@ ohos_unittest("PointerDrawingManagerTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
-    "preferences:native_preferences",
   ]
 }
 
@@ -1180,7 +1260,8 @@ ohos_unittest("PointerDrawingManagerExTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs = [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs =
+      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
   sources = [ "window_manager/test/pointer_drawing_manager_ex_test.cpp" ]
 
   deps = [
@@ -1209,10 +1290,10 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
-    "preferences:native_preferences",
   ]
 }
 
@@ -1237,7 +1318,8 @@ ohos_unittest("TouchDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs = [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs =
+      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
   sources = [
     "window_manager/test/pointer_renderer_test.cpp",
     "window_manager/test/screen_pointer_test.cpp",
@@ -1300,7 +1382,9 @@ ohos_unittest("CursorDrawingComponentTest") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
   ]
-  sources = [ "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp" ]
+  sources = [
+    "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libcursor_drawing_adapter",
@@ -1354,7 +1438,7 @@ ohos_unittest("KnuckleDrawingManagerTest") {
   sources = [ "window_manager/test/knuckle_drawing_manager_test.cpp" ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-knuckle",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -1400,7 +1484,7 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
   sources = [ "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp" ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-knuckle",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -1922,9 +2006,9 @@ ohos_unittest("ModuleLoaderTest") {
     "module_loader/src/input_screen_capture_agent.cpp",
     "module_loader/test/input_screen_capture_agent_test.cpp",
     "module_loader/test/mmi_service_test.cpp",
+    "module_loader/test/multimodal_input_preferences_manager_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
-    "module_loader/test/multimodal_input_preferences_manager_test.cpp",
   ]
 
   deps = [
@@ -2288,32 +2372,32 @@ ohos_unittest("InfraredEmitterTest") {
 
 ohos_unittest("InfraredEmitterEXTest") {
   module_out_path = module_output_path
- 
+
   include_dirs = [
     "infrared_emitter/include",
     "infrared_emitter/test",
   ]
- 
+
   configs = [ "${mmi_path}:coverage_flags" ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
- 
+
   sources = [
     "infrared_emitter/src/infrared_emitter_controller.cpp",
     "infrared_emitter/test/infrared_emitter_controller_ex_test.cpp",
     "infrared_emitter/test/mock.cpp",
   ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utilsbase",
@@ -2326,7 +2410,7 @@ ohos_unittest("InfraredEmitterEXTest") {
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
- 
+
   if (drivers_interface_rtos_extra_enable) {
     external_deps += [
       "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
@@ -3200,8 +3284,8 @@ ohos_unittest("JoystickTest") {
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
-    "libinput:libinput-third-mmi",
     "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
   ]
 }
 
@@ -3257,6 +3341,111 @@ ohos_unittest("KeymapMgrTest") {
     "hisysevent:libhisysevent",
     "preferences:native_preferences",
   ]
+}
+
+ohos_unittest("KnuckleDrawingComponentTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/timer_manager/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  sources = [ "window_manager/test/knuckle_drawing_component_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-knuckle",
+    "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+  ]
+
+  if (input_new_knuckle_dynamic_enabled) {
+    defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
+  }
+}
+
+ohos_unittest("KnuckleDrawingTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/timer_manager/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  sources = [ "window_manager/test/knuckle_drawing_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-knuckle",
+    "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gtest_main",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+  ]
+
+  if (input_new_knuckle_dynamic_enabled) {
+    defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
+  }
 }
 
 group("mmi-service-tests") {

@@ -22,10 +22,6 @@
 
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "knuckle_drawing_manager.h"
-#include "knuckle_dynamic_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 
 namespace OHOS {
 namespace MMI {
@@ -536,9 +532,6 @@ private:
         bool isOpen { false };
     } privacyProtection_;
     bool isOpenPrivacyProtectionserver_ { false };
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_WATCH
     bool mouseFlag_ {false};
     struct ActiveTouchWin {
         WindowInputType windowInputType{ WindowInputType::NORMAL };
@@ -552,9 +545,6 @@ private:
     std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-#endif // OHOS_BUILD_ENABLE_WATCH
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
     std::map<int32_t, std::shared_ptr<PointerEvent>> lastPointerEventforWindowChangeMap_;
     bool cancelTouchStatus_ { false };
