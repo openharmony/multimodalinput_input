@@ -3712,10 +3712,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation,
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 100;
     displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION0;
     auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->cursorPosMap_.end()) {
         it->second.displayId = 100;
         it->second.direction = Direction::DIRECTION0;
+        it->second.displayDirection = Direction::DIRECTION0;
     }
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -3739,10 +3741,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 100;
     displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION0;
     auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->cursorPosMap_.end()) {
         it->second.displayId = 100;
         it->second.direction = Direction::DIRECTION90;
+        it->second.displayDirection = Direction::DIRECTION0;
     }
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -3763,6 +3767,64 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(true));
     InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.AdjustDisplayRotation());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_003
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION90;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        it->second.displayId = 100;
+        it->second.direction = Direction::DIRECTION90;
+        it->second.displayDirection = Direction::DIRECTION0;
+    }
+    auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_004
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION90;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        it->second.displayId = 100;
+        it->second.direction = Direction::DIRECTION0;
+        it->second.displayDirection = Direction::DIRECTION0;
+    }
+    auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
 
 /**

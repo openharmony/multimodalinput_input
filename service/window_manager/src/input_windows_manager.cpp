@@ -1885,7 +1885,8 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
     };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPosCur.displayId);
     CHKPV(displayInfo);
-    if (cursorPosCur.displayDirection != displayInfo->displayDirection) {
+    if (cursorPosCur.displayDirection != displayInfo->displayDirection ||
+        cursorPosCur.direction != displayInfo->direction) {
         MMI_HILOGI("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
             "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
             "dpi:%{public}d, name:%{public}s, uniq:%{public}s, direction:%{public}d, displayDirection:%{public}d",

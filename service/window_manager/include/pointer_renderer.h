@@ -43,6 +43,7 @@ public:
     int32_t userIconHotSpotY { 0 };
     bool userIconFollowSystem { false };
     int32_t GetImageSize() const;
+    float AdjustIncreaseRatio(float dpi) const;
     std::string ToString() const;
     int32_t GetOffsetX() const;
     int32_t GetOffsetY() const;
