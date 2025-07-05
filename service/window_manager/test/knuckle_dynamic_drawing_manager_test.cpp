@@ -443,6 +443,35 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
 }
 
 /**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_007
+ * @tc.desc: Test KnuckleDynamicDrawHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_007,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    int32_t displayX = 100;
+    int32_t displayY = 100;
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    int32_t rsId = 0;
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent, rsId));
+}
+
+/**
  * @tc.name: KnuckleDynamicDrawingManagerTest_UpdateDisplayInfo_001
  * @tc.desc: Test UpdateDisplayInfo
  * @tc.type: Function
@@ -611,6 +640,22 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Proc
     pointerEvent->SetPointerId(10);
     pointerEvent->SetActionTime(1000);
     EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessUpAndCancelEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_SetKnuckleDrawingManager
+ * @tc.desc: Test SetKnuckleDrawingManager
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_SetKnuckleDrawingManager, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    knuckleDynamicDrawMgr.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    knuckleDynamicDrawMgr.knuckleDrawMgr_->screenReadState_.state = "0";
+    knuckleDynamicDrawMgr.pointCounter_ = MAX_DIVERGENCE_NUM;
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.SetKnuckleDrawingManager(knuckleDynamicDrawMgr.knuckleDrawMgr_));
 }
 
 /**
