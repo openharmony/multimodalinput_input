@@ -37,7 +37,6 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-
 class MyInputHandlerManager : public InputHandlerManager {
 public:
     MyInputHandlerManager() = default;
@@ -60,6 +59,7 @@ protected:
     {
         return InputHandlerType::MONITOR;
     }
+
 private:
     bool CheckMonitorValid(TouchGestureType type, int32_t fingers) override
     {
@@ -424,8 +424,8 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RecoverPointerEvent, T
     inputHdlMgr.lastPointerEvent_ = PointerEvent::Create();
     ASSERT_NE(inputHdlMgr.lastPointerEvent_, nullptr);
     inputHdlMgr.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_DOWN,
-        PointerEvent::POINTER_ACTION_UP };
+    std::initializer_list<int32_t> pointerActionEvents {
+        PointerEvent::POINTER_ACTION_DOWN, PointerEvent::POINTER_ACTION_UP};
     int32_t pointerActionEvent = PointerEvent::POINTER_ACTION_DOWN;
     inputHdlMgr.lastPointerEvent_->SetPointerId(0);
     PointerEvent::PointerItem item;
@@ -901,7 +901,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_TRUE(ret);
 
-    #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     handler.eventType_ = HANDLE_EVENT_TYPE_FINGERPRINT;
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_FALSE(ret);
@@ -910,9 +910,9 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_TRUE(ret);
-    #endif
+#endif
 
-    #ifdef OHOS_BUILD_ENABLE_X_KEY
+#ifdef OHOS_BUILD_ENABLE_X_KEY
     handler.eventType_ = HANDLE_EVENT_TYPE_X_KEY;
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_TRUE(ret);
@@ -920,7 +920,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_TRUE(ret);
-    #endif
+#endif
 }
 
 /**
@@ -1138,7 +1138,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RegisterGestureMonitor
 
     manager.monitorHandlers_.emplace(handlerId, handle);
     EXPECT_NO_FATAL_FAILURE(manager.RegisterGestureMonitors());
-    
+
     handlerId++;
     handle.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
     manager.monitorHandlers_.emplace(handlerId, handle);
@@ -1161,6 +1161,42 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnConnected_001, TestS
     int32_t handlerId = 0;
     manager.monitorHandlers_.emplace(handlerId, handle);
     EXPECT_NO_FATAL_FAILURE(manager.OnConnected());
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_monitorCallback_001
+ * @tc.desc: Test the funcation monitorCallback_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_monitorCallback_001, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    int32_t eventId = 1;
+    int64_t actionTime = 2;
+    EXPECT_NO_FATAL_FAILURE(manager.monitorCallback_(eventId, actionTime));
+    EXPECT_NO_FATAL_FAILURE(manager.monitorCallbackConsume_(eventId, actionTime));
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_OnInputEvent_other
+ * @tc.desc: Test the funcation OnInputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnInputEvent_other, TestSize.Level1)
+{
+    MYInputHandlerManager manager;
+    PointerEvent::PointerItem pointerItem;
+    int32_t validPointerId = 0;
+    pointerItem.SetPointerId(validPointerId);
+
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(validPointerId);
+
+    uint32_t deviceTags = 0;
+    EXPECT_NO_FATAL_FAILURE(manager.OnInputEvent(pointerEvent, deviceTags));
 }
 } // namespace MMI
 } // namespace OHOS
