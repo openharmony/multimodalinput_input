@@ -16,10 +16,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "define_multimodal.h"
+#include "error_multimodal.h"
 #include "input_scene_board_judgement.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
-#include "error_multimodal.h"
+#include "multimodal_input_connect_manager.h"
+#include "net_packet.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"

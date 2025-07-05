@@ -15,6 +15,8 @@
 
 #include "oh_input_manager.h"
 
+#include "securec.h"
+
 #include "event_log_helper.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"

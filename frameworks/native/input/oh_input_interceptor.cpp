@@ -15,6 +15,7 @@
 
 #include "oh_input_interceptor.h"
 #include "input_manager_impl.h"
+#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputInterceptor"

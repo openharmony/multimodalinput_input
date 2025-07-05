@@ -77,6 +77,7 @@ public:
 
 private:
     int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
+    static void ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum);
 
     std::mutex mtx_;
     MMIClientPtr client_ { nullptr };
