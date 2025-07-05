@@ -56,7 +56,6 @@ constexpr int32_t ROTATION_ANGLE_0 { 0 };
 constexpr int32_t ROTATION_ANGLE_90 { 90 };
 constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
-constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
 constexpr std::string_view SCREEN_READING { "accessibility_screenreader_enabled" };
 constexpr std::string_view SCREEN_READ_ENABLE { "1" };
 constexpr int32_t POINTER_NUMBER_TO_DRAW { 10 };
