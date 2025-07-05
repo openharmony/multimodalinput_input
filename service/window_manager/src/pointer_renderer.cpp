@@ -35,13 +35,29 @@ constexpr float CALCULATE_IMAGE_MIDDLE{2.0f};
 constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{ 5.0f / 33.0f };
 constexpr float ROTATION_ANGLE90 {90.0f};
+constexpr float MAX_DPI {1.93f};   //1.93 is the max dpi for hardware cursor pointer to limit the image size within 256
+constexpr uint32_t MAX_POINTER_SIZE {7};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 
 namespace OHOS::MMI {
 
 int32_t RenderConfig::GetImageSize() const
 {
-    return pow(INCREASE_RATIO, size - 1) * dpi * DEVCIE_INDEPENDENT_PIXELS;
+    float increaseRatio = AdjustIncreaseRatio(dpi);
+    return pow(increaseRatio, size - 1) * dpi * DEVCIE_INDEPENDENT_PIXELS;
+}
+
+float RenderConfig::AdjustIncreaseRatio(float originDpi) const
+{
+    if (originDpi == 0.0f) {
+        MMI_HILOGE("The originDpi cannot be 0, return default increase ratio");
+        return INCREASE_RATIO;
+    }
+    if (originDpi <= MAX_DPI) {
+        return INCREASE_RATIO;
+    } else {
+        return INCREASE_RATIO * pow(MAX_DPI / originDpi, float(1.0f / float(MAX_POINTER_SIZE - 1)));
+    }
 }
 
 std::string RenderConfig::ToString() const
