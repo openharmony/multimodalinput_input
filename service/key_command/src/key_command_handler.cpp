@@ -32,6 +32,8 @@
 #include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
 #include "timer_manager.h"
+#include <dlfcn.h>
+#include <iostream>
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -84,6 +86,10 @@ const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product
 const std::string DEVICE_TYPE_HPR { "HPR" };
 struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
 std::atomic<int32_t> g_distance { 0 };
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+const char* LOADMISTOUCH_LIBPATH = "libmistouch_prevention.z.so";
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+constexpr int32_t LIGHT_STAY_AWAY { 5 };
 } // namespace
 
 static void SensorDataCallbackImpl(SensorEvent *event)
@@ -1077,19 +1083,12 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
         !IsMusicActivate()) {
-        if (PRODUCT_TYPE == "VDE" && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-            RegisterProximitySensor();
-            std::weak_ptr<KeyCommandHandler> weakPtr = shared_from_this();
-            int32_t timerId = TimerMgr->AddTimer(FREQUENCY, 1, [weakPtr]() {
-                if (auto sharedPtr = weakPtr.lock()) {
-                    sharedPtr->UnregisterProximitySensor(); // 通过 shared_ptr 安全调用
-                } else {
-                    MMI_HILOGW("Timer fired, but object is already destroyed.");
-                }
-            }, "KeyCommandHandler-CheckSpecialRepeatKey");
-            if (timerId < 0) {
-                MMI_HILOGE("Add timer failed");
-            }
+        if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+            MMI_HILOGD("lzc 0, PRODUCT_TYPE:%{public}s", PRODUCT_TYPE.c_str());
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+            CallMistouchPrevention();
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+            MMI_HILOGI("CheckSpecialRepeatKey yes");
         }
         return false;
     }
@@ -1782,9 +1781,15 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std:
     std::string bundleName = item.ability.bundleName;
     std::string matchName = ".camera";
     if (item.keyCode == KeyEvent::KEYCODE_VOLUME_DOWN && bundleName.find(matchName) != std::string::npos) {
-        if (g_distance > 0) {
+        MMI_HILOGD("ret_ %{public}d", ret_.load());
+        if (ret_ == LIGHT_STAY_AWAY) {
             LaunchAbility(item.ability);
+            CHKPV(mistouchPrevention_);
+            MMI_HILOGI("Launch yes");
         }
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+        UnregisterMistouchPrevention();
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
     } else {
         LaunchAbility(item.ability);
     }
@@ -3176,6 +3181,101 @@ bool KeyCommandHandler::HasScreenCapturePermission(uint32_t permissionType)
         recordSwitch_.statusConfigValue,
         hasScreenCapturePermission);
     return hasScreenCapturePermission;
+}
+
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+void KeyCommandHandler::CallMistouchPrevention()
+{
+    if (hasRegisteredSensor_) {
+        MMI_HILOGE("Has SubscribeSensor %{public}d", SENSOR_TYPE_ID_PROXIMITY);
+        return;
+    }
+    if (mistouchLibHandle_ == nullptr) {
+        mistouchLibHandle_ = dlopen(LOADMISTOUCH_LIBPATH, RTLD_LAZY);
+        if (!mistouchLibHandle_) {
+            MMI_HILOGE("Failed to load library: %s", dlerror());
+            return;
+        }
+        typedef IMistouchPrevention* (*funCreate_ptr) (void);
+        funCreate_ptr fnCreate = nullptr;
+        fnCreate = (funCreate_ptr)dlsym(mistouchLibHandle_, "ConsumerMpImplGetInstance");
+        if (fnCreate == nullptr) {
+            MMI_HILOGE("dlsym mistouchPrevention wrapper symbol failed, error:%{public}s", dlerror());
+            dlclose(mistouchLibHandle_);
+            return;
+        }
+        mistouchPrevention_ = (IMistouchPrevention*)fnCreate();
+        if (mistouchPrevention_ == nullptr) {
+            MMI_HILOGE("mistouchPrevention wrapper symbol failed, error:%{public}s", dlerror());
+            dlclose(mistouchLibHandle_);
+            return;
+        }
+    }
+
+    std::weak_ptr<KeyCommandHandler> weakPtr = shared_from_this();
+    auto callback = [weakPtr](int32_t ret) -> void {
+        if (auto sharedPtr = weakPtr.lock()) {
+            sharedPtr->ret_ = ret;
+            MMI_HILOGD("UserStatusDataCallback received data:ret_ %{public}d", sharedPtr->ret_.load());
+        } else {
+            MMI_HILOGE("callback fired, but object is already destroyed.");
+        }
+    };
+    CHKPV(mistouchPrevention_);
+    int ret = mistouchPrevention_->MistouchPreventionConnector(callback);
+    hasRegisteredSensor_ = true;
+    MMI_HILOGD("CallMistouchPrevention yes MistouchPreventionConnector:%{public}d", ret);
+
+    timerId_ = TimerMgr->AddTimer(FREQUENCY, 1, [weakPtr]() {
+        if (auto sharedPtr = weakPtr.lock()) {
+            sharedPtr->UnregisterMistouchPrevention();
+        } else {
+            MMI_HILOGE("Timer fired, but object is already destroyed.");
+        }
+    }, "KeyCommandHandler-CheckSpecialRepeatKey");
+    if (timerId_ < 0) {
+        MMI_HILOGE("Add timer failed");
+    }
+}
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+void KeyCommandHandler::UnregisterMistouchPrevention()
+{
+    if (!hasRegisteredSensor_) {
+        MMI_HILOGD("Has unregistered sensor: %{public}d", SENSOR_TYPE_ID_PROXIMITY);
+        return;
+    }
+    CHKPV(mistouchPrevention_);
+    mistouchPrevention_->MistouchPreventionClose();
+    hasRegisteredSensor_ = false;
+    ret_ = -1;
+    MMI_HILOGD("UnregisterMistouchPrevention:ret_ %{public}d", ret_.load());
+    if (timerId_ >= 0) {
+        MMI_HILOGD("lzc RemoveTimer:%{public}d", timerId_);
+        TimerMgr->RemoveTimer(timerId_);
+        timerId_ = -1;
+    }
+}
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+
+KeyCommandHandler::~KeyCommandHandler()
+{
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+    if (mistouchLibHandle_ != nullptr) {
+        if (mistouchPrevention_ != nullptr) {
+            typedef void (*funCreate_ptr) (IMistouchPrevention* mistouchPrevention);
+            funCreate_ptr fnDestory = nullptr;
+            fnDestory = (funCreate_ptr)dlsym(mistouchLibHandle_, "ConsumerMpImplDestoryInstance");
+            if (fnDestory != nullptr) {
+                fnDestory(mistouchPrevention_);
+            }
+            mistouchPrevention_ = nullptr;
+        }
+        dlclose(mistouchLibHandle_);
+        mistouchLibHandle_ = nullptr;
+    }
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 }
 } // namespace MMI
 } // namespace OHOS

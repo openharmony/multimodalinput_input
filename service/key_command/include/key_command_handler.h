@@ -20,6 +20,7 @@
 
 #include "i_input_event_handler.h"
 #include "input_handler_type.h"
+#include <mutex>
 
 namespace OHOS {
 namespace MMI {
@@ -152,11 +153,22 @@ struct KnuckleSwitch {
     bool statusConfigValue { false };
 };
 
+using MistouchPreventionCallbackFunc = std::function<void(int32_t)>;
+class IMistouchPrevention  {
+public:
+    IMistouchPrevention() = default;
+    virtual ~IMistouchPrevention() = default;
+ 
+    virtual int32_t MistouchPreventionConnector(MistouchPreventionCallbackFunc callbackFunc) = 0;
+
+    virtual int32_t MistouchPreventionClose() = 0;
+};
+
 class KeyCommandHandler final : public IInputEventHandler, public std::enable_shared_from_this<KeyCommandHandler> {
 public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
-    ~KeyCommandHandler() override = default;
+    ~KeyCommandHandler() override;
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
     int32_t EnableCombineKey(bool enable);
     KnuckleGesture GetSingleKnuckleGesture() const;
@@ -331,6 +343,10 @@ private:
     void MenuClickProcess(const std::string bundleName, const std::string abilityName, const std::string action);
     int32_t CheckTwoFingerGesture(int32_t pid);
     bool HasScreenCapturePermission(uint32_t permissionType);
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+    void CallMistouchPrevention();
+    void UnregisterMistouchPrevention()
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 
 private:
     Sequence matchedSequence_;
@@ -418,6 +434,10 @@ private:
     bool gameForbidFingerKnuckle_ { false };
     bool hasRegisteredSensor_ { false };
     uint32_t screenCapturePermission_ { ScreenCapturePermissionType::DEFAULT_PERMISSIONS };
+    void *mistouchLibHandle_ {nullptr};
+    IMistouchPrevention *mistouchPrevention_ {nullptr};
+    std::atomic<int32_t> ret_ {0};
+    std::mutex dataMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
