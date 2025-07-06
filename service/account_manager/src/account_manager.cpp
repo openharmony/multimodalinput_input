@@ -39,6 +39,7 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AccountManager"
 
+
 namespace OHOS {
 namespace MMI {
 namespace {
