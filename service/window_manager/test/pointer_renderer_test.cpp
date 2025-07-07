@@ -369,5 +369,26 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_001, Te
     ret = renderer.LoadCursorSvgWithColor(config);
     EXPECT_EQ(ret, nullptr);
 }
+
+/**
+ * @tc.name: PointerRendererTest_AdjustIncreaseRatio_001
+ * @tc.desc: Test AdjustIncreaseRatio
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_AdjustIncreaseRatio_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    float originDpi = 0.0f;
+    float ret = config.AdjustIncreaseRatio(originDpi);
+    EXPECT_EQ(ret, 1.22f);
+    originDpi = 1.9f;
+    ret = config.AdjustIncreaseRatio(originDpi);
+    EXPECT_EQ(ret, 1.22f);
+    originDpi = 2.125f;
+    ret = config.AdjustIncreaseRatio(originDpi);
+    EXPECT_NE(ret, 1.22f);
+}
 } // namespace MMI
 } // namespace OHOS

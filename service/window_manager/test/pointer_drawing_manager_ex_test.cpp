@@ -62,10 +62,8 @@ public:
     static void SetUpTestCase(void) {};
     static void TearDownTestCase(void) {};
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    void SetUp(void)
-    {}
-    void TearDown(void)
-    {}
+    void SetUp(void) {}
+    void TearDown(void) {}
 
     std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
 };
@@ -508,41 +506,29 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_PixelFormatToC
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     Media::PixelFormat pixelFmt = Media::PixelFormat::RGB_565;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_RGB_565);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGB_565);
     pixelFmt = Media::PixelFormat::RGBA_8888;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888);
     pixelFmt = Media::PixelFormat::BGRA_8888;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888);
     pixelFmt = Media::PixelFormat::ALPHA_8;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8);
     pixelFmt = Media::PixelFormat::RGBA_F16;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16);
     pixelFmt = Media::PixelFormat::UNKNOWN;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = Media::PixelFormat::ARGB_8888;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = Media::PixelFormat::RGB_888;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = Media::PixelFormat::NV21;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = Media::PixelFormat::NV12;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = Media::PixelFormat::CMYK;
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = static_cast<Media::PixelFormat>(100);
-    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
-        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
 }
 
 /**
@@ -556,20 +542,15 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AlphaTypeToAlp
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
-    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
-        Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
     alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
-    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
-        Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE);
     alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
-    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
-        Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL);
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL);
     alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
-    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
-        Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL);
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL);
     alphaType = static_cast<Media::AlphaType>(5);
-    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
-        Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
 }
 
 /**
@@ -1771,47 +1752,47 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SkipPointerLay
 */
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_PixelFormatToColorType_001, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-PointerDrawingManager pointerDrawMgr;
-Media::PixelFormat pixelFormat = Media::PixelFormat::RGB_565;
-auto value = Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
-Rosen::Drawing::ColorType ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::RGBA_8888;
-value = Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::BGRA_8888;
-value = Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::ALPHA_8;
-value = Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::RGBA_F16;
-value = Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::UNKNOWN;
-value = Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::ARGB_8888;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::RGB_888;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::NV21;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::NV12;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
-pixelFormat = Media::PixelFormat::CMYK;
-ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
-EXPECT_EQ(ret, value);
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    Media::PixelFormat pixelFormat = Media::PixelFormat::RGB_565;
+    auto value = Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
+    Rosen::Drawing::ColorType ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::RGBA_8888;
+    value = Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::BGRA_8888;
+    value = Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::ALPHA_8;
+    value = Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::RGBA_F16;
+    value = Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::UNKNOWN;
+    value = Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::ARGB_8888;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::RGB_888;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::NV21;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::NV12;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
+    pixelFormat = Media::PixelFormat::CMYK;
+    ret = pointerDrawMgr.PixelFormatToColorType(pixelFormat);
+    EXPECT_EQ(ret, value);
 }
 
 /**
@@ -1822,24 +1803,24 @@ EXPECT_EQ(ret, value);
 */
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AlphaTypeToAlphaType_001, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-PointerDrawingManager pointerDrawMgr;
-Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
-auto value = Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
-Rosen::Drawing::AlphaType ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
-EXPECT_EQ(ret, value);
-alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
-value = Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
-ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
-EXPECT_EQ(ret, value);
-alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
-value = Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
-ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
-EXPECT_EQ(ret, value);
-alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
-value = Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
-ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
-EXPECT_EQ(ret, value);
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
+    auto value = Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
+    Rosen::Drawing::AlphaType ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+    EXPECT_EQ(ret, value);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    value = Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
+    ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+    EXPECT_EQ(ret, value);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
+    value = Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
+    ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+    EXPECT_EQ(ret, value);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+    value = Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
+    ret = pointerDrawMgr.AlphaTypeToAlphaType(alphaType);
+    EXPECT_EQ(ret, value);
 }
 
 /**
@@ -1850,11 +1831,29 @@ EXPECT_EQ(ret, value);
 */
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ClearWindowPointerStyle_001, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-PointerDrawingManager pointerDrawMgr;
-int32_t pid = 2;
-int32_t windowId = 1;
-ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ClearWindowPointerStyle(pid, windowId));
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t pid = 2;
+    int32_t windowId = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ClearWindowPointerStyle(pid, windowId));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_IsWindowRotation_001
+ * @tc.desc: Test the funcation IsWindowRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_IsWindowRotation_001, TestSize.Level1)
+{
+    OLD::DisplayInfo displayInfo;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    bool ret = pointerDrawingManager->IsWindowRotation(&displayInfo);
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
+        ASSERT_EQ(ret, true);
+    } else {
+        ASSERT_EQ(ret, false);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

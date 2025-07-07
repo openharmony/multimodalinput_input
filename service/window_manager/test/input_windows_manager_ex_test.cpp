@@ -20,7 +20,6 @@
 #include "input_windows_manager.h"
 #include "mmi_matrix3.h"
 #include "mock.h"
-#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -2497,54 +2496,9 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_001, TestSize.Level1)
     ASSERT_NE(inputWindowsManager, nullptr);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-
-    inputWindowsManager->knuckleDrawMgr_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
 }
 
-/**
- * @tc.name: DrawTouchGraphic_002
- * @tc.desc: Test the function DrawTouchGraphic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    inputWindowsManager->knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    ASSERT_NE(inputWindowsManager->knuckleDrawMgr_, nullptr);
-    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
-}
-
-/**
- * @tc.name: DrawTouchGraphic_003
- * @tc.desc: Test the function DrawTouchGraphic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    inputWindowsManager->knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    ASSERT_NE(inputWindowsManager->knuckleDrawMgr_, nullptr);
-
-    inputWindowsManager->knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
-    ASSERT_NE(inputWindowsManager->knuckleDynamicDrawingManager_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
-}
 
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent
@@ -3713,10 +3667,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation,
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 100;
     displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION0;
     auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->cursorPosMap_.end()) {
         it->second.displayId = 100;
         it->second.direction = Direction::DIRECTION0;
+        it->second.displayDirection = Direction::DIRECTION0;
     }
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -3740,10 +3696,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 100;
     displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION0;
     auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->cursorPosMap_.end()) {
         it->second.displayId = 100;
         it->second.direction = Direction::DIRECTION90;
+        it->second.displayDirection = Direction::DIRECTION0;
     }
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -3764,6 +3722,64 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(true));
     InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.AdjustDisplayRotation());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_003
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION90;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        it->second.displayId = 100;
+        it->second.direction = Direction::DIRECTION90;
+        it->second.displayDirection = Direction::DIRECTION0;
+    }
+    auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_004
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.displayDirection = DIRECTION90;
+    auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->cursorPosMap_.end()) {
+        it->second.displayId = 100;
+        it->second.direction = Direction::DIRECTION0;
+        it->second.displayDirection = Direction::DIRECTION0;
+    }
+    auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
 
 /**
@@ -4191,9 +4207,6 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_004, TestSize.Level1)
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displayInfo);
     }
-
-    inputWindowsManager->knuckleDrawMgr_ = nullptr;
-    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
 }

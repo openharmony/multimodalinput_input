@@ -18,6 +18,9 @@
 
 #include "display_manager.h"
 #include "event_log_helper.h"
+#ifndef OHOS_BUILD_ENABLE_WATCH
+#include "knuckle_drawing_component.h"
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
 #include "cursor_drawing_component.h"
@@ -1885,7 +1888,8 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
     };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPosCur.displayId);
     CHKPV(displayInfo);
-    if (cursorPosCur.displayDirection != displayInfo->displayDirection) {
+    if (cursorPosCur.displayDirection != displayInfo->displayDirection ||
+        cursorPosCur.direction != displayInfo->direction) {
         MMI_HILOGI("displayId:%{public}d, cursorPosX:%{private}.2f, cursorPosY:%{private}.2f, direction:%{public}d, "
             "physicalDisplay id:%{public}d, x:%{private}d, y:%{private}d, width:%{public}d, height:%{public}d, "
             "dpi:%{public}d, name:%{public}s, uniq:%{public}s, direction:%{public}d, displayDirection:%{public}d",
@@ -5687,19 +5691,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    if (knuckleDrawMgr_ == nullptr) {
-        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    }
-#ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    if (knuckleDynamicDrawingManager_ == nullptr) {
-        knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
-        if (knuckleDrawMgr_ != nullptr) {
-            knuckleDynamicDrawingManager_->SetKnuckleDrawingManager(knuckleDrawMgr_);
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
         MMI_HILOGE("This display is not exist");
@@ -5725,12 +5716,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
         }
     }
     if (!isInMethodWindow) {
-        knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent, physicDisplayInfo->rsId);
-#ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-        knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent, physicDisplayInfo->rsId);
-#endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+        KnuckleDrawingComponent::GetInstance().Draw(*physicDisplayInfo, pointerEvent);
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
