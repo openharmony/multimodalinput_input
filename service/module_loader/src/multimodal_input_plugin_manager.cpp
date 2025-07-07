@@ -27,7 +27,6 @@ namespace OHOS {
 namespace MMI {
 std::shared_ptr<InputPluginManager> InputPluginManager::instance_;
 std::once_flag InputPluginManager::init_flag_;
-std::mutex InputPluginManager::mutex_;
 
 const char *FILE_EXTENSION = ".so";
 const char *FOLDER_PATH = "/system/lib64/multimodalinput/autorun";
@@ -36,7 +35,6 @@ const int32_t MAX_TIMER = 3;
 
 InputPluginManager::~InputPluginManager()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     plugins_.clear();
     if (instance_ != nullptr) {
         instance_ = nullptr;
@@ -168,11 +166,11 @@ int32_t InputPluginManager::DoHandleEvent(
     libinput_event *event, int64_t frameTime, InputPlugin *iplugin, InputPluginStage stage)
 {
     if (event == nullptr) {
-        return 0;
+        return RET_NOTDO;
     }
     auto it = plugins_.find(stage);
     if (it == plugins_.end()) {
-        return 0;
+        return RET_NOTDO;
     }
     CALL_DEBUG_ENTER;
     auto &plugins = it->second;
@@ -181,7 +179,7 @@ int32_t InputPluginManager::DoHandleEvent(
         auto cur_plugin = std::find_if(plugins.begin(), plugins.end(),
             [iplugin](const std::shared_ptr<InputPlugin> &plugin) { return plugin.get() == iplugin; });
         if (cur_plugin == plugins.end()) {
-            return 0;
+            return RET_NOTDO;
         }
         start_plugin = std::next(cur_plugin);
     }
@@ -206,14 +204,14 @@ int32_t InputPluginManager::DoHandleEvent(
                 MMI_HILOGE("pluginIt is intermediate or end event");
                 continue;
             }
-            return 1;
+            return RET_DO;
         } else if (result == PluginResult::UseNoNeedReissue) {
-            return 1;
+            return RET_DO;
         } else if (result == PluginResult::Error) {
             MMI_HILOGE("pluginIt err name:%{public}s", (*pluginIt)->name_.c_str());
         }
     }
-    return 0;
+    return RET_NOTDO;
 }
 
 // LIBINPUT_EVENT_TABLET_TOOL_BUTTON、LIBINPUT_EVENT_TABLET_PAD_BUTTON、LIBINPUT_EVENT_TABLET_PAD_KEY
@@ -299,7 +297,7 @@ void InputPlugin::UnInit()
 void InputPlugin::DispatchEvent(libinput_event *event, int64_t frameTime)
 {
     int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(event, frameTime, this, stage_);
-    if (result == 0) {
+    if (result == RET_NOTDO) {
         CHKPV(callback_);
         callback_(event, frameTime);
     }
@@ -313,7 +311,6 @@ PluginResult InputPlugin::HandleEvent(libinput_event *event, int64_t frameTime)
 
 int32_t InputPlugin::AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount)
 {
-    std::lock_guard<std::mutex> lock(timerMutex_);
     if (timerCnt_ >= MAX_TIMER) {
         return -1;
     }
@@ -326,7 +323,6 @@ int32_t InputPlugin::AddTimer(std::function<void()> func, int32_t intervalMs, in
 
 int32_t InputPlugin::RemoveTimer(int32_t id)
 {
-    std::lock_guard<std::mutex> lock(timerMutex_);
     int32_t result = TimerMgr->RemoveTimer(id, name_);
     if (timerCnt_ > 0) {
         timerCnt_--;
