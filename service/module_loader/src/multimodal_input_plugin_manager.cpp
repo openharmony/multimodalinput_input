@@ -60,7 +60,7 @@ int32_t InputPluginManager::Init()
     DIR *dir = opendir(directory_.c_str());
     if (!dir) {
         MMI_HILOGE("Failed to open error:%{private}s", strerror(errno));
-        return 0;
+        return RET_OK;
     }
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
@@ -74,7 +74,7 @@ int32_t InputPluginManager::Init()
     }
     closedir(dir);
     PrintPlugins();
-    return 0;
+    return RET_OK;
 }
 
 bool InputPluginManager::LoadPlugin(const std::string &path)
@@ -282,7 +282,7 @@ int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
     prio_ = pin->GetPriority();
     stage_ = pin->GetStage();
     plugin_ = pin;
-    return 0;
+    return RET_OK;
 }
 
 void InputPlugin::UnInit()
@@ -312,7 +312,7 @@ PluginResult InputPlugin::HandleEvent(libinput_event *event, int64_t frameTime)
 int32_t InputPlugin::AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount)
 {
     if (timerCnt_ >= MAX_TIMER) {
-        return -1;
+        return RET_ERR;
     }
     int32_t timerId = TimerMgr->AddTimerInternal(intervalMs, repeatCount, func, name_);
     if (timerId != -1) {
