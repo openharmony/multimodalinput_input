@@ -2652,6 +2652,8 @@ ohos_unittest("EventHandlerEXTest") {
 ohos_unittest("EventDispatchTest") {
   module_out_path = module_output_path
 
+  defines += [ "OHOS_BUILD_ENABLE_ONE_HAND_MODE" ]
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",

@@ -1296,26 +1296,50 @@ public:
         /**
          * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          */
-        double  GetFixedDisplayX() const;
+        int32_t  GetFixedDisplayX() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          * @param fixedDisplayX Indicates the x coordinate to set.
          * @return void
          */
-        void SetFixedDisplayX(double  fixedDisplayX);
+        void SetFixedDisplayX(int32_t fixedDisplayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          */
-        double  GetFixedDisplayY() const;
+        int32_t  GetFixedDisplayY() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
          * @param fixedDisplayY Indicates the y coordinate to set.
          * @return void
          */
-        void SetFixedDisplayY(double  fixedDisplayY);
+        void SetFixedDisplayY(int32_t fixedDisplayY);
+
+        /**
+         * @brief Obtains the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         */
+        double  GetFixedDisplayXPos() const;
+
+        /**
+         * @brief Sets the x coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         * @param fixedDisplayX Indicates the x coordinate to set.
+         * @return void
+         */
+        void SetFixedDisplayXPos(double fixedDisplayX);
+
+        /**
+         * @brief Obtains the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         */
+        double  GetFixedDisplayYPos() const;
+
+        /**
+         * @brief Sets the y coordinate relative to the upper left corner of the virtual screen in one-hand mode.
+         * @param fixedDisplayY Indicates the y coordinate to set.
+         * @return void
+         */
+        void SetFixedDisplayYPos(double fixedDisplayY);
 
         /**
          * @brief Sets the orientation of the physical display.
