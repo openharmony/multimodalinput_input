@@ -100,9 +100,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    void UpdateDisplayXYInOneHandMode(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t PackDisplayData(NetPacket &pkt, const UserScreenInfo &userScreenInfo);
 

@@ -1842,7 +1842,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayX, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto item = PointerEvent::PointerItem();
-    double disPlayX = 25.00;
+    int32_t disPlayX = 25;
     item.SetFixedDisplayX(disPlayX);
     ASSERT_EQ(item.GetFixedDisplayX(), disPlayX);
 }
@@ -1858,7 +1858,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayY, TestSize.Level2)
 {
     CALL_TEST_DEBUG;
     auto item = PointerEvent::PointerItem();
-    double disPlayY = 30.00;
+    int32_t disPlayY = 30;
     item.SetFixedDisplayY(disPlayY);
     ASSERT_EQ(item.GetFixedDisplayY(), disPlayY);
 }

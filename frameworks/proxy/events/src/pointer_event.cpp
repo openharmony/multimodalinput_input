@@ -154,22 +154,42 @@ void PointerEvent::PointerItem::SetWindowYPos(double y)
     windowYPos_ = y;
 }
 
-double PointerEvent::PointerItem::GetFixedDisplayX() const
+int32_t PointerEvent::PointerItem::GetFixedDisplayX() const
+{
+    return static_cast<int32_t>(fixedDisplayX_);
+}
+
+void PointerEvent::PointerItem::SetFixedDisplayX(int32_t fixedDisplayX)
+{
+    fixedDisplayX_ = static_cast<double>(fixedDisplayX);
+}
+
+int32_t PointerEvent::PointerItem::GetFixedDisplayY() const
+{
+    return static_cast<int32_t>(fixedDisplayY_);
+}
+
+void PointerEvent::PointerItem::SetFixedDisplayY(int32_t fixedDisplayY)
+{
+    fixedDisplayY_ = static_cast<double>(fixedDisplayY);
+}
+
+double PointerEvent::PointerItem::GetFixedDisplayXPos() const
 {
     return fixedDisplayX_;
 }
 
-void PointerEvent::PointerItem::SetFixedDisplayX(double fixedDisplayX)
+void PointerEvent::PointerItem::SetFixedDisplayXPos(double fixedDisplayX)
 {
     fixedDisplayX_ = fixedDisplayX;
 }
 
-double PointerEvent::PointerItem::GetFixedDisplayY() const
+double PointerEvent::PointerItem::GetFixedDisplayYPos() const
 {
     return fixedDisplayY_;
 }
 
-void PointerEvent::PointerItem::SetFixedDisplayY(double fixedDisplayY)
+void PointerEvent::PointerItem::SetFixedDisplayYPos(double fixedDisplayY)
 {
     fixedDisplayY_ = fixedDisplayY;
 }
