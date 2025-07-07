@@ -54,11 +54,13 @@ public:
         const std::string &name = "");
     int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
         const std::string &name = "");
-    int32_t RemoveTimer(int32_t timerId);
+    int32_t RemoveTimer(int32_t timerId, const std::string &name = "");
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);
     int32_t CalcNextDelay();
     void ProcessTimers();
+    int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name = "");
 
 private:
     struct TimerItem {
@@ -72,9 +74,7 @@ private:
     };
 private:
     int32_t TakeNextTimerId();
-    int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-        const std::string &name = "");
-    int32_t RemoveTimerInternal(int32_t timerId);
+    int32_t RemoveTimerInternal(int32_t timerId, const std::string &name = "");
     int32_t ResetTimerInternal(int32_t timerId);
     bool IsExistInternal(int32_t timerId);
     void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
