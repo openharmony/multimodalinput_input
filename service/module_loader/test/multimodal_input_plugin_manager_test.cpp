@@ -28,7 +28,7 @@ namespace {
 using namespace testing::ext;
 } // namespace
 
-const std::string PATH { "/system/lib64/multimodalinput/module/autorun" };
+const std::string PATH { "/system/lib64/multimodalinput/autorun" };
 
 class MultimodalInputPluginManagerTest : public testing::Test {
 public:
