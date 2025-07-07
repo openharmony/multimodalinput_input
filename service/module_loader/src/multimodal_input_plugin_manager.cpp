@@ -30,7 +30,7 @@ std::once_flag InputPluginManager::init_flag_;
 std::mutex InputPluginManager::mutex_;
 
 const char *FILE_EXTENSION = ".so";
-const char *FOLDER_PATH = "/system/lib64/multimodalinput/module/autorun";
+const char *FOLDER_PATH = "/system/lib64/multimodalinput/autorun";
 const int32_t TIMEOUT_US = 300;
 const int32_t MAX_TIMER = 3;
 
