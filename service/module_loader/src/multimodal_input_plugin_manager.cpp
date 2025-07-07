@@ -46,14 +46,11 @@ InputPluginManager::~InputPluginManager()
 
 std::shared_ptr<InputPluginManager> InputPluginManager::GetInstance(const std::string &directory)
 {
-    std::call_once(init_flag_, [&directory] {
+    std::call_once(init_flag_, [this, &directory] {
         if (instance_ == nullptr) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            if (instance_ == nullptr) {
-                MMI_HILOGI("New InputPluginManager");
-                std::string dir = directory.empty() ? FOLDER_PATH : directory;
-                instance_ = std::make_shared<InputPluginManager>(dir);
-            }
+            MMI_HILOGI("New InputPluginManager");
+            std::string dir = directory.empty() ? FOLDER_PATH : directory;
+            instance_ = std::make_shared<InputPluginManager>(dir);
         }
     });
     return instance_;
@@ -193,6 +190,9 @@ int32_t InputPluginManager::DoHandleEvent(
     int64_t endTime = 0;
     int64_t lostTime = 0;
     for (auto pluginIt = start_plugin; pluginIt != plugins.end(); ++pluginIt) {
+        if ((*pluginIt) == nullptr) {
+            continue;
+        }
         beginTime = GetSysClockTime();
         result = (*pluginIt)->HandleEvent(event, frameTime);
         endTime = GetSysClockTime();
