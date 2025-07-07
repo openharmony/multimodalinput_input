@@ -266,9 +266,9 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
   sources = [
-    "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
     "src/mock.cpp",
     "src/mouse_transform_processor_ex_test.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
   ]
 
   deps = [
@@ -277,15 +277,16 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   ]
 
   external_deps = [
-    "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
-    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwsutils",
+    "window_manager:libwm",
+    "init:libbegetutil",
+    "graphic_2d:librender_service_client",
   ]
 }

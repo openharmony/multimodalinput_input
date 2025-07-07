@@ -15,8 +15,10 @@
 
 #include "multimodal_event_handler.h"
 
-#include <cJSON.h>
+#include <fstream>
 #include <config_policy_utils.h>
+#include <json/reader.h>
+#include <json/value.h>
 
 #include "event_log_helper.h"
 #include "input_manager_impl.h"
@@ -38,6 +40,7 @@ namespace {
 constexpr int32_t MIN_MULTI_TOUCH_POINT_NUM { 0 };
 constexpr int32_t MAX_MULTI_TOUCH_POINT_NUM { 10 };
 constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
+constexpr size_t DEFAULT_BUFFER_SIZE { 255 };
 }
 
 void OnConnected(const IfMMIClient& client)
@@ -298,35 +301,65 @@ int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t readThreadId
     return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, readThreadId);
 }
 
-static void ReadMaxMultiTouchPointNum(cJSON *productCfg, int32_t &maxMultiTouchPointNum)
+static std::unique_ptr<char[]> ReadMaxTouchPointsConfig(std::ifstream &ifs, Json::Value &jsonMaxTouchPoints)
 {
-    if (!cJSON_IsObject(productCfg)) {
-        MMI_HILOGE("Not json format");
+    auto rdbuf = ifs.rdbuf();
+    CHKPP(rdbuf);
+    rdbuf->pubseekpos(jsonMaxTouchPoints.getOffsetStart());
+
+    size_t sIndexChars = 0;
+    size_t indexChars = 0;
+    size_t countChars = jsonMaxTouchPoints.getOffsetLimit();
+    if (countChars > DEFAULT_BUFFER_SIZE) {
+        MMI_HILOGE("Config of touchscreen.MaxTouchPoints is too long to be integer");
+        return nullptr;
+    }
+    std::unique_ptr<char[]> buffer { new char[countChars + 1] };
+    ifs.read(buffer.get(), countChars);
+
+    while ((indexChars < countChars) && std::isspace(buffer[indexChars])) {
+        ++indexChars;
+    }
+    if (buffer[indexChars] == '-') {
+        buffer[sIndexChars++] = buffer[indexChars++];
+    }
+    while ((indexChars < countChars) && (std::isdigit(buffer[indexChars]) || (buffer[indexChars] == '.'))) {
+        buffer[sIndexChars++] = buffer[indexChars++];
+    }
+    buffer[sIndexChars] = '\0';
+    MMI_HILOGI("Config of touchscreen.MaxTouchPoints: %{public}s", buffer.get());
+    return buffer;
+}
+
+static void ReadMaxMultiTouchPointNum(std::ifstream &ifs, int32_t &maxMultiTouchPointNum)
+{
+    Json::Reader reader;
+    Json::Value root;
+
+    if (!reader.parse(ifs, root)) {
+        MMI_HILOGE("Failed to parse config");
         return;
     }
-    cJSON *jsonTouchscreen = cJSON_GetObjectItemCaseSensitive(productCfg, "touchscreen");
-    if (!cJSON_IsObject(jsonTouchscreen)) {
-        MMI_HILOGE("The jsonTouchscreen is not object");
+    Json::Value jsonTouchscreen = root.get("touchscreen", Json::Value());
+    if (jsonTouchscreen.isNull()) {
+        MMI_HILOGE("Expect 'touchscreen'");
         return;
     }
-    cJSON *jsonMaxNumOfTouches = cJSON_GetObjectItemCaseSensitive(jsonTouchscreen, "MaxTouchPoints");
-    if (!cJSON_IsNumber(jsonMaxNumOfTouches)) {
-        MMI_HILOGE("The jsonMaxNumOfTouches is not number");
+    Json::Value jsonMaxTouchPoints = jsonTouchscreen.get("MaxTouchPoints", Json::Value());
+    if (jsonMaxTouchPoints.isNull()) {
+        MMI_HILOGE("Expect 'touchscreen.MaxTouchPoints'");
         return;
     }
-    char *sMaxNumOfTouches = cJSON_Print(jsonMaxNumOfTouches);
-    if (sMaxNumOfTouches == nullptr) {
-        MMI_HILOGE("The sMaxNumOfTouches is null");
+    if (!jsonMaxTouchPoints.isInt()) {
+        MMI_HILOGE("Expect integer for 'touchscreen.MaxTouchPoints'");
         return;
     }
-    MMI_HILOGI("Config of touchscreen.MaxTouchPoints:%{public}s", sMaxNumOfTouches);
-    bool isInteger = IsInteger(sMaxNumOfTouches);
-    cJSON_free(sMaxNumOfTouches);
-    if (!isInteger) {
+    auto sMaxTouchPoints = ReadMaxTouchPointsConfig(ifs, jsonMaxTouchPoints);
+    if (!IsInteger(sMaxTouchPoints.get())) {
         MMI_HILOGE("Config of touchscreen.MaxTouchPoints is not integer");
         return;
     }
-    auto num = static_cast<int32_t>(cJSON_GetNumberValue(jsonMaxNumOfTouches));
+    auto num = jsonMaxTouchPoints.asInt();
     if ((num < MIN_MULTI_TOUCH_POINT_NUM) || (num > MAX_MULTI_TOUCH_POINT_NUM)) {
         MMI_HILOGW("Invalid config: MaxTouchPoints(%{public}d) is out of range[%{public}d, %{public}d]",
             num, MIN_MULTI_TOUCH_POINT_NUM, MAX_MULTI_TOUCH_POINT_NUM);
@@ -336,13 +369,15 @@ static void ReadMaxMultiTouchPointNum(cJSON *productCfg, int32_t &maxMultiTouchP
     MMI_HILOGI("touchscreen.MaxTouchPoints:%{public}d", maxMultiTouchPointNum);
 }
 
-static void ReadMaxMultiTouchPointNum(const std::string &cfgPath, int32_t &maxMultiTouchPointNum)
+static void ReadMaxMultiTouchPointNum(const char *cfgPath, int32_t &maxMultiTouchPointNum)
 {
-    std::string cfg = ReadJsonFile(cfgPath);
-    cJSON *jsonProductCfg = cJSON_Parse(cfg.c_str());
-    CHKPV(jsonProductCfg);
-    ReadMaxMultiTouchPointNum(jsonProductCfg, maxMultiTouchPointNum);
-    cJSON_Delete(jsonProductCfg);
+    std::ifstream ifs(cfgPath);
+    if (!ifs.is_open()) {
+        MMI_HILOGE("Can not open config");
+        return;
+    }
+    ReadMaxMultiTouchPointNum(ifs, maxMultiTouchPointNum);
+    ifs.close();
 }
 
 static void ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
@@ -352,11 +387,21 @@ static void ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
     char buf[MAX_PATH_LEN] {};
     char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
     if (cfgPath == nullptr) {
-        MMI_HILOGE("No '%{private}s' was found", cfgName);
+        MMI_HILOGE("No input product config was found");
         return;
     }
-    MMI_HILOGI("Input product config:%{private}s", cfgPath);
-    ReadMaxMultiTouchPointNum(std::string(cfgPath), maxMultiTouchPointNum);
+    auto realPath = std::unique_ptr<char, std::function<void(char *)>>(
+        ::realpath(cfgPath, nullptr),
+        [](auto arr) {
+            if (arr != nullptr) {
+                ::free(arr);
+            }
+        });
+    if (realPath == nullptr) {
+        MMI_HILOGI("No input product config");
+        return;
+    }
+    ReadMaxMultiTouchPointNum(realPath.get(), maxMultiTouchPointNum);
 }
 
 int32_t MultimodalEventHandler::GetMaxMultiTouchPointNum(int32_t &pointNum)

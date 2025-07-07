@@ -45,7 +45,8 @@
       "input_feature_one_hand_mode_enable",
       "input_feature_touch_drawing",
       "input_feature_watch_cfg_source",
-      "input_feature_upgrade_skia"
+      "input_feature_upgrade_skia",
+      "input_feature_mistouch_prevention"
     ],
     "adapted_system_type": [
       "standard"
@@ -103,7 +104,8 @@
         "ipc",
         "sensor",
         "idl_tool",
-        "runtime_core"
+        "runtime_core",
+        "jsoncpp"
       ],
       "third_party": [
         "libuv",

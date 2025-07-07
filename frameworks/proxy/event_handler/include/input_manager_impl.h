@@ -316,7 +316,7 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::function<void(int32_t, int32_t)> windowStatecallback_;
     bool knuckleSwitch_ { true };
-    UserScreenInfo userScreenInfo_;
+    UserScreenInfo userScreenInfo_ = {0};
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

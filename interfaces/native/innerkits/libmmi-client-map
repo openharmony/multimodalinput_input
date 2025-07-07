@@ -34,6 +34,10 @@
             OHOS::MMI::PointerStyleColor*;
             OHOS::MMI::MultimodalEventHandler*;
             OHOS::MMI::MMIClient*;
+            OHOS::MMI::BytraceAdapter::StartDevListener*;
+            OHOS::MMI::BytraceAdapter::StopDevListener*;
+            OHOS::MMI::ClientMsgHandler*;
+            OHOS::MMI::MMISceneBoardJudgement*;
             "vtable for OHOS::MMI::MMIClient";
             "virtual thunk to OHOS::MMI::InputDevice::~InputDevice()";
             "virtual thunk to OHOS::MMI::InputEvent::~InputEvent()";

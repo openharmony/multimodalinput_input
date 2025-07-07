@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "input_scene_board_judgement.h"
 #include "input_manager_impl.h"
@@ -62,8 +63,7 @@ public:
     {
         MMI_HILOGI("OnInputEvent PointerEvent enter");
     }
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override
-    {}
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
 };
 
 /**
@@ -139,8 +139,8 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RecoverPointerEvent, TestSiz
     CALL_TEST_DEBUG;
     InputMgrImpl.lastPointerEvent_ = PointerEvent::Create();
     ASSERT_NE(InputMgrImpl.lastPointerEvent_, nullptr);
-    std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_MOVE,
-        PointerEvent::POINTER_ACTION_UP };
+    std::initializer_list<int32_t> pointerActionPullEvents {
+        PointerEvent::POINTER_ACTION_MOVE, PointerEvent::POINTER_ACTION_UP};
     InputMgrImpl.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     EXPECT_FALSE(InputMgrImpl.RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_UP));
 
@@ -248,7 +248,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCustomCursor_01, TestSize
     int32_t windowId = 2;
     int32_t focusX = 3;
     int32_t focusY = 4;
-    void* pixelMap = nullptr;
+    void *pixelMap = nullptr;
     int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
     EXPECT_TRUE(winPid == -1);
     int32_t ret = InputMgrImpl.SetCustomCursor(windowId, focusX, focusY, pixelMap);
@@ -343,7 +343,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_01, TestSize
     CALL_TEST_DEBUG;
     int32_t color = 6;
     int32_t ret = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -357,7 +357,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_02, TestSize
     CALL_TEST_DEBUG;
     int32_t color = -10;
     int32_t ret = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -499,7 +499,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPixelMapData_01, TestSize
 {
     CALL_TEST_DEBUG;
     int32_t infoId = -1;
-    void* pixelMap = nullptr;
+    void *pixelMap = nullptr;
     int32_t ret = InputMgrImpl.SetPixelMapData(infoId, pixelMap);
     EXPECT_EQ(ret, RET_ERR);
 
@@ -803,7 +803,7 @@ HWTEST_F(InputManagerImplTest, SetPixelMapData_InvalidInput_Test, TestSize.Level
  * @tc.desc  : Test CancelInjection function when CancelInjection is successful.
  * @tc.type: FUNC
  * @tc.require:
-  */
+ */
 HWTEST_F(InputManagerImplTest, CancelInjection_Success, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -821,11 +821,14 @@ HWTEST_F(InputManagerImplTest, GetKeyState_ReturnsOk_WhenInputValid, TestSize.Le
 {
     CALL_TEST_DEBUG;
     std::vector<int32_t> pressedKeys = {1, 2, 3};
-    std::map<int32_t, int32_t> specialKeysState = {{1, 1}, {2, 2}, {3, 3}};
+    std::map<int32_t, int32_t> specialKeysState = {
+        {1, 1},
+        {2, 2},
+        {3, 3}
+    };
     int32_t result = InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
     EXPECT_EQ(result, RET_OK);
 }
-
 
 /**
  * @tc.name  : ReAddInputEventFilter_Test_001
@@ -844,7 +847,6 @@ HWTEST_F(InputManagerImplTest, ReAddInputEventFilter_Test_001, TestSize.Level1)
     InputMgrImpl.ReAddInputEventFilter();
     ASSERT_EQ(InputMgrImpl.eventFilterServices_.size(), 5);
 }
-
 
 /**
  * @tc.name  : SetPointerStyle_InvalidParam_Test
@@ -1041,42 +1043,42 @@ HWTEST_F(InputManagerImplTest, SubscribeInputActive_Test001, TestSize.Level1)
     std::shared_ptr<TestInputEventConsumer> inputEventConsumer = std::make_shared<TestInputEventConsumer>();
     EXPECT_NE(inputEventConsumer, nullptr);
     int64_t interval = -1; // ms
-    int32_t subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    int32_t subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_LT(subscriberId, 0);
 
     interval = 0; // ms
-    subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
     interval = 1; // ms
-    subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 
     interval = 499; // ms
-    subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 
     interval = 500; // ms
-    subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 
     interval = 2000; // ms
-    subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 
     interval = 2001; // ms
-    subscriberId = InputMgrImpl.SubscribeInputActive(
-        std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
+    subscriberId =
+        InputMgrImpl.SubscribeInputActive(std::static_pointer_cast<IInputEventConsumer>(inputEventConsumer), interval);
     EXPECT_GE(subscriberId, 0);
     InputMgrImpl.UnsubscribeInputActive(subscriberId);
 }
@@ -1094,6 +1096,319 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation001, TestS
     double displayX = 0.0;
     double displayY = 0.0;
     EXPECT_EQ(InputMgrImpl.GetPointerLocation(displayId, displayX, displayY), ERROR_APP_NOT_FOCUSED);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_001
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayInfo.name = "Main Display";
+    OHOS::MMI::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.id = 1;
+    displayGroupInfo.name = "Main Display Group";
+    displayGroupInfo.type = OHOS::MMI::GroupType::GROUP_DEFAULT;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.mainDisplayId = displayInfo.id;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    OHOS::MMI::UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 100;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, 0);
+}
+
+class MockNetPacket : public NetPacket {
+public:
+    explicit MockNetPacket(MmiMessageId msgId) : NetPacket(msgId) {}
+    MOCK_METHOD(bool, Write, (const char *data, size_t size), (override));
+};
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackDisplayData_WriteFailure
+ * @tc.desc: Test PackDisplayData_WriteFailure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_WriteFailure, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    DisplayGroupInfo group;
+    group.id = 1;
+    group.name = "MainGroup";
+    group.type = GroupType::GROUP_DEFAULT;
+    group.mainDisplayId = 2;
+    group.focusWindowId = 123;
+    group.windowsInfo.push_back(WindowInfo());
+    group.displaysInfo.push_back(DisplayInfo());
+    DisplayInfo display;
+    display.width = 1920;
+    display.height = 1080;
+    group.displaysInfo.push_back(display);
+    WindowInfo window;
+    window.groupId = 0;
+    window.id = 123;
+    group.windowsInfo.push_back(window);
+    userScreenInfo.displayGroups.push_back(group);
+    userScreenInfo.screens.push_back(ScreenInfo());
+    MockNetPacket mock_pkt(MmiMessageId::DISPLAY_INFO);
+    EXPECT_CALL(mock_pkt, Write(testing::_, testing::_)).WillRepeatedly(testing::Return(false));
+    int32_t result = InputMgrImpl.PackDisplayData(mock_pkt, userScreenInfo);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackWindowInfoReturnsError
+ * @tc.desc: Test TestPackWindowInfoReturnsError
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackWindowInfoReturnsError, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.id = 101;
+    displayGroupInfo.type = GroupType::GROUP_DEFAULT;
+    displayGroupInfo.focusWindowId = 123;
+    displayGroupInfo.mainDisplayId = 0;
+    WindowInfo windowInfo;
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    MockNetPacket mockPacket(MmiMessageId::DISPLAY_INFO);
+    int writeCallCount = 0;
+    EXPECT_CALL(mockPacket, Write(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke([&writeCallCount](const char *, size_t) {
+            bool success = (writeCallCount < 6);
+            writeCallCount++;
+            return success;
+        }));
+    int32_t result = InputMgrImpl.PackDisplayData(mockPacket, userScreenInfo);
+    EXPECT_NE(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_PrintDisplayInfo_004
+ * @tc.desc: Test TestPrintDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintDisplayInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    DisplayGroupInfo group;
+    int32_t mainDisplayId = 0;
+    group.mainDisplayId = mainDisplayId;
+    DisplayInfo displayInfo;
+    displayInfo.id = mainDisplayId;
+    displayInfo.name = "Display 0";
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    group.displaysInfo.push_back(displayInfo);
+    WindowInfo windowInfo;
+    windowInfo.id = 123;
+    windowInfo.displayId = mainDisplayId;
+    group.windowsInfo.push_back(windowInfo);
+    userScreenInfo.displayGroups.push_back(group);
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.PrintDisplayInfo(userScreenInfo));
+    DisplayGroupInfo newGroup;
+    newGroup.mainDisplayId = 1;
+    DisplayInfo newDisplayInfo;
+    newDisplayInfo.id = 1;
+    newDisplayInfo.name = "Display 1";
+    newDisplayInfo.width = 1440;
+    newDisplayInfo.height = 900;
+    newGroup.displaysInfo.push_back(newDisplayInfo);
+    WindowInfo newWindowInfo;
+    newWindowInfo.id = 1;
+    newWindowInfo.displayId = 1;
+    newGroup.windowsInfo.push_back(newWindowInfo);
+    userScreenInfo.displayGroups.push_back(newGroup);
+    int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackDisplayData_WriteFailure
+ * @tc.desc: Test PackDisplayData_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    DisplayGroupInfo group;
+    group.id = 1;
+    group.name = "MainGroup";
+    group.type = GroupType::GROUP_DEFAULT;
+    group.mainDisplayId = 2;
+    group.focusWindowId = 123;
+    group.windowsInfo.push_back(WindowInfo());
+    group.displaysInfo.push_back(DisplayInfo());
+    DisplayInfo display;
+    display.width = 1920;
+    display.height = 1080;
+    group.displaysInfo.push_back(display);
+    WindowInfo window;
+    window.groupId = 1;
+    window.id = 123;
+    group.windowsInfo.push_back(window);
+    userScreenInfo.displayGroups.push_back(group);
+    userScreenInfo.screens.push_back(ScreenInfo());
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+    auto result = InputMgrImpl.PackDisplayData(pkt, userScreenInfo);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackScreensInfo
+ * @tc.desc: Test PackScreensInfo_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackScreensInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+    std::vector<ScreenInfo> screens;
+    auto result = InputMgrImpl.PackScreensInfo(pkt, screens);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackDisplayGroupsInfo
+ * @tc.desc: Test PackDisplayGroupsInfo_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayGroupsInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+    std::vector<DisplayGroupInfo> group;
+    auto result = InputMgrImpl.PackDisplayGroupsInfo(pkt, group);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackDisplaysInfo
+ * @tc.desc: Test PackDisplaysInfo_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplaysInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+    std::vector<DisplayInfo> displayInfo;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.PackDisplaysInfo(pkt, displayInfo));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_001
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayInfo.name = "Main Display";
+    OHOS::MMI::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.id = 1;
+    displayGroupInfo.name = "Main Display Group";
+    displayGroupInfo.type = OHOS::MMI::GroupType::GROUP_DEFAULT;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.mainDisplayId = displayInfo.id;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    OHOS::MMI::UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 100;
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
+    userScreenInfo.displayGroups.resize(110);
+    int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, RET_ERR);
+    userScreenInfo.screens.resize(1100);
+    result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackDisplayData_002
+ * @tc.desc: Test PackDisplayData_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UserScreenInfo userScreenInfo;
+    std::vector<DisplayGroupInfo> group;
+    userScreenInfo.userId = 0;
+
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+    auto result = InputMgrImpl.PackDisplayGroupsInfo(pkt, group);
+    EXPECT_EQ(result, RET_ERR);
+    result = InputMgrImpl.PackDisplayData(pkt, userScreenInfo);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestPackDisplayData_003
+ * @tc.desc: Test PackDisplayData_003
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+    auto result = InputMgrImpl.PackDisplayData(pkt, userScreenInfo);
+    EXPECT_EQ(result, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS

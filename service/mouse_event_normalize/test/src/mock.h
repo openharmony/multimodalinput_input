@@ -28,14 +28,16 @@ public:
 public:
     virtual uint32_t libinput_event_pointer_get_finger_count() = 0;
     virtual uint32_t libinput_event_pointer_get_button_area() = 0;
+    virtual bool IsSceneBoardEnabled() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
- 
+
 class MessageParcelMock : public DfsMessageParcel {
 public:
     MOCK_METHOD0(libinput_event_pointer_get_finger_count, uint32_t());
     MOCK_METHOD0(libinput_event_pointer_get_button_area, uint32_t());
+    MOCK_METHOD0(IsSceneBoardEnabled, bool());
 };
 } // namespace MMI
 } // namespace OHOS
