@@ -95,15 +95,16 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
         if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
             hasHandleRingMute_ = false;
         }
+        MMI_HILOGI("The state:%{public}d, hasHandleRingMute_:%{public}d", state, hasHandleRingMute_);
         return;
     }
     callState = eventData.GetWant().GetIntParam("state", -1);
-    MMI_HILOGI("The state %{public}d", callState);
     if (hasHandleRingMute_ && (callState_ == CALL_STATUS_INCOMING || callState_ == CALL_STATUS_WAITING)) {
         MMI_HILOGI("Mute reply success");
         hasHandleRingMute_ = false;
     }
     callState_ = callState;
+    MMI_HILOGI("The callState:%{public}d, hasHandleRingMute_:%{public}d", callState, hasHandleRingMute_);
     if (callState_ == StateType::CALL_STATUS_DISCONNECTED) {
         auto subscriberHandler = InputHandler->GetSubscriberHandler();
         CHKPV(subscriberHandler);
@@ -115,6 +116,7 @@ int32_t DeviceEventMonitor::GetCallState()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    MMI_HILOGI("The callState:%{public}d", callState_);
     return callState_;
 }
 
