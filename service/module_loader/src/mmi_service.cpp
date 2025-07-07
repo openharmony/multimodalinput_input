@@ -66,6 +66,7 @@
 #include "touchpad_settings_handler.h"
 #include "account_manager.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
+#include "multimodal_input_plugin_manager.h"
 
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -404,6 +405,7 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
+    InputPluginManager::GetInstance()->Init();
     MMI_HILOGI("PointerDrawingManager Init");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!CursorDrawingComponent::GetInstance().Init()) {

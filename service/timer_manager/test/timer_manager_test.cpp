@@ -115,6 +115,21 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_005, TestSize.Level1)
 }
 
 /**
+ * @tc.name: TimerManagerTest_ManagerTimer_006
+ * @tc.desc: Test the function RemoveTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t repeatCount = 3;
+    int32_t intervalMs = 1000;
+    int32_t timerld = TimerMgr->AddTimerInternal(intervalMs, repeatCount, AddTimerCallback, "test006");
+    ASSERT_EQ(TimerMgr->RemoveTimer(timerld, "test006"), 0);
+}
+
+/**
  * @tc.name: TimerManagerTest_AddTimer_001
  * @tc.desc: Test adding a timer to the TimerManager
  * @tc.type: FUNC

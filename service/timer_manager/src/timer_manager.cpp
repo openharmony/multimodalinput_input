@@ -56,9 +56,9 @@ int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount, std:
     return AddTimerInternal(intervalMs, repeatCount, callback, name);
 }
 
-int32_t TimerManager::RemoveTimer(int32_t timerId)
+int32_t TimerManager::RemoveTimer(int32_t timerId, const std::string &name)
 {
-    return RemoveTimerInternal(timerId);
+    return RemoveTimerInternal(timerId, name);
 }
 
 int32_t TimerManager::ResetTimer(int32_t timerId)
@@ -125,11 +125,11 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     return timerId;
 }
 
-int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
+int32_t TimerManager::RemoveTimerInternal(int32_t timerId, const std::string &name)
 {
     std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
-        if ((*it)->id == timerId) {
+        if ((*it)->id == timerId && (name.empty() || (*it)->name == name)) {
             timers_.erase(it);
             return RET_OK;
         }
