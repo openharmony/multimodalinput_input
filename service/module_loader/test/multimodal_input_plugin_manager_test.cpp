@@ -111,7 +111,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Hand
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     int32_t result = manager->HandleEvent(event, GetSysClockTime(),
                      InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
-    EXPECT_GE(result, 0);
+    EXPECT_GE(result, RET_OK);
 }
 
 /**
