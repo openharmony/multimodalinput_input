@@ -168,7 +168,7 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     state = keyEvent->GetFunctionKey(funcKey);
-    MMI_HILOGD("Get the function key:%{public}d status as %{public}s", funcKey, state ? "open" : "close");
+    MMI_HILOGI("Get function key:%{public}d status as %{public}s", funcKey, state ? "open" : "close");
     return RET_OK;
 }
 
@@ -203,14 +203,14 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     bool checkState = keyEvent->GetFunctionKey(funcKey);
+    MMI_HILOGI("checkState:%{public}d, enable:%{public}d", checkState, enable);
     if (checkState == enable) {
-        MMI_HILOGE("Current device no need to set up");
         return RET_OK;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (funcKey == KeyEvent::CAPS_LOCK_FUNCTION_KEY) {
         // set vkeyboard caps state with separate API.
-        MMI_HILOGD("Set vkb func state old=%{private}d, new=%{private}d", checkState, enable);
+        MMI_HILOGI("Set vkb func state old:%{private}d, new:%{private}d", checkState, enable);
         libinput_toggle_caps_key();
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
