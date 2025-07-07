@@ -210,7 +210,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (funcKey == KeyEvent::CAPS_LOCK_FUNCTION_KEY) {
         // set vkeyboard caps state with separate API.
-        MMI_HILOGI("Set vkb func state old:%{private}d, new:%{private}d", checkState, enable);
+        MMI_HILOGI("Set vkb func state old:%{public}d, new:%{public}d", checkState, enable);
         libinput_toggle_caps_key();
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
