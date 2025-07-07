@@ -46,7 +46,7 @@ InputPluginManager::~InputPluginManager()
 
 std::shared_ptr<InputPluginManager> InputPluginManager::GetInstance(const std::string &directory)
 {
-    std::call_once(init_flag_, [this, &directory] {
+    std::call_once(init_flag_, [&directory] {
         if (instance_ == nullptr) {
             MMI_HILOGI("New InputPluginManager");
             std::string dir = directory.empty() ? FOLDER_PATH : directory;
