@@ -101,15 +101,10 @@ ani_boolean AniUtil::IsInstanceOf(ani_env *env, const std::string &cls_name, ani
 
 ani_object AniUtil::CreateAniObject(ani_env *env, const char *nsName, const char *className)
 {
-    ani_namespace ns;
-    if (ANI_OK != env->FindNamespace(nsName, &ns)) {
-        MMI_HILOGE("%{public}s: Not found %{public}s", __func__, nsName);
-        return nullptr;
-    }
-
     ani_class cls;
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
-        MMI_HILOGE("%{public}s: Namespace_FindClass %{public}s failed",  __func__, className);
+    const std::string fullClassName = std::string(nsName) + "." + className;
+    if (ANI_OK != env->FindClass(fullClassName.c_str(), &cls)) {
+        MMI_HILOGE("%{public}s: FindClass %{public}s failed",  __func__, className);
         return nullptr;
     }
 
