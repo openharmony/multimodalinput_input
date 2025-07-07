@@ -65,7 +65,6 @@ public:
     void* handle_;
 
 private:
-    std::mutex timerMutex_;
     InputPluginStage stage_;
 };
 
@@ -89,7 +88,6 @@ private:
     std::map<InputPluginStage, std::list<std::shared_ptr<InputPlugin>>> plugins_;
     static std::shared_ptr<InputPluginManager> instance_;
     static std::once_flag init_flag_;
-    static std::mutex mutex_;
 };
 } // namespace MMI
 } // namespace OHOS
