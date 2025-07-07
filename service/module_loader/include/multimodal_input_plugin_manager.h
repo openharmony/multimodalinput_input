@@ -41,6 +41,9 @@ typedef int32_t (*InitPlugin)(std::shared_ptr<IPluginContext> ctx, std::shared_p
  */
 typedef int32_t (*UnintPlugin)(std::shared_ptr<IInputPlugin> plugin);
 
+const int32_t RET_NOTDO = 0;
+const int32_t RET_DO = 1;
+
 struct InputPlugin : public IPluginContext {
 public:
     InputPlugin() {};
