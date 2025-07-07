@@ -231,7 +231,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
             int32_t result = manager->HandleEvent(static_cast<libinput_event *>(event),
                 frameTime,
                 InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
-            if (result != 0) {
+            if (result != RET_NOTDO) {
                 return;
             }
         }
