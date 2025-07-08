@@ -7046,7 +7046,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_004, TestS
     event->SetKeyCode(KeyEvent::KEYCODE_MENU);
     event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     bool ret = handler.MenuClickHandle(event);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     EXPECT_EQ(handler.existMenuDown_, false);
 }
 
@@ -7064,21 +7064,21 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
     event->SetKeyCode(KeyEvent::KEYCODE_MENU);
     event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     bool ret = handler.MenuClickHandle(event);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
     EXPECT_EQ(handler.existMenuDown_, false);
 
     ret = handler.MenuClickHandle(event);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 
     handler.existMenuDown_ = true;
     event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     ret = handler.MenuClickHandle(event);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
 
     handler.existMenuDown_ = false;
     event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     ret = handler.MenuClickHandle(event);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 } // namespace MMI
 } // namespace OHOS

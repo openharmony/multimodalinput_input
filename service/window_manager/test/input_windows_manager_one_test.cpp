@@ -2199,5 +2199,179 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetPointerPosi
     displayGroupInfo.displaysInfo.push_back(currentDisplay);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ResetPointerPosition(displayGroupInfo));
 }
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_GetWindowGroupInfoByDisplayIdCopy1
+ * @tc.desc: Test the funcation GetWindowGroupInfoByDisplayIdCopy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowGroupInfoByDisplayIdCopy1, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+
+    int32_t displayId = 1;
+    int32_t groupId = 1003;
+
+    OLD::DisplayInfo displayInfo = {};
+    displayInfo.id = displayId;
+
+    OLD::DisplayGroupInfo displayGroupInfo = {};
+    displayGroupInfo.groupId = groupId;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.displayGroupInfoMap_.insert(std::make_pair(groupId, displayGroupInfo));
+
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.windowsInfo.clear();
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    inputWindowsManager.GetWindowGroupInfoByDisplayIdCopy(displayId);
+    inputWindowsManager.windowsPerDisplay_.clear();
+    inputWindowsManager.GetWindowGroupInfoByDisplayIdCopy(displayId);
+    inputWindowsManager.windowsPerDisplayMap_.clear();
+    EXPECT_TRUE(inputWindowsManager.GetWindowGroupInfoByDisplayIdCopy(displayId).empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_GetWindowGroupInfoByDisplayId1
+ * @tc.desc: Test GetWindowGroupInfoByDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowGroupInfoByDisplayId1, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 1;
+    int32_t groupId = 1003;
+
+    OLD::DisplayInfo displayInfo = {};
+    displayInfo.id = displayId;
+
+    OLD::DisplayGroupInfo displayGroupInfo = {};
+    displayGroupInfo.groupId = groupId;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.displayGroupInfoMap_.insert(std::make_pair(groupId, displayGroupInfo));
+
+    WindowGroupInfo windowGroupInfo;
+
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    EXPECT_TRUE(inputWindowsManager.GetWindowGroupInfoByDisplayId(displayId).empty());
+
+    WindowInfo windowInfo;
+    displayId = 2;
+    windowInfo.id = 1;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    EXPECT_FALSE(!inputWindowsManager.GetWindowGroupInfoByDisplayId(displayId).empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_GetCancelEventFlag1
+ * @tc.desc: Test the funcation GetCancelEventFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetCancelEventFlag1, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->bitwise_ = 0x00000080;
+    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+    pointerEvent->bitwise_ = 0x00000100;
+    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ClearMouseHideFlag001
+ * @tc.desc: Test ClearMouseHideFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMouseHideFlag001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsMgr.lastPointerEvent_ = pointerEvent;
+    auto eventId = 100;
+    inputWindowsMgr.lastPointerEvent_->SetId(eventId);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearMouseHideFlag(eventId));
+    eventId = 200;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearMouseHideFlag(eventId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_SendBackCenterPointerEevent
+ * @tc.desc: Test BypassChainAndDispatchDirectly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPointerEevent, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsMgr.lastPointerEvent_ = pointerEvent;
+    CursorPosition currentPos;
+    currentPos.cursorPos.x = 1;
+    currentPos.cursorPos.y = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendBackCenterPointerEevent(currentPos));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_DispatchTouch_002
+ * @tc.desc: Test the funcation DispatchTouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    auto pointerId = 1;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetGlobalX(DBL_MAX);
+    pointerItem.SetGlobalY(DBL_MAX);
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.flags = 0;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    inputWindowsManager->lastTouchEvent_->SetPointerId(pointerId);
+    pointerItem.SetPointerId(pointerId);
+    inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
+    auto fixedMode = PointerEvent::FixedMode::NORMAL;
+    inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
+    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+
+    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::NORMAL;
+    inputWindowsManager->lastTouchWindowInfo_.transform.clear();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+    float pointerChangeAreasCount = 8;
+    inputWindowsManager->lastTouchWindowInfo_.transform.push_back(pointerChangeAreasCount);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+}
 } // namespace MMI
 } // namespace OHOS
