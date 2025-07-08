@@ -3405,9 +3405,7 @@ void InputWindowsManager::SetGlobalDefaultPointerStyle()
 {
     for (auto &iter : pointerStyle_) {
         for (auto &item : iter.second) {
-            if (item.second.id == DEFAULT_POINTER_STYLE) {
-                item.second.id = globalStyle_.id;
-            } else if (item.second.id == CURSOR_CIRCLE_STYLE || item.second.id == AECH_DEVELOPER_DEFINED_STYLE) {
+            if (item.second.id == CURSOR_CIRCLE_STYLE || item.second.id == AECH_DEVELOPER_DEFINED_STYLE) {
                 item.second.id = globalStyle_.id;
             }
             item.second.options = globalStyle_.options;
