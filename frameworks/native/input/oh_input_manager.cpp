@@ -2830,7 +2830,7 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
         return INPUT_SERVICE_EXCEPTION;
     }
     AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
-    switch(recvStatus) {
+    switch (recvStatus) {
         case AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION:
         case AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION: {
             return INPUT_INJECTION_AUTHORIZING;
@@ -2868,25 +2868,25 @@ Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
         return INPUT_SERVICE_EXCEPTION;
     }
     AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(tmpStatus);
-    switch(recvStatus) {
+    switch (recvStatus) {
         case AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION:
         case AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED:
         case AUTHORIZE_QUERY_STATE::UNAUTHORIZED: {
             *status = Input_InjectionStatus::UNAUTHORIZED;
             break;
         }
-    case AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION: {
-        *status = Input_InjectionStatus::AUTHORIZING;
-        break;
-    }
-    case AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED: {
-        *status = Input_InjectionStatus::AUTHORIZED;
-        break;
-    }
-    default:
-        MMI_HILOGE("QueryAuthorizedStatus fail, status:%{public}d", recvStatus);
-        return INPUT_SERVICE_EXCEPTION;
-    }
+        case AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION: {
+            *status = Input_InjectionStatus::AUTHORIZING;
+            break;
+        }
+        case AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED: {
+            *status = Input_InjectionStatus::AUTHORIZED;
+            break;
+        }
+        default:
+            MMI_HILOGE("QueryAuthorizedStatus fail, status:%{public}d", recvStatus);
+            return INPUT_SERVICE_EXCEPTION;
+        }
     return INPUT_SUCCESS;
 }
 
