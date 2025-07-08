@@ -288,12 +288,16 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
+        ResetDisplayXY(point);
         return;
     }
     auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
     int32_t fd = GetClientFd(pid, point);
     auto udsServer = InputHandler->GetUDSServer();
-    CHKPV(udsServer);
+    if (udsServer == nullptr) {
+        ResetDisplayXY(point);
+        return;
+    }
     if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
         pid != -1 && point->GetTargetWindowId() != -1) {
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
@@ -307,6 +311,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         }
     }
     DispatchPointerEventInner(point, fd);
+    ResetDisplayXY(point);
 }
 
 int32_t EventDispatchHandler::GetClientFd(int32_t pid, std::shared_ptr<PointerEvent> point)
@@ -345,15 +350,41 @@ void EventDispatchHandler::UpdateDisplayXY(const std::shared_ptr<PointerEvent> &
         if (windowInputType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
             windowInputType != WindowInputType::DUALTRIGGER_TOUCH &&
             windowInputType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) {
+            currentXY_.x = pointerItem.GetDisplayXPos();
+            currentXY_.y = pointerItem.GetDisplayYPos();
             pointerItem.SetDisplayX(pointerItem.GetFixedDisplayX());
             pointerItem.SetDisplayY(pointerItem.GetFixedDisplayY());
+            pointerItem.SetDisplayXPos(pointerItem.GetFixedDisplayXPos());
+            pointerItem.SetDisplayYPos(pointerItem.GetFixedDisplayYPos());
             point->UpdatePointerItem(pointerId, pointerItem);
+            currentXY_.fixed = true;
         } else {
             MMI_HILOGI("targetDisplayId=%{private}d, targetWindowId=%{private}d, windowInputType=%{private}d, "
                 "not need to modify DX", targetDisplayId, targetWindowId, static_cast<int32_t>(windowInputType));
         }
     }
 #endif
+}
+
+void EventDispatchHandler::ResetDisplayXY(const std::shared_ptr<PointerEvent> &point)
+{
+#ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
+    CHKPV(point);
+    int32_t pointerId = point->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!point->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    if (point->GetFixedMode() == PointerEvent::FixedMode::AUTO && currentXY_.fixed) {
+        pointerItem.SetDisplayX(static_cast<int32_t>(currentXY_.x));
+        pointerItem.SetDisplayY(static_cast<int32_t>(currentXY_.y));
+        pointerItem.SetDisplayXPos(currentXY_.x);
+        pointerItem.SetDisplayYPos(currentXY_.y);
+        point->UpdatePointerItem(pointerId, pointerItem);
+        currentXY_.fixed = false;
+    }
+#endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 }
 
 void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
