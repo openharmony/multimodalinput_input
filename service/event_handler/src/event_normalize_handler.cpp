@@ -500,6 +500,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
+        MMI_HILOGI("Currently in factory mode, events are only dispatched");
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
         eventDispatchHandler->HandleKeyEvent(keyEvent);

@@ -138,7 +138,7 @@ private:
             if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
                 MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d,"
                     "KC:%{private}d, AT:%{public}" PRId64
-                    ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%d, SL:%d, KIC:%zu, "
+                    ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%zu, "
                     "DI:%{public}d, IR:%{public}s, SI:%{public}s",
                     event->GetId(), event->GetKeyCode(), event->GetActionTime(),
                     InputEvent::EventTypeToString(event->GetEventType()),
