@@ -361,7 +361,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
     callback(event);
-    MMI_HILOGD("Key event id:%{public}d, keyCode:%{private}d", subscribeId, event->GetKeyCode());
+    MMI_HILOGI("event:(%{public}d, %{private}d)", subscribeId, event->GetKeyCode());
     return RET_OK;
 }
 
