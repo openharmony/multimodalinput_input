@@ -2926,16 +2926,14 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
     if (tokenType != OHOS::Security::AccessToken::TOKEN_HAP) {
         return ERROR_APP_NOT_FOCUSED;
     }
-    bool hasPointerDevice = INPUT_DEV_MGR->HasPointerDevice();
-    if (!hasPointerDevice) {
-        MMI_HILOGE("There hasn't any pointer device");
-        return ERROR_DEVICE_NO_POINTER;
-    }
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &displayId, &displayX, &displayY, clientPid] {
-            bool focusPid = WIN_MGR->CheckAppFocused(clientPid);
-            if (!focusPid) {
+            if (!INPUT_DEV_MGR->HasPointerDevice() && !INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+                MMI_HILOGE("There hasn't any pointer device");
+                return ERROR_DEVICE_NO_POINTER;
+            }
+            if (!WIN_MGR->CheckAppFocused(clientPid)) {
                 return ERROR_APP_NOT_FOCUSED;
             }
             return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->GetPointerLocation(displayId,
