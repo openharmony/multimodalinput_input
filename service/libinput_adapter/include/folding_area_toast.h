@@ -28,9 +28,8 @@ public:
     DISALLOW_COPY_AND_MOVE(FoldingAreaToast);
     void FoldingAreaProcess(struct libinput_event *event);
 
-public:
-    int32_t deviceId_;
 private:
+    int32_t deviceId_;
     std::unordered_map<int32_t, uint16_t> touchId2KeepFrames_;
     std::unordered_map<int32_t, int64_t> touchId2FirstDownTimes_;
     std::unordered_map<int32_t, uint16_t> touchId2KeepDownTimes_;
@@ -41,6 +40,7 @@ private:
     int32_t touchId_ = 0;
     uint16_t pointX_ = 0;
     uint16_t pointY_ = 0;
+
 private:
     void NotifyFoldingAreaTouchStatus(const int8_t state);
     void FoldingAreaClear(void);
