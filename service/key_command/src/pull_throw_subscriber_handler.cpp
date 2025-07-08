@@ -100,7 +100,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
     if (!CheckProgressValid(touchEvent)) {
         return;
     }
-    // 更新最后一个位置点，用于计算加速度
+    // Update the last position point for calculating acceleration
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -108,29 +108,29 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
     if (gestureInProgress_) {
         MMI_HILOGI("PullThrow On gestureInProgress");
         double endTime = touchEvent->GetActionTime();
-        // 计算距离
+        // Calcultating distance
         double dx = item.GetDisplayX() - fingerGesture_.touches[FIRST_TOUCH_FINGER].x;
         double dy = item.GetDisplayY() - fingerGesture_.touches[FIRST_TOUCH_FINGER].y;
         double distance = std::sqrt(dx * dx + dy * dy);
-        double deltaTime = (endTime - triggerTime_) / 1e3; // 计算时间差，毫秒转换为秒
+        double deltaTime = (endTime - triggerTime_) / 1e3;
         if (deltaTime <= 0) {
-            deltaTime = 1.0 / 1e3; // 设置最小时间差，防止除以0
+            deltaTime = 1.0 / 1e3;
         }
         double speed = distance / deltaTime;
-        // 如果用户手指在靠近转轴区域操作，给予速度加成，提高识别成功率
+        //  provide a speed scale to improve success rate in spin area
         if (item.GetDisplayY() > SPIN_UP_AREA_Y && item.GetDisplayY() < SPIN_DOWN_AREA_Y) {
-            speed = speed * SPEED_SCALE; // 2.0:速度倍率
+            speed = speed * SPEED_SCALE;
         }
-        double throwAngle = atan2(dy, dx) * 180 / M_PI; // 180:弧度转化为角度
+        double throwAngle = atan2(dy, dx) * 180 / M_PI;
         MMI_HILOGI("Throw speed: %{public}f, angle: %{public}f, dist: %{public}f", speed, throwAngle, distance);
-        // 检查是否有急停动作
+        // check sudden stop
         bool hasSuddenStop = CheckSuddenStop();
         if (hasSuddenStop) {
-            MMI_HILOGI("PullThrow detected sudden stop, ignoring gesture");
+            MMI_HILOGI("PullThrow detected sudden stop");
             StopFingerGesture(touchEvent);
             return;
         }
-        // 检查速度距离是否大于阈值
+        // check pull throw condition: speed, distance, direction
         if (speed > THRES_SPEED && distance > MIN_THRES_DIST && CheckThrowDirection(throwAngle, item.GetDisplayY())) {
             touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_THROW);
             touchEvent->SetThrowAngle(throwAngle);
@@ -161,7 +161,6 @@ void PullThrowSubscriberHandler::UpdateFingerPoisition(std::shared_ptr<PointerEv
     fingerGesture_.touches[FIRST_TOUCH_FINGER].x = item.GetDisplayX();
     fingerGesture_.touches[FIRST_TOUCH_FINGER].y = item.GetDisplayY();
     
-    // 更新位置历史记录，用于计算加速度
     UpdatePositionHistory(item.GetDisplayX(), item.GetDisplayY(), touchEvent->GetActionTime());
 }
 
@@ -216,7 +215,6 @@ void PullThrowSubscriberHandler::StartFingerGesture()
 {
     CALL_DEBUG_ENTER;
     gestureInProgress_ = true;
-    // 清空位置历史记录
     positionHistory_.clear();
 }
 
@@ -226,20 +224,17 @@ void PullThrowSubscriberHandler::StopFingerGesture(std::shared_ptr<PointerEvent>
     gestureInProgress_ = false;
     alreadyTouchDown_ = false;
     triggerTime_ = touchEvent->GetActionTime();
-    // 清空位置历史记录
     positionHistory_.clear();
 }
 
 void PullThrowSubscriberHandler::UpdatePositionHistory(double x, double y, double time)
 {
-    // 添加新的位置记录
     PositionRecord record;
     record.x = x;
     record.y = y;
     record.time = time;
     
     positionHistory_.push_back(record);
-    // 如果历史记录超过最大数量，删除最旧的记录
     if (positionHistory_.size() > MAX_HISTORY_SIZE) {
         positionHistory_.erase(positionHistory_.begin());
     }
@@ -247,7 +242,6 @@ void PullThrowSubscriberHandler::UpdatePositionHistory(double x, double y, doubl
 
 bool PullThrowSubscriberHandler::CheckSuddenStop() const
 {
-    // 如果历史记录不足，无法计算加速度
     if (positionHistory_.size() < MIN_HISTORY_SIZE) {
         MMI_HILOGI("PullThrow position history size less than 3");
         return false;
@@ -261,11 +255,11 @@ bool PullThrowSubscriberHandler::CheckSuddenStop() const
     // 计算位移和时间差
     double dx1 = middle.x - oldest.x;
     double dy1 = middle.y - oldest.y;
-    double dt1 = (middle.time - oldest.time) / 1e3; // 转换为秒
+    double dt1 = (middle.time - oldest.time) / 1e3;
     
     double dx2 = newest.x - middle.x;
     double dy2 = newest.y - middle.y;
-    double dt2 = (newest.time - middle.time) / 1e3; // 转换为秒
+    double dt2 = (newest.time - middle.time) / 1e3;
     
     // 防止除以零
     if (dt1 <= 0) dt1 = NUM_EPSILON;
@@ -276,10 +270,9 @@ bool PullThrowSubscriberHandler::CheckSuddenStop() const
     double speed2 = std::sqrt(dx2 * dx2 + dy2 * dy2) / dt2;
     
     // 计算加速度（速度变化率）
-    double acceleration = (speed2 - speed1) / ((dt1 + dt2) / 2);
-    
-    MMI_HILOGI("PullThrow acceleration: %{public}f, speed1: %{public}f, speed2: %{public}f",
-               acceleration, speed1, speed2);
+    double timeSpace = (dt1 + dt2) / 2;
+    if (timeSpace <= 0) timeSpace = NUM_EPSILON;
+    double acceleration = (speed2 - speed1) / timeSpace;
     
     // 如果加速度为负且绝对值大于阈值，说明有急停动作
     return (acceleration < MAX_DECELERATION);
