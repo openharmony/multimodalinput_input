@@ -30,6 +30,7 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t TEST_ACCOUNT_ID_001 { 1 };
 constexpr int32_t TEST_ACCOUNT_ID_002 { 2 };
+constexpr int32_t MAIN_ACCOUNT_ID { 100 };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
 const std::string SECURE_SETTING_URI_PROXY {""};
 } // namespace
@@ -37,7 +38,14 @@ const std::string SECURE_SETTING_URI_PROXY {""};
 class AccountManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    static void TearDownTestCase(void)
+    {
+        int32_t accountId = ACCOUNT_MGR->currentAccountId_;
+        EXPECT_EQ(accountId, MAIN_ACCOUNT_ID);
+        ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->accounts_[accountId]->switchObserver_ = nullptr);
+        ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->accounts_[accountId]->onScreenLockedSwitchObserver_ = nullptr);
+        ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->accounts_[accountId]->configObserver_ = nullptr);
+    }
 };
 
 /**
@@ -167,6 +175,12 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_02, TestSize.Level1
     EventFwk::CommonEventData data;
     data.SetCode(accountId);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+
+    data.SetCode(MAIN_ACCOUNT_ID);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -175,12 +189,12 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_02, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto accountSetting = ACCOUNT_MGR->GetCurrentAccountSetting();
     int32_t accountId = accountSetting.GetAccountId();
-    EXPECT_EQ(accountId, TEST_ACCOUNT_ID_001);
+    EXPECT_EQ(accountId, MAIN_ACCOUNT_ID);
 }
 
 /**
@@ -196,6 +210,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_01, TestSize.L
     AccountManager::AccountSetting accountSetting(accountId);
     accountSetting.switchObserver_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -211,6 +229,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_02, TestSize.L
     AccountManager::AccountSetting accountSetting(accountId);
     accountSetting.onScreenLockedSwitchObserver_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -226,6 +248,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_03, TestSize.L
     AccountManager::AccountSetting accountSetting(accountId);
     accountSetting.configObserver_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -244,6 +270,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_01, TestSize.Le
     bool currentSwitchStatus = true;
     bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
     EXPECT_FALSE(ret);
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -265,6 +295,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_02, TestSize.Le
     EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
     bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
     EXPECT_FALSE(ret);
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -280,6 +314,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_01, TestSize.L
     AccountManager::AccountSetting accountSetting(accountId);
     accountSetting.accountId_ = -1;
     ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -298,6 +336,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_02, TestSize.L
     char buf[DEFAULT_BUFFER_LENGTH] {};
     EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
     ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -315,6 +357,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_01, TestSize.
     auto accountMgr = ACCOUNT_MGR;
     accountMgr->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
     ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutTimeout(accountId, key));
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -331,6 +377,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_02, TestSize.
     AccountManager::AccountSetting accountSetting(accountId);
     auto accountMgr = ACCOUNT_MGR;
     ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutTimeout(accountId, key));
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -348,6 +398,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_01, TestSize.
     auto accountMgr = ACCOUNT_MGR;
     accountMgr->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
     ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabled(accountId, key));
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -364,6 +418,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_02, TestSize.
     AccountManager::AccountSetting accountSetting(accountId);
     auto accountMgr = ACCOUNT_MGR;
     ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabled(accountId, key));
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -381,6 +439,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked
     auto accountMgr = ACCOUNT_MGR;
     accountMgr->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
     ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabledOnScreenLocked(accountId, key));
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -397,6 +459,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked
     AccountManager::AccountSetting accountSetting(accountId);
     auto accountMgr = ACCOUNT_MGR;
     ASSERT_NO_FATAL_FAILURE(accountSetting.AccShortcutEnabledOnScreenLocked(accountId, key));
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -414,6 +480,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_03, TestSize.Le
     bool currentSwitchStatus = true;
     bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
     EXPECT_FALSE(ret);
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -434,6 +504,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_04, TestSize.Le
     EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
     bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
     EXPECT_FALSE(ret);
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -448,6 +522,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_03, TestSize.L
     int32_t accountId = -1;
     AccountManager::AccountSetting accountSetting(accountId);
     ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 /**
@@ -465,6 +543,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_04, TestSize.L
     char buf[DEFAULT_BUFFER_LENGTH] {};
     EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
     ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+
+    EventFwk::CommonEventData data;
+    data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
 } // namespace MMI
