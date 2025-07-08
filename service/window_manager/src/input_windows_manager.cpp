@@ -4727,8 +4727,8 @@ void InputWindowsManager::HandleOneHandMode(const OLD::DisplayInfo &displayInfo,
     } else {
         UpdateDisplayXYInOneHandMode(fixedDisplayX, fixedDisplayY, displayInfo, oneHandScale);
     }
-    pointerItem.SetFixedDisplayX(static_cast<int32_t>(fixedDisplayX));
-    pointerItem.SetFixedDisplayY(static_cast<int32_t>(fixedDisplayY));
+    pointerItem.SetFixedDisplayXPos(fixedDisplayX);
+    pointerItem.SetFixedDisplayYPos(fixedDisplayY);
 }
 
 void InputWindowsManager::UpdatePointerItemInOneHandMode(const OLD::DisplayInfo &displayInfo,
@@ -4746,8 +4746,8 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const OLD::DisplayInfo 
         MMI_HILOG_DISPATCHE("displayInfo.height=%{private}d, displayInfo.oneHandY=%{private}d is invalid",
             displayInfo.height, displayInfo.oneHandY);
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
-        pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
-        pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
+        pointerItem.SetFixedDisplayXPos(physicalX);
+        pointerItem.SetFixedDisplayYPos(physicalY);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         return;
     }
@@ -4755,15 +4755,15 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const OLD::DisplayInfo 
         HandleOneHandMode(displayInfo, pointerEvent, pointerItem);
     } else {
         pointerEvent->SetFixedMode(PointerEvent::FixedMode::NORMAL);
-        pointerItem.SetFixedDisplayX(static_cast<int32_t>(physicalX));
-        pointerItem.SetFixedDisplayY(static_cast<int32_t>(physicalY));
+        pointerItem.SetFixedDisplayXPos(physicalX);
+        pointerItem.SetFixedDisplayYPos(physicalY);
         MMI_HILOG_DISPATCHD("displayInfo.oneHandY=%{private}d, fixedModeStr=%{public}s",
             displayInfo.oneHandY, pointerEvent->GetFixedModeStr().c_str());
     }
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    MMI_HILOG_DISPATCHD("targetDisplayId=%{private}d, DX=%{private}d, DY=%{private}d, FDX=%{private}d, "
-        "FDY=%{private}d", pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(),
-        pointerItem.GetDisplayY(), pointerItem.GetFixedDisplayX(), pointerItem.GetFixedDisplayY());
+    MMI_HILOG_DISPATCHD("targetDisplayId:%{private}d, DXY:{%{private}d, %{private}d}, FDXY:{%{private}.5f, "
+        "%{private}.5f}", pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(),
+        pointerItem.GetDisplayY(), pointerItem.GetFixedDisplayXPos(), pointerItem.GetFixedDisplayYPos());
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
@@ -4779,8 +4779,8 @@ void InputWindowsManager::UpdateFixedXY(const OLD::DisplayInfo& displayInfo,
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    pointerItem.SetFixedDisplayX(pointerItem.GetDisplayX());
-    pointerItem.SetFixedDisplayY(pointerItem.GetDisplayY());
+    pointerItem.SetFixedDisplayXPos(pointerItem.GetDisplayXPos());
+    pointerItem.SetFixedDisplayYPos(pointerItem.GetDisplayYPos());
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 }
@@ -5574,8 +5574,8 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
                 windowX = windowXY.first;
                 windowY = windowXY.second;
             }
-            currentPointerItem.SetFixedDisplayX(lastPointerItem.GetFixedDisplayX());
-            currentPointerItem.SetFixedDisplayY(lastPointerItem.GetFixedDisplayY());
+            currentPointerItem.SetFixedDisplayXPos(lastPointerItem.GetFixedDisplayXPos());
+            currentPointerItem.SetFixedDisplayYPos(lastPointerItem.GetFixedDisplayYPos());
             pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
         }
     }

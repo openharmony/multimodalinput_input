@@ -1981,7 +1981,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_001, TestSize.Leve
     pointerEvent = nullptr;
     ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_UpdateDisplayXY_002
  * @tc.desc: Test the function UpdateDisplayXY
@@ -2001,7 +2001,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_002, TestSize.Leve
     pointerEvent->AddPointerItem(pointerItem);
     ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_UpdateDisplayXY_003
  * @tc.desc: Test the function UpdateDisplayXY
@@ -2025,7 +2025,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_003, TestSize.Leve
     pointerItem.SetTargetWindowId(windowId);
     ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_UpdateDisplayXY_004
  * @tc.desc: Test the function UpdateDisplayXY
@@ -2050,7 +2050,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_004, TestSize.Leve
     pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
     ASSERT_NO_FATAL_FAILURE(handler.UpdateDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_UpdateDisplayXY_005
  * @tc.desc: Test the function UpdateDisplayXY

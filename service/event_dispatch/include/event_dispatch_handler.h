@@ -62,10 +62,16 @@ private:
     bool SearchWindow(std::vector<std::shared_ptr<WindowInfo>> &windowList, std::shared_ptr<WindowInfo> targetWindow);
     int32_t GetClientFd(int32_t pid, std::shared_ptr<PointerEvent> point);
     void UpdateDisplayXY(const std::shared_ptr<PointerEvent> &point);
+    void ResetDisplayXY(const std::shared_ptr<PointerEvent> &point);
 
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
     bool enableMark_ { true };
+    struct {
+        double x {};
+        double y {};
+        bool fixed { false };
+    } currentXY_;
     struct {
         int32_t pid { -1 };
         int32_t windowId { -1 };
