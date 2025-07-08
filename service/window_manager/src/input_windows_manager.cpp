@@ -4757,8 +4757,8 @@ void InputWindowsManager::UpdatePointerItemInOneHandMode(const OLD::DisplayInfo 
             displayInfo.oneHandY, pointerEvent->GetFixedModeStr().c_str());
     }
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    MMI_HILOG_DISPATCHD("targetDisplayId=%{private}d, DX=%{private}d, DY=%{private}d, FDX=%{private}.5f, "
-        "FDY=%{private}.5f", pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(),
+    MMI_HILOG_DISPATCHD("targetDisplayId:%{private}d, DXY:{%{private}d, %{private}d}, FDXY:{%{private}.5f, "
+        "%{private}.5f}", pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), pointerItem.GetFixedDisplayXPos(), pointerItem.GetFixedDisplayYPos());
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
