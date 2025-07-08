@@ -488,6 +488,7 @@ if (defined(global_parts_info) &&
 
 if (input_feature_virtual_keyboard) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_VKEYBOARD" ]
+  libmmi_service_sources += [ "libinput_adapter/src/folding_area_toast.cpp" ]
 }
 
 if (input_feature_dfx_radar_enable) {
