@@ -50,6 +50,7 @@ ohos_shared_library("libmmi-screen_capture") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
   ]
 
   if (enable_player_framework) {
