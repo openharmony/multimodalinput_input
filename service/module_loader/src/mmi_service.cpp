@@ -4063,7 +4063,7 @@ ErrCode MMIService::RequestInjection(int32_t &status, int32_t &reqId)
         }
         );
     if (ret != RET_OK) {
-        MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
+        MMI_HILOGE("RequestInjection failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
