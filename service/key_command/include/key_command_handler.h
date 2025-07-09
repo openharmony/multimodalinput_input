@@ -207,6 +207,9 @@ public:
     void UnregisterProximitySensor();
     int32_t LaunchAiScreenAbility(int32_t pid);
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+    void UnregisterMistouchPrevention();
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 
 private:
     void Print();
@@ -345,7 +348,6 @@ private:
     bool HasScreenCapturePermission(uint32_t permissionType);
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
     void CallMistouchPrevention();
-    void UnregisterMistouchPrevention()
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 
 private:
