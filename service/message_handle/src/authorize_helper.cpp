@@ -194,7 +194,7 @@ void AuthorizeHelper::NoticeRequestInjectionResult(const int32_t reqId, const in
             sendStatus = AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED;
         }
     }
-    MMI_HILOGD("result callback! pid_:%{public}d,sendStatus:%{public}d,state_:%{public}d,mapId:%{public}d",
+    MMI_HILOGD("result callback! %{public}d, %{public}d,state_:%{public}d,%{public}d",
         pid_, sendStatus, state_, callingPid);
     pClientProxy->NoticeRequestInjectionResult(reqId, static_cast<int32_t>(sendStatus));
 }
