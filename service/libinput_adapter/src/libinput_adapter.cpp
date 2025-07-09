@@ -704,6 +704,7 @@ void LibinputAdapter::OnEventHandler()
     int64_t frameTime = GetSysClockTime();
     while ((event = libinput_get_event(input_))) {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        foldingAreaToast_.FoldingAreaProcess(event);
         libinput_event_type eventType = libinput_event_get_type(event);
         int32_t touchId = 0;
         libinput_event_touch* touch = nullptr;
