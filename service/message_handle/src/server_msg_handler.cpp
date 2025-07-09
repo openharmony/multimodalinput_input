@@ -1536,7 +1536,7 @@ void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
 {
     CALL_DEBUG_ENTER;
     if (transparentWins_.find(infoId) == transparentWins_.end()) {
-        MMI_HILOGE("The infoId is Invalid, %{public}d", infoId);
+        MMI_HILOGE("The infoId is Invalid, infoId:%{public}d", infoId);
         return;
     }
     info.pixelMap = transparentWins_[infoId].get();

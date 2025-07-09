@@ -2818,7 +2818,7 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
     int32_t reqId = 0;
     int32_t status = 0;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->RequestInjection(status, reqId);
-    MMI_HILOGD("RequestInjection ret:%{public}d,status:%{public}d,reqId:%{public}d", ret, status, reqId);
+    MMI_HILOGD("RequestInjection %{public}d,%{public}d,%{public}d", ret, status, reqId);
     if (ret != RET_OK) {
         MMI_HILOGE("RequestInjection fail, error:%{public}d", ret);
         if (ret ==  OHOS::MMI::ERROR_DEVICE_NOT_SUPPORTED) {
@@ -2842,7 +2842,7 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
             return INPUT_INJECTION_AUTHORIZED;
         }
         case AUTHORIZE_QUERY_STATE::UNAUTHORIZED: {
-            MMI_HILOGD("RequestInjection ok reqId:%{public}d", reqId);
+            MMI_HILOGD("RequestInjection ok %{public}d", reqId);
             OHOS::MMI::InputManager::GetInstance()->InsertRequestInjectionCallback(reqId,
                 [callback, reqId](int32_t status) {
                     AUTHORIZE_QUERY_STATE callStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
@@ -2862,7 +2862,7 @@ Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
     CHKPR(status, INPUT_PARAMETER_ERROR);
     int32_t tmpStatus = 0;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->QueryAuthorizedStatus(tmpStatus);
-    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,tmpStatus:%{public}d", ret, tmpStatus);
+    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,%{public}d", ret, tmpStatus);
     if (ret != RET_OK) {
         MMI_HILOGE("QueryAuthorizedStatus fail, error:%{public}d", ret);
         return INPUT_SERVICE_EXCEPTION;
@@ -2884,7 +2884,7 @@ Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
             break;
         }
         default:
-            MMI_HILOGE("QueryAuthorizedStatus fail, status:%{public}d", recvStatus);
+            MMI_HILOGE("QueryAuthorizedStatus fail, %{public}d", recvStatus);
             return INPUT_SERVICE_EXCEPTION;
         }
     return INPUT_SUCCESS;
