@@ -1704,7 +1704,6 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t phy
 void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY,
     Direction direction)
 {
-    CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     BytraceAdapter::StartRsSurfaceNode(rsId);
 
@@ -1718,7 +1717,6 @@ void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX
             return;
         }
     }
-    MMI_HILOGI("CreatePointerWindow The screenId_:%{public}" PRIu64, screenId_);
     screenId_ = rsId;
     AttachToDisplay();
     lastDisplayId_ = rsId;
@@ -2333,6 +2331,10 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
             DrawManager();
             return;
         }
+    }
+    if (displayGroupInfo.displaysInfo.empty()) {
+        MMI_HILOGW("displaysInfo is empty");
+        return;
     }
     OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
     if (GetHardCursorEnabled()) {
@@ -3234,9 +3236,6 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
-            MMI_HILOGI("Got screen, RsId:%{public}" PRIu64 ", shape=(%{public}u,%{public}u), rotation=%{public}u, "
-                "dpi=%{public}f", si->GetRsId(), GetScreenInfoWidth(si), GetScreenInfoHeight(si),
-                si->GetRotation(), si->GetVirtualPixelRatio());
             if (si->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
                 continue;
             }

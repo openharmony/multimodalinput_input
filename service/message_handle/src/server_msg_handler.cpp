@@ -775,6 +775,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     if (!ChangeToOld(userScreenInfo)) {
         return RET_ERR;
     }
+    Printf(userScreenInfo);
     for (auto &displayGroupInfo : oldDisplayGroupInfos_) {
         WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
     }
@@ -1139,32 +1140,31 @@ void ServerMsgHandler::ChangeToOld(size_t num, const std::vector<DisplayInfo>& d
 void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
 {
     MMI_HILOGD("userScreenInfo-----------");
-    MMI_HILOGD("userId:%{public}d, ", userScreenInfo.userId);
     size_t num = 0;
     for (const auto &item : userScreenInfo.screens) {
-        MMI_HILOGD("screen%{public}zu, id:%{public}d, uniqueId:%{public}s, screenType:%{public}d, width:%{public}d, "
+        MMI_HILOGD("screen%{public}zu, id:%{public}d, screenType:%{public}d, width:%{public}d, "
                    "height:%{public}d, physicalWidth:%{public}d, physicalHeight:%{public}d, tpDirection:%{public}d, "
-                   "dpi%{public}d, ppi%{public}d, rotation%{public}d", num, item.id, item.uniqueId.c_str(),
+                   "dpi%{public}d, ppi%{public}d, rotation%{public}d", num, item.id,
                    item.screenType, item.width, item.height, item.physicalWidth, item.physicalHeight, item.tpDirection,
                    item.dpi, item.ppi, item.rotation);
         num++;
     }
     num = 0;
     for (const auto &item : userScreenInfo.displayGroups) {
-        MMI_HILOGD("displayGroups%{public}zu,id:%{public}d,name:%{public}s,type:%{public}d, mainDisplayId:%{public}d,"
+        MMI_HILOGD("displayGroups%{public}zu,id:%{public}d,type:%{public}d, mainDisplayId:%{public}d,"
             "focusWindowId:%{public}d",
-            num, item.id, item.name.c_str(), item.type, item.mainDisplayId, item.focusWindowId);
+            num, item.id, item.type, item.mainDisplayId, item.focusWindowId);
         size_t numDisplayInfo = 0;
         for (const auto &itemDisplay : item.displaysInfo) {
             MMI_HILOGD("displays%{public}zu,id:%{public}d,x:%{public}d,y:%{public}d,width:%{public}d,"
-                "height:%{public}d,dpi:%{public}d,name:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
+                "height:%{public}d,dpi:%{public}d,direction:%{public}d,displayDirection:%{public}d,"
                 "displayMode:%{public}d,scalePercent:%{public}d, expandHeight:%{public}d,"
-                "isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d,oneHandX:%{public}d,"
-                "oneHandY:%{public}d, screenArea:{%{public}d:{%{public}d,%{public}d,%{public}d,%{public}d},"
+                "isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d,oneHandX:%{private}d,"
+                "oneHandY:%{private}d, screenArea:{%{public}d:{%{public}d,%{public}d,%{public}d,%{public}d},"
                 "rsId:%{public}" PRIu64 "},offsetX:%{public}d,offsetY:%{public}d,pointerActiveWidth:%{public}d,"
                 "pointerActiveHeight:%{public}d,transform:",
                 numDisplayInfo, itemDisplay.id, itemDisplay.x, itemDisplay.y, itemDisplay.width, itemDisplay.height,
-                itemDisplay.dpi, itemDisplay.name.c_str(), itemDisplay.direction, itemDisplay.displayDirection,
+                itemDisplay.dpi, itemDisplay.direction, itemDisplay.displayDirection,
                 itemDisplay.displayMode, itemDisplay.scalePercent, itemDisplay.expandHeight,
                 itemDisplay.isCurrentOffScreenRendering, itemDisplay.displaySourceMode, itemDisplay.oneHandX,
                 itemDisplay.oneHandY, itemDisplay.screenArea.id, itemDisplay.screenArea.area.x,
