@@ -7080,5 +7080,19 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
     ret = handler.MenuClickHandle(event);
     EXPECT_EQ(ret, false);
 }
+
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+ /**
+  * @tc.name: KeyCommandHandlerTest_CallMistouchPrevention001
+  * @tc.desc: Test the normal running condition
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention001, TestSize.Level1) {
+    auto handler = std::make_shared<KeyCommandHandler>();
+    handler->CallMistouchPrevention();
+    EXPECT_EQ(handler->mistouchLibHandle_, nullptr);
+}
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
