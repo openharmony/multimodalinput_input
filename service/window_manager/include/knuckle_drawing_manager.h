@@ -22,6 +22,7 @@
 
 #include "pointer_event.h"
 #include "old_display_info.h"
+#include "setting_datashare.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,7 +41,7 @@ public:
     void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t rsId = -1);
     void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     KnuckleDrawingManager();
-    ~KnuckleDrawingManager() = default;
+    ~KnuckleDrawingManager();
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const OLD::DisplayInfo& displayInfo);
     std::string GetScreenReadState();
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
@@ -97,7 +98,7 @@ private:
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
-    bool hasScreenReadObserver_ { false };
+    sptr<SettingObserver> screenReadObserver_ { nullptr };
     ScreenReadState screenReadState_ { };
     int32_t pointerNum_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
