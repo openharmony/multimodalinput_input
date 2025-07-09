@@ -172,7 +172,6 @@ ohos_unittest("IntentionDeviceManagerTest") {
     "${device_status_root_path}/services/interaction/drag:interaction_drag",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
