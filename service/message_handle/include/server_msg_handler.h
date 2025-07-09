@@ -185,7 +185,6 @@ private:
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<InjectNoticeManager> injectNotice_ { nullptr };
     ClientDeathHandler clientDeathHandler_;
-    std::mutex mutexMapQueryAuthorizeLastTimestamp_;
     std::map<int32_t, int64_t> mapQueryAuthorizeLastTimestamp_;
     std::vector<OLD::DisplayGroupInfo> oldDisplayGroupInfos_;
 };

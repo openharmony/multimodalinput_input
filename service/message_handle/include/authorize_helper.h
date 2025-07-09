@@ -57,7 +57,7 @@ private:
     AuthorizeExitCallback exitCallback_ { nullptr };
     static std::mutex mutex_;
     static std::shared_ptr<AuthorizeHelper> instance_;
-    ClientDeathHandler* clientDeathHandler_;
+    ClientDeathHandler* clientDeathHandler_ { nullptr };
     std::map<int32_t, int32_t> mapQueryAuthorizeInfo_;
 };
 

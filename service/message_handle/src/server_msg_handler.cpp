@@ -1449,10 +1449,10 @@ int32_t ServerMsgHandler::RequestInjection(const int32_t callingPid, int32_t &st
         return ERROR_DEVICE_NOT_SUPPORTED;
     }
     auto ret = QueryAuthorizedStatus(callingPid, status);
-    MMI_HILOGD("QueryAuthorizedStatus,ret:%{public}d, callingPid:%{public}d, status:%{public}d",
+    MMI_HILOGD("QueryAuthorizedStatus,%{public}d,%{public}d,%{public}d",
         ret, callingPid, status);
     if (ret != ERR_OK) {
-        MMI_HILOGE("QueryAuthorizedStatus,ret:%{public}d, callingPid:%{public}d", ret, callingPid);
+        MMI_HILOGE("QueryAuthorizedStatus,%{public}d,%{public}d", ret, callingPid);
         return ret;
     }
     if (static_cast<AUTHORIZE_QUERY_STATE>(status) != AUTHORIZE_QUERY_STATE::UNAUTHORIZED) {
@@ -1463,7 +1463,7 @@ int32_t ServerMsgHandler::RequestInjection(const int32_t callingPid, int32_t &st
     }
     LaunchAbility();
     AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
-        MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+        MMI_HILOGI("User not authorized to inject %{public}d", pid);
         AUTH_DIALOG.CloseDialog();
     };
     reqId = GetRequestInjectionCallbackReqId();
@@ -1514,10 +1514,9 @@ bool ServerMsgHandler::CheckForRequestInjectionFrequentAccess(int32_t callingPid
 {
     CALL_DEBUG_ENTER;
     int64_t curTimestamp = GetMillisTime();
-    std::lock_guard<std::mutex> lock(mutexMapQueryAuthorizeLastTimestamp_);
     for (auto it = mapQueryAuthorizeLastTimestamp_.begin(); it != mapQueryAuthorizeLastTimestamp_.end();) {
         if (curTimestamp - it->second >= interval) {
-            MMI_HILOGD("requestInjection cur:%{public}" PRId64",it:%{public}" PRId64",sub:%{public}" PRId64"",
+            MMI_HILOGD("requestInjection %{public}" PRId64",%{public}" PRId64",%{public}" PRId64"",
             curTimestamp, it->second, curTimestamp - it->second);
             mapQueryAuthorizeLastTimestamp_.erase(it++);
         } else {
@@ -1526,7 +1525,7 @@ bool ServerMsgHandler::CheckForRequestInjectionFrequentAccess(int32_t callingPid
     }
     auto itFind = mapQueryAuthorizeLastTimestamp_.find(callingPid);
     if (itFind == mapQueryAuthorizeLastTimestamp_.end()) {
-        MMI_HILOGD("requestInjection instert: %{public}d", callingPid);
+        MMI_HILOGD("requestInjection %{public}d", callingPid);
         mapQueryAuthorizeLastTimestamp_.insert(std::make_pair(callingPid, curTimestamp));
         return false;
     }
