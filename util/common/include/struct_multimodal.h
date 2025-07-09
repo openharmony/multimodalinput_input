@@ -255,14 +255,26 @@ struct EventJoyStickAxis {
     EventJoyStickAxisAbsInfo abs_wheel;
 };
 
+struct PhysicalCoordinate {
+    double x {};
+    double y {};
+};
+
+struct LogicalCoordinate {
+    int32_t x {};
+    int32_t y {};
+};
+
+struct NormalizedCoords {
+    double x {};
+    double y {};
+};
+
 struct MMICoordinate2D  {
     double x { 0.0f };
     double y { 0.0f };
 };
 
-using NormalizedCoords = MMICoordinate2D;
-using PhysicalCoordinate = MMICoordinate2D;
-using LogicalCoordinate = MMICoordinate2D;
 using GlobalCoords = MMICoordinate2D;
 
 struct LogicalRectangle {

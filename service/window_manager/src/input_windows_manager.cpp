@@ -1147,21 +1147,16 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(OLD::DisplayGroupInfo
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
     });
-    if (GetHardCursorEnabled())
-    {
-        for (auto &windowInfo : displayGroupInfo.windowsInfo)
-        {
-            if (windowInfo.isDisplayCoord)
-            {
+    if (GetHardCursorEnabled()) {
+        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+            if (windowInfo.isDisplayCoord) {
                 continue;
             }
             auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
             CHKPR(displayInfo, action);
             ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
-            if (!windowInfo.uiExtentionWindowInfo.empty())
-            {
-                for (auto &item : windowInfo.uiExtentionWindowInfo)
-                {
+            if (!windowInfo.uiExtentionWindowInfo.empty()) {
+                for (auto &item : windowInfo.uiExtentionWindowInfo) {
                     ChangeWindowArea(displayInfo->x, displayInfo->y, item);
                 }
             }
@@ -4435,15 +4430,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerItem.SetWindowYPos(windowY);
     pointerItem.SetGlobalX(logicalX);
     pointerItem.SetGlobalY(logicalY);
-    MMI_HILOGD("(displayX:%{private}d, displayY:%{private}d)"
-        "(displayInfoX:%{private}d, displayInfoY:%{private}d)"
-        "(globalX:%{private}f, globalY:%{private}f)",
-        pointerItem.GetDisplayX(),
-        pointerItem.GetDisplayY(),
-        displayInfoX,
-        displayInfoY,
-        pointerItem.GetGlobalX(),
-        pointerItem.GetGlobalY());
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
