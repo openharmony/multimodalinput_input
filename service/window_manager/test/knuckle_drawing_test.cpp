@@ -65,7 +65,7 @@ HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_Draw, TestSize.Level1)
     OLD::DisplayInfo info;
     auto pointerEvent = PointerEvent::Create();
     knuckleDrawing->Draw(info, pointerEvent);
-    ASSERT_FALSE(knuckleDrawing->knuckleDrawingMgr_->hasScreenReadObserver_);
+    ASSERT_EQ(knuckleDrawing->knuckleDrawingMgr_->screenReadObserver_, nullptr);
 
     knuckleDrawing->knuckleDrawingMgr_ = nullptr;
     knuckleDrawing->Draw(info, pointerEvent);
@@ -86,7 +86,7 @@ HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_SetMultiWindowScreenId, TestSize
     uint64_t screenId = 0;
     uint64_t displayNodeScreenId = 0;
     knuckleDrawing->SetMultiWindowScreenId(screenId, displayNodeScreenId);
-    ASSERT_FALSE(knuckleDrawing->knuckleDrawingMgr_->hasScreenReadObserver_);
+    ASSERT_EQ(knuckleDrawing->knuckleDrawingMgr_->screenReadObserver_, nullptr);
 
     knuckleDrawing->knuckleDrawingMgr_ = nullptr;
     knuckleDrawing->SetMultiWindowScreenId(screenId, displayNodeScreenId);
