@@ -2294,6 +2294,87 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_009,
     auto windowInfo = eventdispatchhandler.SearchCancelList(pointerId, windowId);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
 }
+
+
+/**
+ * @tc.name: EventDispatchTest_FilterInvalidPointerItem_010
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_011, TestSize.Level1)
+ {
+     EventDispatchHandler eventdispatchhandler;
+     int32_t fd = 1;
+     int32_t eventType = 3;
+     std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(eventType);
+ 
+     std::vector<int32_t> pointerIdList;
+     pointerEvent->pointerId_ = 3;
+     pointerIdList.push_back(pointerEvent->pointerId_);
+     pointerEvent->pointerId_ = 5;
+     pointerIdList.push_back(pointerEvent->pointerId_);
+     EXPECT_TRUE(pointerIdList.size() > 1);
+ 
+     PointerEvent::PointerItem pointeritem;
+     pointeritem.SetWindowX(10);
+     pointeritem.SetWindowY(20);
+     pointeritem.SetTargetWindowId(2);
+     int32_t id = 1;
+     EXPECT_FALSE(pointerEvent->GetPointerItem(id, pointeritem));
+ 
+     pointeritem.targetWindowId_ = 3;
+     auto itemPid = WIN_MGR->GetWindowPid(pointeritem.targetWindowId_);
+     EXPECT_FALSE(itemPid >= 0);
+     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+ }
+ 
+ /**
+  * @tc.name: EventDispatchTest_SearchCancelList_004
+  * @tc.desc: Test SearchCancelList
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+ HWTEST_F(EventDispatchTest, EventDispatchTest_SearchCancelList_005, TestSize.Level1)
+ {
+     EventDispatchHandler handler;
+     int32_t pointerId = 1;
+     int32_t windowId = 1;
+     std::shared_ptr<WindowInfo> result = handler.SearchCancelList(pointerId, windowId);
+     ASSERT_EQ(result, nullptr);
+ }
+ 
+ /**
+  * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_009
+  * @tc.desc: Test HandleMultiWindowPointerEvent
+  * @tc.type: FUNC
+  * @tc.require:
+  */
+ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_010, TestSize.Level1)
+ {
+     EventDispatchHandler eventdispatchhandler;
+     int32_t eventType = 3;
+     std::shared_ptr<PointerEvent> point = std::make_shared<PointerEvent>(eventType);
+     EXPECT_NE(point, nullptr);
+ 
+     std::vector<int32_t> windowIds;
+     windowIds.push_back(1);
+     windowIds.push_back(2);
+     windowIds.push_back(3);
+ 
+     PointerEvent::PointerItem pointerItem;
+     pointerItem.SetWindowX(10);
+     pointerItem.SetWindowY(20);
+     pointerItem.SetTargetWindowId(2);
+ 
+     int32_t pointerId = 1;
+     int32_t windowId = 1;
+     std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
+     windowInfo1->id = 1;
+     eventdispatchhandler.cancelEventList_[1].push_back(windowInfo1);
+     auto windowInfo = eventdispatchhandler.SearchCancelList(pointerId, windowId);
+     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+}
 } // namespace MMI
 } // namespace OHOS
 
