@@ -2818,7 +2818,7 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
     int32_t reqId = 0;
     int32_t status = 0;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->RequestInjection(status, reqId);
-    MMI_HILOGD("RequestInjection ret:%{public}d,status:%{public}d,reqId:%{public}d", ret, status, reqId);
+    MMI_HILOGD("RequestInjection %{public}d,%{public}d,%{public}d", ret, status, reqId);
     if (ret != RET_OK) {
         MMI_HILOGE("RequestInjection fail, error:%{public}d", ret);
         if (ret ==  OHOS::MMI::ERROR_DEVICE_NOT_SUPPORTED) {
@@ -2830,32 +2830,30 @@ Input_Result OH_Input_RequestInjection(Input_InjectAuthorizeCallback callback)
         return INPUT_SERVICE_EXCEPTION;
     }
     AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
-    if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION ||
-        recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION) {
-        return INPUT_INJECTION_AUTHORIZING;
-    }
-    if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED) {
-        return INPUT_INJECTION_AUTHORIZED_OTHERS;
-    }
-    if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
-        return INPUT_INJECTION_AUTHORIZED;
-    }
-    if (recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZED) {
-        MMI_HILOGD("RequestInjection ok reqId:%{public}d", reqId);
-        OHOS::MMI::InputManager::GetInstance()->InsertRequestInjectionCallback(reqId,
-            [callback, reqId](int32_t status) {
-            MMI_HILOGD("RequestInjection callback reqId:%{public}d,status:%{public}d",
-                reqId, status);
-            AUTHORIZE_QUERY_STATE callStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
-            if (callStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
-                callback(Input_InjectionStatus::AUTHORIZED);
-            } else {
-                callback(Input_InjectionStatus::UNAUTHORIZED);
-            }
-        });
-        return INPUT_SUCCESS;
-    }
-    return INPUT_SERVICE_EXCEPTION;
+    switch (recvStatus) {
+        case AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION:
+        case AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION: {
+            return INPUT_INJECTION_AUTHORIZING;
+        }
+        case AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED: {
+            return INPUT_INJECTION_AUTHORIZED_OTHERS;
+        }
+        case AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED: {
+            return INPUT_INJECTION_AUTHORIZED;
+        }
+        case AUTHORIZE_QUERY_STATE::UNAUTHORIZED: {
+            MMI_HILOGD("RequestInjection ok %{public}d", reqId);
+            OHOS::MMI::InputManager::GetInstance()->InsertRequestInjectionCallback(reqId,
+                [callback, reqId](int32_t status) {
+                    AUTHORIZE_QUERY_STATE callStatus = static_cast<AUTHORIZE_QUERY_STATE>(status);
+                    callback(callStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED ?
+                        Input_InjectionStatus::AUTHORIZED : Input_InjectionStatus::UNAUTHORIZED);
+                });
+            return INPUT_SUCCESS;
+        }
+        default:
+            return INPUT_SERVICE_EXCEPTION;
+        }
 }
 
 Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
@@ -2864,24 +2862,31 @@ Input_Result OH_Input_QueryAuthorizedStatus(Input_InjectionStatus* status)
     CHKPR(status, INPUT_PARAMETER_ERROR);
     int32_t tmpStatus = 0;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->QueryAuthorizedStatus(tmpStatus);
-    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,tmpStatus:%{public}d", ret, tmpStatus);
+    MMI_HILOGD("QueryAuthorizedStatus ret:%{public}d,%{public}d", ret, tmpStatus);
     if (ret != RET_OK) {
         MMI_HILOGE("QueryAuthorizedStatus fail, error:%{public}d", ret);
         return INPUT_SERVICE_EXCEPTION;
     }
     AUTHORIZE_QUERY_STATE recvStatus = static_cast<AUTHORIZE_QUERY_STATE>(tmpStatus);
-    if (recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION
-        || recvStatus == AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED
-        || recvStatus == AUTHORIZE_QUERY_STATE::UNAUTHORIZED) {
+    switch (recvStatus) {
+        case AUTHORIZE_QUERY_STATE::OTHER_PID_IN_AUTHORIZATION_SELECTION:
+        case AUTHORIZE_QUERY_STATE::OTHER_PID_AUTHORIZED:
+        case AUTHORIZE_QUERY_STATE::UNAUTHORIZED: {
             *status = Input_InjectionStatus::UNAUTHORIZED;
-    } else if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION) {
-        *status = Input_InjectionStatus::AUTHORIZING;
-    } else if (recvStatus == AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED) {
-         *status = Input_InjectionStatus::AUTHORIZED;
-    } else {
-        MMI_HILOGE("QueryAuthorizedStatus fail, status:%{public}d", recvStatus);
-        return INPUT_SERVICE_EXCEPTION;
-    }
+            break;
+        }
+        case AUTHORIZE_QUERY_STATE::CURRENT_PID_IN_AUTHORIZATION_SELECTION: {
+            *status = Input_InjectionStatus::AUTHORIZING;
+            break;
+        }
+        case AUTHORIZE_QUERY_STATE::CURRENT_PID_AUTHORIZED: {
+            *status = Input_InjectionStatus::AUTHORIZED;
+            break;
+        }
+        default:
+            MMI_HILOGE("QueryAuthorizedStatus fail, %{public}d", recvStatus);
+            return INPUT_SERVICE_EXCEPTION;
+        }
     return INPUT_SUCCESS;
 }
 

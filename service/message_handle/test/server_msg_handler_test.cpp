@@ -2260,10 +2260,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSi
         return;
     }
     handler.OnCancelInjection(callingPid);
-    result = handler.OnAuthorize(false);
+    result = handler.OnAuthorize(true);
     EXPECT_EQ(result, ERR_OK);
     result = handler.RequestInjection(callingPid, status, reqId);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, ERR_OK);
     result = handler.OnAuthorize(true);
     EXPECT_EQ(result, ERR_OK);
     result = handler.OnAuthorize(false);
