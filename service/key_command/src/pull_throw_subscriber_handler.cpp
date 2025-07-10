@@ -55,7 +55,7 @@ void PullThrowSubscriberHandler::HandleFingerGestureDownEvent(std::shared_ptr<Po
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (CheckFingerValidation(touchEvent)) {
+    if (!CheckFingerValidation(touchEvent)) {
         return;
     }
     UpdateFingerPoisition(touchEvent);
@@ -68,7 +68,7 @@ void PullThrowSubscriberHandler::HandleFingerGestureMoveEvent(std::shared_ptr<Po
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (CheckProgressValid(touchEvent)) {
+    if (!CheckProgressValid(touchEvent)) {
         return;
     }
 }
@@ -77,7 +77,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullMoveEvent(std::shared_pt
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (CheckProgressValid(touchEvent)) {
+    if (!CheckProgressValid(touchEvent)) {
         return;
     }
     if (gestureInProgress_ && alreadyTouchDown_) {
@@ -97,35 +97,41 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     MMI_HILOGI("PullThrow On PullUp Event");
-    if (CheckProgressValid(touchEvent)) {
+    if (!CheckProgressValid(touchEvent)) {
         return;
     }
+    // Update the last position point for calculating acceleration
+    int32_t id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    UpdatePositionHistory(item.GetDisplayX(), item.GetDisplayY(), touchEvent->GetActionTime());
     if (gestureInProgress_) {
         MMI_HILOGI("PullThrow On gestureInProgress");
         double endTime = touchEvent->GetActionTime();
-        // 计算距离
-        int32_t id = touchEvent->GetPointerId();
-        PointerEvent::PointerItem item;
-        touchEvent->GetPointerItem(id, item);
+        // Calcultating distance
         double dx = item.GetDisplayX() - fingerGesture_.touches[FIRST_TOUCH_FINGER].x;
         double dy = item.GetDisplayY() - fingerGesture_.touches[FIRST_TOUCH_FINGER].y;
         double distance = std::sqrt(dx * dx + dy * dy);
-        // 计算时间差，转换为秒
-        double deltaTime = (endTime - triggerTime_) / 1e3; // 如果时间戳是毫秒
+        double deltaTime = (endTime - triggerTime_) / 1e3;
         if (deltaTime <= 0) {
-            deltaTime = 1.0 / 1e3; // 设置最小时间差，防止除以0
+            deltaTime = 1.0 / 1e3;
         }
-        // 计算速度
         double speed = distance / deltaTime;
-        // 如果用户手指在靠近转轴区域操作，给予速度加成，提高识别成功率
+        //  provide a speed scale to improve success rate in spin area
         if (item.GetDisplayY() > SPIN_UP_AREA_Y && item.GetDisplayY() < SPIN_DOWN_AREA_Y) {
-            speed = speed * SPEED_SCALE; // 2.0:速度倍率
+            speed = speed * SPEED_SCALE;
         }
-        double throwAngle = atan2(dy, dx) * 180 / M_PI; // 180:弧度转化为角度
+        double throwAngle = atan2(dy, dx) * 180 / M_PI;
         MMI_HILOGI("Throw speed: %{public}f, angle: %{public}f, dist: %{public}f", speed, throwAngle, distance);
-        // 检查速度距离是否大于阈值
-        if (speed > THRES_SPEED && distance > MIN_THRES_DIST && CheckThrowAngleValid(throwAngle)) {
-            // 判断方向
+        // check sudden stop
+        bool hasSuddenStop = CheckSuddenStop();
+        if (hasSuddenStop) {
+            MMI_HILOGI("PullThrow detected sudden stop");
+            StopFingerGesture(touchEvent);
+            return;
+        }
+        // check pull throw condition: speed, distance, direction
+        if (speed > THRES_SPEED && distance > MIN_THRES_DIST && CheckThrowDirection(throwAngle, item.GetDisplayY())) {
             touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_THROW);
             touchEvent->SetThrowAngle(throwAngle);
             touchEvent->SetThrowSpeed(speed);
@@ -154,6 +160,8 @@ void PullThrowSubscriberHandler::UpdateFingerPoisition(std::shared_ptr<PointerEv
     fingerGesture_.touches[FIRST_TOUCH_FINGER].id = id;
     fingerGesture_.touches[FIRST_TOUCH_FINGER].x = item.GetDisplayX();
     fingerGesture_.touches[FIRST_TOUCH_FINGER].y = item.GetDisplayY();
+    
+    UpdatePositionHistory(item.GetDisplayX(), item.GetDisplayY(), touchEvent->GetActionTime());
 }
 
 bool PullThrowSubscriberHandler::CheckFingerValidation(std::shared_ptr<PointerEvent> touchEvent) const
@@ -161,15 +169,31 @@ bool PullThrowSubscriberHandler::CheckFingerValidation(std::shared_ptr<PointerEv
     auto fingerCount = touchEvent->GetPointerIds().size();
     if (fingerCount != static_cast<size_t>(ONE_FINGER)) {
         MMI_HILOGD("PullThrow check cancel: The number of finger count is not 1");
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool PullThrowSubscriberHandler::CheckProgressValid(std::shared_ptr<PointerEvent> touchEvent)
 {
-    if (gestureInProgress_ && CheckFingerValidation(touchEvent)) {
+    if (touchEvent->HasFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW)) {
         StopFingerGesture(touchEvent);
+        return false;
+    }
+    if (gestureInProgress_ && !CheckFingerValidation(touchEvent)) {
+        StopFingerGesture(touchEvent);
+        return false;
+    }
+    return true;
+}
+
+bool PullThrowSubscriberHandler::CheckThrowDirection(double angle, int32_t posY)
+{
+    angle = (angle < NUM_EPSILON) ? angle + FULL_CIRCLE_DEGREES : angle;
+    if (posY < UP_SCREEN_AREA_Y && angle >= ANGLE_DOWN_MIN && angle < ANGLE_DOWN_MAX) {
+        return true;
+    }
+    if (posY > DOWN_SCREEN_AREA_Y && angle >= ANGLE_UP_MIN && angle < ANGLE_UP_MAX) {
         return true;
     }
     return false;
@@ -177,7 +201,7 @@ bool PullThrowSubscriberHandler::CheckProgressValid(std::shared_ptr<PointerEvent
 
 bool PullThrowSubscriberHandler::CheckThrowAngleValid(double angle)
 {
-    angle = (angle < ANGLE_EPSILON) ? angle + FULL_CIRCLE_DEGREES : angle;
+    angle = (angle < NUM_EPSILON) ? angle + FULL_CIRCLE_DEGREES : angle;
     if (angle >= ANGLE_DOWN_MIN && angle < ANGLE_DOWN_MAX) {
         return true;
     }
@@ -191,6 +215,7 @@ void PullThrowSubscriberHandler::StartFingerGesture()
 {
     CALL_DEBUG_ENTER;
     gestureInProgress_ = true;
+    positionHistory_.clear();
 }
 
 void PullThrowSubscriberHandler::StopFingerGesture(std::shared_ptr<PointerEvent> touchEvent)
@@ -199,6 +224,59 @@ void PullThrowSubscriberHandler::StopFingerGesture(std::shared_ptr<PointerEvent>
     gestureInProgress_ = false;
     alreadyTouchDown_ = false;
     triggerTime_ = touchEvent->GetActionTime();
+    positionHistory_.clear();
 }
+
+void PullThrowSubscriberHandler::UpdatePositionHistory(double x, double y, double time)
+{
+    PositionRecord record;
+    record.x = x;
+    record.y = y;
+    record.time = time;
+    
+    positionHistory_.push_back(record);
+    if (positionHistory_.size() > MAX_HISTORY_SIZE) {
+        positionHistory_.erase(positionHistory_.begin());
+    }
+}
+
+bool PullThrowSubscriberHandler::CheckSuddenStop() const
+{
+    if (positionHistory_.size() < MIN_HISTORY_SIZE) {
+        MMI_HILOGI("PullThrow position history size less than 3");
+        return false;
+    }
+    
+    // 计算最近两段的速度
+    const auto& newest = positionHistory_.back();
+    const auto& middle = positionHistory_[positionHistory_.size() - 2];
+    const auto& oldest = positionHistory_[positionHistory_.size() - 3];
+    
+    // 计算位移和时间差
+    double dx1 = middle.x - oldest.x;
+    double dy1 = middle.y - oldest.y;
+    double dt1 = (middle.time - oldest.time) / 1e3;
+    
+    double dx2 = newest.x - middle.x;
+    double dy2 = newest.y - middle.y;
+    double dt2 = (newest.time - middle.time) / 1e3;
+    
+    // 防止除以零
+    if (dt1 <= 0) dt1 = NUM_EPSILON;
+    if (dt2 <= 0) dt2 = NUM_EPSILON;
+    
+    // 计算速度（矢量长度）
+    double speed1 = std::sqrt(dx1 * dx1 + dy1 * dy1) / dt1;
+    double speed2 = std::sqrt(dx2 * dx2 + dy2 * dy2) / dt2;
+    
+    // 计算加速度（速度变化率）
+    double timeSpace = (dt1 + dt2) / 2;
+    if (timeSpace <= 0) timeSpace = NUM_EPSILON;
+    double acceleration = (speed2 - speed1) / timeSpace;
+    
+    // 如果加速度为负且绝对值大于阈值，说明有急停动作
+    return (acceleration < MAX_DECELERATION);
+}
+
 } // namespace MMI
 } // namespace OHOS

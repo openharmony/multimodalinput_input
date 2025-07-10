@@ -139,6 +139,10 @@ public:
 
     static constexpr uint32_t EVENT_FLAG_GESTURE_SUPPLEMENT = 0x00008000;
 
+    static constexpr uint32_t EVENT_FLAG_UITEST = 0x00010000;
+
+    static constexpr uint32_t EVENT_FLAG_DISABLE_PULL_THROW = 0x00020000;
+
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *
