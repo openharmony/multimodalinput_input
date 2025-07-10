@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1657,13 +1657,20 @@ void InputManagerImpl::OnConnected()
         }
     }
     MULTIMODAL_INPUT_CONNECT_MGR->SetKnuckleSwitch(knuckleSwitch_);
-    if (anrObservers_.empty()) {
+    if (!anrObservers_.empty()) {
+        if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetAnrObserver(); ret != RET_OK) {
+            MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
+        }
+    }
+    if (currentUserId_.load() == -1) {
+        MMI_HILOGW("Current userId is not initialized");
         return;
     }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetAnrObserver();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
+    if (int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCurrentUser(currentUserId_.load()); ret != RET_OK) {
+        MMI_HILOGE("Set currentUserId:%{private}d failed, ret:%{public}d", currentUserId_.load(), ret);
+        return;
     }
+    MMI_HILOGI("Set currentUserId:%{private}d successfully", currentUserId_.load());
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -2628,11 +2635,12 @@ int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
 
 int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (userId < 0) {
         MMI_HILOGE("Invalid userId");
         return RET_ERR;
     }
+    currentUserId_.store(userId);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
