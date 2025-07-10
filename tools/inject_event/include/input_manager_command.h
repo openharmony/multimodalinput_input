@@ -57,6 +57,7 @@ private:
     void FillPointerItem(PointerEvent::PointerItem &itemFirst, int32_t pointX, int32_t pointY, int32_t id, bool press);
     int32_t ActionPinchEvent(int32_t centerX, int32_t centerY, int32_t scalePercentNumerator);
     uint32_t KeyCodeToUnicode(int32_t keyCode);
+    std::atomic_bool isHPR_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
