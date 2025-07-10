@@ -7093,6 +7093,66 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
     handler->CallMistouchPrevention();
     EXPECT_EQ(handler->mistouchLibHandle_, nullptr);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_003
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    handler.RegisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, true);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_004
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = false;
+    handler.RegisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_003
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    handler.UnregisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_004
+ * @tc.desc: Test MenuClickProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = false;
+    handler.UnregisterProximitySensor();
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
