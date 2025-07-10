@@ -1467,11 +1467,14 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (!callBahaviorState_) {
-        MMI_HILOGD("CallBehaviorState is false");
+#ifndef OHOS_BUILD_PC_PRIORITY
+        MMI_HILOGI("CallBehaviorState is false");
+#endif // OHOS_BUILD_PC_PRIORITY
         return false;
     }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER ||
-        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN &&
+        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_UP)) {
         MMI_HILOGE("This key event no need to CallEnded");
         return false;
     }
