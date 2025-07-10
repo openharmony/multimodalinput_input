@@ -69,6 +69,8 @@ constexpr int32_t ONE_ARGC = 1;
 constexpr int32_t TWO_ARGC = 2;
 constexpr int32_t THREE_ARGC = 3;
 constexpr int32_t FOUR_ARGC = 4;
+const std::string DEVICE_TYPE_HPR { "HPR" };
+const std::string PRODUCT_TYPE_HPR = OHOS::system::GetParameter("const.build.product", "HYM");
 
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
@@ -1189,6 +1191,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                isHPR_ = PRODUCT_TYPE_HPR ==DEVICE_TYPE_HPR;
+                                if (isHPR_) {
+                                    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
+                                }
                             }
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
@@ -1230,6 +1236,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     pointerEvent->SetPointerId(pointerId);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                    isHPR_ = PRODUCT_TYPE_HPR ==DEVICE_TYPE_HPR;
+                                    if (isHPR_) {
+                                        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
+                                    }
                                 }
                                 nowSysTimeUs = GetSysClockTime();
                                 nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
@@ -1253,6 +1263,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerId(pointerId);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                isHPR_ = PRODUCT_TYPE_HPR ==DEVICE_TYPE_HPR;
+                                if (isHPR_) {
+                                    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
+                                }
                             }
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
@@ -1279,6 +1293,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         pointerEvent->SetPointerId(pointerId);
                                         pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                        isHPR_ = PRODUCT_TYPE_HPR ==DEVICE_TYPE_HPR;
+                                        if (isHPR_) {
+                                            pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
+                                        }
                                     }
                                     nowSysTimeUs = GetSysClockTime();
                                     nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
@@ -1300,6 +1318,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                isHPR_ = PRODUCT_TYPE_HPR ==DEVICE_TYPE_HPR;
+                                if (isHPR_) {
+                                    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
+                                }
                                 pointerEvent->RemovePointerItem(pointerId);
                             }
                             break;
