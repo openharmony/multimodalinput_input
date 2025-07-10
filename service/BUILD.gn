@@ -3087,6 +3087,7 @@ ohos_unittest("ConnectManagerProxyEXTest") {
 
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/util:libmmi-util",
   ]
