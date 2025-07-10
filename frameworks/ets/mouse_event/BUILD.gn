@@ -15,7 +15,10 @@ import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 copy_taihe_idl("mouse_event_taihe") {
   sources = [ "idl/ohos.multimodalInput.mouseEvent.taihe" ]
-  deps = [ "${mmi_path}/frameworks/ets/input_event:input_event_taihe" ]
+  deps = [
+  "${mmi_path}/frameworks/ets/input_event:input_event_taihe",
+  "${mmi_path}/frameworks/ets/key_code:key_code_taihe",
+  ]
 }
 config("mouseEvent_config") {
   visibility = [ ":*" ]
