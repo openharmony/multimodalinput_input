@@ -62,27 +62,45 @@ private:
     bool CheckFingerValidation(std::shared_ptr<PointerEvent> touchEvent) const;
     bool CheckProgressValid(std::shared_ptr<PointerEvent> touchEvent);
     bool CheckThrowAngleValid(double angle);
+    bool CheckThrowDirection(double angle, int32_t posY);
     void UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent);
+    void UpdatePositionHistory(double x, double y, double time);
+    bool CheckSuddenStop() const;
  
 private:
     FingerGesture fingerGesture_;
     std::shared_ptr<PointerEvent> touchEvent_ { nullptr };
     bool gestureInProgress_ = false;
-    double triggerTime_ = 0.0; // 触发时间，单位毫秒
+    double triggerTime_ = 0.0; // trigger time milliseconds
     bool alreadyTouchDown_ = false;
-    static constexpr double THRES_SPEED = 0.6; // 阈值，单位像素/秒
-    static constexpr int64_t MIN_THRES_DIST = 5; // 阈值，单位像素
-    static constexpr int32_t FIRST_TOUCH_FINGER = 0; // 单指触摸抛甩
+    
+    // Store historical positions and times
+    struct PositionRecord {
+        double x { 0.0 };
+        double y { 0.0 };
+        double time { 0.0 }; // milliseconds
+    };
+    std::vector<PositionRecord> positionHistory_; //  Store the most recent location record
+    static constexpr size_t MAX_HISTORY_SIZE = 10;
+    static constexpr size_t MIN_HISTORY_SIZE = 3;
+    
+    static constexpr double THRES_SPEED = 0.6; // unit: pix
+    static constexpr int64_t MIN_THRES_DIST = 50; // unit: pix
+    static constexpr double MAX_DECELERATION = 0.0;
+    static constexpr int32_t FIRST_TOUCH_FINGER = 0;
+    
     static constexpr double ANGLE_DOWN_MIN {45.0};
     static constexpr double ANGLE_DOWN_MAX {135.0};
     static constexpr double ANGLE_UP_MIN {225.0};
     static constexpr double ANGLE_UP_MAX {315.0};
     static constexpr double FULL_CIRCLE_DEGREES {360.0};
-    static constexpr double ANGLE_EPSILON {1e-9};
-    static constexpr double SPIN_UP_AREA_Y = 600;
-    static constexpr double SPIN_DOWN_AREA_Y = 2400; // 靠近转轴区域的坐标Y值
-    static constexpr double SPEED_SCALE = 2.0; // 速度加成系数
-    const int64_t WINDOW_TIME_INTERVAL = 0.5e6; // 采样窗口，单位u秒
+    static constexpr double NUM_EPSILON {1e-3};
+    static constexpr double SPIN_UP_AREA_Y = 600; // Y value close to the spin from up screen side
+    static constexpr double SPIN_DOWN_AREA_Y = 2400; // Y value close to the spin from down screen side
+    static constexpr double UP_SCREEN_AREA_Y = 1600;
+    static constexpr double DOWN_SCREEN_AREA_Y = 1700;
+    static constexpr double SPEED_SCALE = 2.0;
+    const int64_t WINDOW_TIME_INTERVAL = 0.20e6; // sample window, unit: u sec
 };
 #define PULL_THROW_EVENT_HANDLER ::OHOS::DelayedSingleton<PullThrowSubscriberHandler>::GetInstance()
 } // namespace MMI
