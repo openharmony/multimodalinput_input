@@ -4301,7 +4301,7 @@ ErrCode MMIService::SetMoveEventFilters(bool flag)
 
 ErrCode MMIService::SetCurrentUser(int32_t userId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubSetCurrentUser Verify system APP failed");
         return ERROR_NOT_SYSAPI;

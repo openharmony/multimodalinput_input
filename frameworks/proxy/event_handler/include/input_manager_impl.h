@@ -317,6 +317,7 @@ private:
     std::function<void(int32_t, int32_t)> windowStatecallback_;
     bool knuckleSwitch_ { true };
     UserScreenInfo userScreenInfo_ = {0};
+    std::atomic_int32_t currentUserId_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;
