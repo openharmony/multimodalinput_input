@@ -100,10 +100,10 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
                 MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d", timerId_);
             } else {
                 if (keyEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%d",
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{private}d",
                         timerId_, keyEvent_->GetKeyCode());
                 } else {
-                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%d",
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{private}d",
                         timerId_, keyEvent_->GetKeyCode());
                 }
             }
@@ -121,7 +121,8 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
                        "timeId:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction(), timerId_);
         } else {
-            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d, timeId:%d",
+            MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d, keyAction: %{public}d,"
+                       "timeId:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction(), timerId_);
         }
         timerId_ = -1;
@@ -144,7 +145,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             if (!JudgeLimitPrint(keyEvent_)) {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%{private}d", keyEvent_->GetKeyCode());
             } else {
-                MMI_HILOGD("The end keyboard autorepeat, keyCode:%d", keyEvent_->GetKeyCode());
+                MMI_HILOGD("The end keyboard autorepeat, keyCode:%{private}d", keyEvent_->GetKeyCode());
             }
         }
     }

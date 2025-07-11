@@ -140,7 +140,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
-        MMI_HILOGE("keyCode is not within the query range, keyCode:%{public}d", keyState->keyCode);
+        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -2095,7 +2095,7 @@ Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
 {
     CALL_DEBUG_ENTER;
     if (keyCode < 0 || keyCode != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
-        MMI_HILOGE("Invalid keycode:%{public}d", keyCode);
+        MMI_HILOGE("Invalid keycode:%{private}d", keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(state, INPUT_PARAMETER_ERROR);

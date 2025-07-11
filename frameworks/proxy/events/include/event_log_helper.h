@@ -145,8 +145,8 @@ private:
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
                     event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
             } else {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{public}d,"
-                    "AT:%{public}" PRId64", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d,"
+                MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{private}d,"
+                    "AT:%{public} " PRId64 " , ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, "
                     "SL:%{public}d, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
                     event->GetId(), event->GetKeyCode(), event->GetActionTime(),
                     InputEvent::EventTypeToString(event->GetEventType()),
@@ -164,10 +164,10 @@ private:
                 ", IP:%{public}d,", item.GetDeviceId(), item.IsPressed());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%d, DT:%{public}" PRId64
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64
                     ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
                 } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%d, DT:%{public}" PRId64
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{private}d, DT:%{public}" PRId64
                     ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
                 }
             }
@@ -203,7 +203,8 @@ private:
                 KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
         } else {
             if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || !isJudgeMode) {
-                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
+                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d,"
+                    "AT:%{public}" PRId64 ", AST:%{public}" PRId64
                     ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
                     ", EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
@@ -213,8 +214,8 @@ private:
                     event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
             } else {
-                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{public}d, KI:%{public}d, AT:%{public}" PRId64
-                    ", AST:%{public}" PRId64", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d,"
+                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d, AT:%{public}" PRId64 ","
+                    "AST:%{public}" PRId64 ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, "
                     "CL:%{public}d, SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
                     event->GetActionStartTime(),
@@ -248,7 +249,7 @@ private:
             }
             if (IsBetaVersion()) {
                 if (isJudgeMode || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s]", tmpStr.c_str());
                 }
             }
         }
