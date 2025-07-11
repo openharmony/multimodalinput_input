@@ -188,16 +188,16 @@ ohos_shared_library("libcursor_drawing_adapter") {
     ]
   }
 
+  sources = [ "window_manager/src/cursor_drawing_adapter.cpp" ]
   if (input_feature_pointer_drawing) {
-    sources = [
+    sources += [
       "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
-      "window_manager/src/cursor_drawing_adapter.cpp",
       "window_manager/src/pointer_drawing_manager.cpp",
       "window_manager/src/pointer_renderer.cpp",
       "window_manager/src/screen_pointer.cpp",
     ]
   } else {
-    sources = [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
+    sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
   }
 
   deps = [
@@ -212,9 +212,13 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
     "graphic_surface:surface",
+    "graphic_2d:librender_service_client",
     "hisysevent:libhisysevent",
+    "init:libbeget_proxy",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libdm_lite",
@@ -232,14 +236,10 @@ ohos_shared_library("libcursor_drawing_adapter") {
   if (input_feature_product != "watch") {
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
     external_deps += [
-      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
       "graphic_2d:libcomposer",
       "graphic_2d:librender_service_base",
-      "graphic_2d:librender_service_client",
       "hilog:libhilog",
       "image_framework:image_native",
-      "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
