@@ -250,6 +250,10 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_002, TestSize.Level1)
     screenpointer->isWindowRotation_ = true;
     ret = screenpointer->Move(x, y, align);
     EXPECT_FALSE(ret);
+    x = -1;
+    y = -1;
+    ret = screenpointer->Move(x, y, align);
+    EXPECT_FALSE(ret);
 }
 
 /**
