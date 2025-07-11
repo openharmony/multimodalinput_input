@@ -5266,6 +5266,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         int32_t focusWindowId = GetFocusWindowId(groupId);
         if (focusWindowId == touchWindow->id) {
+            pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
             return RET_OK;
         }
         pointerEvent->SetAncoDeal(false);
