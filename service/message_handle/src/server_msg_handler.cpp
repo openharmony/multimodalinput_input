@@ -657,42 +657,43 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         return false;
     }
     if (isShell) {
-        auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
-        if (iter != shellTargetWindowIds_.end()) {
-            targetWindowId = iter->second;
-        }
-    } else if ((IsCastInject(pointerEvent->GetDeviceId())) && (pointerEvent->GetZOrder() > 0)) {
-        pointerEvent->RemovePointerItem(pointerId);
-        pointerId += CAST_POINTER_ID;
-        pointerItem.SetPointerId(pointerId);
-        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-        pointerEvent->SetPointerId(pointerId);
-        auto iter = castTargetWindowIds_.find(pointerEvent->GetPointerId());
-        if (iter != castTargetWindowIds_.end()) {
-            targetWindowId = iter->second;
-        }
+        targetWindowId = FixTargetWindowIdExt(pointerEvent, shellTargetWindowIds_, pointerItem);
+    } else if ((IsCastInject(pointerEvent->GetDeviceId()))) {
+        targetWindowId = (pointerEvent->GetZOrder() > 0) ? // Gesture Window in Collaborative Scenarios
+        FixTargetWindowIdExt(pointerEvent, castTargetWindowIds_, pointerItem, true, CAST_POINTER_ID) :
+        FixTargetWindowIdExt(pointerEvent, nativeTargetWindowIds_, pointerItem, true, CAST_POINTER_ID);
     } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-        auto iter = accessTargetWindowIds_.find(pointerEvent->GetPointerId());
-        if (iter != accessTargetWindowIds_.end()) {
-            targetWindowId = iter->second;
-        }
+        targetWindowId = FixTargetWindowIdExt(pointerEvent, accessTargetWindowIds_, pointerItem);
     } else {
-        pointerEvent->RemovePointerItem(pointerId);
-        if (IsCastInject(pointerEvent->GetDeviceId())) {
-            pointerId += CAST_POINTER_ID;
-        } else {
-            pointerId += DEFAULT_POINTER_ID;
-        }
-        pointerItem.SetPointerId(pointerId);
-        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-        pointerEvent->SetPointerId(pointerId);
-        auto iter = nativeTargetWindowIds_.find(pointerEvent->GetPointerId());
-        if (iter != nativeTargetWindowIds_.end()) {
-            targetWindowId = iter->second;
-        }
+        targetWindowId = FixTargetWindowIdExt(pointerEvent, nativeTargetWindowIds_, pointerItem,
+            true, DEFAULT_POINTER_ID);
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     return UpdateTouchEvent(pointerEvent, action, targetWindowId);
+}
+
+int32_t ServerMsgHandler::FixTargetWindowIdExt(std::shared_ptr<PointerEvent> pointerEvent,
+    const std::map<int32_t, int32_t>& targetWindowIdMap, PointerEvent::PointerItem& pointerItem,
+    bool bNeedResetPointerId, int32_t diffPointerId)
+{
+    CHKPR(pointerEvent, RET_ERR);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (bNeedResetPointerId) {
+        if (diffPointerId <= 0) {
+            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", pointerId);
+            return RET_ERR;
+        }
+        pointerEvent->RemovePointerItem(pointerId);
+        pointerId += diffPointerId;
+        pointerItem.SetPointerId(pointerId);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        pointerEvent->SetPointerId(pointerId);
+    }
+    auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
+    if (iter != targetWindowIdMap.end()) {
+        return iter->second;
+    }
+    return RET_ERR;
 }
 
 bool ServerMsgHandler::UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent,
