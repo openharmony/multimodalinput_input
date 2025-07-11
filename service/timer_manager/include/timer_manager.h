@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,10 +46,10 @@ private:
 
 namespace MMI {
 class TimerManager final {
-    DECLARE_DELAYED_SINGLETON(TimerManager);
-
 public:
+    ~TimerManager();
     DISALLOW_COPY_AND_MOVE(TimerManager);
+    static std::shared_ptr<TimerManager> GetInstance();
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
         const std::string &name = "");
     int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
@@ -73,6 +73,7 @@ private:
         std::string name { "" };
     };
 private:
+    TimerManager();
     int32_t TakeNextTimerId();
     int32_t RemoveTimerInternal(int32_t timerId, const std::string &name = "");
     int32_t ResetTimerInternal(int32_t timerId);
@@ -82,11 +83,13 @@ private:
     void ProcessTimersInternal();
 
 private:
+    static std::once_flag initFlag_;
+    static std::shared_ptr<TimerManager> instance_;
     std::list<std::unique_ptr<TimerItem>> timers_;
     std::recursive_mutex timerMutex_;
 };
 
-#define TimerMgr ::OHOS::DelayedSingleton<TimerManager>::GetInstance()
+#define TimerMgr ::OHOS::MMI::TimerManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // TIMER_MANAGER_H
