@@ -1215,6 +1215,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
@@ -1275,6 +1276,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "eventhandler:libeventhandler",
@@ -1445,6 +1447,7 @@ ohos_unittest("KnuckleDrawingManagerTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
@@ -1491,6 +1494,7 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
@@ -3436,6 +3440,7 @@ ohos_unittest("KnuckleDrawingTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "googletest:gtest_main",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",

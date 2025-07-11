@@ -25,7 +25,6 @@
 #endif // USE_ROSEN_DRAWING
 #include "imultimodal_input_connect.h"
 #include "input_windows_manager.h"
-#include "setting_datashare.h"
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 #include "timer_manager.h"
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
@@ -151,6 +150,16 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     displayInfo_.height = 0;
     displayInfo_.direction = Direction::DIRECTION0;
     displayInfo_.displayDirection = Direction::DIRECTION0;
+}
+
+KnuckleDrawingManager::~KnuckleDrawingManager()
+{
+    if (screenReadObserver_ != nullptr) {
+        ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .UnregisterObserver(screenReadObserver_);
+        MMI_HILOGI("Unregister setting observer, ret=%{public}d", ret);
+        screenReadObserver_ = nullptr;
+    }
 }
 
 void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t rsId)
@@ -926,7 +935,7 @@ int32_t KnuckleDrawingManager::DestoryWindow()
 void KnuckleDrawingManager::CreateObserver()
 {
     CALL_DEBUG_ENTER;
-    if (!hasScreenReadObserver_) {
+    if (screenReadObserver_ == nullptr) {
         screenReadState_.switchName = SCREEN_READING;
         CreateScreenReadObserver(screenReadState_);
     }
@@ -955,7 +964,8 @@ void KnuckleDrawingManager::CreateScreenReadObserver(T &item)
         statusObserver = nullptr;
         return;
     }
-    hasScreenReadObserver_ = true;
+    // save screenReadObserver here and unregister it before the knuckle shard library is dlclosed.
+    screenReadObserver_ = statusObserver;
 }
 
 std::string KnuckleDrawingManager::GetScreenReadState()
