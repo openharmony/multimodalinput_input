@@ -6489,8 +6489,8 @@ std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInf
     double logicX, double logicY) const
 {
     UpdateCurrentDisplay(window.displayId);
-    int32_t currX = logicX - currentDisplayXY_.first;
-    int32_t currY = logicY - currentDisplayXY_.second;
+    double currX = logicX - currentDisplayXY_.first;
+    double currY = logicY - currentDisplayXY_.second;
     Matrix3f transform(window.transform);
     if (window.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
         return {currX, currY};
