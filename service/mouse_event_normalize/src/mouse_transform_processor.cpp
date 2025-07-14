@@ -1278,8 +1278,7 @@ int32_t MouseTransformProcessor::GetPointerLocation(int32_t &displayId, double &
     displayId = mouseInfo.displayId;
     displayX = mouseInfo.physicalX;
     displayY = mouseInfo.physicalY;
-    MMI_HILOGD("Cursor pointer location displayId:%{public}d, displayX:%{private}f, displayY:%{private}f",
-        displayId, displayX, displayY);
+    MMI_HILOGD("Cursor {%{public}d, %{private}f, %{private}f}", displayId, displayX, displayY);
     return RET_OK;
 }
 

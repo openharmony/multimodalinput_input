@@ -1082,11 +1082,12 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             .path_ = mouseIcons_[mouseStyle].iconPath,
             .color = GetPointerColor(),
             .size = GetPointerSize(),
-            .direction = displayInfo_.direction,
             .isHard = false,
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
         CHKPV(it.second);
+        Direction direction = CalculateRenderDirection(false, IsWindowRotation(&displayInfo_));
+        cfg.direction = it.second->IsMirror() ? DIRECTION0 : direction;
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
         MMI_HILOGD("SoftwareCursorDynamicRender, screen = %{public}" PRIu64 ", dpi = %{public}f", it.first, cfg.dpi);
