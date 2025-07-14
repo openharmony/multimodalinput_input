@@ -1848,6 +1848,171 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayX, TestSize.Level2)
 }
 
 /**
+ * @tc.name: PointerEventTest_GetFixedDisplayXPosTouchScreen
+ * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosTouchScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosTouchScreen, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem pointerItem1;
+    int32_t disPlayX1 = 100;
+    int32_t disPlayY1 = 110;
+    pointerItem1.SetFixedDisplayXPos(disPlayX1);
+    pointerItem1.SetFixedDisplayYPos(disPlayY1);
+    pointerItem1.SetPointerId(0);
+    pointerItem1.SetDownTime(0);
+    pointerItem1.SetPressed(true);
+    pointerItem1.SetPressure(30);
+    pointerItem1.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerItem1.SetWindowX(10);
+    pointerItem1.SetWindowY(10);
+    pointerItem1.SetDisplayX(12);
+    pointerItem1.SetDisplayY(12);
+    pointerItem1.SetDisplayXPos(13);
+    pointerItem1.SetDisplayYPos(13);
+    pointerEvent->AddPointerItem(pointerItem1);
+    PointerEvent::PointerItem pointerItem2;
+    int32_t disPlayX2 = 200;
+    int32_t disPlayY2 = 220;
+    pointerItem2.SetFixedDisplayXPos(disPlayX2);
+    pointerItem2.SetFixedDisplayYPos(disPlayY2);
+    pointerItem2.SetPointerId(1);
+    pointerItem2.SetDownTime(0);
+    pointerItem2.SetPressed(true);
+    pointerItem2.SetPressure(30);
+    pointerItem2.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerItem2.SetWindowX(20);
+    pointerItem2.SetWindowY(20);
+    pointerItem2.SetDisplayX(22);
+    pointerItem2.SetDisplayY(22);
+    pointerItem2.SetDisplayXPos(23);
+    pointerItem2.SetDisplayYPos(23);
+    pointerEvent->AddPointerItem(pointerItem2);
+    PointerEvent::PointerItem pointerItemRes1;
+    pointerEvent->GetPointerItem(0, pointerItemRes1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayXPos(), disPlayX1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayYPos(), disPlayY1);
+    PointerEvent::PointerItem pointerItemRes2;
+    pointerEvent->GetPointerItem(1, pointerItemRes2);
+    ASSERT_EQ(pointerItemRes2.GetFixedDisplayXPos(), disPlayX2);
+    ASSERT_EQ(pointerItemRes2.GetFixedDisplayYPos(), disPlayY2);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFixedDisplayXPosMouse
+ * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosMouse
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosMouse, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem pointerItem1;
+    int32_t disPlayX1 = 100;
+    int32_t disPlayY1 = 110;
+    pointerItem1.SetFixedDisplayXPos(disPlayX1);
+    pointerItem1.SetFixedDisplayYPos(disPlayY1);
+    pointerItem1.SetPointerId(0);
+    pointerItem1.SetDownTime(0);
+    pointerItem1.SetPressed(true);
+    pointerItem1.SetPressure(30);
+    pointerItem1.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    pointerItem1.SetWindowX(10);
+    pointerItem1.SetWindowY(10);
+    pointerItem1.SetDisplayX(12);
+    pointerItem1.SetDisplayY(12);
+    pointerItem1.SetDisplayXPos(13);
+    pointerItem1.SetDisplayYPos(13);
+    pointerEvent->AddPointerItem(pointerItem1);
+    PointerEvent::PointerItem pointerItemRes1;
+    pointerEvent->GetPointerItem(0, pointerItemRes1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayXPos(), disPlayX1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayYPos(), disPlayY1);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFixedDisplayXPosPen
+ * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosPen
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosPen, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem pointerItem1;
+    int32_t disPlayX1 = 100;
+    int32_t disPlayY1 = 110;
+    pointerItem1.SetFixedDisplayXPos(disPlayX1);
+    pointerItem1.SetFixedDisplayYPos(disPlayY1);
+    pointerItem1.SetPointerId(0);
+    pointerItem1.SetDownTime(0);
+    pointerItem1.SetPressed(true);
+    pointerItem1.SetPressure(30);
+    pointerItem1.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerItem1.SetWindowX(10);
+    pointerItem1.SetWindowY(10);
+    pointerItem1.SetDisplayX(12);
+    pointerItem1.SetDisplayY(12);
+    pointerItem1.SetDisplayXPos(13);
+    pointerItem1.SetDisplayYPos(13);
+    pointerEvent->AddPointerItem(pointerItem1);
+    PointerEvent::PointerItem pointerItemRes1;
+    pointerEvent->GetPointerItem(0, pointerItemRes1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayXPos(), disPlayX1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayYPos(), disPlayY1);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFixedDisplayXPosJoystick
+ * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosJoystick
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosJoystick, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    PointerEvent::PointerItem pointerItem1;
+    int32_t disPlayX1 = 100;
+    int32_t disPlayY1 = 110;
+    pointerItem1.SetFixedDisplayXPos(disPlayX1);
+    pointerItem1.SetFixedDisplayYPos(disPlayY1);
+    pointerItem1.SetPointerId(0);
+    pointerItem1.SetDownTime(0);
+    pointerItem1.SetPressed(true);
+    pointerEvent->AddPointerItem(pointerItem1);
+    PointerEvent::PointerItem pointerItemRes1;
+    pointerEvent->GetPointerItem(0, pointerItemRes1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayXPos(), disPlayX1);
+    ASSERT_EQ(pointerItemRes1.GetFixedDisplayYPos(), disPlayY1);
+}
+
+/**
  * @tc.name: PointerEventTest_GetFixedDisplayY
  * @tc.desc: Verify the funcation FixedDisplayY
  * @tc.type: FUNC
