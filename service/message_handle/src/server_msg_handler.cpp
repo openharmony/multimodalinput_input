@@ -650,26 +650,47 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     int32_t action, bool isShell)
 {
     int32_t targetWindowId = -1;
+    if (isShell) {
+        targetWindowId = FixTargetWindowIdExt(pointerEvent, shellTargetWindowIds_);
+    } else if ((IsCastInject(pointerEvent->GetDeviceId()))) {
+        targetWindowId = (pointerEvent->GetZOrder() > 0) ? // Gesture Window in Collaborative Scenarios
+        FixTargetWindowIdExt(pointerEvent, castTargetWindowIds_, true, CAST_POINTER_ID) :
+        FixTargetWindowIdExt(pointerEvent, nativeTargetWindowIds_, true, CAST_POINTER_ID);
+    } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        targetWindowId = FixTargetWindowIdExt(pointerEvent, accessTargetWindowIds_);
+    } else {
+        targetWindowId = FixTargetWindowIdExt(pointerEvent, nativeTargetWindowIds_, true, DEFAULT_POINTER_ID);
+    }
+    MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
+    return UpdateTouchEvent(pointerEvent, action, targetWindowId);
+}
+
+int32_t ServerMsgHandler::FixTargetWindowIdExt(std::shared_ptr<PointerEvent> pointerEvent,
+    const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
+{
+    CHKPR(pointerEvent, RET_ERR);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return false;
+        return RET_ERR;
     }
-    if (isShell) {
-        targetWindowId = FixTargetWindowIdExt(pointerEvent, shellTargetWindowIds_, pointerItem);
-    } else if ((IsCastInject(pointerEvent->GetDeviceId()))) {
-        targetWindowId = (pointerEvent->GetZOrder() > 0) ? // Gesture Window in Collaborative Scenarios
-        FixTargetWindowIdExt(pointerEvent, castTargetWindowIds_, pointerItem, true, CAST_POINTER_ID) :
-        FixTargetWindowIdExt(pointerEvent, nativeTargetWindowIds_, pointerItem, true, CAST_POINTER_ID);
-    } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-        targetWindowId = FixTargetWindowIdExt(pointerEvent, accessTargetWindowIds_, pointerItem);
-    } else {
-        targetWindowId = FixTargetWindowIdExt(pointerEvent, nativeTargetWindowIds_, pointerItem,
-            true, DEFAULT_POINTER_ID);
+    if (bNeedResetPointerId) {
+        if (diffPointerId <= 0) {
+            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", pointerId);
+            return RET_ERR;
+        }
+        pointerEvent->RemovePointerItem(pointerId);
+        pointerId += diffPointerId;
+        pointerItem.SetPointerId(pointerId);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        pointerEvent->SetPointerId(pointerId);
     }
-    MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
-    return UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
+    if (iter != targetWindowIdMap.end()) {
+        return iter->second;
+    }
+    return RET_ERR;
 }
 
 int32_t ServerMsgHandler::FixTargetWindowIdExt(std::shared_ptr<PointerEvent> pointerEvent,
