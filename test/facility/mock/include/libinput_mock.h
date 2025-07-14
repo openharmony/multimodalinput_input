@@ -71,6 +71,8 @@ public:
     MOCK_METHOD(struct libinput_event_keyboard*, LibinputEventGetKeyboardEvent, (struct libinput_event *));
     MOCK_METHOD(uint32_t, LibinputEventKeyboardGetKey, (struct libinput_event_keyboard *));
     MOCK_METHOD(enum libinput_key_state, LibinputEventKeyboardGetKeyState, (struct libinput_event_keyboard *));
+    MOCK_METHOD(int, HasEventLedType, (struct libinput_device *));
+    MOCK_METHOD(int, GetFuncKeyState, (struct libinput_device *, unsigned int));
 };
 } // namespace MMI
 } // namespace OHOS

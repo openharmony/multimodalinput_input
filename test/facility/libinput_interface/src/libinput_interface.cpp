@@ -338,7 +338,12 @@ int libinput_event_gesture_get_device_coords_y(struct libinput_event_gesture *ev
 
 int libinput_has_event_led_type(struct libinput_device *device)
 {
-    return 0;
+    return g_instance->HasEventLedType(device);
+}
+
+int libinput_set_led_state(struct libinput_device *device, unsigned int code, unsigned int state)
+{
+    return 1;
 }
 
 const char* libinput_device_get_name(struct libinput_device *device)
@@ -388,7 +393,11 @@ struct udev_device* libinput_device_get_udev_device(struct libinput_device *devi
 
 enum evdev_device_udev_tags libinput_device_get_tags(struct libinput_device* device)
 {
-    return EVDEV_UDEV_TAG_INPUT;
+    if (device == nullptr) {
+        return EVDEV_UDEV_TAG_INPUT;
+    }
+    enum evdev_device_udev_tags tag = static_cast<enum evdev_device_udev_tags>(device->udevDev.tags);
+    return tag;
 }
 
 int libinput_device_has_capability(struct libinput_device *device, enum libinput_device_capability capability)
@@ -433,7 +442,7 @@ int libinput_device_get_size(struct libinput_device *device, double *width, doub
 
 int libinput_get_funckey_state(struct libinput_device *device, unsigned int code)
 {
-    return 0;
+    return g_instance->GetFuncKeyState(device, code);
 }
 
 uint32_t libinput_event_pointer_get_finger_count(struct libinput_event_pointer *event)
