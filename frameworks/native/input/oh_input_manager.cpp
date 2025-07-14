@@ -526,7 +526,12 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
     CHKPR(g_mouseEvent, INPUT_PARAMETER_ERROR);
     g_mouseEvent->ClearFlag();
     g_mouseEvent->ClearAxisValue();
-    g_mouseEvent->SetTargetDisplayId(0);
+    if (mouseEvent->displayId <= 0) {
+        g_mouseEvent->SetTargetDisplayId(0);
+    } else {
+        MMI_HILOGI("{%{public}d}", mouseEvent->displayId);
+        g_mouseEvent->SetTargetDisplayId(mouseEvent->displayId);
+    }
     int64_t time = mouseEvent->actionTime;
     if (time < 0) {
         time = OHOS::MMI::GetSysClockTime();
