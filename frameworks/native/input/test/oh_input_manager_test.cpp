@@ -61,7 +61,6 @@ struct Input_TouchEvent {
     int32_t displayY;
     int32_t globalX { INT_MAX };
     int32_t globalY { INT_MAX };
-    ;
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
