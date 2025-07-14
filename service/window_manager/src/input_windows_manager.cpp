@@ -5290,6 +5290,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+        return ERR_OK;
+    }
     bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
         pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);

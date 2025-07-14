@@ -121,7 +121,8 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     int32_t toolType = GetTouchToolType(touch, device);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     auto keyHandler = InputHandler->GetKeyCommandHandler();
-    if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect())) {
+    if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect()) &&
+        toolType != PointerEvent::TOOL_TYPE_THP_FEATURE) {
         NotifyFingersenseProcess(item, toolType);
     } else {
         MMI_HILOGD("Skip fingersense detect");
@@ -344,6 +345,12 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     }
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_FREEZE);
+    PointerEvent::PointerItem item;
+    if (pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item)) {
+        if (item.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+            return pointerEvent_;
+        }
+    }
     WIN_MGR->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;
 }
