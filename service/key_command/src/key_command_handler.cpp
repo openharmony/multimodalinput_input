@@ -90,6 +90,8 @@ std::atomic<int32_t> g_distance { 0 };
 const char* LOADMISTOUCH_LIBPATH = "libmistouch_prevention.z.so";
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 constexpr int32_t LIGHT_STAY_AWAY { 5 };
+const std::string DEVICE_TYPE_TV = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_TV = "tv";
 } // namespace
 
 static void SensorDataCallbackImpl(SensorEvent *event)
@@ -2959,6 +2961,10 @@ void KeyCommandHandler::OnKunckleSwitchStatusChange(const std::string switchName
 bool KeyCommandHandler::MenuClickHandle(std::shared_ptr<KeyEvent> event)
 {
     CALL_DEBUG_ENTER;
+    if (DEVICE_TYPE_TV != PRODUCT_TYPE_TV) {
+        MMI_HILOGD("In non-TV scenarios, the menu key does not support this feature");
+        return false;
+    }
     CHKPF(event);
     auto keycode = event->GetKeyCode();
     if (keycode != KeyEvent::KEYCODE_MENU) {
