@@ -4681,5 +4681,119 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest0
 
 #endif /* OHOS_BUILD_ENABLE_POINTER */
 
+/**
+ * @tc.name: InputWindowsManagerTest_CreateObserver_001
+ * @tc.desc: Test CreateObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreateObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = false;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->CreateObserver());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreateObserver_002
+ * @tc.desc: Test CreateObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreateObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = true;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->CreateObserver());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreateObserver_003
+ * @tc.desc: Test CreateObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreateObserver_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = false;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->CreateObserver());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreateObserver_004
+ * @tc.desc: Test CreateObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreateObserver_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = true;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->CreateObserver());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetupSettingObserver_001
+ * @tc.desc: Test SetupSettingObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetupSettingObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = true;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->Initialize());
+    int32_t nRetries = 0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = false;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+    nRetries = 1;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetupSettingObserver_002
+ * @tc.desc: Test SetupSettingObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetupSettingObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = true;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = false;
+    int32_t nRetries = 0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = false;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+    nRetries = 1;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(nRetries));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetupSettingObserver_003
+ * @tc.desc: Test SetupSettingObserver
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetupSettingObserver_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = true;
+    TOUCH_DRAWING_MGR->hasPointerObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(1));
+    TOUCH_DRAWING_MGR->hasBubbleObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetupSettingObserver(1));
+}
 } // namespace MMI
 } // namespace OHOS
