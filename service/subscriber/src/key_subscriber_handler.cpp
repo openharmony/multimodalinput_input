@@ -1471,7 +1471,8 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         return false;
     }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER ||
-        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN &&
+        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_UP)) {
         MMI_HILOGE("This key event no need to CallEnded");
         return false;
     }
