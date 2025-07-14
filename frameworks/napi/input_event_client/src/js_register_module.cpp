@@ -371,6 +371,10 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
         MMI_HILOGE("toolType:%{public}d is less 0, can not process", toolType);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "toolType must be greater than or equal to 0");
     }
+    int32_t screenId = -1;
+    if (GetNamedPropertyInt32(env, mouseHandle, "screenId", screenId, false) != RET_OK) {
+        MMI_HILOGW("Get screenId failed");
+    }
     int32_t globalX = INT_MAX;
     if (GetNamedPropertyInt32(env, mouseHandle, "globalX", globalX, false) != RET_OK) {
         MMI_HILOGD("No globaX");
@@ -380,6 +384,7 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
         MMI_HILOGD("No globaY");
     }
     pointerEvent->SetSourceType(toolType);
+    pointerEvent->SetTargetDisplayId(screenId);
     item.SetPointerId(0);
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
