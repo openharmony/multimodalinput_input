@@ -28,9 +28,9 @@ config("inputConsumer_config") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_inputConsumer = "$taihe_file_path/out/$subsystem_name/$part_name/inputConsumer"
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_inputConsumer}"
   deps = [ ":input_consumer_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputConsumer.ani.cpp",
@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
   ]
 }
 taihe_shared_library("InputConsumer") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_inputConsumer}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
@@ -70,8 +70,8 @@ taihe_shared_library("InputConsumer") {
   }
 }
 generate_static_abc("crypto_framework_abc") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.inputConsumer.ets" ]
+  base_url = "${taihe_generated_file_path_inputConsumer}"
+  files = [ "${taihe_generated_file_path_inputConsumer}/@ohos.multimodalInput.inputConsumer.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/crypto_framework_abc.abc"
   dependencies = [ ":run_taihe" ]
