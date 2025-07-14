@@ -144,8 +144,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, bool isShell);
     int32_t FixTargetWindowIdExt(std::shared_ptr<PointerEvent> pointerEvent,
-        const std::map<int32_t, int32_t>& targetWindowIdMap, PointerEvent::PointerItem& pointerItem,
-        bool bNeedResetPointerId = false, int32_t diffPointerId = 0);
+        const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId = false,
+        int32_t diffPointerId = 0);
     bool UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t targetWindowId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
