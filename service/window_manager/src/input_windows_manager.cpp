@@ -5266,6 +5266,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         int32_t focusWindowId = GetFocusWindowId(groupId);
         if (focusWindowId == touchWindow->id) {
+            pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
             return RET_OK;
         }
         pointerEvent->SetAncoDeal(false);
@@ -6488,8 +6489,8 @@ std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInf
     double logicX, double logicY) const
 {
     UpdateCurrentDisplay(window.displayId);
-    int32_t currX = logicX - currentDisplayXY_.first;
-    int32_t currY = logicY - currentDisplayXY_.second;
+    double currX = logicX - currentDisplayXY_.first;
+    double currY = logicY - currentDisplayXY_.second;
     Matrix3f transform(window.transform);
     if (window.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
         return {currX, currY};
