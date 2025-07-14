@@ -456,7 +456,9 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
             }
 
             std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-            keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+            if (keyEvent != nullptr) {
+                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
+            }
             MultiKeyboardSetLedState(isCapsLockOn);
             if (libinputCapsLockOn == isCapsLockOn) {
                 libinput_toggle_caps_key();
