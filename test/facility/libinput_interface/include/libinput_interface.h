@@ -143,6 +143,8 @@ public:
     virtual struct libinput_event_keyboard* LibinputEventGetKeyboardEvent (struct libinput_event *event) = 0;
     virtual uint32_t LibinputEventKeyboardGetKey (struct libinput_event_keyboard *event) = 0;
     virtual enum libinput_key_state LibinputEventKeyboardGetKeyState (struct libinput_event_keyboard *event) = 0;
+    virtual int HasEventLedType (struct libinput_device *device) = 0;
+    virtual int GetFuncKeyState (struct libinput_device *device, unsigned int code) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
