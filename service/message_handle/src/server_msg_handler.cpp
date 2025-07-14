@@ -693,30 +693,6 @@ int32_t ServerMsgHandler::FixTargetWindowIdExt(std::shared_ptr<PointerEvent> poi
     return RET_ERR;
 }
 
-int32_t ServerMsgHandler::FixTargetWindowIdExt(std::shared_ptr<PointerEvent> pointerEvent,
-    const std::map<int32_t, int32_t>& targetWindowIdMap, PointerEvent::PointerItem& pointerItem,
-    bool bNeedResetPointerId, int32_t diffPointerId)
-{
-    CHKPR(pointerEvent, RET_ERR);
-    int32_t pointerId = pointerEvent->GetPointerId();
-    if (bNeedResetPointerId) {
-        if (diffPointerId <= 0) {
-            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", pointerId);
-            return RET_ERR;
-        }
-        pointerEvent->RemovePointerItem(pointerId);
-        pointerId += diffPointerId;
-        pointerItem.SetPointerId(pointerId);
-        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-        pointerEvent->SetPointerId(pointerId);
-    }
-    auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
-    if (iter != targetWindowIdMap.end()) {
-        return iter->second;
-    }
-    return RET_ERR;
-}
-
 bool ServerMsgHandler::UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent,
     int32_t action, int32_t targetWindowId)
 {
