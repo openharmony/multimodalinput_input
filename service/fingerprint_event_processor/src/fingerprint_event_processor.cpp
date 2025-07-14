@@ -316,7 +316,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
             break;
         }
         default:
-            MMI_HILOGW("Unknown key event:%{public}d", key);
+            MMI_HILOGW("Unknown key event:%{private}d", key);
             return UNKNOWN_EVENT;
     }
     int64_t time = GetSysClockTime();
