@@ -423,10 +423,6 @@ void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
 bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(hwcMgr_);
-    if (IsPositionOutScreen(x, y)) {
-        MMI_HILOGE("Position out of screen");
-    }
-
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
@@ -439,7 +435,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
             ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         Rotate(rotation_t(direction), x, y);
     }
-
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
     px = x - FOCUS_POINT;
     py = y - FOCUS_POINT;
 
@@ -460,9 +458,6 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 {
     CHKPF(surfaceNode_);
-    if (IsPositionOutScreen(x, y)) {
-        MMI_HILOGE("Position out of screen");
-    }
     int32_t px = 0;
     int32_t py = 0;
     if (IsMirror()) {
@@ -523,11 +518,6 @@ float ScreenPointer::GetRenderDPI() const
 
 bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
 {
-    if (IsMirror()) {
-        CalculateHwcPositionForMirror(x, y);
-    } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
-        CalculateHwcPositionForExtend(x, y);
-    }
     int32_t width = static_cast<int32_t>(width_);
     int32_t height = static_cast<int32_t>(height_);
     if (x < 0 || y < 0 || x > width || y > height) {
