@@ -489,7 +489,72 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_04, TestSize.Lev
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
 
-
+/**
+ * @tc.name: InputManagerImplTest_OnConnected_05
+ * @tc.desc: Test OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputMgrImpl.anrObservers_.push_back(nullptr);
+    EXPECT_FALSE(InputMgrImpl.anrObservers_.empty());
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
+}
+ 
+/**
+ * @tc.name: InputManagerImplTest_OnConnected_06
+ * @tc.desc: Test OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    class IAnrObserverTest : public IAnrObserver {
+    public:
+        IAnrObserverTest() : IAnrObserver()
+        {}
+        virtual ~IAnrObserverTest()
+        {}
+        void OnAnr(int32_t pid, int32_t eventId) const override
+        {
+            MMI_HILOGD("Set anr success");
+        };
+    };
+    std::shared_ptr<IAnrObserverTest> observer = std::make_shared<IAnrObserverTest>();
+    InputMgrImpl.anrObservers_.push_back(observer);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
+}
+ 
+/**
+ * @tc.name: InputManagerImplTest_OnConnected_07
+ * @tc.desc: Test OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputMgrImpl.currentUserId_.store(42);
+    EXPECT_TRUE(InputMgrImpl.currentUserId_ != -1);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
+}
+ 
+/**
+ * @tc.name: InputManagerImplTest_OnConnected_08
+ * @tc.desc: Test OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputMgrImpl.currentUserId_.store(-1);
+    EXPECT_TRUE(InputMgrImpl.currentUserId_ == -1);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
+}
 
 /**
  * @tc.name: InputManagerImplTest_SetPixelMapData_01
