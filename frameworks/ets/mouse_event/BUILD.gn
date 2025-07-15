@@ -27,9 +27,9 @@ config("mouseEvent_config") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_mouseEvent = "$taihe_file_path/out/$subsystem_name/$part_name/mouseEvent"
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_mouseEvent}"
   deps = [ ":mouse_event_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.mouseEvent.ani.cpp",
@@ -37,7 +37,7 @@ ohos_taihe("run_taihe") {
   ]
 }
 taihe_shared_library("MouseEvent") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_mouseEvent}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
@@ -69,8 +69,8 @@ taihe_shared_library("MouseEvent") {
   }
 }
 generate_static_abc("crypto_framework_abc") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.mouseEvent.ets" ]
+  base_url = "${taihe_generated_file_path_mouseEvent}"
+  files = [ "${taihe_generated_file_path_mouseEvent}/@ohos.multimodalInput.mouseEvent.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/crypto_framework_abc.abc"
   dependencies = [ ":run_taihe" ]

@@ -28,9 +28,9 @@ config("intentionCode_config") {
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+taihe_generated_file_path_intentionCode = "$taihe_file_path/out/$subsystem_name/$part_name/intentionCode"
 ohos_taihe("run_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_intentionCode}"
   deps = [ ":intention_code_taihe" ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.intentionCode.ani.cpp",
@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
   ]
 }
 taihe_shared_library("IntentionCode") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
+  taihe_generated_file_path = "${taihe_generated_file_path_intentionCode}"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
   sources = get_target_outputs(":run_taihe")
@@ -70,8 +70,8 @@ taihe_shared_library("IntentionCode") {
   }
 }
 generate_static_abc("crypto_framework_abc") {
-  base_url = "$taihe_generated_file_path"
-  files = [ "$taihe_generated_file_path/@ohos.multimodalInput.intentionCode.ets" ]
+  base_url = "${taihe_generated_file_path_intentionCode}"
+  files = [ "${taihe_generated_file_path_intentionCode}/@ohos.multimodalInput.intentionCode.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/crypto_framework_abc.abc"
   dependencies = [ ":run_taihe" ]
