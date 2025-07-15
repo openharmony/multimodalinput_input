@@ -17,7 +17,6 @@
 
 #include <linux/input.h>
 #include <parameters.h>
-#include "libinput.h"
 #include "display_manager.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
@@ -183,6 +182,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
             KeyEvent::CAPS_LOCK_FUNCTION_KEY,
             KeyEvent::SCROLL_LOCK_FUNCTION_KEY
         };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         if (newKeyEventJustCreated) {
             // if key event just created, set keyevent from this new device.
             MMI_HILOGI("Reset key event function key state based on the new added device's led");
@@ -196,6 +196,11 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
                 libinput_set_led_state(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
             }
         }
+#else // OHOS_BUILD_ENABLE_VKEYBOARD
+        for (const auto &funcKey : funcKeys) {
+            keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
 }
 
