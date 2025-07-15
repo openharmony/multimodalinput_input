@@ -193,7 +193,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
             // otherwise, set this new device's function key state based on the key event.
             MMI_HILOGI("Reset new added device's led based on the key event");
             for (const auto &funcKey : funcKeys) {
-                libinput_set_led_state(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
+                LibinputAdapter::DeviceLedUpdate(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
             }
         }
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
