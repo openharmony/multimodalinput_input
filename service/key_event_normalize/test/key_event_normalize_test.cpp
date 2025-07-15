@@ -373,10 +373,12 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_ResetKeyEvent_LedOn_004, T
     // mock: all lights on.
     EXPECT_CALL(libinputMock, GetFuncKeyState).WillRepeatedly(testing::Return(1));
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     // keyEvent unchanged: 0, 1, 0
     EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY), false);
     EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY), true);
     EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), false);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /**
