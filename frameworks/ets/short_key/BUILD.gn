@@ -1,0 +1,89 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+copy_taihe_idl("short_key_taihe") {
+  sources = [ "idl/ohos.multimodalInput.shortKey.taihe" ]
+}
+config("shortKey_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+  ]
+}
+subsystem_name = "multimodalinput"
+part_name = "input"
+taihe_generated_file_path_shortKey = "$taihe_file_path/out/$subsystem_name/$part_name/shortKey"
+ohos_taihe("run_taihe") {
+  taihe_generated_file_path = "${taihe_generated_file_path_shortKey}"
+  deps = [ ":short_key_taihe" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.multimodalInput.shortKey.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.shortKey.abi.c",
+  ]
+}
+taihe_shared_library("ShortKey") {
+  taihe_generated_file_path = "${taihe_generated_file_path_shortKey}"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  sources = get_target_outputs(":run_taihe")
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":shortKey_config",
+  ]
+  sources += [
+    "src/ani_constructor.cpp",
+    "src/ohos.multimodalInput.shortKey.impl.cpp",
+  ]
+  deps = [
+    ":run_taihe",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+}
+generate_static_abc("short_key") {
+  base_url = "${taihe_generated_file_path_shortKey}"
+  files = [ "${taihe_generated_file_path_shortKey}/@ohos.multimodalInput.shortKey.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/short_key.abc"
+  dependencies = [ ":run_taihe" ]
+}
+ohos_prebuilt_etc("short_key_etc") {
+  source = "$target_out_dir/short_key.abc"
+  module_install_dir = "framework"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  deps = [ ":short_key" ]
+}
+group("ets_shortKey_package") {
+  deps = [
+    ":short_key_etc",
+    ":ShortKey",
+  ]
+}

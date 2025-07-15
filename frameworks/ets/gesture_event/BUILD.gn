@@ -1,0 +1,90 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+copy_taihe_idl("gesture_event_taihe") {
+  sources = [ "idl/ohos.multimodalInput.gestureEvent.taihe" ]
+  deps = [ "${mmi_path}/frameworks/ets/touch_event:touch_event_taihe" ]
+}
+config("gestureEvent_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+  ]
+}
+subsystem_name = "multimodalinput"
+part_name = "input"
+taihe_generated_file_path_gestureEvent = "$taihe_file_path/out/$subsystem_name/$part_name/gestureEvent"
+ohos_taihe("run_taihe") {
+  taihe_generated_file_path = "${taihe_generated_file_path_gestureEvent}"
+  deps = [ ":gesture_event_taihe" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.multimodalInput.gestureEvent.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.gestureEvent.abi.c",
+  ]
+}
+taihe_shared_library("GestureEvent") {
+  taihe_generated_file_path = "${taihe_generated_file_path_gestureEvent}"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  sources = get_target_outputs(":run_taihe")
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":gestureEvent_config",
+  ]
+  sources += [
+    "src/ani_constructor.cpp",
+    "src/ohos.multimodalInput.gestureEvent.impl.cpp",
+  ]
+  deps = [
+    ":run_taihe",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+}
+generate_static_abc("gesture_event") {
+  base_url = "${taihe_generated_file_path_gestureEvent}"
+  files = [ "${taihe_generated_file_path_gestureEvent}/@ohos.multimodalInput.gestureEvent.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/gesture_event.abc"
+  dependencies = [ ":run_taihe" ]
+}
+ohos_prebuilt_etc("gesture_event_etc") {
+  source = "$target_out_dir/gesture_event.abc"
+  module_install_dir = "framework"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  deps = [ ":gesture_event" ]
+}
+group("ets_gestureEvent_package") {
+  deps = [
+    ":gesture_event_etc",
+    ":GestureEvent",
+  ]
+}
