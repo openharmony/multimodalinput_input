@@ -61,7 +61,6 @@ declare_args() {
   input_feature_event_recorder = true
   input_ext_feature_keyboard_ext_flag = false
   input_feature_watch_cfg_source = false
-  drivers_interface_rtos_extra_enable = false
   input_feature_upgrade_skia = false
   input_feature_mistouch_prevention = false
 
@@ -73,11 +72,6 @@ declare_args() {
   if (defined(global_parts_info) &&
       defined(global_parts_info.theme_screenlock_mgr)) {
     screenlock_manager_enabled = true
-  }
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.hdf_drivers_interface_rtos_extra)) {
-    drivers_interface_rtos_extra_enable = true
   }
 
   if (is_emulator) {
@@ -510,10 +504,6 @@ if (input_feature_key_pressed_handler) {
 
 if (input_feature_event_recorder) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_EVENT_RECORDER" ]
-}
-
-if (drivers_interface_rtos_extra_enable) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_RTOS_EXTRA" ]
 }
 
 if (input_feature_mistouch_prevention) {
