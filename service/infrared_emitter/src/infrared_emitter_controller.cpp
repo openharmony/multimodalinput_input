@@ -27,10 +27,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const char* IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
+const char* INFRARED_ADAPTER_PATH = "libinfrared_emitter_adapter.z.so";
 std::mutex mutex_;
 }
-using namespace OHOS::HDI::V1_0;
+using namespace OHOS::HDI::Consumerir::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
 InfraredEmitterController::InfraredEmitterController() {}
 
@@ -38,8 +38,13 @@ InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    irInterface_ = nullptr;
     if (soIrHandle_ != nullptr) {
+        typedef void (*funDestroyPtr) (IInfraredEmitterAdapter*);
+        funDestroyPtr fnDestroy = (funDestroyPtr)dlsym(soIrHandle_, "DestroyInstance");
+        if (fnDestroy != nullptr) {
+            fnDestroy(irInterface_);
+            irInterface_ = nullptr;
+        }
         dlclose(soIrHandle_);
         soIrHandle_ = nullptr;
     }
@@ -58,15 +63,15 @@ void InfraredEmitterController::InitInfraredEmitter()
         return;
     }
     if (soIrHandle_ == nullptr) {
-        soIrHandle_ = dlopen(IR_WRAPPER_PATH, RTLD_NOW);
+        soIrHandle_ = dlopen(INFRARED_ADAPTER_PATH, RTLD_NOW);
         if (soIrHandle_ == nullptr) {
-            MMI_HILOGE("Loaded %{public}s failed:%{public}s", IR_WRAPPER_PATH, dlerror());
+            MMI_HILOGE("Loaded %{public}s failed:%{public}s", INFRARED_ADAPTER_PATH, dlerror());
             return;
         }
     }
-    typedef ConsumerIr* (*funCreate_ptr) (void);
-    funCreate_ptr fnCreate = nullptr;
-    fnCreate = (funCreate_ptr)dlsym(soIrHandle_, "ConsumerIrImplGetInstance");
+    typedef IInfraredEmitterAdapter* (*funCreatePtr) (void);
+    funCreatePtr fnCreate = nullptr;
+    fnCreate = (funCreatePtr)dlsym(soIrHandle_, "ConsumerIrImplGetInstance");
     const char *dlsymError = dlerror();
     if (dlsymError != nullptr) {
         MMI_HILOGE("Loaded ConsumerIrImplGetInstance failed:%{public}s", dlsymError);
@@ -80,8 +85,8 @@ void InfraredEmitterController::InitInfraredEmitter()
         soIrHandle_ = nullptr;
         return;
     }
-    MMI_HILOGI("Infrared emitter call ConsumerIr:fnCreate begin");
-    irInterface_ = (ConsumerIr *)fnCreate();
+    MMI_HILOGI("Infrared emitter call IInfraredEmitterAdapter:fnCreate begin");
+    irInterface_ = (IInfraredEmitterAdapter *)fnCreate();
     if (irInterface_ == nullptr) {
         MMI_HILOGE("Infrared emitter init fail irInterface_ is nullptr");
         dlclose(soIrHandle_);
