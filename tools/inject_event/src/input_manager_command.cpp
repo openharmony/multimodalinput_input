@@ -354,7 +354,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                             return RET_ERR;
                                         }
                                     } else if (!StrToInt(arg5, totalTimeMs)) {
-                                        std::cout << "invalid total times" << std::endl;
+                                        std::cout << "invalid smooth times" << std::endl;
                                         return RET_ERR;
                                     }
                                     optind++;
@@ -433,11 +433,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid button press command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (buttonId > MOUSE_ID) {
+                            if (buttonId > MOUSE_ID || buttonId < 0) {
                                 std::cout << "invalid button press command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            std::cout << "press down" << buttonId << std::endl;
+                            std::cout << "press down " << buttonId << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -459,7 +459,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid raise button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (buttonId > MOUSE_ID) {
+                            if (buttonId > MOUSE_ID || buttonId < 0) {
                                 std::cout << "invalid raise button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -529,11 +529,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid click button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (buttonId > MOUSE_ID) {
+                            if (buttonId > MOUSE_ID || buttonId < 0) {
                                 std::cout << "invalid button press command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            std::cout << "click   " << buttonId << std::endl;
+                            std::cout << "click " << buttonId << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -595,7 +595,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             if (argc == BUTTON_PARAM_SIZE) {
                                 if (!StrToInt(argv[optind + 3], clickIntervalTimeMs)) {
-                                    std::cout << "invalid interval between hits" << std::endl;
+                                    std::cout << "invalid click interval time" << std::endl;
                                     return RET_ERR;
                                 }
                             }
