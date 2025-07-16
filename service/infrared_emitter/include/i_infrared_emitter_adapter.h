@@ -37,7 +37,6 @@ public:
     virtual ~IInfraredEmitterAdapter() = default;
 
     virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t>& pattern, bool& ret) = 0;
-
     virtual int32_t GetCarrierFreqs(bool& ret,
         std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange>& range) = 0;
 
