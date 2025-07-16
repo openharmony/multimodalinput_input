@@ -17,11 +17,10 @@
 #define INFRARED_EMMITTER_CONTROLLER_H
 
 #include "nocopyable.h"
-#include "infrared_emitter_def.h"
+#include "i_infrared_emitter_adapter.h"
 
 namespace OHOS {
 namespace MMI {
-using namespace OHOS::HDI::V1_0;
 struct InfraredFrequencyInfo {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
@@ -43,7 +42,7 @@ private:
     InfraredEmitterController();
     DISALLOW_COPY_AND_MOVE(InfraredEmitterController);
     static InfraredEmitterController *instance_;
-    ConsumerIr *irInterface_ {nullptr};
+    IInfraredEmitterAdapter *irInterface_ {nullptr};
     void *soIrHandle_ {nullptr};
 };
 }
