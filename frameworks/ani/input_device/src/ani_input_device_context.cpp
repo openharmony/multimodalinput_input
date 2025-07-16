@@ -63,14 +63,14 @@ static AniUtil::DeviceType g_deviceType[] = {
 static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
     MMI_HILOGD("Begin ThrowBusinessError.");
-    static const char *errorClsName = "L@ohos/base/BusinessError;";
+    static const char *errorClsName = "@ohos.base.BusinessError";
     ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
         MMI_HILOGE("find class BusinessError %{public}s failed", errorClsName);
         return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         MMI_HILOGE("find method BusinessError.constructor failed");
         return;
     }
@@ -278,12 +278,12 @@ static ani_object StringArrayToObject(ani_env *env, const std::vector<std::strin
 {
     ani_object arrayObj = nullptr;
     ani_class arrayCls = nullptr;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
+    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
         MMI_HILOGE("FindClass Lescompat/Array; Failed");
     }
 
     ani_method arrayCtor;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor)) {
+    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor)) {
         MMI_HILOGE("Class_FindMethod <ctor> Failed");
         return arrayObj;
     }
@@ -299,7 +299,7 @@ static ani_object StringArrayToObject(ani_env *env, const std::vector<std::strin
             MMI_HILOGE("String_NewUTF8 Faild ");
             break;
         }
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, ani_str)) {
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iC{std.core.Object}:", index, ani_str)) {
             MMI_HILOGE("Object_CallMethodByName_Void  $_set Faild ");
             break;
         }
@@ -366,12 +366,12 @@ static std::string EmptyAxisRangesSource(ani_env *env, ani_object obj, std::shar
         MMI_HILOGD("SourceType not found");
         ani_object arrayObj = nullptr;
         ani_class arrayCls = nullptr;
-        if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
+        if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
             MMI_HILOGE("FindClass Lescompat/Array; Failed");
         }
 
         ani_method arrayCtor;
-        if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", ":V", &arrayCtor)) {
+        if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", ":", &arrayCtor)) {
             MMI_HILOGE("Class_FindMethod <ctor> Failed");
             return "";
         }
@@ -518,7 +518,7 @@ static ani_object CreatAxisRangesObj(ani_env *env, const std::string &sourceType
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "l:", &ctor)) {
         MMI_HILOGE("get ctor Failed %{public}s.'", className);
         return AxisRangesObj;
     }
@@ -544,12 +544,12 @@ static ani_object SetCreateArrayAxisRangesObj(ani_env *env, std::shared_ptr<Inpu
 {
     ani_object arrayAxisRangesObj = nullptr;
     ani_class arrayCls = nullptr;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
+    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
         MMI_HILOGE("FindClass Lescompat/Array; Failed");
     }
 
     ani_method arrayCtor;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", ":V", &arrayCtor)) {
+    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", ":", &arrayCtor)) {
         MMI_HILOGE("Class_FindMethod <ctor> Failed");
         return arrayAxisRangesObj;
     }
@@ -567,7 +567,7 @@ static ani_object SetCreateArrayAxisRangesObj(ani_env *env, std::shared_ptr<Inpu
             continue;
         }
         ani_object objAxisRanges = CreatAxisRangesObj(env, sourceType, item);
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayAxisRangesObj, "$_set", "ILstd/core/Object;:V", index,
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayAxisRangesObj, "$_set", "iC{std.core.Object}:", index,
             objAxisRanges)) {
             MMI_HILOGE("%{public}s Object_CallMethodByName_Void  $_set Faild", __FUNCTION__);
             return arrayAxisRangesObj;
@@ -594,7 +594,7 @@ static ani_object CreateDeviceInfoObj(ani_env *env, std::shared_ptr<InputDevice>
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "l:", &ctor)) {
         MMI_HILOGE("get ctor Failed %{public}s.'", className);
         return nullptr;
     }
@@ -628,14 +628,14 @@ static ani_object DoubleToObject(ani_env *env, double value)
 {
     ani_object aniObject = nullptr;
     ani_double doubleValue = static_cast<ani_double>(value);
-    static const char *className = "Lstd/core/Double;";
+    static const char *className = "std.core.Double";
     ani_class aniClass;
     if (ANI_OK != env->FindClass(className, &aniClass)) {
         MMI_HILOGE("Not found '%{public}s'.", className);
         return aniObject;
     }
     ani_method objCtor;
-    if (ANI_OK != env->Class_FindMethod(aniClass, "<ctor>", "D:V", &objCtor)) {
+    if (ANI_OK != env->Class_FindMethod(aniClass, "<ctor>", "d:", &objCtor)) {
         MMI_HILOGE("Class_GetMethod Failed '%{public}s <ctor>.'", className);
         return aniObject;
     }
@@ -651,13 +651,13 @@ static ani_object DoubleArrayToObject(ani_env *env, const std::shared_ptr<std::v
 {
     ani_object arrayObj = nullptr;
     ani_class arrayCls = nullptr;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
+    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
         MMI_HILOGE("FindClass Lescompat/Array; Failed");
         return arrayObj;
     }
 
     ani_method arrayCtor;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor)) {
+    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor)) {
         MMI_HILOGE("Class_FindMethod <ctor> Failed");
         return arrayObj;
     }
@@ -674,7 +674,7 @@ static ani_object DoubleArrayToObject(ani_env *env, const std::shared_ptr<std::v
     ani_int index = 0;
     for (auto id : *ids) {
         ani_object aniValue = DoubleToObject(env, id);
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, aniValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iC{std.core.Object}:", index, aniValue)) {
             MMI_HILOGI("Object_CallMethodByName_Void  $_set Faild ");
             break;
         }
@@ -780,7 +780,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
 
-    static const char *name = "L@ohos/multimodalInput/inputDevice/inputDevice;";
+    static const char *name = "@ohos.multimodalInput.inputDevice.inputDevice";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(name, &ns)) {
         MMI_HILOGE("%{public}s: Not found %{public}s", __func__, name);
