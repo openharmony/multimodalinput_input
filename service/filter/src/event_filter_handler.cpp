@@ -176,6 +176,7 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
             continue;
         }
         bool resultValue = false;
+        CHKPF(i.filter);
         i.filter->HandleKeyEvent(event, resultValue);
         if (resultValue) {
             MMI_HILOGD("Call HandleKeyEventFilter return true");
@@ -202,6 +203,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
             continue;
         }
         bool resultValue = false;
+        CHKPF(i.filter);
         i.filter->HandlePointerEvent(event, resultValue);
         if (resultValue) {
             int32_t action = event->GetPointerAction();

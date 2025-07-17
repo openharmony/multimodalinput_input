@@ -269,6 +269,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.input_event_usec = tm.tv_usec;
     if (!(CheckEventValue(injectArgvs_[SEND_EVENT_TYPE_INDEX], injectArgvs_[SEND_EVENT_CODE_INDEX],
         injectArgvs_[SEND_EVENT_VALUE_INDEX]))) {
+        close(fd);
         return RET_ERR;
     }
     event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
@@ -277,6 +278,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
         MMI_HILOGE("Send event to device node failed");
+        close(fd);
         return RET_ERR;
     }
     if (fd >= 0) {
