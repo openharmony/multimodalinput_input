@@ -27,6 +27,7 @@ namespace MMI {
 #ifndef OHOS_BUILD_PC_UNIT_TEST
 namespace {
 using namespace testing::ext;
+const std::string IR_WRAPPER_PATH = "libinfrared_emitter_adapter.z.so";
 } // namespace
 
 class InfraredEmitterControllerTest : public testing::Test {
@@ -61,6 +62,10 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 {
     CALL_TEST_DEBUG;
     InfraredEmitterController controller;
+    controller.irInterface_ = nullptr;
+    controller.soIrHandle_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(controller.InitInfraredEmitter());
+    controller.soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
     ASSERT_NO_FATAL_FAILURE(controller.InitInfraredEmitter());
 }
 
@@ -89,9 +94,25 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
 {
     CALL_TEST_DEBUG;
     InfraredEmitterController controller;
+    controller.irInterface_ = nullptr;
     std::vector<InfraredFrequencyInfo> frequencyInfo;
     frequencyInfo.push_back(InfraredFrequencyInfo({1, 1000}));
     ASSERT_NO_FATAL_FAILURE(controller.GetFrequencies(frequencyInfo));
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_InfraredEmitterController_001
+ * @tc.desc: Test the funcation GetFrequencies
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InfraredEmitterController_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InfraredEmitterController controller;
+    const std::string irWrapperPath = "libconsumer_ir_service_1.0.z.so";
+    controller.soIrHandle_ = dlopen(irWrapperPath.c_str(), RTLD_NOW);
+    ASSERT_EQ(controller.irInterface_, nullptr);
 }
 #endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI
