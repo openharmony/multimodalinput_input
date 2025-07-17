@@ -70,8 +70,8 @@ bool AniEventTarget::EmitCallbackWork(ani_env *env, const std::shared_ptr<AniUti
         return false;
     }
     std::vector<ani_ref> args;
-    const char *nsName = "L@ohos/multimodalInput/inputDevice/inputDevice;";
-    const char *className = "LDeviceListenerImpl;";
+    const char *nsName = "@ohos.multimodalInput.inputDevice.inputDevice";
+    const char *className = "DeviceListenerImpl";
     auto obj = AniUtil::CreateAniObject(env, nsName, className);
     if (obj == nullptr) {
         MMI_HILOGE("%{public}s: CreateAniObject DeviceListenerObj failed", __func__);
@@ -92,7 +92,7 @@ bool AniEventTarget::EmitCallbackWork(ani_env *env, const std::shared_ptr<AniUti
     args.push_back(obj);
 
     auto fnObj = reinterpret_cast<ani_fn_object>(reportData->ref);
-    if (AniUtil::IsInstanceOf(env, "Lstd/core/Function1;", fnObj) == 0) {
+    if (AniUtil::IsInstanceOf(env, "std.core.Function1", fnObj) == 0) {
         MMI_HILOGE("%{public}s: fnObj is not instance Of function", __func__);
         return false;
     }
