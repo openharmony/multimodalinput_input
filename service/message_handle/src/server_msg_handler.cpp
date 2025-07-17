@@ -1154,12 +1154,12 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
             num, item.id, item.type, item.mainDisplayId, item.focusWindowId);
         size_t numDisplayInfo = 0;
         for (const auto &itemDisplay : item.displaysInfo) {
-            MMI_HILOGD("displays%{public}zu,id:%{public}d,x:%{public}d,y:%{public}d,width:%{public}d,"
+            MMI_HILOGD("displays%{public}zu,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,"
                 "height:%{public}d,dpi:%{public}d,direction:%{public}d,displayDirection:%{public}d,"
                 "displayMode:%{public}d,scalePercent:%{public}d, expandHeight:%{public}d,"
                 "isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d,oneHandX:%{private}d,"
-                "oneHandY:%{private}d, screenArea:{%{public}d:{%{public}d,%{public}d,%{public}d,%{public}d},"
-                "rsId:%{public}" PRIu64 "},offsetX:%{public}d,offsetY:%{public}d,pointerActiveWidth:%{public}d,"
+                "oneHandY:%{private}d, screenArea:{%{private}d:{%{private}d,%{public}d,%{public}d,%{public}d},"
+                "rsId:%{public}" PRIu64 "},offsetX:%{private}d,offsetY:%{private}d,pointerActiveWidth:%{public}d,"
                 "pointerActiveHeight:%{public}d,transform:",
                 numDisplayInfo, itemDisplay.id, itemDisplay.x, itemDisplay.y, itemDisplay.width, itemDisplay.height,
                 itemDisplay.dpi, itemDisplay.direction, itemDisplay.displayDirection,

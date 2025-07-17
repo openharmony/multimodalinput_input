@@ -449,7 +449,8 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     auto ret = hwcMgr_->SetPosition(screenId_, px, py, bh);
     BytraceAdapter::StopHardPointerMove();
     if (ret != RET_OK) {
-        MMI_HILOGE("SetPosition failed, screenId=%{public}" PRIu64 ", pos=(%{public}d, %{public}d)", screenId_, px, py);
+        MMI_HILOGE("SetPosition failed, screenId=%{public}" PRIu64 ", pos=(%{private}d, %{private}d)",
+            screenId_, px, py);
         return false;
     }
     return true;
@@ -500,7 +501,7 @@ bool ScreenPointer::SetInvisible()
     CHKPF(bh);
     auto ret = hwcMgr_->SetPosition(screenId_, 0, 0, bh);
     if (ret != RET_OK) {
-        MMI_HILOGE("SetLocation failed, screenId=%{public}" PRIu64 ", loc=(%{public}d, %{public}d)", screenId_, 0, 0);
+        MMI_HILOGE("SetLocation failed, screenId=%{public}" PRIu64 ", loc=(%{private}d, %{private}d)", screenId_, 0, 0);
         return false;
     }
     MMI_HILOGI("SetInvisible success, screenId=%{public}" PRIu64, screenId_);
@@ -521,7 +522,7 @@ bool ScreenPointer::IsPositionOutScreen(int32_t x, int32_t y)
     int32_t width = static_cast<int32_t>(width_);
     int32_t height = static_cast<int32_t>(height_);
     if (x < 0 || y < 0 || x > width || y > height) {
-        MMI_HILOGE("Position out of screen, x=%{public}d, y=%{public}d, width=%{public}d, height=%{public}d",
+        MMI_HILOGE("Position out of screen, x=%{private}d, y=%{private}d, width=%{public}d, height=%{public}d",
             x, y, width, height);
         return true;
     }
