@@ -6332,7 +6332,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_001,
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_002
- * @tc.desc: Test if (WIN_MGR->JudgeCaramaInFore() &&
+ * @tc.desc: Test if (WIN_MGR->JudgeCameraInFore() &&
  * (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked))
  * @tc.type: FUNC
  * @tc.require:
@@ -6375,7 +6375,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_002,
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey_003
- * @tc.desc: Test if (WIN_MGR->JudgeCaramaInFore() &&
+ * @tc.desc: Test if (WIN_MGR->JudgeCameraInFore() &&
  * (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked))
  * @tc.type: FUNC
  * @tc.require:

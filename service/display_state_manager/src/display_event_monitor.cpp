@@ -53,15 +53,15 @@ DisplayEventMonitor::~DisplayEventMonitor()
 }
 
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-class DisplyChangedReceiver : public EventFwk::CommonEventSubscriber {
+class DisplayChangedReceiver : public EventFwk::CommonEventSubscriber {
 public:
-    explicit DisplyChangedReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+    explicit DisplayChangedReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
         : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
     {
-        MMI_HILOGD("DisplyChangedReceiver register");
+        MMI_HILOGD("DisplayChangedReceiver register");
     }
 
-    virtual ~DisplyChangedReceiver() = default;
+    virtual ~DisplayChangedReceiver() = default;
     __attribute__((no_sanitize("cfi")))
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
@@ -170,7 +170,7 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
-        std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));
+        std::make_shared<DisplayChangedReceiver>(commonEventSubscribeInfo));
 }
 
 bool DisplayEventMonitor::IsCommonEventSubscriberInit()
