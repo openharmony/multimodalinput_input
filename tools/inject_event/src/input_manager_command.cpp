@@ -2440,13 +2440,13 @@ void InputManagerCommand::PrintMouseUsage()
     std::cout << "   key value:5 - button forward"  << std::endl;
     std::cout << "   key value:6 - button back"     << std::endl;
     std::cout << "   key value:7 - button task"     << std::endl;
-    std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
+    std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards," << std::endl;
+    std::cout << "                                               negative values are sliding forwards"  << std::endl;
     std::cout << "-g <dx1> <dy1> <dx2> <dy2> [total time]       --drag <dx1> <dy1> <dx2> <dy2> [total time],";
     std::cout << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth drag"         << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "                                               negative values are sliding forwards"  << std::endl;
 }
 
 void InputManagerCommand::PrintKeyboardUsage()
