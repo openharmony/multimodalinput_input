@@ -17,7 +17,6 @@
 
 #include <linux/input.h>
 #include <parameters.h>
-#include "libinput_adapter.h"
 #include "display_manager.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
