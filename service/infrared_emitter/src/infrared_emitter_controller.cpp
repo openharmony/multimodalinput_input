@@ -28,7 +28,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const char* INFRARED_ADAPTER_PATH = "libinfrared_emitter_adapter.z.so";
-std::mutex mutex_;
 }
 using namespace OHOS::HDI::Consumerir::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
@@ -37,7 +36,6 @@ InfraredEmitterController::InfraredEmitterController() {}
 InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     if (soIrHandle_ != nullptr) {
         typedef void (*funDestroyPtr) (IInfraredEmitterAdapter*);
         funDestroyPtr fnDestroy = (funDestroyPtr)dlsym(soIrHandle_, "DestroyInstance");
@@ -52,7 +50,6 @@ InfraredEmitterController::~InfraredEmitterController()
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
 {
-    std::lock_guard<std::mutex> guard(mutex_);
     return instance_;
 }
 
@@ -65,7 +62,7 @@ void InfraredEmitterController::InitInfraredEmitter()
     if (soIrHandle_ == nullptr) {
         soIrHandle_ = dlopen(INFRARED_ADAPTER_PATH, RTLD_NOW);
         if (soIrHandle_ == nullptr) {
-            MMI_HILOGE("Loaded %{public}s failed:%{public}s", INFRARED_ADAPTER_PATH, dlerror());
+            MMI_HILOGE("Loaded %{private}s failed:%{public}s", INFRARED_ADAPTER_PATH, dlerror());
             return;
         }
     }
@@ -98,7 +95,6 @@ void InfraredEmitterController::InitInfraredEmitter()
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
@@ -128,7 +124,6 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
 bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     if (!irInterface_) {
         MMI_HILOGE("Infrared emitter not init");
