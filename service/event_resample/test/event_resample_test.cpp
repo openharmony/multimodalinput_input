@@ -365,10 +365,10 @@ int32_t EventResampleTest::CheckResults(std::shared_ptr<PointerEvent> outEvent,
             dispY = expected[it.id].touchUpY;
         }
 
-        MMI_HILOGD("OutEvent: x=%{public}d y=%{public}d t=%{public}" PRId64 " f=%{public}" PRId64 " (%{public}d)",
+        MMI_HILOGD("OutEvent: x=%{private}d y=%{private}d t=%{public}" PRId64 " f=%{public}" PRId64 " (%{public}d)",
                    pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), outEvent->GetActionTime(),
                    context.frameTime, outEvent->GetPointerAction());
-        MMI_HILOGD("Expected: x=%{public}d y=%{public}d t=%{public}" PRId64, dispX, dispY, actionTime);
+        MMI_HILOGD("Expected: x=%{private}d y=%{private}d t=%{public}" PRId64, dispX, dispY, actionTime);
 
         if (pointerItem.GetDisplayX() != dispX) {
             failCount++;
