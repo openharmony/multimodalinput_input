@@ -2483,7 +2483,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
         currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
         GlobalCoords globalCoords = DisplayCoords2GlobalCoords({lastPointerItem.GetDisplayX(),
-                lastPointerItem.GetDisplayY()}, lastPointerEventCopy->GetTargetDisplayId());
+            lastPointerItem.GetDisplayY()}, lastPointerEventCopy->GetTargetDisplayId());
         currentPointerItem.SetGlobalX(globalCoords.x);
         currentPointerItem.SetGlobalY(globalCoords.y);
         currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
