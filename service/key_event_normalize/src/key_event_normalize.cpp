@@ -17,6 +17,7 @@
 
 #include <linux/input.h>
 #include <parameters.h>
+#include "libinput_adapter.h"
 #include "display_manager.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
@@ -191,7 +192,6 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
             }
         } else {
             // otherwise, set this new device's function key state based on the key event.
-            MMI_HILOGI("Reset new added device's led based on the key event");
             for (const auto &funcKey : funcKeys) {
                 LibinputAdapter::DeviceLedUpdate(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
             }
