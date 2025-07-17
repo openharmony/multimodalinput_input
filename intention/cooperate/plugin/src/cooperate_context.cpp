@@ -366,14 +366,14 @@ void Context::SetCursorPosition(const Coordinate &cursorPos)
     cursorPos_.x = static_cast<int32_t>(xPercent * display->GetWidth());
     cursorPos_.y = static_cast<int32_t>(yPercent * display->GetHeight());
     env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
-    FI_HILOGI("Set cursor position (%{public}d,%{public}d)(%{public}d,%{public}d)(%{public}d,%{public}d)", cursorPos.x,
-        cursorPos.y, cursorPos_.x, cursorPos_.y, display->GetWidth(), display->GetHeight());
+    FI_HILOGI("Set cursor position (%{private}d,%{private}d)(%{private}d,%{private}d)(%{public}d,%{public}d)",
+        cursorPos.x, cursorPos.y, cursorPos_.x, cursorPos_.y, display->GetWidth(), display->GetHeight());
 }
 
 void Context::UpdateCursorPosition()
 {
     env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
-    FI_HILOGI("Update cursor position (%{public}d,%{public}d)", cursorPos_.x, cursorPos_.y);
+    FI_HILOGI("Update cursor position (%{private}d,%{private}d)", cursorPos_.x, cursorPos_.y);
 }
 
 void Context::ResetCursorPosition()

@@ -59,7 +59,7 @@ void InputEventBuilder::Enable(Context &context)
     remoteNetworkId_ = context.Peer();
     env_->GetDSoftbus().AddObserver(observer_);
     Coordinate cursorPos = context.CursorPosition();
-    FI_HILOGI("Cursor transite in (%{public}d, %{public}d)", cursorPos.x, cursorPos.y);
+    FI_HILOGI("Cursor transite in (%{private}d, %{private}d)", cursorPos.x, cursorPos.y);
 }
 
 void InputEventBuilder::Disable()

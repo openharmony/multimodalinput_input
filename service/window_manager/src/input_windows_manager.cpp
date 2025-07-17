@@ -4478,8 +4478,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
-            "logicalX:%{public}d, logicalY:%{public}d,"
-            "displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d",
+            "logicalX:%{private}d, logicalY:%{private}d,"
+            "displayX:%{private}d, displayY:%{private}d, windowX:%{private}d, windowY:%{private}d",
             isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
             touchWindow->id, touchWindow->agentWindowId, logicalX, logicalY,
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerItem.GetWindowX(), pointerItem.GetWindowY());
@@ -5349,7 +5349,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                 MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
                     "FWI:%{public}d,EID:%{public}d,"
-                    "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                    "W:%{public}d,H:%{public}d,AX:%{private}d,AY:%{private}d,"
                     "flags:%{public}d,DID:%{public}d"
                     "AWI:%{public}d,zOrder:%{public}1f",
                     pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
@@ -5359,9 +5359,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
             } else {
                 MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
-                    "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
-                    "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
-                    "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                    "FWI:%{public}d,EID:%{public}d,LX:%{private}1f,LY:%{private}1f,"
+                    "DX:%{private}1f,DY:%{private}1f,WX:%{private}1f,WY:%{private}1f,"
+                    "W:%{public}d,H:%{public}d,AX:%{private}d,AY:%{private}d,"
                     "flags:%{public}d,DID:%{public}d"
                     "AWI:%{public}d,zOrder:%{public}1f",
                     pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
@@ -6198,8 +6198,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         physicalX = posMap->second.cursorPos.x;
         physicalY = posMap->second.cursorPos.y;
     }
-    MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{public}d, %{public}d}, "
-        "cursorPosXY: {%{public}.2f, %{public}.2f} -> {%{public}.2f %{private}.2f}",
+    MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{private}d, %{private}d}, "
+        "cursorPosXY: {%{private}.2f, %{private}.2f} -> {%{private}.2f %{private}.2f}",
         static_cast<int32_t>(isRealData), displayId, mouseLocationTmp.physicalX,
         mouseLocationTmp.physicalY, oldX, oldY, physicalX, physicalY);
 }
@@ -6230,7 +6230,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
             displayInfo.id, displayInfo.validWidth, displayInfo.validHeight);
         return curMouseLocation;
     }
-    MMI_HILOGD("Mouselocation next: displayId:%{public}d, X:%{public}d, Y:%{public}d",
+    MMI_HILOGD("Mouselocation next: displayId:%{public}d, X:%{private}d, Y:%{private}d",
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
     return curMouseLocation;
 }
@@ -6759,7 +6759,7 @@ void InputWindowsManager::PrintChangedWindowBySync(const OLD::DisplayGroupInfo &
             continue;
         }
         if (item.direction != iter->direction) {
-            MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d,"
+            MMI_HILOGI("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                 "name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
                 "oldDirection:%{public}d,oldDisplayDirection:%{public}d", item.id, item.x, item.y, item.width,
                 item.height, item.name.c_str(), item.uniq.c_str(), item.direction, item.displayDirection,
