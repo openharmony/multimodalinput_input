@@ -41,7 +41,7 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
         if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
             (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
             (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            FI_HILOGE("Invalid parameter, shadowInfox:%{private}d, shadowInfoy:%{private}d",
                 shadowInfo.x, shadowInfo.y);
             return RET_ERR;
         }
@@ -209,7 +209,7 @@ int32_t DragClient::UpdateShadowPic(ITunnelClient &tunnel, const ShadowInfo &sha
     if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
         (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
         (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+        FI_HILOGE("Invalid parameter, shadowInfox:%{private}d, shadowInfoy:%{private}d",
             shadowInfo.x, shadowInfo.y);
         return RET_ERR;
     }

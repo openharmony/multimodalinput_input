@@ -1942,7 +1942,7 @@ int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
-    MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
+    MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
         style.id, userIconHotSpotX_, userIconHotSpotY_);
     return ret;
 }
@@ -3504,7 +3504,7 @@ std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint64_t 
 
 int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
 {
-    MMI_HILOGD("HardwareCursorMove loc: (%{public}d, %{public}d), align type: %{public}d", x, y, align);
+    MMI_HILOGD("HardwareCursorMove loc: (%{private}d, %{private}d), align type: %{public}d", x, y, align);
     int32_t ret = RET_OK;
     auto sp = GetScreenPointer(displayId_);
     CHKPR(sp, RET_ERR);
@@ -3644,7 +3644,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
             if (direction == DIRECTION90 || direction == DIRECTION270) {
                 std::swap(x, y);
             }
-            MMI_HILOGD("DrawScreenCenterPointer, x=%{public}d, y=%{public}d", x, y);
+            MMI_HILOGD("DrawScreenCenterPointer, x=%{private}d, y=%{private}d", x, y);
             DrawPointer(displayInfo_.rsId, x, y, pointerStyle, direction);
         } else {
             DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
@@ -3684,7 +3684,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
     userIconHotSpotY_ = static_cast<int32_t>((float)focusY_ * axis);
     MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d,"
         "imageHeight:%{public}d, focusX:%{private}d, focusY:%{private}d, axis:%{public}f,"
-        "userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
+        "userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
         cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
         focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
     SetSurfaceNodeBounds();
@@ -3726,7 +3726,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
-    MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
+    MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
         style.id, userIconHotSpotX_, userIconHotSpotY_);
     return ret;
 }
