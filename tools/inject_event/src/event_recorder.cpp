@@ -48,9 +48,15 @@ bool EventRecorder::Start(std::vector<InputDevice>& devices)
         PrintError("No devices to record from");
         return false;
     }
-    outputFile_.open(outputPath_, std::ios::binary | std::ios::trunc);
+    // ensure the out coming path safe
+    char resolvedPath[PATH_MAX] = {};
+    if (realpath(outputPath_.c_str(), resolvedPath) == nullptr) {
+        PrintError("Realpath failed. path:%{private}s", outputPath_.c_str());
+        return false;
+    }
+    outputFile_.open(resolvedPath, std::ios::binary | std::ios::trunc);
     if (!outputFile_) {
-        PrintError("Failed to open output file: %s", outputPath_.c_str());
+        PrintError("Failed to open output file: %s", resolvedPath);
         return false;
     }
     devices_.clear();

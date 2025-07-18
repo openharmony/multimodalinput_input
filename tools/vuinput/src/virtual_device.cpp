@@ -57,7 +57,7 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_POWER = 0777;
 constexpr int32_t SLEEP_TIME = 1500000;
-const std::string PROC_PATH = "/proc";
+const std::string PROC_PATH = "/proc/";
 const std::string VIRTUAL_DEVICE_NAME = "vuinput";
 const std::string g_pid = std::to_string(getpid());
 
