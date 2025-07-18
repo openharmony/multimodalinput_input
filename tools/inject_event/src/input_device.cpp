@@ -206,7 +206,7 @@ bool InputDevice::OpenDevice(int32_t flags)
         return false;
     }
 
-    fd_ = ::open(realpath, flags);
+    fd_ = ::open(resolvedPath, flags);
     if (fd_ < 0) {
         PrintError("Failed to open device %s: %s", path_.c_str(), strerror(errno));
         return false;
