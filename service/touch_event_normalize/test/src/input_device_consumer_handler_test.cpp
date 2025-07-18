@@ -307,5 +307,61 @@ HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_HandleDe
     MOCKHANDLER->mockSendMsgRet = false;
     ASSERT_NO_FATAL_FAILURE(DEVICEHANDLER->HandleDeviceConsumerEvent(name, pointerEvent));
 }
+
+/**
+ * @tc.name: InputDeviceConsumerHandlerTest_HandleDeviceConsumerEvent_007
+ * @tc.desc: Test HandleDeviceConsumerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_HandleDeviceConsumerEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string name = "device1";
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    MOCKHANDLER->mockChkRWErrorRet = false;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetOrientation(0);
+    item.SetBlobId(0);
+    item.SetToolType(0);
+    pointerEvent->UpdatePointerItem(0, item);
+    MOCKHANDLER->mockGetPointerItemRet = true;
+    MOCKHANDLER->mockMarshallingRet = RET_OK;
+    int32_t fd_1 = 1;
+    int32_t fd_2 = 2;
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, fd_1, UDS_UID, UDS_PID);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, fd_2, UDS_UID, UDS_PID);
+    auto& deviceHandler = DEVICEHANDLER->deviceConsumerHandler_.deviceHandler_;
+    auto sessionHandler1 = std::set<InputDeviceConsumerHandler::SessionHandler>{session1};
+    auto sessionHandler2 = std::set<InputDeviceConsumerHandler::SessionHandler>{session2};
+    deviceHandler["device1"] = sessionHandler1;
+    deviceHandler["device2"] = sessionHandler2;
+    MOCKHANDLER->mockSendMsgRet = true;
+    ASSERT_NO_FATAL_FAILURE(DEVICEHANDLER->HandleDeviceConsumerEvent(name, pointerEvent));
+}
+
+/**
+ * @tc.name: InputDeviceConsumerHandlerTest_RemoveDeviceHandler
+ * @tc.desc: Test SetDeviceConsumerHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_RemoveDeviceHandler_001 , TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> deviceNames = {"device1", "device2"};
+    int32_t fd_1 = 1;
+    int32_t fd_2 = 2;
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, fd_1, UDS_UID, UDS_PID);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, fd_2, UDS_UID, UDS_PID);
+    auto& deviceHandler = DEVICEHANDLER->deviceConsumerHandler_.deviceHandler_;
+    auto sessionHandler = std::set<InputDeviceConsumerHandler::SessionHandler>{session1, session2};
+    deviceHandler["device1"] = sessionHandler;
+    EXPECT_EQ(deviceHandler["device1"].size(), 2);
+    auto ret = DEVICEHANDLER->deviceConsumerHandler_.RemoveDeviceHandler(deviceNames, session2);
+    ASSERT_EQ(ret, RET_OK);
+    EXPECT_EQ(deviceHandler["device1"].size(), 1);
+}
 } // namespace MMI
 } // namespace OHOS
