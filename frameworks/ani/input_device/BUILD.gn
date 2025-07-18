@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 import("../../../multimodalinput_mini.gni")
 
 ohos_shared_library("ani_input_device") {
+  shlib_type = "ani"
   branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
