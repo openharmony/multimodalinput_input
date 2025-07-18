@@ -17,7 +17,6 @@
 
 #include <linux/input.h>
 #include <parameters.h>
-
 #include "display_manager.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
@@ -166,20 +165,41 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 {
     if (INPUT_DEV_MGR->IsKeyboardDevice(device) || INPUT_DEV_MGR->IsPointerDevice(device)) {
+        bool newKeyEventJustCreated = false;
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
+            newKeyEventJustCreated = true;
         }
-        if (libinput_has_event_led_type(device)) {
-            CHKPV(keyEvent_);
-            const std::vector<int32_t> funcKeys = {
-                KeyEvent::NUM_LOCK_FUNCTION_KEY,
-                KeyEvent::CAPS_LOCK_FUNCTION_KEY,
-                KeyEvent::SCROLL_LOCK_FUNCTION_KEY
-            };
+        CHKPV(keyEvent_);
+
+        if (!libinput_has_event_led_type(device)) {
+            // skip if this device does not have led lights.
+            return;
+        }
+
+        const std::vector<int32_t> funcKeys = {
+            KeyEvent::NUM_LOCK_FUNCTION_KEY,
+            KeyEvent::CAPS_LOCK_FUNCTION_KEY,
+            KeyEvent::SCROLL_LOCK_FUNCTION_KEY
+        };
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (newKeyEventJustCreated) {
+            // if key event just created, set keyevent from this new device.
+            MMI_HILOGI("Reset key event function key state based on the new added device's led");
             for (const auto &funcKey : funcKeys) {
                 keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
             }
+        } else {
+            // otherwise, set this new device's function key state based on the key event.
+            for (const auto &funcKey : funcKeys) {
+                LibinputAdapter::DeviceLedUpdate(device, funcKey, keyEvent_->GetFunctionKey(funcKey));
+            }
         }
+#else // OHOS_BUILD_ENABLE_VKEYBOARD
+        for (const auto &funcKey : funcKeys) {
+            keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     }
 }
 

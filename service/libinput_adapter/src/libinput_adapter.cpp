@@ -421,11 +421,31 @@ void LibinputAdapter::HandleVFullKeyboardMessages(
 void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
                                              std::vector<libinput_event*> keyEvents, int64_t frameTime)
 {
+    bool isCapsLockOn = false;
+    bool libinputCapsLockOn = false;
+    if ((eventType == VKeyboardEventType::NormalKeyboardEvent || eventType == VKeyboardEventType::UpdateCaps) &&
+        !keyEvents.empty()) {
+        // check current caps state.
+        std::shared_ptr<KeyEvent> sharedKeyEvent = KeyEventHdr->GetKeyEvent();
+        auto device = libinput_event_get_device(keyEvents.front());
+        if (sharedKeyEvent != nullptr && device != nullptr) {
+            isCapsLockOn = sharedKeyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+            libinputCapsLockOn =
+                static_cast<bool>(libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+        } else {
+            MMI_HILOGW("Failed to sync virtual keyboard's Caps state given nullptr of keyEvent/device.");
+        }
+    }
     switch (eventType) {
         case VKeyboardEventType::NormalKeyboardEvent: {
             for (auto event : keyEvents) {
                 funInputEvent_(event, frameTime);
                 free(event);
+            }
+
+            if (libinputCapsLockOn != isCapsLockOn) {
+                // non-caps scenario, if a mismatch is found, sync it now.
+                libinput_toggle_caps_key();
             }
             break;
         }
@@ -434,16 +454,15 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
                 funInputEvent_(event, frameTime);
                 free(event);
             }
-            struct libinput_device* device = INPUT_DEV_MGR->GetKeyboardDevice();
-            if (device != nullptr) {
-                std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
-                if (keyEvent != nullptr) {
-                    bool isCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
-                    DeviceLedUpdate(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-                    keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
-                }
+            std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
+            if (keyEvent != nullptr) {
+                keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, !isCapsLockOn);
             }
+            MultiKeyboardSetLedState(isCapsLockOn);
+            if (libinputCapsLockOn == isCapsLockOn) {
+                libinput_toggle_caps_key();
+            } // no need to flip virtual keyboard's caps if it is already flipped.
             break;
         }
         case VKeyboardEventType::HideCursor: {
@@ -796,7 +815,6 @@ type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{pri
 			   && keyEvent != nullptr) {
                 bool oldCapsLockOn = keyEvent->GetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
                 libinput_device* device = libinput_event_get_device(event);
-                int libinputCaps = libinput_get_funckey_state(device, MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY);
 
                 HandleHWKeyEventForVKeyboard(event);
                 funInputEvent_(event, frameTime);

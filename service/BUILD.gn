@@ -2058,12 +2058,14 @@ ohos_unittest("KeyEventNormalizeTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "cJSON:cjson",
     "c_utils:utilsbase",
+    "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
