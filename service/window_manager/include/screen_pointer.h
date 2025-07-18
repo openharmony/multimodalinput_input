@@ -175,6 +175,26 @@ public:
         return bufferId_;
     }
 
+    void SetMirrorWidth(const uint32_t mirrorWidth)
+    {
+        mirrorWidth_ = mirrorWidth
+    }
+
+    uint32_t GetMirrorWidth() const
+    {
+        return mirrorWidth_;
+    }
+
+    void SetMirrorHeight(const uint32_t mirrorHeight)
+    {
+        mirrorHeight_ = mirrorHeight
+    }
+
+    uint32_t GetMirrorHeight() const
+    {
+        return mirrorHeight_;
+    }
+
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
@@ -193,6 +213,8 @@ private:
     uint64_t screenId_{0};
     uint32_t width_{0};
     uint32_t height_{0};
+    uint32_t mirrorWidth_{0};
+    uint32_t mirrorHeight_{0};
     mode_t mode_{mode_t::SCREEN_MAIN};
     rotation_t rotation_{rotation_t::ROTATION_0};
     float dpi_{1.0f};
