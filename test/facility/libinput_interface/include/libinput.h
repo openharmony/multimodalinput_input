@@ -60,6 +60,7 @@ struct libinput_event_joystick_axis_abs_info {
 
 enum libinput_event_type {
     LIBINPUT_EVENT_NONE = 0,
+    LIBINPUT_EVENT_DEVICE_ADDED,
 
     LIBINPUT_EVENT_KEYBOARD_KEY = 300,
 
