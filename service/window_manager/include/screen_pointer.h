@@ -177,7 +177,7 @@ public:
 
     void SetMirrorWidth(const uint32_t mirrorWidth)
     {
-        mirrorWidth_ = mirrorWidth
+        mirrorWidth_ = mirrorWidth;
     }
 
     uint32_t GetMirrorWidth() const
@@ -187,7 +187,7 @@ public:
 
     void SetMirrorHeight(const uint32_t mirrorHeight)
     {
-        mirrorHeight_ = mirrorHeight
+        mirrorHeight_ = mirrorHeight;
     }
 
     uint32_t GetMirrorHeight() const
