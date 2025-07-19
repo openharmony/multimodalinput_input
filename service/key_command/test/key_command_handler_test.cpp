@@ -7122,6 +7122,17 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
 }
 
 /**
+* @tc.name  : KeyCommandHandlerTest_CallMistouchPrevention002
+* @tc.number: CallMistouchPrevention_Test_002
+* @tc.desc  : Test CallMistouchPrevention when dlsym fails
+*/
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention002, TestSize.Level1) {
+    auto handler = std::make_shared<KeyCommandHandler>();
+    handler->mistouchLibHandle_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler->CallMistouchPrevention());
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_003
  * @tc.desc: Test MenuClickProcess
  * @tc.type: FUNC
@@ -7152,6 +7163,32 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
 }
 
 /**
+ * @tc.name  : UnregisterMistouchPrevention_ShouldDoNothing_WhenNotRegistered
+ * @tc.number: UnregisterMistouchPreventionTest_001
+ * @tc.desc  : When an unregistered sensor is tested, the UnregisterMistouchPrevention
+ * function should return immediately.
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPrevention001, TestSize.Level1) {
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = false;
+    handler.UnregisterMistouchPrevention();
+    EXPECT_FALSE(handler.hasRegisteredSensor_);
+}
+ 
+/**
+ * @tc.name  : KeyCommandHandlerTest_UnregisterMistouchPrevention002
+ * @tc.number: UnregisterMistouchPreventionTest_002
+ * @tc.desc  : When an unregistered sensor is tested, the UnregisterMistouchPrevention
+ * function should return immediately.
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPrevention002, TestSize.Level1) {
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    handler.timerId_ = 1;
+    ASSERT_NO_FATAL_FAILURE(handler.UnregisterMistouchPrevention());
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_003
  * @tc.desc: Test MenuClickProcess
  * @tc.type: FUNC
@@ -7179,6 +7216,154 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
     handler.hasRegisteredSensor_ = false;
     handler.UnregisterProximitySensor();
     EXPECT_EQ(handler.hasRegisteredSensor_, false);
+}
+
+/**
+ * @tc.name  : KeyCommandHandlerTest_CheckSpecialRepeatKey001
+ * @tc.number: CheckSpecialRepeatKeyTest_001
+ * @tc.desc  : When the key code does not match, the function should return false
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey001, TestSize.Level1) {
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+
+    EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name  : KeyCommandHandlerTest_CheckSpecialRepeatKey002
+ * @tc.number: CheckSpecialRepeatKeyTest_002
+ * @tc.desc  : When the key code is not the volume down key, the function should return false
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey002, TestSize.Level1) {
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+
+    EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name  : KeyCommandHandlerTest_CheckSpecialRepeatKey003
+ * @tc.number: CheckSpecialRepeatKeyTest_003
+ * @tc.desc  : When the application package name does not contain '. camera',
+ * the function should return false
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey003, TestSize.Level1) {
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.app";
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name  : KeyCommandHandlerTest_CheckSpecialRepeatKey004
+ * @tc.number: CheckSpecialRepeatKeyTest_004
+ * @tc.desc  : When the screen is locked and the screen status is not off,
+ * the function should return true
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey004, TestSize.Level1) {
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera";
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_TRUE(CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name  : KeyCommandHandlerTest_CheckSpecialRepeatKey005
+ * @tc.number: CheckSpecialRepeatKeyTest_005
+ * @tc.desc  : When the call status is active, the function should return true
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey005, TestSize.Level1) {
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera";
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_TRUE(CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name  : KeyCommandHandlerTest_CheckSpecialRepeatKey006
+ * @tc.number: CheckSpecialRepeatKeyTest_006
+ * @tc.desc  : When the screen is locked and the music is not activated,
+ * the function should return false
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey006, TestSize.Level1) {
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera";
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name  : CallMistouchPrevention_ShouldReturnImmediately_WhenHasRegisteredSensor
+ * @tc.number: CallMistouchPreventionTest_001
+ * @tc.desc  : 当 hasRegisteredSensor_ 为 true 时,函数应立即返回
+ */
+HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldReturnImmediately_WhenHasRegisteredSensor, TestSize.Level0) {
+    keyCommandHandler->hasRegisteredSensor_ = true;
+    keyCommandHandler->CallMistouchPrevention();
+
+    EXPECT_TRUE(keyCommandHandler->hasRegisteredSensor_);
+}
+
+/**
+ * @tc.name  : CallMistouchPrevention_ShouldLogError_WhenLoadLibraryFails
+ * @tc.number: CallMistouchPreventionTest_002
+ * @tc.desc  : 当加载免触操作库失败时,函数应记录错误日志并返回
+ */
+HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldLogError_WhenLoadLibraryFails, TestSize.Level0) {
+    keyCommandHandler->hasRegisteredSensor_ = false;
+    keyCommandHandler->mistouchLibHandle_ = nullptr;
+    keyCommandHandler->CallMistouchPrevention();
+
+    EXPECT_EQ(keyCommandHandler->mistouchLibHandle_, nullptr);
+}
+
+/**
+ * @tc.name  : CallMistouchPrevention_ShouldLogError_WhenCreateFunctionFails
+ * @tc.number: CallMistouchPreventionTest_003
+ * @tc.desc  : 当获取 IMistouchPrevention 实例创建函数失败时,函数应记录错误日志并返回
+ */
+HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldLogError_WhenCreateFunctionFails, TestSize.Level0) {
+    keyCommandHandler->hasRegisteredSensor_ = false;
+    keyCommandHandler->mistouchLibHandle_ = (void*)0x1;
+    keyCommandHandler->fnCreate_ = nullptr;
+    keyCommandHandler->CallMistouchPrevention();
+
+    EXPECT_EQ(keyCommandHandler->fnCreate_, nullptr);
+}
+
+/**
+ * @tc.name  : CallMistouchPrevention_ShouldSucceed_WhenAllConditionsMet
+ * @tc.number: CallMistouchPreventionTest_004
+ * @tc.desc  : 当所有条件满足时,函数应成功执行免触操作逻辑
+ */
+HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldSucceed_WhenAllConditionsMet, TestSize.Level0) {
+    keyCommandHandler->hasRegisteredSensor_ = false;
+    keyCommandHandler->mistouchLibHandle_ = (void*)0x1;
+    keyCommandHandler->fnCreate_ = (void*)0x1;
+    keyCommandHandler->mistouchPrevention_ = (IMistouchPrevention*)0x1;
+    keyCommandHandler->ret_ = 0;
+    keyCommandHandler->timerId_ = 0;
+    keyCommandHandler->CallMistouchPrevention();
+
+    EXPECT_TRUE(keyCommandHandler->hasRegisteredSensor_);
+    EXPECT_NE(keyCommandHandler->timerId_, -1);
 }
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
