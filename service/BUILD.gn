@@ -223,6 +223,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwsutils",
+    "window_manager:libdm",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -405,6 +406,7 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
+    "window_manager:libdm",
   ]
 
   if (input_feature_pointer_drawing) {
