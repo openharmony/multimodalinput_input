@@ -32,7 +32,8 @@ static const std::vector<int32_t> supportedKeyCodes = {
     KeyEvent::KEYCODE_VOLUME_UP,
     KeyEvent::KEYCODE_VOLUME_DOWN,
     KeyEvent::KEYCODE_META_RIGHT,
-    KeyEvent::KEYCODE_FUNCTION
+    KeyEvent::KEYCODE_FUNCTION,
+    KeyEvent::KEYCODE_KEY_PEN_AIR_MOUSE
 };
 } // namespace
 PreMonitorManager::PreMonitorManager() {}
