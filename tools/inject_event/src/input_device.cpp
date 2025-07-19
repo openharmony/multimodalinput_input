@@ -165,7 +165,15 @@ bool InputDevice::VerifyDeviceMatch() const
     if (name_.empty()) {
         return true;
     }
-    int32_t tempFd = ::open(path_.c_str(), O_RDONLY | O_NONBLOCK);
+
+    // ensure the out coming path safe
+    char resolvedPath[PATH_MAX] = {};
+    if (realpath(path_.c_str(), resolvedPath) == nullptr) {
+        PrintError("Realpath failed. path:%{private}s", path_.c_str());
+        return false;
+    }
+
+    int32_t tempFd = ::open(resolvedPath, O_RDONLY | O_NONBLOCK);
     if (tempFd < 0) {
         PrintWarning("Cannot verify device %s: %s", path_.c_str(), strerror(errno));
         return true;
@@ -190,7 +198,15 @@ bool InputDevice::VerifyDeviceMatch() const
 bool InputDevice::OpenDevice(int32_t flags)
 {
     Close();  // Close if already open
-    fd_ = ::open(path_.c_str(), flags);
+
+    // ensure the out coming path safe
+    char resolvedPath[PATH_MAX] = {};
+    if (realpath(path_.c_str(), resolvedPath) == nullptr) {
+        PrintError("Realpath failed. path:%{private}s", path_.c_str());
+        return false;
+    }
+
+    fd_ = ::open(resolvedPath, flags);
     if (fd_ < 0) {
         PrintError("Failed to open device %s: %s", path_.c_str(), strerror(errno));
         return false;
