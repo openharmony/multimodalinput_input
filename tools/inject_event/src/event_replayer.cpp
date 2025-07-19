@@ -106,7 +106,13 @@ bool EventReplayer::SeekToEventsSection(std::ifstream& inputFile)
 
 bool EventReplayer::Replay()
 {
-    std::ifstream inputFile(inputPath_);
+    // ensure the out coming path safe
+    char resolvedPath[PATH_MAX] = {};
+    if (realpath(inputPath_.c_str(), resolvedPath) == nullptr) {
+        PrintError("Realpath failed. path:%{private}s", inputPath_.c_str());
+        return false;
+    }
+    std::ifstream inputFile(resolvedPath);
     if (!SeekToDevicesSection(inputFile)) {
         PrintError("seek to DEVICES_PREFIX tag error");
         return false;
