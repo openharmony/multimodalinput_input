@@ -328,7 +328,7 @@ void MouseLocation::TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGE("Corrupted pointer event");
         return;
     }
-    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    auto display = Rosen::DisplayManagerLite::GetInstance().GetDefaultDisplay();
     CHKPV(display);
     locationInfo = {
         .displayX = pointerItem.GetDisplayX(),

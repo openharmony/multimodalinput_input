@@ -15,17 +15,15 @@
 
 #include "event_dispatch_handler.h"
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "transaction/rs_interfaces.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
-
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
+#include "cursor_drawing_component.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "pointer_device_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -219,9 +217,13 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
+    (void)programName;
+    (void)pid;
 #ifndef OHOS_BUILD_ENABLE_WATCH
     auto begin = std::chrono::high_resolution_clock::now();
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+    if (POINTER_DEV_MGR.isInit) {
+        CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
+    }
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR

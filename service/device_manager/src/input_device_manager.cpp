@@ -24,6 +24,7 @@
 #include "dfx_hisysevent_device.h"
 #include "cursor_drawing_component.h"
 #include "parameters.h"
+#include "pointer_device_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -516,6 +517,8 @@ void InputDeviceManager::ScanPointerDevice()
         NotifyPointerDevice(false, false, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
         MMI_HILOGI("Set para input.pointer.device false");
+        POINTER_DEV_MGR.isInit = false;
+        CursorDrawingComponent::GetInstance().UnLoad();
     }
 }
 
@@ -888,10 +891,43 @@ void InputDeviceManager::NotifyRemoveDeviceListeners(int32_t deviceId)
     }
 }
 
+void InputDeviceManager::PointerDeviceInit()
+{
+    MMI_HILOGI("start");
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (!CursorDrawingComponent::GetInstance().Init()) {
+        MMI_HILOGE("Pointer draw init failed");
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    auto proxy = POINTER_DEV_MGR.GetDelegateProxy();
+    if (proxy != nullptr) {
+        CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (POINTER_DEV_MGR.renderServiceIsOk) {
+        CursorDrawingComponent::GetInstance().InitPointerCallback();
+    }
+    if (POINTER_DEV_MGR.displayManagerServiceSaIdIsOk) {
+        CursorDrawingComponent::GetInstance().InitScreenInfo();
+        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
+    }
+    CursorDrawingComponent::GetInstance().InitPointerObserver();
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    POINTER_DEV_MGR.isInit = true;
+}
+
 void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice)
 {
     MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
         existEnabledPointerDevice);
+    if (addNewPointerDevice) {
+        PointerDeviceInit();
+    }
     if (addNewPointerDevice && !existEnabledPointerDevice) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {
@@ -919,6 +955,8 @@ void InputDeviceManager::NotifyRemovePointerDevice(bool removePointerDevice)
     if (removePointerDevice && !HasPointerDevice() && !HasVirtualPointerDevice() &&
         CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        POINTER_DEV_MGR.isInit = false;
+        CursorDrawingComponent::GetInstance().UnLoad();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }

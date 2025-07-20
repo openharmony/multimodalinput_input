@@ -17,7 +17,7 @@
 
 #include <linux/input.h>
 #include <parameters.h>
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"
@@ -32,7 +32,7 @@ namespace MMI {
 namespace {
 constexpr uint32_t KEYSTATUS { 0 };
 constexpr int32_t SWAP_VOLUME_KEYS_ON_FOLD { 0 };
-class FoldStatusCallback : public Rosen::DisplayManager::IFoldStatusListener {
+class FoldStatusCallback : public Rosen::DisplayManagerLite::IFoldStatusListener {
 public:
     FoldStatusCallback() = default;
     ~FoldStatusCallback() = default;
@@ -61,7 +61,7 @@ void KeyEventNormalize::Init()
 {
     g_foldStatusCallback = new (std::nothrow) FoldStatusCallback();
     CHKPV(g_foldStatusCallback);
-    Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(g_foldStatusCallback);
+    Rosen::DisplayManagerLite::GetInstance().RegisterFoldStatusListener(g_foldStatusCallback);
 }
 
 std::shared_ptr<KeyEvent> KeyEventNormalize::GetKeyEvent()

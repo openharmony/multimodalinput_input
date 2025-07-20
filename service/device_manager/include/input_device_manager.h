@@ -132,6 +132,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     int32_t GetTouchscreenKeyboardType(const InputDeviceInfo &deviceInfo, int32_t &keyboardType);
     int32_t GetVirtualKeyboardType(int32_t deviceId, int32_t &keyboardType);
+    void PointerDeviceInit();
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
