@@ -446,4 +446,12 @@ int32_t CursorDrawingComponent::GetPointerSnapshot(void *pixelMapPtr)
     return pointerInstance_->GetPointerSnapshot(pixelMapPtr);
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+#ifndef OHOS_BUILD_ENABLE_WATCH
+void CursorDrawingComponent::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->NotifyPointerEventToRS(pointAction, pointCnt);
+}
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace OHOS

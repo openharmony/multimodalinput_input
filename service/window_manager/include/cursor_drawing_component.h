@@ -89,6 +89,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt);
+#endif // OHOS_BUILD_ENABLE_WATCH
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();

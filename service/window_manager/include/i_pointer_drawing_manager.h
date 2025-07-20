@@ -185,6 +185,9 @@ public:
     {
         return false;
     }
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    virtual void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt) {}
+#endif // OHOS_BUILD_ENABLE_WATCH
 };
 } // namespace MMI
 } // namespace OHOS

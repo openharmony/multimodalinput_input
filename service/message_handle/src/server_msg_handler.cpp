@@ -20,6 +20,7 @@
 #include "authorization_dialog.h"
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
+#include "cursor_drawing_component.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
@@ -35,8 +36,8 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
+#include "pointer_device_manager.h"
 #include "time_cost_chk.h"
-#include "cursor_drawing_component.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
@@ -293,11 +294,14 @@ int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<Pointer
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
-        } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
-            (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
-            !CursorDrawingComponent::GetInstance().IsPointerVisible()) {
-            CursorDrawingComponent::GetInstance().SetPointerVisible(getpid(), true, 0, false);
+            if (POINTER_DEV_MGR.isInit) {
+                CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
+            }
+        } else if ((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+            (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {
+            if (POINTER_DEV_MGR.isInit && !CursorDrawingComponent::GetInstance().IsPointerVisible()) {
+                CursorDrawingComponent::GetInstance().SetPointerVisible(getpid(), true, 0, false);
+            }
         }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     } else {

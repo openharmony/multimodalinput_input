@@ -16,6 +16,7 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
+#include "cursor_drawing_component.h"
 #include "device_event_monitor.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
@@ -26,7 +27,7 @@
 #include "key_command_handler_util.h"
 #include "key_event_normalize.h"
 #include "long_press_subscriber_handler.h"
-#include "cursor_drawing_component.h"
+#include "pointer_device_manager.h"
 #include "pull_throw_subscriber_handler.h"
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
@@ -2657,7 +2658,9 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
         MMI_HILOGI("Force make pointer visible");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (POINTER_DEV_MGR.isInit) {
         CursorDrawingComponent::GetInstance().ForceClearPointerVisiableStatus();
+    }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
     lastKeyEventCode_ = keyEvent->GetKeyCode();

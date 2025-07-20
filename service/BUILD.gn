@@ -151,6 +151,7 @@ ohos_rust_unittest("rust_mmi_test") {
 }
 
 ohos_shared_library("libcursor_drawing_adapter") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -216,8 +217,10 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
     "graphic_surface:surface",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "hisysevent:libhisysevent",
+    "image_framework:image_native",
     "init:libbeget_proxy",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
@@ -243,6 +246,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
       "init:libbegetutil",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
+      "window_manager:libwm_lite",
     ]
   }
   if (resource_schedule_service_enabled) {
@@ -270,6 +274,7 @@ ohos_shared_library("libmmi-server") {
   }
   version_script = "libmmi-server-map"
   include_dirs = [
+    "delegate_task/include",
     "${mmi_path}/frameworks/proxy/events/include",
     "window_manager/include",
   ]
@@ -449,7 +454,6 @@ ohos_shared_library("libmmi-server") {
 
   external_deps += [
     "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "access_token:libtokenid_sdk",
     "config_policy:configpolicy_util",
@@ -460,9 +464,11 @@ ohos_shared_library("libmmi-server") {
     "ffrt:libffrt",
     "hicollie:libhicollie",
     "hisysevent:libhisysevent",
+    "image_framework:image_native",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libdm_lite",
+    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 
@@ -487,11 +493,7 @@ ohos_shared_library("libmmi-server") {
 
     external_deps += [
       "common_event_service:cesfwk_innerkits",
-      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
-      "graphic_2d:libcomposer",
-      "graphic_2d:librender_service_base",
-      "graphic_2d:librender_service_client",
+      "hdf_core:libhdi",
       "hilog:libhilog",
       "image_framework:image_native",
       "init:libbeget_proxy",
@@ -878,6 +880,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
     "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
+    "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
     "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
     "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
     "${mmi_path}/service/subscriber/src/key_shortcut_manager.cpp",

@@ -16,8 +16,9 @@
 #include "input_windows_manager.h"
 #include <linux/input.h>
 
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "event_log_helper.h"
+#include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -1559,7 +1560,7 @@ bool InputWindowsManager::IsCaptureMode()
                     window.area.height > SCREEN_RECORD_WINDOW_HEIGHT);
         }
     }
-    
+
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -7009,9 +7010,9 @@ int32_t InputWindowsManager::GetCurrentUserId()
 
 void InputWindowsManager::SetFoldState()
 {
-    BytraceAdapter::StartFoldState(Rosen::DisplayManager::GetInstance().IsFoldable());
+    BytraceAdapter::StartFoldState(Rosen::DisplayManagerLite::GetInstance().IsFoldable());
     auto begin = std::chrono::high_resolution_clock::now();
-    IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
+    IsFoldable_ = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
