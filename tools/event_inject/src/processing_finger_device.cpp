@@ -35,6 +35,10 @@ int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem &f
     }
     TouchPadInputEvents touchPadInputEvents = {};
     AnalysisTouchPadFingerDate(inputData, touchPadInputEvents);
+    if (touchPadInputEvents.eventArray.empty()) {
+        MMI_HILOGE("The eventArray is empty");
+        return RET_ERR;
+    }
     TouchPadInputEvent pressEvents = touchPadInputEvents.eventArray[0];
     AnalysisTouchPadFingerPressData(inputEventArray, pressEvents);
     for (uint64_t i = 1; i < touchPadInputEvents.eventNumber; i++) {

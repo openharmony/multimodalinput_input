@@ -50,7 +50,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
-    if (devIndex > targetSize) {
+    if (devIndex >= targetSize) {
         MMI_HILOGE("Failed to devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
@@ -121,6 +121,10 @@ void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs,
         if (temp == "N") {
             startPos = item.find("=") + strlen("N:");
             endPos = item.size() - 1;
+            if (startPos >= item.size()) {
+                MMI_HILOGE("subscript out of range");
+                return;
+            }
             name = item.substr(startPos, endPos - startPos - 1);
         }
         if (temp == "H") {
