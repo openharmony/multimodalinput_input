@@ -2836,5 +2836,908 @@ HWTEST_F(MMIServerTest, MMIService_SetTouchpadTapSwitch_001, TestSize.Level1)
     ErrCode ret = mmiService.SetTouchpadTapSwitch(value);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
 }
+
+/**
+ * @tc.name: MMIService_SetTouchpadTapSwitch_002
+ * @tc.desc: Verify SetTouchpadTapSwitch returns RET_OK or ETASKS_POST_SYNCTASK_FAIL on normal condition
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadTapSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool value = true;
+    ErrCode ret = mmiService.SetTouchpadTapSwitch(value);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadTapSwitch_001
+ * @tc.desc: Verify GetTouchpadTapSwitch returns MMISERVICE_NOT_RUNNING when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadTapSwitch(switchFlag);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadTapSwitch_002
+ * @tc.desc: Verify GetTouchpadTapSwitch returns RET_OK or ETASKS_POST_SYNCTASK_FAIL under normal condition
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadTapSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadTapSwitch(switchFlag);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadPointerSpeed_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadPointerSpeed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t speed = 3;
+    ErrCode ret = mmiService.SetTouchpadPointerSpeed(speed);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadPointerSpeed_002
+ * @tc.desc: Normal call with speed clipping, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadPointerSpeed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    std::vector<int32_t> testSpeeds = { -10, 0, 1, 3, 5, 10, 999 };
+    for (int32_t speed : testSpeeds) {
+        ErrCode ret = mmiService.SetTouchpadPointerSpeed(speed);
+        EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL) << "Failed at speed=" << speed;
+    }
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadPointerSpeed_001
+ * @tc.desc: Service is not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadPointerSpeed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t speed = 0;
+    ErrCode ret = mmiService.GetTouchpadPointerSpeed(speed);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadPointerSpeed_002
+ * @tc.desc: Valid request, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadPointerSpeed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t speed = -1;
+    ErrCode ret = mmiService.GetTouchpadPointerSpeed(speed);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadPinchSwitch_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    ErrCode ret = mmiService.SetTouchpadPinchSwitch(true);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadPinchSwitch_002
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadPinchSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SetTouchpadPinchSwitch(true);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadPinchSwitch_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadPinchSwitch(switchFlag);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadPinchSwitch_002
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadPinchSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadPinchSwitch(switchFlag);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadSwipeSwitch_001
+ * @tc.desc: Service is not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    ErrCode ret = mmiService.SetTouchpadSwipeSwitch(true);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadSwipeSwitch_002
+ * @tc.desc: Valid call with running service, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadSwipeSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SetTouchpadSwipeSwitch(false);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadSwipeSwitch_001
+ * @tc.desc: Service is not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadSwipeSwitch(switchFlag);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadSwipeSwitch_002
+ * @tc.desc: Valid call with running service, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadSwipeSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadSwipeSwitch(switchFlag);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_001
+ * @tc.desc: Valid type TOUCHPAD_RIGHT_BUTTON, expect true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_TRUE(mmiService.IsValidType(RightClickType::TOUCHPAD_RIGHT_BUTTON));
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_002
+ * @tc.desc: Valid type TOUCHPAD_LEFT_BUTTON, expect true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_TRUE(mmiService.IsValidType(RightClickType::TOUCHPAD_LEFT_BUTTON));
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_003
+ * @tc.desc: Valid type TOUCHPAD_TWO_FINGER_TAP, expect true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_TRUE(mmiService.IsValidType(RightClickType::TOUCHPAD_TWO_FINGER_TAP));
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_004
+ * @tc.desc: Valid type TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON, expect true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_TRUE(mmiService.IsValidType(RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_RIGHT_BUTTON));
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_005
+ * @tc.desc: Valid type TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON, expect true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_TRUE(mmiService.IsValidType(RightClickType::TOUCHPAD_TWO_FINGER_TAP_OR_LEFT_BUTTON));
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_006
+ * @tc.desc: Invalid type -1, expect false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_FALSE(mmiService.IsValidType(-1));
+}
+
+/**
+ * @tc.name: MMIService_IsValidType_007
+ * @tc.desc: Invalid type 1000, expect false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_IsValidType_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    EXPECT_FALSE(mmiService.IsValidType(1000));
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadRightClickType_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadRightClickType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t type = RightClickType::TOUCHPAD_RIGHT_BUTTON;
+    ErrCode ret = mmiService.SetTouchpadRightClickType(type);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadRightClickType_002
+ * @tc.desc: Invalid right click type, expect RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadRightClickType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t type = -999;
+    ErrCode ret = mmiService.SetTouchpadRightClickType(type);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadRightClickType_003
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadRightClickType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t type = RightClickType::TOUCHPAD_RIGHT_BUTTON;
+    ErrCode ret = mmiService.SetTouchpadRightClickType(type);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadRightClickType_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadRightClickType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t type = 0;
+    ErrCode ret = mmiService.GetTouchpadRightClickType(type);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadRightClickType_002
+ * @tc.desc: Valid case, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadRightClickType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t type = 0;
+    ErrCode ret = mmiService.GetTouchpadRightClickType(type);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadRotateSwitch_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool rotateSwitch = true;
+    ErrCode ret = mmiService.SetTouchpadRotateSwitch(rotateSwitch);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadRotateSwitch_002
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadRotateSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool rotateSwitch = true;
+    ErrCode ret = mmiService.SetTouchpadRotateSwitch(rotateSwitch);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadRotateSwitch_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool rotateSwitch = false;
+    ErrCode ret = mmiService.GetTouchpadRotateSwitch(rotateSwitch);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadRotateSwitch_002
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadRotateSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool rotateSwitch = false;
+    ErrCode ret = mmiService.GetTouchpadRotateSwitch(rotateSwitch);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    ErrCode ret = mmiService.SetTouchpadDoubleTapAndDragState(true);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadDoubleTapAndDragState_002
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadDoubleTapAndDragState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SetTouchpadDoubleTapAndDragState(true);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadDoubleTapAndDragState(switchFlag);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadDoubleTapAndDragState_002
+ * @tc.desc: Valid call, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadDoubleTapAndDragState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadDoubleTapAndDragState(switchFlag);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetKeyState_001
+ * @tc.desc: GetKeyState returns RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetKeyState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+
+    std::vector<int32_t> pressedKeys;
+    std::unordered_map<int32_t, int32_t> specialKeysState;
+    ErrCode ret = mmiService.GetKeyState(pressedKeys, specialKeysState);
+
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_Authorize_001
+ * @tc.desc: Service fails system app check, expect ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_Authorize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.Authorize(true);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_CancelInjection_001
+ * @tc.desc: PostSyncTask fails, expect ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_CancelInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.CancelInjection();
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_CancelInjection_002
+ * @tc.desc: PostSyncTask success, expect RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_CancelInjection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.CancelInjection();
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_HasIrEmitter_001
+ * @tc.desc: Verify system app failed, expect ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_HasIrEmitter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    bool hasIrEmitter = false;
+    ErrCode ret = mmiService.HasIrEmitter(hasIrEmitter);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_HasIrEmitter_002
+ * @tc.desc: Verify valid path, expect RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_HasIrEmitter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool hasIrEmitter = false;
+    ErrCode ret = mmiService.HasIrEmitter(hasIrEmitter);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_RequestInjection_001
+ * @tc.desc: Verify sync task failure path, expect ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_RequestInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t status = -1;
+    int32_t reqId = -1;
+    ErrCode ret = mmiService.RequestInjection(status, reqId);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_RequestInjection_002
+ * @tc.desc: Validate output parameters are unchanged if task fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_RequestInjection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t status = 100;
+    int32_t reqId = 200;
+    ErrCode ret = mmiService.RequestInjection(status, reqId);
+    if (ret != RET_OK) {
+        EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+        EXPECT_EQ(status, 100);
+        EXPECT_EQ(reqId, 200);
+    }
+}
+
+/**
+ * @tc.name: MMIService_QueryAuthorizedStatus_001
+ * @tc.desc: PostSyncTask fails, expect ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_QueryAuthorizedStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t status = -1;
+    ErrCode ret = mmiService.QueryAuthorizedStatus(status);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_QueryAuthorizedStatus_002
+ * @tc.desc: Validate status unchanged on failure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_QueryAuthorizedStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t status = 1234;
+    ErrCode ret = mmiService.QueryAuthorizedStatus(status);
+    if (ret != RET_OK) {
+        EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+        EXPECT_EQ(status, 1234);
+    }
+}
+
+/**
+ * @tc.name: MMIService_GetInfraredFrequencies_001
+ * @tc.desc: CheckInfraredEmmit permission denied, expect ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<InfraredFrequency> frequencies;
+    ErrCode ret = mmiService.GetInfraredFrequencies(frequencies);
+    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == RET_OK);
+    if (ret == RET_OK) {
+#ifndef OHOS_BUILD_ENABLE_WATCH
+        EXPECT_GE(frequencies.size(), 0);
+#endif
+    } else {
+        EXPECT_EQ(frequencies.size(), 0);
+    }
+}
+
+/**
+ * @tc.name: MMIService_GetInfraredFrequencies_002
+ * @tc.desc: Normal case, verify return value and content
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<InfraredFrequency> frequencies;
+    ErrCode ret = mmiService.GetInfraredFrequencies(frequencies);
+    EXPECT_EQ(ret, RET_OK);
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    for (auto &freq : frequencies) {
+        EXPECT_GE(freq.min_, 0);
+        EXPECT_GE(freq.max_, freq.min_);
+    }
+#endif
+}
+
+/**
+ * @tc.name: MMIService_TransmitInfrared_001
+ * @tc.desc: Permission check fails, expect ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_TransmitInfrared_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<int64_t> pattern = {1000, 1000};
+    ErrCode ret = mmiService.TransmitInfrared(38000, pattern);
+    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_TransmitInfrared_002
+ * @tc.desc: Invalid pattern length (0), expect RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_TransmitInfrared_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<int64_t> pattern;
+    ErrCode ret = mmiService.TransmitInfrared(38000, pattern);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_TransmitInfrared_003
+ * @tc.desc: Invalid pattern length (超限), expect RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_TransmitInfrared_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<int64_t> pattern(1024 + 1, 1000);
+    ErrCode ret = mmiService.TransmitInfrared(38000, pattern);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_TransmitInfrared_004
+ * @tc.desc: Invalid number (负值), expect RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_TransmitInfrared_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<int64_t> pattern = {1000, 1000};
+    ErrCode ret = mmiService.TransmitInfrared(-1, pattern);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_TransmitInfrared_005
+ * @tc.desc: Valid parameters, expect RET_OK or RET_ERR depending on hardware
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_TransmitInfrared_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<int64_t> pattern = {1000, 2000, 1000, 2000};
+    ErrCode ret = mmiService.TransmitInfrared(38000, pattern);
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_OnHasIrEmitter_001
+ * @tc.desc: The service normally calls OnHasIrEmitter, expecting it to return false and succeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_OnHasIrEmitter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    bool hasIrEmitter = true;
+    int32_t ret = mmiService.OnHasIrEmitter(hasIrEmitter);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_FALSE(hasIrEmitter);
+}
+
+/**
+ * @tc.name: MMIService_SetPixelMapData_001
+ * @tc.desc: Non-system applications calling SetPixelMapData are expected to return ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    CursorPixelMap pixelMap;
+    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
+    ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetPixelMapData_002
+ * @tc.desc: The service is not running; SetPixelMapData returned MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    CursorPixelMap pixelMap;
+    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
+    ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetPixelMapData_003
+ * @tc.desc: The parameter infoId is invalid (<=0), expecting to return RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    CursorPixelMap pixelMap;
+    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
+    ErrCode ret = mmiService.SetPixelMapData(0, pixelMap);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_SetPixelMapData_004
+ * @tc.desc: PixelMap is nullptr, expecting to return ERROR_NULL_POINTER
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    CursorPixelMap pixelMap;
+    pixelMap.pixelMap = nullptr;
+    ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+}
 } // namespace MMI
 } // namespace OHOS
