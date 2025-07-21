@@ -7183,7 +7183,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention005,
     EXPECT_NE(keyCommandHandler->timerId_, -1);
 }
 
-
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
  * @tc.desc: Test MenuClickProcess
@@ -7360,7 +7359,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey006, 
 
     EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
 }
-
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
