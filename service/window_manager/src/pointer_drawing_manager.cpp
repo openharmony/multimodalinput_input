@@ -3248,8 +3248,8 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             sids.insert(sid);
 
             if (si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
-                mainWidth = GetScreenInfoWidth(si);
-                mainHeight = GetScreenInfoHeight(si);
+                mainWidth = (si->GetMirrorWidth() == 0) ? GetScreenInfoWidth(si) : si->GetMirrorWidth();
+                mainHeight = (si->GetMirrorHeight() == 0) ? GetScreenInfoHeight(si) : si->GetMirrorHeight();
                 mainRotation = static_cast<rotation_t>(si->GetRotation());
             }
 
@@ -3258,6 +3258,8 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 // ScreenPointer already exist
                 MMI_HILOGI("OnScreenModeChange screen %{public}" PRIu64 " info update", sid);
                 it->second->UpdateScreenInfo(si);
+                it->second->SetMirrorWidth(mainWidth);
+                it->second->SetMirrorHeight(mainHeight);
             } else {
                 // Create & Init ScreenPointer
                 MMI_HILOGI("OnScreenModeChange got new screen %{public}" PRIu64, sid);
@@ -3448,8 +3450,8 @@ int32_t PointerDrawingManager::DrawHardCursor(std::shared_ptr<ScreenPointer> sp,
 void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> sp, OLD::DisplayInfo displayInfo)
 {
     CHKPV(sp);
-    uint32_t mainWidth = sp->GetScreenWidth();
-    uint32_t mainHeight = sp->GetScreenHeight();
+    uint32_t mainWidth = (sp->GetMirrorWidth() == 0) ? sp->GetScreenWidth() : sp->GetMirrorWidth();
+    uint32_t mainHeight = (sp->GetMirrorHeight() == 0) ? sp->GetScreenHeight(): sp->GetMirrorHeight();
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto it : screenPointers_) {
         if (it.second == nullptr) {
