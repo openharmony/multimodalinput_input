@@ -89,7 +89,7 @@ std::atomic<int32_t> g_distance { 0 };
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 const char* LOADMISTOUCH_LIBPATH = "libmistouch_prevention.z.so";
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
-constexpr int32_t LIGHT_STAY_AWAY { 5 };
+constexpr int32_t LIGHT_STAY_AWAY { 0 };
 const std::string DEVICE_TYPE_TV = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_TV = "tv";
 } // namespace
@@ -1784,7 +1784,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std:
     std::string matchName = ".camera";
     if (item.keyCode == KeyEvent::KEYCODE_VOLUME_DOWN && bundleName.find(matchName) != std::string::npos) {
         MMI_HILOGD("ret_ %{public}d", ret_.load());
-        if (ret_ == LIGHT_STAY_AWAY) {
+        if (ret_ != LIGHT_STAY_AWAY) {
             LaunchAbility(item.ability);
             CHKPV(mistouchPrevention_);
             MMI_HILOGI("Launch yes");

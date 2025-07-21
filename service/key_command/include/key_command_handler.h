@@ -438,7 +438,7 @@ private:
     uint32_t screenCapturePermission_ { ScreenCapturePermissionType::DEFAULT_PERMISSIONS };
     void *mistouchLibHandle_ {nullptr};
     IMistouchPrevention *mistouchPrevention_ {nullptr};
-    std::atomic<int32_t> ret_ {0};
+    std::atomic<int32_t> ret_ { 5 };
     std::mutex dataMutex_;
 };
 } // namespace MMI
