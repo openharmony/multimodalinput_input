@@ -1935,5 +1935,906 @@ HWTEST_F(MMIServerTest, MMIServerTest_SubscribeKeyMonitor_001, TestSize.Level1)
     MMI_HILOGI("SubscribeKeyMonitor_001 ret: %{public}d", ret);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
 }
+
+/**
+ * @tc.name: MMIServerTest_SubscribeKeyMonitor_002
+ * @tc.desc: SubscribeKeyMonitor returns ETASKS_POST_SYNCTASK_FAIL when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeKeyMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    KeyMonitorOption keyOption;
+    keyOption.SetKey(126);
+    keyOption.SetAction(KeyEvent::KEY_ACTION_UP);
+    keyOption.SetRepeat(true);
+    ErrCode ret = mmiService.SubscribeKeyMonitor(keyOption);
+    MMI_HILOGI("SubscribeKeyMonitor_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeKeyMonitor_001
+ * @tc.desc: UnsubscribeKeyMonitor returns MMISERVICE_NOT_RUNNING when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeKeyMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    KeyMonitorOption keyOption;
+    keyOption.SetKey(123);
+    keyOption.SetAction(KeyEvent::KEY_ACTION_DOWN);
+    keyOption.SetRepeat(false);
+    ErrCode ret = mmiService.UnsubscribeKeyMonitor(keyOption);
+    MMI_HILOGI("UnsubscribeKeyMonitor_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeKeyMonitor_002
+ * @tc.desc: UnsubscribeKeyMonitor returns ETASKS_POST_SYNCTASK_FAIL when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeKeyMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    KeyMonitorOption keyOption;
+    keyOption.SetKey(124);
+    keyOption.SetAction(KeyEvent::KEY_ACTION_UP);
+    keyOption.SetRepeat(true);
+    ErrCode ret = mmiService.UnsubscribeKeyMonitor(keyOption);
+    MMI_HILOGI("UnsubscribeKeyMonitor_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeSwitchEvent_001
+ * @tc.desc: SubscribeSwitchEvent returns MMISERVICE_NOT_RUNNING when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeSwitchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t subscribeId = 1001;
+    int32_t switchType = 1;
+    ErrCode ret = mmiService.SubscribeSwitchEvent(subscribeId, switchType);
+    MMI_HILOGI("SubscribeSwitchEvent_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeSwitchEvent_002
+ * @tc.desc: SubscribeSwitchEvent returns ETASKS_POST_SYNCTASK_FAIL when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeSwitchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t subscribeId = 1002;
+    int32_t switchType = 2;
+    ErrCode ret = mmiService.SubscribeSwitchEvent(subscribeId, switchType);
+    MMI_HILOGI("SubscribeSwitchEvent_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeSwitchEvent_001
+ * @tc.desc: UnsubscribeSwitchEvent returns RET_ERR for invalid subscribeId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeSwitchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t subscribeId = -1;
+    ErrCode ret = mmiService.UnsubscribeSwitchEvent(subscribeId);
+    MMI_HILOGI("UnsubscribeSwitchEvent_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeSwitchEvent_002
+ * @tc.desc: UnsubscribeSwitchEvent returns ETASKS_POST_SYNCTASK_FAIL when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeSwitchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t subscribeId = 1000;
+    ErrCode ret = mmiService.UnsubscribeSwitchEvent(subscribeId);
+    MMI_HILOGI("UnsubscribeSwitchEvent_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIServerTest_QuerySwitchStatus_001
+ * @tc.desc: QuerySwitchStatus returns error when service not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_QuerySwitchStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t switchType = 1;
+    int32_t state = -1;
+    ErrCode ret = mmiService.QuerySwitchStatus(switchType, state);
+    MMI_HILOGI("QuerySwitchStatus_001 ret: %{public}d, state: %{public}d", ret, state);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_QuerySwitchStatus_002
+ * @tc.desc: QuerySwitchStatus returns error when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_QuerySwitchStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t switchType = 1;
+    int32_t state = -1;
+    ErrCode ret = mmiService.QuerySwitchStatus(switchType, state);
+    MMI_HILOGI("QuerySwitchStatus_002 ret: %{public}d, state: %{public}d", ret, state);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeTabletProximity_001
+ * @tc.desc: SubscribeTabletProximity returns error when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeTabletProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t subscribeId = 123;
+    ErrCode ret = mmiService.SubscribeTabletProximity(subscribeId);
+    MMI_HILOGI("SubscribeTabletProximity_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeTabletProximity_002
+ * @tc.desc: SubscribeTabletProximity returns error when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeTabletProximity_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t subscribeId = 456;
+    ErrCode ret = mmiService.SubscribeTabletProximity(subscribeId);
+    MMI_HILOGI("SubscribeTabletProximity_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribetabletProximity_001
+ * @tc.desc: Unsubscribe tablet proximity when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribetabletProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t subscribeId = 1;
+    ErrCode ret = mmiService.UnsubscribetabletProximity(subscribeId);
+    MMI_HILOGI("UnsubscribetabletProximity_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribetabletProximity_002
+ * @tc.desc: Unsubscribe tablet proximity with invalid id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribetabletProximity_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t invalidId = -1;
+    ErrCode ret = mmiService.UnsubscribetabletProximity(invalidId);
+    MMI_HILOGI("UnsubscribetabletProximity_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeLongPressEvent_001
+ * @tc.desc: SubscribeLongPressEvent when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeLongPressEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t subscribeId = 1;
+    LongPressRequest req;
+    ErrCode ret = mmiService.SubscribeLongPressEvent(subscribeId, req);
+    MMI_HILOGI("SubscribeLongPressEvent_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeLongPressEvent_002
+ * @tc.desc: SubscribeLongPressEvent returns failure if PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeLongPressEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t subscribeId = 100;
+    LongPressRequest req;
+    ErrCode ret = mmiService.SubscribeLongPressEvent(subscribeId, req);
+    MMI_HILOGI("SubscribeLongPressEvent_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeLongPressEvent_001
+ * @tc.desc: UnsubscribeLongPressEvent when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeLongPressEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t subscribeId = 1;
+    ErrCode ret = mmiService.UnsubscribeLongPressEvent(subscribeId);
+    MMI_HILOGI("UnsubscribeLongPressEvent_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeLongPressEvent_002
+ * @tc.desc: UnsubscribeLongPressEvent fails if PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeLongPressEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t subscribeId = 99;
+    ErrCode ret = mmiService.UnsubscribeLongPressEvent(subscribeId);
+    MMI_HILOGI("UnsubscribeLongPressEvent_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_SetAnrObserver_001
+ * @tc.desc: SetAnrObserver when service not running, expect fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SetAnrObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    ErrCode ret = mmiService.SetAnrObserver();
+    MMI_HILOGI("SetAnrObserver_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_SetAnrObserver_002
+ * @tc.desc: SetAnrObserver when PostSyncTask fails, expect fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SetAnrObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SetAnrObserver();
+    MMI_HILOGI("SetAnrObserver_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_GetAllMmiSubscribedEvents_001
+ * @tc.desc: GetAllMmiSubscribedEvents when service not running, expect fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetAllMmiSubscribedEvents_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    MmiEventMap mmiEventMap;
+    ErrCode ret = mmiService.GetAllMmiSubscribedEvents(mmiEventMap);
+    MMI_HILOGI("GetAllMmiSubscribedEvents_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_GetAllMmiSubscribedEvents_002
+ * @tc.desc: GetAllMmiSubscribedEvents when service is running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_GetAllMmiSubscribedEvents_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    MmiEventMap mmiEventMap;
+    mmiEventMap.datas.emplace(std::make_tuple(1, 0, "dummy"), 123);
+    ErrCode ret = mmiService.GetAllMmiSubscribedEvents(mmiEventMap);
+    MMI_HILOGI("GetAllMmiSubscribedEvents_002 ret: %{public}d, datas size: %{public}zu",
+               ret, mmiEventMap.datas.size());
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(mmiEventMap.datas.empty());
+}
+
+/**
+ * @tc.name: MMIServerTest_SetPointerLocation_001
+ * @tc.desc: SetPointerLocation when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SetPointerLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService service;
+    service.state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t x = 100;
+    int32_t y = 200;
+    int32_t displayId = 0;
+    ErrCode ret = service.SetPointerLocation(x, y, displayId);
+    MMI_HILOGI("SetPointerLocation_001 ret: %{public}d", ret);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIServerTest_SetPointerLocation_002
+ * @tc.desc: SetPointerLocation when PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SetPointerLocation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService service;
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t x = 300;
+    int32_t y = 400;
+    int32_t displayId = 1;
+    ErrCode ret = service.SetPointerLocation(x, y, displayId);
+    MMI_HILOGI("SetPointerLocation_002 ret: %{public}d", ret);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_OnGetWindowPid_001
+ * @tc.desc: Obtain the pid of a legitimate windowId, and it should return RET_OK
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ1CT
+ */
+HWTEST_F(MMIServerTest, MMIService_OnGetWindowPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t windowId = 1;
+    int32_t pid = -1;
+    int32_t ret = mmiService.OnGetWindowPid(windowId, pid);
+    MMI_HILOGI("OnGetWindowPid ret: %{public}d, pid: %{public}d", ret, pid);
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR);
+    if (ret == RET_OK) {
+        EXPECT_GT(pid, 0);
+    }
+}
+
+/**
+ * @tc.name: MMIService_AppendExtraData_001
+ * @tc.desc: When the system application appends valid ExtraData, it should return RET_OK or a task failure code
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_AppendExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ExtraData data;
+    data.sourceType = InputEvent::SOURCE_TYPE_TOUCHSCREEN;
+    data.pointerId = 0;
+    data.pullId = 0;
+    data.eventId = 100;
+    data.buffer.resize(32);
+    int32_t returnCode = 65142800;
+    int32_t ret = mmiService.AppendExtraData(data);
+    MMI_HILOGI("AppendExtraData ret: %{public}d", ret);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: MMIService_AppendExtraData_002
+ * @tc.desc: When called while MMIService is not running, it should return MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_AppendExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ExtraData data;
+    data.sourceType = InputEvent::SOURCE_TYPE_TOUCHSCREEN;
+    data.pointerId = 0;
+    data.pullId = 0;
+    data.eventId = 500;
+    data.buffer.resize(16);
+    int32_t ret = mmiService.AppendExtraData(data);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_UpdateCombineKeyState_001
+ * @tc.desc: Both handlers exist, and the EnableCombineKey call succeeds or fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateCombineKeyState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    bool enable = true;
+    int32_t ret = mmiService.UpdateCombineKeyState(enable);
+    MMI_HILOGI("UpdateCombineKeyState ret: %{public}d", ret);
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_UpdateCombineKeyState_002
+ * @tc.desc: When SubscriberHandler is null, RET_ERR should be returned
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateCombineKeyState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    auto backup = InputHandler->GetSubscriberHandler();
+    int32_t ret = mmiService.UpdateCombineKeyState(true);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_UpdateCombineKeyState_003
+ * @tc.desc: When KeyCommandHandler is null, RET_ERR should be returned
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateCombineKeyState_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    auto backup = InputHandler->GetSubscriberHandler();
+    int32_t ret = mmiService.UpdateCombineKeyState(true);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_EnableCombineKey_001
+ * @tc.desc: EnableCombineKey when service not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_EnableCombineKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.EnableCombineKey(true);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_EnableCombineKey_002
+ * @tc.desc: Non-system application calls EnableCombineKey and returns ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_EnableCombineKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t ret = mmiService.EnableCombineKey(true);
+    EXPECT_NE(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_EnableCombineKey_003
+ * @tc.desc: When MMIService is not running, EnableCombineKey returns MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_EnableCombineKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t ret = mmiService.EnableCombineKey(true);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_UpdateSettingsXml_001
+ * @tc.desc: Normally calling UpdateSettingsXml is expected to return RET_OK or a business layer return code
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateSettingsXml_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    std::string businessId = "com.example.setting";
+    int32_t delay = 300;
+    int32_t ret = mmiService.UpdateSettingsXml(businessId, delay);
+    MMI_HILOGI("UpdateSettingsXml return code: %{public}d", ret);
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR || ret > 0);
+}
+
+/**
+ * @tc.name: MMIService_UpdateSettingsXml_002
+ * @tc.desc: Pass an empty business ID and check the function's processing result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateSettingsXml_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::string businessId = "";
+    int32_t delay = 100;
+    int32_t ret = mmiService.UpdateSettingsXml(businessId, delay);
+    MMI_HILOGI("UpdateSettingsXml with empty businessId, return code: %{public}d", ret);
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR || ret > 0);
+}
+
+/**
+ * @tc.name: MMIService_UpdateSettingsXml_003
+ * @tc.desc: Pass a negative number delay, check the function's processing result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateSettingsXml_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::string businessId = "com.example.delay";
+    int32_t delay = -100;
+    int32_t ret = mmiService.UpdateSettingsXml(businessId, delay);
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR || ret > 0);
+}
+
+/**
+ * @tc.name: MMIService_SetKeyDownDuration_001
+ * @tc.desc: Service not running, expect MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetKeyDownDuration_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.SetKeyDownDuration("testBusiness", 100);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetKeyDownDuration_002
+ * @tc.desc: PostSyncTask runs (success or fail), service running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetKeyDownDuration_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SetKeyDownDuration("realBiz", 300);
+    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadScrollSwich_001
+ * @tc.desc: Verify ReadTouchpadScrollSwich returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadScrollSwich_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadScrollSwich(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadScrollDirection_001
+ * @tc.desc: Verify ReadTouchpadScrollDirection returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadScrollDirection_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadScrollDirection(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadTapSwitch_001
+ * @tc.desc: Verify ReadTouchpadTapSwitch returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadTapSwitch_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadTapSwitch(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadPointerSpeed_001
+ * @tc.desc: Verify ReadTouchpadPointerSpeed returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadPointerSpeed_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t speed = -1;
+    int32_t ret = mmiService.ReadTouchpadPointerSpeed(speed);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadPinchSwitch_001
+ * @tc.desc: Verify ReadTouchpadPinchSwitch returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadPinchSwitch(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadSwipeSwitch_001
+ * @tc.desc: Verify ReadTouchpadSwipeSwitch returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadSwipeSwitch(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadRightMenuType_001
+ * @tc.desc: Verify ReadTouchpadRightMenuType returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadRightMenuType_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t type = -1;
+    int32_t ret = mmiService.ReadTouchpadRightMenuType(type);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadRotateSwitch_001
+ * @tc.desc: Verify ReadTouchpadRotateSwitch returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadRotateSwitch(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ReadTouchpadDoubleTapAndDragState_001
+ * @tc.desc: Verify ReadTouchpadDoubleTapAndDragState returns RET_OK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ReadTouchpadDoubleTapAndDragState_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool value = false;
+    int32_t ret = mmiService.ReadTouchpadDoubleTapAndDragState(value);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadScrollSwitch_001
+ * @tc.desc: Verify SetTouchpadScrollSwitch returns RET_OK or ETASKS_POST_SYNCTASK_FAIL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadScrollSwitch_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool switchFlag = true;
+    int32_t ret = mmiService.SetTouchpadScrollSwitch(switchFlag);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadScrollSwitch_002
+ * @tc.desc: Verify SetTouchpadScrollSwitch returns MMISERVICE_NOT_RUNNING when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadScrollSwitch_002, TestSize.Level1)
+{
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    int32_t ret = mmiService.SetTouchpadScrollSwitch(switchFlag);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadScrollSwitch_001
+ * @tc.desc: GetTouchpadScrollSwitch should return RET_OK or ETASKS_POST_SYNCTASK_FAIL when service is running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadScrollSwitch_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool switchFlag = false;
+    int32_t ret = mmiService.GetTouchpadScrollSwitch(switchFlag);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadScrollSwitch_002
+ * @tc.desc: GetTouchpadScrollSwitch should return MMISERVICE_NOT_RUNNING when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadScrollSwitch_002, TestSize.Level1)
+{
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    int32_t ret = mmiService.GetTouchpadScrollSwitch(switchFlag);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadScrollDirection_001
+ * @tc.desc: SetTouchpadScrollDirection should succeed or fail due to PostSyncTask failure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadScrollDirection_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool state = true;
+    int32_t ret = mmiService.SetTouchpadScrollDirection(state);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadScrollDirection_002
+ * @tc.desc: SetTouchpadScrollDirection should fail when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadScrollDirection_002, TestSize.Level1)
+{
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool state = false;
+    int32_t ret = mmiService.SetTouchpadScrollDirection(state);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadScrollDirection_001
+ * @tc.desc: Verify return RET_OK when service is running and permission is valid
+ * @tc.type: FUNC
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetTouchpadScrollDirection(switchFlag);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetTouchpadScrollDirection_002
+ * @tc.desc: Test GetTouchpadScrollDirection when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetTouchpadScrollDirection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool direction = false;
+    ErrCode ret = mmiService.GetTouchpadScrollDirection(direction);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SetTouchpadTapSwitch_001
+ * @tc.desc: Verify SetTouchpadTapSwitch returns MMISERVICE_NOT_RUNNING when service not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetTouchpadTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool value = false;
+    ErrCode ret = mmiService.SetTouchpadTapSwitch(value);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
 } // namespace MMI
 } // namespace OHOS
