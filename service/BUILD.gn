@@ -2967,6 +2967,77 @@ ohos_unittest("DeviceManagerTest") {
   ]
 }
 
+ohos_unittest("DeviceManagerExTest") {
+  module_out_path = module_output_path
+ 
+  include_dirs = [
+    "connect_manager/include",
+    "delegate_task/include",
+    "device_config/include",
+    "device_manager/include",
+    "dfx/include",
+    "event_dispatch/include",
+    "event_handler/include",
+    "filter/include",
+    "hardware_cursor_pointer_manager/include",
+    "interceptor/include",
+    "joystick/include",
+    "key_command/include",
+    "key_event_normalize/include",
+    "module_loader/include",
+    "monitor/include",
+    "mouse_event_normalize/include",
+    "nap_process/include",
+    "subscriber/include",
+    "timer_manager/include",
+    "touch_event_normalize/include",
+    "window_manager/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+  ]
+ 
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [ "-Wno-string-conversion" ]
+ 
+  sources = [
+    "device_manager/src/input_device_manager.cpp",
+    "device_manager/test/input_device_manager_ex_test.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+ 
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libdm_lite",
+  ]
+}
+
 ohos_unittest("DeviceConfigTest") {
   module_out_path = module_output_path
 
