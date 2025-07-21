@@ -7115,7 +7115,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
   * @tc.type: FUNC
   * @tc.require:
   */
- HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention001, TestSize.Level1) {
+ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention001, TestSize.Level1)
+ {
     auto handler = std::make_shared<KeyCommandHandler>();
     handler->CallMistouchPrevention();
     EXPECT_EQ(handler->mistouchLibHandle_, nullptr);
@@ -7126,19 +7127,70 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
 * @tc.number: CallMistouchPrevention_Test_002
 * @tc.desc  : Test CallMistouchPrevention when dlsym fails
 */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention002, TestSize.Level1) {
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention002, TestSize.Level1)
+{
     auto handler = std::make_shared<KeyCommandHandler>();
     handler->mistouchLibHandle_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(handler->CallMistouchPrevention());
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_003
+ * @tc.name  : CallMistouchPrevention_ShouldLogError_WhenLoadLibraryFails
+ * @tc.number: CallMistouchPreventionTest_003
+ * @tc.desc  : When loading the contactless operation library fails, the function should log an error and return
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention003, TestSize.Level1)
+{
+    keyCommandHandler->hasRegisteredSensor_ = false;
+    keyCommandHandler->mistouchLibHandle_ = nullptr;
+    keyCommandHandler->CallMistouchPrevention();
+
+    EXPECT_EQ(keyCommandHandler->mistouchLibHandle_, nullptr);
+}
+
+/**
+ * @tc.name  : CallMistouchPrevention_ShouldLogError_WhenCreateFunctionFails
+ * @tc.number: CallMistouchPreventionTest_003
+ * @tc.desc  : When the IMistouchPrevention instance creation function fails,
+ * the function should log an error and return
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention004, TestSize.Level1)
+{
+    keyCommandHandler->hasRegisteredSensor_ = false;
+    keyCommandHandler->mistouchLibHandle_ = (void*)0x1;
+    keyCommandHandler->fnCreate_ = nullptr;
+    keyCommandHandler->CallMistouchPrevention();
+
+    EXPECT_EQ(keyCommandHandler->fnCreate_, nullptr);
+}
+
+/**
+ * @tc.name  : CallMistouchPrevention_ShouldSucceed_WhenAllConditionsMet
+ * @tc.number: CallMistouchPreventionTest_004
+ * @tc.desc  : When all conditions are met, the function should successfully
+ * execute the touch free operation logic
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention005, TestSize.Level1)
+{
+    keyCommandHandler->hasRegisteredSensor_ = false;
+    keyCommandHandler->mistouchLibHandle_ = (void*)0x1;
+    keyCommandHandler->fnCreate_ = (void*)0x1;
+    keyCommandHandler->mistouchPrevention_ = (IMistouchPrevention*)0x1;
+    keyCommandHandler->ret_ = 0;
+    keyCommandHandler->timerId_ = 0;
+    keyCommandHandler->CallMistouchPrevention();
+    EXPECT_TRUE(keyCommandHandler->hasRegisteredSensor_);
+    EXPECT_NE(keyCommandHandler->timerId_, -1);
+}
+
+
+/**
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
  * @tc.desc: Test MenuClickProcess
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_003, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -7148,12 +7200,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_004
+ * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_002
  * @tc.desc: Test MenuClickProcess
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_004, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -7309,62 +7361,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey006, 
     EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
 }
 
-/**
- * @tc.name  : CallMistouchPrevention_ShouldReturnImmediately_WhenHasRegisteredSensor
- * @tc.number: CallMistouchPreventionTest_001
- * @tc.desc  : 当 hasRegisteredSensor_ 为 true 时,函数应立即返回
- */
-HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldReturnImmediately_WhenHasRegisteredSensor, TestSize.Level0) {
-    keyCommandHandler->hasRegisteredSensor_ = true;
-    keyCommandHandler->CallMistouchPrevention();
-
-    EXPECT_TRUE(keyCommandHandler->hasRegisteredSensor_);
-}
-
-/**
- * @tc.name  : CallMistouchPrevention_ShouldLogError_WhenLoadLibraryFails
- * @tc.number: CallMistouchPreventionTest_002
- * @tc.desc  : 当加载免触操作库失败时,函数应记录错误日志并返回
- */
-HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldLogError_WhenLoadLibraryFails, TestSize.Level0) {
-    keyCommandHandler->hasRegisteredSensor_ = false;
-    keyCommandHandler->mistouchLibHandle_ = nullptr;
-    keyCommandHandler->CallMistouchPrevention();
-
-    EXPECT_EQ(keyCommandHandler->mistouchLibHandle_, nullptr);
-}
-
-/**
- * @tc.name  : CallMistouchPrevention_ShouldLogError_WhenCreateFunctionFails
- * @tc.number: CallMistouchPreventionTest_003
- * @tc.desc  : 当获取 IMistouchPrevention 实例创建函数失败时,函数应记录错误日志并返回
- */
-HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldLogError_WhenCreateFunctionFails, TestSize.Level0) {
-    keyCommandHandler->hasRegisteredSensor_ = false;
-    keyCommandHandler->mistouchLibHandle_ = (void*)0x1;
-    keyCommandHandler->fnCreate_ = nullptr;
-    keyCommandHandler->CallMistouchPrevention();
-
-    EXPECT_EQ(keyCommandHandler->fnCreate_, nullptr);
-}
-
-/**
- * @tc.name  : CallMistouchPrevention_ShouldSucceed_WhenAllConditionsMet
- * @tc.number: CallMistouchPreventionTest_004
- * @tc.desc  : 当所有条件满足时,函数应成功执行免触操作逻辑
- */
-HWTEST_F(CallMistouchPreventionTest,ATC_CallMistouchPrevention_ShouldSucceed_WhenAllConditionsMet, TestSize.Level0) {
-    keyCommandHandler->hasRegisteredSensor_ = false;
-    keyCommandHandler->mistouchLibHandle_ = (void*)0x1;
-    keyCommandHandler->fnCreate_ = (void*)0x1;
-    keyCommandHandler->mistouchPrevention_ = (IMistouchPrevention*)0x1;
-    keyCommandHandler->ret_ = 0;
-    keyCommandHandler->timerId_ = 0;
-    keyCommandHandler->CallMistouchPrevention();
-
-    EXPECT_TRUE(keyCommandHandler->hasRegisteredSensor_);
-    EXPECT_NE(keyCommandHandler->timerId_, -1);
-}
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
