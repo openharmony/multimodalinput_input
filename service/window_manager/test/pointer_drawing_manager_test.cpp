@@ -2616,7 +2616,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_branchCoverage, Test
     pointerDrawingManager.surfaceNode_ = nullptr;
     auto ret = pointerDrawingManager.SkipPointerLayer(false);
     ASSERT_EQ(ret, RET_OK);
-
     pointerDrawingManager.canvasWidth_ = 0;
     pointerDrawingManager.cursorWidth_ = 1;
     pointerDrawingManager.canvasHeight_ = 0;

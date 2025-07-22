@@ -67,7 +67,7 @@ public:
     virtual ~IInputWindowsManager() = default;
 
     virtual void Init(UDSServer& udsServer) = 0;
-    virtual bool JudgeCaramaInFore() = 0;
+    virtual bool JudgeCameraInFore() = 0;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId) = 0;

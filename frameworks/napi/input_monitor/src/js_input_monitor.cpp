@@ -1634,7 +1634,12 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     delete work;
     work = nullptr;
     auto jsMonitor { JS_INPUT_MONITOR_MGR.GetMonitor(temp->monitorId, temp->fingers) };
-    CHKPV(jsMonitor);
+    if (jsMonitor == nullptr) {
+        delete temp;
+        temp = nullptr;
+        MMI_HILOGE("jsMonitor is null");
+        return;
+    }
     jsMonitor->OnPointerEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
     delete temp;
     temp = nullptr;
@@ -2021,7 +2026,12 @@ void JsInputMonitor::JsPreCallback(uv_work_t *work, int32_t status)
     delete work;
     work = nullptr;
     auto jsMonitor { JS_INPUT_MONITOR_MGR.GetPreMonitor(temp->monitorId) };
-    CHKPV(jsMonitor);
+    if (jsMonitor == nullptr) {
+        delete temp;
+        temp = nullptr;
+        MMI_HILOGE("jsMonitor is null");
+        return;
+    }
     jsMonitor->OnKeyEventInJsThread(jsMonitor->GetTypeName());
     delete temp;
     temp = nullptr;

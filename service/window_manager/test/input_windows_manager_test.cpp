@@ -7331,21 +7331,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueEvent_004, Test
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 /**
- * @tc.name: InputWindowsManagerTest_JudgeCaramaInFore_001
+ * @tc.name: InputWindowsManagerTest_JudgeCameraInFore_001
  * @tc.desc: Verify if (udsServer_ == nullptr)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCaramaInFore_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCameraInFore_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
+    EXPECT_EQ(inputWindowsManager.JudgeCameraInFore(), false);
 
     UDSServer udsServer;
     inputWindowsManager.udsServer_ = &udsServer;
     EXPECT_NE(inputWindowsManager.udsServer_, nullptr);
-    EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
+    EXPECT_EQ(inputWindowsManager.JudgeCameraInFore(), false);
 
     int32_t udsPid = 20;
     int32_t udsFd = 15;
@@ -7360,7 +7360,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCaramaInFore_001,
         it->second.windowsInfo.push_back(windowInfo);
     }
     it->second.focusWindowId = 20;
-    EXPECT_EQ(inputWindowsManager.JudgeCaramaInFore(), false);
+    EXPECT_EQ(inputWindowsManager.JudgeCameraInFore(), false);
 }
 
 /**

@@ -27,6 +27,17 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+    const std::string INJECT_PERMISSION_CODE = "ohos.permission.INJECT_INPUT_EVENT";
+    const std::string MONITOR_PERMISSION_CODE = "ohos.permission.INPUT_MONITORING";
+    const std::string INTERCEPT_PERMISSION_CODE = "ohos.permission.INTERCEPT_INPUT_EVENT";
+    const std::string INFRAREDEMITTER_PERMISSION_CODE = "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
+    const std::string CONTROL_DISPATCHING_PERMISSION_CODE = "ohos.permission.INPUT_CONTROL_DISPATCHING";
+    const std::string MOUSE_CURSOR_PERMISSION_CODE = "ohos.permission.MANAGE_MOUSE_CURSOR";
+    const std::string FILTER_PERMISSION_CODE = "ohos.permission.FILTER_INPUT_EVENT";
+    const std::string DEVICE_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_DEVICE_CONTROLLER";
+    const std::string KEYBOARD_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_KEYBOARD_CONTROLLER";
+} // namespace
 bool PermissionHelper::VerifySystemApp()
 {
     MMI_HILOGD("verify system App");
@@ -55,43 +66,39 @@ bool PermissionHelper::CheckInjectPermission()
         MMI_HILOGD("called tokenType is shell, verify success");
         return true;
     }
-    std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, injectPermissionCode);
+    
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INJECT_PERMISSION_CODE);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
         MMI_HILOGE("Check Permission:%{public}s fail for appId:%{public}d, and ret:%{public}d",
-                   injectPermissionCode.c_str(), tokenId, ret);
+                   INJECT_PERMISSION_CODE.c_str(), tokenId, ret);
         return false;
     }
-    MMI_HILOGD("Check permission( %{public}s) permission success", injectPermissionCode.c_str());
+    MMI_HILOGD("Check permission( %{public}s) permission success", INJECT_PERMISSION_CODE.c_str());
     return true;
 }
 
 bool PermissionHelper::CheckMonitor()
 {
     CALL_DEBUG_ENTER;
-    std::string monitorPermissionCode = "ohos.permission.INPUT_MONITORING";
-    return CheckHapPermission(monitorPermissionCode);
+    return CheckHapPermission(MONITOR_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckInterceptor()
 {
     CALL_DEBUG_ENTER;
-    std::string interceptorPermissionCode = "ohos.permission.INTERCEPT_INPUT_EVENT";
-    return CheckHapPermission(interceptorPermissionCode);
+    return CheckHapPermission(INTERCEPT_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckInfraredEmmit()
 {
     CALL_DEBUG_ENTER;
-    std::string infraredEmmitPermissionCode = "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
-    return CheckHapPermission(infraredEmmitPermissionCode);
+    return CheckHapPermission(INFRAREDEMITTER_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckAuthorize()
 {
     CALL_DEBUG_ENTER;
-    std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
-    return CheckHapPermission(injectPermissionCode);
+    return CheckHapPermission(INJECT_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
@@ -144,8 +151,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string pe
 bool PermissionHelper::CheckDispatchControl()
 {
     CALL_DEBUG_ENTER;
-    std::string inputDispatchControl = "ohos.permission.INPUT_CONTROL_DISPATCHING";
-    return CheckHapPermission(inputDispatchControl);
+    return CheckHapPermission(CONTROL_DISPATCHING_PERMISSION_CODE);
 }
 
 int32_t PermissionHelper::GetTokenType()
@@ -181,29 +187,25 @@ bool PermissionHelper::RequestFromShell()
 bool PermissionHelper::CheckMouseCursor()
 {
     CALL_DEBUG_ENTER;
-    std::string mousePermissionCode = "ohos.permission.MANAGE_MOUSE_CURSOR";
-    return CheckHapPermission(mousePermissionCode);
+    return CheckHapPermission(MOUSE_CURSOR_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckInputEventFilter()
 {
     CALL_DEBUG_ENTER;
-    std::string filterPermissionCode = "ohos.permission.FILTER_INPUT_EVENT";
-    return CheckHapPermission(filterPermissionCode);
+    return CheckHapPermission(FILTER_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckInputDeviceController()
 {
     CALL_DEBUG_ENTER;
-    std::string filterPermissionCode = "ohos.permission.INPUT_DEVICE_CONTROLLER";
-    return CheckHapPermission(filterPermissionCode);
+    return CheckHapPermission(DEVICE_CONTROLLER_PERMISSION_CODE);
 }
 
 bool PermissionHelper::CheckFunctionKeyEnabled()
 {
     CALL_DEBUG_ENTER;
-    std::string funcKeyStatePermissionCode = "ohos.permission.INPUT_KEYBOARD_CONTROLLER";
-    return CheckHapPermission(funcKeyStatePermissionCode);
+    return CheckHapPermission(KEYBOARD_CONTROLLER_PERMISSION_CODE);
 }
 } // namespace MMI
 } // namespace OHOS
