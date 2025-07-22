@@ -393,7 +393,7 @@ bool LongPressSubscriberHandler::CheckFingerGestureAction(int32_t fingerCount) c
 {
     CALL_DEBUG_ENTER;
     auto displayInfo = WIN_MGR->GetDefaultDisplayInfo();
-    CHKPR(displayInfo, false);
+    CHKPF(displayInfo);
     auto leftLimit = ConvertVPToPX(TOUCH_LIFT_LIMIT);
     auto rightLimit = displayInfo->width - ConvertVPToPX(TOUCH_RIGHT_LIMIT);
     auto topLimit = ConvertVPToPX(TOUCH_TOP_LIMIT);

@@ -50,7 +50,7 @@ AuthorizationDialog::~AuthorizationDialog()
 bool AuthorizationDialog::ConnectSystemUi()
 {
     CALL_DEBUG_ENTER;
-    CHKPR(dialogConnectionCallback_, false);
+    CHKPF(dialogConnectionCallback_);
     if (dialogConnectionCallback_->DialogIsOpen()) {
         MMI_HILOGW("Power dialog has been show");
         return true;

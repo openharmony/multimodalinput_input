@@ -78,7 +78,7 @@ bool CooperateFree::HasLocalPointerDevice() const
 bool CooperateFree::HasLocalKeyboardDevice() const
 {
     return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
-    CHKPR(dev, false);
+    CHKPF(dev);
     return (dev->IsKeyboard() && !dev->IsRemote());
     }};
 }

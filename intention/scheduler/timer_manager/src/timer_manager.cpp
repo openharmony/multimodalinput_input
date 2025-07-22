@@ -121,7 +121,7 @@ bool TimerManager::OnIsExist(int32_t timerId) const
 
 bool TimerManager::IsExist(int32_t timerId) const
 {
-    CHKPR(context_, false);
+    CHKPF(context_);
     std::packaged_task<bool(int32_t)> task { [this](int32_t timerId) {
         return this->OnIsExist(timerId);
     } };

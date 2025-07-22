@@ -1243,7 +1243,7 @@ void EventNormalizeHandler::HandleDeviceConsumerEvent(int32_t toolType, libinput
 
 bool EventNormalizeHandler::IsAccessibilityEventWithZOrder(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     static std::unordered_set<int32_t> accessibilityEventAction {
         PointerEvent::POINTER_ACTION_HOVER_MOVE,
         PointerEvent::POINTER_ACTION_HOVER_ENTER,

@@ -58,7 +58,7 @@ FingerprintEventProcessor::~FingerprintEventProcessor()
 bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, false);
+    CHKPF(event);
     if (!isStartedSmartKey_) {
         StartSmartKeyIfNeeded();
         isStartedSmartKey_ = true;

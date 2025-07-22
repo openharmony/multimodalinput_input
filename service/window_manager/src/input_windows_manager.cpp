@@ -6504,7 +6504,7 @@ std::pair<double, double> InputWindowsManager::TransformDisplayXY(const OLD::Dis
 bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     if (!(pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) || MMI_LE(pointerEvent->GetZOrder(), 0.0f)) {
         return true;
     }
@@ -6861,7 +6861,7 @@ bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent:
 bool InputWindowsManager::IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(keyEvent, false);
+    CHKPF(keyEvent);
     for (const auto &item : vecWhiteList_) {
         if (item.keyCode == keyEvent->GetKeyCode()) {
             auto keyItems = keyEvent->GetKeyItems();
@@ -6919,7 +6919,7 @@ void InputWindowsManager::CleanInvalidPiexMap(int32_t groupId)
 bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     PointerEvent::PointerItem pointerItem {};
     int32_t pointerId = pointerEvent->GetPointerId();
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
@@ -7361,7 +7361,7 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
 
 bool InputWindowsManager::IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     static std::unordered_set<int32_t> accessibilityEventAction {
         PointerEvent::POINTER_ACTION_HOVER_MOVE,
         PointerEvent::POINTER_ACTION_HOVER_ENTER,
@@ -7374,7 +7374,7 @@ bool InputWindowsManager::IsAccessibilityFocusEvent(std::shared_ptr<PointerEvent
 
 bool InputWindowsManager::IsAccessibilityEventWithZorderInjected(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     if (IsAccessibilityFocusEvent(pointerEvent) && pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
         pointerEvent->GetZOrder() > 0) {
         return true;

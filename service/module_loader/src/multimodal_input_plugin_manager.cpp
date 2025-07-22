@@ -244,30 +244,30 @@ bool InputPluginManager::IntermediateEndEvent(libinput_event *event)
             return true;
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
             struct libinput_event_keyboard *keyboardEvent = libinput_event_get_keyboard_event(event);
-            CHKPR(keyboardEvent, false);
+            CHKPF(keyboardEvent);
             return libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_RELEASED;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD: {
             auto touchpadButtonEvent = libinput_event_get_pointer_event(event);
-            CHKPR(touchpadButtonEvent, false);
+            CHKPF(touchpadButtonEvent);
             return libinput_event_pointer_get_button_state(touchpadButtonEvent) == LIBINPUT_BUTTON_STATE_RELEASED;
         }
         case LIBINPUT_EVENT_JOYSTICK_BUTTON: {
             auto rawBtnEvent = libinput_event_get_joystick_button_event(event);
-            CHKPR(rawBtnEvent, false);
+            CHKPF(rawBtnEvent);
             return libinput_event_joystick_button_get_key_state(rawBtnEvent) == LIBINPUT_BUTTON_STATE_RELEASED;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY: {
             auto tabletEvent = libinput_event_get_tablet_tool_event(event);
-            CHKPR(tabletEvent, false);
+            CHKPF(tabletEvent);
             return libinput_event_tablet_tool_get_proximity_state(tabletEvent) ==
                    LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_OUT;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
             auto tabletEvent = libinput_event_get_tablet_tool_event(event);
-            CHKPR(tabletEvent, false);
+            CHKPF(tabletEvent);
             return libinput_event_tablet_tool_get_tip_state(tabletEvent) == LIBINPUT_TABLET_TOOL_TIP_UP;
         }
         default:

@@ -1066,19 +1066,19 @@ std::vector<libinput_device*> InputDeviceManager::GetTouchPadDeviceOrigins()
 
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPR(inputDevice, false);
+    CHKPF(inputDevice);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
 }
 
 bool InputDeviceManager::IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPR(inputDevice, false);
+    CHKPF(inputDevice);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
 }
 
 bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPR(inputDevice, false);
+    CHKPF(inputDevice);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
 }
 

@@ -805,7 +805,7 @@ void MultiFingersTapHandler::SetMultiFingersTapHdrDefault(bool isAllDefault)
 
 bool MultiFingersTapHandler::ClearPointerItems(std::shared_ptr<PointerEvent> pointer)
 {
-    CHKPR(pointer, ERROR_NULL_POINTER);
+    CHKPF(pointer);
     auto ids_ = pointer->GetPointerIds();
     for (const auto &id : ids_) {
         pointer->RemovePointerItem(id);
@@ -820,7 +820,7 @@ MulFingersTap MultiFingersTapHandler::GetMultiFingersState()
 
 bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *event)
 {
-    CHKPR(event, RET_ERR);
+    CHKPF(event);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(event);
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
         return false;
@@ -833,7 +833,7 @@ bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *ev
 
 bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *event)
 {
-    CHKPR(event, RET_ERR);
+    CHKPF(event);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(event);
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
         return false;
