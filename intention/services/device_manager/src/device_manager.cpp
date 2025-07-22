@@ -418,7 +418,7 @@ bool DeviceManager::HasLocalPointerDevice()
 bool DeviceManager::HasLocalKeyboardDevice()
 {
     return AnyOf([this](std::shared_ptr<IDevice> dev) {
-        CHKPR(dev, false);
+        CHKPF(dev);
         return (dev->IsKeyboard() && !dev->IsRemote());
     });
 }
