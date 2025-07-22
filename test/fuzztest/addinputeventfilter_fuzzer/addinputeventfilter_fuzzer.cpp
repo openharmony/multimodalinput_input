@@ -49,13 +49,13 @@ void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
     struct TestFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            CHKPR(keyEvent, false);
+            CHKPF(keyEvent);
             MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,key code:%{private}d", keyEvent->GetKeyCode());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
         {
-            CHKPR(pointerEvent, false);
+            CHKPF(pointerEvent);
             MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,pointer id:%{public}d", pointerEvent->GetPointerId());
             return false;
         }

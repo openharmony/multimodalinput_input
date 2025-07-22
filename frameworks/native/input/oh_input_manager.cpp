@@ -1075,8 +1075,8 @@ void OH_Input_CancelInjection()
 static bool SetAxisValueByAxisEventType(std::shared_ptr<OHOS::MMI::PointerEvent> event,
     struct Input_AxisEvent *axisEvent, int32_t axisEventType)
 {
-    CHKPR(event, false);
-    CHKPR(axisEvent, false);
+    CHKPF(event);
+    CHKPF(axisEvent);
     if (axisEventType == OHOS::MMI::PointerEvent::AXIS_EVENT_TYPE_PINCH) {
         double value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_PINCH);
         axisEvent->axisValues.insert(std::make_pair(AXIS_TYPE_PINCH, value));

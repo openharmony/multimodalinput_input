@@ -61,9 +61,9 @@ XKeyEventProcessor::~XKeyEventProcessor()
 bool XKeyEventProcessor::IsXKeyEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(event, false);
+    CHKPF(event);
     auto device = libinput_event_get_device(event);
-    CHKPR(device, false);
+    CHKPF(device);
     std::string name = libinput_device_get_name(device);
     if (X_KEY_SOURCE_KEY != name) {
         MMI_HILOGD("Not X-key");

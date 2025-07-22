@@ -152,7 +152,7 @@ bool MouseEventNormalize::CheckAndPackageAxisEvent(libinput_event* event)
 {
     CHKPF(event);
     auto device = libinput_event_get_device(event);
-    CHKPR(device, RET_ERR);
+    CHKPF(device);
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
         MMI_HILOGE("The deviceId is invalid, deviceId:%{public}d", deviceId);
