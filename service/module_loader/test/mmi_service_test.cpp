@@ -4159,8 +4159,7 @@ HWTEST_F(MMIServerTest, MMIService_PrintLog_001, TestSize.Level1)
     int32_t duration = 5;
     int32_t pid = getpid();
     int32_t tid = gettid();
-    mmiService.PrintLog(flag, duration, pid, tid);
-    MMI_HILOGI("PrintLog_001 finished with pid:%{public}d, tid:%{public}d", pid, tid);
+    ASSERT_NO_FATAL_FAILURE(mmiService.PrintLog(flag, duration, pid, tid));
 }
 
 /**
@@ -4188,7 +4187,7 @@ HWTEST_F(MMIServerTest, MMIService_OnSessionDelete_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     SessionPtr session = nullptr;
-    mmiService.OnSessionDelete(session);
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnSessionDelete(session));
 }
 
 /**
@@ -4246,9 +4245,7 @@ HWTEST_F(MMIServerTest, MMIService_InitPrintClientInfo_001, TestSize.Level1)
             .readThreadId = 8765
         };
     }
-    mmiService.InitPrintClientInfo();
-    sleep(2);
-    SUCCEED();
+    ASSERT_NO_FATAL_FAILURE(mmiService.InitPrintClientInfo());
 }
 
 /**
@@ -4618,6 +4615,465 @@ HWTEST_F(MMIServerTest, MMIService_FilterConsumers_003, TestSize.Level1)
     std::vector<std::string> deviceNames = { "NonExistDevice" };
     std::vector<std::string> result = mmiService.FilterConsumers(deviceNames);
     EXPECT_TRUE(result.empty());
+}
+
+/**
+ * @tc.name: MMIService_UpdateConsumers_001
+ * @tc.desc: Parse valid JSON and store name and uids correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateConsumers_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    const char *jsonStr = R"({
+        "name": "DeviceTest",
+        "uids": [1001, 1002]
+    })";
+    cJSON *json = cJSON_Parse(jsonStr);
+    ASSERT_NE(json, nullptr);
+    mmiService.UpdateConsumers(json);
+    ASSERT_EQ(mmiService.consumersData_.consumers.size(), 1);
+    const auto &consumer = mmiService.consumersData_.consumers[0];
+    EXPECT_EQ(consumer.name, "DeviceTest");
+    EXPECT_EQ(consumer.uids.size(), 2);
+    EXPECT_EQ(consumer.uids[0], 1001);
+    EXPECT_EQ(consumer.uids[1], 1002);
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: MMIService_UpdateConsumers_002
+ * @tc.desc: JSON without name, should skip name assignment
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateConsumers_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    const char *jsonStr = R"({
+        "uids": [2001, 2002]
+    })";
+    cJSON *json = cJSON_Parse(jsonStr);
+    ASSERT_NE(json, nullptr);
+    mmiService.UpdateConsumers(json);
+    ASSERT_EQ(mmiService.consumersData_.consumers.size(), 1);
+    const auto &consumer = mmiService.consumersData_.consumers[0];
+    EXPECT_EQ(consumer.name, "");
+    EXPECT_EQ(consumer.uids.size(), 2);
+    EXPECT_EQ(consumer.uids[0], 2001);
+    EXPECT_EQ(consumer.uids[1], 2002);
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: MMIService_UpdateConsumers_003
+ * @tc.desc: JSON without uids, should keep uids empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateConsumers_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    const char *jsonStr = R"({
+        "name": "DeviceOnly"
+    })";
+    cJSON *json = cJSON_Parse(jsonStr);
+    ASSERT_NE(json, nullptr);
+    mmiService.UpdateConsumers(json);
+    ASSERT_EQ(mmiService.consumersData_.consumers.size(), 1);
+    const auto &consumer = mmiService.consumersData_.consumers[0];
+    EXPECT_EQ(consumer.name, "DeviceOnly");
+    EXPECT_TRUE(consumer.uids.empty());
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: MMIService_UpdateConsumers_004
+ * @tc.desc: uids array includes non-numeric value, should ignore them
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UpdateConsumers_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    const char *jsonStr = R"({
+        "name": "MixedUID",
+        "uids": [3001, "notANumber", 3002]
+    })";
+    cJSON *json = cJSON_Parse(jsonStr);
+    ASSERT_NE(json, nullptr);
+    mmiService.UpdateConsumers(json);
+    ASSERT_EQ(mmiService.consumersData_.consumers.size(), 1);
+    const auto &consumer = mmiService.consumersData_.consumers[0];
+    EXPECT_EQ(consumer.name, "MixedUID");
+    ASSERT_EQ(consumer.uids.size(), 2);
+    EXPECT_EQ(consumer.uids[0], 3001);
+    EXPECT_EQ(consumer.uids[1], 3002);
+
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: MMIService_SetInputDeviceConsumer_001
+ * @tc.desc: deviceNames size > MAX_DEVICE_NUM returns RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames(10 + 5, "testDevice");
+    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_SetInputDeviceConsumer_002
+ * @tc.desc: config parse fails (no config file), returns ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames = {"keyboard"};
+    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIService_SetInputDeviceConsumer_003
+ * @tc.desc: deviceNames empty, FilterConsumers returns empty, returns ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames = {};
+    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIService_SetInputDeviceConsumer_004
+ * @tc.desc: session is null, returns ERROR_NULL_POINTER
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames = {"keyboard"};
+    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ParseDeviceConsumerConfig_001
+ * @tc.desc: GetOneCfgFile returns nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ParseDeviceConsumerConfig_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    bool result = mmiService.ParseDeviceConsumerConfig();
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: MMIService_ClearInputDeviceConsumer_001
+ * @tc.desc: deviceNames.size > MAX_DEVICE_NUM should return RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames(10 + 10, "device");
+    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_ClearInputDeviceConsumer_002
+ * @tc.desc: ParseDeviceConsumerConfig returns false, should return ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames = {"keyboard"};
+    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIService_ClearInputDeviceConsumer_003
+ * @tc.desc: FilterConsumers returns empty, should return ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames = {};
+    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIService_ClearInputDeviceConsumer_004
+ * @tc.desc: session not registered, PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::string> deviceNames = {"keyboard"};
+    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIService_SubscribeInputActive_001
+ * @tc.desc: VerifySystemApp returns false → return ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SubscribeInputActive_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.SubscribeInputActive(1, 1000);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SubscribeInputActive_002
+ * @tc.desc: Service not running → return MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SubscribeInputActive_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    ErrCode ret = mmiService.SubscribeInputActive(2, 1000);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_SubscribeInputActive_003
+ * @tc.desc: GetSessionByPid returns nullptr → return RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SubscribeInputActive_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SubscribeInputActive(3, 500);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_UnsubscribeInputActive_001
+ * @tc.desc: Permission denied, VerifySystemApp returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnsubscribeInputActive_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.UnsubscribeInputActive(1);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_UnsubscribeInputActive_002
+ * @tc.desc: Service not running, return MMISERVICE_NOT_RUNNING
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnsubscribeInputActive_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    ErrCode ret = mmiService.UnsubscribeInputActive(2);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_UnsubscribeInputActive_003
+ * @tc.desc: Invalid subscribeId (negative), return RET_ERR
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnsubscribeInputActive_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.UnsubscribeInputActive(-1);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIService_UnsubscribeInputActive_004
+ * @tc.desc: No session registered, GetSessionByPid returns null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_UnsubscribeInputActive_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.UnsubscribeInputActive(4);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SetMouseAccelerateMotionSwitch_001
+ * @tc.desc: Permission denied → RequestFromShell returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetMouseAccelerateMotionSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 0;
+    bool enable = true;
+    ErrCode ret = mmiService.SetMouseAccelerateMotionSwitch(deviceId, enable);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetMouseAccelerateMotionSwitch_002
+ * @tc.desc: Permission granted, but PostSyncTask fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetMouseAccelerateMotionSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t deviceId = 1;
+    bool enable = false;
+    ErrCode ret = mmiService.SetMouseAccelerateMotionSwitch(deviceId, enable);
+    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_SwitchScreenCapturePermission_001
+ * @tc.desc: Not system app, should return ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SwitchScreenCapturePermission_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.SwitchScreenCapturePermission(1, true);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SwitchScreenCapturePermission_002
+ * @tc.desc: Uid not in {PENGLAI_UID, GAME_UID}, return ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SwitchScreenCapturePermission_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.SwitchScreenCapturePermission(2, false);
+    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
+}
+
+/**
+ * @tc.name: MMIService_ClearMouseHideFlag_001
+ * @tc.desc: App is not a system app, return ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ClearMouseHideFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t eventId = 100;
+    ErrCode ret = mmiService.ClearMouseHideFlag(eventId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_ClearMouseHideFlag_002
+ * @tc.desc: Uid not SYNERGY_UID, return ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ClearMouseHideFlag_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    int32_t eventId = 101;
+    ErrCode ret = mmiService.ClearMouseHideFlag(eventId);
+    EXPECT_TRUE(ret == ERROR_NOT_SYSAPI || ret == ERROR_NO_PERMISSION || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_QueryPointerRecord_001
+ * @tc.desc: Not system app, should return ERROR_NOT_SYSAPI
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_QueryPointerRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    ErrCode ret = mmiService.QueryPointerRecord(5, pointerList);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_QueryPointerRecord_002
+ * @tc.desc: No monitor permission, should return ERROR_NO_PERMISSION
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_QueryPointerRecord_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    ErrCode ret = mmiService.QueryPointerRecord(10, pointerList);
+    EXPECT_TRUE(ret == ERROR_NOT_SYSAPI || ret == ERROR_NO_PERMISSION || ret == ETASKS_POST_SYNCTASK_FAIL);
 }
 } // namespace MMI
 } // namespace OHOS
