@@ -30,6 +30,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+const std::string g_volumeSwitchesKey {"settings.trackpad.right_volume_switches"};
+const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_switches"};
 const std::string g_pressureKey {"settings.trackpad.press_level"};
 const std::string g_vibrationKey {"settings.trackpad.shock_level"};
 const std::string g_touchpadSwitchesKey {"settings.trackpad.touchpad_switches"};
@@ -38,12 +40,16 @@ const std::string g_datashareBaseUri =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
 const std::string g_libthpPath {"/system/lib64/libthp_extra_innerapi.z.so"};
 const std::map<std::string, int> g_keyToCmd = {
+    {g_volumeSwitchesKey, 111}, // right volume gesture cmd 111
+    {g_brightnessSwitchesKey, 110}, // left brightness gesture cmd 110
     {g_pressureKey, 103}, // pressure cmd 103
     {g_vibrationKey, 104}, // vibration cmd 104
     {g_touchpadSwitchesKey, 108}, // touchpad switches cmd 108
     {g_knuckleSwitchesKey, 109} // knuckle switches cmd 109
 };
 const std::map<std::string, std::string> g_defaultValue = {
+    {g_volumeSwitchesKey, "1"}, // default gesture on
+    {g_brightnessSwitchesKey, "1"}, // default gesture on
     {g_pressureKey, "2"}, // default pressure value 2
     {g_vibrationKey, "2"}, // default vibration value 2
     {g_touchpadSwitchesKey, "1"}, // tdefault touchpad on
@@ -123,6 +129,30 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
     return;
 }
 
+sptr<SettingObserver> TouchpadSettingsObserver::RegisterDatashareObserver(
+    const std::string key, SettingObserver::UpdateFunc onUpdate)
+{
+    ErrCode ret = 0;
+    if (key.empty() || datashareUri_.empty() || onUpdate == nullptr) {
+        MMI_HILOGE("Invalid input parameter");
+        return nullptr;
+    }
+ 
+    auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    sptr<SettingObserver> settingObserver = settingHelper.CreateObserver(key, onUpdate);
+    if (settingObserver == nullptr) {
+        MMI_HILOGE("CreateObserver fail");
+        return nullptr;
+    }
+ 
+    ret = settingHelper.RegisterObserver(settingObserver, datashareUri_);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("RegisterObserver failed");
+        return nullptr;
+    }
+    return settingObserver;
+}
+
 bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
 {
     if (!isCommonEventReady_.load() || hasRegistered_) { return false; }
@@ -136,43 +166,30 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
     RegisterUpdateFunc();
     TP_CHECK_FALSE_RETURN(updateFunc_ != nullptr, false, "Update function is null");
 
+    if (volumeSwitchesObserver_ == nullptr) {
+        volumeSwitchesObserver_ = RegisterDatashareObserver(g_volumeSwitchesKey, updateFunc_);
+    }
+    if (brightnessSwitchesObserver_ == nullptr) {
+        brightnessSwitchesObserver_ = RegisterDatashareObserver(g_brightnessSwitchesKey, updateFunc_);
+    }
     if (pressureObserver_ == nullptr) {
-        pressureObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_pressureKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(pressureObserver_ != nullptr, false, "PressureObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(pressureObserver_, datashareUri_);
+        pressureObserver_ = RegisterDatashareObserver(g_pressureKey, updateFunc_);
     }
     if (vibrationObserver_ == nullptr) {
-        vibrationObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_vibrationKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(vibrationObserver_ != nullptr, false, "VibrationObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(vibrationObserver_, datashareUri_);
+        vibrationObserver_ = RegisterDatashareObserver(g_vibrationKey, updateFunc_);
     }
     if (touchpadSwitchesObserver_ == nullptr) {
-        touchpadSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_touchpadSwitchesKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(touchpadSwitchesObserver_ != nullptr, false, "TouchpadSwitchesObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(touchpadSwitchesObserver_, datashareUri_);
+        touchpadSwitchesObserver_ = RegisterDatashareObserver(g_touchpadSwitchesKey, updateFunc_);
     }
     if (knuckleSwitchesObserver_ == nullptr) {
-        knuckleSwitchesObserver_ = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .CreateObserver(g_knuckleSwitchesKey, updateFunc_);
-        TP_CHECK_FALSE_RETURN(knuckleSwitchesObserver_ != nullptr, false, "KnuckleSwitchesObserver fail");
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .RegisterObserver(knuckleSwitchesObserver_, datashareUri_);
+        knuckleSwitchesObserver_ = RegisterDatashareObserver(g_knuckleSwitchesKey, updateFunc_);
     }
-    if (ret) {
-        pressureObserver_ = nullptr;
-        vibrationObserver_ = nullptr;
-        touchpadSwitchesObserver_ = nullptr;
-        knuckleSwitchesObserver_ = nullptr;
-        MMI_HILOGE("Register setting observer failed, ret = %{public}d", ret);
+    if (volumeSwitchesObserver_ == nullptr || brightnessSwitchesObserver_ == nullptr || pressureObserver_ == nullptr ||
+        vibrationObserver_ == nullptr ||touchpadSwitchesObserver_ == nullptr || knuckleSwitchesObserver_ == nullptr) {
+        MMI_HILOGE("Register setting observer fail");
         return false;
     }
-    MMI_HILOGI("Register touchpad observer end");
+    MMI_HILOGI("Register touchpad observer");
     hasRegistered_ = true;
     return true;
 }
@@ -185,27 +202,34 @@ bool TouchpadSettingsObserver::UnregisterTpObserver(const int32_t accountId)
     std::lock_guard<std::mutex> lock { lock_ };
     ErrCode ret = 0;
 
+    auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    if (volumeSwitchesObserver_ != nullptr) {
+        ret = settingHelper.UnregisterObserver(volumeSwitchesObserver_, datashareUri_);
+        TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister volumeSwitchesObserver fail");
+        volumeSwitchesObserver_ = nullptr;
+    }
+    if (brightnessSwitchesObserver_ != nullptr) {
+        ret = settingHelper.UnregisterObserver(brightnessSwitchesObserver_, datashareUri_);
+        TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister brightnessSwitchesObserver fail");
+        brightnessSwitchesObserver_ = nullptr;
+    }
     if (pressureObserver_ != nullptr) {
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .UnregisterObserver(pressureObserver_, datashareUri_);
+        ret = settingHelper.UnregisterObserver(pressureObserver_, datashareUri_);
         TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister pressureObserver fail");
         pressureObserver_ = nullptr;
     }
     if (vibrationObserver_ != nullptr) {
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .UnregisterObserver(vibrationObserver_, datashareUri_);
+        ret = settingHelper.UnregisterObserver(vibrationObserver_, datashareUri_);
         TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister vibrationObserver fail");
         vibrationObserver_ = nullptr;
     }
     if (touchpadSwitchesObserver_ != nullptr) {
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .UnregisterObserver(touchpadSwitchesObserver_, datashareUri_);
+        ret = settingHelper.UnregisterObserver(touchpadSwitchesObserver_, datashareUri_);
         TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister touchpadSwitchesObserver fail");
         touchpadSwitchesObserver_ = nullptr;
     }
     if (knuckleSwitchesObserver_ != nullptr) {
-        ret = ret || SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .UnregisterObserver(knuckleSwitchesObserver_, datashareUri_);
+        ret = settingHelper.UnregisterObserver(knuckleSwitchesObserver_, datashareUri_);
         TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister knuckleSwitchesObserver fail");
         knuckleSwitchesObserver_ = nullptr;
     }
@@ -228,6 +252,8 @@ void TouchpadSettingsObserver::SyncTouchpadSettingsData()
     if (updateFunc_ == nullptr) {
         return;
     }
+    updateFunc_(g_volumeSwitchesKey);
+    updateFunc_(g_brightnessSwitchesKey);
     updateFunc_(g_pressureKey);
     updateFunc_(g_vibrationKey);
     updateFunc_(g_touchpadSwitchesKey);

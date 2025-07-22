@@ -33,6 +33,7 @@ static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
     void SetCommonEventReady();
     bool GetCommonEventStatus();
 private:
+    sptr<SettingObserver> RegisterDatashareObserver(const std::string key, SettingObserver::UpdateFunc onUpdate);
     static std::shared_ptr<TouchpadSettingsObserver> instance_;
     static std::mutex mutex_;
     std::mutex lock_;
@@ -40,6 +41,8 @@ private:
     bool hasRegistered_ = false;
     std::atomic<bool> isCommonEventReady_ {false};
     int32_t currentAccountId_ = -1;
+    sptr<SettingObserver> volumeSwitchesObserver_ {nullptr};
+    sptr<SettingObserver> brightnessSwitchesObserver_ {nullptr};
     sptr<SettingObserver> pressureObserver_ {nullptr};
     sptr<SettingObserver> vibrationObserver_ {nullptr};
     sptr<SettingObserver> touchpadSwitchesObserver_ {nullptr};
