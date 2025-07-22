@@ -150,7 +150,7 @@ sptr<SettingObserver> AccountManager::AccountSetting::RegisterSettingObserver(
 {
     char buf[DEFAULT_BUFFER_LENGTH] {};
     if (sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountId_) < 0) {
-        MMI_HILOGE("Failed to format URI");
+        MMI_HILOGE("Failed to format URI, accountId:%{private}d", accountId_);
         return nullptr;
     }
     MMI_HILOGI("[AccountSetting] Registering observer of '%{public}s' in %{public}s", key.c_str(), buf);

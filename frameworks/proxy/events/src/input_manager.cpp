@@ -754,7 +754,7 @@ void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
     InputMgrImpl.ClearWindowPointerStyle(pid, windowId);
 }
 
-void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
+void InputManager::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
 {
     InputMgrImpl.SetNapStatus(pid, uid, bundleName, napStatus);
 }

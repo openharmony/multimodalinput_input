@@ -38,43 +38,33 @@ bool IsMouseDevice(const std::string &deviceName)
 }
 } // namespace
 
-DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
+DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string &deviceName)
 {
     DeviceBase* deviceBasePtr = nullptr;
     if (deviceName == "finger") {
         deviceBasePtr = new (std::nothrow) ProcessingFingerDevice();
-        CHKPP(deviceBasePtr);
     } else if (deviceName == "pen") {
         deviceBasePtr = new (std::nothrow) ProcessingPenDevice();
-        CHKPP(deviceBasePtr);
     } else if (deviceName == "pad") {
         deviceBasePtr = new (std::nothrow) ProcessingPadDevice();
-        CHKPP(deviceBasePtr);
     } else if (deviceName == "touch") {
         deviceBasePtr = new (std::nothrow) ProcessingTouchScreenDevice();
-        CHKPP(deviceBasePtr);
     } else if (deviceName == "gamePad") {
         deviceBasePtr = new (std::nothrow) ProcessingGamePadDevice();
-        CHKPP(deviceBasePtr);
     } else if (deviceName == "joystick") {
         deviceBasePtr = new (std::nothrow) ProcessingJoystickDevice();
-        CHKPP(deviceBasePtr);
     } else if (IsKeyboardDevice(deviceName)) {
         deviceBasePtr = new (std::nothrow) ProcessingKeyboardDevice();
-        CHKPP(deviceBasePtr);
     } else if ((deviceName == "mouse") || (deviceName == "trackball")) {
         deviceBasePtr = new (std::nothrow) ProcessingMouseDevice();
-        CHKPP(deviceBasePtr);
     } else if (deviceName == "remoteControl") {
         deviceBasePtr = new (std::nothrow) ProcessingKeyboardDevice();
-        CHKPP(deviceBasePtr);
     } else if (IsMouseDevice(deviceName)) {
         deviceBasePtr = new (std::nothrow) ProcessingMouseDevice();
-        CHKPP(deviceBasePtr);
     } else {
         MMI_HILOGI("Not supported device :%s", deviceName.c_str());
     }
-
+    CHKPP(deviceBasePtr);
     return deviceBasePtr;
 }
 } // namespace MMI
