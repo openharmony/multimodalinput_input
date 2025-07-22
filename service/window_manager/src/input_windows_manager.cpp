@@ -16,7 +16,7 @@
 #include "input_windows_manager.h"
 #include <linux/input.h>
 
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "event_log_helper.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
@@ -1749,7 +1749,7 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
     }
 }
 
-bool InputWindowsManager::JudgeCaramaInFore()
+bool InputWindowsManager::JudgeCameraInFore()
 {
     CALL_DEBUG_ENTER;
     int32_t focWid = GetFocusWindowId(MAIN_GROUPID);
@@ -2483,7 +2483,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
         currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
         currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
         GlobalCoords globalCoords = DisplayCoords2GlobalCoords({lastPointerItem.GetDisplayX(),
-                lastPointerItem.GetDisplayY()}, lastPointerEventCopy->GetTargetDisplayId());
+            lastPointerItem.GetDisplayY()}, lastPointerEventCopy->GetTargetDisplayId());
         currentPointerItem.SetGlobalX(globalCoords.x);
         currentPointerItem.SetGlobalY(globalCoords.y);
         currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
@@ -7009,9 +7009,9 @@ int32_t InputWindowsManager::GetCurrentUserId()
 
 void InputWindowsManager::SetFoldState()
 {
-    BytraceAdapter::StartFoldState(Rosen::DisplayManager::GetInstance().IsFoldable());
+    BytraceAdapter::StartFoldState(Rosen::DisplayManagerLite::GetInstance().IsFoldable());
     auto begin = std::chrono::high_resolution_clock::now();
-    IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
+    IsFoldable_ = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR

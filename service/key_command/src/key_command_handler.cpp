@@ -89,7 +89,7 @@ std::atomic<int32_t> g_distance { 0 };
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 const char* LOADMISTOUCH_LIBPATH = "libmistouch_prevention.z.so";
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
-constexpr int32_t LIGHT_STAY_AWAY { 5 };
+constexpr int32_t LIGHT_STAY_AWAY { 0 };
 const std::string DEVICE_TYPE_TV = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_TV = "tv";
 } // namespace
@@ -1073,7 +1073,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    if (WIN_MGR->JudgeCaramaInFore() &&
+    if (WIN_MGR->JudgeCameraInFore() &&
         (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked)) {
             return true;
     }
@@ -1784,7 +1784,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std:
     std::string matchName = ".camera";
     if (item.keyCode == KeyEvent::KEYCODE_VOLUME_DOWN && bundleName.find(matchName) != std::string::npos) {
         MMI_HILOGD("ret_ %{public}d", ret_.load());
-        if (ret_ == LIGHT_STAY_AWAY) {
+        if (ret_ != LIGHT_STAY_AWAY) {
             LaunchAbility(item.ability);
             CHKPV(mistouchPrevention_);
             MMI_HILOGI("Launch yes");
@@ -1959,7 +1959,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGD("The same key is waiting timeout, skip");
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VCR2 && WIN_MGR->JudgeCaramaInFore()) {
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VCR2 && WIN_MGR->JudgeCameraInFore()) {
         MMI_HILOGD("The camera has been activated");
         return false;
     }

@@ -347,7 +347,7 @@ HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_HandleDe
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_RemoveDeviceHandler_001 , TestSize.Level1)
+HWTEST_F(InputDeviceConsumerHandlerTest, InputDeviceConsumerHandlerTest_RemoveDeviceHandler_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<std::string> deviceNames = {"device1", "device2"};

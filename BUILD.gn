@@ -177,6 +177,7 @@ group("mmi_tests") {
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",
     "service:DeviceEventMonitorTest",
+    "service:DeviceManagerExTest",
     "service:DeviceManagerTest",
     "service:DfxHisysEventTest",
     "service:DisplayStateManagerTest",
@@ -186,6 +187,7 @@ group("mmi_tests") {
     "service:EventFilterHandlerTest",
     "service:EventHandlerTest",
     "service:EventNormalizeHandlerTest",
+    "service:InfraredEmitterTest",
     "service:InputDisplayBindHelperTest",
     "service:InputEventHandlerTest",
     "service:InputWindowsManagerEXTest",
@@ -252,13 +254,6 @@ group("mmi_tests") {
     deps += [
       "service/window_manager:TouchDrawingHandlerTest",
       "service:TouchDrawingManagerTest",
-    ]
-  }
-
-  if (drivers_interface_rtos_extra_enable) {
-    deps += [
-      "service:InfraredEmitterEXTest",
-      "service:InfraredEmitterTest",
     ]
   }
 }

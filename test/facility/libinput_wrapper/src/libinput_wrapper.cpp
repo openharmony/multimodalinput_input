@@ -58,7 +58,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             MMI_HILOGWK("The error path is %{private}s", path);
             return RET_ERR;
         }
-        int32_t fd;
+        int32_t fd = -1;
         for (int32_t i = 0; i < MAX_RETRY_COUNT; i++) {
             fd = open(realPath, flags);
             if (fd >= 0) {

@@ -128,7 +128,7 @@ void GeneralDevice::GetInputDeviceNodes(std::map<std::string, std::string> &node
                     nodes.erase(cItr);
                 }
                 std::string::size_type tpos = spos + kevent.size();
-                while (std::isalnum(res[tpos])) {
+                while (tpos < res.size() && std::isalnum(res[tpos])) {
                     ++tpos;
                 }
                 auto [_, ret] = nodes.emplace(name, res.substr(spos, tpos - spos));
