@@ -2075,8 +2075,8 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
     for (size_t i = keys_.size(); i > 0; --i) {
-        if (keys_[i-1].keyCode == sequenceKey.keyCode) {
-            if (keys_[i-1].keyAction == sequenceKey.keyAction) {
+        if (keys_[i - 1].keyCode == sequenceKey.keyCode) {
+            if (keys_[i - 1].keyAction == sequenceKey.keyAction) {
                 MMI_HILOGI("Is repeat key, keyCode:%{private}d", sequenceKey.keyCode);
                 return true;
             }
@@ -2833,8 +2833,7 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
     if (timeDiffToPrevKnuckleUpTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
         if (tappingCount_ == MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
-        }
-        if (tappingCount_ > MAX_TAP_COUNT) {
+        } else if (tappingCount_ > MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfKnockTooFast();
         }
     }

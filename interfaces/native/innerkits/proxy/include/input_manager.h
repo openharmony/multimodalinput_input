@@ -99,7 +99,7 @@ public:
      * @param napStatus Indicates napStatus.
      * @since 10
      */
-    void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
+    void SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
 
     /**
      * @brief Get the process info datas to other server.

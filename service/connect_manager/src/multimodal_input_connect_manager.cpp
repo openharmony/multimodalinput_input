@@ -185,7 +185,8 @@ int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
     return multimodalInputConnectService_->SetPointerSize(size);
 }
 
-int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
+int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid,
+    const std::string &bundleName, int32_t napStatus)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
