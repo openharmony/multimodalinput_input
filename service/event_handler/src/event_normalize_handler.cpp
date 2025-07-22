@@ -1104,7 +1104,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         auto touchPadDevice = libinput_event_get_device(event);
         // product isolation
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
-        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID && 
+        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
             touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID) {
             return g_isSwipeInward;
         }
