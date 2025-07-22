@@ -1073,7 +1073,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    if (WIN_MGR->JudgeCaramaInFore() &&
+    if (WIN_MGR->JudgeCameraInFore() &&
         (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked)) {
             return true;
     }
@@ -1959,7 +1959,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGD("The same key is waiting timeout, skip");
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VCR2 && WIN_MGR->JudgeCaramaInFore()) {
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VCR2 && WIN_MGR->JudgeCameraInFore()) {
         MMI_HILOGD("The camera has been activated");
         return false;
     }

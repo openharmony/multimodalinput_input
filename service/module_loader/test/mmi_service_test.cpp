@@ -4246,8 +4246,6 @@ HWTEST_F(MMIServerTest, MMIService_InitPrintClientInfo_001, TestSize.Level1)
         };
     }
     ASSERT_NO_FATAL_FAILURE(mmiService.InitPrintClientInfo());
-    sleep(2);
-    SUCCEED();
 }
 
 /**
