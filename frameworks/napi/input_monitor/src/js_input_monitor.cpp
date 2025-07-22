@@ -1922,7 +1922,7 @@ bool JsInputMonitor::IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEven
 
 bool JsInputMonitor::IsJoystick(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPF(pointerEvent);
 
     return (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP ||
@@ -1951,7 +1951,7 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
 
 bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
         ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
@@ -1967,7 +1967,7 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 bool JsInputMonitor::IsXKey(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
         return true;
     }

@@ -614,7 +614,7 @@ bool InputHandlerManager::IsFourFingersSwipeType(std::shared_ptr<PointerEvent> p
 
 bool InputHandlerManager::IsThreeFingersTapType(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
         pointerEvent->GetFingerCount() != THREE_FINGERS ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TRIPTAP)) {
@@ -626,7 +626,7 @@ bool InputHandlerManager::IsThreeFingersTapType(std::shared_ptr<PointerEvent> po
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
         ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
@@ -643,7 +643,7 @@ bool InputHandlerManager::IsFingerprintType(std::shared_ptr<PointerEvent> pointe
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 bool InputHandlerManager::IsXKeyType(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
         return true;
     }

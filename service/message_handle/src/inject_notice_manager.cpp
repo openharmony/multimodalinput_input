@@ -74,7 +74,7 @@ bool InjectNoticeManager::StartNoticeAbility()
 bool InjectNoticeManager::ConnectNoticeSrv()
 {
     CALL_DEBUG_ENTER;
-    CHKPR(connectionCallback_, false);
+    CHKPF(connectionCallback_);
     if (connectionCallback_->IsConnected()) {
         MMI_HILOGD("InjectNoticeAbility has connected");
         return true;
