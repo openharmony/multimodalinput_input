@@ -71,6 +71,7 @@ constexpr int32_t SWIPE_INWARD_EDGE_X_THRE { 8 };
 constexpr int32_t SWIPE_INWARD_ANGLE_TOLERANCE { 8 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
+constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t KNUCKLE_BLOCK_THRETHOLD { MS2US(800) };
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
@@ -1103,7 +1104,8 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         auto touchPadDevice = libinput_event_get_device(event);
         // product isolation
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
-        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID) {
+        if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID && 
+            touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID) {
             return g_isSwipeInward;
         }
         // get touchpad physic size
