@@ -30,7 +30,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManagerMock);
 
     void Init(UDSServer&) override {}
-    bool JudgeCaramaInFore() override
+    bool JudgeCameraInFore() override
     {
         return true;
     }

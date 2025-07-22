@@ -1749,7 +1749,7 @@ void InputWindowsManager::PrintWindowNavbar(int32_t groupId)
     }
 }
 
-bool InputWindowsManager::JudgeCaramaInFore()
+bool InputWindowsManager::JudgeCameraInFore()
 {
     CALL_DEBUG_ENTER;
     int32_t focWid = GetFocusWindowId(MAIN_GROUPID);
