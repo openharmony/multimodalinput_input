@@ -1166,7 +1166,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             std::cout << "fingerCount:" << fingerCount <<std::endl;
                             std::cout << "keepTimeMs:" << keepTimeMs <<std::endl;
-                            std::cout << "totalTimeMs:" << totalTimeMs <<std::endl;
+                            std::cout << "smoothTimeMs:" << totalTimeMs <<std::endl;
 
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
@@ -1509,9 +1509,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             const int32_t minMoveTimeMs = 500;
                             if ((totalTimeMs -  pressTimems) <  minMoveTimeMs) {
-                                std::cout << "move time is out of range" << std::endl;
+                                std::cout << "[total time] - [Press time] not less than 500ms" << std::endl;
                                 return RET_ERR;
                             }
+
+                            std::cout << "pressTimems:" << pressTimems <<std::endl;
+                            std::cout << "totalTimeMs:" << totalTimeMs <<std::endl;
+
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -2199,7 +2203,7 @@ int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
     int32_t centerY = 0;
     int32_t scalePercentNumerator = 0;
     std::string tips = "uinput -P -p dx, dy, scalePercent; dx, dy, scalePercent are all number.";
-    std::string extralTips = " dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;";
+    std::string extralTips = " dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent =< 500;";
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
         std::cout << tips << extralTips << std::endl;
@@ -2218,7 +2222,7 @@ int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
         return RET_ERR;
     }
     if ((scalePercentNumerator <= minScaleNumerator) || (scalePercentNumerator > maxScaleNumerator)) {
-        std::cout << "Invalid scale numberator:" << scalePercentNumerator << std::endl;
+        std::cout << "Invalid scalePercent:" << scalePercentNumerator << std::endl;
         std::cout << tips << extralTips << std::endl;
         return RET_ERR;
     }
@@ -2227,6 +2231,8 @@ int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
         std::cout << tips << extralTips << std::endl;
         return RET_ERR;
     }
+
+    std::cout << "scalePercent:" << scalePercentNumerator << std::endl;
     return ActionPinchEvent(centerX, centerY, scalePercentNumerator);
 }
 
@@ -2426,12 +2432,19 @@ void InputManagerCommand::PrintMouseUsage()
     std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
     std::cout << "                                               2 is the middle"   << std::endl;
     std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
-    std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
+    std::cout << "-c <key>                  --click  <key>      -click button" << std::endl;
     std::cout << "-b <dx1> <dy1> <id> [press time] [click interval time]                --double click" << std::endl;
-    std::cout << "  [press time] the time range is more than 1ms but less than 300ms, "       << std::endl;
-    std::cout << "  [click interval time] the time range is more than 1ms but less than 450ms, " << std::endl;
-    std::cout << "  Otherwise the operation result may produce error or invalid operation"       << std::endl;
-    std::cout << " -press the left button down,then raise" << std::endl;
+    std::cout << "   [press time] the time range is more than 1ms but less than 300ms, "       << std::endl;
+    std::cout << "   [click interval time] the time range is more than 1ms but less than 450ms, " << std::endl;
+    std::cout << "   Otherwise the operation result may produce error or invalid operation"       << std::endl;
+    std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards," << std::endl;
+    std::cout << "                                               negative values are sliding forwards"  << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [total time]       --drag <dx1> <dy1> <dx2> <dy2> [total time],";
+    std::cout << std::endl;
+    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth drag"         << std::endl;
+    std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
+    std::cout << "Mouse button type:" << std::endl;
     std::cout << "   key value:0 - button left"     << std::endl;
     std::cout << "   key value:1 - button right"    << std::endl;
     std::cout << "   key value:2 - button middle"   << std::endl;
@@ -2440,13 +2453,6 @@ void InputManagerCommand::PrintMouseUsage()
     std::cout << "   key value:5 - button forward"  << std::endl;
     std::cout << "   key value:6 - button back"     << std::endl;
     std::cout << "   key value:7 - button task"     << std::endl;
-    std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards," << std::endl;
-    std::cout << "                                               negative values are sliding forwards"  << std::endl;
-    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [total time]       --drag <dx1> <dy1> <dx2> <dy2> [total time],";
-    std::cout << std::endl;
-    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth drag"         << std::endl;
-    std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
-    std::cout << std::endl;
 }
 
 void InputManagerCommand::PrintKeyboardUsage()
@@ -2470,9 +2476,8 @@ void InputManagerCommand::PrintStylusUsage()
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
-    std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
+    std::cout << "-c <dx1> <dy1> [click interval]               -stylus click dx1 dy1"         << std::endl;
     std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
     std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
     std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
@@ -2499,13 +2504,16 @@ void InputManagerCommand::PrintTouchUsage()
     std::cout << std::endl;
     std::cout << "   (600, 900)" << std::endl;
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
+    std::cout << "   [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
+    std::cout << "   Otherwise the operation result may produce error or invalid operation"                << std::endl;
+    std::cout << std::endl;
+
     std::cout << "-k --knuckle                                                  " << std::endl;
     std::cout << "commands for knucle:                                          " << std::endl;
     PrintKnuckleUsage();
     std::cout << std::endl;
-    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
-    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
-    std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
+
 }
 
 void InputManagerCommand::PrintKnuckleUsage()
@@ -2517,13 +2525,13 @@ void InputManagerCommand::PrintKnuckleUsage()
 
 void InputManagerCommand::PrintTouchPadUsage()
 {
-    std::cout << "-p dx, dy, scalePercent; dx, dy, scalePercent are all number."                    << std::endl;
-    std::cout << "dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;"           << std::endl;
-    std::cout << "While simulate this, make sure that a picture is on the top of the desktop."      << std::endl;
-    std::cout << "-s startX, startY, endX, endY;"                                                   << std::endl;
-    std::cout << "And startX, startY, endX, endY are all number which is bigger than 0;"            << std::endl;
-    std::cout << "While simulate this, make sure that your actual action is available"              << std::endl;
-    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                         << std::endl;
+    std::cout << "-p <dx> <dy> <scalePercent>  --dx, dy, scalePercent are all number."                    << std::endl;
+    std::cout << "   dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;"           << std::endl;
+    std::cout << "   While simulate this, make sure that a picture is on the top of the desktop."      << std::endl;
+    std::cout << "-s <startX> <startY> <endX> <endY>  --startX, startY, endX, endY are all number which is bigger than 0";
+    std::cout << std::endl;
+    std::cout << "   While simulate this, make sure that your actual action is available"              << std::endl;
+    std::cout << "-r <rotateValue> --rotateValue must be within (-360,360)"                         << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()
@@ -2543,6 +2551,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-P  --touchpad                                                " << std::endl;
     std::cout << "commands for touchpad:                                        " << std::endl;
     PrintTouchPadUsage();
+    std::cout << std::endl;
 
     std::cout << "-S  --stylus                                                   " << std::endl;
     std::cout << "commands for stylus:                                           " << std::endl;
