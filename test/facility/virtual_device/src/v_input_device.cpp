@@ -279,6 +279,8 @@ void VInputDevice::CheckAbs()
         caps_.set(DEVICE_CAP_TOUCH);
     } else if (HasJoystickAxesOrButtons()) {
         caps_.set(DEVICE_CAP_JOYSTICK);
+    } else {
+        std::cout << "CheckAbs failed" << std::endl;
     }
 }
 
@@ -290,6 +292,8 @@ void VInputDevice::CheckMt()
         caps_.set(DEVICE_CAP_POINTER);
     } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
         caps_.set(DEVICE_CAP_TOUCH);
+    } else {
+        std::cout << "CheckAbs failed" << std::endl;
     }
 }
 

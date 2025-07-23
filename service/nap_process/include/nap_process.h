@@ -27,24 +27,25 @@ public:
 
     static NapProcess *GetInstance();
 
-struct NapStatusData {
-    int32_t pid;
-    int32_t uid;
-    std::string bundleName;
-    bool operator==(const NapStatusData b) const
-    {
-        return pid == b.pid && uid == b.uid && bundleName == b.bundleName;
-    }
-    bool operator<(const NapStatusData b) const
-    {
-        if (pid != b.pid) return pid < b.pid;
-        if (uid != b.uid) return uid < b.uid;
-        return bundleName < b.bundleName;
-    }
-};
-    std::map<NapStatusData, int32_t> napMap_;
+    struct NapStatusData {
+        int32_t pid;
+        int32_t uid;
+        std::string bundleName;
+        bool operator==(const NapStatusData b) const
+        {
+            return pid == b.pid && uid == b.uid && bundleName == b.bundleName;
+        }
+        bool operator<(const NapStatusData b) const
+        {
+            if (pid != b.pid) return pid < b.pid;
+            if (uid != b.uid) return uid < b.uid;
+            return bundleName < b.bundleName;
+        }
+    };
+
+public:
     int32_t NotifyBundleName(NapStatusData napData, int32_t syncState);
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napState);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napState);
     int32_t NotifyNapOnline();
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t RemoveInputEventObserver();
@@ -60,6 +61,7 @@ private:
     NapProcess() = default;
     DISALLOW_COPY_AND_MOVE(NapProcess);
     static NapProcess *instance_;
+    std::map<NapStatusData, int32_t> napMap_;
     std::mutex mapMtx_;
 };
 } // namespace MMI

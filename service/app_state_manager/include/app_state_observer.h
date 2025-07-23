@@ -43,7 +43,7 @@ class AppObserverManager final {
 public:
     DISALLOW_COPY_AND_MOVE(AppObserverManager);
     void InitAppStateObserver();
-    void SetForegroundAppData(std::vector<AppExecFwk::AppStateData> list);
+    void SetForegroundAppData(const std::vector<AppExecFwk::AppStateData> &list);
     std::vector<AppExecFwk::AppStateData> GetForegroundAppData();
 private:
     bool hasInit_ { false };

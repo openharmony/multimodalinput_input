@@ -42,7 +42,7 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t NotifyNapOnline();
     int32_t RemoveInputEventObserver();
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
