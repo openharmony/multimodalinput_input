@@ -85,7 +85,7 @@ int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray &inputEv
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_HILOGE("Open device node:%{public}s failed", deviceNode.c_str());
+        MMI_HILOGE("Open device node:%{private}s failed", deviceNode.c_str());
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {

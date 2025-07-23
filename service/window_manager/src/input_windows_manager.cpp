@@ -375,10 +375,7 @@ bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> point
         return true;
     } else if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        if (mouseDownInfo_.pid != -1) {
-            return false;
-        }
-        return true;
+        return mouseDownInfo_.pid == -1;
     }
     return false;
 }
@@ -3095,10 +3092,7 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
     int32_t& targetDisplayId, PhysicalCoordinate& coord)
 {
     CHKPF(tip);
-    if (!TransformTipPoint(tip, coord, targetDisplayId)) {
-        return false;
-    }
-    return true;
+    return TransformTipPoint(tip, coord, targetDisplayId);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -4652,12 +4646,14 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
 void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
     WindowInfo **touchWindow, bool &isUiExtentionWindow)
 {
-    for (auto &windowinfo : uiExtentionWindowInfo) {
-        if (windowinfo.id == windowId) {
-            *touchWindow = &windowinfo;
-            isUiExtentionWindow = true;
-            break;
+    auto iter = std::find_if(uiExtentionWindowInfo.begin(), uiExtentionWindowInfo.end(),
+        [windowId](const auto &windowInfo) {
+            return windowId == windowInfo.id;
         }
+    );
+    if (iter != uiExtentionWindowInfo.end()) {
+        *touchWindow = &(*iter);
+        isUiExtentionWindow = true;
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -6526,8 +6522,7 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
         MMI_HILOG_WINDOWE("Invalid pointer:%{public}d", pointerId);
         return false;
     }
-    [[ maybe_unused ]] int32_t toolType = item.GetToolType();
-    [[ maybe_unused ]] int32_t sourceType = pointerEvent->GetSourceType();
+    int32_t sourceType = pointerEvent->GetSourceType();
     WindowInputType windowTypeTemp = window.windowInputType;
     if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         GetActiveWindowTypeById(window.id, windowTypeTemp);

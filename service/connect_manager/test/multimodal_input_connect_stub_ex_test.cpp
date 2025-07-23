@@ -85,7 +85,10 @@ public:
         size_ = size;
         return size_;
     }
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override { return pid; }
+    int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus) override
+    {
+        return pid;
+    }
     int32_t GetPointerSize(int32_t &size) override { return size_; }
 
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override

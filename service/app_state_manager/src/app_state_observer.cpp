@@ -78,7 +78,7 @@ std::vector<AppExecFwk::AppStateData> AppObserverManager::GetForegroundAppData()
     return foregroundAppData_;
 }
 
-void AppObserverManager::SetForegroundAppData(std::vector<AppExecFwk::AppStateData> list)
+void AppObserverManager::SetForegroundAppData(const std::vector<AppExecFwk::AppStateData> &list)
 {
     CALL_DEBUG_ENTER;
     foregroundAppData_ = list;
