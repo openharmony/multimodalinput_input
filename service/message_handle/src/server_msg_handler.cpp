@@ -81,6 +81,7 @@ constexpr float FACTOR_27 { 1.2f };
 constexpr float FACTOR_55 { 1.6f };
 constexpr float FACTOR_MAX { 2.4f };
 constexpr int64_t QUERY_AUTHORIZE_MAX_INTERVAL_TIME { 3000 };
+constexpr uint32_t MAX_ENHANCE_CONFIG_SIZE { 1000 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -728,6 +729,10 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
 {
     uint32_t num = 0;
     pkt >> num;
+    if (num > MAX_UI_EXTENSION_SIZE) {
+        MMI_HILOGE("Invalid num:%{public}u", num);
+        return RET_ERR;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
@@ -867,6 +872,10 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
     uint32_t num = 0;
     pkt >> num;
+    if (num > MAX_WINDOW_GROUP_INFO_SIZE) {
+        MMI_HILOGE("Invalid windowGroup info size:%{public}u", num);
+        return RET_ERR;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read window group info failed");
         return RET_ERR;
@@ -917,6 +926,10 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     }
     uint32_t num = 0;
     pkt >> num;
+    if (num > MAX_ENHANCE_CONFIG_SIZE) {
+        MMI_HILOGE("Invalid enhance data size:%{public}u", num);
+        return RET_ERR;
+    }
     uint8_t cfg[num];
     for (uint32_t i = 0; i < num; i++) {
         pkt >> cfg[i];

@@ -29,6 +29,8 @@ constexpr uint32_t MAX_DISPLAY_GROUP_SIZE = 100;
 constexpr uint32_t MAX_DISPLAY_SIZE = 1000;
 constexpr uint32_t MAX_SCREEN_SIZE = 1000;
 constexpr uint32_t MAX_WINDOWS_SIZE = 1000;
+constexpr uint32_t MAX_UI_EXTENSION_SIZE = 1000;
+constexpr uint32_t MAX_WINDOW_GROUP_INFO_SIZE = 1000;
 
 enum SecureFlag {
     DEFAULT_MODE = 0,

@@ -25,6 +25,15 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr size_t MAX_PRESSED_BUTTONS { 10 };
+constexpr size_t MAX_POINTER_COUNT { 10 };
+constexpr size_t MAX_PRESSED_KEY_NUM { 10 };
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+constexpr uint32_t MAX_ENHANCE_DATA_LEN { 1000 };
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+} // namespace
+
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
@@ -374,6 +383,10 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
+    if (nPressed > MAX_PRESSED_BUTTONS) {
+        MMI_HILOGE("Invalid nPressed:%{public}zu", nPressed);
+        return RET_ERR;
+    }
     while (nPressed-- > 0) {
         pkt >> tField;
         event->SetButtonPressed(tField);
@@ -386,6 +399,10 @@ int32_t InputEventDataTransformation::DeserializePointerIds(std::shared_ptr<Poin
     CHKPR(event, ERROR_NULL_POINTER);
     std::vector<int32_t>::size_type pointerCnt;
     pkt >> pointerCnt;
+    if (pointerCnt > MAX_POINTER_COUNT) {
+        MMI_HILOGE("Invalid pointerCnt:%{public}zu", pointerCnt);
+        return RET_ERR;
+    }
     while (pointerCnt-- > 0) {
         PointerEvent::PointerItem item;
         if (DeserializePointerItem(pkt, item) != RET_OK) {
@@ -427,6 +444,10 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     std::vector<int32_t>::size_type pressedKeySize;
     int32_t tField;
     pkt >> pressedKeySize;
+    if (pressedKeySize > MAX_PRESSED_KEY_NUM) {
+        MMI_HILOGE("Invalid pressedKeySize:%{public}zu", pressedKeySize);
+        return RET_ERR;
+    }
     while (pressedKeySize-- > 0) {
         pkt >> tField;
         pressedKeys.push_back(tField);
@@ -440,6 +461,10 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     std::vector<uint8_t> buffer;
     std::vector<uint8_t>::size_type bufferSize;
     pkt >> bufferSize;
+    if (bufferSize > ExtraData::MAX_BUFFER_SIZE) {
+        MMI_HILOGE("Invalid bufferSize:%{public}zu", bufferSize);
+        return RET_ERR;
+    }
     uint8_t buff = 0;
     while (bufferSize-- > 0) {
         pkt >> buff;
@@ -563,6 +588,10 @@ int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, s
     pkt >> enHanceDataLen;
     if (enHanceDataLen == 0) {
         return RET_OK;
+    }
+    if (enHanceDataLen > MAX_ENHANCE_DATA_LEN) {
+        MMI_HILOGE("Invalid enHanceDataLen:%{public}u", enHanceDataLen);
+        return RET_ERR;
     }
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
