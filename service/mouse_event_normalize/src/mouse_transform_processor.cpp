@@ -14,12 +14,13 @@
  */
 
 #include "mouse_transform_processor.h"
+#include "cursor_drawing_component.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "i_preference_manager.h"
 #include "input_event_handler.h"
 #include "mouse_device_state.h"
-#include "cursor_drawing_component.h"
+#include "pointer_device_manager.h"
 #include "scene_board_judgement.h"
 #include "touchpad_transform_processor.h"
 #include "util_ex.h"
@@ -1266,8 +1267,10 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y, false);
     cursorPos = WIN_MGR->GetCursorPos();
-    CursorDrawingComponent::GetInstance().SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y,
-        cursorPos.displayId);
+    if (POINTER_DEV_MGR.isInit) {
+        CursorDrawingComponent::GetInstance().SetPointerLocation(
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    }
     MMI_HILOGI("CursorPosX:%f, cursorPosY:%f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     return RET_OK;
 }
