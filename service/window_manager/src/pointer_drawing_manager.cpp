@@ -3008,7 +3008,7 @@ void PointerDrawingManager::SubscribeScreenModeChange()
     }
     MMI_HILOGI("SubscribeScreenModeChange success");
 }
- 
+
 void PointerDrawingManager::RegisterDisplayStatusReceiver()
 {
     if (!GetHardCursorEnabled()) {
@@ -3824,5 +3824,12 @@ bool PointerDrawingManager::GetHardCursorEnabled()
     }
     return isHardCursorEnabled;
 }
+
+#ifndef OHOS_BUILD_ENABLE_WATCH
+void PointerDrawingManager::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt)
+{
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+}
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace MMI
 } // namespace OHOS

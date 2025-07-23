@@ -18,6 +18,7 @@
 
 #include "display_manager_lite.h"
 #include "event_log_helper.h"
+#include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -1559,7 +1560,7 @@ bool InputWindowsManager::IsCaptureMode()
                     window.area.height > SCREEN_RECORD_WINDOW_HEIGHT);
         }
     }
-    
+
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD

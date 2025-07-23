@@ -138,8 +138,10 @@ public:
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
-int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
-    int32_t physicalX, int32_t physicalY) override;
+    int32_t UpdateMouseLayer(const PointerStyle& pointerStyle, int32_t physicalX, int32_t physicalY) override;
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt) override;
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 private:
     struct PixelMapInfo {
