@@ -114,7 +114,7 @@ bool EventReplayer::Replay()
     }
     std::ifstream inputFile(resolvedPath);
     if (!inputFile.is_open()) {
-        PrintError("Failed to open file:%{private}s, error:%{private}s", resolvedPath, strerror(errno));
+        PrintError("Failed to open file, error:%{private}s", strerror(errno));
         return false;
     }
     if (!SeekToDevicesSection(inputFile)) {
