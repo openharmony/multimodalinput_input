@@ -113,6 +113,10 @@ bool EventReplayer::Replay()
         return false;
     }
     std::ifstream inputFile(resolvedPath);
+    if (!inputFile.is_open()) {
+        PrintError("Failed to open file:%{private}s, error:%{private}s", resolvedPath, strerror(errno));
+        return false;
+    }
     if (!SeekToDevicesSection(inputFile)) {
         PrintError("seek to DEVICES_PREFIX tag error");
         return false;

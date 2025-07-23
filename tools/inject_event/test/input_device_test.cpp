@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <fcntl.h>
 
 #include "input_device.h"
 
@@ -213,6 +214,117 @@ HWTEST_F(InputDeviceTest, InputDeviceTest_WriteEvents_EmptyVector, TestSize.Leve
     InputDevice device;
     std::vector<input_event> events;
     EXPECT_FALSE(device.WriteEvents(events));
+}
+
+/**
+ * @tc.name: InputDeviceTest_VerifyDeviceMatch_001
+ * @tc.desc: Test verify device match when name is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_VerifyDeviceMatch_001, TestSize.Level0) {
+    InputDevice device;
+    device.name_ = "";
+    EXPECT_TRUE(device.VerifyDeviceMatch());
+}
+ 
+ 
+/**
+ * @tc.name: InputDeviceTest_VerifyDeviceMatch_002
+ * @tc.desc: Test verify device match when realpath is failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_VerifyDeviceMatch_002, TestSize.Level0) {
+    InputDevice device;
+    device.name_ = "Keyboard";
+ 
+    device.path_ = "\\dev\\input\\event0";
+    EXPECT_FALSE(device.VerifyDeviceMatch());
+ 
+    device.path_ = "/dev/input/invalid";
+    EXPECT_FALSE(device.VerifyDeviceMatch());
+}
+ 
+/**
+ * @tc.name: InputDeviceTest_VerifyDeviceMatch_WhenDeviceOpenFailed
+ * @tc.desc: Test verify device match when device match failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_VerifyDeviceMatch_003, TestSize.Level0) {
+    InputDevice device;
+    device.path_ = "/dev/input/event0";
+    device.name_ = "Keyboard1";
+    EXPECT_FALSE(device.VerifyDeviceMatch());
+}
+ 
+/**
+ * @tc.name: InputDeviceTest_OpenDevice_001
+ * @tc.desc: Test close device wether the device already opend
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_OpenDevice_001, TestSize.Level0) {
+    InputDevice device;
+    device.path_ = "/dev/input/event0";
+ 
+    int fd = open(device.path_.c_str(), O_RDONLY);
+    EXPECT_NE(fd, -1);
+    if (fd != -1) {
+        close(fd);
+    }
+ 
+    bool result = device.OpenDevice(O_RDONLY);
+    EXPECT_TRUE(result);
+}
+ 
+/**
+ * @tc.name: InputDeviceTest_OpenDevice_002
+ * @tc.desc: Test the device path realpath check failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_OpenDevice_002, TestSize.Level0) {
+    InputDevice device;
+    device.path_ = "";
+ 
+    bool result = device.OpenDevice(O_RDONLY);
+    EXPECT_FALSE(result);
+}
+ 
+/**
+ * @tc.name: InputDeviceTest_OpenDevice_003
+ * @tc.desc: Test the device path open failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_OpenDevice_003, TestSize.Level0) {
+    InputDevice device;
+    device.path_ = "/dev/input/nonexistent";
+ 
+    bool result = device.OpenDevice(O_RDONLY);
+    EXPECT_FALSE(result);
+}
+ 
+/**
+ * @tc.name: InputDeviceTest_OpenDevice_004
+ * @tc.desc: Test the device path open succeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceTest, InputDeviceTest_OpenDevice_004, TestSize.Level0) {
+    InputDevice device;
+    device.path_ = "/dev/input/event0";
+ 
+    int fd = open(device.path_.c_str(), O_RDONLY);
+    EXPECT_NE(fd, -1);
+    if (fd != -1) {
+        close(fd);
+    }
+ 
+    bool result = device.OpenDevice(O_RDONLY);
+    EXPECT_TRUE(result);
 }
 } // namespace MMI
 } // namespace OHOS
