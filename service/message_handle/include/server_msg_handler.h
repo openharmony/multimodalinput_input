@@ -17,6 +17,7 @@
 #define SERVER_MSG_HANDLER_H
 
 #include "client_death_handler.h"
+#include "device_observer.h"
 #include "event_dispatch_handler.h"
 #include "ievent_filter.h"
 #include "inject_notice_manager.h"
@@ -44,11 +45,26 @@ enum class InjectionType : int32_t {
 };
 
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
+
 class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
+private:
+    class InputDeviceObserver final : public IDeviceObserver {
+    public:
+        InputDeviceObserver(ServerMsgHandler &handler)
+            : handler_(handler) {}
+        ~InputDeviceObserver() override = default;
+        void OnDeviceAdded(int32_t deviceId) override {}
+        void OnDeviceRemoved(int32_t deviceId) override;
+        void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
+
+    private:
+        ServerMsgHandler &handler_;
+    };
+
 public:
-    ServerMsgHandler() = default;
+    ServerMsgHandler();
+    ~ServerMsgHandler() override;
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
-    ~ServerMsgHandler() override = default;
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
@@ -174,6 +190,12 @@ private:
     void ChangeToOld(size_t num, const std::vector<DisplayInfo>& displaysInfo,
         const std::vector<ScreenInfo>& screens);
     void Printf(const UserScreenInfo& userScreenInfo);
+    void SetUpDeviceObserver();
+    void TearDownDeviceObserver();
+    void OnDeviceRemoved(int32_t deviceId);
+    std::shared_ptr<KeyEvent> CleanUpKeyEvent() const;
+    std::shared_ptr<KeyEvent> NormalizeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
@@ -185,6 +207,7 @@ private:
     InjectionType InjectionType_ { InjectionType::UNKNOWN };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::shared_ptr<InputDeviceObserver> inputDevObserver_ { nullptr };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     std::shared_ptr<InjectNoticeManager> injectNotice_ { nullptr };
     ClientDeathHandler clientDeathHandler_;
