@@ -47,6 +47,7 @@ public:
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
+    bool IsRemoteInputDevice(int32_t deviceId) const;
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
@@ -133,6 +134,8 @@ private:
     int32_t GetTouchscreenKeyboardType(const InputDeviceInfo &deviceInfo, int32_t &keyboardType);
     int32_t GetVirtualKeyboardType(int32_t deviceId, int32_t &keyboardType);
     void PointerDeviceInit();
+    void NotifyDeviceAdded(int32_t deviceId) const;
+    void NotifyDeviceRemoved(int32_t deviceId) const;
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;

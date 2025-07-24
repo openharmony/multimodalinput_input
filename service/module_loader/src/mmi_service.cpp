@@ -1488,6 +1488,8 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     inputDevice->SetVendor(tmpDevice->GetVendor());
     inputDevice->SetPhys(tmpDevice->GetPhys());
     inputDevice->SetUniq(tmpDevice->GetUniq());
+    inputDevice->SetVirtualDevice(tmpDevice->IsVirtualDevice());
+    inputDevice->SetRemoteDevice(tmpDevice->IsRemoteDevice());
     inputDevice->SetCapabilities(tmpDevice->GetCapabilities());
     inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
 
@@ -2136,7 +2138,6 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
 #else
     return RET_OK;

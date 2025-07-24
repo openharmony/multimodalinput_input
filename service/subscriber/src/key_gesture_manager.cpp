@@ -255,7 +255,7 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
 
 void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) const
 {
-    output << "[" << keyCode_ << "] --> {";
+    output << "[*] --> {";
     if (auto iter = handlers_.begin(); iter != handlers_.end()) {
         output << iter->GetLongPressTime();
         for (++iter; iter != handlers_.end(); ++iter) {
@@ -340,14 +340,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
 
 void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output) const
 {
-    output << "[";
-    if (auto keyIter = keys_.begin(); keyIter != keys_.end()) {
-        output << *keyIter;
-        for (++keyIter; keyIter != keys_.end(); ++keyIter) {
-            output << "," << *keyIter;
-        }
-    }
-    output << "] --> {";
+    output << "[**] --> {";
     if (auto iter = handlers_.begin(); iter != handlers_.end()) {
         output << "(ID:" << iter->GetId() << ",T:" << iter->GetLongPressTime() << ")";
         for (++iter; iter != handlers_.end(); ++iter) {
