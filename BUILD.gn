@@ -215,6 +215,7 @@ group("mmi_tests") {
     "service:MonitorTest",
     "service:NapProcessTest",
     "service:PointerDrawingManagerExTest",
+    "service:PointerDrawingManagerSupTest",
     "service:PointerDrawingManagerTest",
     "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",
@@ -252,8 +253,8 @@ group("mmi_tests") {
 
   if (input_feature_touch_drawing) {
     deps += [
-      "service/window_manager:TouchDrawingHandlerTest",
       "service:TouchDrawingManagerTest",
+      "service/window_manager:TouchDrawingHandlerTest",
     ]
   }
 }
