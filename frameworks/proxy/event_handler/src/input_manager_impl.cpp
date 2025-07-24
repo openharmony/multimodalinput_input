@@ -1273,6 +1273,11 @@ int32_t InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> point
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
     HandleSimulateInputEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP &&
+        pointerEvent->IsButtonPressed(pointerEvent->GetButtonId()) != 0) {
+        MMI_HILOGE("ButtonPressed state is err");
+        pointerEvent->DeleteReleaseButton(pointerEvent->GetButtonId());
+    }
     if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
         return INPUT_PERMISSION_DENIED;

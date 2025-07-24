@@ -473,7 +473,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPressed(false);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->DeleteReleaseButton(buttonId);
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -483,6 +483,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 's': {
                             if (!StrToInt(optarg, scrollValue)) {
                                 std::cout << "invalid scroll button command" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            if (buttonId > MOUSE_ID) {
+                                std::cout << "invalid raise button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "scroll wheel " << scrollValue << std::endl;
@@ -517,7 +521,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetActionTime(time + ACTION_TIME);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->DeleteReleaseButton(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL, scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -554,7 +558,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayY(py);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->UpdatePointerItem(0, item);
-                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->DeleteReleaseButton(buttonId);
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -637,17 +641,20 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->DeleteReleaseButton(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(clickIntervalTimeMs));
 
                             item.SetPressed(true);
                             pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->DeleteReleaseButton(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             simulateMouseEvent(pointerEvent);
                             break;
@@ -739,6 +746,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px2);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
+                            pointerEvent->DeleteReleaseButton(buttonsId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             simulateMouseEvent(pointerEvent);
                             break;

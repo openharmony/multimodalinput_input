@@ -1586,6 +1586,11 @@ void InputWindowsManager::CancelMouseEvent()
 {
     auto lastPointerEventCopy = GetlastPointerEvent();
     CHKPV(lastPointerEventCopy);
+    if (lastPointerEventCopy->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL ||
+        lastPointerEventCopy->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_CANCEL) {
+        MMI_HILOGE("lastPointerEventCopy has canceled");
+        return;
+    }
     int32_t action = PointerEvent::POINTER_ACTION_CANCEL;
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         action = PointerEvent::POINTER_ACTION_PULL_CANCEL;
@@ -1613,6 +1618,11 @@ void InputWindowsManager::CancelMouseEvent()
         auto filter = InputHandler->GetFilterHandler();
         CHKPV(filter);
         filter->HandlePointerEvent(lastPointerEvent);
+        {
+            std::lock_guard<std::mutex> guard(mtx_);
+            lastPointerEvent_->SetPointerAction(action);
+            lastPointerEvent_->DeleteReleaseButton(lastPointerEvent_->GetButtonId());
+        }
     }
 }
 
