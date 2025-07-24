@@ -2047,6 +2047,7 @@ ohos_unittest("ModuleLoaderTest") {
 
   include_dirs = [
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/util/common/include",
   ]
 
