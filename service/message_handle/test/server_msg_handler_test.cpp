@@ -3934,5 +3934,305 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_006, TestSize.
     pkt << ret;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_OK);
 }
+
+/**
+@tc.name: ServerMsgHandlerTest_NativeInjectCheck
+@tc.desc: Test the function NativeInjectCheck
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.InitInjectNoticeSource();
+    int32_t pid = -1;
+    auto result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+    pid = 0;
+    result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_NativeInjectCheck001
+@tc.desc: Test the function NativeInjectCheck
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = 1234;
+    auto isPC = handler.IsPC();
+    if (!isPC) {
+        auto result = handler.NativeInjectCheck(pid);
+        EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+    }
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_NativeInjectCheck002
+@tc.desc: Test the function NativeInjectCheck
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = 1234;
+    auto isPC = handler.IsPC();
+    EXPECT_EQ(isPC, false);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    auto result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_NativeInjectCheck003
+@tc.desc: Test the function NativeInjectCheck
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = 1234;
+    auto isPC = handler.IsPC();
+    EXPECT_EQ(isPC, false);
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    auto result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_002
+ * @tc.desc: Test CloseInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.InitInjectNoticeSource();
+    int32_t pid = 0;
+    bool result = handler.CloseInjectNotice(pid);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_003
+ * @tc.desc: Test the function CloseInjectNotice
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    handler.InitInjectNoticeSource();
+    int32_t pid = 1234;
+    handler.injectNotice_ = nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = false;
+    ret = handler.CloseInjectNotice(pid);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_004
+ * @tc.desc: Test the function InitInjectNoticeSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
+    manager.isStartSrv_ = false;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+    manager.isStartSrv_ = true;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    manager.connectionCallback_->isConnected_ = false;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+    manager.connectionCallback_->isConnected_ = true;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_QueryAuthorizedStatus001
+ * @tc.desc: Test the function QueryAuthorizedStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_QueryAuthorizedStatus001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    int32_t callingPid = 1;
+    int32_t status = 1;
+    int32_t result = handler.QueryAuthorizedStatus(callingPid, status);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_RequestInjection_002
+ * @tc.desc: Test the function RequestInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t callingPid = 1;
+    int32_t status = 1;
+    int32_t reqId = 1;
+    auto isPC = handler.IsPC();
+    if (!isPC) {
+        auto result = handler.RequestInjection(callingPid, status, reqId);
+        EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
+        return;
+    }
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    handler.OnCancelInjection(callingPid);
+    auto result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+    result = handler.RequestInjection(callingPid, status, reqId);
+    EXPECT_EQ(result, ERR_OK);
+    result = handler.OnAuthorize(true);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_ChangeToOld_007
+@tc.desc: Test ChangeToOld
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ChangeToOld_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+
+    DisplayGroupInfo displayGroupInfo1;
+    displayGroupInfo1.id = 0;
+    displayGroupInfo1.type = GroupType::GROUP_DEFAULT;
+    displayGroupInfo1.mainDisplayId = 0;
+    displayGroupInfo1.focusWindowId = GLOBAL_WINDOW_ID;
+
+    DisplayGroupInfo displayGroupInfo2;
+    displayGroupInfo2.id = 1;
+    displayGroupInfo2.type = GroupType::GROUP_SPECIAL;
+    displayGroupInfo2.mainDisplayId = 1;
+    displayGroupInfo2.focusWindowId = GLOBAL_WINDOW_ID;
+
+    DisplayGroupInfo displayGroupInfo3;
+    displayGroupInfo3.id = 2;
+    displayGroupInfo3.type = GroupType::GROUP_DEFAULT;
+    displayGroupInfo3.mainDisplayId = 2;
+    displayGroupInfo3.focusWindowId = GLOBAL_WINDOW_ID;
+
+    DisplayGroupInfo displayGroupInfo4;
+    displayGroupInfo3.id = 3;
+    displayGroupInfo3.type = GroupType::GROUP_SPECIAL;
+    displayGroupInfo3.mainDisplayId = 3;
+    displayGroupInfo3.focusWindowId = DEFAULT_GROUP_ID;
+
+    userScreenInfo.displayGroups = {displayGroupInfo1, displayGroupInfo2, displayGroupInfo3, displayGroupInfo4};
+
+    ServerMsgHandler handler;
+    EXPECT_FALSE(handler.ChangeToOld(userScreenInfo));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_TestChangeToOld_008
+ * @tc.desc: Test ChangeToOld
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_TestChangeToOld_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    size_t num {1};
+    std::vector<DisplayInfo> displaysInfos;
+    DisplayInfo display;
+    display.width = 1920;
+    display.height = 1080;
+    display.direction = DIRECTION180;
+    display.screenArea.id = 2;
+    display.screenArea.area.width = 0;
+    display.screenArea.area.height = 0;
+    displaysInfos.push_back(display);
+    std::vector<ScreenInfo> screens;
+    ScreenInfo screenInfo;
+    screenInfo.id = 1;
+    screens.push_back(screenInfo);
+    ServerMsgHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.ChangeToOld(num, displaysInfos, screens));
+    display.direction = DIRECTION90;
+    displaysInfos = {display};
+    ASSERT_NO_FATAL_FAILURE(handler.ChangeToOld(num, displaysInfos, screens));
+    display.direction = DIRECTION270;
+    displaysInfos = {display};
+    ASSERT_NO_FATAL_FAILURE(handler.ChangeToOld(num, displaysInfos, screens));
+}
+
+/**
+@tc.name: ServerMsgHandlerTest_OnWindowGroupInfo_005
+@tc.desc: Test the function OnWindowGroupInfo
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowGroupInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    sess->SetTokenType(TOKEN_INVALID);
+    int32_t p1 = 112;
+    std::string p2 = "test111";
+    NetPacket pkt(MmiMessageId::INVALID);
+    pkt << p1 << p2;
+    EXPECT_FALSE(pkt.ChkRWError());
+
+    int32_t r1 = 0;
+    std::string r2;
+    pkt >> r1 >> r2;
+    EXPECT_FALSE(pkt.ChkRWError());
+    int32_t r3;
+    pkt >> r3;
+    EXPECT_TRUE(pkt.ChkRWError());
+
+    Rect rec = {1, 1, 1, 1};
+    std::vector recVec = {rec, rec};
+    std::vector<int32_t> pChangeAreas = {1, 1, 1};
+    std::vector transform = {1.0, 1.0, 1.0};
+
+    int32_t ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
