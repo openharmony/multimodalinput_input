@@ -1874,6 +1874,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, 
     ret = handler.InitInjectNoticeSource();
     EXPECT_FALSE(ret);
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    ASSERT_NE(manager.connectionCallback_, nullptr);
     manager.connectionCallback_->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
     EXPECT_FALSE(ret);
