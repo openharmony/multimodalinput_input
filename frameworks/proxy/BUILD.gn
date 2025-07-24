@@ -81,6 +81,7 @@ ohos_source_set("libmmi-common") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_single",
   ]
 
   part_name = "input"
@@ -170,6 +171,7 @@ ohos_shared_library("libmmi-client") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "jsoncpp:jsoncpp",
     "qos_manager:qos",
     "samgr:samgr_proxy",
