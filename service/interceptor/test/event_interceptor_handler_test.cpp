@@ -1048,5 +1048,160 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_0028, TestSiz
     EXPECT_EQ(ret, false);
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: EventInterceptorHandler_HandleKeyEvent_002
+ * @tc.desc: Test the function HandleKeyEvent WhenDoubleClickDetected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
+    event->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_HandleKeyEvent_003
+ * @tc.desc: Test the function HandleKeyEvent WhenDoubleClickDetected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
+    event->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_HandleKeyEvent_004
+ * @tc.desc: Test the function HandleKeyEvent WhenKeyInWhiteList
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
+    event->SetKeyAction(INPUT_DEVICE_AISENSOR);
+    int32_t keyCode = 123;
+    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("123;456;");
+    EXPECT_TRUE(handler.KeyInterceptByHostOSWhiteList(keyCode));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_HandleKeyEvent_005
+ * @tc.desc: Test the function HandleKeyEvent WhenKeyNotInWhiteListAndNotOnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
+    event->SetKeyAction(INPUT_DEVICE_AISENSOR);
+    handler.keyevent_intercept_whitelist = nullptr;
+    int32_t keyCode = 123;
+    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
+    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("");
+    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_HandleKeyEvent_006
+ * @tc.desc: Test the function HandleKeyEvent WhenKeyNotInWhiteList
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
+    event->SetKeyAction(INPUT_DEVICE_AISENSOR);
+    int32_t keyCode = 789;
+    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("123;456;");
+    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
+    event->bitwise_ = 0x00000000;
+    EXPECT_FALSE(handler.OnHandleEvent(event));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnHandleEvent_001
+ * @tc.desc: Test the function OnHandleEvent_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnHandleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->bitwise_ = 0x00000001;
+    EXPECT_FALSE(handler.OnHandleEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnHandleEvent_002
+ * @tc.desc: Test the function OnHandleEvent_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnHandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    event->bitwise_ = 0x00000000;
+    EXPECT_FALSE(handler.OnHandleEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnHandleEvent_003
+ * @tc.desc: Test the function OnHandleEvent_003
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnHandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    event->bitwise_ = 0x00000001;
+    EXPECT_FALSE(handler.OnHandleEvent(event));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnHandleEvent_004
+ * @tc.desc: Test the function OnHandleEvent_004
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnHandleEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    event->bitwise_ = 0x0000000;
+    EXPECT_FALSE(handler.OnHandleEvent(event));
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
 } // namespace MMI
-} // namespace OHOS
+} // namespace OH
