@@ -452,6 +452,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (info.enable) {
         NotifyAddDeviceListeners(deviceId);
     }
+    NotifyDeviceAdded(deviceId);
     NotifyDevCallback(deviceId, info);
     NotifyAddPointerDevice(info.isPointerDevice, existEnabledPointerDevice);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -495,6 +496,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     if (enable) {
         NotifyRemoveDeviceListeners(deviceId);
     }
+    NotifyDeviceRemoved(deviceId);
     ScanPointerDevice();
     if (deviceId == INVALID_DEVICE_ID) {
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -779,6 +781,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
 
     // in current structure, virtual devices are always enabled.
     NotifyAddDeviceListeners(deviceId);
+    NotifyDeviceAdded(deviceId);
     NotifyDevCallback(deviceId, deviceInfo);
     NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -824,6 +827,7 @@ void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const str
 
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
+    inputDevice->SetVirtualDevice(true);
     virtualInputDevices_[deviceId] = inputDevice;
 }
 
@@ -972,11 +976,18 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     MMI_HILOGI("RemoveVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
     NotifyRemovePointerDevice(deviceInfo.isPointerDevice);
     NotifyRemoveDeviceListeners(deviceId);
+    NotifyDeviceRemoved(deviceId);
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
 #endif
     return RET_OK;
+}
+
+bool InputDeviceManager::IsRemoteInputDevice(int32_t deviceId) const
+{
+    auto iter = virtualInputDevices_.find(deviceId);
+    return ((iter != virtualInputDevices_.cend()) && (iter->second != nullptr) && iter->second->IsRemoteDevice());
 }
 
 int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
@@ -1261,6 +1272,24 @@ int32_t InputDeviceManager::GetVirtualKeyboardType(int32_t deviceId, int32_t &ke
         return RET_OK;
     }
     return RET_ERR;
+}
+
+void InputDeviceManager::NotifyDeviceAdded(int32_t deviceId) const
+{
+    for (auto observer : observers_) {
+        if (observer != nullptr) {
+            observer->OnDeviceAdded(deviceId);
+        }
+    }
+}
+
+void InputDeviceManager::NotifyDeviceRemoved(int32_t deviceId) const
+{
+    for (auto observer : observers_) {
+        if (observer != nullptr) {
+            observer->OnDeviceRemoved(deviceId);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

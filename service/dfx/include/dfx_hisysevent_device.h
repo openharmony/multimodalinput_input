@@ -51,7 +51,6 @@ public:
         SIMULATE_EVENT_DRAW_START = 1
     };
 
-
     static void ReportDeviceFault(int32_t faultType, std::string faultMsg);
     static void ReportDeviceFault(int32_t deviceId, int32_t faultType, std::string faultMsg);
     static void ReportDeviceBehavior(int32_t deviceId, std::string msg);
