@@ -231,7 +231,6 @@ public:
     bool IsMouseInCastWindow();
     bool IsCaptureMode();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t GetFocusPid();
 
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
@@ -398,9 +397,9 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     template <class T>
-    void CreateAntiMisTakeObserver(T& item);
+    void CreateAntiMisTakeObserver(std::shared_ptr<T>& item);
     template <class T>
-    void CreatePrivacyProtectionObserver(T& item);
+    void CreatePrivacyProtectionObserver(std::shared_ptr<T>& item);
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -525,12 +524,14 @@ private:
     struct AntiMisTake {
         std::string switchName;
         bool isOpen { false };
-    } antiMistake_;
+    };
+    std::shared_ptr<AntiMisTake> antiMistake_ = std::make_shared<AntiMisTake>();
     bool isOpenAntiMisTakeObserver_ { false };
     struct PrivacyProtection {
         std::string switchName;
         bool isOpen { false };
-    } privacyProtection_;
+    };
+    std::shared_ptr<PrivacyProtection> privacyProtection_ = std::make_shared<PrivacyProtection>();
     bool isOpenPrivacyProtectionserver_ { false };
     bool mouseFlag_ {false};
     struct ActiveTouchWin {
