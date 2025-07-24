@@ -147,6 +147,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.L
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
+    ASSERT_NE(observer, nullptr);
     observer->key_ = "settingDateShare";
     std::string strUri = "strUri";
     settingDataShare.isDataShareReady_ = false;
@@ -167,6 +168,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
+    ASSERT_NE(observer, nullptr);
     observer->key_ = "settingDateShare";
     std::string strUri = "strUri";
     settingDataShare.isDataShareReady_ = false;
