@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace MMI {
 
-void DfxHisyseventDeivce::ReportDeviceFault(int32_t faultType, std::string faultMsg)
+void DfxHisyseventDevice::ReportDeviceFault(int32_t faultType, std::string faultMsg)
 {
     int32_t ret = HiSysEventWrite(DFX_HISYSEVENT_DOMAIN,
         DFX_HISYSEVENT_NAME_DEVICE_FAULT,
@@ -48,7 +48,7 @@ void DfxHisyseventDeivce::ReportDeviceFault(int32_t faultType, std::string fault
     }
 }
 
-void DfxHisyseventDeivce::ReportDeviceFault(int32_t deviceId, int32_t faultType, std::string faultMsg)
+void DfxHisyseventDevice::ReportDeviceFault(int32_t deviceId, int32_t faultType, std::string faultMsg)
 {
     std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(deviceId);
     CHKPV(dev);
@@ -77,7 +77,7 @@ void DfxHisyseventDeivce::ReportDeviceFault(int32_t deviceId, int32_t faultType,
     }
 }
 
-void DfxHisyseventDeivce::ReportDeviceBehavior(int32_t deviceId, std::string msg)
+void DfxHisyseventDevice::ReportDeviceBehavior(int32_t deviceId, std::string msg)
 {
     std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(deviceId);
     CHKPV(dev);
@@ -99,6 +99,25 @@ void DfxHisyseventDeivce::ReportDeviceBehavior(int32_t deviceId, std::string msg
     if (ret != 0) {
         MMI_HILOGE(
             "HiviewDFX Write failed, ret:%{public}d, deivceId:%{public}d, msg:%{public}s", ret, deviceId, msg.c_str());
+    }
+}
+
+void DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(int32_t pointerId, int64_t processDT)
+{
+    int32_t ret = HiSysEventWrite(DFX_HISYSEVENT_DOMAIN,
+        DFX_HISYSEVENT_NAME_DEVICE_BEHAVIOR,
+        DFX_HISYSEVENT_TYPE_BEHAVIOR,
+        "BIZ_SCENE", BizScene::EVENT_DRAW,
+        "BIZ_STAGE", BizStage::SIMULATE_EVENT_DRAW,
+        "STAGE_RES", StageRes::SIMULATE_EVENT_DRAW_SUCCESS,
+        "BIZ_STATE", BizState::SIMULATE_EVENT_DRAW_START,
+        "POINTER_EVENT_ID", pointerId,
+        "PROCESS_TIME", processDT
+        );
+    if (ret != 0) {
+        MMI_HILOGE(
+            "HiviewDFX Write failed, ret:%{public}d, pointerId:%{public}d, processDT:%{public}" PRId64,
+                ret, pointerId, processDT);
     }
 }
 

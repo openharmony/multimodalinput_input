@@ -43,6 +43,8 @@ int64_t GetSysClockTime();
 
 int64_t GetMillisTime();
 
+int64_t GetTimeToMilli(int64_t timeDT);
+
 uint64_t GetThisThreadId();
 
 size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList);

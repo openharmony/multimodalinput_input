@@ -90,6 +90,11 @@ int64_t GetMillisTime()
     return tmp.count();
 }
 
+int64_t GetTimeToMilli(int64_t timeDT)
+{
+    return (timeDT + 999) / TIME_CONVERSION_UNIT;
+}
+
 static std::string GetThisThreadIdOfString()
 {
     thread_local std::string threadLocalId;

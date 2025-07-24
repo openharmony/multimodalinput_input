@@ -36,6 +36,9 @@
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "hitrace_meter.h"
 #include "pull_throw_subscriber_handler.h"
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+#include "dfx_hisysevent_device.h"
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -105,6 +108,9 @@ constexpr uint32_t VOICE_WINDOW_ZORDER { 4000.0 };
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t CURSOR_POSITION_EXPECTED_SIZE { 2 };
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+constexpr int64_t SIMULATE_EVENT_LATENCY { 5 };
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -4270,6 +4276,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+            int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime);
+            if (timeDT > SIMULATE_EVENT_LATENCY) {
+                MMI_HILOGI("Not touchWindow simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
+                    pointerEvent->GetId(), timeDT);
+                DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(pointerEvent->GetId(), timeDT);
+            }
+#endif                
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
             int64_t endTime = GetSysClockTime();
             if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
@@ -4398,6 +4412,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 dragPointerStyle_.id, globalStyle_.id);
             dragPointerStyle_ = globalStyle_;
         }
+#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+        int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime);
+        if (timeDT > SIMULATE_EVENT_LATENCY) {
+            MMI_HILOGI("simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
+                pointerEvent->GetId(), timeDT);
+            DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(pointerEvent->GetId(), timeDT);
+        }
+#endif        
         CursorDrawingComponent::GetInstance().DrawPointer(physicalDisplayInfo->rsId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
