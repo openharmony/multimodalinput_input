@@ -34,6 +34,7 @@
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_unicode_transformation.h"
 #include "long_press_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "pointer_device_manager.h"
@@ -84,6 +85,18 @@ constexpr int64_t QUERY_AUTHORIZE_MAX_INTERVAL_TIME { 3000 };
 constexpr uint32_t MAX_ENHANCE_CONFIG_SIZE { 1000 };
 } // namespace
 
+void ServerMsgHandler::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
+{
+    handler_.OnDeviceRemoved(deviceId);
+}
+
+ServerMsgHandler::ServerMsgHandler() {}
+
+ServerMsgHandler::~ServerMsgHandler()
+{
+    TearDownDeviceObserver();
+}
+
 void ServerMsgHandler::Init(UDSServer &udsServer)
 {
     udsServer_ = &udsServer;
@@ -107,6 +120,7 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
         }
     }
     AUTHORIZE_HELPER->Init(&clientDeathHandler_);
+    SetUpDeviceObserver();
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
@@ -131,25 +145,26 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(keyEvent, ERROR_NULL_POINTER);
-    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
         int32_t checkReturn = NativeInjectCheck(pid);
         if (checkReturn != RET_OK) {
             return checkReturn;
         }
     }
-    keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
+    auto tKeyEvent = NormalizeKeyEvent(keyEvent);
+    CHKPR(tKeyEvent, ERROR_NULL_POINTER);
+    LogTracer lt(tKeyEvent->GetId(), tKeyEvent->GetEventType(), tKeyEvent->GetKeyAction());
+    tKeyEvent->SetKeyIntention(KeyItemsTransKeyIntention(tKeyEvent->GetKeyItems()));
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
+    inputEventNormalizeHandler->HandleKeyEvent(tKeyEvent);
 #ifdef SHORTCUT_KEY_RULES_ENABLED
-    KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
+    KEY_SHORTCUT_MGR->UpdateShortcutConsumed(tKeyEvent);
 #endif // SHORTCUT_KEY_RULES_ENABLED
-    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Inject keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (EventLogHelper::IsBetaVersion() && !tKeyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("inject (%{private}d, %{public}d)", tKeyEvent->GetKeyCode(), tKeyEvent->GetKeyAction());
     } else {
-        MMI_HILOGD("Inject keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGD("inject (%{private}d, %{public}d)", tKeyEvent->GetKeyCode(), tKeyEvent->GetKeyAction());
     }
     return RET_OK;
 }
@@ -1720,6 +1735,108 @@ int32_t ServerMsgHandler::NativeInjectCheck(int32_t pid)
         return COMMON_PERMISSION_CHECK_ERROR;
     }
     return RET_OK;
+}
+
+void ServerMsgHandler::SetUpDeviceObserver()
+{
+    inputDevObserver_ = std::make_shared<InputDeviceObserver>(*this);
+    INPUT_DEV_MGR->Attach(inputDevObserver_);
+}
+
+void ServerMsgHandler::TearDownDeviceObserver()
+{
+    if (inputDevObserver_ != nullptr) {
+        INPUT_DEV_MGR->Detach(inputDevObserver_);
+        inputDevObserver_ = nullptr;
+    }
+}
+
+void ServerMsgHandler::OnDeviceRemoved(int32_t deviceId)
+{
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPV(keyEvent);
+    for (auto &keyItem : keyEvent->GetKeyItems()) {
+        if (keyItem.GetDeviceId() != deviceId) {
+            continue;
+        }
+        if (!keyItem.IsPressed()) {
+            keyEvent->RemoveReleasedKeyItems(keyItem);
+            continue;
+        }
+        keyEvent->SetActionTime(GetSysClockTime());
+        keyEvent->SetAction(KeyEvent::KEY_ACTION_CANCEL);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+        keyEvent->SetDeviceId(keyItem.GetDeviceId());
+        keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
+        keyEvent->SetKeyCode(keyItem.GetKeyCode());
+        keyEvent->SetRepeat(false);
+        keyItem.SetPressed(false);
+        keyEvent->RemoveReleasedKeyItems(keyItem);
+        keyEvent->AddPressedKeyItems(keyItem);
+        keyEvent->SetKeyIntention(KeyItemsTransKeyIntention(keyEvent->GetKeyItems()));
+        keyEvent->UpdateId();
+
+        LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+        auto eventHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPV(eventHandler);
+        eventHandler->HandleKeyEvent(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
+        KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
+#endif // SHORTCUT_KEY_RULES_ENABLED
+        keyEvent->RemoveReleasedKeyItems(keyItem);
+    }
+}
+
+std::shared_ptr<KeyEvent> ServerMsgHandler::CleanUpKeyEvent() const
+{
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPP(keyEvent);
+    for (const auto &keyItem : keyEvent->GetKeyItems()) {
+        if (!keyItem.IsPressed()) {
+            keyEvent->RemoveReleasedKeyItems(keyItem);
+        }
+    }
+    return keyEvent;
+}
+
+std::shared_ptr<KeyEvent> ServerMsgHandler::NormalizeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPP(keyEvent);
+    if (!INPUT_DEV_MGR->IsRemoteInputDevice(keyEvent->GetDeviceId())) {
+        return keyEvent;
+    }
+    auto tKeyEvent = CleanUpKeyEvent();
+    CHKPP(tKeyEvent);
+    tKeyEvent->SetActionTime(keyEvent->GetActionTime());
+    tKeyEvent->SetAction(keyEvent->GetKeyAction());
+    tKeyEvent->SetKeyAction(keyEvent->GetKeyAction());
+    tKeyEvent->SetDeviceId(keyEvent->GetDeviceId());
+    tKeyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
+    tKeyEvent->SetKeyCode(keyEvent->GetKeyCode());
+    if ((tKeyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) && tKeyEvent->GetPressedKeys().empty()) {
+        tKeyEvent->SetActionStartTime(keyEvent->GetActionTime());
+    }
+    KeyEvent::KeyItem tKeyItem {};
+    tKeyItem.SetDownTime(keyEvent->GetActionTime());
+    tKeyItem.SetKeyCode(keyEvent->GetKeyCode());
+    tKeyItem.SetDeviceId(keyEvent->GetDeviceId());
+    tKeyItem.SetPressed(keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN);
+    tKeyItem.SetUnicode(KeyCodeToUnicode(keyEvent->GetKeyCode(), keyEvent));
+
+    if (!tKeyItem.IsPressed()) {
+        auto item = keyEvent->GetKeyItem(keyEvent->GetKeyCode());
+        if (item) {
+            tKeyItem.SetDownTime(item->GetDownTime());
+        }
+        tKeyEvent->RemoveReleasedKeyItems(tKeyItem);
+        auto functionKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
+        if (functionKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
+            tKeyEvent->SetFunctionKey(functionKey, keyEvent->GetFunctionKey(functionKey));
+        }
+    }
+    tKeyEvent->AddPressedKeyItems(tKeyItem);
+    tKeyEvent->UpdateId();
+    return tKeyEvent;
 }
 } // namespace MMI
 } // namespace OHOS

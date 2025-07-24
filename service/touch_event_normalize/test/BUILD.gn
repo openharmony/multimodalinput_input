@@ -1050,11 +1050,49 @@ ohos_unittest("InputDeviceConsumerHandlerTest") {
   ]
 }
 
+ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
+
+  sources = [
+    "src/remote_control_transform_processor_test_with_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utilsbase",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libwm",
+  ]
+}
+
 group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
     ":InputDeviceConsumerHandlerTest",
+    ":RemoteControlTransformProcessorTestWithMock", 
     ":TouchEventNormalizeTest",
     ":TouchTransformProcessorTestWithMock",
     ":TransformPointTest",

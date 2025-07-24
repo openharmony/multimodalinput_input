@@ -56,6 +56,7 @@ constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t COLOR_FIXEX_WIDTH { 6 };
 const std::string COLOR_PREFIX = "#";
 const char COLOR_FILL = '0';
+constexpr int64_t TIME_ROUND_UP { 999 };
 } // namespace
 
 int64_t GetSysClockTime()
@@ -92,7 +93,7 @@ int64_t GetMillisTime()
 
 int64_t GetTimeToMilli(int64_t timeDT)
 {
-    return (timeDT + 999) / TIME_CONVERSION_UNIT;
+    return (timeDT + TIME_ROUND_UP) / TIME_CONVERSION_UNIT;
 }
 
 static std::string GetThisThreadIdOfString()
