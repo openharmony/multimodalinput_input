@@ -1887,8 +1887,10 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
 HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
 {
     int64_t *intervalSinceLastInput = static_cast<int64_t *>(malloc(sizeof(int64_t)));
+    ASSERT_NE(intervalSinceLastInput, nullptr);
     int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
     free(intervalSinceLastInput);
+    intervalSinceLastInput = nullptr;
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 
