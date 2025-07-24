@@ -420,7 +420,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     std::string errStr = "Parsing strName failed: \'" + strName + "\'";
     MMI_HILOGE("%{public}s", errStr.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER, errStr);
+    DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER, errStr);
 #endif
     return RET_ERR;
 }
@@ -455,7 +455,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     NotifyDevCallback(deviceId, info);
     NotifyAddPointerDevice(info.isPointerDevice, existEnabledPointerDevice);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device added successfully");
+    DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device added successfully");
 #endif
 }
 
@@ -498,7 +498,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     ScanPointerDevice();
     if (deviceId == INVALID_DEVICE_ID) {
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
+        DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
                                                "Device reomved failed becaused of not found");
 #endif
     }
@@ -782,7 +782,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     NotifyDevCallback(deviceId, deviceInfo);
     NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
+    DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
 #endif
     return RET_OK;
 }
@@ -794,8 +794,8 @@ bool InputDeviceManager::CheckDuplicateInputDevice(struct libinput_device *input
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-            DfxHisyseventDeivce::ReportDeviceFault(item.first,
-                DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
+            DfxHisyseventDevice::ReportDeviceFault(item.first,
+                DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
                 "The device is already existent");
 #endif
             return true;
@@ -836,7 +836,7 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
             deviceId = it->first;
             enable = it->second.enable;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-            DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device removed successfully");
+            DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device removed successfully");
 #endif
             MMI_HILOGI("Device removed successfully, deviceId:%{public}d, sys uid:%{public}s", deviceId,
                 it->second.sysUid.c_str());
@@ -974,7 +974,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     NotifyRemoveDeviceListeners(deviceId);
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
+    DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
 #endif
     return RET_OK;
 }

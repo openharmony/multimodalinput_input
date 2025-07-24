@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace MMI {
-class DfxHisyseventDeivce {
+class DfxHisyseventDevice {
 public:
 
     enum DeviceFaultType : int32_t {
@@ -35,9 +35,27 @@ public:
         DEVICE_FAULT_TYPE_INNER,
     };
 
+    enum BizScene {
+        EVENT_DRAW = 1
+    };
+
+    enum BizStage {
+        SIMULATE_EVENT_DRAW = 1
+    };
+
+    enum StageRes {
+        SIMULATE_EVENT_DRAW_SUCCESS = 1
+    };
+
+    enum BizState {
+        SIMULATE_EVENT_DRAW_START = 1
+    };
+
+
     static void ReportDeviceFault(int32_t faultType, std::string faultMsg);
     static void ReportDeviceFault(int32_t deviceId, int32_t faultType, std::string faultMsg);
     static void ReportDeviceBehavior(int32_t deviceId, std::string msg);
+    static void ReportSimulateToRsLatecyBehavior(int32_t pointerId, int64_t processDT);
 };
 } // namespace MMI
 } // namespace OHOS
