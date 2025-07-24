@@ -457,12 +457,15 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest02, TestSize.Leve
     auto env = ContextService::GetInstance();
     ASSERT_NE(env, nullptr);
     auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
+    ASSERT_NE(eventData, nullptr);
     eventData->fd = 1;
     eventData->event_type = EPOLL_EVENT_BEGIN;
     struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
     ASSERT_NO_FATAL_FAILURE(env->devMgr_.Dispatch(ev));
+    free(eventData);
+    eventData = nullptr;
 }
 
 /**

@@ -243,6 +243,10 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
         MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
     }
+    if (enhanceCfg_ != nullptr) {
+        delete enhanceCfg_;
+        enhanceCfg_ = nullptr;
+    }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
     CHKPV(enhanceCfg_);
     errno_t ret = memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen);
