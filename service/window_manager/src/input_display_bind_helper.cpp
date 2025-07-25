@@ -359,7 +359,7 @@ void InputDisplayBindHelper::RemoveInputDevice(int32_t id)
 
 bool InputDisplayBindHelper::IsDisplayAdd(int32_t id, const std::string &name)
 {
-    CHKPV(infos_);
+    CHKPF(infos_);
     const auto &infos = infos_->GetInfos();
     for (const auto &info : infos) {
         if ((info.GetDisplayName() == name) && (info.GetDisplayId() == id)) {
