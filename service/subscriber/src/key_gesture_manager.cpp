@@ -515,6 +515,7 @@ void KeyGestureManager::Dump() const
 {
     for (const auto &keyGesture : keyGestures_) {
         std::ostringstream output;
+        CHKPC(keyGesture);
         keyGesture->Dump(output);
         MMI_HILOGI("%s", output.str().c_str());
     }
