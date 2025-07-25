@@ -30,7 +30,7 @@ inline constexpr double DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE { 1.000000 };
 inline constexpr double LEFT_SILDE_UP_ABS_PRESSURE_VALUE = 249.0 / 255;
 inline constexpr double LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE = 250.0 / 255;
 inline constexpr double RIGHT_SILDE_UP_ABS_PRESSURE_VALUE = 251.0 / 255;
-inline constexpr double RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE 252.0 / 255;
+inline constexpr double RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE = 252.0 / 255;
 inline constexpr double SYNC_TOUCHPAD_SETTINGS = 253.0 / 255;
 
 enum KNUCKLE_DOUBLE_CLICK_EVENT_TYPE {
