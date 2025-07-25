@@ -31,7 +31,7 @@ public:
 
     void Draw(const OLD::DisplayInfo& displayInfo, const std::shared_ptr<PointerEvent> &touchEvent) override;
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
-
+    void RegisterAddTimer(AddTimerFunc addTimerFunc) override;
 private:
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawingMgr_ {nullptr};
 #ifndef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC

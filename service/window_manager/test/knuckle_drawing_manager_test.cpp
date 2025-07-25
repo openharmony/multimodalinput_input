@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -931,5 +931,24 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_InitParticleEmitte
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.InitParticleEmitter());
 }
 #endif
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_RegisterAddTimer_001
+ * @tc.desc: Test Overrides RegisterAddTimer function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RegisterAddTimer_001, TestSize.Level1)
+{
+    knuckleDrawMgr_->RegisterAddTimer([] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+            const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return RET_OK;
+    });
+    ASSERT_FALSE(knuckleDrawMgr_->addTimerFunc_);
+}
 } // namespace MMI
 } // namespace OHOS
