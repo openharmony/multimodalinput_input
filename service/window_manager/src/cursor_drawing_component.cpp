@@ -43,12 +43,12 @@ static constexpr const char *MULTIMODAL_PATH_NAME = "libcursor_drawing_adapter.z
 CursorDrawingComponent& CursorDrawingComponent::GetInstance()
 {
     static CursorDrawingComponent instance;
+    instance.Load();
     return instance;
 }
 
 CursorDrawingComponent::CursorDrawingComponent()
 {
-    Load();
     MMI_HILOGI("create succeeded");
 }
 
