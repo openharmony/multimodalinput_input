@@ -638,6 +638,7 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     int32_t displayY = pointerItem.GetDisplayY();
     std::unordered_set<int32_t> fingerFocusPidSet;
     for (const auto &monitor : monitors_) {
+        CHKPC(monitor.session_);
         if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
             monitor.session_->GetPid() == WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId())) {
             fingerFocusPidSet.insert(monitor.session_->GetPid());

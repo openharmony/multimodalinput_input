@@ -732,7 +732,7 @@ void TouchGestureDetector::CheckGestureTrend(std::shared_ptr<PointerEvent> event
 
     for (const auto &[pointerId, downPt] : downPoint_) {
         PointerEvent::PointerItem item {};
-
+        CHKPC(event);
         if (!event->GetPointerItem(pointerId, item)) {
             MMI_HILOGW("No touch(%{public}d) record", pointerId);
             return;

@@ -579,6 +579,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisib
 {
     MMI_HILOGI("The observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
+        CHKPV(*observer);
         (*observer)->UpdatePointerDevice(hasPointerDevice, isVisible, isHotPlug);
     }
 }

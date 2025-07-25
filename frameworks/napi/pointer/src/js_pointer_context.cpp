@@ -86,9 +86,11 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
         MMI_HILOGI("Jsvm ends");
         JsPointerContext *context = static_cast<JsPointerContext*>(data);
         delete context;
+        context = nullptr;
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
+        jsContext = nullptr;
         THROWERR(env, "Failed to wrap native instance");
         return nullptr;
     }
@@ -1895,10 +1897,12 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
     cursor.pixelMap = pixelMapData;
     if (!GetFocusInfo(env, obj, "focusX", cursor.focusX, pixelMap->GetWidth())) {
         delete static_cast<Parcel*>(cursor.pixelMap);
+        cursor.pixelMap = nullptr;
         return false;
     }
     if (!GetFocusInfo(env, obj, "focusY", cursor.focusY, pixelMap->GetHeight())) {
         delete static_cast<Parcel*>(cursor.pixelMap);
+        cursor.pixelMap = nullptr;
         return false;
     }
     return true;

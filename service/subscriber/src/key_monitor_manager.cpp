@@ -225,6 +225,7 @@ void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int
     CALL_DEBUG_ENTER;
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY_MONITOR);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
+    CHKPV(keyEvent);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Failed to package key event(No:%{public}d)", keyEvent->GetId());
         return;

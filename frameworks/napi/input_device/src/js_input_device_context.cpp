@@ -98,6 +98,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
+        jsContext = nullptr;
         MMI_HILOGE("Failed to wrap native instance");
         return nullptr;
     }
