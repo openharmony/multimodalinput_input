@@ -154,6 +154,8 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.L
     ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
     settingDataShare.isDataShareReady_ = true;
     ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
+    delete(observer);
+    observer = nullptr;
 }
 
 /**
@@ -175,6 +177,8 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
     ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
     settingDataShare.isDataShareReady_ = true;
     ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
+    delete(observer);
+    observer = nullptr;
 }
 
 /**

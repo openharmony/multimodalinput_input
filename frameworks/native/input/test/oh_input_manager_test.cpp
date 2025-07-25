@@ -373,6 +373,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent, TestS
     CALL_TEST_DEBUG;
     Input_AxisEvent *inputAxisEvent = nullptr;
     EXPECT_EQ(OH_Input_DestroyAxisEvent(&inputAxisEvent), INPUT_PARAMETER_ERROR);
+    delete inputAxisEvent;
+    inputAxisEvent = nullptr;
 }
 
 /**
