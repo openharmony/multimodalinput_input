@@ -1249,7 +1249,7 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
         MMI_HILOGI("pressure is not in gesture list");
         return false;
     }
-    MMI_HILOGI("Current is touchpad edge swipe: type: %{public}f",pressure);
+    MMI_HILOGI("Current is touchpad edge swipe: type: %{public}f", pressure);
     keyDownEvent->SetKeyCode(keyCode);
     keyUpEvent->SetKeyCode(keyCode);
     itemDown->SetKeyCode(keyCode);
