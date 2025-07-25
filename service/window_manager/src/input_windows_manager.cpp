@@ -4283,7 +4283,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                     pointerEvent->GetId(), timeDT);
                 DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(pointerEvent->GetId(), timeDT);
             }
-#endif                
+#endif              
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
             int64_t endTime = GetSysClockTime();
             if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
@@ -4419,7 +4419,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 pointerEvent->GetId(), timeDT);
             DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(pointerEvent->GetId(), timeDT);
         }
-#endif        
+#endif
         CursorDrawingComponent::GetInstance().DrawPointer(physicalDisplayInfo->rsId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
