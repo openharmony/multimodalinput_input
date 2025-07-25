@@ -1237,13 +1237,13 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     keyUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 
     int ret = -1;
-    if (presssure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE) {
+    if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_BRIGHTNESS_UP;
-    } else if (presssure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
+    } else if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_BRIGHTNESS_DOWN;
-    } else if (presssure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE) {
+    } else if (pressure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_VOLUME_UP;
-    } else if (presssure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
+    } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     } else {
         MMI_HILOGI("pressure is not in gesture list");
@@ -1252,10 +1252,10 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     MMI_HILOGI("Current is touchpad edge swipe: type: %{public}f", pressure);
     keyDownEvent->SetKeyCode(keyCode);
     keyUpEvent->SetKeyCode(keyCode);
-    itemDown->SetKeyCode(keyCode);
-    itemUp->SetKeyCode(keyCode);
-    itemDown->SetPressed(isKeyPressed);
-    itemUp->SetPressed(isKeyPressed);
+    itemDown.SetKeyCode(keyCode);
+    itemUp.SetKeyCode(keyCode);
+    itemDown.SetPressed(isKeyPressed);
+    itemUp.SetPressed(isKeyPressed);
     keyDownEvent->AddPressedKeyItems(itemDown);
     keyUpEvent->AddPressedKeyItems(itemUp);
     nextHandler_->HandleKeyEvent(keyDownEvent);
