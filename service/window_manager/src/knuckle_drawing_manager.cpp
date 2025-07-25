@@ -751,12 +751,17 @@ int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
     }
     if (isNeedUpAnimation) {
         ActionUpAnimation();
-        int32_t repeatTime = 1;
-        int32_t timerId = TimerMgr->AddTimer(PROTOCOL_DURATION, repeatTime, [this]() {
-            DestoryWindow();
-        }, "KnuckleDrawingManager");
-        if (timerId < 0) {
-            MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+        if (addTimerFunc_) {
+            int32_t repeatTime = 1;
+            int32_t timerId = addTimerFunc_(PROTOCOL_DURATION, repeatTime, [this]() {
+                DestoryWindow();
+            }, "KnuckleDrawingManager");
+            if (timerId < 0) {
+                MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+                DestoryWindow();
+            }
+        } else {
+            MMI_HILOGE("addTimerFunc_ is invalid");
             DestoryWindow();
         }
     } else {
@@ -977,6 +982,11 @@ void KnuckleDrawingManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t d
 {
     g_WindowScreenId = screenId;
     g_DisplayNodeScreenId = displayNodeScreenId;
+}
+
+void KnuckleDrawingManager::RegisterAddTimer(AddTimerCallbackFunc addTimerFunc)
+{
+    addTimerFunc_ = addTimerFunc;
 }
 } // namespace MMI
 } // namespace OHOS
