@@ -1071,7 +1071,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_001, T
     displayGroupInfo.displaysInfo.push_back(displayInfo);
     OHOS::MMI::UserScreenInfo userScreenInfo;
     userScreenInfo.userId = 100;
-    userScreenInfo.displayGroups.push_back(displayGroupInfo); 
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
     EXPECT_EQ(result, RET_OK);
 }
@@ -1384,7 +1384,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_003, T
     displayGroupInfo.displaysInfo.push_back(displayInfo);
     OHOS::MMI::UserScreenInfo userScreenInfo;
     userScreenInfo.userId = 100;
-    userScreenInfo.displayGroups.push_back(displayGroupInfo); 
+    userScreenInfo.displayGroups.push_back(displayGroupInfo);
     userScreenInfo.displayGroups.resize(1110);
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
     EXPECT_EQ(result, RET_ERR);
