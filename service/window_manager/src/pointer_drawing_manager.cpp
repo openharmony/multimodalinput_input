@@ -484,6 +484,7 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
+    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     currentDirection_ = direction;
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
@@ -1120,6 +1121,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         return;
     }
     PostTask([this]() -> void {
+        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
         if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
             MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
             return;
@@ -2522,6 +2524,7 @@ IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     if (IsPointerVisible() && mouseDisplayState_) {
