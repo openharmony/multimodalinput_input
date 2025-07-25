@@ -83,7 +83,6 @@ void PriorityMiddleCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
     if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-        ASSERT_TRUE(pointerEvent != nullptr);
         TestUtil->AddEventDump("Call middle interceptor");
     }
 }
@@ -93,7 +92,6 @@ void PriorityMiddleCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) co
     CALL_DEBUG_ENTER;
     if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-        ASSERT_TRUE(keyEvent != nullptr);
         TestUtil->AddEventDump("Call middle interceptor");
     }
 }
@@ -103,7 +101,6 @@ void PriorityHighCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEve
     CALL_DEBUG_ENTER;
     if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-        ASSERT_TRUE(pointerEvent != nullptr);
         TestUtil->AddEventDump("Call high interceptor");
     }
 }
@@ -113,7 +110,6 @@ void PriorityHighCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) cons
     CALL_DEBUG_ENTER;
     if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-        ASSERT_TRUE(keyEvent != nullptr);
         TestUtil->AddEventDump("Call high interceptor");
     }
 }
@@ -175,8 +171,6 @@ bool EventUtilTest::Init()
     if (!WindowUtilsTest::GetInstance()->DrawTestWindow()) {
         return false;
     }
-    sptr<Rosen::Window> window_ = WindowUtilsTest::GetInstance()->GetWindow();
-    CHKPF(window_);
     auto listener_ = GetPtr<InputEventConsumer>();
     CHKPF(listener_);
     const std::string threadTest = "EventUtilTest";

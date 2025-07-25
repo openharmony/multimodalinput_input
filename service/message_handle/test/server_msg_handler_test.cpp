@@ -1881,6 +1881,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, 
     manager.connectionCallback_->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
     EXPECT_FALSE(ret);
+    delete(manager.connectionCallback_);
+    manager.connectionCallback_ = nullptr;
 }
 
 /**
