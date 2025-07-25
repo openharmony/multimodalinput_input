@@ -164,6 +164,7 @@ group("mmi_tests") {
     "frameworks/proxy:KeyEventInputSubscribeManagerTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:LongPressEventSubscribeManagerTest",
+    "frameworks/proxy:PointerEventExTest",
     "frameworks/proxy:PointerEventNdkTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:PointerStyleTest",
