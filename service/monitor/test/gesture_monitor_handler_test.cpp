@@ -65,6 +65,42 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid, T
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_CheckMonitorValid_001
+ * @tc.desc: Test the funcation CheckMonitorValid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    TouchGestureType type = TOUCH_GESTURE_TYPE_ALL;
+    int32_t fingers = FOUR_FINGER_COUNT;
+    bool ret = handler.CheckMonitorValid(type, fingers);
+    ASSERT_TRUE(ret);
+    type = TOUCH_GESTURE_TYPE_PINCH;
+    fingers = THREE_FINGER_COUNT;
+    ret = handler.CheckMonitorValid(type, fingers);
+    ASSERT_FALSE(ret);
+    type = TOUCH_GESTURE_TYPE_SWIPE;
+    fingers = 2;
+    ret = handler.CheckMonitorValid(type, fingers);
+    ASSERT_FALSE(ret);
+    type = TOUCH_GESTURE_TYPE_ALL;
+    fingers = MAX_FINGERS_COUNT;
+    ret = handler.CheckMonitorValid(type, fingers);
+    ASSERT_TRUE(ret);
+    type = 0xFFFFFFFF;
+    fingers = FOUR_FINGER_COUNT;
+    ret = handler.CheckMonitorValid(type, fingers);
+    ASSERT_FALSE(ret);
+    type = TOUCH_GESTURE_TYPE_ALL;
+    fingers = -1;
+    ret = handler.CheckMonitorValid(type, fingers);
+    ASSERT_FALSE(ret);
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_IsTouchGestureEvent
  * @tc.desc: Test the funcation IsTouchGestureEvent
  * @tc.type: FUNC
