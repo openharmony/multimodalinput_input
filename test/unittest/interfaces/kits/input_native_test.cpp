@@ -1881,7 +1881,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
 HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
 {
     int64_t intervalSinceLastInput = 5;
-    ASSERT_NE(intervalSinceLastInput, nullptr);
     int32_t retResult = OH_Input_GetIntervalSinceLastInput(&intervalSinceLastInput);
 
     EXPECT_EQ(retResult, INPUT_SUCCESS);
