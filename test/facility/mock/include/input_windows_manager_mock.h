@@ -67,6 +67,7 @@ public:
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
     MOCK_METHOD(void, SetFoldState, ());
+    MOCK_METHOD(bool, CheckAppFocused, (int32_t));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(MouseLocation, GetMouseInfo, ());
