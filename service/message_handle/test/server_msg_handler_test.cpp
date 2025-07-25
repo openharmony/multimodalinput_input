@@ -504,8 +504,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeLongPressEvent, T
     int32_t pid = 1;
     int32_t subscribeId = 1;
     LongPressRequest longPressRequest;
-    EXPECT_EQ(
-        servermsghandler.OnSubscribeLongPressEvent(&udsServer, pid, subscribeId, longPressRequest), ERROR_NULL_POINTER);
+    EXPECT_EQ(servermsghandler.OnSubscribeLongPressEvent(&udsServer, pid, subscribeId, longPressRequest),
+        ERROR_NULL_POINTER);
     EXPECT_EQ(servermsghandler.OnUnsubscribeLongPressEvent(&udsServer, pid, subscribeId), ERROR_NULL_POINTER);
 }
 

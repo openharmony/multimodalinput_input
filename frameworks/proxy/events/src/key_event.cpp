@@ -1171,12 +1171,12 @@ bool KeyEvent::IsValidKeyItem() const
     for (auto it = keys_.begin(); it != keys_.end(); ++it) {
         if (it->GetKeyCode() == keyCode) {
             if (++sameKeyCodeNum > 1) {
-                MMI_HILOGE("Keyitems keyCode is not unique with keyEvent keyCode");
+                MMI_HILOGE("Keyitems key code is not unique with keyEvent key code");
                 return false;
             }
         }
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
-            MMI_HILOGE("The keyCode is invalid");
+            MMI_HILOGE("The key code is invalid");
             return false;
         }
         if (it->GetDownTime() <= 0) {
@@ -1189,7 +1189,7 @@ bool KeyEvent::IsValidKeyItem() const
         }
         if (action == KEY_ACTION_UP && it->IsPressed() == false) {
             if (it->GetKeyCode() != keyCode) {
-                MMI_HILOGE("The keyCode is invalid when isPressed is false");
+                MMI_HILOGE("The key code is invalid when isPressed is false");
                 return false;
             }
         }
@@ -1197,14 +1197,14 @@ bool KeyEvent::IsValidKeyItem() const
         auto item = it;
         for (++item; item != keys_.end(); item++) {
             if (it->GetKeyCode() == item->GetKeyCode()) {
-                MMI_HILOGE("Keyitems keyCode exist same items");
+                MMI_HILOGE("Keyitems key code exist same items");
                 return false;
             }
         }
     }
 
     if (sameKeyCodeNum == 0) {
-        MMI_HILOGE("Keyitems keyCode is not exist equal item with keyEvent keyCode");
+        MMI_HILOGE("Keyitems key code is not exist equal item with keyEvent key code");
         return false;
     }
     return true;
@@ -1215,7 +1215,7 @@ bool KeyEvent::IsValid() const
     CALL_DEBUG_ENTER;
     int32_t keyCode = GetKeyCode();
     if (keyCode <= KEYCODE_UNKNOWN) {
-        MMI_HILOGE("KeyCode_ is invalid");
+        MMI_HILOGE("Key code is invalid");
         return false;
     }
 
