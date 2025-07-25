@@ -1705,12 +1705,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_OnGetKeyState_001, TestSize.Level1)
     ErrCode ret = mmiService.OnGetKeyState(pressedKeys, specialKeysState);
     MMI_HILOGI("OnGetKeyState_001 ret: %{public}d", ret);
     EXPECT_TRUE(ret == RET_OK || ret == ERROR_NULL_POINTER);
-    for (auto code : pressedKeys) {
-        MMI_HILOGI("PressedKey: %{public}d", code);
-    }
-    for (auto &[key, state] : specialKeysState) {
-        MMI_HILOGI("SpecialKey: %{public}d -> %{public}d", key, state);
-    }
 }
 
 /**
@@ -2080,7 +2074,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_QuerySwitchStatus_001, TestSize.Level1)
     int32_t switchType = 1;
     int32_t state = -1;
     ErrCode ret = mmiService.QuerySwitchStatus(switchType, state);
-    MMI_HILOGI("QuerySwitchStatus_001 ret: %{public}d, state: %{public}d", ret, state);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
 }
 
@@ -2098,7 +2091,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_QuerySwitchStatus_002, TestSize.Level1)
     int32_t switchType = 1;
     int32_t state = -1;
     ErrCode ret = mmiService.QuerySwitchStatus(switchType, state);
-    MMI_HILOGI("QuerySwitchStatus_002 ret: %{public}d, state: %{public}d", ret, state);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -2303,8 +2295,6 @@ HWTEST_F(MMIServerTest, MMIServerTest_GetAllMmiSubscribedEvents_002, TestSize.Le
     MmiEventMap mmiEventMap;
     mmiEventMap.datas.emplace(std::make_tuple(1, 0, "dummy"), 123);
     ErrCode ret = mmiService.GetAllMmiSubscribedEvents(mmiEventMap);
-    MMI_HILOGI("GetAllMmiSubscribedEvents_002 ret: %{public}d, datas size: %{public}zu",
-               ret, mmiEventMap.datas.size());
     EXPECT_EQ(ret, RET_OK);
     EXPECT_TRUE(mmiEventMap.datas.empty());
 }
@@ -3971,9 +3961,6 @@ HWTEST_F(MMIServerTest, MMIService_GetHardwareCursorStats_001, TestSize.Level1)
     uint32_t vsyncCount = 0;
     ErrCode ret = mmiService.GetHardwareCursorStats(frameCount, vsyncCount);
     EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
-    if (ret == RET_OK) {
-        MMI_HILOGI("frameCount: %{public}u, vsyncCount: %{public}u", frameCount, vsyncCount);
-    }
 }
 
 /**
