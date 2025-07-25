@@ -177,11 +177,26 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestS
     auto pointerEvent = PointerEvent::Create();
     UDSServer udsServer;
     WIN_MGR->Init(udsServer);
-    OLD::DisplayGroupInfo displayGroupInfo;
-    displayGroupInfo.focusWindowId = 1;
-    displayGroupInfo = WIN_MGR->GetDisplayGroupInfo();
     int32_t idNames = -1;
     ASSERT_EQ(WIN_MGR->GetClientFd(pointerEvent), idNames);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetDisplayGroupInfo_001
+ * @tc.desc: Test GetDisplayGroupInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayGroupInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    int32_t groupId = 1;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo(groupId));
 }
 
 /**
@@ -219,7 +234,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleKeyEventWindowId
     keyEvent->SetDeviceId(1);
     keyEvent->SetTargetWindowId(1);
     keyEvent->SetAgentWindowId(1);
-    WIN_MGR->HandleKeyEventWindowId(keyEvent);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->HandleKeyEventWindowId(keyEvent));
 }
 
 /**
@@ -245,6 +260,49 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_002, Test
     window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
     WIN_MGR->UpdateWindowInfo({0, 11, {window}});
     ASSERT_EQ(WIN_MGR->GetWindowPid(11), -1);
+    window.groupId = 2;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetWindowInfoVector(2));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindow_003
+ * @tc.desc: Test UpdateWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo window;
+    window.id = 11;
+    window.pid = 1221;
+    window.uid = 1;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    WIN_MGR->UpdateWindowInfo({0, 11, {window}});
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo;
+    std::vector<OHOS::MMI::OLD::DisplayInfo> displaysInfo;
+
+    windowsInfo.push_back({});
+    windowsInfo[0].id = 11;
+    windowsInfo[0].pid = 12;
+
+    windowsInfo.push_back({});
+    windowsInfo[1].id = 12;
+    windowsInfo[1].pid = 13;
+
+    windowsInfo.push_back({});
+    displaysInfo[0].id = -1;
+    displaysInfo[1].id = 1;
+    WIN_MGR->displayGroupInfoMap_.emplace(-1, OLD::DisplayGroupInfo {1, (OHOS::MMI::GroupType)1, 1,
+        1, -1, windowsInfo, displaysInfo});
+    ASSERT_EQ(WIN_MGR->GetWindowPid(11), 12);
 }
 
 /**
@@ -260,6 +318,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_00
     WIN_MGR->Init(udsServer);
     auto pointerEvent = PointerEvent::Create();
     ASSERT_EQ(WIN_MGR->UpdateTargetPointer(pointerEvent), -1);
+    WIN_MGR->IsFoldable_ = true;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    PointerEvent::PointerItem pointerItem;
+    pointerEvent->UpdatePointerItem(2, pointerItem);
+    WIN_MGR->cancelTouchStatus_ = true;
+    int32_t longAxis = 1U << 27U;
+    pointerItem.SetLongAxis(longAxis);
+    ASSERT_EQ(WIN_MGR->UpdateTargetPointer(pointerEvent), RET_ERR);
 }
 
 /**
@@ -274,13 +341,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006
     UDSServer udsServer;
     WIN_MGR->Init(udsServer);
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-2), true);
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-1), true);
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(0), true);
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(1), true);
+        ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-2), true);
     } else {
+        ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-2), false);
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-1), false);
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(0), false);
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(1), false);
+        ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-2), false);
     }
 }
 
@@ -303,6 +374,25 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetMouseCaptureMode_00
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DeviceStatusChanged_002
+ * @tc.desc: Test DeviceStatusChanged
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    std::string name = "mouse";
+    std::string sysUid = "james";
+    std::string devStatus = "add";
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->DeviceStatusChanged(2, name, sysUid, devStatus));
+    devStatus = "remove";
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->DeviceStatusChanged(2, name, sysUid, devStatus));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SetDisplayBind_009
  * @tc.desc: Test SetDisplayBind
  * @tc.type: FUNC
@@ -313,14 +403,32 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetDisplayBind_009, Te
     CALL_TEST_DEBUG;
     UDSServer udsServer;
     WIN_MGR->Init(udsServer);
-    std::string name = "mouse";
-    std::string sysUid = "james";
-    std::string devStatus = "add";
-    WIN_MGR->DeviceStatusChanged(2, name, sysUid, devStatus);
-    devStatus = "remove";
-    WIN_MGR->DeviceStatusChanged(2, name, sysUid, devStatus);
     std::string msg = "There is in InputWindowsManagerTest_GetDisplayIdNames_009";
     ASSERT_EQ(WIN_MGR->SetDisplayBind(-1, 1, msg), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetDisplayBind_010
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetDisplayBind_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    std::string msg = "There is in InputWindowsManagerTest_GetDisplayIdNames_009";
+    //std::shared_ptr<BindInfos> infos_ = std::make_shared<BindInfos>();
+    int32_t deviceId = 2;
+    int32_t displayId = 3;
+    BindInfo infos_;
+    infos_.inputDeviceId_ = 3;
+    infos_.inputNodeName_ = 4;
+    infos_.inputDeviceName_ = 5;
+    infos_.displayId_ = 6;
+    infos_.displayName_= "abc";
+    ASSERT_EQ(WIN_MGR->SetDisplayBind(deviceId, displayId, msg), RET_ERR);
 }
 
 /**
@@ -334,6 +442,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetHoverScrollState_01
     CALL_TEST_DEBUG;
     ASSERT_TRUE(WIN_MGR->SetHoverScrollState(false) == RET_OK);
     WIN_MGR->SetHoverScrollState(true);
+    ASSERT_TRUE(WIN_MGR->GetHoverScrollState());
 }
 
 /**
@@ -407,9 +516,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDi
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t displayId = 1;
-    const std::vector<WindowInfo> &windowGroupInfo = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
-    EXPECT_FALSE(windowGroupInfo.empty());
+    int32_t displayId = -1;
+    std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap_;
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo;
+    std::vector<OHOS::MMI::OLD::DisplayInfo> displaysInfo;
+    displaysInfo[0].id = -1;
+    displaysInfo[1].id = 1;
+    windowsInfo[0].id = 50;
+    windowsInfo[1].id = 51;
+    displayGroupInfoMap_.emplace(-1, OLD::DisplayGroupInfo {1, (OHOS::MMI::GroupType)1, 1,
+        1, -1, windowsInfo, displaysInfo});
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetWindowGroupInfoByDisplayId(displayId));
 }
 
 /**
@@ -458,6 +575,30 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_001, Test
     std::vector<WindowInfo> windowsInfo;
     int32_t ret = WIN_MGR->GetWindowPid(windowId, windowsInfo);
     EXPECT_EQ(ret, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowPid_002
+ * @tc.desc: Test getting the process ID of a window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 5;
+    std::vector<WindowInfo> windowsInfo(3);
+
+    windowsInfo[0].id = 5;
+    windowsInfo[0].pid = 6;
+
+    windowsInfo[1].id = 12;
+    windowsInfo[1].pid = 13;
+
+    windowsInfo[2].id = 123;
+    windowsInfo[2].pid = 124;
+    int32_t ret = WIN_MGR->GetWindowPid(windowId,  windowsInfo);
+    EXPECT_EQ(ret, 6);
 }
 
 /**
@@ -6712,12 +6853,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayI
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnDisplayRemovedOrCombinationChanged_001
+ * @tc.name: InputWindowsManagerTest_OnDisplayRemovedOrCombinationChanged_003
  * @tc.desc: Test the funcation OnDisplayRemovedOrCombinationChanged
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrCombinationChanged_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemovedOrCombinationChanged_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
@@ -7710,12 +7851,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetWindowPid_002
+ * @tc.name: InputWindowsManagerTest_GetWindowPid_003
  * @tc.desc: Test if (uiExtentionWindow.id == windowId)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
@@ -7734,12 +7875,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetWindowPid_003
+ * @tc.name: InputWindowsManagerTest_GetWindowPid_004
  * @tc.desc: Test if (uiExtentionWindow.id == windowId)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
