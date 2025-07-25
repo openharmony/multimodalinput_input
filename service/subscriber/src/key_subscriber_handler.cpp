@@ -312,6 +312,7 @@ void KeySubscriberHandler::UnregisterHotKey(int32_t shortcutId)
 
 void KeySubscriberHandler::DeleteShortcutId(std::shared_ptr<Subscriber> subscriber)
 {
+    CHKPV(subscriber);
     if (subscriber->isSystem) {
         UnregisterSystemKey(subscriber->shortcutId_);
     } else {
@@ -759,6 +760,7 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
                     subscriber->timerId_, sess->GetPid());
                 keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
                 auto option = subscriber->keyOption_;
+                CHKPC(option);
                 MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscriber->id_, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
@@ -1017,6 +1019,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
     }
 
     auto &keyOption = subscriber->keyOption_;
+    CHKPF(keyOption);
     bool isKeyDown = keyOption->IsFinalKeyDown();
     int32_t duration = isKeyDown ? keyOption->GetFinalKeyDownDuration() : keyOption->GetFinalKeyUpDelay();
     if (duration <= 0) {
@@ -1129,6 +1132,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
         auto subscribers = iter.second;
         PrintKeyOption(keyOption);
         IsMatchForegroundPid(subscribers, pids);
+        CHKPC(keyOption);
         if (!keyOption->IsFinalKeyDown()) {
             MMI_HILOGD("!keyOption->IsFinalKeyDown()");
             continue;
@@ -1246,6 +1250,7 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
     for (const auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
+        CHKPC(keyOption);
         MMI_HILOGD("keyOption->finalKey:%{private}d, keyOption->isFinalKeyDown:%{public}s, "
             "keyOption->finalKeyDownDuration:%{public}d",
             keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -1340,6 +1345,8 @@ void KeySubscriberHandler::RemoveSubscriberKeyUpTimer(int32_t keyCode)
 void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent,
     const std::shared_ptr<Subscriber> &subscriber)
 {
+    CHKPV(subscriber);
+    CHKPV(subscriber->keyOption_);
     auto keyUpDelay = subscriber->keyOption_->GetFinalKeyUpDelay();
     if (keyUpDelay <= 0) {
         NotifySubscriber(keyEvent, subscriber);
@@ -1366,6 +1373,7 @@ void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subs
 {
     CHKPV(subscriber);
     auto &keyOption = subscriber->keyOption_;
+    CHKPV(keyOption);
     MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d,"
         "keyOption->finalKeyUpDelay:%{public}d",

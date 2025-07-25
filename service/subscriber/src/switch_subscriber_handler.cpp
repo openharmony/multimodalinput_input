@@ -116,6 +116,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
         if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
             (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
                 switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID)) {
+            CHKPC(subscriber->sess_);
             MMI_HILOGI("The subscriber:%{public}d", subscriber->sess_->GetPid());
             NotifySubscriber(switchEvent, subscriber);
             handled = true;

@@ -357,6 +357,7 @@ image_ptr_t PointerRenderer::ExtractDrawingImage(pixelmap_ptr_t pixelMap)
     if (image == nullptr) {
         MMI_HILOGE("ExtractDrawingImage image fail");
         delete releaseContext;
+        releaseContext = nullptr;
     }
     return image;
 }

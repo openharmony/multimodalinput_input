@@ -106,6 +106,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
         MMI_HILOGE("Call memset_s failed");
         delete[] argv;
+        argv = nullptr;
         return;
     }
     for (size_t i = 0; i < args.size(); ++i) {

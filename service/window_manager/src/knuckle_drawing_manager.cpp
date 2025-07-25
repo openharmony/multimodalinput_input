@@ -387,6 +387,8 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t rsId)
     MMI_HILOGI("KnuckleDrawingManager screenId_:%{public}" PRIu64, screenId_);
     RotationCanvasNode(brushCanvasNode_, displayInfo_);
     RotationCanvasNode(trackCanvasNode_, displayInfo_);
+    CHKPV(brushCanvasNode_);
+    CHKPV(trackCanvasNode_);
     brushCanvasNode_->ResetSurface(scaleW_, scaleH_);
     trackCanvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -428,6 +430,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
         ", screenId_:%{public}" PRIu64, g_WindowScreenId, g_DisplayNodeScreenId, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(canvasNode_, displayInfo_);
+    CHKPV(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

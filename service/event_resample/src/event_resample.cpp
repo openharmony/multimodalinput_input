@@ -521,6 +521,7 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
 
 void EventResample::PrintfDeviceName()
 {
+    CHKPV(pointerEvent_);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
