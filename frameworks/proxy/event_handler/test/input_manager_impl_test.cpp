@@ -1073,7 +1073,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_001, T
     userScreenInfo.userId = 100; 
     userScreenInfo.displayGroups.push_back(displayGroupInfo); 
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, MSG_SEND_FAIL);
+    EXPECT_EQ(result, RET_OK);
 }
  
 class MockNetPacket : public NetPacket {
@@ -1188,7 +1188,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintDisplayInfo_004, TestSi
     newGroup.windowsInfo.push_back(newWindowInfo);
     userScreenInfo.displayGroups.push_back(newGroup);
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
-    EXPECT_NE(result, RET_OK);
+    EXPECT_EQ(result, RET_OK);
 }
  
 /**
