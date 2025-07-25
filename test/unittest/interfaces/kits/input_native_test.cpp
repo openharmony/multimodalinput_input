@@ -36,7 +36,7 @@ constexpr float DISPLAY_X { 100.0 };
 constexpr float DISPLAY_Y { 200.0 };
 constexpr double DEFAULT_AXIS_VALUE { 50.0 };
 constexpr double AXIS_VALUE { 100.0 };
-constexpr int64_t DEFAULT_ACTIONE_TIME { 10 };
+constexpr int64_t DEFAULT_ACTION_TIME { 10 };
 constexpr int64_t ACTIONE_TIME { 20 };
 } // namespace
 
@@ -57,10 +57,7 @@ public:
 HWTEST_F(InputNativeTest, InputNativeTest_KeyState_001, TestSize.Level1)
 {
     struct Input_KeyState* keyState = OH_Input_CreateKeyState();
-    if (keyState == nullptr) {
-        ASSERT_EQ(keyState, nullptr);
-    } else {
-        ASSERT_NE(keyState, nullptr);
+    if (keyState != nullptr) {
         OH_Input_DestroyKeyState(&keyState);
     }
 }
@@ -124,7 +121,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
     struct Input_KeyState* keyState = OH_Input_CreateKeyState();
     ASSERT_NE(keyState, nullptr);
     OH_Input_SetKeyCode(keyState, KEYCODE_DPAD_UP);
-    OH_Input_GetKeyState(keyState);
     EXPECT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
     EXPECT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
     EXPECT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
@@ -647,8 +643,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_004, TestSize.Level1)
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
     ASSERT_NE(keyEvent, nullptr);
     OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_VOLUME_DOWN);
-    std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
-    g_keyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
     OH_Input_SetKeyEventActionTime(keyEvent, 2);
     OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_DOWN);
     int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
@@ -920,7 +914,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_005, TestSize.Level1)
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_CreateAxisEvent_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
 
     InputEvent_AxisAction action = AXIS_ACTION_BEGIN;
     Input_Result result = OH_Input_SetAxisEventAction(axisEvent, action);
@@ -955,13 +949,13 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_CreateAxisEvent_001, TestSize
     EXPECT_EQ(result, INPUT_SUCCESS);
     EXPECT_DOUBLE_EQ(axisValue, DEFAULT_AXIS_VALUE);
 
-    int64_t actionTime = DEFAULT_ACTIONE_TIME;
+    int64_t actionTime = DEFAULT_ACTION_TIME;
     result = OH_Input_SetAxisEventActionTime(axisEvent, actionTime);
     EXPECT_EQ(result, INPUT_SUCCESS);
     actionTime = ACTIONE_TIME;
     result = OH_Input_GetAxisEventActionTime(axisEvent, &actionTime);
     EXPECT_EQ(result, INPUT_SUCCESS);
-    EXPECT_EQ(actionTime, DEFAULT_ACTIONE_TIME);
+    EXPECT_EQ(actionTime, DEFAULT_ACTION_TIME);
 
     InputEvent_AxisEventType axisEventType = AXIS_EVENT_TYPE_PINCH;
     result = OH_Input_SetAxisEventType(axisEvent, axisEventType);
@@ -1017,7 +1011,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventAction_001, TestS
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventAction_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     Input_Result result = OH_Input_GetAxisEventAction(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
     result = OH_Input_DestroyAxisEvent(&axisEvent);
@@ -1071,7 +1065,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventDisplayX_001, Tes
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventDisplayX_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     Input_Result result = OH_Input_GetAxisEventDisplayX(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
     result = OH_Input_DestroyAxisEvent(&axisEvent);
@@ -1125,7 +1119,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventDisplayY_001, Tes
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventDisplayY_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     Input_Result result = OH_Input_GetAxisEventDisplayY(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
     result = OH_Input_DestroyAxisEvent(&axisEvent);
@@ -1180,7 +1174,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventAxisValue_001, Te
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventAxisValue_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     InputEvent_AxisType axisType = AXIS_TYPE_SCROLL_VERTICAL;
     Input_Result result = OH_Input_GetAxisEventAxisValue(axisEvent, axisType, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
@@ -1224,7 +1218,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventAxisValue_003, Te
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventAxisValue_004, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     InputEvent_AxisType axisType = AXIS_TYPE_SCROLL_VERTICAL;
     double axisValue = DEFAULT_AXIS_VALUE;
     Input_Result result = OH_Input_GetAxisEventAxisValue(axisEvent, axisType, &axisValue);
@@ -1241,7 +1235,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventAxisValue_004, Te
  */
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventActionTime_001, TestSize.Level1)
 {
-    int64_t actionTime = DEFAULT_ACTIONE_TIME;
+    int64_t actionTime = DEFAULT_ACTION_TIME;
     Input_Result result = OH_Input_SetAxisEventActionTime(nullptr, actionTime);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
 }
@@ -1255,7 +1249,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventActionTime_001, T
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventActionTime_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     Input_Result result = OH_Input_GetAxisEventActionTime(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
     result = OH_Input_DestroyAxisEvent(&axisEvent);
@@ -1270,7 +1264,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventActionTime_001, T
  */
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventActionTime_002, TestSize.Level1)
 {
-    int64_t actionTime = DEFAULT_ACTIONE_TIME;
+    int64_t actionTime = DEFAULT_ACTION_TIME;
     Input_Result result = OH_Input_GetAxisEventActionTime(nullptr, &actionTime);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
 }
@@ -1309,7 +1303,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventType_001, TestSiz
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventType_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     Input_Result result = OH_Input_GetAxisEventType(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
     result = OH_Input_DestroyAxisEvent(&axisEvent);
@@ -1363,7 +1357,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_SetAxisEventSourceType_001, T
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventSourceType_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     Input_Result result = OH_Input_GetAxisEventSourceType(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
     result = OH_Input_DestroyAxisEvent(&axisEvent);
@@ -1404,7 +1398,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAxisEventSourceType_003, T
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_AxisEventWindowId_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     int32_t windowId = -1;
     Input_Result result = OH_Input_GetAxisEventWindowId(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
@@ -1431,7 +1425,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_AxisEventWindowId_001, TestSi
 HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_AxisEventDisplayId_001, TestSize.Level1)
 {
     Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     int32_t displayId = -1;
     Input_Result result = OH_Input_GetAxisEventDisplayId(axisEvent, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
@@ -1451,7 +1445,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_AxisEventDisplayId_001, TestS
 
 static void KeyEventCallback(const struct Input_KeyEvent* keyEvent)
 {
-    EXPECT_NE(keyEvent, nullptr);
+    ASSERT_NE(keyEvent, nullptr);
     int32_t action = OH_Input_GetKeyEventAction(keyEvent);
     int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
     MMI_HILOGI("KeyEventCallback, action:%{public}d, keyCode:%{private}d,", action, keyCode);
@@ -1459,7 +1453,7 @@ static void KeyEventCallback(const struct Input_KeyEvent* keyEvent)
 
 static void MouseEventCallback(const struct Input_MouseEvent* mouseEvent)
 {
-    EXPECT_NE(mouseEvent, nullptr);
+    ASSERT_NE(mouseEvent, nullptr);
     int32_t action = OH_Input_GetMouseEventAction(mouseEvent);
     int32_t displayX = OH_Input_GetMouseEventDisplayX(mouseEvent);
     int32_t displayY = OH_Input_GetMouseEventDisplayY(mouseEvent);
@@ -1469,7 +1463,7 @@ static void MouseEventCallback(const struct Input_MouseEvent* mouseEvent)
 
 static void TouchEventCallback(const struct Input_TouchEvent* touchEvent)
 {
-    EXPECT_NE(touchEvent, nullptr);
+    ASSERT_NE(touchEvent, nullptr);
     int32_t action = OH_Input_GetTouchEventAction(touchEvent);
     int32_t id = OH_Input_GetTouchEventFingerId(touchEvent);
     MMI_HILOGI("TouchEventCallback, action:%{public}d, id:%{public}d", action, id);
@@ -1477,7 +1471,7 @@ static void TouchEventCallback(const struct Input_TouchEvent* touchEvent)
 
 static void AxisEventCallbackAll(const struct Input_AxisEvent* axisEvent)
 {
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     InputEvent_AxisAction axisAction = AXIS_ACTION_BEGIN;
     OH_Input_GetAxisEventAction(axisEvent, &axisAction);
     InputEvent_AxisEventType sourceType = AXIS_EVENT_TYPE_PINCH;
@@ -1490,7 +1484,7 @@ static void AxisEventCallbackAll(const struct Input_AxisEvent* axisEvent)
 
 static void AxisEventCallback(const struct Input_AxisEvent* axisEvent)
 {
-    EXPECT_NE(axisEvent, nullptr);
+    ASSERT_NE(axisEvent, nullptr);
     InputEvent_AxisAction axisAction = AXIS_ACTION_BEGIN;
     OH_Input_GetAxisEventAction(axisEvent, &axisAction);
     InputEvent_AxisEventType sourceType = AXIS_EVENT_TYPE_PINCH;
@@ -1886,11 +1880,9 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
  */
 HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
 {
-    int64_t *intervalSinceLastInput = static_cast<int64_t *>(malloc(sizeof(int64_t)));
-    ASSERT_NE(intervalSinceLastInput, nullptr);
-    int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
-    free(intervalSinceLastInput);
-    intervalSinceLastInput = nullptr;
+    int64_t intervalSinceLastInput = 5;
+    int32_t retResult = OH_Input_GetIntervalSinceLastInput(&intervalSinceLastInput);
+
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 
