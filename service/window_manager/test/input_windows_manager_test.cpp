@@ -4400,12 +4400,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
     inputWindowsMgr.isOpenAntiMisTakeObserver_ = false;
-    inputWindowsMgr.antiMistake_->isOpen = true;
+    inputWindowsMgr.antiMistake_.isOpen = true;
     ASSERT_TRUE(
         inputWindowsMgr.SkipNavigationWindow(WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE, PointerEvent::TOOL_TYPE_PEN));
 
     inputWindowsMgr.isOpenAntiMisTakeObserver_ = true;
-    inputWindowsMgr.antiMistake_->isOpen = false;
+    inputWindowsMgr.antiMistake_.isOpen = false;
     ASSERT_FALSE(
         inputWindowsMgr.SkipNavigationWindow(WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE, PointerEvent::TOOL_TYPE_PEN));
 }
@@ -5567,7 +5567,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     inputWindowsMgr.isOpenAntiMisTakeObserver_ = false;
-    inputWindowsMgr.antiMistake_->isOpen = true;
+    inputWindowsMgr.antiMistake_.isOpen = true;
     auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displayInfo);
@@ -5621,7 +5621,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.extraData_.appended = true;
     inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     inputWindowsMgr.isOpenAntiMisTakeObserver_ = true;
-    inputWindowsMgr.antiMistake_->isOpen = false;
+    inputWindowsMgr.antiMistake_.isOpen = false;
     auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displayInfo);

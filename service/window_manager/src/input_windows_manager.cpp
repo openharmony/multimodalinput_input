@@ -3036,8 +3036,7 @@ void InputWindowsManager::TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId)
 
 void InputWindowsManager::SetAntiMisTake(bool state)
 {
-    CHKPV(antiMistake_);
-    antiMistake_->isOpen = state;
+    antiMistake_.isOpen = state;
 }
 
 void InputWindowsManager::SetAntiMisTakeStatus(bool state)
@@ -4606,18 +4605,17 @@ bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<Poin
     const bool &isSkip)
 {
     CHKPF(pointerEvent);
-    CHKPF(privacyProtection_);
     if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
         pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
         if (!isOpenPrivacyProtectionserver_) {
-            privacyProtection_->switchName = PRIVACY_SWITCH_NAME;
+            privacyProtection_.switchName = PRIVACY_SWITCH_NAME;
             CreatePrivacyProtectionObserver(privacyProtection_);
             isOpenPrivacyProtectionserver_ = true;
             SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
-                antiMistake_->isOpen);
+                antiMistake_.isOpen);
             MMI_HILOGD("Get privacy protection switch end");
         }
-        if (privacyProtection_->isOpen && isSkip) {
+        if (privacyProtection_.isOpen && isSkip) {
             MMI_HILOGD("It's a Privacy protection window and pointer find the next window");
             return true;
         }
@@ -4640,17 +4638,16 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
         windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
-    CHKPF(antiMistake_);
     if (!isOpenAntiMisTakeObserver_) {
-        antiMistake_->switchName = NAVIGATION_SWITCH_NAME;
+        antiMistake_.switchName = NAVIGATION_SWITCH_NAME;
         CreateAntiMisTakeObserver(antiMistake_);
         isOpenAntiMisTakeObserver_ = true;
         MMI_HILOGI("Get anti mistake touch switch start");
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
-            antiMistake_->isOpen);
+            antiMistake_.isOpen);
         MMI_HILOGI("Get anti mistake touch switch end");
     }
-    if (antiMistake_->isOpen) {
+    if (antiMistake_.isOpen) {
         MMI_HILOGI("Anti mistake switch is open");
         return true;
     }
@@ -5728,18 +5725,18 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 template <class T>
-void InputWindowsManager::CreateAntiMisTakeObserver(std::shared_ptr<T>& item)
+void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
 {
     CALL_INFO_TRACE;
     CHKPV(item);
-    SettingObserver::UpdateFunc updateFunc = [item](const std::string& key) {
-        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item->isOpen) != RET_OK) {
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
         }
-        MMI_HILOGI("Anti mistake observer key:%{public}s, statusValue:%{public}d", key.c_str(), item->isOpen);
+        MMI_HILOGI("Anti mistake observer key:%{public}s, statusValue:%{public}d", key.c_str(), item.isOpen);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .CreateObserver(item->switchName, updateFunc);
+        .CreateObserver(item.switchName, updateFunc);
     CHKPV(statusObserver);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
@@ -5749,18 +5746,18 @@ void InputWindowsManager::CreateAntiMisTakeObserver(std::shared_ptr<T>& item)
 }
 
 template <class T>
-void InputWindowsManager::CreatePrivacyProtectionObserver(std::shared_ptr<T>& item)
+void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
 {
     CALL_INFO_TRACE;
     CHKPV(item);
-    SettingObserver::UpdateFunc updateFunc = [item](const std::string& key) {
-        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item->isOpen) != RET_OK) {
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
         }
-        MMI_HILOGI("privacy protection key:%{public}s, statusValue:%{public}d", key.c_str(), item->isOpen);
+        MMI_HILOGI("privacy protection key:%{public}s, statusValue:%{public}d", key.c_str(), item.isOpen);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .CreateObserver(item->switchName, updateFunc);
+        .CreateObserver(item.switchName, updateFunc);
     CHKPV(statusObserver);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
