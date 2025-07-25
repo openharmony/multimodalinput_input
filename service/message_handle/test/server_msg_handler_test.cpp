@@ -4302,10 +4302,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_009, Test
     EXPECT_EQ(ret, RET_ERR);
     pointer->SetDeviceId(-1);
     pointer->SetZOrder(-1);
-    pointer->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     ret = handler.SaveTargetWindowId(pointer, false);
     EXPECT_EQ(ret, RET_ERR);
-    pointer->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     ret = handler.SaveTargetWindowId(pointer, false);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -4371,7 +4369,6 @@ HWTEST_F(ServerMsgHandlerTest, DealGesturePointers003, TestSize.Level1)
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     handler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     std::list<PointerEvent::PointerItem> pointers_;
     PointerEvent::PointerItem item1;
     item1.SetPointerId(1);
