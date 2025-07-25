@@ -27,6 +27,7 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t UID_ROOT { 0 };
 static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
+int32_t g_handlerId = 1;
 int32_t g_moduleType = 3;
 int32_t g_pid = 0;
 int32_t g_writeFd = -1;
@@ -201,6 +202,46 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_OnSessionLost_00
 }
 
 /**
+ * @tc.name: EventPreMonitorHandlerTest_OnSessionLost_002
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_OnSessionLost_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    std::vector<int32_t> keys = {2, 3, 4};
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys] =
+        std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>>();
+    ASSERT_NO_FATAL_FAILURE(eventPreMonitorHandler.OnSessionLost(session));
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_OnSessionLost_003
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_OnSessionLost_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    HandleEventType eventType = HANDLE_EVENT_TYPE_PRE_KEY;
+    std::vector<int32_t> keys = {2, 3, 4};
+    auto sessionHandler =
+        std::make_shared<EventPreMonitorHandler::SessionHandler>(session, 1, eventType, keys);
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys] =
+        std::list<std::shared_ptr<EventPreMonitorHandler::SessionHandler>>();
+    eventPreMonitorHandler.monitors_.sessionHandlers_[keys].push_back(sessionHandler);
+    char testProgramName[] = "uds_sesion_test_2";
+    SessionPtr testSession = std::make_shared<UDSSession>(testProgramName, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ASSERT_NO_FATAL_FAILURE(eventPreMonitorHandler.OnSessionLost(testSession));
+}
+
+/**
  * @tc.name: EventPreMonitorHandlerTest_AddMonitor_001
  * @tc.desc: Verify the invalid and valid event type of AddMonitor
  * @tc.type: FUNC
@@ -270,7 +311,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_IsEqualsKeys_001
     std::vector<int32_t> newKeys;
     std::vector<int32_t> oldKeys = {1, 2, 3};
     ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
-    newKeys = {1, 2, 3};
+    newKeys = oldKeys;
     ASSERT_TRUE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
     oldKeys = {1, 2, 3, 4};
     ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
@@ -470,6 +511,41 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddInputHandler_
     eventType = HANDLE_EVENT_TYPE_NONE;
     ret = eventPreMonitorHandler.AddInputHandler(sess, 1, eventType, keys);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_AddInputHandler_003
+ * @tc.desc: Verify the invalid and valid event type of AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddInputHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    std::vector<int32_t> keys = {1, 2, 3};
+    ASSERT_NE(sess, nullptr);
+    int32_t ret = eventPreMonitorHandler.AddInputHandler(sess, g_handlerId, eventType, keys);
+    EXPECT_EQ(ret, RET_ERR);
+    eventType = HANDLE_EVENT_TYPE_ALL;
+    ret = eventPreMonitorHandler.AddInputHandler(sess, g_handlerId, eventType, keys);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_RemoveInputHandler_002
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_RemoveInputHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ASSERT_NO_FATAL_FAILURE(eventPreMonitorHandler.RemoveInputHandler(sess, g_handlerId));
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
