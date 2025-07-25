@@ -304,6 +304,7 @@ private:
     std::unique_ptr<std::thread> renderThread_ { nullptr };
     bool isInit_ { false };
     std::mutex mtx_;
+    std::recursive_mutex rec_mtx_;
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
     sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
     std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers_;
