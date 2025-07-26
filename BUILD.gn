@@ -170,6 +170,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerStyleTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "frameworks/proxy/event_handler/test:InputActiveSubscribeManagerTest",
+    "frameworks/proxy/event_handler/test:MultimodalEventHandlerTest",
     "libudev:test",
     "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",

@@ -131,5 +131,87 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     EXPECT_EQ(physicalX, 140);
     EXPECT_EQ(physicalY, 50);
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_001
+ * @tc.desc: Test TouchDrawingManager::RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->LoadTouchDrawingHandler();
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateLabels_001
+ * @tc.desc: Test TouchDrawingManager::UpdateLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
+    EXPECT_NE(TOUCH_DRAWING_MGR->GetTouchDrawingHandler(), nullptr);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateLabels_002
+ * @tc.desc: Test TouchDrawingManager::UpdateLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
+    EXPECT_EQ(TOUCH_DRAWING_MGR->GetTouchDrawingHandler(), nullptr);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateBubbleData_001
+ * @tc.desc: Test TouchDrawingManager::UpdateBubbleData
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateBubbleData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateBubbleData());
+    EXPECT_NE(TOUCH_DRAWING_MGR->GetTouchDrawingHandler(), nullptr);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateBubbleData_002
+ * @tc.desc: Test TouchDrawingManager::UpdateBubbleData
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateBubbleData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateBubbleData());
+    EXPECT_EQ(TOUCH_DRAWING_MGR->GetTouchDrawingHandler(), nullptr);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_LoadTouchDrawingHandler_001
+ * @tc.desc: Test TouchDrawingManager::LoadTouchDrawingHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_LoadTouchDrawingHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->LoadTouchDrawingHandler());
+    EXPECT_NE(TOUCH_DRAWING_MGR->GetTouchDrawingHandler(), nullptr);
+}
 } // namespace MMI
 } // namespace OHOS

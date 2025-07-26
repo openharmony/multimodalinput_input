@@ -60,3 +60,50 @@ ohos_unittest("InputActiveSubscribeManagerTest") {
     "samgr:samgr_proxy",
   ]
 }
+
+ohos_unittest("MultimodalEventHandlerTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${mmi_path}/frameworks/proxy/event_handler/include" ]
+
+  sources = [
+    "multimodal_event_handler_test.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/input_active_subscribe_manager.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/input_device_consumer.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/input_manager_impl.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/key_event_input_subscribe_manager.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/long_press_event_subscribe_manager.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/multimodal_event_handler.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/pre_monitor_manager.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/tablet_event_input_subscribe_manager.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "samgr:samgr_proxy",
+  ]
+}

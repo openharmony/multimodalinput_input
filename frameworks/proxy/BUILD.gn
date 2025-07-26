@@ -163,6 +163,7 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
@@ -172,7 +173,6 @@ ohos_shared_library("libmmi-client") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "jsoncpp:jsoncpp",
     "qos_manager:qos",
     "samgr:samgr_proxy",
   ]

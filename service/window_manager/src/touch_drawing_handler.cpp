@@ -80,6 +80,12 @@ constexpr char PRODUCT_PHONE[] { "phone" };
 constexpr char PRODUCT_TYPE_PC[] { "2in1" };
 } // namespace
 
+TouchDrawingHandler::~TouchDrawingHandler()
+{
+    UpdateLabels(false);
+    UpdateBubbleData(false);
+}
+
 void TouchDrawingHandler::RecordLabelsInfo()
 {
     CHKPV(pointerEvent_);
@@ -818,7 +824,7 @@ std::pair<double, double> TouchDrawingHandler::TransformDisplayXY(
     }
     Vector3f logicXY(logicX, logicY, 1.0);
     Vector3f displayXY = transform * logicXY;
-    return { std::round(displayXY[0]), std::round(displayXY[1]) };
+    return { displayXY[0], displayXY[1] };
 }
 
 void TouchDrawingHandler::StartTrace(int32_t pointerId)
