@@ -802,6 +802,492 @@ TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount010, Tes
     
     EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility001
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_001
+ * @tc.desc: Verify VOLUME_DOWN with camera app when ret_ is not LIGHT_STAY_AWAY
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility001, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);  // Not LIGHT_STAY_AWAY
+
+    EXPECT_CALL(handler, LaunchAbility(_)).Times(1);
+    EXPECT_CALL(handler, UnregisterMistouchPrevention()).Times(1);
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(subscriberHandlerMock_));
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([keyEvent](std::shared_ptr<KeyEvent> event) {
+            EXPECT_EQ(event->GetKeyAction(), KeyEvent::KEY_ACTION_CANCEL);
+            EXPECT_EQ(event->GetKeyCode(), keyEvent->GetKeyCode());
+        });
+    
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility002
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_002
+ * @tc.desc: Verify VOLUME_DOWN with camera app when ret_ is LIGHT_STAY_AWAY
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility002, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+
+    KeyCommandHandler handler;
+    handler.ret_.store(LIGHT_STAY_AWAY);
+
+    EXPECT_CALL(handler, LaunchAbility(_)).Times(0);
+    EXPECT_CALL(handler, UnregisterMistouchPrevention()).Times(1);
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(subscriberHandlerMock_));
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_));
+    
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility003
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_003
+ * @tc.desc: Verify non-VOLUME_DOWN key with camera app
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility003, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;  // Non-volume down
+    item.ability.bundleName = "com.ohos.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);
+
+    EXPECT_CALL(handler, LaunchAbility(_)).Times(1);
+    EXPECT_CALL(handler, UnregisterMistouchPrevention()).Times(0); // Not called for non-volume
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(subscriberHandlerMock_));
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_));
+    
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility004
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_004
+ * @tc.desc: Verify VOLUME_DOWN with non-camera app
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility004, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.music";  // Non-camera
+    auto keyEvent = std::make_shared<KeyEvent>();
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);
+
+    EXPECT_CALL(handler, LaunchAbility(_)).Times(1);
+    EXPECT_CALL(handler, UnregisterMistouchPrevention()).Times(0);
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(subscriberHandlerMock_));
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_));
+    
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility005
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_005
+ * @tc.desc: Verify cancel event propagation
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility005, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    item.ability.bundleName = "com.ohos.settings";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyCommandHandler handler;
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([](std::shared_ptr<KeyEvent> event) {
+            EXPECT_EQ(KeyEvent::KEY_ACTION_CANCEL, event->GetKeyAction());
+            EXPECT_EQ(KeyEvent::KEYCODE_POWER, event->GetKeyCode());
+        });
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(subscriberHandlerMock_));
+    
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility006
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_006
+ * @tc.desc: Verify map clearing
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility006, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    item.ability.bundleName = "com.ohos.music";
+    auto keyEvent = std::make_shared<KeyEvent>();
+
+    KeyCommandHandler handler;
+    handler.repeatKeyCountMap_[KeyEvent::KEYCODE_VOLUME_UP] = 3;
+    
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey001
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_001
+ * @tc.desc: Verify that non-SOS page names disable power key freezing
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = true;  // Initial state
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("HomePage"), RET_OK);
+    EXPECT_FALSE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey002
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_002
+ * @tc.desc: Verify SOS page name resets state and starts timer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 5;
+    handler.launchAbilityCount_ = 2;
+    handler.repeatKeyCountMap_ = {{1, 1}};
+    handler.sosDelayTimerId_ = 100;  // Existing timer
+    
+    // Setup timer expectations
+    EXPECT_CALL(*timerMgrMock_, RemoveTimer(100)).Times(1);
+    EXPECT_CALL(*timerMgrMock_, AddTimer(SOS_COUNT_DOWN_TIMES/1000, 1, _, "KeyCommandHandler-SetIsFreezePowerKey"))
+        .WillOnce(Return(200));  // New timer ID
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+    EXPECT_TRUE(handler.isFreezePowerKey_);
+    EXPECT_EQ(handler.count_, 0);
+    EXPECT_EQ(handler.launchAbilityCount_, 0);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+    EXPECT_GT(handler.sosLaunchTime_, 0);
+    EXPECT_EQ(handler.sosDelayTimerId_, 200);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey003
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_003
+ * @tc.desc: Verify timer failure handling
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey003, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    
+    EXPECT_CALL(*timerMgrMock_, AddTimer(_, _, _, _))
+        .WillOnce(Return(-1));  // Timer failure
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("SosCountdown"), RET_ERR);
+    EXPECT_FALSE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey004
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_004
+ * @tc.desc: Verify no timer removal when no existing timer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey004, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.sosDelayTimerId_ = -1;  // No existing timer
+    
+    EXPECT_CALL(*timerMgrMock_, RemoveTimer(_)).Times(0);  // No removal
+    EXPECT_CALL(*timerMgrMock_, AddTimer(_, _, _, _))
+        .WillOnce(Return(300));
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey005
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_005
+ * @tc.desc: Verify timer callback resets freeze state
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey005, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    TimerCallback callback;
+    
+    // Capture timer callback
+    EXPECT_CALL(*timerMgrMock_, AddTimer(_, _, _, _))
+        .WillOnce(DoAll(SaveArg<2>(&callback), Return(400)));
+    
+    handler.SetIsFreezePowerKey("SosCountdown");
+    ASSERT_TRUE(callback);
+    
+    // Execute timer callback
+    callback();
+    EXPECT_FALSE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey006
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_006
+ * @tc.desc: Verify mutex lock during execution
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey006, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.mutex_.lock();  // Lock mutex to test contention
+    
+    std::thread testThread([&] {
+        EXPECT_EQ(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+    });
+    
+    // Verify thread blocks on mutex
+    auto status = testThread.join_for(std::chrono::milliseconds(100));
+    EXPECT_NE(status, std::future_status::ready);
+    
+    handler.mutex_.unlock();  // Release lock
+    testThread.join();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount001
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_001
+ * @tc.desc: Verify UP event for non-POWER key sets timer with default interval
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount001, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(100);
+    
+    KeyCommandHandler handler;
+    handler.intervalTime_ = 500;
+    
+    EXPECT_CALL(*timerMgrMock_, AddTimer(500, 1, _, "KeyCommandHandler-HandleRepeatKeyCount"))
+        .WillOnce(Return(100));
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler.upActionTime_, 100);
+    EXPECT_EQ(handler.repeatKey_.keyCode, KeyEvent::KEYCODE_VOLUME_UP);
+    EXPECT_EQ(handler.repeatKey_.keyAction, KeyEvent::KEY_ACTION_UP);
+    EXPECT_EQ(handler.repeatTimerId_, 100);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount002
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_002
+ * @tc.desc: Verify POWER UP event calculates interval from key press duration
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount002, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(300);
+    
+    KeyCommandHandler handler;
+    handler.intervalTime_ = 1000;
+    handler.downActionTime_ = 100;  // Press duration = 200ms
+    
+    EXPECT_CALL(*timerMgrMock_, AddTimer(800, 1, _, _))  // 1000 - 200 = 800
+        .WillOnce(Return(101));
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount003
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_003
+ * @tc.desc: Verify wallet delay overrides POWER key interval calculation
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount003, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    KeyCommandHandler handler;
+    handler.walletLaunchDelayTimes_ = 300;
+    
+    EXPECT_CALL(*timerMgrMock_, AddTimer(300, 1, _, _))
+        .WillOnce(Return(102));
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount004
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_004
+ * @tc.desc: Verify timer failure returns false for UP event
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount004, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    EXPECT_CALL(*timerMgrMock_, AddTimer(_, _, _, _))
+        .WillOnce(Return(-1));
+    
+    KeyCommandHandler handler;
+    EXPECT_FALSE(handler.HandleRepeatKeyCount(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount005
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_005
+ * @tc.desc: Verify new key DOWN initializes state
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount005, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(200);
+    
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP; // Different key
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler.count_, 1);
+    EXPECT_EQ(handler.repeatKey_.keyCode, KeyEvent::KEYCODE_VOLUME_DOWN);
+    EXPECT_EQ(handler.repeatKey_.keyAction, KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(handler.isDownStart_);
+    EXPECT_EQ(handler.downActionTime_, 200);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount006
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_006
+ * @tc.desc: Verify repeated DOWN resets state
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount006, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    handler.repeatKey_.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.count_ = 3;
+    handler.isDownStart_ = true;
+    handler.repeatKeyCountMap_[KeyEvent::KEYCODE_VOLUME_UP] = 2;
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler.count_, 0);
+    EXPECT_FALSE(handler.isDownStart_);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount007
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_007
+ * @tc.desc: Verify DOWN after UP increments count
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount007, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    auto downEvent = KeyEvent::Create();
+    downEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    downEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    downEvent->SetActionTime(150);
+    
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_POWER;
+    handler.repeatKey_.keyAction = KeyEvent::KEY_ACTION_UP; // Previous was UP
+    handler.count_ = 1;
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, downEvent));
+    EXPECT_EQ(handler.count_, 2);
+    EXPECT_EQ(handler.repeatKey_.keyAction, KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(handler.isDownStart_);
+    EXPECT_EQ(handler.downActionTime_, 150);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount008
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_008
+ * @tc.desc: Verify early DOWN cancels existing timer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount008, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(150);
+    
+    KeyCommandHandler handler;
+    handler.upActionTime_ = 100;
+    handler.intervalTime_ = 500; // Time since up: 50ms < interval
+    handler.repeatTimerId_ = 200;
+    
+    EXPECT_CALL(*timerMgrMock_, RemoveTimer(200)).Times(1);
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler.repeatTimerId_, -1);
+    EXPECT_FALSE(handler.isHandleSequence_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount009
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_009
+ * @tc.desc: Verify late DOWN doesn't cancel timer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount009, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(700);
+    
+    KeyCommandHandler handler;
+    handler.upActionTime_ = 100;
+    handler.intervalTime_ = 500; // Time since up: 600ms > interval
+    handler.repeatTimerId_ = 201;
+    
+    EXPECT_CALL(*timerMgrMock_, RemoveTimer(_)).Times(0);
+    
+    EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
+}
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
