@@ -1255,7 +1255,7 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     itemDown.SetKeyCode(keyCode);
     itemUp.SetKeyCode(keyCode);
     itemDown.SetPressed(isKeyPressed);
-    itemUp.SetPressed(isKeyPressed);
+    itemUp.SetPressed(!isKeyPressed);
     keyDownEvent->AddPressedKeyItems(itemDown);
     keyUpEvent->AddPressedKeyItems(itemUp);
     nextHandler_->HandleKeyEvent(keyDownEvent);
