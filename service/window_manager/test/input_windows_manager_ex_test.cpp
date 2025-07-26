@@ -572,11 +572,11 @@ HWTEST_F(InputWindowsManagerTest, SkipNavigationWindow_001, TestSize.Level1)
 
     toolType = PointerEvent::TOOL_TYPE_PEN;
     inputWindowsManager->isOpenAntiMisTakeObserver_ = false;
-    inputWindowsManager->antiMistake_->isOpen = true;
+    inputWindowsManager->antiMistake_.isOpen = true;
     EXPECT_TRUE(inputWindowsManager->SkipNavigationWindow(windowType, toolType));
 
     inputWindowsManager->isOpenAntiMisTakeObserver_ = true;
-    inputWindowsManager->antiMistake_->isOpen = false;
+    inputWindowsManager->antiMistake_.isOpen = false;
     EXPECT_FALSE(inputWindowsManager->SkipNavigationWindow(windowType, toolType));
     inputWindowsManager->isOpenAntiMisTakeObserver_ = false;
 }
@@ -4374,7 +4374,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionW
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     bool isSkip = true;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
-    inputWindowsManager->privacyProtection_->isOpen = true;
+    inputWindowsManager->privacyProtection_.isOpen = true;
     EXPECT_TRUE(inputWindowsManager->isOpenPrivacyProtectionserver_);
     EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
     isSkip = false;
