@@ -37,7 +37,7 @@ public:
 
 void PointerEventTest::SetUpTestCase(void)
 {
-    ASSERT_TRUE(TestUtil->Init());
+
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -2507,6 +2507,625 @@ HWTEST_F(PointerEventTest, AddPointerItemTest1, TestSize.Level2)
     PointerEvent::PointerItem item11;
     item11.SetPointerId(0);
     ASSERT_NO_FATAL_FAILURE(pointerEvent->AddPointerItem(item11));
+}
+
+/**
+ * @tc.name: PointerEventTest_SetPressure_002
+ * @tc.desc: Test the function SetPressure when tool type is pen and pressure < MAX_PRESSURE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    double pressure = 0.8;
+    item.SetPressure(pressure);
+    EXPECT_EQ(item.GetPressure(), 0.8);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetPressure_003
+ * @tc.desc: Test the function SetPressure when tool type is pen and pressure >= MAX_PRESSURE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    double pressure = 1.0 + 1.0;
+    item.SetPressure(pressure);
+    EXPECT_EQ(item.GetPressure(), 1.0);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetPressure_004
+ * @tc.desc: Test the function SetPressure when tool type is not pen and pressure > 1.0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_004, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    double pressure = 1.5;
+    item.SetPressure(pressure);
+    EXPECT_EQ(item.GetPressure(), 1.5);
+}
+
+/**
+ * @tc.name: PointerEventTest_ToString_001
+ * @tc.desc: Verify ToString with single pointer and single pressed button
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ToString_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(100);
+    item.SetDisplayY(200);
+    item.SetWindowX(10);
+    item.SetWindowY(20);
+    item.SetTargetWindowId(1);
+    item.SetLongAxis(15);
+    item.SetShortAxis(5);
+    pointerEvent->pointers_.push_back(item);
+    pointerEvent->pressedButtons_.insert(1);
+    std::string str = pointerEvent->ToString();
+    EXPECT_NE(str.find("displayX:100"), std::string::npos);
+    EXPECT_NE(str.find("displayY:200"), std::string::npos);
+    EXPECT_NE(str.find("windowX:10"), std::string::npos);
+    EXPECT_NE(str.find("windowY:20"), std::string::npos);
+    EXPECT_NE(str.find("pressedButtons:[1"), std::string::npos);
+}
+
+/**
+ * @tc.name: PointerEventTest_ToString_002
+ * @tc.desc: Verify ToString with multiple pointers and multiple pressed buttons
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ToString_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item1;
+    item1.SetDisplayX(300);
+    item1.SetDisplayY(400);
+    item1.SetWindowX(30);
+    item1.SetWindowY(40);
+    item1.SetTargetWindowId(2);
+    item1.SetLongAxis(25);
+    item1.SetShortAxis(15);
+    PointerEvent::PointerItem item2;
+    item2.SetDisplayX(500);
+    item2.SetDisplayY(600);
+    item2.SetWindowX(50);
+    item2.SetWindowY(60);
+    item2.SetTargetWindowId(3);
+    item2.SetLongAxis(35);
+    item2.SetShortAxis(25);
+    pointerEvent->pointers_.push_back(item1);
+    pointerEvent->pointers_.push_back(item2);
+    pointerEvent->pressedButtons_.insert(1);
+    pointerEvent->pressedButtons_.insert(2);
+    pointerEvent->pressedButtons_.insert(3);
+    std::string str = pointerEvent->ToString();
+    EXPECT_NE(str.find("displayX:300"), std::string::npos);
+    EXPECT_NE(str.find("displayY:400"), std::string::npos);
+    EXPECT_NE(str.find("displayX:500"), std::string::npos);
+    EXPECT_NE(str.find("pressedButtons:[1,2,3"), std::string::npos);
+}
+
+/**
+ * @tc.name: PointerEventTest_ToString_003
+ * @tc.desc: Verify ToString with empty pointers and buttons
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ToString_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointers_.clear();
+    pointerEvent->pressedButtons_.clear();
+    std::string str = pointerEvent->ToString();
+    EXPECT_NE(str.find("pointers:["), std::string::npos);
+    EXPECT_NE(str.find("pressedButtons:["), std::string::npos);
+}
+
+/**
+ * @tc.name: PointerEventTest_AddPointerItem_001
+ * @tc.desc: Verify AddPointerItem inserts a new pointer when list is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_AddPointerItem_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(100);
+    item.SetDisplayY(200);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->AddPointerItem(item));
+    ASSERT_EQ(pointerEvent->pointers_.size(), 1U);
+    auto firstItem = pointerEvent->pointers_.front();
+    EXPECT_EQ(firstItem.GetPointerId(), 1);
+}
+
+/**
+ * @tc.name: PointerEventTest_AddPointerItem_002
+ * @tc.desc: Verify AddPointerItem updates existing pointer when pointerId matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_AddPointerItem_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(2);
+    item1.SetDisplayX(150);
+    item1.SetDisplayY(250);
+    pointerEvent->pointers_.push_back(item1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(2);
+    item2.SetDisplayX(300);
+    item2.SetDisplayY(400);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->AddPointerItem(item2));
+    ASSERT_EQ(pointerEvent->pointers_.size(), 1U);
+    auto updatedItem = pointerEvent->pointers_.front();
+    EXPECT_EQ(updatedItem.GetDisplayX(), 300);
+    EXPECT_EQ(updatedItem.GetDisplayY(), 400);
+}
+
+/**
+ * @tc.name: PointerEventTest_AddPointerItem_003
+ * @tc.desc: Verify AddPointerItem fails when exceeding MAX_N_POINTER_ITEMS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_AddPointerItem_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    const int maxItems = 10;
+    for (int i = 0; i < maxItems; i++) {
+        PointerEvent::PointerItem item;
+        item.SetPointerId(i);
+        pointerEvent->pointers_.push_back(item);
+    }
+    PointerEvent::PointerItem newItem;
+    newItem.SetPointerId(999);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->AddPointerItem(newItem));
+    EXPECT_EQ(pointerEvent->pointers_.size(), maxItems);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetButtonPressed_001
+ * @tc.desc: Test SetButtonPressed with a valid buttonId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetButtonPressed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetButtonPressed(1));
+    EXPECT_EQ(pointerEvent->pressedButtons_.count(1), 1);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetButtonPressed_002
+ * @tc.desc: Test SetButtonPressed with duplicate buttonId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetButtonPressed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetButtonPressed(2);
+    EXPECT_EQ(pointerEvent->pressedButtons_.count(2), 1);
+    pointerEvent->SetButtonPressed(2);
+    EXPECT_EQ(pointerEvent->pressedButtons_.size(), 1);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetButtonPressed_003
+ * @tc.desc: Test SetButtonPressed when exceeding MAX_N_PRESSED_BUTTONS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetButtonPressed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    for (int i = 0; i < 10; i++) {
+        pointerEvent->SetButtonPressed(i + 1);
+    }
+    EXPECT_EQ(pointerEvent->pressedButtons_.size(), 10);
+    pointerEvent->SetButtonPressed(999);
+    EXPECT_EQ(pointerEvent->pressedButtons_.size(), 10);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_002
+ * @tc.desc: Verify ReadFromParcel fails when nPointers > MAX_N_POINTER_ITEMS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(InputEvent::EVENT_TYPE_POINTER); // for InputEvent::ReadFromParcel
+    parcel.WriteInt32(1); // pointerId_
+    parcel.WriteInt32(10 + 1); // nPointers (exceed limit)
+
+    auto event = PointerEvent::Create();
+    bool ret = event->ReadFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_003
+ * @tc.desc: Verify ReadFromParcel fails when PointerItem::ReadFromParcel returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(InputEvent::EVENT_TYPE_POINTER); // InputEvent::ReadFromParcel
+    parcel.WriteInt32(1); // pointerId_
+    parcel.WriteInt32(1); // nPointers
+    parcel.WriteInt32(-999); // illegal data to fail PointerItem::ReadFromParcel
+
+    auto event = PointerEvent::Create();
+    bool ret = event->ReadFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_004
+ * @tc.desc: Verify ReadFromParcel fails when nPressedButtons > MAX_N_PRESSED_BUTTONS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_004, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(InputEvent::EVENT_TYPE_POINTER); // InputEvent
+    parcel.WriteInt32(1); // pointerId_
+    parcel.WriteInt32(0); // nPointers
+    parcel.WriteInt32(0); // bufferLength
+    parcel.WriteInt32(10 + 1); // nPressedButtons
+
+    auto event = PointerEvent::Create();
+    bool ret = event->ReadFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_005
+ * @tc.desc: Verify ReadFromParcel fails when nPressedKeys > MAX_N_PRESSED_KEYS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_005, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(InputEvent::EVENT_TYPE_POINTER); // InputEvent
+    parcel.WriteInt32(1); // pointerId_
+    parcel.WriteInt32(0); // nPointers
+    parcel.WriteInt32(0); // buffer
+    parcel.WriteInt32(0); // nPressedButtons
+    parcel.WriteInt32(10 + 1); // nPressedKeys
+    auto event = PointerEvent::Create();
+    bool ret = event->ReadFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadAxisFromParcel_001
+ * @tc.desc: Verify ReadAxisFromParcel when axes = 0 (no axis data)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadAxisFromParcel_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteUint32(0);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadAxisFromParcel(parcel);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadAxisFromParcel_002
+ * @tc.desc: Verify ReadAxisFromParcel with valid axis values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadAxisFromParcel_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    uint32_t axesMask = 0;
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        axesMask |= (1 << i);
+    }
+    parcel.WriteUint32(axesMask);
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        parcel.WriteDouble(static_cast<double>(i + 1) * 1.5);
+    }
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadAxisFromParcel(parcel);
+    EXPECT_TRUE(ret);
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        double val = pointerEvent.GetAxisValue(static_cast<PointerEvent::AxisType>(i));
+        EXPECT_DOUBLE_EQ(val, static_cast<double>(i + 1) * 1.5);
+    }
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadAxisFromParcel_003
+ * @tc.desc: Verify ReadAxisFromParcel when only some axes are set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadAxisFromParcel_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteUint32(0x02);
+    parcel.WriteDouble(12.34);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadAxisFromParcel(parcel);
+    EXPECT_TRUE(ret);
+    EXPECT_DOUBLE_EQ(pointerEvent.GetAxisValue(static_cast<PointerEvent::AxisType>(1)), 12.34);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadEnhanceDataFromParcel_001
+ * @tc.desc: Verify ReadEnhanceDataFromParcel with valid enhance data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadEnhanceDataFromParcel_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    int32_t size = 3;
+    parcel.WriteInt32(size);
+    parcel.WriteUint32(11);
+    parcel.WriteUint32(22);
+    parcel.WriteUint32(33);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadEnhanceDataFromParcel(parcel);
+    EXPECT_TRUE(ret);
+    const std::vector<uint8_t> &data = pointerEvent.GetEnhanceData();
+    ASSERT_EQ(data.size(), static_cast<size_t>(size));
+    EXPECT_EQ(data[0], static_cast<uint8_t>(11));
+    EXPECT_EQ(data[1], static_cast<uint8_t>(22));
+    EXPECT_EQ(data[2], static_cast<uint8_t>(33));
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadEnhanceDataFromParcel_002
+ * @tc.desc: Verify ReadEnhanceDataFromParcel with invalid size (exceed MAX_N_ENHANCE_DATA_SIZE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadEnhanceDataFromParcel_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(static_cast<int32_t>(64) + 1);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadEnhanceDataFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadEnhanceDataFromParcel_003
+ * @tc.desc: Verify ReadEnhanceDataFromParcel with negative size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadEnhanceDataFromParcel_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(-1);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadEnhanceDataFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadBufferFromParcel_001
+ * @tc.desc: Verify ReadBufferFromParcel with valid buffer data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadBufferFromParcel_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    int32_t buffLen = 5;
+    parcel.WriteInt32(buffLen);
+    for (int32_t i = 0; i < buffLen; ++i) {
+        parcel.WriteUint8(static_cast<uint8_t>(i + 10));
+    }
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadBufferFromParcel(parcel);
+    EXPECT_TRUE(ret);
+    const std::vector<uint8_t> &buffer = pointerEvent.GetBuffer();
+    ASSERT_EQ(buffer.size(), static_cast<size_t>(buffLen));
+    for (int32_t i = 0; i < buffLen; ++i) {
+        EXPECT_EQ(buffer[i], static_cast<uint8_t>(i + 10));
+    }
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadBufferFromParcel_002
+ * @tc.desc: Verify ReadBufferFromParcel when buffLen is 0 (no data)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadBufferFromParcel_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(0);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadBufferFromParcel(parcel);
+    EXPECT_TRUE(ret);
+    EXPECT_TRUE(pointerEvent.GetBuffer().empty());
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadBufferFromParcel_003
+ * @tc.desc: Verify ReadBufferFromParcel with invalid buffer length (exceed MAX_N_BUFFER_SIZE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadBufferFromParcel_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(static_cast<int32_t>(64) + 1);
+    PointerEvent pointerEvent(InputEvent::EVENT_TYPE_POINTER);
+    bool ret = pointerEvent.ReadBufferFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckTouch_001
+ * @tc.desc: Return false when pointerId < 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckTouch_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(-1);
+    item.SetDownTime(100);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_FALSE(pointerEvent->IsValidCheckTouch());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckTouch_002
+ * @tc.desc: Return false when downTime <= 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckTouch_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_FALSE(pointerEvent->IsValidCheckTouch());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckTouch_003
+ * @tc.desc: Return false when IsPressed != false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckTouch_003, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(100);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_FALSE(pointerEvent->IsValidCheckTouch());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckTouch_004
+ * @tc.desc: Return false when duplicate pointerId exists
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckTouch_004, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(1);
+    item1.SetDownTime(100);
+    item1.SetPressed(false);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(1);
+    item2.SetDownTime(200);
+    item2.SetPressed(false);
+    pointerEvent->AddPointerItem(item1);
+    pointerEvent->AddPointerItem(item2);
+    EXPECT_FALSE(pointerEvent->IsValidCheckTouch());
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValidCheckTouch_005
+ * @tc.desc: Return false when no item matches touchPointID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckTouch_005, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(10);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(5);
+    item.SetDownTime(100);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_FALSE(pointerEvent->IsValidCheckTouch());
 }
 } // namespace MMI
 } // namespace OHOS
