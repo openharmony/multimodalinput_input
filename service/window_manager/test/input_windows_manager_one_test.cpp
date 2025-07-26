@@ -404,7 +404,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
-    inputWindowsManager->privacyProtection_->isOpen = true;
+    inputWindowsManager->privacyProtection_.isOpen = true;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     inputWindowsManager->transparentWins_.insert_or_assign(windowInfo.id, std::move(pixelMap));
 
@@ -445,7 +445,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
-    inputWindowsManager->privacyProtection_->isOpen = false;
+    inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
@@ -488,7 +488,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
-    inputWindowsManager->privacyProtection_->isOpen = false;
+    inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
@@ -532,7 +532,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
-    inputWindowsManager->privacyProtection_->isOpen = false;
+    inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
@@ -594,7 +594,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
-    inputWindowsManager->privacyProtection_->isOpen = false;
+    inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
@@ -639,7 +639,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
-    inputWindowsManager->privacyProtection_->isOpen = false;
+    inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
@@ -824,14 +824,14 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SkipPrivacyProte
     bool isSkip = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     inputWindowsManager->isOpenPrivacyProtectionserver_ = false;
-    inputWindowsManager->privacyProtection_->isOpen = true;
+    inputWindowsManager->privacyProtection_.isOpen = true;
     EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
 
     pointerEvent->SetDeviceId(CAST_SCREEN_DEVICEID);
     isSkip = false;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
 
-    inputWindowsManager->privacyProtection_->isOpen = false;
+    inputWindowsManager->privacyProtection_.isOpen = false;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
 }
 
