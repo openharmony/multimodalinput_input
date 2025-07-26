@@ -36,12 +36,12 @@ public:
 };
 
 /**
- * @tc.name: EventMonitorHandlerTest_CheckMonitorValid
+ * @tc.name: EventMonitorHandlerTest_CheckMonitorValid_001
  * @tc.desc: Test the funcation CheckMonitorValid
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid, TestSize.Level1)
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     GestureMonitorHandler handler;
@@ -65,12 +65,12 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid, T
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_CheckMonitorValid_001
+ * @tc.name: EventMonitorHandlerTest_CheckMonitorValid_002
  * @tc.desc: Test the funcation CheckMonitorValid
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_001, TestSize.Level1)
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     GestureMonitorHandler handler;
@@ -100,13 +100,14 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_00
     ASSERT_FALSE(ret);
 }
 
+
 /**
- * @tc.name: EventMonitorHandlerTest_IsTouchGestureEvent
+ * @tc.name: EventMonitorHandlerTest_IsTouchGestureEvent_001
  * @tc.desc: Test the funcation IsTouchGestureEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsTouchGestureEvent, TestSize.Level1)
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsTouchGestureEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     GestureMonitorHandler handler;
@@ -137,12 +138,12 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsTouchGestureEvent,
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_IsMatchGesture_001
+ * @tc.name: EventMonitorHandlerTest_IsMatchGesture_002
  * @tc.desc: Test the funcation IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_001, TestSize.Level1)
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     GestureMonitorHandler handler;
@@ -174,12 +175,12 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_001, 
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_IsMatchGesture_002
+ * @tc.name: EventMonitorHandlerTest_IsMatchGesture_003
  * @tc.desc: Test the funcation IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_002, TestSize.Level1)
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     GestureMonitorHandler handler;
@@ -191,6 +192,98 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_002, 
     action = PointerEvent::TOUCH_ACTION_PINCH_OPENED;
     ret = handler.IsMatchGesture(action, count);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsMatchGesture_004
+ * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    int32_t action = PointerEvent::TOUCH_ACTION_SWIPE_DOWN;
+    int32_t count = 1;
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_SWIPE, std::set<int32_t>{1, 2, 3}));
+    bool ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_FALSE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    auto range = handler.touchGestureInfo_.equal_range(TOUCH_GESTURE_TYPE_SWIPE);
+    handler.touchGestureInfo_.erase(range.first, range.second);
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_SWIPE, std::set<int32_t>{2, 3}));
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_FALSE(ret);
+    action = PointerEvent::TOUCH_ACTION_PINCH_OPENED;
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_PINCH, std::set<int32_t>{1, 2, 3}));
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_FALSE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
+    range = handler.touchGestureInfo_.equal_range(TOUCH_GESTURE_TYPE_PINCH);
+    handler.touchGestureInfo_.erase(range.first, range.second);
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_PINCH, std::set<int32_t>{2, 3}));
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsMatchGesture_005
+ * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    int32_t action = PointerEvent::TOUCH_ACTION_SWIPE_DOWN;
+    int32_t count = 1;
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_ALL, std::set<int32_t>{1, 2, 3}));
+    bool ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
+    action = PointerEvent::TOUCH_ACTION_PINCH_OPENED;
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_ALL;
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_NONE;
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsMatchGesture_006
+ * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    int32_t action = PointerEvent::TOUCH_ACTION_SWIPE_DOWN;
+    int32_t count = 1;
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_SWIPE, std::set<int32_t>{ALL_FINGER_COUNT}));
+    bool ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
+    handler.gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_PINCH, std::set<int32_t>{ALL_FINGER_COUNT}));
+    action = PointerEvent::TOUCH_ACTION_PINCH_OPENED;
+    ret = handler.IsMatchGesture(action, count);
+    ASSERT_TRUE(ret);
 }
 
 /**
@@ -211,6 +304,67 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_AddGestureMonitor, T
     EXPECT_NO_FATAL_FAILURE(handler.AddGestureMonitor(type, fingers));
     type = TOUCH_GESTURE_TYPE_SWIPE;
     EXPECT_NO_FATAL_FAILURE(handler.AddGestureMonitor(type, fingers));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_AddGestureMonitor_001
+ * @tc.desc: Test the funcation AddGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_AddGestureMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    TouchGestureType type = TOUCH_GESTURE_TYPE_NONE;
+    int32_t fingers = THREE_FINGER_COUNT;
+    EXPECT_NO_FATAL_FAILURE(handler.AddGestureMonitor(type, fingers));
+    type = TOUCH_GESTURE_TYPE_PINCH;
+    handler.touchGestureInfo_.insert(std::make_pair(2, std::set<int32_t>{1, 2}));
+    EXPECT_NO_FATAL_FAILURE(handler.AddGestureMonitor(type, fingers));
+    type = TOUCH_GESTURE_TYPE_SWIPE;
+    EXPECT_NO_FATAL_FAILURE(handler.AddGestureMonitor(type, fingers));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveGestureMonitor_001
+ * @tc.desc: Test the funcation RemoveGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_RemoveGestureMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    TouchGestureType type = TOUCH_GESTURE_TYPE_PINCH;
+    int32_t fingers = THREE_FINGER_COUNT;
+    bool ret = handler.RemoveGestureMonitor(type, fingers);
+    ASSERT_FALSE(ret);
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_PINCH, std::set<int32_t>{}));
+    ret = handler.RemoveGestureMonitor(type, fingers);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveGestureMonitor_002
+ * @tc.desc: Test the funcation RemoveGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_RemoveGestureMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    GestureMonitorHandler handler;
+    TouchGestureType type = TOUCH_GESTURE_TYPE_PINCH;
+    int32_t fingers = THREE_FINGER_COUNT;
+    handler.touchGestureInfo_.insert(std::make_pair(type, std::set<int32_t>{ fingers, FOUR_FINGER_COUNT}));
+    handler.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_SWIPE, std::set<int32_t>{ FOUR_FINGER_COUNT}));
+    bool ret = handler.RemoveGestureMonitor(TOUCH_GESTURE_TYPE_SWIPE, FOUR_FINGER_COUNT);
+    ASSERT_FALSE(ret);
+    ret = handler.RemoveGestureMonitor(type, FOUR_FINGER_COUNT);
+    ASSERT_FALSE(ret);
+    ret = handler.RemoveGestureMonitor(type, fingers);
+    ASSERT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace MMI
