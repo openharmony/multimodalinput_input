@@ -50,7 +50,7 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     }
     bool isIntercept = this->KeyInterceptByHostOSWhiteList(keyEvent->GetKeyCode());
     if (!isIntercept && OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event key code:%{private}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event:%{private}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         DfxHisysevent::ReportKeyEvent("intercept");
