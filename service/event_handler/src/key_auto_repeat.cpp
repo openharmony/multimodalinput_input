@@ -99,10 +99,10 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
                 MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d", timerId_);
             } else {
                 if (keyEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, key code:%{private}d",
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, code:%{private}d",
                         timerId_, keyEvent_->GetKeyCode());
                 } else {
-                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, key code:%{private}d",
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, code:%{private}d",
                         timerId_, keyEvent_->GetKeyCode());
                 }
             }
@@ -124,10 +124,10 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
         keyEvent_->SetRepeatKey(false);
         timerId_ = -1;
         if (!JudgeLimitPrint(keyEvent_)) {
-            MMI_HILOGI("Stop autorepeat, key code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
+            MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         } else {
-            MMI_HILOGI("Stop autorepeat, key code:%{private}d, repeatKeyCode:%{private}d, keyAction:%d",
+            MMI_HILOGI("Stop autorepeat, code:%{private}d, repeatKeyCode:%{private}d, keyAction:%d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         }
         if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && repeatKeyCode_ != keyEvent_->GetKeyCode()) {
@@ -148,9 +148,9 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetRepeatKey(true);
             AddHandleTimer(delayTime);
             if (!JudgeLimitPrint(keyEvent_)) {
-                MMI_HILOGD("The end keyboard autorepeat, key code:%{private}d", keyEvent_->GetKeyCode());
+                MMI_HILOGD("The end keyboard autorepeat:%{private}d", keyEvent_->GetKeyCode());
             } else {
-                MMI_HILOGD("The end keyboard autorepeat, key code:%{private}d", keyEvent_->GetKeyCode());
+                MMI_HILOGD("The end keyboard autorepeat:%{private}d", keyEvent_->GetKeyCode());
             }
         } else {
             repeatKeyCode_ = -1;
