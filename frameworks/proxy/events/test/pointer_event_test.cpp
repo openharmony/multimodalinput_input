@@ -31,14 +31,10 @@ using namespace testing::ext;
 } // namespace
 class PointerEventTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
     static std::shared_ptr<PointerEvent> CreatePointEvent();
 };
-
-void PointerEventTest::SetUpTestCase(void)
-{
-
-}
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
