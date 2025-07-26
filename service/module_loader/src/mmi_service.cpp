@@ -577,7 +577,7 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     MMI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d, pid:%{public}d",
         programName.c_str(), moduleType, pid);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
+        [this, programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
             return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
         }
         );
