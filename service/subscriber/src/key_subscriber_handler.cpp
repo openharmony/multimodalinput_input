@@ -76,9 +76,9 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
             keyEvent->SetFourceMonitorFlag(false);
         }
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscribe keyEvent filter success:%{private}d", keyEvent->GetKeyCode());
         } else {
-            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscribe keyEvent filter success:%{private}d", keyEvent->GetKeyCode());
         }
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         DfxHisysevent::ReportKeyEvent("subcriber");
@@ -496,9 +496,9 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT ||
         keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Subscriber mulit swipe keycode is:%{private}d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscriber mulit swipe:%{private}d", keyEvent->GetKeyCode());
         } else {
-            MMI_HILOGD("Subscriber mulit swipe keycode is:%{private}d", keyEvent->GetKeyCode());
+            MMI_HILOGD("Subscriber mulit swipe:%{private}d", keyEvent->GetKeyCode());
         }
         return IsEnableCombineKeySwipe(keyEvent);
     }
@@ -575,7 +575,7 @@ void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> 
 {
     OHOS::AAFwk::Want want;
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
-    want.SetParam("keyCode", keyEvent->GetKeyCode());
+    want.SetParam("code", keyEvent->GetKeyCode());
     EventFwk::CommonEventPublishInfo publishInfo;
     std::vector<std::string> permissionVec {"ohos.permission.NOTIFICATION_CONTROLLER"};
     publishInfo.SetSubscriberPermissions(permissionVec);
@@ -694,10 +694,10 @@ bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
+        MMI_HILOGD("code:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
             KeyEvent::ActionToString(keyAction));
     } else {
-        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s",
+        MMI_HILOGD("code:%{private}d, keyAction:%{public}s",
             keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     }
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
@@ -708,9 +708,9 @@ bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
+            MMI_HILOGD("Pressed:%{private}d", keyCode);
         } else {
-            MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
+            MMI_HILOGD("Pressed:%{private}d", keyCode);
         }
     }
     bool handled = false;
@@ -875,7 +875,7 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
-        MMI_HILOGI("Notify subscribe conditions, isForegroundExits:%{public}d, KeyCode()%{private}d, pid:%{public}d",
+        MMI_HILOGI("Notify subscribe conditions, isForegroundExits:%{public}d, code()%{private}d, pid:%{public}d",
             isForegroundExits_, keyEvent->GetKeyCode(), sess->GetPid());
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
@@ -941,7 +941,7 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
         CHKPC(sess);
-        MMI_HILOGI("Notify subscribe conditions, isForegroundExits:%{public}d, KeyCode()%{private}d, pid:%{public}d",
+        MMI_HILOGI("Notify subscribe conditions, isForegroundExits:%{public}d, code()%{private}d, pid:%{public}d",
             isForegroundExits_, keyEvent->GetKeyCode(), sess->GetPid());
         if (!isForegroundExits_ || foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             interestedSubscribers.push_back(subscriber);
@@ -987,10 +987,10 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
     } else {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
+            MMI_HILOGI("Notify subscriber id:%{public}d, code:%{private}d, pid:%{public}d",
                 subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         } else {
-            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
+            MMI_HILOGI("Notify subscriber id:%{public}d, code:%{private}d, pid:%{public}d",
                 subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         }
     }
@@ -1134,7 +1134,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
             continue;
         }
         if (keyCode != keyOption->GetFinalKey()) {
-            MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
+            MMI_HILOGD("code != keyOption->GetFinalKey()");
             ClearSubscriberTimer(subscribers);
             continue;
         }
@@ -1198,7 +1198,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             continue;
         }
         if (keyCode != keyOption->GetFinalKey()) {
-            MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
+            MMI_HILOGD("code != keyOption->GetFinalKey()");
             continue;
         }
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {

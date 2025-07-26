@@ -112,8 +112,7 @@ void DfxHisyseventDevice::ReportSimulateToRsLatecyBehavior(int32_t pointerId, in
         "STAGE_RES", StageRes::SIMULATE_EVENT_DRAW_SUCCESS,
         "BIZ_STATE", BizState::SIMULATE_EVENT_DRAW_START,
         "POINTER_EVENT_ID", pointerId,
-        "PROCESS_TIME", processDT
-        );
+        "PROCESS_TIME", processDT);
     if (ret != 0) {
         MMI_HILOGE(
             "HiviewDFX Write failed, ret:%{public}d, pointerId:%{public}d, processDT:%{public}" PRId64,
