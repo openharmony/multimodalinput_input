@@ -4374,7 +4374,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionW
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     bool isSkip = true;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
-    inputWindowsManager->privacyProtection_->isOpen = true;
+    inputWindowsManager->privacyProtection_.isOpen = true;
     EXPECT_TRUE(inputWindowsManager->isOpenPrivacyProtectionserver_);
     EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
     isSkip = false;

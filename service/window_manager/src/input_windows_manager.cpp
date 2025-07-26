@@ -5728,7 +5728,6 @@ template <class T>
 void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
 {
     CALL_INFO_TRACE;
-    CHKPV(item);
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
@@ -5749,7 +5748,6 @@ template <class T>
 void InputWindowsManager::CreatePrivacyProtectionObserver(T& item)
 {
     CALL_INFO_TRACE;
-    CHKPV(item);
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("Get settingdata failed, key:%{public}s", key.c_str());
