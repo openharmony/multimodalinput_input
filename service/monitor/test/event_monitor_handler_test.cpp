@@ -35,6 +35,9 @@ int32_t g_no_focus_pid = 1;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 int32_t g_writeFd = -1;
 constexpr size_t MAX_EVENTIDS_SIZE = 1001;
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
 } // namespace
