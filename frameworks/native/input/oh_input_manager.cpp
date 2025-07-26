@@ -180,14 +180,14 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("key code is invaild");
+            MMI_HILOGE("Invaild");
         } else {
-            MMI_HILOGE("key code is invaild");
+            MMI_HILOGE("Invaild");
         }
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
-        MMI_HILOGE("key code is not within the query range, key code:%{private}d", keyState->keyCode);
+        MMI_HILOGE("code is not within the query range:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -233,9 +233,9 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("key code is invaild");
+            MMI_HILOGE("Invaild");
         } else {
-            MMI_HILOGE("key code is invaild");
+            MMI_HILOGE("Invaild");
         }
         return;
     }
@@ -297,9 +297,9 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("key code is less 0, can not process");
+            MMI_HILOGE("code is less 0, can not process");
         } else {
-            MMI_HILOGE("key code is less 0, can not process");
+            MMI_HILOGE("code is less 0, can not process");
         }
         return INPUT_PARAMETER_ERROR;
     }
@@ -2791,7 +2791,7 @@ Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
 {
     CALL_DEBUG_ENTER;
     if (keyCode < 0 || keyCode != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
-        MMI_HILOGE("Invalid key code:%{private}d", keyCode);
+        MMI_HILOGE("Invalid code:%{private}d", keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(state, INPUT_PARAMETER_ERROR);
