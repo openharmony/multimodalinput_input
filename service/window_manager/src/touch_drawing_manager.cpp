@@ -56,11 +56,9 @@ void TouchDrawingManager::Initialize()
 
 void TouchDrawingManager::SetupSettingObserver(int32_t nRetries)
 {
-    if (HasDisplayInfo()) {
-        CreateObserver();
-        if (hasBubbleObserver_ && hasPointerObserver_) {
-            return;
-        }
+    CreateObserver();
+    if (hasBubbleObserver_ && hasPointerObserver_) {
+        return;
     }
     if (nRetries <= 0) {
         MMI_HILOGE("Failed to setup setting observer after tens of retries");
@@ -73,11 +71,6 @@ void TouchDrawingManager::SetupSettingObserver(int32_t nRetries)
     if (timerId < 0) {
         MMI_HILOGE("AddTimer fail");
     }
-}
-
-bool TouchDrawingManager::HasDisplayInfo() const
-{
-    return ((displayInfo_.validWidth != 0) && (displayInfo_.validHeight != 0));
 }
 
 void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
