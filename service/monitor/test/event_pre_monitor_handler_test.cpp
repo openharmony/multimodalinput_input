@@ -311,7 +311,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_IsEqualsKeys_001
     std::vector<int32_t> newKeys;
     std::vector<int32_t> oldKeys = {1, 2, 3};
     ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
-    newKeys = oldKeys;
+    newKeys = {1, 2, 3};
     ASSERT_TRUE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
     oldKeys = {1, 2, 3, 4};
     ASSERT_FALSE(monitorCollection.IsEqualsKeys(newKeys, oldKeys));
