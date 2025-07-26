@@ -577,46 +577,6 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_001
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_RemoveMonitor_002
- * @tc.desc: Verify the invalid and valid event type of RemoveMonitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    InputHandlerType handlerType = InputHandlerType::NONE;
-    HandleEventType eventType = 0;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
-    monitorCollection.monitors_.insert(sessionHandler);
-    std::set<EventMonitorHandler::SessionHandler> setIters = { sessionHandler };
-    monitorCollection.endScreenCaptureMonitors_[g_pid] = setIters;
-    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
-}
-
-/**
- * @tc.name: EventMonitorHandlerTest_RemoveMonitor_003
- * @tc.desc: Verify the invalid and valid event type of RemoveMonitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    InputHandlerType handlerType = InputHandlerType::NONE;
-    HandleEventType eventType = 0;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
-    monitorCollection.monitors_.insert(sessionHandler);
-    std::set<EventMonitorHandler::SessionHandler> setIters = { };
-    monitorCollection.endScreenCaptureMonitors_[g_pid] = setIters;
-    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
-}
-
-/**
  * @tc.name: EventMonitorHandlerTest_SendToClient_001
  * @tc.desc: Verify the keyEvent and pointerEvent of SendToClient
  * @tc.type: FUNC
@@ -702,6 +662,46 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_001, Tes
     eventType = 1;
     sessionHandler = { handlerType, eventType, session2 };
     monitorCollection.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveMonitor_002
+ * @tc.desc: Verify the invalid and valid event type of RemoveMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    monitorCollection.monitors_.insert(sessionHandler);
+    std::set<EventMonitorHandler::SessionHandler> setIters = { sessionHandler };
+    monitorCollection.endScreenCaptureMonitors_[g_pid] = setIters;
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveMonitor_003
+ * @tc.desc: Verify the invalid and valid event type of RemoveMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    monitorCollection.monitors_.insert(sessionHandler);
+    std::set<EventMonitorHandler::SessionHandler> setIters = { };
+    monitorCollection.endScreenCaptureMonitors_[g_pid] = setIters;
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
 }
 
