@@ -54,7 +54,7 @@ class TouchDrawingHandler final : public ITouchDrawingHandler {
 
 public:
     TouchDrawingHandler() = default;
-    ~TouchDrawingHandler() = default;
+    ~TouchDrawingHandler() override;
     DISALLOW_COPY_AND_MOVE(TouchDrawingHandler);
 
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo) override;
