@@ -409,5 +409,399 @@
      EXPECT_TRUE(OHOS::MMI::GetPreKeys(jsonData, shortcutKey));
      cJSON_Delete(jsonData);
  }
- } // namespace MMI
+
+#ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+ /**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey001
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_001
+ * @tc.desc: Verify that when the key code configured for a repeat key does not match the actual key code
+ * of the key event, the special repeat key check should return false.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey001, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = 1;
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(0);
+
+    KeyCommandHandler handler;
+    EXPECT_FALSE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey002
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_002
+ * @tc.desc: Test the key event for the non-volume down button;
+ * it should return false even if the key code matches.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey002, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = 1;
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(1);
+
+    KeyCommandHandler handler;
+    EXPECT_FALSE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey003
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_003
+ * @tc.desc: Verify that when the application bundleName does not contain ".camera",
+ * the special repeat key check for the volume down button should return false.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey003, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.app";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    KeyCommandHandler handler;
+    EXPECT_FALSE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey004
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_004
+ * @tc.desc: When the camera app is in the foreground and the screen is locked,
+ * the special repeat key check for the volume down button should return true.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey004, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_CALL(*winMgr, JudgeCaramaInFore()).WillOnce(Return(true));
+    EXPECT_CALL(*displayMonitor, GetScreenStatus()).WillOnce(Return("ON"));
+    EXPECT_CALL(*displayMonitor, GetScreenLocked()).WillOnce(Return(true));
+
+    KeyCommandHandler handler;
+    EXPECT_TRUE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey005
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_005
+ * @tc.desc: Verify that when the call state is active,
+ * the special repeat key check for the volume down button should return true.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey005, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_CALL(*deviceMonitor, GetCallState()).WillOnce(Return(StateType::CALL_STATUS_ACTIVE));
+
+    KeyCommandHandler handler;
+    EXPECT_TRUE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey006
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_006
+ * @tc.desc: When testing screen lock with no music activated,
+ * the special repeat key check for the volume down button should return false.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey006, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    EXPECT_CALL(*displayMonitor, GetScreenLocked()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceMonitor, IsMusicActivate()).WillOnce(Return(false));
+
+    KeyCommandHandler handler;
+    EXPECT_FALSE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckSpecialRepeatKey007
+ * @tc.number: KeyCommandHandlerTest_CheckSpecialRepeatKey_007
+ * @tc.desc: Verify that when music is active and the screen is not locked,
+ * the special repeat key check for the volume down button should return true.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey007, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    EXPECT_CALL(*displayMonitor, GetScreenStatus()).WillOnce(Return("ON"));
+    EXPECT_CALL(*displayMonitor, GetScreenLocked()).WillOnce(Return(false));
+    EXPECT_CALL(*deviceMonitor, IsMusicActivate()).WillOnce(Return(true));
+
+    KeyCommandHandler handler;
+    EXPECT_TRUE(handler.CheckSpecialRepeatKey(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility001
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_001
+ * @tc.desc: Test the ability to initiate repeated key presses,
+ * verifying the correct process for handling key events and initiating functionality.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility001, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera";
+    auto keyEvent = std::make_shared<KeyEvent>();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyCommandHandler handler;
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(subscriberHandlerMock_));
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .Times(1);
+    EXPECT_CALL(handler, LaunchAbility(_))
+        .Times(1);
+    EXPECT_CALL(handler, UnregisterMistouchPrevention())
+        .Times(1);
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount001
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_001
+ * @tc.desc: To verify that false is returned when a null key event is transferred.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount001, TestSize.Level1)
+{
+    RepeatKey item;
+    EXPECT_FALSE(handler_->HandleRepeatKeyCount(item, nullptr));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount002
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_002
+ * @tc.desc: When the key code configured for the repeat key does not match
+ * the actual key event key code, the UP event handler should return false.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount002, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    EXPECT_FALSE(handler_->HandleRepeatKeyCount(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount003
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_003
+ * @tc.desc: Verify the time interval calculation logic and timer settings for the POWER key UP event.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount003, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(200);
+    
+    handler_->downActionTime_ = 100;
+    
+    EXPECT_CALL(mockTimerMgr_, AddTimer(900, 1, _, "KeyCommandHandler-HandleRepeatKeyCount"))
+        .WillOnce(Return(VALID_TIMER_ID));
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler_->upActionTime_, 200);
+    EXPECT_EQ(handler_->repeatKey_.keyCode, KeyEvent::KEYCODE_POWER);
+    EXPECT_EQ(handler_->repeatKey_.keyAction, KeyEvent::KEY_ACTION_UP);
+    EXPECT_EQ(handler_->repeatTimerId_, VALID_TIMER_ID);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount004
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_004
+ * @tc.desc: When there is a wallet delay,
+ * the POWER key UP event should use the wallet delay time to set the timer.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount004, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    handler_->walletLaunchDelayTimes_ = 500;
+    
+    EXPECT_CALL(mockTimerMgr_, AddTimer(500, 1, _, _))
+        .WillOnce(Return(VALID_TIMER_ID));
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount005
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_005
+ * @tc.desc: To verify that false is returned when the timer fails to be added.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount005, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    EXPECT_CALL(mockTimerMgr_, AddTimer(_, 1, _, _))
+        .WillOnce(Return(INVALID_TIMER_ID));
+    
+    EXPECT_FALSE(handler_->HandleRepeatKeyCount(item, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount006
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_006
+ * @tc.desc: The DOWN event for the new button should correctly initialize the count and status.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount006, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(100);
+    
+    handler_->repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler_->count_, 1);
+    EXPECT_EQ(handler_->repeatKey_.keyCode, KeyEvent::KEYCODE_VOLUME_UP);
+    EXPECT_EQ(handler_->repeatKey_.keyAction, KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(handler_->isDownStart_);
+    EXPECT_EQ(handler_->downActionTime_, 100);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount007
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_007
+ * @tc.desc: Verify that the count and state mapping should be reset when a repeated DOWN event occurs.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount007, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    handler_->repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    handler_->repeatKey_.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler_->count_ = 5;
+    handler_->isDownStart_ = true;
+    handler_->repeatKeyCountMap_[KeyEvent::KEYCODE_VOLUME_UP] = 3;
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler_->count_, 0);
+    EXPECT_FALSE(handler_->isDownStart_);
+    EXPECT_TRUE(handler_->repeatKeyCountMap_.empty());
+}
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount008
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_008
+ * @tc.desc: The complete key sequence should correctly update the count and action status.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount008, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    
+    auto upEvent = KeyEvent::Create();
+    upEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    upEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    upEvent->SetActionTime(UP_ACTION_TIME);
+
+    EXPECT_CALL(mockTimerMgr_, AddTimer(_, 1, _, _))
+        .WillOnce(Return(VALID_TIMER_ID));
+
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, upEvent));
+
+    auto downEvent = KeyEvent::Create();
+    downEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    downEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    downEvent->SetActionTime(150);
+
+    handler_->repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    handler_->repeatKey_.keyAction = KeyEvent::KEY_ACTION_UP;
+    handler_->count_ = 1;
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, downEvent));
+    EXPECT_EQ(handler_->count_, 2);
+    EXPECT_EQ(handler_->repeatKey_.keyAction, KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(handler_->isDownStart_);
+    EXPECT_EQ(handler_->downActionTime_, 150);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount009
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_009
+ * @tc.desc: Verify that when the key press interval is less than the set value,
+ * the existing timer should be canceled and the state reset.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount009, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    
+    handler_->repeatTimerId_ = VALID_TIMER_ID;
+    
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(150);
+    
+    handler_->upActionTime_ = UP_ACTION_TIME;
+    handler_->intervalTime_ = UP_ACTION_TIME;
+
+    EXPECT_CALL(mockTimerMgr_, RemoveTimer(VALID_TIMER_ID));
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
+    EXPECT_EQ(handler_->repeatTimerId_, -1);
+    EXPECT_FALSE(handler_->isHandleSequence_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount010
+ * @tc.number: KeyCommandHandlerTest_HandleRepeatKeyCount_010
+ * @tc.desc: To test the UP event of the non-POWER key,
+ * set the timer using the default interval time.
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount010, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    EXPECT_CALL(mockTimerMgr_, AddTimer(handler_->intervalTime_, 1, _, _))
+        .WillOnce(Return(VALID_TIMER_ID));
+    
+    EXPECT_TRUE(handler_->HandleRepeatKeyCount(item, keyEvent));
+}
+#endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+} // namespace MMI
 } // namespace OHOS
