@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "define_multimodal.h"
 #include "i_knuckle_drawing.h"
 #include "knuckle_drawing.h"
 
@@ -90,6 +91,56 @@ HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_SetMultiWindowScreenId, TestSize
 
     knuckleDrawing->knuckleDrawingMgr_ = nullptr;
     knuckleDrawing->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+}
+
+/**
+ * @tc.name: KnuckleDrawingTest_RegisterAddTimer_001
+ * @tc.desc: Test Overrides RegisterAddTimer function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_RegisterAddTimer_001, TestSize.Level1)
+{
+    std::shared_ptr<KnuckleDrawing> knuckleDrawing = std::make_shared<KnuckleDrawing>();
+    ASSERT_NE(knuckleDrawing, nullptr);
+    ASSERT_NE(knuckleDrawing->knuckleDrawingMgr_, nullptr);
+
+    auto addTimerFunc = []
+        (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return RET_OK;
+    };
+    knuckleDrawing->RegisterAddTimer(addTimerFunc);
+    ASSERT_NE(knuckleDrawing->knuckleDrawingMgr_->addTimerFunc_, nullptr);
+}
+
+/**
+ * @tc.name: KnuckleDrawingTest_RegisterAddTimer_002
+ * @tc.desc: Test Overrides RegisterAddTimer function abnormal branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_RegisterAddTimer_002, TestSize.Level1)
+{
+    std::shared_ptr<KnuckleDrawing> knuckleDrawing = std::make_shared<KnuckleDrawing>();
+    ASSERT_NE(knuckleDrawing, nullptr);
+    ASSERT_NE(knuckleDrawing->knuckleDrawingMgr_, nullptr);
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawingMgrTmp = knuckleDrawing->knuckleDrawingMgr_;
+    knuckleDrawing->knuckleDrawingMgr_ = nullptr;
+
+    auto addTimerFunc = []
+        (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return RET_OK;
+    };
+    knuckleDrawing->RegisterAddTimer(addTimerFunc);
+    ASSERT_TRUE(knuckleDrawingMgrTmp->addTimerFunc_);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -51,6 +51,12 @@ void KnuckleDrawing::SetMultiWindowScreenId(uint64_t screenId, uint64_t displayN
     knuckleDrawingMgr_->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 }
 
+void KnuckleDrawing::RegisterAddTimer(AddTimerFunc addTimerFunc)
+{
+    CHKPRV(knuckleDrawingMgr_, "knuckleDrawingMgr_ is nullptr");
+    knuckleDrawingMgr_->RegisterAddTimer(addTimerFunc);
+}
+
 extern "C" IKnuckleDrawing *GetKnuckleDrawing()
 {
     return new (std::nothrow) KnuckleDrawing();
