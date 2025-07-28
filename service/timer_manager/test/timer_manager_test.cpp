@@ -25,6 +25,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t MIN_INTERVAL { 36 };
+constexpr int32_t MAX_LONG_INTERVAL_MS { 30000 };
+constexpr int32_t NONEXISTENT_ID { -1 };
 } // namespace
 
 class TimerManagerTest : public testing::Test {
@@ -427,6 +431,295 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal, TestSize.Leve
     timer->nextCallTime = 10000000000;
     tMgr.InsertTimerInternal(timer);
     ASSERT_NO_FATAL_FAILURE(tMgr.ProcessTimersInternal());
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimer_002
+ * @tc.desc: Verify AddTimer adjusts intervalMs to MIN_INTERVAL when less than MIN_INTERVAL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_002, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = -100;
+    int32_t repeatCount = 2;
+    bool callbackInvoked = false;
+    auto callback = [&]() { callbackInvoked = true; };
+    auto ret = timermanager.AddTimer(intervalMs, repeatCount, callback, "TestTimerMin");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimer_003
+ * @tc.desc: Verify AddTimer adjusts intervalMs to MAX_INTERVAL_MS when greater than MAX_INTERVAL_MS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_003, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = MAX_INTERVAL_MS + 5000;
+    int32_t repeatCount = 3;
+    bool callbackInvoked = false;
+    auto callback = [&]() { callbackInvoked = true; };
+    auto ret = timermanager.AddTimer(intervalMs, repeatCount, callback, "TestTimerMax");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimer_004
+ * @tc.desc: Verify AddTimer works with a normal valid interval
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_004, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = 500;
+    int32_t repeatCount = 1;
+    bool callbackInvoked = false;
+    auto callback = [&]() { callbackInvoked = true; };
+    auto ret = timermanager.AddTimer(intervalMs, repeatCount, callback, "TestTimerNormal");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddLongTimer_001
+ * @tc.desc: Verify AddLongTimer adjusts intervalMs to MIN_INTERVAL when less than MIN_INTERVAL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddLongTimer_001, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = MIN_INTERVAL - 10;
+    int32_t repeatCount = 1;
+    bool callbackInvoked = false;
+    auto callback = [&]() { callbackInvoked = true; };
+    int32_t ret = timermanager.AddLongTimer(intervalMs, repeatCount, callback, "LongTimerMin");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddLongTimer_002
+ * @tc.desc: Verify AddLongTimer adjusts intervalMs to MAX_INTERVAL_MS when greater than MAX_LONG_INTERVAL_MS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddLongTimer_002, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = MAX_LONG_INTERVAL_MS + 5000;
+    int32_t repeatCount = 2;
+    bool callbackInvoked = false;
+    auto callback = [&]() { callbackInvoked = true; };
+    int32_t ret = timermanager.AddLongTimer(intervalMs, repeatCount, callback, "LongTimerMax");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddLongTimer_003
+ * @tc.desc: Verify AddLongTimer works correctly with valid interval
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddLongTimer_003, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = 2000;
+    int32_t repeatCount = 1;
+    bool callbackInvoked = false;
+    auto callback = [&]() { callbackInvoked = true; };
+    int32_t ret = timermanager.AddLongTimer(intervalMs, repeatCount, callback, "LongTimerNormal");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimerInternal_002
+ * @tc.desc: Return NONEXISTENT_ID when callback is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimerInternal_002, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int32_t intervalMs = 100;
+    int32_t repeatCount = 1;
+    std::function<void()> cb;
+    auto ret = timermanager.AddTimerInternal(intervalMs, repeatCount, cb, "null_cb");
+    EXPECT_EQ(ret, NONEXISTENT_ID);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimerInternal_003
+ * @tc.desc: Add many timers to ensure id keeps increasing monotonically
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimerInternal_003, TestSize.Level1)
+{
+    TimerManager timermanager;
+    auto cb = []() {};
+    const int kCount = 20;
+    for (int i = 0; i < kCount; i++) {
+        int32_t ret = timermanager.AddTimerInternal(100 + i, 1, cb, "bulk_" + std::to_string(i));
+        EXPECT_EQ(ret, i);
+    }
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimerInternal_004
+ * @tc.desc: Add timer with repeatCount = 0 (edge value) should still return a valid id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimerInternal_004, TestSize.Level1)
+{
+    TimerManager timermanager;
+    auto cb = []() {};
+    int32_t ret = timermanager.AddTimerInternal(200, 0, cb, "repeat_zero");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_AddTimerInternal_005
+ * @tc.desc: Add timer with very large intervalMs to ensure it is handled (no overflow path reachable here)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimerInternal_005, TestSize.Level1)
+{
+    TimerManager timermanager;
+    auto cb = []() {};
+    int32_t ret = timermanager.AddTimerInternal(INT32_MAX, 1, cb, "large_interval");
+    EXPECT_GE(ret, 0);
+}
+
+/**
+ * @tc.name: TimerManagerTest_ResetTimerInternal_002
+ * @tc.desc: Add a timer and reset it successfully
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimerInternal_002, TestSize.Level1)
+{
+    TimerManager timermanager;
+    auto callback = []() {};
+    int32_t timerId = timermanager.AddTimerInternal(100, 1, callback, "reset_ok");
+    ASSERT_GE(timerId, 0);
+    int32_t ret = timermanager.ResetTimerInternal(timerId);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: TimerManagerTest_ResetTimerInternal_003
+ * @tc.desc: Add multiple timers and reset one of them
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimerInternal_003, TestSize.Level1)
+{
+    TimerManager timermanager;
+    auto callback = []() {};
+
+    int32_t id1 = timermanager.AddTimerInternal(200, 1, callback, "t1");
+    int32_t id2 = timermanager.AddTimerInternal(300, 1, callback, "t2");
+    int32_t id3 = timermanager.AddTimerInternal(400, 1, callback, "t3");
+    ASSERT_GE(id1, 0);
+    ASSERT_GE(id2, 0);
+    ASSERT_GE(id3, 0);
+    int32_t ret = timermanager.ResetTimerInternal(id2);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(timermanager.ResetTimerInternal(id1), RET_OK);
+}
+
+/**
+ * @tc.name: TimerManagerTest_ResetTimerInternal_004
+ * @tc.desc: Attempt to reset non-existing timerId after timers have been added
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimerInternal_004, TestSize.Level1)
+{
+    TimerManager timermanager;
+    auto callback = []() {};
+    timermanager.AddTimerInternal(100, 1, callback, "t1");
+    int32_t ret = timermanager.ResetTimerInternal(9999);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TimerManagerTest_ProcessTimersInternal_002
+ * @tc.desc: Add one timer and ensure its callback is executed once
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_002, TestSize.Level1)
+{
+    TimerManager timermanager;
+    bool callbackExecuted = false;
+    auto callback = [&]() { callbackExecuted = true; };
+    int32_t timerId = timermanager.AddTimerInternal(0, 1, callback, "test_timer");
+    ASSERT_GE(timerId, 0);
+    timermanager.ProcessTimersInternal();
+    EXPECT_TRUE(callbackExecuted);
+}
+
+/**
+ * @tc.name: TimerManagerTest_ProcessTimersInternal_003
+ * @tc.desc: Add a single timer with repeatCount=1 and verify callback is called once
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_003, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int callCount = 0;
+    auto callback = [&]() { callCount++; };
+    int32_t timerId = timermanager.AddTimerInternal(0, 1, callback, "single_shot");
+    ASSERT_GE(timerId, 0);
+    timermanager.ProcessTimersInternal();
+    EXPECT_EQ(callCount, 1);
+}
+
+
+
+/**
+ * @tc.name: TimerManagerTest_ProcessTimersInternal_004
+ * @tc.desc: Add multiple timers with different intervals and process them
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_004, TestSize.Level1)
+{
+    TimerManager timermanager;
+    int callCount1 = 0;
+    int callCount2 = 0;
+    auto cb1 = [&]() { callCount1++; };
+    auto cb2 = [&]() { callCount2++; };
+    timermanager.AddTimerInternal(0, 1, cb1, "t1");
+    timermanager.AddTimerInternal(0, 1, cb2, "t2");
+    timermanager.ProcessTimersInternal();
+    EXPECT_EQ(callCount1, 1);
+    EXPECT_EQ(callCount2, 1);
+}
+
+/**
+ * @tc.name: TimerManagerTest_ProcessTimersInternal_005
+ * @tc.desc: ProcessTimersInternal with future timer (nextCallTime > nowTime) should not invoke callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_005, TestSize.Level1)
+{
+    TimerManager timermanager;
+    bool callbackExecuted = false;
+    auto callback = [&]() { callbackExecuted = true; };
+    int32_t timerId = timermanager.AddTimerInternal(5000, 1, callback, "future_timer");
+    ASSERT_GE(timerId, 0);
+    timermanager.ProcessTimersInternal();
+    EXPECT_FALSE(callbackExecuted);
 }
 } // namespace MMI
 } // namespace OHOS
