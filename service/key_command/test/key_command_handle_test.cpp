@@ -1288,6 +1288,311 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyCount009, T
     
     EXPECT_TRUE(handler.HandleRepeatKeyCount(item, keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent001
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_001
+ * @tc.desc: Verify no action when isHandleSequence_ is true
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = true;
+    handler.count_ = 5;
+    handler.launchAbilityCount_ = 2;
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler()).Times(0);
+    
+    handler.SendKeyEvent();
+    EXPECT_EQ(handler.count_, 0);
+    EXPECT_EQ(handler.launchAbilityCount_, 0);
+    EXPECT_FALSE(handler.isDownStart_);
+    EXPECT_FALSE(handler.isHandleSequence_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent002
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_002
+ * @tc.desc: Verify special key handling with KEY_DOWN_ACTION
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_BACK;
+    handler.count_ = 3;
+    handler.launchAbilityCount_ = 1;
+    handler.repeatKeyMaxTimes_[KeyEvent::KEYCODE_BACK] = 5;
+    
+    EXPECT_CALL(handler, IsSpecialType(KeyEvent::KEYCODE_BACK, SpecialType::KEY_DOWN_ACTION))
+        .WillOnce(Return(true));
+    EXPECT_CALL(handler, HandleSpecialKeys(KeyEvent::KEYCODE_BACK, KeyEvent::KEY_ACTION_UP))
+        .Times(2);
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .Times(4);
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillRepeatedly(Return(subscriberHandlerMock_));
+    
+    handler.SendKeyEvent();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent003
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_003
+ * @tc.desc: Verify POWER key cancel event at max count
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent003, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_POWER;
+    handler.count_ = 5;
+    handler.launchAbilityCount_ = 4;
+    handler.repeatKeyMaxTimes_[KeyEvent::KEYCODE_POWER] = 5;
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([](std::shared_ptr<KeyEvent> event) {
+            EXPECT_EQ(event->GetKeyCode(), KeyEvent::KEYCODE_POWER);
+            EXPECT_EQ(event->GetKeyAction(), KeyEvent::KEY_ACTION_CANCEL);
+        });
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_)).Times(1);
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillRepeatedly(Return(subscriberHandlerMock_));
+    
+    handler.SendKeyEvent();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent004
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_004
+ * @tc.desc: Verify DOWN event skipping on first iteration
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent004, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    handler.count_ = 3;
+    handler.launchAbilityCount_ = 0;
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .Times(0);
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([](std::shared_ptr<KeyEvent> event) {
+            EXPECT_EQ(event->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+        });
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .Times(2);
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .Times(2);
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillRepeatedly(Return(subscriberHandlerMock_));
+    
+    handler.SendKeyEvent();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent005
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_005
+ * @tc.desc: Verify state reset after execution
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent005, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 2;
+    handler.launchAbilityCount_ = 1;
+    handler.isDownStart_ = true;
+    handler.isHandleSequence_ = false;
+    handler.repeatKeyCountMap_[KeyEvent::KEYCODE_VOLUME_UP] = 3;
+    
+    handler.SendKeyEvent();
+    
+    EXPECT_EQ(handler.count_, 0);
+    EXPECT_EQ(handler.launchAbilityCount_, 0);
+    EXPECT_FALSE(handler.isDownStart_);
+    EXPECT_FALSE(handler.isHandleSequence_);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent006
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_006
+ * @tc.desc: Verify no events when count <= launchAbilityCount
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent006, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 2;
+    handler.launchAbilityCount_ = 3;
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler()).Times(0);
+    
+    handler.SendKeyEvent();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent007
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_007
+ * @tc.desc: Verify normal DOWN/UP sequence for non-special keys
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent007, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_ENTER;
+    handler.count_ = 2;
+    handler.launchAbilityCount_ = 0;
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([](auto event) { EXPECT_EQ(KeyEvent::KEY_ACTION_UP, event->GetKeyAction()); });
+    
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([](auto event) { EXPECT_EQ(KeyEvent::KEY_ACTION_DOWN, event->GetKeyAction()); });
+    EXPECT_CALL(*subscriberHandlerMock_, HandleKeyEvent(_))
+        .WillOnce([](auto event) { EXPECT_EQ(KeyEvent::KEY_ACTION_UP, event->GetKeyAction()); });
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillRepeatedly(Return(subscriberHandlerMock_));
+    
+    handler.SendKeyEvent();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent008
+ * @tc.number: KeyCommandHandlerTest_SendKeyEvent_008
+ * @tc.desc: Verify null subscriber handler safety
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent008, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    handler.count_ = 2;
+    handler.launchAbilityCount_ = 0;
+    
+    EXPECT_CALL(*inputHandlerMock_, GetSubscriberHandler())
+        .WillOnce(Return(nullptr));
+    
+    handler.SendKeyEvent();
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys001
+ * @tc.number: KeyCommandHandlerTest_HandleShortKeys_001
+ * @tc.desc: Verify returns false when no shortcut keys configured
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys001, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    KeyCommandHandler handler;
+    handler.shortcutKeys_.clear();
+    
+    EXPECT_FALSE(handler.HandleShortKeys(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys002
+ * @tc.number: KeyCommandHandlerTest_HandleShortKeys_002
+ * @tc.desc: Verify skips when same key is waiting timeout
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys002, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    
+    KeyCommandHandler handler;
+    handler.shortcutKeys_.push_back({});
+    handler.lastMatchedKey_.finalKey = KeyEvent::KEYCODE_A;
+    handler.lastMatchedKey_.timerId = 100;
+    
+    EXPECT_CALL(handler, IsKeyMatch(_, _))
+        .WillOnce(Return(true));
+    
+    EXPECT_TRUE(handler.HandleShortKeys(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys003
+ * @tc.number: KeyCommandHandlerTest_HandleShortKeys_003
+ * @tc.desc: Verify camera blocks VCR2 key
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys003, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VCR2);
+    
+    KeyCommandHandler handler;
+    handler.shortcutKeys_.push_back({});
+    
+    // Camera in foreground
+    EXPECT_CALL(*winMgrMock_, JudgeCaramaInFore())
+        .WillOnce(Return(true));
+    
+    EXPECT_FALSE(handler.HandleShortKeys(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys004
+ * @tc.number: KeyCommandHandlerTest_HandleShortKeys_004
+ * @tc.desc: Verify skips when current ability key matches
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys004, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_B);
+    
+    KeyCommandHandler handler;
+    handler.shortcutKeys_.push_back({});
+    handler.currentLaunchAbilityKey_.finalKey = KeyEvent::KEYCODE_B;
+    handler.currentLaunchAbilityKey_.timerId = 200;
+    
+    EXPECT_CALL(handler, IsKeyMatch(_, _))
+        .WillOnce(Return(true));
+    
+    EXPECT_TRUE(handler.HandleShortKeys(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys005
+ * @tc.number: KeyCommandHandlerTest_HandleShortKeys_005
+ * @tc.desc: Verify removes pending timer before matching
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys005, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    
+    KeyCommandHandler handler;
+    handler.shortcutKeys_.push_back({});
+    handler.lastMatchedKey_.timerId = 300;
+
+    EXPECT_CALL(*timerMgrMock_, RemoveTimer(300)).Times(1);
+    
+    EXPECT_CALL(handler, MatchShortcutKeys(_))
+        .WillOnce(Return(true));
+    
+    EXPECT_TRUE(handler.HandleShortKeys(keyEvent));
+    EXPECT_EQ(handler.lastMatchedKey_.timerId, -1);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys006
+ * @tc.number: KeyCommandHandlerTest_HandleShortKeys_006
+ * @tc.desc: Verify shortcut match returns true
+ */
+TEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys006, TestSize.Level1)
+{
+    auto keyEvent = KeyEvent::Create();
+    
+    KeyCommandHandler handler;
+    handler.shortcutKeys_.push_back({});
+    
+    EXPECT_CALL(handler, MatchShortcutKeys(_))
+        .WillOnce(Return(true));
+    
+    EXPECT_TRUE(handler.HandleShortKeys(keyEvent));
+}
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
