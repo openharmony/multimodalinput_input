@@ -339,24 +339,18 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::s
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    std::vector<sptr<KeyEventMonitorInfo>> info;
-    {
-        std::lock_guard guard(sCallBacksMutex);
-        auto iter = callbacks.find(keyOptionKey);
-        if (iter != callbacks.end()) {
-            auto &list = iter->second;
-            MMI_HILOGD("list size:%{public}zu", list.size());
-            for (auto monitorInfo : list) {
-                if (MatchCombinationKeys(monitorInfo, keyEvent)) {
-                    info.push_back(monitorInfo);
-                }
+    std::lock_guard guard(sCallBacksMutex);
+    auto iter = callbacks.find(keyOptionKey);
+    if (iter != callbacks.end()) {
+        auto &list = iter->second;
+        MMI_HILOGD("list size:%{public}zu", list.size());
+        for (auto monitorInfo : list) {
+            if (MatchCombinationKeys(monitorInfo, keyEvent)) {
+                EmitAsyncCallbackWork(monitorInfo);
             }
-        } else {
-            MMI_HILOGE("No Matches found for SubKeyEventCallback");
         }
-    }
-    for (auto it : info) {
-        EmitAsyncCallbackWork(it);
+    } else {
+        MMI_HILOGE("No Matches found for SubKeyEventCallback");
     }
 }
 
@@ -365,25 +359,20 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     std::vector<sptr<KeyEventMonitorInfo>> info;
-    {
-        std::lock_guard guard(sCallBacksMutex);
-        auto iter = hotkeyCallbacks.begin();
-        while (iter != hotkeyCallbacks.end()) {
-            auto &list = iter->second;
-            ++iter;
-            MMI_HILOGD("Callback list size:%{public}zu", list.size());
-            auto infoIter = list.begin();
-            while (infoIter != list.end()) {
-                auto monitorInfo = *infoIter;
-                if (MatchCombinationKeys(monitorInfo, keyEvent)) {
-                    info.push_back(monitorInfo);
-                }
-                ++infoIter;
+    std::lock_guard guard(sCallBacksMutex);
+    auto iter = hotkeyCallbacks.begin();
+    while (iter != hotkeyCallbacks.end()) {
+        auto &list = iter->second;
+        ++iter;
+        MMI_HILOGD("Callback list size:%{public}zu", list.size());
+        auto infoIter = list.begin();
+        while (infoIter != list.end()) {
+            auto monitorInfo = *infoIter;
+            if (MatchCombinationKeys(monitorInfo, keyEvent)) {
+                EmitAsyncCallbackWork(monitorInfo);
             }
+            ++infoIter;
         }
-    }
-    for (auto it : info) {
-        EmitAsyncCallbackWork(it);
     }
 }
 
