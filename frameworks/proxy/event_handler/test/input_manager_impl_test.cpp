@@ -1618,7 +1618,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_006, T
  */
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_007, TestSize.Level1)
 {
-     UserScreenInfo userScreenInfo;
+    UserScreenInfo userScreenInfo;
     for (size_t i = 0; i < MAX_DISPLAY_GROUP_SIZE; ++i) {
         DisplayGroupInfo group;
         userScreenInfo.displayGroups.push_back(group);
@@ -1769,7 +1769,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_004, TestSi
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-     WindowGroupInfo windowGroupInfo;
+    WindowGroupInfo windowGroupInfo;
     windowGroupInfo.focusWindowId = 10;
     windowGroupInfo.displayId = 1;
     WindowInfo window;
