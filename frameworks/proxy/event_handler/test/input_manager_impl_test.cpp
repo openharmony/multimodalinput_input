@@ -30,9 +30,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-// constexpr uint32_t MAX_DISPLAY_GROUP_SIZE = 100;
-// constexpr uint32_t MAX_DISPLAY_SIZE = 1000;
-// constexpr uint32_t MAX_SCREEN_SIZE = 1000;
 constexpr uint32_t MAX_WINDOW_SIZE = 1000;
 using namespace testing::ext;
 } // namespace
