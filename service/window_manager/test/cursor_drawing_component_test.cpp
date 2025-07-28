@@ -630,5 +630,35 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetPointerSnapsh
     EXPECT_NO_FATAL_FAILURE(instance_->GetPointerSnapshot(pixelMapPtr));
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+/**
+ * @tc.name: CursorDrawingComponentTest_Load_002
+ * @tc.desc: Test Load
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_Load_002, TestSize.Level1)
+{
+    instance_ = &CursorDrawingComponent::GetInstance();
+    ASSERT_NE(instance_, nullptr);
+    instance_->isLoaded_ = true;
+    instance_->soHandle_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(instance_->Load());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_UnLoad_002
+ * @tc.desc: Test UnLoad
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_002, TestSize.Level1)
+{
+    instance_ = &CursorDrawingComponent::GetInstance();
+    ASSERT_NE(instance_, nullptr);
+    instance_->isLoaded_ = true;
+    ASSERT_NE(instance_->soHandle_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
+}
 } // namespace MMI
 } // namespace OHOS
