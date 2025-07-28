@@ -946,7 +946,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     CHKFR(jsonArray, {}, "Invalid jsonArray");
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
-        CHKFR(jsonData, {}, "Invalid jsonData");
+        CHKPC(jsonData);
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
         cJSON_AddItemToArray(jsonArray, jsonData);
