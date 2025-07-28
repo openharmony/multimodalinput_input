@@ -277,6 +277,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
         auto infoTemp = std::string("AddEnv GET_CB_INFO failed");
         napi_throw_error(env, nullptr, infoTemp.c_str());
         delete id;
+        id = nullptr;
         return false;
     }
     auto status = napi_wrap(env, thisVar, static_cast<void*>(id),

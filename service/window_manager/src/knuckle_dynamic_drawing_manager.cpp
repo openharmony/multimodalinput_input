@@ -289,6 +289,7 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         // Add glowing particles onto the last path segment that was drawn
         int64_t now = pointerEvent->GetActionTime();
         if (draw) {
+            CHKPV(glowTraceSystem_);
             glowTraceSystem_->AddGlowPoints(pointerPath_, (now - lastUpdateTimeMillis_) / TIME_DIMENSION);
         }
         pointerPath_.Reset();
@@ -323,6 +324,7 @@ int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, RET_ERR);
     CHKPR(canvasNode_, RET_ERR);
+    CHKPR(glowTraceSystem_, RET_ERR);
     glowTraceSystem_->Update();
     if ((pointerEvent->GetActionTime() - isInDrawingTime_) > IN_DRAWING_TIME) {
         isInDrawingTime_ = pointerEvent->GetActionTime();
@@ -385,6 +387,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t rsId)
     MMI_HILOGD("KnuckleDynamicDrawingManager screenId_:%{private}" PRIu64, screenId_);
     CHKPV(knuckleDrawMgr_);
     knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
+    CHKPV(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

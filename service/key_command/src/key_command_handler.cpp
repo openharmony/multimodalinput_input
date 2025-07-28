@@ -106,6 +106,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
         return;
     }
     ProximityData* proximityData = reinterpret_cast<ProximityData*>(event->data);
+    CHKPV(proximityData);
     int32_t distance = static_cast<int32_t>(proximityData->distance);
     MMI_HILOGI("Proximity distance %{public}d", distance);
     g_distance = distance;
@@ -942,8 +943,10 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
+    CHKFR(jsonArray, {}, "Invalid jsonArray");
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
+        CHKPC(jsonData);
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
         cJSON_AddItemToArray(jsonArray, jsonData);

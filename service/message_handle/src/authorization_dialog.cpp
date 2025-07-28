@@ -85,6 +85,7 @@ bool AuthorizationDialog::ConnectSystemUi()
 void AuthorizationDialog::CloseDialog()
 {
     CALL_DEBUG_ENTER;
+    CHKPV(dialogConnectionCallback_);
     dialogConnectionCallback_->CloseDialog();
 }
 
