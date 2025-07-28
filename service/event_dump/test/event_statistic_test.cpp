@@ -27,6 +27,8 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t EVENT_OUT_SIZE { 30 };
 constexpr int32_t POINTER_RECORD_MAX_SIZE { 100 };
+const char* EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
+const char* EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
 } // namespace
 
 class EventStatisticTest : public testing::Test {
