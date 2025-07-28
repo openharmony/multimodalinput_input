@@ -39,6 +39,7 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 const std::string TEST_FILE_NAME = "/data/log.log";
+constexpr int32_t MAX_COMMAND_COUNT { 32 };
 } // namespace
 
 class EventDumpTest : public testing::Test {
