@@ -32,7 +32,7 @@ public:
     void Load();
     void UnLoad();
 
-    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
     void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo);
@@ -48,7 +48,7 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension);
     void DrawPointerStyle(const PointerStyle &pointerStyle);
     bool IsPointerVisible();
-    void SetPointerLocation(int32_t x, int32_t y, int32_t displayId);
+    void SetPointerLocation(int32_t x, int32_t y, uint64_t displayId);
     void SetMouseDisplayState(bool state);
     bool GetMouseDisplayState();
     int32_t SetCustomCursor(CursorPixelMap curPixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY);
@@ -63,7 +63,7 @@ public:
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle);
     const std::map<MOUSE_ICON, IconStyle>& GetMouseIconPath();
     int32_t SwitchPointerStyle();
-    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    void DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void InitPointerCallback();
     void InitScreenInfo();
@@ -82,7 +82,7 @@ public:
     void SubscribeScreenModeChange();
     void RegisterDisplayStatusReceiver();
     int32_t UpdateMouseLayer(
-        const PointerStyle &pointerStyle, int32_t displayId, int32_t physicalX, int32_t physicalY);
+        const PointerStyle &pointerStyle, uint64_t displayId, int32_t physicalX, int32_t physicalY);
     int32_t DrawNewDpiPointer();
     bool GetHardCursorEnabled();
 

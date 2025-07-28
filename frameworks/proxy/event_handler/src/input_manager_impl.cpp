@@ -17,17 +17,21 @@
 
 #include <regex>
 
+#include "pixel_map.h"
+#include "securec.h"
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
+#include "error_multimodal.h"
 #include "event_log_helper.h"
 #include "long_press_event_subscribe_manager.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "net_packet.h"
 #include "oh_input_manager.h"
-#include "pixel_map.h"
 #include "tablet_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
@@ -41,7 +45,6 @@ constexpr int32_t MAX_DELAY { 4000 };
 constexpr int32_t MIN_DELAY { 0 };
 constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 constexpr int32_t EVENT_TYPE { 0 };
-constexpr uint8_t LOOP_COND { 2 };
 constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
@@ -242,6 +245,10 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
     if (cfg == nullptr || cfgLen <= 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
+    }
+    if (enhanceCfg_ != nullptr) {
+        delete enhanceCfg_;
+        enhanceCfg_ = nullptr;
     }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
     CHKPV(enhanceCfg_);

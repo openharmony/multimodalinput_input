@@ -107,12 +107,12 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
     };
 
     if (!CheckSystemKey(key, shortcut)) {
-        MMI_HILOGE("Not system key ([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
+        MMI_HILOGE("Not system key ([%{private}s],FinalKey:%{private}d,PressTime:%{public}d,TriggerType:%{public}d)",
             FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
         if (IsExceptionalSystemKey(eSysKey)) {
             auto shortcutId = GenerateId();
             MMI_HILOGI("Register exceptional system key [No.%{public}d]"
-                "([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
+                "([%{private}s],FinalKey:%{private}d,PressTime:%{public}d,TriggerType:%{public}d)",
                 shortcutId, FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
             return shortcutId;
         }
@@ -122,7 +122,7 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         if (IsExceptionalSystemKey(eSysKey)) {
             auto shortcutId = GenerateId();
             MMI_HILOGI("Register exceptional system key [No.%{public}d]"
-                "([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
+                "([%{private}s],FinalKey:%{private}d,PressTime:%{public}d,TriggerType:%{public}d)",
                 shortcutId, FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
             return shortcutId;
         }
@@ -130,7 +130,7 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), shortcut);
-    MMI_HILOGI("Register system key [No.%{public}d](0x%{public}x,%{public}d,%{public}d,%{public}d,%{public}d)",
+    MMI_HILOGI("Register system key [No.%{public}d](0x%{private}x,%{private}d,%{public}d,%{public}d,%{public}d)",
         iter->first, shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime,
         shortcut.triggerType, shortcut.session);
     return iter->first;
@@ -144,7 +144,7 @@ void KeyShortcutManager::UnregisterSystemKey(int32_t shortcutId)
         return;
     }
     const KeyShortcut &key = iter->second;
-    MMI_HILOGI("Unregister system key(0x%{public}x,%{public}d,%{public}d,%{public}d,SESSION:%{public}d)",
+    MMI_HILOGI("Unregister system key(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
         key.modifiers, key.finalKey, key.longPressTime, key.triggerType, key.session);
     ResetTriggering(shortcutId);
     shortcuts_.erase(iter);
@@ -159,16 +159,16 @@ int32_t KeyShortcutManager::RegisterHotKey(const HotKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     if (HaveRegisteredGlobalKey(globalKey)) {
-        MMI_HILOGE("Global key (0x%{public}x, %{public}d) has been taken", globalKey.modifiers, globalKey.finalKey);
+        MMI_HILOGE("Global key (0x%{private}x, %{private}d) has been taken", globalKey.modifiers, globalKey.finalKey);
         return KEY_SHORTCUT_ERROR_TAKEN;
     }
     if (IsReservedSystemKey(globalKey)) {
-        MMI_HILOGE("Can not register reserved system key ([%{public}s],%{public}d)",
+        MMI_HILOGE("Can not register reserved system key ([%{private}s],%{private}d)",
             FormatModifiers(key.modifiers).c_str(), key.finalKey);
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), globalKey);
-    MMI_HILOGI("Register global key [No.%{public}d](0x%{public}x,%{public}d,SESSION:%{public}d)",
+    MMI_HILOGI("Register global key [No.%{public}d](0x%{private}x,%{private}d,SESSION:%{public}d)",
         iter->first, globalKey.modifiers, globalKey.finalKey, globalKey.session);
     return iter->first;
 }
@@ -181,7 +181,7 @@ void KeyShortcutManager::UnregisterHotKey(int32_t shortcutId)
         return;
     }
     const KeyShortcut &key = iter->second;
-    MMI_HILOGI("Unregister global key(0x%{public}x,%{public}d,SESSION:%{public}d)",
+    MMI_HILOGI("Unregister global key(0x%{private}x,%{private}d,SESSION:%{public}d)",
         key.modifiers, key.finalKey, key.session);
     shortcuts_.erase(iter);
 }
@@ -189,7 +189,7 @@ void KeyShortcutManager::UnregisterHotKey(int32_t shortcutId)
 bool KeyShortcutManager::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    MMI_HILOGI("Handle key event(No.%{public}d,KC:%{private}d,KA:%{public}d,PressedKeys:[%{public}s])",
+    MMI_HILOGI("Handle key event(No.%{public}d,KC:%{private}d,KA:%{public}d,PressedKeys:[%{private}s])",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), FormatPressedKeys(keyEvent).c_str());
     ResetTriggering(keyEvent);
     if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
@@ -277,7 +277,7 @@ int32_t KeyShortcutManager::AddSystemKey(const std::set<int32_t> &preKeys, int32
     KeyShortcut shortcut {};
 
     if (!CheckSystemKey(sysKey, shortcut)) {
-        MMI_HILOGE("Not system key ([%{public}s],%{public}d)", FormatModifiers(preKeys).c_str(), finalKey);
+        MMI_HILOGE("Not system key ([%{private}s],%{private}d)", FormatModifiers(preKeys).c_str(), finalKey);
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     systemKeys_.emplace(SystemKey {
@@ -374,7 +374,7 @@ int32_t KeyShortcutManager::ReadExceptionalSystemKey(cJSON *jsonSysKey)
 
 void KeyShortcutManager::AddExceptionalSystemKey(const ExceptionalSystemKey &sysKey)
 {
-    MMI_HILOGI("Add exceptional system key ([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,%{public}s)",
+    MMI_HILOGI("Add exceptional system key ([%{private}s],FinalKey:%{private}d,PressTime:%{public}d,%{public}s)",
         FormatModifiers(sysKey.preKeys).c_str(), sysKey.finalKey, sysKey.longPressTime,
         (sysKey.triggerType == SHORTCUT_TRIGGER_TYPE_DOWN ? "down" : "up"));
     exceptSysKeys_.emplace(sysKey);
@@ -439,7 +439,7 @@ bool KeyShortcutManager::CheckSystemKey(const SystemShortcutKey &key, KeyShortcu
     for (auto keyCode : key.modifiers) {
         auto iter = modifiers_.find(keyCode);
         if (iter == modifiers_.end()) {
-            MMI_HILOGE("Key code (%{public}d) is not modifier", keyCode);
+            MMI_HILOGE("Key code (%{private}d) is not modifier", keyCode);
             return false;
         }
         if ((modifiers & iter->second) != iter->second) {
@@ -488,7 +488,7 @@ bool KeyShortcutManager::CheckGlobalKey(const HotKey &key, KeyShortcut &shortcut
     for (auto keyCode : key.modifiers) {
         auto iter = modifiers_.find(keyCode);
         if (iter == modifiers_.end()) {
-            MMI_HILOGE("Key code (%{public}d) is not modifier", keyCode);
+            MMI_HILOGE("Key code (%{private}d) is not modifier", keyCode);
             return false;
         }
         if ((modifiers & iter->second) != iter->second) {
@@ -497,7 +497,7 @@ bool KeyShortcutManager::CheckGlobalKey(const HotKey &key, KeyShortcut &shortcut
         }
     }
     if (IsModifier(key.finalKey)) {
-        MMI_HILOGE("FinalKey(%{public}d) should not be modifier", key.finalKey);
+        MMI_HILOGE("FinalKey(%{private}d) should not be modifier", key.finalKey);
         return false;
     }
     if (key.finalKey == SHORTCUT_PURE_MODIFIERS) {
@@ -605,7 +605,7 @@ bool KeyShortcutManager::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent)
             continue;
         }
         MMI_HILOGI("Matched shortcut[No.%{public}d]"
-            "(0x%{public}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
+            "(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
             item.first, shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime,
             shortcut.triggerType, shortcut.session);
         TriggerDown(keyEvent, item.first, shortcut);
@@ -631,7 +631,7 @@ bool KeyShortcutManager::HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent)
         if (!CheckCombination(keyEvent, shortcut)) {
             continue;
         }
-        MMI_HILOGI("Matched shortcut(0x%{public}x,%{public}d,%{public}d,%{public}d,SESSION:%{public}d)",
+        MMI_HILOGI("Matched shortcut(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d)",
             shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime, shortcut.triggerType, shortcut.session);
         TriggerUp(keyEvent, item.first, shortcut);
         handled = true;
@@ -692,7 +692,7 @@ void KeyShortcutManager::TriggerDown(
     } else {
         if (triggering_.find(shortcutId) != triggering_.cend()) {
             MMI_HILOGI("Shortcut[No.%{public}d]"
-                "(0x%{public}x,%{public}d,%{public}d,%{public}d,SESSION:%{public}d) is pending",
+                "(0x%{private}x,%{private}d,%{public}d,%{public}d,SESSION:%{public}d) is pending",
                 shortcutId, shortcut.modifiers, shortcut.finalKey, shortcut.longPressTime,
                 shortcut.triggerType, shortcut.session);
             return;
@@ -805,7 +805,8 @@ bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent
 
 void KeyShortcutManager::UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+    if ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) ||
+        (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL)) {
         shortcutConsumed_.erase(keyEvent->GetKeyCode());
     }
 }

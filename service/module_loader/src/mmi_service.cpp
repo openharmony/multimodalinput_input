@@ -577,7 +577,7 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     MMI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d, pid:%{public}d",
         programName.c_str(), moduleType, pid);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
+        [this, programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
             return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
         }
         );
@@ -813,9 +813,6 @@ ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixe
     }
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, curPixelMap] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
         }
         ));
@@ -946,9 +943,7 @@ ErrCode MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerSize(int32_t &size)
 {
-    if (POINTER_DEV_MGR.isInit) {
-        size = CursorDrawingComponent::GetInstance().GetPointerSize();
-    }
+    size = CursorDrawingComponent::GetInstance().GetPointerSize();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -994,9 +989,6 @@ ErrCode MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto ret = delegateTasks_.PostSyncTask(
         [&surfaceId] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetCursorSurfaceId(surfaceId);
         });
     if (ret != RET_OK) {
@@ -1488,6 +1480,8 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     inputDevice->SetVendor(tmpDevice->GetVendor());
     inputDevice->SetPhys(tmpDevice->GetPhys());
     inputDevice->SetUniq(tmpDevice->GetUniq());
+    inputDevice->SetVirtualDevice(tmpDevice->IsVirtualDevice());
+    inputDevice->SetRemoteDevice(tmpDevice->IsRemoteDevice());
     inputDevice->SetCapabilities(tmpDevice->GetCapabilities());
     inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
 
@@ -2136,7 +2130,6 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
 #else
     return RET_OK;
@@ -4440,9 +4433,6 @@ ErrCode MMIService::EnableHardwareCursorStats(bool enable)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid, enable] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().EnableHardwareCursorStats(pid, enable);
         }
         );
@@ -4467,9 +4457,6 @@ ErrCode MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid, &frameCount, &vsyncCount] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetHardwareCursorStats(pid, frameCount, vsyncCount);
         }
         );
@@ -4659,9 +4646,6 @@ ErrCode MMIService::SkipPointerLayer(bool isSkip)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [isSkip] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SkipPointerLayer(isSkip);
         }
         );

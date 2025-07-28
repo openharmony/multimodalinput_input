@@ -37,6 +37,7 @@ namespace {
 constexpr int32_t LOCATION { 14 };
 constexpr int32_t TIME_WAIT_FOR_OP { 1000 };
 constexpr int32_t DEFAULT_PID { -1 };
+constexpr int32_t ZERO { 0 };
 } // namespace
 
 inline double CHK_RATE(double rate)
@@ -159,7 +160,9 @@ double CpuInfo::GetCpuUsage(const Total_Cpu_Occupy &first, const Total_Cpu_Occup
                                                         second.idle + second.lowait + second.irq + second.softirq);
     unsigned long cpuTime1 = static_cast<unsigned long>(first.user + first.nice + first.system +
                                                         first.idle + first.lowait + first.irq + first.softirq);
-
+    if (cpuTime2 - cpuTime1 == ZERO) {
+        return CPU_USAGE_UNKNOWN;
+    }
     double cpu_use = (second.user - first.user) * CPU_USAGE_MAX / (cpuTime2 - cpuTime1);
     double cpu_sys = (second.system - first.system) * CPU_USAGE_MAX / (cpuTime2 - cpuTime1);
 
@@ -250,7 +253,9 @@ double CpuInfo::GetProcCpuUsage(const std::string &process_name)
         MMI_HILOGE("Failed to obtain process CPU information");
         return CPU_USAGE_UNKNOWN;
     }
-
+    if (totalTime2 - totalTime1 == ZERO) {
+        return CPU_USAGE_UNKNOWN;
+    }
     return CHK_RATE(CPU_USAGE_MAX * (procTime2 - procTime1) / (totalTime2 - totalTime1));
 }
 } // namespace SYSTEM_INFO

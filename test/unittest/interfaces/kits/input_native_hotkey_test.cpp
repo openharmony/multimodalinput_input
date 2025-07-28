@@ -610,7 +610,6 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_022, Test
     EXPECT_EQ(hotkey, nullptr);
 }
 
-#ifndef OHOS_BUILD_PC_UNIT_TEST
 /**
  * @tc.name: InputNativeHotkeyTest_AddHotkeyMonitor_023
  * @tc.desc: Subscribe alt + tab
@@ -628,36 +627,15 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_023, Test
     OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
     OH_Input_SetRepeat(hotkey, false);
     int32_t ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
+#ifndef OHOS_BUILD_PC_UNIT_TEST
     EXPECT_NE(ret, INPUT_OCCUPIED_BY_OTHER);
-    OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
-    OH_Input_DestroyHotkey(&hotkey);
-    EXPECT_EQ(hotkey, nullptr);
-}
 #endif // OHOS_BUILD_PC_UNIT_TEST
-
 #ifdef OHOS_BUILD_PC_UNIT_TEST
-/**
- * @tc.name: InputNativeHotkeyTest_AddHotkeyMonitor_024
- * @tc.desc: Subscribe alt + tab
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_024, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Input_Hotkey *hotkey = OH_Input_CreateHotkey();
-    ASSERT_NE(hotkey, nullptr);
-
-    int32_t prekeys[1] = { KEYCODE_ALT_LEFT };
-    OH_Input_SetPreKeys(hotkey, prekeys, 1);
-    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
-    OH_Input_SetRepeat(hotkey, false);
-    int32_t ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
     EXPECT_EQ(ret, INPUT_OCCUPIED_BY_OTHER);
+#endif // OHOS_BUILD_PC_UNIT_TEST
     OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
     OH_Input_DestroyHotkey(&hotkey);
     EXPECT_EQ(hotkey, nullptr);
 }
-#endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI
 } // namespace OHOS

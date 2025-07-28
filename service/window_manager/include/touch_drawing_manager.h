@@ -49,7 +49,6 @@ public:
 
 private:
     void SetupSettingObserver(int32_t nRetries);
-    bool HasDisplayInfo() const;
     void CreateObserver();
     int32_t UpdateLabels();
     int32_t UpdateBubbleData();
