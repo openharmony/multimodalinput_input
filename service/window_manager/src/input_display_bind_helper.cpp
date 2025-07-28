@@ -341,6 +341,7 @@ void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeN
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
+    CHKPV(configFileInfos_);
     auto displayName = configFileInfos_->GetDisplayNameByInputDevice(sysUid);
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
     info.AddInputDevice(id, nodeName, sysUid);
@@ -352,11 +353,13 @@ void InputDisplayBindHelper::RemoveInputDevice(int32_t id)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d", id);
+    CHKPV(infos_);
     infos_->UnbindInputDevice(id);
 }
 
 bool InputDisplayBindHelper::IsDisplayAdd(int32_t id, const std::string &name)
 {
+    CHKPF(infos_);
     const auto &infos = infos_->GetInfos();
     for (const auto &info : infos) {
         if ((info.GetDisplayName() == name) && (info.GetDisplayId() == id)) {
@@ -370,6 +373,7 @@ std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdN
 {
     CALL_DEBUG_ENTER;
     std::set<std::pair<uint64_t, std::string>> idNames;
+    CHKFR(infos_, idNames, "infos_ is null");
     const auto &infos = infos_->GetInfos();
     for (const auto &info : infos) {
         if (info.GetDisplayId() != -1) {
@@ -545,6 +549,7 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d", id);
+    CHKPV(infos_);
     infos_->UnbindDisplay(id);
 }
 

@@ -937,6 +937,7 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
     if (image == nullptr) {
         MMI_HILOGE("ExtractDrawingImage image fail");
         delete releaseContext;
+        releaseContext = nullptr;
     }
     return image;
 }
@@ -3240,6 +3241,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
+            CHKPC(si);
             if (si->GetType() != OHOS::Rosen::ScreenType::REAL && !(si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
                 si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND)) {
                 continue;
@@ -3287,6 +3289,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
 
         // update screen scale and padding
         for (auto sp : screenPointers_) {
+            CHKPC(sp.second);
             if (sp.second->IsMirror()) {
                 sp.second->SetRotation(mainRotation);
                 sp.second->UpdatePadding(mainWidth, mainHeight);
@@ -3492,6 +3495,7 @@ std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScre
     std::vector<std::shared_ptr<ScreenPointer>> mirrors;
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto it : screenPointers_) {
+        CHKPC(it.second);
         if (it.second->IsMirror()) {
             mirrors.push_back(it.second);
         }
@@ -3524,6 +3528,7 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         screenPointers = screenPointers_;
     }
     for (auto it : screenPointers) {
+        CHKPC(it.second);
         if (it.second->IsMirror()) {
             if (!it.second->Move(x, y, align)) {
                 ret = RET_ERR;
@@ -3563,6 +3568,7 @@ void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     sp->MoveSoft(x, y, align);
 
     for (auto& msp : GetMirrorScreenPointers()) {
+        CHKPC(msp);
         msp->MoveSoft(x, y, align);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -3627,6 +3633,7 @@ void PointerDrawingManager::HideHardwareCursors()
     }
 
     for (auto msp : GetMirrorScreenPointers()) {
+        CHKPC(msp);
         if (!msp->SetInvisible()) {
             MMI_HILOGE("Hide cursor of mirror screen failed, screenId_: %{public}" PRIu64, screenId_);
         }

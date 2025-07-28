@@ -95,6 +95,7 @@ std::shared_ptr<WindowInfo> EventDispatchHandler::SearchCancelList (int32_t poin
     }
     auto windowList = cancelEventList_[pointerId];
     for (auto &info : windowList) {
+        CHKPC(info);
         if (info->id == windowId) {
             return info;
         }
@@ -140,6 +141,7 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
     std::shared_ptr<WindowInfo> targetWindow)
 {
     for (auto &window : windowList) {
+        CHKPC(window);
         if (window->id == targetWindow->id) {
             return true;
         }

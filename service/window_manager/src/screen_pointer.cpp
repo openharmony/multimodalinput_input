@@ -261,6 +261,7 @@ bool ScreenPointer::InitSurface()
 
     // set soft cursor buffer size
     auto surface = surfaceNode_->GetSurface();
+    CHKPF(surface);
     surface->SetQueueSize(DEFAULT_BUFFER_SIZE);
 
     surfaceNode_->SetVisible(true);
@@ -295,6 +296,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     CHKPV(si);
     auto id = si->GetRsId();
     if (screenId_ != id) {
+        CHKPV(surfaceNode_);
         surfaceNode_->AttachToDisplay(id);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }

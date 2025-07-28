@@ -2368,12 +2368,14 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     info->keyOption = reportEvent->keyOption;
     if (info->keyOption == nullptr) {
         delete info;
+        info = nullptr;
         MMI_HILOGE("KeyOption is null");
         return;
     }
     info->callback = reportEvent->callback;
     if (info->callback == nullptr) {
         delete info;
+        info = nullptr;
         MMI_HILOGE("Callback is null");
         return;
     }
@@ -2384,6 +2386,7 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     hotkey.isRepeat = info->keyOption->IsRepeat();
     info->callback(&hotkey);
     delete info;
+    info = nullptr;
 }
 
 static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -2415,6 +2418,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2427,16 +2431,19 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
         subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeHotkey(keyOption, HandleKeyEvent);
         if (subscribeId == OHOS::MMI::ERROR_UNSUPPORT) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_DEVICE_NOT_SUPPORTED;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_SYSTEM;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_OTHER;
         }
@@ -2447,6 +2454,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     }
     if (AddHotkeySubscribe(hotkeyInfo) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("AddHotkeySubscribe fail");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2473,6 +2481,7 @@ int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
+            monitorInfo = nullptr;
             MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
             continue;
         }
@@ -2483,6 +2492,7 @@ int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
+            monitorInfo = nullptr;
             MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
             return INPUT_SUCCESS;
         }
@@ -2516,6 +2526,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2523,6 +2534,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     int32_t subscribeId = -1;
     if (DelEventCallback(hotkeyInfo, subscribeId) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("DelEventCallback failed");
         return INPUT_SERVICE_EXCEPTION;
     }
@@ -2531,6 +2543,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         OHOS::MMI::InputManager::GetInstance()->UnsubscribeHotkey(subscribeId);
     }
     delete hotkeyInfo;
+    hotkeyInfo = nullptr;
     return INPUT_SUCCESS;
 }
 

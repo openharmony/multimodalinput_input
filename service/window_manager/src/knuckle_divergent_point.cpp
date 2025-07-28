@@ -88,6 +88,7 @@ void KnuckleDivergentPoint::Draw(Rosen::ExtendRecordingCanvas* canvas)
     traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
     canvas->SetMatrix(traceMatrix_);
     canvas->AttachBrush(brush_);
+    CHKPV(traceShadow_);
     Rosen::Drawing::Rect src = Rosen::Drawing::Rect(0, 0, traceShadow_->GetWidth(), traceShadow_->GetHeight());
     Rosen::Drawing::Rect dst = Rosen::Drawing::Rect(pointX_, pointY_, pointX_ + traceShadow_->GetWidth(),
         pointY_ + traceShadow_->GetHeight());

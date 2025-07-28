@@ -644,6 +644,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::UpdateTarget(st
             MMI_HILOG_DISPATCHE("Invalid pid:%{public}d", pid);
             continue;
         }
+        CHKPC(udsServer_);
         fd = udsServer_->GetClientFd(pid);
         if (fd < 0) {
             MMI_HILOG_DISPATCHE("The windowPid:%{public}d matching fd:%{public}d is invalid", pid, fd);
@@ -1236,7 +1237,9 @@ void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &curs
         pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
     }
     MMI_HILOGD("pointerBackCenterEvent status: %{private}s", pointerBackCenterEvent->ToString().c_str());
-    InputHandler->GetFilterHandler()->HandlePointerEvent(pointerBackCenterEvent);
+    auto filter = InputHandler->GetFilterHandler();
+    CHKPV(filter);
+    filter->HandlePointerEvent(pointerBackCenterEvent);
 }
 
 CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &displayGroupInfo)
@@ -4868,6 +4871,7 @@ void InputWindowsManager::SendUIExtentionPointerEvent(double logicalX, double lo
     pointerItem.SetWindowYPos(windowY);
     pointerItem.SetTargetWindowId(windowInfo.id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    CHKPV(udsServer_);
     auto fd = udsServer_->GetClientFd(windowInfo.pid);
     auto sess = udsServer_->GetSession(fd);
     CHKPRV(sess, "The window has disappeared");
@@ -5450,6 +5454,7 @@ void InputWindowsManager::UpdateTargetTouchWinIds(const WindowInfo &item, Pointe
 void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId) {
     for (int32_t windowId : targetTouchWinIds_[pointerId]) {
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
+        CHKCC(windowInfo);
         if (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL) {
             auto it = std::find(targetTouchWinIds_[pointerId].begin(), targetTouchWinIds_[pointerId].end(), windowId);
             if (it != targetTouchWinIds_[pointerId].end()) {
@@ -6359,6 +6364,7 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
     Rosen::WindowManagerLite::GetInstance().GetVisibilityWindowInfo(infos);
     BytraceAdapter::StopWindowVisible();
     for (const auto &it: infos) {
+        CHKPC(it);
         if (pid == it->pid_ &&
             it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_TOTALLY_OCCUSION) {
             MMI_HILOGD("pid:%{public}d has visible window", pid);
@@ -7088,7 +7094,9 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
     pointerEvent->SetAgentWindowId(sourceWindowInfo.agentWindowId);
     ClearTargetWindowId(pointerId);
     pointerEvent->UpdatePointerItem(pointerId, item);
-    InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
+    auto filter = InputHandler->GetFilterHandler();
+    CHKPR(filter, RET_ERR);
+    filter->HandlePointerEvent(pointerEvent);
     if (autoGenDown) {
         item.SetWindowX(shiftWindowInfo.x);
         item.SetWindowY(shiftWindowInfo.y);
@@ -7109,7 +7117,7 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
         pointerEvent->SetTargetWindowId(targetWindowInfo.id);
         pointerEvent->SetAgentWindowId(targetWindowInfo.agentWindowId);
         HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event dispatch down event");
-        InputHandler->GetFilterHandler()->HandlePointerEvent(pointerEvent);
+        filter->HandlePointerEvent(pointerEvent);
     }
     firstBtnDownWindowInfo_.first = targetWindowInfo.id;
     firstBtnDownWindowInfo_.second = targetWindowInfo.displayId;
@@ -7149,7 +7157,9 @@ int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindow
     lastTouchEvent_->UpdateId();
     ClearTargetWindowId(shiftWindowInfo.fingerId);
     lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
-    InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
+    auto filter = InputHandler->GetFilterHandler();
+    CHKPR(filter, RET_ERR);
+    filter->HandlePointerEvent(lastTouchEvent_);
     item.SetWindowX(shiftWindowInfo.x);
     item.SetWindowY(shiftWindowInfo.y);
     item.SetWindowXPos(shiftWindowInfo.x);
@@ -7170,7 +7180,7 @@ int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindow
     lastTouchEvent_->SetAgentWindowId(targetWindowInfo.agentWindowId);
     lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift touch event dispatch down event");
-    InputHandler->GetFilterHandler()->HandlePointerEvent(lastTouchEvent_);
+    filter->HandlePointerEvent(lastTouchEvent_);
     return RET_OK;
 }
 

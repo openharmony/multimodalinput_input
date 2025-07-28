@@ -191,7 +191,7 @@ std::optional<DelegateInterface::HandlerSummary> DelegateInterface::RemoveLocal(
         auto summary = it->second;
         handlers_.erase(it);
         if (type == InputHandlerType::INTERCEPTOR) {
-            deviceTags = it->second.deviceTags;
+            deviceTags = summary.deviceTags;
         }
         return summary;
     }
