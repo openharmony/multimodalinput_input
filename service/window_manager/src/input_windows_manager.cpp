@@ -785,7 +785,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     const int32_t focusWindowId = GetFocusWindowId(groupId);
     if (GetHardCursorEnabled()) {
-        UpdateKeyEventDisplayId(keyEvent, focusWindowId);
+        UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
     }
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());

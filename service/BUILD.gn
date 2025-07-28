@@ -3012,7 +3012,10 @@ ohos_unittest("DeviceManagerTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
-  sources = [ "device_manager/test/input_device_manager_test.cpp" ]
+  sources = [
+    "device_manager/test/input_device_manager_test.cpp",
+    "device_manager/test/pointer_device_manager_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
