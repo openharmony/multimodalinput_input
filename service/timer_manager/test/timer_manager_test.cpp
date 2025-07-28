@@ -445,7 +445,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_002, TestSize.Level1)
     int32_t intervalMs = -100;
     int32_t repeatCount = 2;
     bool callbackInvoked = false;
-    auto callback = [&]() { callbackInvoked = true; };
+    auto callback = [&callbackInvoked]() { callbackInvoked = true; };
     auto ret = timermanager.AddTimer(intervalMs, repeatCount, callback, "TestTimerMin");
     EXPECT_GE(ret, 0);
 }
@@ -462,7 +462,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_003, TestSize.Level1)
     int32_t intervalMs = MAX_INTERVAL_MS + 5000;
     int32_t repeatCount = 3;
     bool callbackInvoked = false;
-    auto callback = [&]() { callbackInvoked = true; };
+    auto callback = [&callbackInvoked]() { callbackInvoked = true; };
     auto ret = timermanager.AddTimer(intervalMs, repeatCount, callback, "TestTimerMax");
     EXPECT_GE(ret, 0);
 }
@@ -479,7 +479,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_004, TestSize.Level1)
     int32_t intervalMs = 500;
     int32_t repeatCount = 1;
     bool callbackInvoked = false;
-    auto callback = [&]() { callbackInvoked = true; };
+    auto callback = [&callbackInvoked]() { callbackInvoked = true; };
     auto ret = timermanager.AddTimer(intervalMs, repeatCount, callback, "TestTimerNormal");
     EXPECT_GE(ret, 0);
 }
@@ -496,7 +496,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddLongTimer_001, TestSize.Level1)
     int32_t intervalMs = MIN_INTERVAL - 10;
     int32_t repeatCount = 1;
     bool callbackInvoked = false;
-    auto callback = [&]() { callbackInvoked = true; };
+    auto callback = [&callbackInvoked]() { callbackInvoked = true; };
     int32_t ret = timermanager.AddLongTimer(intervalMs, repeatCount, callback, "LongTimerMin");
     EXPECT_GE(ret, 0);
 }
@@ -513,7 +513,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddLongTimer_002, TestSize.Level1)
     int32_t intervalMs = MAX_LONG_INTERVAL_MS + 5000;
     int32_t repeatCount = 2;
     bool callbackInvoked = false;
-    auto callback = [&]() { callbackInvoked = true; };
+    auto callback = [&callbackInvoked]() { callbackInvoked = true; };
     int32_t ret = timermanager.AddLongTimer(intervalMs, repeatCount, callback, "LongTimerMax");
     EXPECT_GE(ret, 0);
 }
@@ -530,7 +530,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddLongTimer_003, TestSize.Level1)
     int32_t intervalMs = 2000;
     int32_t repeatCount = 1;
     bool callbackInvoked = false;
-    auto callback = [&]() { callbackInvoked = true; };
+    auto callback = [&callbackInvoked]() { callbackInvoked = true; };
     int32_t ret = timermanager.AddLongTimer(intervalMs, repeatCount, callback, "LongTimerNormal");
     EXPECT_GE(ret, 0);
 }
@@ -659,7 +659,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_002, TestSize.
 {
     TimerManager timermanager;
     bool callbackExecuted = false;
-    auto callback = [&]() { callbackExecuted = true; };
+    auto callback = [&callbackExecuted]() { callbackExecuted = true; };
     int32_t timerId = timermanager.AddTimerInternal(0, 1, callback, "test_timer");
     ASSERT_GE(timerId, 0);
     timermanager.ProcessTimersInternal();
@@ -676,14 +676,12 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_003, TestSize.
 {
     TimerManager timermanager;
     int callCount = 0;
-    auto callback = [&]() { callCount++; };
+    auto callback = [&callCount]() { callCount++; };
     int32_t timerId = timermanager.AddTimerInternal(0, 1, callback, "single_shot");
     ASSERT_GE(timerId, 0);
     timermanager.ProcessTimersInternal();
     EXPECT_EQ(callCount, 1);
 }
-
-
 
 /**
  * @tc.name: TimerManagerTest_ProcessTimersInternal_004
@@ -696,8 +694,8 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_004, TestSize.
     TimerManager timermanager;
     int callCount1 = 0;
     int callCount2 = 0;
-    auto cb1 = [&]() { callCount1++; };
-    auto cb2 = [&]() { callCount2++; };
+    auto cb1 = [&callCount1]() { callCount1++; };
+    auto cb2 = [&callCount2]() { callCount2++; };
     timermanager.AddTimerInternal(0, 1, cb1, "t1");
     timermanager.AddTimerInternal(0, 1, cb2, "t2");
     timermanager.ProcessTimersInternal();
@@ -715,7 +713,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_005, TestSize.
 {
     TimerManager timermanager;
     bool callbackExecuted = false;
-    auto callback = [&]() { callbackExecuted = true; };
+    auto callback = [&callbackExecuted]() { callbackExecuted = true; };
     int32_t timerId = timermanager.AddTimerInternal(5000, 1, callback, "future_timer");
     ASSERT_GE(timerId, 0);
     timermanager.ProcessTimersInternal();

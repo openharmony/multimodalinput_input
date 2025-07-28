@@ -480,7 +480,7 @@ HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_008, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::vector<std::string> args = {"-h", "-z", "-d"}; 
+    std::vector<std::string> args = {"-h", "-z", "-d"};
     EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
 }
 
