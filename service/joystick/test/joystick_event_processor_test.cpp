@@ -133,6 +133,67 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X, Test
 }
 
 /**
+ * @tc.name: JoystickEventProcessorTest_CheckHAT0X_002
+ * @tc.desc: Test CheckHAT0X
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->axes_ = PointerEvent::AXIS_TYPE_SCROLL_VERTICAL;
+    std::vector<KeyEvent::KeyItem> buttonEvents;
+    ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
+    pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
+    pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = 0;
+    ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_CheckHAT0X_003
+ * @tc.desc: Test CheckHAT0X
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    std::vector<KeyEvent::KeyItem> buttonEvents;
+    pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
+    double axisValue = 0.02;
+    pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = axisValue;
+    ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
+    axisValue = -0.02;
+    pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = axisValue;
+    ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_CheckHAT0X_004
+ * @tc.desc: Test CheckHAT0X
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    std::vector<KeyEvent::KeyItem> buttonEvents;
+    pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
+    double axisValue = 0;
+    pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = axisValue;
+    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_LEFT};
+    ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
+    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_RIGHT};
+    ASSERT_NO_FATAL_FAILURE(JoystickEvent->CheckHAT0X(pointerEvent, buttonEvents));
+}
+
+/**
  * @tc.name: JoystickEventProcessorTest_CheckHAT0Y
  * @tc.desc: Test CheckHAT0Y
  * @tc.type: FUNC
