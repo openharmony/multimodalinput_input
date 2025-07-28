@@ -194,6 +194,10 @@ public:
     {
         return mirrorHeight_;
     }
+    void SetVirtualExtend(bool isVirtualExtend)
+    {
+        isVirtualExtend_ = isVirtualExtend;
+    }
 
 private:
     bool InitSurfaceNode();
@@ -244,6 +248,7 @@ private:
     bool isCurrentOffScreenRendering_ = false;
     float offRenderScale_{1.0f};
     int32_t screenRealDPI_{1.0f};
+    bool isVirtualExtend_ = false;
 };
 
 } // namespace OHOS::MMI

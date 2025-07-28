@@ -2211,7 +2211,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
 {
     CALL_DEBUG_ENTER;
     if (GetHardCursorEnabled()) {
-        if (screenPointers_.count(static_cast<size_t>(displayInfo.rsId))) {
+        if (screenPointers_.count(displayInfo.rsId)) {
             auto sp = screenPointers_[displayInfo.rsId];
             CHKPV(sp);
             sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
@@ -3240,11 +3240,8 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
-            if (si->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
-                continue;
-            }
-            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-                si->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            if (si->GetType() != OHOS::Rosen::ScreenType::REAL && !(si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND)) {
                 continue;
             }
             uint64_t sid = si->GetRsId();
@@ -3271,6 +3268,10 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 if (!sp->Init(pointerRenderer_)) {
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}" PRIu64, sid);
                 }
+            }
+            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+                screenPointers_[sid]->SetVirtualExtend(true);
             }
         }
 
