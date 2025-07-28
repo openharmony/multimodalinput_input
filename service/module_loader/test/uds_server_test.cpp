@@ -999,8 +999,11 @@ HWTEST_F(UDSServerTest, ReleaseSession_003, TestSize.Level1)
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     udsServer.sessionsMap_.insert(std::make_pair(fd, session));
     auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
+    ASSERT_NE(eventData, nullptr);
     ev.data.ptr = eventData;
     ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
+    free(eventData);
+    eventData = nullptr;
 }
 
 /**

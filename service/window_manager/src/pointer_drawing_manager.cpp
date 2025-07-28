@@ -484,6 +484,7 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
+    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     currentDirection_ = direction;
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
@@ -1121,6 +1122,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         return;
     }
     PostTask([this]() -> void {
+        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
         if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
             MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
             return;
@@ -2210,7 +2212,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
 {
     CALL_DEBUG_ENTER;
     if (GetHardCursorEnabled()) {
-        if (screenPointers_.count(static_cast<size_t>(displayInfo.rsId))) {
+        if (screenPointers_.count(displayInfo.rsId)) {
             auto sp = screenPointers_[displayInfo.rsId];
             CHKPV(sp);
             sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
@@ -2523,6 +2525,7 @@ IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     if (IsPointerVisible() && mouseDisplayState_) {
@@ -3239,11 +3242,8 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         // construct ScreenPointers for new screens
         for (auto si : screens) {
             CHKPC(si);
-            if (si->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
-                continue;
-            }
-            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-                si->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            if (si->GetType() != OHOS::Rosen::ScreenType::REAL && !(si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND)) {
                 continue;
             }
             uint64_t sid = si->GetRsId();
@@ -3270,6 +3270,10 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 if (!sp->Init(pointerRenderer_)) {
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}" PRIu64, sid);
                 }
+            }
+            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+                screenPointers_[sid]->SetVirtualExtend(true);
             }
         }
 

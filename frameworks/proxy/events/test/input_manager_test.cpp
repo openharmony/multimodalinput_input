@@ -5968,7 +5968,7 @@ void InputManagerTest::ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
         MMI_HILOGE("No '%{private}s' was found", cfgName);
         return;
     }
-    std::cout << "Input product config:%{private}s" << cfgPath << std::endl;
+    std::cout << "Input product config: " << cfgPath << std::endl;
     ReadMaxMultiTouchPointNum(std::string(cfgPath), maxMultiTouchPointNum);
 }
 

@@ -49,6 +49,7 @@ HWTEST_F(EventFilterDeathRecipientTest, EventFilterDeathRecipientTest_Interface_
         flag = true;
     }};
     ASSERT_NO_FATAL_FAILURE(item.OnRemoteDied(nullptr));
+    ASSERT_TRUE(flag);
 }
 } // namespace MMI
 } // namespace OHOS

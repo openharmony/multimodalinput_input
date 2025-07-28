@@ -108,6 +108,28 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetInvisible_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ScreenPointerTest_SetInvisible_002
+ * @tc.desc: Test SetInvisible
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_SetInvisible_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
+    screenpointer->SetVirtualExtend(true);
+    bool ret = screenpointer->SetInvisible();
+    EXPECT_TRUE(ret);
+}
+
+/**
  * @tc.name: ScreenPointerTest_MoveSoft_001
  * @tc.desc: Test MoveSoft
  * @tc.type: Function
@@ -254,6 +276,38 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_002, TestSize.Level1)
     y = -1;
     ret = screenpointer->Move(x, y, align);
     EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ScreenPointerTest_Move_003
+ * @tc.desc: Test Move
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
+        Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
+    ASSERT_NE(screenpointer->surfaceNode_, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
+    screenpointer->isCurrentOffScreenRendering_ = true;
+    ICON_TYPE align = ANGLE_W;
+    int32_t x = 0;
+    int32_t y = 0;
+    screenpointer->SetVirtualExtend(true);
+    bool ret = screenpointer->Move(x, y, align);
+    EXPECT_TRUE(ret);
 }
 
 /**

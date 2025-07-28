@@ -73,7 +73,6 @@ bool PermissionHelper::CheckInjectPermission()
                    INJECT_PERMISSION_CODE.c_str(), tokenId, ret);
         return false;
     }
-    MMI_HILOGD("Check permission( %{public}s) permission success", INJECT_PERMISSION_CODE.c_str());
     return true;
 }
 

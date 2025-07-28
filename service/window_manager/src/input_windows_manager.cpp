@@ -786,7 +786,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     const int32_t focusWindowId = GetFocusWindowId(groupId);
     if (GetHardCursorEnabled()) {
-        UpdateKeyEventDisplayId(keyEvent, focusWindowId);
+        UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
     }
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
@@ -4607,6 +4607,7 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
 bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent,
     const bool &isSkip)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
         pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
         if (!isOpenPrivacyProtectionserver_) {

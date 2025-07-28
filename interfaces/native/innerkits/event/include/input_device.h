@@ -79,6 +79,10 @@ public:
     std::string GetPhys() const;
     void SetUniq(std::string uniq);
     std::string GetUniq() const;
+    void SetVirtualDevice(bool isVirtual);
+    bool IsVirtualDevice() const;
+    void SetRemoteDevice(bool isRemote);
+    bool IsRemoteDevice() const;
     void AddCapability(InputDeviceCapability cap);
     bool HasCapability(InputDeviceCapability cap) const;
     bool HasCapability(uint32_t deviceTags) const;
@@ -185,7 +189,8 @@ public:
             in.ReadInt32(product_) &&
             in.ReadInt32(vendor_) &&
             in.ReadString(phys_) &&
-            in.ReadString(uniq_)
+            in.ReadString(uniq_) &&
+            in.ReadUint32(feature_)
         );
         uint64_t capabilities = 0;
         if (!result || !in.ReadUint64(capabilities)) {
@@ -223,6 +228,9 @@ public:
         if (!out.WriteString(uniq_)) {
             return false;
         }
+        if (!out.WriteUint32(feature_)) {
+            return false;
+        }
         if (!out.WriteUint64(capabilities_.to_ulong())) {
             return false;
         }
@@ -254,6 +262,7 @@ private:
     int32_t version_ { -1 };
     int32_t product_ { -1 };
     int32_t vendor_ { -1 };
+    uint32_t feature_ { 0U };
     std::string phys_ { "null" };
     std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
