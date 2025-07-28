@@ -43,7 +43,10 @@ MMIClient::~MMIClient()
 
 void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
 {
-    CHKPV(eventHandler);
+    if (eventHandler == nullptr) {
+        MMI_HILOGW("CHKPV(%{public}s) is null", #eventHandler);
+        return;
+    }
     // use the new thread untill eventhandler use poll thread
     eventHandler_ = eventHandler;
 }
