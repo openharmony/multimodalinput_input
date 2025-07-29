@@ -33,9 +33,8 @@ struct ScreenCaptureHandle {
     ScreenCaptureHandle(): handle(nullptr), isWorking(nullptr), registerListener(nullptr),
         isMusicActivate(nullptr) {}
 
-    void Free(std::mutex &agentMutex)
+    void Free()
     {
-        std::lock_guard<std::mutex> guard(agentMutex);
         if (handle != nullptr) {
             dlclose(handle);
             handle = nullptr;
