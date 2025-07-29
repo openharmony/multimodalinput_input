@@ -2782,6 +2782,7 @@ ohos_unittest("EventHandlerEXTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
