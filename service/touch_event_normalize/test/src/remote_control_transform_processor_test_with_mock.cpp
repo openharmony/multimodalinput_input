@@ -12,15 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "remote_control_transform_processor.h"
 
- #include "remote_control_transform_processor.h"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <linux/input.h>
 
- #include <gtest/gtest.h>
- #include <gmock/gmock.h>
- #include <linux/input.h>
- 
- #include "libinput_mock.h"
- #include "input_windows_manager_mock.h"
+#include "libinput_mock.h"
+#include "input_windows_manager_mock.h"
 
 namespace OHOS {
 namespace MMI {
