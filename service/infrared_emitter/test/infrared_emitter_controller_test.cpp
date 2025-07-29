@@ -189,7 +189,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 
 /**
  * @tc.name: InfraredEmitterControllerTest_Transmit_002
- * @tc.desc: irInterface_ 为 nullptr，Transmit 应返回 true
+ * @tc.desc: irInterface_ is nullptr，Transmit return true
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -206,7 +206,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
 
 /**
  * @tc.name: InfraredEmitterControllerTest_Transmit_003
- * @tc.desc: irInterface_->Transmit 返回负数，预期返回 false
+ * @tc.desc: irInterface_->Transmit return -1，expected return false
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -236,7 +236,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
 
 /**
  * @tc.name: InfraredEmitterControllerTest_Transmit_004
- * @tc.desc: irInterface_->Transmit 成功但 outRet 为 false，预期返回 false
+ * @tc.desc: irInterface_->Transmit success but outRet return false
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -266,7 +266,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
 
 /**
  * @tc.name: InfraredEmitterControllerTest_Transmit_005
- * @tc.desc: irInterface_->Transmit 成功且 outRet 为 true，预期返回 true
+ * @tc.desc: irInterface_->Transmit success and return true
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -308,7 +308,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
         int32_t GetCarrierFreqs(bool& ret, std::vector<HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
         {
             ret = true;
-            return -1; // 模拟返回错误
+            return -1;
         }
     };
     InfraredEmitterController controller;
