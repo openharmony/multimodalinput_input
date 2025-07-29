@@ -113,6 +113,7 @@ private:
     Rosen::Drawing::Point lastPt_;
     DevMode bubbleMode_;
     DevMode pointerMode_;
+    int32_t currentDeviceId_ { -1 };
     int32_t currentPointerId_ { 0 };
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };

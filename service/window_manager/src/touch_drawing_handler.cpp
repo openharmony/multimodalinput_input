@@ -430,6 +430,10 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
+    if ((pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) &&
+        (pointerEvent_->GetDeviceId() != currentDeviceId_)) {
+        return;
+    }
     UpdatePointerPosition();
     ClearTracker();
     RecordLabelsInfo();
@@ -724,11 +728,12 @@ void TouchDrawingHandler::ClearTracker()
 
 void TouchDrawingHandler::InitLabels()
 {
+    currentDeviceId_ = pointerEvent_->GetDeviceId();
     isFirstDownAction_ = true;
     isDownAction_ = true;
     maxPointerCount_ = 0;
     currentPointerCount_ = 0;
-    currentPointerId_ = 0;
+    currentPointerId_ = pointerEvent_->GetPointerId();
     xVelocity_ = 0.0;
     yVelocity_ = 0.0;
     lastPointerItem_.clear();
