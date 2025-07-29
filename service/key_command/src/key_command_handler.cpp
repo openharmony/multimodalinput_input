@@ -1790,6 +1790,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std:
         MMI_HILOGD("ret_ %{public}d", ret_.load());
         if (ret_ != LIGHT_STAY_AWAY) {
             LaunchAbility(item.ability);
+            launchAbilityCount_ = 0;
             CHKPV(mistouchPrevention_);
             MMI_HILOGI("Launch yes");
         }
