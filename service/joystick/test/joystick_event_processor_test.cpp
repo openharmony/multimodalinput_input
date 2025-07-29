@@ -225,7 +225,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y, Test
 
 /**
  * @tc.name: JoystickEventProcessorTest_CheckHAT0Y_002
- * @tc.desc: Test CheckHAT0X
+ * @tc.desc: Test CheckHAT0Y
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -241,7 +241,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_002, 
 
 /**
  * @tc.name: JoystickEventProcessorTest_CheckHAT0Y_003
- * @tc.desc: Test CheckHAT0X
+ * @tc.desc: Test CheckHAT0Y
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -262,7 +262,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_003, 
 
 /**
  * @tc.name: JoystickEventProcessorTest_CheckHAT0Y_004
- * @tc.desc: Test CheckHAT0X
+ * @tc.desc: Test CheckHAT0Y
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -283,7 +283,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_004, 
 
 /**
  * @tc.name: JoystickEventProcessorTest_CheckHAT0Y_005
- * @tc.desc: Test CheckHAT0X
+ * @tc.desc: Test CheckHAT0Y
  * @tc.type: FUNC
  * @tc.require:
  */
