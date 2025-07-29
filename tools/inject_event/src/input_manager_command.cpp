@@ -383,7 +383,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 std::cout << "start coordinate: (" << px1 << ", " << py1 << ")" << std::endl;
                                 std::cout << "  end coordinate: (" << px2 << ", " << py2 << ")" << std::endl;
-                                std::cout << "     total times: "  << totalTimeMs << " ms"      << std::endl;
+                                std::cout << "     smooth time: "  << totalTimeMs << " ms"      << std::endl;
                                 std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2203,7 +2203,7 @@ int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
     int32_t centerY = 0;
     int32_t scalePercentNumerator = 0;
     std::string tips = "uinput -P -p dx, dy, scalePercent; dx, dy, scalePercent are all number.";
-    std::string extralTips = " dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent =< 500;";
+    std::string extralTips = " dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent <= 500;";
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
         std::cout << tips << extralTips << std::endl;
@@ -2513,7 +2513,6 @@ void InputManagerCommand::PrintTouchUsage()
     std::cout << "commands for knucle:                                          " << std::endl;
     PrintKnuckleUsage();
     std::cout << std::endl;
-
 }
 
 void InputManagerCommand::PrintKnuckleUsage()
@@ -2528,7 +2527,7 @@ void InputManagerCommand::PrintTouchPadUsage()
     std::cout << "-p <dx> <dy> <scalePercent>  --dx, dy, scalePercent are all number."                    << std::endl;
     std::cout << "   dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;"           << std::endl;
     std::cout << "   While simulate this, make sure that a picture is on the top of the desktop."      << std::endl;
-    std::cout << "-s <startX> <startY> <endX> <endY>  --startX, startY, endX, endY are all number which is bigger than 0";
+    std::cout << "-s <startX> <startY> <endX> <endY>  --startX, startY, endX, endY are all greater than 0";
     std::cout << std::endl;
     std::cout << "   While simulate this, make sure that your actual action is available"              << std::endl;
     std::cout << "-r <rotateValue> --rotateValue must be within (-360,360)"                         << std::endl;
