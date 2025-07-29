@@ -16,6 +16,7 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
+#include "cursor_drawing_component.h"
 #include "device_event_monitor.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
@@ -26,7 +27,7 @@
 #include "key_command_handler_util.h"
 #include "key_event_normalize.h"
 #include "long_press_subscriber_handler.h"
-#include "cursor_drawing_component.h"
+#include "pointer_device_manager.h"
 #include "pull_throw_subscriber_handler.h"
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
@@ -105,6 +106,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
         return;
     }
     ProximityData* proximityData = reinterpret_cast<ProximityData*>(event->data);
+    CHKPV(proximityData);
     int32_t distance = static_cast<int32_t>(proximityData->distance);
     MMI_HILOGI("Proximity distance %{public}d", distance);
     g_distance = distance;
@@ -118,7 +120,7 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
         return;
     }
     if (MenuClickHandle(keyEvent)) {
-        MMI_HILOGD("MenuClickHandle return true, keyCode:%{private}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("MenuClickHandle return true:%{private}d", keyEvent->GetKeyCode());
         return;
     }
     if (OnHandleEvent(keyEvent)) {
@@ -131,7 +133,7 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("The keyEvent start launch an ability:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
     }
@@ -941,8 +943,10 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
+    CHKFR(jsonArray, {}, "Invalid jsonArray");
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
+        CHKPC(jsonData);
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
         cJSON_AddItemToArray(jsonArray, jsonData);
@@ -1182,7 +1186,7 @@ void KeyCommandHandler::PrintExcludeKeys()
 {
     size_t keysSize = excludeKeys_.size();
     for (size_t i = 0; i < keysSize; i++) {
-        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
+        MMI_HILOGD("code:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
                    excludeKeys_[i].keyCode, excludeKeys_[i].keyAction, excludeKeys_[i].delay);
     }
 }
@@ -1194,7 +1198,7 @@ void KeyCommandHandler::PrintSeq()
     for (const auto &item : sequences_) {
         MMI_HILOGI("The row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGI("The keyCode:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("code:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
         MMI_HILOGI("Ability bundleName:%{public}s, abilityName:%{public}s",
@@ -1405,10 +1409,10 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
+        MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
             key->GetKeyCode(), key->GetKeyAction());
     } else {
-        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
+        MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
             key->GetKeyCode(), key->GetKeyAction());
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_F1) {
@@ -1786,6 +1790,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std:
         MMI_HILOGD("ret_ %{public}d", ret_.load());
         if (ret_ != LIGHT_STAY_AWAY) {
             LaunchAbility(item.ability);
+            launchAbilityCount_ = 0;
             CHKPV(mistouchPrevention_);
             MMI_HILOGI("Launch yes");
         }
@@ -2075,9 +2080,9 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
     for (size_t i = keys_.size(); i > 0; --i) {
-        if (keys_[i-1].keyCode == sequenceKey.keyCode) {
-            if (keys_[i-1].keyAction == sequenceKey.keyAction) {
-                MMI_HILOGI("Is repeat key, keyCode:%{private}d", sequenceKey.keyCode);
+        if (keys_[i - 1].keyCode == sequenceKey.keyCode) {
+            if (keys_[i - 1].keyAction == sequenceKey.keyAction) {
+                MMI_HILOGI("Is repeat key:%{private}d", sequenceKey.keyCode);
                 return true;
             }
             MMI_HILOGI("Is not repeat key");
@@ -2316,7 +2321,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     }
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
-            MMI_HILOGD("The keyCode or keyAction not matching");
+            MMI_HILOGD("KeyAction not matching");
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
@@ -2657,7 +2662,9 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
         MMI_HILOGI("Force make pointer visible");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (POINTER_DEV_MGR.isInit) {
         CursorDrawingComponent::GetInstance().ForceClearPointerVisiableStatus();
+    }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
     lastKeyEventCode_ = keyEvent->GetKeyCode();
@@ -2742,7 +2749,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "Sequence: count = %zu", sequences_.size());
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
-            mprintf(fd, "keyCode: %{private}d | keyAction: %s",
+            mprintf(fd, "code: %{private}d | keyAction: %s",
                 sequenceKey.keyCode, ConvertKeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
@@ -2751,7 +2758,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
     mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
-        mprintf(fd, "keyCode: %{private}d | keyAction: %s", item.keyCode,
+        mprintf(fd, "code: %{private}d | keyAction: %s", item.keyCode,
             ConvertKeyActionToString(item.keyAction).c_str());
     }
     mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
@@ -2833,8 +2840,7 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
     if (timeDiffToPrevKnuckleUpTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
         if (tappingCount_ == MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
-        }
-        if (tappingCount_ > MAX_TAP_COUNT) {
+        } else if (tappingCount_ > MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfKnockTooFast();
         }
     }
@@ -3012,7 +3018,7 @@ void KeyCommandHandler::SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("The keyEvent start launch an ability:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
     }

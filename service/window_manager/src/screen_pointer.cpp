@@ -261,6 +261,7 @@ bool ScreenPointer::InitSurface()
 
     // set soft cursor buffer size
     auto surface = surfaceNode_->GetSurface();
+    CHKPF(surface);
     surface->SetQueueSize(DEFAULT_BUFFER_SIZE);
 
     surfaceNode_->SetVisible(true);
@@ -295,6 +296,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     CHKPV(si);
     auto id = si->GetRsId();
     if (screenId_ != id) {
+        CHKPV(surfaceNode_);
         surfaceNode_->AttachToDisplay(id);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
@@ -422,6 +424,10 @@ void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
 
 bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
 {
+    if (isVirtualExtend_) {
+        MMI_HILOGD("Virtual extend screen move, screenId=%{public}" PRIu64, screenId_);
+        return true;
+    }
     CHKPF(hwcMgr_);
     int32_t px = 0;
     int32_t py = 0;
@@ -481,6 +487,10 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
 
 bool ScreenPointer::SetInvisible()
 {
+    if (isVirtualExtend_) {
+        MMI_HILOGD("Virtual extend screen set invisible, screenId=%{public}" PRIu64, screenId_);
+        return true;
+    }
     CHKPF(hwcMgr_);
 
     auto buffer = GetTransparentBuffer();

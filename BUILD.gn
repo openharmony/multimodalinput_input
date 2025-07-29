@@ -164,11 +164,13 @@ group("mmi_tests") {
     "frameworks/proxy:KeyEventInputSubscribeManagerTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:LongPressEventSubscribeManagerTest",
+    "frameworks/proxy:PointerEventExTest",
     "frameworks/proxy:PointerEventNdkTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:PointerStyleTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "frameworks/proxy/event_handler/test:InputActiveSubscribeManagerTest",
+    "frameworks/proxy/event_handler/test:MultimodalEventHandlerTest",
     "libudev:test",
     "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",
@@ -215,6 +217,7 @@ group("mmi_tests") {
     "service:MonitorTest",
     "service:NapProcessTest",
     "service:PointerDrawingManagerExTest",
+    "service:PointerDrawingManagerSupTest",
     "service:PointerDrawingManagerTest",
     "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",
@@ -252,8 +255,8 @@ group("mmi_tests") {
 
   if (input_feature_touch_drawing) {
     deps += [
-      "service/window_manager:TouchDrawingHandlerTest",
       "service:TouchDrawingManagerTest",
+      "service/window_manager:TouchDrawingHandlerTest",
     ]
   }
 }

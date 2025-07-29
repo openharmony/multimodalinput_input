@@ -15,6 +15,7 @@
 
 #ifndef INPUT_MANAGER_IMPL_H
 #define INPUT_MANAGER_IMPL_H
+#include <thread>
 
 #include "event_filter_service.h"
 #include "extra_data.h"
@@ -35,7 +36,6 @@
 #include "key_option.h"
 #include "long_press_event.h"
 #include "mmi_event_observer.h"
-#include "nap_process.h"
 #include "pointer_style.h"
 #include "touchpad_control_display_gain.h"
 #include "shift_info.h"

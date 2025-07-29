@@ -56,6 +56,7 @@ constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t COLOR_FIXEX_WIDTH { 6 };
 const std::string COLOR_PREFIX = "#";
 const char COLOR_FILL = '0';
+constexpr int64_t TIME_ROUND_UP { 999 };
 } // namespace
 
 int64_t GetSysClockTime()
@@ -74,7 +75,7 @@ int64_t GetSysClockTime()
     }
 
     uint64_t totalMicroSeconds = static_cast<uint64_t>(ts.tv_sec) * TIME_CONVERSION_UNIT *
-    TIME_CONVERSION_UNIT + ts.tv_nsec / TIME_CONVERSION_UNIT;
+    TIME_CONVERSION_UNIT + static_cast<uint64_t>(ts.tv_nsec) / TIME_CONVERSION_UNIT;
 
     if (totalMicroSeconds > static_cast<uint64_t>(std::numeric_limits<int64_t>::max())) {
         MMI_HILOGE("Total time value integer overflow detected!");
@@ -88,6 +89,11 @@ int64_t GetMillisTime()
     auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
     return tmp.count();
+}
+
+int64_t GetTimeToMilli(int64_t timeDT)
+{
+    return (timeDT + TIME_ROUND_UP) / TIME_CONVERSION_UNIT;
 }
 
 static std::string GetThisThreadIdOfString()

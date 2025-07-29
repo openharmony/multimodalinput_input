@@ -40,19 +40,19 @@ HWTEST_F(DfxHisysEventDeviceTest, ReportDeviceFault_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t id = 1;
-    auto type = DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_SYS;
-    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDeivce::ReportDeviceFault(type, "test fault 1"));
-    type = DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER;
-    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDeivce::ReportDeviceFault(id, type, "test fault 2"));
+    auto type = DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_SYS;
+    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDevice::ReportDeviceFault(type, "test fault 1"));
+    type = DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER;
+    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDevice::ReportDeviceFault(id, type, "test fault 2"));
 }
 
 HWTEST_F(DfxHisysEventDeviceTest, ReportDeviceBehavior_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t id = -1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDeivce::ReportDeviceBehavior(id, "test behavior"));
+    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDevice::ReportDeviceBehavior(id, "test behavior"));
     id = 1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDeivce::ReportDeviceBehavior(id, "test behavior"));
+    ASSERT_NO_FATAL_FAILURE(DfxHisyseventDevice::ReportDeviceBehavior(id, "test behavior"));
 }
 
 } // namespace MMI

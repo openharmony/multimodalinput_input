@@ -44,7 +44,7 @@ MMIClient::~MMIClient()
 void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
 {
     if (eventHandler == nullptr) {
-        MMI_HILOGW("CHKPV(%{public}s) is null", #eventHandler);
+        MMI_HILOGW("eventHandler is null");
         return;
     }
     // use the new thread untill eventhandler use poll thread

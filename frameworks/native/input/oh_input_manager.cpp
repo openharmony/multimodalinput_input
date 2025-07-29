@@ -15,6 +15,8 @@
 
 #include "oh_input_manager.h"
 
+#include "securec.h"
+
 #include "event_log_helper.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
@@ -180,14 +182,14 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         } else {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         }
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
-        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
+        MMI_HILOGE("code is not within the query range:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -233,9 +235,9 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         } else {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         }
         return;
     }
@@ -297,9 +299,9 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is less 0, can not process");
+            MMI_HILOGE("code is less 0, can not process");
         } else {
-            MMI_HILOGE("keyCode is less 0, can not process");
+            MMI_HILOGE("code is less 0, can not process");
         }
         return INPUT_PARAMETER_ERROR;
     }
@@ -2366,12 +2368,14 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     info->keyOption = reportEvent->keyOption;
     if (info->keyOption == nullptr) {
         delete info;
+        info = nullptr;
         MMI_HILOGE("KeyOption is null");
         return;
     }
     info->callback = reportEvent->callback;
     if (info->callback == nullptr) {
         delete info;
+        info = nullptr;
         MMI_HILOGE("Callback is null");
         return;
     }
@@ -2382,6 +2386,7 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     hotkey.isRepeat = info->keyOption->IsRepeat();
     info->callback(&hotkey);
     delete info;
+    info = nullptr;
 }
 
 static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -2413,6 +2418,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2425,16 +2431,19 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
         subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeHotkey(keyOption, HandleKeyEvent);
         if (subscribeId == OHOS::MMI::ERROR_UNSUPPORT) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_DEVICE_NOT_SUPPORTED;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_SYSTEM;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_OTHER;
         }
@@ -2445,6 +2454,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     }
     if (AddHotkeySubscribe(hotkeyInfo) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("AddHotkeySubscribe fail");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2471,6 +2481,7 @@ int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
+            monitorInfo = nullptr;
             MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
             continue;
         }
@@ -2481,6 +2492,7 @@ int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
+            monitorInfo = nullptr;
             MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
             return INPUT_SUCCESS;
         }
@@ -2514,6 +2526,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2521,6 +2534,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     int32_t subscribeId = -1;
     if (DelEventCallback(hotkeyInfo, subscribeId) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("DelEventCallback failed");
         return INPUT_SERVICE_EXCEPTION;
     }
@@ -2529,6 +2543,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         OHOS::MMI::InputManager::GetInstance()->UnsubscribeHotkey(subscribeId);
     }
     delete hotkeyInfo;
+    hotkeyInfo = nullptr;
     return INPUT_SUCCESS;
 }
 
@@ -2791,7 +2806,7 @@ Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
 {
     CALL_DEBUG_ENTER;
     if (keyCode < 0 || keyCode != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
-        MMI_HILOGE("Invalid keycode:%{private}d", keyCode);
+        MMI_HILOGE("Invalid code:%{private}d", keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(state, INPUT_PARAMETER_ERROR);

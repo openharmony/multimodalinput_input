@@ -408,17 +408,17 @@ int32_t IntentionManager::RotateDragWindowSync(const std::shared_ptr<Rosen::RSTr
         FI_HILOGW("Screen rotation, not need rotate drag window");
         return RET_OK;
     }
-    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+    if (Rosen::DisplayManagerLite::GetInstance().IsFoldable()) {
         if ((foldRotatePolicys_.empty()) || (foldRotatePolicys_.size() < POLICY_VEC_SIZE)) {
             FI_HILOGE("foldRotatePolicys_ is invalid");
             return drag_.RotateDragWindowSync(*tunnel_, rsTransaction);
         }
-        if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::FULL) {
+        if (Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::FULL) {
             if (foldRotatePolicys_[INDEX_FULL] == SCREEN_ROTATION) {
                 FI_HILOGD("Full display rotation, not need rotate drag window");
                 return RET_OK;
             }
-        } else if (Rosen::DisplayManager::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::MAIN) {
+        } else if (Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode() == Rosen::FoldDisplayMode::MAIN) {
             if (foldRotatePolicys_[INDEX_MAIN] == SCREEN_ROTATION) {
                 FI_HILOGD("Main display rotation, not need rotate drag window");
                 return RET_OK;

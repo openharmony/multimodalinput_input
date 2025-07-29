@@ -200,7 +200,7 @@ void Context::DisableInputDevMgr()
 
 NormalizedCoordinate Context::NormalizedCursorPosition() const
 {
-    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    auto display = Rosen::DisplayManagerLite::GetInstance().GetDefaultDisplay();
     if (display == nullptr) {
         FI_HILOGE("No default display");
         return cursorPos_;
@@ -361,7 +361,7 @@ void Context::SetCursorPosition(const Coordinate &cursorPos)
     double xPercent = (PERCENT - std::clamp<double>(cursorPos.x, 0.0, PERCENT)) / PERCENT;
     double yPercent = std::clamp<double>(cursorPos.y, 0.0, PERCENT) / PERCENT;
 
-    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    auto display = Rosen::DisplayManagerLite::GetInstance().GetDefaultDisplay();
     CHKPV(display);
     cursorPos_.x = static_cast<int32_t>(xPercent * display->GetWidth());
     cursorPos_.y = static_cast<int32_t>(yPercent * display->GetHeight());

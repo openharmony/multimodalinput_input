@@ -14,7 +14,7 @@
  */
 
 #include "hot_area.h"
-#include "display_manager.h"
+#include "display_manager_lite.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HotArea"
@@ -54,7 +54,7 @@ void HotArea::EnableCooperate(const EnableCooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    auto display = Rosen::DisplayManagerLite::GetInstance().GetDefaultDisplay();
     CHKPV(display);
     width_ = display->GetWidth();
     height_ = display->GetHeight();

@@ -160,6 +160,37 @@ HWTEST_F(EventRecorderTest, EventRecorderTest_Start_EmptyDevices, TestSize.Level
 }
 
 /**
+ * @tc.name: EventRecorderTest_Start_emptyPath
+ * @tc.desc: Test start with realpath outputpath failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventRecorderTest, EventRecorderTest_Start_emptyPath, TestSize.Level1)
+{
+    EventRecorder recorder(TEST_FILE_PATH);
+    recorder.outputPath_ = "";
+    std::vector<InputDevice> devices;
+    EXPECT_FALSE(recorder.Start(devices));
+}
+ 
+/**
+ * @tc.name: EventRecorderTest_Start_InvalidPath
+ * @tc.desc: Test start with invalid output path
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventRecorderTest, EventRecorderTest_Start_InvalidPath, TestSize.Level1)
+{
+    EventRecorder recorder(TEST_FILE_PATH);
+    recorder.outputPath_ = "/invalid/path";
+ 
+    std::vector<InputDevice> devices;
+    bool result = recorder.Start(devices);
+ 
+    EXPECT_FALSE(result);
+}
+
+/**
  * @tc.name: EventRecorderTest_Stop_NotRunning
  * @tc.desc: Test stop when not running
  * @tc.type: FUNC

@@ -63,8 +63,8 @@ HWTEST_F(CursorDrawingAdapterTest, CursorDrawingAdapterTest_GetPointerInstance_0
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_load_001, TestSize.Level1)
 {
     CursorDrawingComponent cursorDrawingComponent;
-    EXPECT_EQ(cursorDrawingComponent.isLoaded_, true);
-    EXPECT_NE(cursorDrawingComponent.soHandle_, nullptr);
+    EXPECT_EQ(cursorDrawingComponent.isLoaded_, false);
+    EXPECT_EQ(cursorDrawingComponent.soHandle_, nullptr);
 
     cursorDrawingComponent.Load();
     EXPECT_EQ(cursorDrawingComponent.isLoaded_, true);
@@ -243,7 +243,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     EXPECT_EQ(ret, RET_OK);
 
     EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
-    
+
     ret = instance_->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_OK);
 

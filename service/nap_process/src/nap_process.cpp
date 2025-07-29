@@ -82,7 +82,7 @@ bool NapProcess::IsNeedNotify(const NapStatusData& data)
     return false;
 }
 
-int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
+int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
     NapStatusData napData;

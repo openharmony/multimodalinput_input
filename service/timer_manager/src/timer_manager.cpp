@@ -31,19 +31,8 @@ constexpr int32_t MAX_TIMER_COUNT { 64 };
 constexpr int32_t NONEXISTENT_ID { -1 };
 } // namespace
 
-std::once_flag TimerManager::initFlag_;
-std::shared_ptr<TimerManager> TimerManager::instance_;
-
 TimerManager::TimerManager() {}
 TimerManager::~TimerManager() {}
-
-std::shared_ptr<TimerManager> TimerManager::GetInstance()
-{
-    std::call_once(initFlag_, [] {
-        instance_ = std::shared_ptr<TimerManager>(new TimerManager);
-    });
-    return instance_;
-}
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
     const std::string &name)

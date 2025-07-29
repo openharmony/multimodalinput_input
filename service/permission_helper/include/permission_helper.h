@@ -52,8 +52,8 @@ public:
 
 private:
     PermissionHelper() {}
-    bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
-    bool CheckHapPermission(std::string permissionCode);
+    bool CheckHapPermission(uint32_t tokenId, const std::string &permissionCode);
+    bool CheckHapPermission(const std::string &permissionCode);
 };
 
 #define PER_HELPER PermissionHelper::GetInstance()

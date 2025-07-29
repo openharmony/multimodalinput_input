@@ -22,6 +22,7 @@
             OHOS::MMI::StreamBuffer*;
             OHOS::MMI::StringPrintf*;
             OHOS::MMI::GetMillisTime*;
+            OHOS::MMI::GetTimeToMilli*;
             OHOS::MMI::SetThreadName*;
             OHOS::MMI::GetProgramName*;
             OHOS::MMI::GetSysClockTime*;

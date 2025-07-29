@@ -16,20 +16,7 @@
 #ifndef TOUCH_DRAWING_MANAGER_H
 #define TOUCH_DRAWING_MANAGER_H
 
-#include "draw/canvas.h"
-#include "nocopyable.h"
 #include "singleton.h"
-#include "transaction/rs_transaction.h"
-#include "ui/rs_canvas_node.h"
-#include "ui/rs_surface_node.h"
-#include "utils/rect.h"
-
-#ifndef USE_ROSEN_DRAWING
-#include "pipeline/rs_recording_canvas.h"
-#else
-#include "recording/recording_canvas.h"
-#include "ui/rs_canvas_drawing_node.h"
-#endif // USE_ROSEN_DRAWING
 
 #include "i_touch_drawing_handler.h"
 #include "component_manager.h"
@@ -62,7 +49,6 @@ public:
 
 private:
     void SetupSettingObserver(int32_t nRetries);
-    bool HasDisplayInfo() const;
     void CreateObserver();
     int32_t UpdateLabels();
     int32_t UpdateBubbleData();

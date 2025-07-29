@@ -482,6 +482,7 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
         MMI_HILOGE("Subscriber's sess is null");
         return;
     }
+    CHKPV(touchEvent_);
     int32_t windowPid = WIN_MGR->GetWindowPid(touchEvent_->GetTargetWindowId());
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");

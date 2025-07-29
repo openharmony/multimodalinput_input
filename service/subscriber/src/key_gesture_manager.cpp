@@ -255,7 +255,7 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
 
 void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) const
 {
-    output << "[" << keyCode_ << "] --> {";
+    output << "[*] --> {";
     if (auto iter = handlers_.begin(); iter != handlers_.end()) {
         output << iter->GetLongPressTime();
         for (++iter; iter != handlers_.end(); ++iter) {
@@ -340,14 +340,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
 
 void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output) const
 {
-    output << "[";
-    if (auto keyIter = keys_.begin(); keyIter != keys_.end()) {
-        output << *keyIter;
-        for (++keyIter; keyIter != keys_.end(); ++keyIter) {
-            output << "," << *keyIter;
-        }
-    }
-    output << "] --> {";
+    output << "[**] --> {";
     if (auto iter = handlers_.begin(); iter != handlers_.end()) {
         output << "(ID:" << iter->GetId() << ",T:" << iter->GetLongPressTime() << ")";
         for (++iter; iter != handlers_.end(); ++iter) {
@@ -462,6 +455,7 @@ int32_t KeyGestureManager::AddKeyGesture(int32_t pid, std::shared_ptr<KeyOption>
 {
     CHKPR(keyOption, INVALID_ENTITY_ID);
     for (auto &keyGesture : keyGestures_) {
+        CHKPC(keyGesture);
         if (keyGesture->ShouldIntercept(keyOption)) {
             auto downDuration = std::max(keyOption->GetFinalKeyDownDuration(), COMBINATION_KEY_TIMEOUT);
             return keyGesture->AddHandler(pid, downDuration, callback);
@@ -484,6 +478,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
     CALL_INFO_TRACE;
     CHKPF(keyEvent);
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
+        CHKPC(*iter);
         if ((*iter)->Intercept(keyEvent)) {
             std::ostringstream output;
             (*iter)->Dump(output);
@@ -504,6 +499,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 void KeyGestureManager::ResetAll()
 {
     for (auto &keyGesture : keyGestures_) {
+        CHKPC(keyGesture);
         keyGesture->Reset();
     }
 }
@@ -512,6 +508,7 @@ void KeyGestureManager::Dump() const
 {
     for (const auto &keyGesture : keyGestures_) {
         std::ostringstream output;
+        CHKPC(keyGesture);
         keyGesture->Dump(output);
         MMI_HILOGI("%s", output.str().c_str());
     }

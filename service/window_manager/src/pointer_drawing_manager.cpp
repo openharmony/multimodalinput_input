@@ -484,6 +484,7 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
+    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     currentDirection_ = direction;
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
@@ -936,6 +937,7 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
     if (image == nullptr) {
         MMI_HILOGE("ExtractDrawingImage image fail");
         delete releaseContext;
+        releaseContext = nullptr;
     }
     return image;
 }
@@ -1120,6 +1122,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         return;
     }
     PostTask([this]() -> void {
+        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
         if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
             MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
             return;
@@ -2209,7 +2212,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
 {
     CALL_DEBUG_ENTER;
     if (GetHardCursorEnabled()) {
-        if (screenPointers_.count(static_cast<size_t>(displayInfo.rsId))) {
+        if (screenPointers_.count(displayInfo.rsId)) {
             auto sp = screenPointers_[displayInfo.rsId];
             CHKPV(sp);
             sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
@@ -2522,6 +2525,7 @@ IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     if (IsPointerVisible() && mouseDisplayState_) {
@@ -3008,7 +3012,7 @@ void PointerDrawingManager::SubscribeScreenModeChange()
     }
     MMI_HILOGI("SubscribeScreenModeChange success");
 }
- 
+
 void PointerDrawingManager::RegisterDisplayStatusReceiver()
 {
     if (!GetHardCursorEnabled()) {
@@ -3237,11 +3241,9 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
-            if (si->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
-                continue;
-            }
-            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-                si->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            CHKPC(si);
+            if (si->GetType() != OHOS::Rosen::ScreenType::REAL && !(si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND)) {
                 continue;
             }
             uint64_t sid = si->GetRsId();
@@ -3269,6 +3271,10 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}" PRIu64, sid);
                 }
             }
+            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+                screenPointers_[sid]->SetVirtualExtend(true);
+            }
         }
 
         // delete ScreenPointers that disappeared
@@ -3283,6 +3289,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
 
         // update screen scale and padding
         for (auto sp : screenPointers_) {
+            CHKPC(sp.second);
             if (sp.second->IsMirror()) {
                 sp.second->SetRotation(mainRotation);
                 sp.second->UpdatePadding(mainWidth, mainHeight);
@@ -3488,6 +3495,7 @@ std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScre
     std::vector<std::shared_ptr<ScreenPointer>> mirrors;
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto it : screenPointers_) {
+        CHKPC(it.second);
         if (it.second->IsMirror()) {
             mirrors.push_back(it.second);
         }
@@ -3520,6 +3528,7 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         screenPointers = screenPointers_;
     }
     for (auto it : screenPointers) {
+        CHKPC(it.second);
         if (it.second->IsMirror()) {
             if (!it.second->Move(x, y, align)) {
                 ret = RET_ERR;
@@ -3559,6 +3568,7 @@ void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     sp->MoveSoft(x, y, align);
 
     for (auto& msp : GetMirrorScreenPointers()) {
+        CHKPC(msp);
         msp->MoveSoft(x, y, align);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -3623,6 +3633,7 @@ void PointerDrawingManager::HideHardwareCursors()
     }
 
     for (auto msp : GetMirrorScreenPointers()) {
+        CHKPC(msp);
         if (!msp->SetInvisible()) {
             MMI_HILOGE("Hide cursor of mirror screen failed, screenId_: %{public}" PRIu64, screenId_);
         }
@@ -3824,5 +3835,12 @@ bool PointerDrawingManager::GetHardCursorEnabled()
     }
     return isHardCursorEnabled;
 }
+
+#ifndef OHOS_BUILD_ENABLE_WATCH
+void PointerDrawingManager::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt)
+{
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+}
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace MMI
 } // namespace OHOS

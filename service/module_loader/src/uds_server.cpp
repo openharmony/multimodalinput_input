@@ -42,6 +42,7 @@ void UDSServer::UdsStop()
     }
     auto tmpMap = GetSessionMapCopy();
     for (const auto &item : tmpMap) {
+        CHKPC(item.second);
         item.second->Close();
     }
     ClearSessionMap();

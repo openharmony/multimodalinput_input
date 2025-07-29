@@ -16,10 +16,18 @@
 #ifndef DEVICE_OBSERVER_H
 #define DEVICE_OBSERVER_H
 
+#include <cstdint>
+#include <memory>
+
 namespace OHOS {
 namespace MMI {
 class IDeviceObserver {
 public:
+    IDeviceObserver() = default;
+    virtual ~IDeviceObserver() = default;
+
+    virtual void OnDeviceAdded(int32_t deviceId) {}
+    virtual void OnDeviceRemoved(int32_t deviceId) {}
     virtual void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) = 0;
 };
 

@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
+using AddTimerCallbackFunc = std::function<int32_t(int, int, std::function<void()>, const std::string&)>;
 struct PointerInfo {
     float x { 0.0F };
     float y { 0.0F };
@@ -45,6 +46,7 @@ public:
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const OLD::DisplayInfo& displayInfo);
     std::string GetScreenReadState();
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+    void RegisterAddTimer(AddTimerCallbackFunc addTimerFunc);
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t rsId);
@@ -109,6 +111,7 @@ private:
     uint32_t trackColorG_ { 0x00 };
     uint32_t trackColorB_ { 0x00 };
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
+    AddTimerCallbackFunc addTimerFunc_;
 };
 } // namespace MMI
 } // namespace OHOS
