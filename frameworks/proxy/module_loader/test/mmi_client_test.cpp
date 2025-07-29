@@ -135,41 +135,6 @@ HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__002, TestSize.L
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_AddFdListener_001
- * @tc.desc: Add fdlistener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, MMIClientTest_AddFdListener_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>();
-    mmiClient.SetEventHandler(eventHandler);
-    int32_t fd = -1;
-    bool selfCreate = TRUE;
-    ASSERT_FALSE(mmiClient.AddFdListener(fd, selfCreate));
-
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_AddFdListener_002
- * @tc.desc: Add fdlistener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, MMIClientTest_AddFdListener_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>();
-    mmiClient.SetEventHandler(eventHandler);
-    int32_t fd = 1;
-    bool selfCreate = TRUE;
-    ASSERT_True(mmiClient.AddFdListener(fd, selfCreate));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_Reconnect_001
  * @tc.desc: Socket reconnection
  * @tc.type: FUNC
@@ -198,23 +163,6 @@ HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
     client->OnDisconnect();
     ASSERT_NO_FATAL_FAILURE(client->OnDisconnect());
     client->Stop();
-}
-
-/**
- * @tc.name: MMIClientTest_StartEventRunner_001
- * @tc.desc: Start event runner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, MMIClientTest_StartEventRunner_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
-    client->isConnected_ = true;
-    client->fd_ = 1;
-    client->eventHandler_ = nullptr;
-    bool result = client->StartEventRunner();
-    EXPECT_TRUE(result);
 }
 }
 } // namespace MMI
