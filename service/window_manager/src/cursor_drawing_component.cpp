@@ -43,12 +43,12 @@ static constexpr const char *MULTIMODAL_PATH_NAME = "libcursor_drawing_adapter.z
 CursorDrawingComponent& CursorDrawingComponent::GetInstance()
 {
     static CursorDrawingComponent instance;
+    instance.Load();
     return instance;
 }
 
 CursorDrawingComponent::CursorDrawingComponent()
 {
-    Load();
     MMI_HILOGI("create succeeded");
 }
 
@@ -117,7 +117,7 @@ void CursorDrawingComponent::UnLoad()
     MMI_HILOGI("UnLoad %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
-void CursorDrawingComponent::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+void CursorDrawingComponent::DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
@@ -210,7 +210,7 @@ bool CursorDrawingComponent::IsPointerVisible()
     return pointerInstance_->IsPointerVisible();
 }
 
-void CursorDrawingComponent::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
+void CursorDrawingComponent::SetPointerLocation(int32_t x, int32_t y, uint64_t displayId)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->SetPointerLocation(x, y, displayId);
@@ -312,7 +312,7 @@ int32_t CursorDrawingComponent::SwitchPointerStyle()
     return pointerInstance_->SwitchPointerStyle();
 }
 
-void CursorDrawingComponent::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
+void CursorDrawingComponent::DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->DrawMovePointer(displayId, physicalX, physicalY);
@@ -421,7 +421,7 @@ void CursorDrawingComponent::RegisterDisplayStatusReceiver()
 }
 
 int32_t CursorDrawingComponent::UpdateMouseLayer(
-    const PointerStyle &pointerStyle, int32_t displayId, int32_t physicalX, int32_t physicalY)
+    const PointerStyle &pointerStyle, uint64_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
     return pointerInstance_->UpdateMouseLayer(pointerStyle, physicalX, physicalY);
@@ -446,4 +446,12 @@ int32_t CursorDrawingComponent::GetPointerSnapshot(void *pixelMapPtr)
     return pointerInstance_->GetPointerSnapshot(pixelMapPtr);
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+#ifndef OHOS_BUILD_ENABLE_WATCH
+void CursorDrawingComponent::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->NotifyPointerEventToRS(pointAction, pointCnt);
+}
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace OHOS

@@ -176,6 +176,7 @@ void EventPreMonitorHandler::MonitorCollection::RemoveMonitor(SessionPtr sess, i
     for (auto iter = sessionHandlers_.begin(); iter != sessionHandlers_.end();) {
         auto &sessionHandlers = iter->second;
         for (auto it = sessionHandlers.begin(); it != sessionHandlers.end();) {
+            CHKPC(*it);
             if ((*it)->handlerId_ == handlerId && (*it)->session_ == sess) {
                 it = sessionHandlers.erase(it);
             } else {
@@ -203,6 +204,7 @@ bool EventPreMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyE
     for (auto iter = sessionHandlers_.begin(); iter != sessionHandlers_.end(); iter++) {
         auto &sessionHandlers = iter->second;
         for (auto it = sessionHandlers.begin(); it != sessionHandlers.end(); it++) {
+            CHKPC(*it);
             auto keys = (*it)->keys_;
             auto keyIter = std::find(keys.begin(), keys.end(), keyEvent->GetKeyCode());
             if (keyIter != keys.end()) {
@@ -255,6 +257,7 @@ void EventPreMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vect
     for (const auto &item : sessionHandlers_) {
         const std::list<std::shared_ptr<SessionHandler>> &handlers = item.second;
         for (const auto &handler : handlers) {
+            CHKPC(handler);
             SessionPtr session = handler->session_;
             if (!session) {
                 continue;

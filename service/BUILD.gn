@@ -151,6 +151,7 @@ ohos_rust_unittest("rust_mmi_test") {
 }
 
 ohos_shared_library("libcursor_drawing_adapter") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -215,9 +216,11 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
-    "graphic_surface:surface",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_surface:surface",
     "hisysevent:libhisysevent",
+    "image_framework:image_native",
     "init:libbeget_proxy",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
@@ -243,6 +246,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
       "init:libbegetutil",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
+      "window_manager:libwm_lite",
     ]
   }
   if (resource_schedule_service_enabled) {
@@ -270,6 +274,7 @@ ohos_shared_library("libmmi-server") {
   }
   version_script = "libmmi-server-map"
   include_dirs = [
+    "delegate_task/include",
     "${mmi_path}/frameworks/proxy/events/include",
     "window_manager/include",
   ]
@@ -449,7 +454,6 @@ ohos_shared_library("libmmi-server") {
 
   external_deps += [
     "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "access_token:libtokenid_sdk",
     "config_policy:configpolicy_util",
@@ -460,9 +464,11 @@ ohos_shared_library("libmmi-server") {
     "ffrt:libffrt",
     "hicollie:libhicollie",
     "hisysevent:libhisysevent",
+    "image_framework:image_native",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libdm_lite",
+    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 
@@ -487,11 +493,7 @@ ohos_shared_library("libmmi-server") {
 
     external_deps += [
       "common_event_service:cesfwk_innerkits",
-      "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-      "drivers_interface_display:libdisplay_composer_proxy_1.0",
-      "graphic_2d:libcomposer",
-      "graphic_2d:librender_service_base",
-      "graphic_2d:librender_service_client",
+      "hdf_core:libhdi",
       "hilog:libhilog",
       "image_framework:image_native",
       "init:libbeget_proxy",
@@ -878,6 +880,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
     "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
+    "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
     "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
     "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
     "${mmi_path}/service/subscriber/src/key_shortcut_manager.cpp",
@@ -1206,10 +1209,10 @@ ohos_unittest("PointerDrawingManagerTest") {
   ]
 
   external_deps = [
-    "common_event_service:cesfwk_innerkits",
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1294,6 +1297,68 @@ ohos_unittest("PointerDrawingManagerExTest") {
   ]
 }
 
+ohos_unittest("PointerDrawingManagerSupTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs =
+      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  sources = [ "window_manager/test/pointer_drawing_manager_sup_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service:libcursor_drawing_adapter",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:dataobs_manager",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libdm_lite",
+    "window_manager:libwm",
+    "window_manager:libwmutil",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("TouchDrawingManagerTest") {
   module_out_path = module_output_path
 
@@ -1349,8 +1414,8 @@ ohos_unittest("TouchDrawingManagerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
-    "window_manager:libwsutils",
     "window_manager:libwmutil",
+    "window_manager:libwsutils",
   ]
 }
 
@@ -1671,6 +1736,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
 
   deps = [
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
+    "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
@@ -1753,7 +1819,8 @@ ohos_unittest("AccountManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "${mmi_path}/service/account_manager/test/account_manager_test.cpp" ]
+  sources =
+      [ "${mmi_path}/service/account_manager/test/account_manager_test.cpp" ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -1980,6 +2047,7 @@ ohos_unittest("ModuleLoaderTest") {
 
   include_dirs = [
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/util/common/include",
   ]
 
@@ -2000,18 +2068,18 @@ ohos_unittest("ModuleLoaderTest") {
     "module_loader/src/input_screen_capture_agent.cpp",
     "module_loader/test/input_screen_capture_agent_test.cpp",
     "module_loader/test/mmi_service_test.cpp",
+    "module_loader/test/multimodal_input_plugin_manager_test.cpp",
+    "module_loader/test/multimodal_input_preferences_manager_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
-    "module_loader/test/multimodal_input_preferences_manager_test.cpp",
-    "module_loader/test/multimodal_input_plugin_manager_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
@@ -2057,8 +2125,8 @@ ohos_unittest("KeyEventNormalizeTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -2714,6 +2782,7 @@ ohos_unittest("EventHandlerEXTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
@@ -2740,9 +2809,9 @@ ohos_unittest("EventDispatchTest") {
   sources = [ "event_dispatch/test/event_dispatch_test.cpp" ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
@@ -2819,9 +2888,9 @@ ohos_unittest("ServerMsgHandlerTest") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
 
   external_deps = [
@@ -2944,7 +3013,10 @@ ohos_unittest("DeviceManagerTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
-  sources = [ "device_manager/test/input_device_manager_test.cpp" ]
+  sources = [
+    "device_manager/test/input_device_manager_test.cpp",
+    "device_manager/test/pointer_device_manager_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
@@ -2969,7 +3041,7 @@ ohos_unittest("DeviceManagerTest") {
 
 ohos_unittest("DeviceManagerExTest") {
   module_out_path = module_output_path
- 
+
   include_dirs = [
     "connect_manager/include",
     "delegate_task/include",
@@ -2994,30 +3066,30 @@ ohos_unittest("DeviceManagerExTest") {
     "window_manager/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-string-conversion" ]
- 
+
   sources = [
     "device_manager/src/input_device_manager.cpp",
     "device_manager/test/input_device_manager_ex_test.cpp",
   ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utilsbase",

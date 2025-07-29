@@ -105,13 +105,13 @@
         "sensor",
         "idl_tool",
         "runtime_core",
-        "jsoncpp"
+        "jsoncpp",
+        "libinput"
       ],
       "third_party": [
         "libuv",
         "libevdev",
         "mtdev",
-        "libinput",
         "rust"
       ]
     },

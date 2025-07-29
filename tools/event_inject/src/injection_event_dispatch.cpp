@@ -182,6 +182,10 @@ bool InjectionEventDispatch::CheckValue(const std::string &inputValue)
         return false;
     }
     bool isValueNumber = regex_match(inputValue, std::regex("(-[\\d+]+)|(\\d+)"));
+    auto parseInt32 = [](const std::string &str, int32_t &out) -> bool {
+        auto result = std::from_chars(str.data(), str.data() + str.size(), out);
+        return result.ec == std::errc() && result.ptr == str.data() + str.size();
+    }
     if (isValueNumber) {
         int32_t numberValue = stoi(inputValue);
         if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {

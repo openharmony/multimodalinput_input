@@ -86,7 +86,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     CHKPR(device, ERROR_NULL_POINTER);
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
-    MMI_HILOGD("The linux input keyCode:%{private}d", keyCode);
+    MMI_HILOGD("The linux input:%{private}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
     if (keyCode == KeyEvent::KEYCODE_UNKNOWN) {
         MMI_HILOGE("The key value is unknown");
@@ -155,7 +155,7 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_HILOGE("Find pressed key failed, keyCode:%{private}d", keyCode);
+            MMI_HILOGE("Find pressed key failed:%{private}d", keyCode);
         }
         keyEvent->RemoveReleasedKeyItems(item);
         keyEvent->AddPressedKeyItems(item);

@@ -26,6 +26,8 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 } // namespace
+const std::string g_volumeSwitchesKey {"settings.trackpad.right_volume_switches"};
+const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_switches"};
 const std::string g_pressureKey {"settings.trackpad.press_level"};
 const std::string g_vibrationKey {"settings.trackpad.shock_level"};
 const std::string g_touchpadSwitchesKey {"settings.trackpad.touchpad_switches"};
@@ -145,6 +147,8 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_004, TestSize.Level1)
     TouchpadSettingsObserver observer;
     observer.hasRegistered_ = true;
     observer.currentAccountId_ = 1;
+    observer.volumeSwitchesObserver_ = nullptr;
+    observer.brightnessSwitchesObserver_ = nullptr;
     observer.pressureObserver_ = nullptr;
     observer.vibrationObserver_ = nullptr;
     observer.touchpadSwitchesObserver_ = nullptr;
@@ -200,6 +204,26 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_003, TestSize.Lev
 }
 
 /**
+ * @tc.name: SyncTouchpadSettingsData_004
+ * @tc.desc: Test in normal case, SyncTouchpadSettingsData should not return early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_004, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    observer.hasRegistered_ = true;
+    bool ret = true;
+    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
+        std::cout <<"Test UpdateFunc" << std::endl;
+    };
+    observer.updateFunc_ = UpdateFunc;
+    observer.isCommonEventReady_.store(true);
+    EXPECT_NE(observer.updateFunc_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+}
+
+/**
  * @tc.name: UnregisterTpObserver_005
  * @tc.desc: Test when the observer is null, UnregisterTpObserver should return true
  * @tc.type: FUNC
@@ -211,6 +235,10 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
     observer.hasRegistered_ = true;
     observer.currentAccountId_ = 1;
     int32_t serviceId = 3101;
+    observer.volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_volumeSwitchesKey, observer.updateFunc_);
+    observer.brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_brightnessSwitchesKey, observer.updateFunc_);
     observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_pressureKey, observer.updateFunc_);
     observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
@@ -220,6 +248,8 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
     observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
     EXPECT_TRUE(observer.UnregisterTpObserver(2));
+    observer.volumeSwitchesObserver_ = nullptr;
+    observer.brightnessSwitchesObserver_ = nullptr;
     observer.pressureObserver_ = nullptr;
     observer.vibrationObserver_ = nullptr;
     observer.touchpadSwitchesObserver_ = nullptr;
@@ -268,6 +298,10 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
     };
     observer.updateFunc_ = UpdateFunc;
     int32_t serviceId = 3101;
+    observer.volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_volumeSwitchesKey, observer.updateFunc_);
+    observer.brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_brightnessSwitchesKey, observer.updateFunc_);
     observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_pressureKey, observer.updateFunc_);
     observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
@@ -277,10 +311,59 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
     observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
     ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
+    observer.volumeSwitchesObserver_ = nullptr;
+    observer.brightnessSwitchesObserver_ = nullptr;
     observer.pressureObserver_ = nullptr;
     observer.vibrationObserver_ = nullptr;
     observer.touchpadSwitchesObserver_ = nullptr;
     observer.knuckleSwitchesObserver_ = nullptr;
+}
+
+/**
+ * @tc.name: RegisterTpObserver_009
+ * @tc.desc: Test in normal case, the function should not return early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_009, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    bool ret = true;
+    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
+        std::cout <<"Test UpdateFunc" << std::endl;
+    };
+    observer.updateFunc_ = UpdateFunc;
+    observer.isCommonEventReady_.store(true);
+    observer.hasRegistered_ = false;
+    observer.currentAccountId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
+}
+
+/**
+ * @tc.name: RegisterTpObserver_0010
+ * @tc.desc: Test when the observer has already been registered, the function should return false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_0010, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    bool ret = true;
+    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
+        std::cout <<"Test UpdateFunc" << std::endl;
+    };
+    observer.updateFunc_ = UpdateFunc;
+    int32_t serviceId = 3101;
+    observer.volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_volumeSwitchesKey, observer.updateFunc_);
+    observer.brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_brightnessSwitchesKey, observer.updateFunc_);
+    observer.isCommonEventReady_.store(true);
+    observer.hasRegistered_ = false;
+    observer.currentAccountId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
+    observer.volumeSwitchesObserver_ = nullptr;
+    observer.brightnessSwitchesObserver_ = nullptr;
 }
 
 /**
@@ -307,6 +390,78 @@ HWTEST_F(TouchpadSettingsHandlerTest, GetInstance_002, TestSize.Level1)
     TouchpadSettingsObserver::instance_ = std::make_shared<TouchpadSettingsObserver>();
     auto instance = OHOS::MMI::TouchpadSettingsObserver::GetInstance();
     EXPECT_NE(instance, nullptr);
+}
+
+/**
+ * @tc.name: RegisterDatashareObserver_001
+ * @tc.desc: Test when parameter "key" is empty, the function should return nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_001, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    std::string key = "";
+    bool ret = true;
+    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
+        std::cout <<"Test UpdateFunc" << std::endl;
+    };
+    observer.updateFunc_ = UpdateFunc;
+    observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_EQ(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
+}
+
+/**
+ * @tc.name: RegisterDatashareObserver_002
+ * @tc.desc: Test when parameter "datashareUri_" is empty, the function should return nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_002, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    std::string key = "settings.trackpad.right_volume_switches";
+    bool ret = true;
+    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
+        std::cout <<"Test UpdateFunc" << std::endl;
+    };
+    observer.updateFunc_ = UpdateFunc;
+    observer.datashareUri_ = "";
+    EXPECT_EQ(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
+}
+
+/**
+ * @tc.name: RegisterDatashareObserver_003
+ * @tc.desc: Test when parameter "onUpdate" is empty, the function should return nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_003, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    std::string key = "settings.trackpad.right_volume_switches";
+    observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_EQ(observer.RegisterDatashareObserver(key, nullptr), nullptr);
+}
+
+/**
+ * @tc.name: RegisterDatashareObserver_004
+ * @tc.desc: Test in normal case, the fonction should return a SettingObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_004, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    std::string key = "settings.trackpad.right_volume_switches";
+    bool ret = true;
+    SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
+        std::cout <<"Test UpdateFunc" << std::endl;
+    };
+    observer.updateFunc_ = UpdateFunc;
+    observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_NE(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
+    observer.volumeSwitchesObserver_ = nullptr;
 }
 
 /**

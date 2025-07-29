@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
+using AddTimerFunc = std::function<int32_t(int, int, std::function<void()>, const std::string&)>;
 class IKnuckleDrawing {
 public:
     IKnuckleDrawing() = default;
@@ -28,6 +29,7 @@ public:
 
     virtual void Draw(const OLD::DisplayInfo& displayInfo, const std::shared_ptr<PointerEvent> &touchEvent) = 0;
     virtual void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
+    virtual void RegisterAddTimer(AddTimerFunc addTimerFunc) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

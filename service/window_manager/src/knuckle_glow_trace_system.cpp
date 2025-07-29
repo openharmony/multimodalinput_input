@@ -41,6 +41,7 @@ void KnuckleGlowTraceSystem::Clear()
 {
     CALL_DEBUG_ENTER;
     for (const auto &divergentPoint : divergentPoints_) {
+        CHKPC(divergentPoint);
         divergentPoint->Clear();
     }
 }
@@ -49,6 +50,8 @@ void KnuckleGlowTraceSystem::Update()
 {
     CALL_DEBUG_ENTER;
     for (size_t i = 0; i < glowPoints_.size(); i++) {
+        CHKPC(glowPoints_[i]);
+        CHKPC(divergentPoints_[i]);
         glowPoints_[i]->Update();
         divergentPoints_[i]->Update();
     }

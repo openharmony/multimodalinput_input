@@ -31,7 +31,7 @@ namespace MMI {
 class GetDeviceObject {
 public:
     DISALLOW_COPY_AND_MOVE(GetDeviceObject);
-    static DeviceBase* CreateDeviceObject(const std::string deviceName);
+    static DeviceBase* CreateDeviceObject(const std::string &deviceName);
 };
 } // namespace MMI
 } // namespace OHOS

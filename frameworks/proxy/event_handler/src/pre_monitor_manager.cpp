@@ -81,7 +81,6 @@ int32_t PreMonitorManager::RemoveHandler(int32_t handlerId)
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    const HandleEventType currentType = GetEventType();
     int32_t ret = RemoveLocal(handlerId);
     if (ret == RET_OK) {
         ret = RemoveFromServer(handlerId);

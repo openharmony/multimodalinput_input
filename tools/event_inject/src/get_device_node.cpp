@@ -46,7 +46,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
     std::string deviceName = deviceList_[targetName];
     auto iter = deviceList.find(deviceName);
     if (iter == deviceList.end()) {
-        MMI_HILOGE("Failed to find deviceName:%{public}s", deviceName.c_str());
+        MMI_HILOGE("Failed to find deviceName:%{private}s", deviceName.c_str());
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
@@ -56,7 +56,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
     }
     std::string nodeRootPath = "/dev/input/";
     deviceNode = nodeRootPath + iter->second[devIndex];
-    MMI_HILOGI("%{public}s[%{public}d] --> %{public}s", targetName.c_str(), devIndex,
+    MMI_HILOGI("%{private}s[%{public}d] --> %{private}s", targetName.c_str(), devIndex,
                deviceNode.c_str());
 
     return RET_OK;
@@ -129,6 +129,9 @@ void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs,
         }
         if (temp == "H") {
             startPos = item.rfind("event");
+            if (startPos == std::string::npos) {
+                continue;
+            }
             uint64_t eventLength = item.substr(startPos).find_first_of(" ");
             std::string target = item.substr(startPos, eventLength);
             if (!(name.empty())) {

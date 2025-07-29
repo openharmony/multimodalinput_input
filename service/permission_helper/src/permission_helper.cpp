@@ -73,7 +73,6 @@ bool PermissionHelper::CheckInjectPermission()
                    INJECT_PERMISSION_CODE.c_str(), tokenId, ret);
         return false;
     }
-    MMI_HILOGD("Check permission( %{public}s) permission success", INJECT_PERMISSION_CODE.c_str());
     return true;
 }
 
@@ -101,7 +100,7 @@ bool PermissionHelper::CheckAuthorize()
     return CheckHapPermission(INJECT_PERMISSION_CODE);
 }
 
-bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
+bool PermissionHelper::CheckHapPermission(const std::string &permissionCode)
 {
     CALL_DEBUG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
@@ -124,7 +123,7 @@ bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
     }
 }
 
-bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string permissionCode)
+bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string &permissionCode)
 {
     CALL_DEBUG_ENTER;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);

@@ -656,5 +656,123 @@ HWTEST_F(KeyEventTest, CloneTest1, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(keyEvent->Clone(nullptr));
 }
+
+/**
+ * @tc.name: KeyEventTest_ToString_002
+ * @tc.desc: Verify ToString when KeyEvent has multiple KeyItems
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ToString_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(100);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem keyItem1;
+    keyItem1.SetPressed(true);
+    keyItem1.SetDeviceId(1);
+    keyItem1.SetKeyCode(100);
+    keyItem1.SetDownTime(123456789);
+    keyItem1.SetUnicode(65); // 'A'
+    keyEvent->AddKeyItem(keyItem1);
+    KeyEvent::KeyItem keyItem2;
+    keyItem2.SetPressed(false);
+    keyItem2.SetDeviceId(2);
+    keyItem2.SetKeyCode(200);
+    keyItem2.SetDownTime(987654321);
+    keyItem2.SetUnicode(66); // 'B'
+    keyEvent->AddKeyItem(keyItem2);
+    std::string result;
+    ASSERT_NO_FATAL_FAILURE(result = keyEvent->ToString());
+    EXPECT_NE(result.find("keyCode:100"), std::string::npos);
+    EXPECT_NE(result.find("keyItems:["), std::string::npos);
+    EXPECT_NE(result.find("deviceId:1"), std::string::npos);
+    EXPECT_NE(result.find("deviceId:2"), std::string::npos);
+}
+
+/**
+ * @tc.name: KeyEventTest_KeyCodeToString_001
+ * @tc.desc: Verify KeyCodeToString returns correct string when keyCode is found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_KeyCodeToString_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    const char* result = nullptr;
+    ASSERT_NO_FATAL_FAILURE(result = KeyEvent::KeyCodeToString(keyCode));
+    EXPECT_STRNE(result, "KEYCODE_INVALID");
+    EXPECT_NE(std::string(result).find("A"), std::string::npos);
+}
+
+/**
+ * @tc.name: KeyEventTest_KeyCodeToString_002
+ * @tc.desc: Verify KeyCodeToString returns "KEYCODE_INVALID" when keyCode is not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_KeyCodeToString_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t invalidKeyCode = -999;
+    const char* result = nullptr;
+    ASSERT_NO_FATAL_FAILURE(result = KeyEvent::KeyCodeToString(invalidKeyCode));
+    EXPECT_STREQ(result, "KEYCODE_INVALID");
+}
+
+/**
+ * @tc.name: KeyEventTest_ReadEnhanceDataFromParcel_001
+ * @tc.desc: Verify ReadEnhanceDataFromParcel returns true with valid enhance data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ReadEnhanceDataFromParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    int32_t size = 3;
+    parcel.WriteInt32(size);
+    for (int32_t i = 0; i < size; i++) {
+        parcel.WriteUint32(static_cast<uint32_t>(i + 100));
+    }
+    KeyEvent keyEvent(InputEvent::EVENT_TYPE_KEY);
+    bool ret = keyEvent.ReadEnhanceDataFromParcel(parcel);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyEventTest_ReadEnhanceDataFromParcel_002
+ * @tc.desc: Verify ReadEnhanceDataFromParcel returns false when size < 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ReadEnhanceDataFromParcel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(-5);
+    KeyEvent keyEvent(InputEvent::EVENT_TYPE_KEY);
+    bool ret = keyEvent.ReadEnhanceDataFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyEventTest_ReadEnhanceDataFromParcel_003
+ * @tc.desc: Verify ReadEnhanceDataFromParcel returns false when size > MAX_N_ENHANCE_DATA_SIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ReadEnhanceDataFromParcel_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Parcel parcel;
+    parcel.WriteInt32(64 + 1);
+    KeyEvent keyEvent(InputEvent::EVENT_TYPE_KEY);
+    bool ret = keyEvent.ReadEnhanceDataFromParcel(parcel);
+    EXPECT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS

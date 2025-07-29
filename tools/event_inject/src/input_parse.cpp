@@ -171,7 +171,7 @@ bool ParseData(cJSON* events, std::vector<DeviceEvent>& eventData)
             MMI_HILOGE("Events is error");
             return false;
         }
-        eventData.push_back(event);
+        eventData.push_back(std::move(event));
     }
     return true;
 }

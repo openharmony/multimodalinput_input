@@ -50,6 +50,25 @@ bool CreateTestEventFile(const std::string& path)
     return true;
 }
 
+bool CreateTestDeviceFile(const std::string& path)
+{
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        return false;
+    }
+    file << "EVENTS_BEGIN" << std::endl;
+    file << "[1, 1, 30, 1, 1682345678, 123456] # EV_KEY / KEY_A 1" << std::endl;
+    file << "[1, 0, 0, 0, 1682345678, 123456] # EV_SYN / SYN_REPORT 0" << std::endl;
+    file << "[1, 1, 30, 0, 1682345678, 223456] # EV_KEY / KEY_A 0" << std::endl;
+    file << "[1, 0, 0, 0, 1682345678, 223456] # EV_SYN / SYN_REPORT 0" << std::endl;
+    file << "EVENTS_END" << std::endl;
+    file << std::endl;
+    file << "DEVICES: 1" << std::endl;
+    file << "DEVICE: 1|/dev/input/event2|Test Keyboard|123124a" << std::endl;
+    file.close();
+    return true;
+}
+
 bool CreateInvalidEventFile(const std::string& path)
 {
     std::ofstream file(path);
@@ -231,6 +250,33 @@ HWTEST_F(EventReplayerTest, EventReplayerTest_InvalidFileFormat, TestSize.Level1
         GTEST_SKIP() << "Failed to create test file, skipping test";
     }
     EventReplayer replayer(INVALID_FILE_PATH);
+    EXPECT_FALSE(replayer.Replay());
+}
+
+/**
+ * @tc.name: EventReplayerTest_InvaildFilePath
+ * @tc.desc: Test with invalid file path
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventReplayerTest, EventReplayerTest_InvaildFilePath, TestSize.Level1)
+{
+    EventReplayer replayer("/invaild/path");
+    EXPECT_FALSE(replayer.Replay());
+}
+ 
+/**
+ * @tc.name: EventReplayerTest_VaildFilePath
+ * @tc.desc: Test with valid file path but no available device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventReplayerTest, EventReplayerTest_VaildFilePath, TestSize.Level1)
+{
+    if (!CreateTestDeviceFile(TEST_FILE_PATH)) {
+    GTEST_SKIP() << "Failed to create test file, skipping test";
+    }
+    EventReplayer replayer(TEST_FILE_PATH);
     EXPECT_FALSE(replayer.Replay());
 }
 

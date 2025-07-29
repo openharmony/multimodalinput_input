@@ -80,6 +80,12 @@ constexpr char PRODUCT_PHONE[] { "phone" };
 constexpr char PRODUCT_TYPE_PC[] { "2in1" };
 } // namespace
 
+TouchDrawingHandler::~TouchDrawingHandler()
+{
+    UpdateLabels(false);
+    UpdateBubbleData(false);
+}
+
 void TouchDrawingHandler::RecordLabelsInfo()
 {
     CHKPV(pointerEvent_);
@@ -147,7 +153,8 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
 void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
-    isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
+    isChangedRotation_ = (displayInfo.direction == displayInfo_.direction &&
+        displayInfo.displayDirection == displayInfo_.displayDirection) ? false : true;
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
@@ -818,7 +825,7 @@ std::pair<double, double> TouchDrawingHandler::TransformDisplayXY(
     }
     Vector3f logicXY(logicX, logicY, 1.0);
     Vector3f displayXY = transform * logicXY;
-    return { std::round(displayXY[0]), std::round(displayXY[1]) };
+    return { displayXY[0], displayXY[1] };
 }
 
 void TouchDrawingHandler::StartTrace(int32_t pointerId)

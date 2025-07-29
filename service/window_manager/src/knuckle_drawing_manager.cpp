@@ -387,6 +387,8 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t rsId)
     MMI_HILOGI("KnuckleDrawingManager screenId_:%{public}" PRIu64, screenId_);
     RotationCanvasNode(brushCanvasNode_, displayInfo_);
     RotationCanvasNode(trackCanvasNode_, displayInfo_);
+    CHKPV(brushCanvasNode_);
+    CHKPV(trackCanvasNode_);
     brushCanvasNode_->ResetSurface(scaleW_, scaleH_);
     trackCanvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -428,6 +430,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
         ", screenId_:%{public}" PRIu64, g_WindowScreenId, g_DisplayNodeScreenId, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(canvasNode_, displayInfo_);
+    CHKPV(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -751,12 +754,17 @@ int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
     }
     if (isNeedUpAnimation) {
         ActionUpAnimation();
-        int32_t repeatTime = 1;
-        int32_t timerId = TimerMgr->AddTimer(PROTOCOL_DURATION, repeatTime, [this]() {
-            DestoryWindow();
-        }, "KnuckleDrawingManager");
-        if (timerId < 0) {
-            MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+        if (addTimerFunc_) {
+            int32_t repeatTime = 1;
+            int32_t timerId = addTimerFunc_(PROTOCOL_DURATION, repeatTime, [this]() {
+                DestoryWindow();
+            }, "KnuckleDrawingManager");
+            if (timerId < 0) {
+                MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+                DestoryWindow();
+            }
+        } else {
+            MMI_HILOGE("addTimerFunc_ is invalid");
             DestoryWindow();
         }
     } else {
@@ -977,6 +985,11 @@ void KnuckleDrawingManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t d
 {
     g_WindowScreenId = screenId;
     g_DisplayNodeScreenId = displayNodeScreenId;
+}
+
+void KnuckleDrawingManager::RegisterAddTimer(AddTimerCallbackFunc addTimerFunc)
+{
+    addTimerFunc_ = addTimerFunc;
 }
 } // namespace MMI
 } // namespace OHOS
