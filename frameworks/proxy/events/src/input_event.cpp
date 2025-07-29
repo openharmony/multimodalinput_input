@@ -518,7 +518,7 @@ void EndLogTraceId(int64_t id)
     RefreshTraceStr();
 }
 
-const char *FormatLogTrace()
+__attribute__((noinline)) const char *FormatLogTrace()
 {
     return g_traceStr.c_str();
 }
