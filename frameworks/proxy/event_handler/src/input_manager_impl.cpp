@@ -1214,6 +1214,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
 {
     CALL_DEBUG_ENTER;
     int maxPointerId = SIMULATE_EVENT_START_ID;
+    CHKPV(pointerEvent);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     for (auto &pointerItem : pointerItems) {
         int32_t pointerId = pointerItem.GetPointerId();

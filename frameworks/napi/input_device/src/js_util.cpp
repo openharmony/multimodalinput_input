@@ -211,6 +211,7 @@ bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
 void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(callback);
     if (callback->ref != nullptr && callback->env != nullptr) {
         CHKRV(napi_delete_reference(callback->env, callback->ref), DELETE_REFERENCE);
         callback->env = nullptr;
