@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,31 +13,34 @@
  * limitations under the License.
  */
 
+#include "key_subscriber_handler.h"
+
 #include <fstream>
 #include <list>
 
 #include <gtest/gtest.h>
 
-#include "key_option.h"
-#include "key_subscriber_handler.h"
-#include "key_shortcut_manager.h"
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 #include "call_manager_client.h"
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
-#include "common_event_data.h"
+
+#include "want.h"
+
+#include  "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "device_event_monitor.h"
 #include "display_event_monitor.h"
+#include "event_log_helper.h"
 #include "input_event_handler.h"
 #include "key_event.h"
+#include "key_option.h"
+#include "key_shortcut_manager.h"
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "switch_subscriber_handler.h"
 #include "tablet_subscriber_handler.h"
 #include "uds_server.h"
-#include "want.h"
-#include "event_log_helper.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -47,10 +50,10 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 const std::string PROGRAM_NAME = "uds_session_test";
-constexpr int32_t MODULE_TYPE = 1;
-constexpr int32_t UDS_FD = 1;
-constexpr int32_t UDS_UID = 100;
-constexpr int32_t UDS_PID = 100;
+constexpr int32_t MODULE_TYPE { 1 };
+constexpr int32_t UDS_FD { 1 }；
+constexpr int32_t UDS_UID { 100 };
+constexpr int32_t UDS_PID { 100 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
