@@ -114,6 +114,266 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InfraredEm
     controller.soIrHandle_ = dlopen(irWrapperPath.c_str(), RTLD_NOW);
     ASSERT_EQ(controller.irInterface_, nullptr);
 }
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_002
+ * @tc.desc: soIrHandle_ already loaded, should not dlopen again
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfraredEmitter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InfraredEmitterController controller;
+    controller.soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
+    controller.irInterface_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(controller.InitInfraredEmitter());
+    if (controller.soIrHandle_ != nullptr) {
+        dlclose(controller.soIrHandle_);
+    }
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_003
+ * @tc.desc: dlopen fails, should return early
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfraredEmitter_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InfraredEmitterController controller;
+    controller.irInterface_ = nullptr;
+    controller.soIrHandle_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(controller.InitInfraredEmitter());
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_004
+ * @tc.desc: dlsym returns nullptr, should cleanup so handle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfraredEmitter_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InfraredEmitterController controller;
+    controller.irInterface_ = nullptr;
+    controller.soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
+    if (controller.soIrHandle_ != nullptr) {
+        dlsym(controller.soIrHandle_, "NonExistFunction");
+    }
+    ASSERT_NO_FATAL_FAILURE(controller.InitInfraredEmitter());
+    if (controller.soIrHandle_ != nullptr) {
+        dlclose(controller.soIrHandle_);
+    }
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_005
+ * @tc.desc: fnCreate is nullptr even if dlsym success, should cleanup
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfraredEmitter_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InfraredEmitterController controller;
+    controller.irInterface_ = nullptr;
+    controller.soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
+    ASSERT_NO_FATAL_FAILURE(controller.InitInfraredEmitter());
+    if (controller.soIrHandle_ != nullptr) {
+        dlclose(controller.soIrHandle_);
+    }
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_Transmit_002
+ * @tc.desc: irInterface_ 为 nullptr，Transmit 应返回 true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InfraredEmitterController controller;
+    controller.irInterface_ = nullptr;
+    int64_t carrierFreq = 38000;
+    std::vector<int64_t> pattern = {100, 200, 300};
+    bool ret = controller.Transmit(carrierFreq, pattern);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_Transmit_003
+ * @tc.desc: irInterface_->Transmit 返回负数，预期返回 false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool& outRet) override
+        {
+            outRet = true;
+            return -1;
+        }
+        int32_t GetCarrierFreqs(bool&, std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            return 0;
+        }
+    };
+
+    InfraredEmitterController controller;
+    controller.irInterface_ = new FakeAdapter();
+    int64_t carrierFreq = 36000;
+    std::vector<int64_t> pattern = {500, 600};
+    bool ret = controller.Transmit(carrierFreq, pattern);
+    ASSERT_FALSE(ret);
+    delete controller.irInterface_;
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_Transmit_004
+ * @tc.desc: irInterface_->Transmit 成功但 outRet 为 false，预期返回 false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool& outRet) override
+        {
+            outRet = false;
+            return 0;
+        }
+        int32_t GetCarrierFreqs(bool&, std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            return 0;
+        }
+    };
+
+    InfraredEmitterController controller;
+    controller.irInterface_ = new FakeAdapter();
+    int64_t carrierFreq = 40000;
+    std::vector<int64_t> pattern = {150, 250};
+    bool ret = controller.Transmit(carrierFreq, pattern);
+    ASSERT_FALSE(ret);
+    delete controller.irInterface_;
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_Transmit_005
+ * @tc.desc: irInterface_->Transmit 成功且 outRet 为 true，预期返回 true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool& outRet) override
+        {
+            outRet = true;
+            return 0;
+        }
+        int32_t GetCarrierFreqs(bool&, std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            return 0;
+        }
+    };
+
+    InfraredEmitterController controller;
+    controller.irInterface_ = new FakeAdapter();
+    int64_t carrierFreq = 39000;
+    std::vector<int64_t> pattern = {100, 100, 100, 100};
+    bool ret = controller.Transmit(carrierFreq, pattern);
+    ASSERT_TRUE(ret);
+    delete controller.irInterface_;
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_GetFrequencies_002
+ * @tc.desc: Test GetFrequencies when interface returns ret < 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequencies_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool&) override { return 0; }
+        int32_t GetCarrierFreqs(bool& ret, std::vector<HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            ret = true;
+            return -1; // 模拟返回错误
+        }
+    };
+    InfraredEmitterController controller;
+    controller.irInterface_ = new (std::nothrow) FakeAdapter();
+    std::vector<InfraredFrequencyInfo> frequencyInfo;
+    bool result = controller.GetFrequencies(frequencyInfo);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_GetFrequencies_003
+ * @tc.desc: Test GetFrequencies when interface returns outRet = false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequencies_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool&) override { return 0; }
+        int32_t GetCarrierFreqs(bool& ret, std::vector<HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            ret = false;
+            return 0;
+        }
+    };
+    InfraredEmitterController controller;
+    controller.irInterface_ = new (std::nothrow) FakeAdapter();
+    std::vector<InfraredFrequencyInfo> frequencyInfo;
+    bool result = controller.GetFrequencies(frequencyInfo);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_GetFrequencies_004
+ * @tc.desc: Test GetFrequencies with valid data returned
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequencies_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool&) override { return 0; }
+        int32_t GetCarrierFreqs(bool& ret, std::vector<HDI::Consumerir::V1_0::ConsumerIrFreqRange>& range) override
+        {
+            ret = true;
+            range = {
+                { .min = 36000, .max = 40000 },
+                { .min = 38000, .max = 42000 }
+            };
+            return 0;
+        }
+    };
+    InfraredEmitterController controller;
+    controller.irInterface_ = new (std::nothrow) FakeAdapter();
+    std::vector<InfraredFrequencyInfo> frequencyInfo;
+    bool result = controller.GetFrequencies(frequencyInfo);
+    ASSERT_TRUE(result);
+    ASSERT_EQ(frequencyInfo.size(), 2);
+    ASSERT_EQ(frequencyInfo[0].min_, 36000);
+    ASSERT_EQ(frequencyInfo[0].max_, 40000);
+    ASSERT_EQ(frequencyInfo[1].min_, 38000);
+    ASSERT_EQ(frequencyInfo[1].max_, 42000);
+}
 #endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI
 } // namespace OHOS
