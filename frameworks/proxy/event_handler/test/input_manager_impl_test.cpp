@@ -30,6 +30,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr uint32_t MAX_WINDOW_SIZE = 1000;
 using namespace testing::ext;
 } // namespace
 
@@ -1468,6 +1469,335 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPrintDisplaysInfo, TestS
     displayGroupInfo.displaysInfo.push_back(displayInfo);
     DisplayGroupInfo userScreenInfo;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.PrintDisplaysInfo(displayGroupInfo.displaysInfo));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetDisplayBindInfo_001
+ * @tc.desc: Get diaplay bind information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetDisplayBindInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::DisplayBindInfos infos;
+    int32_t ret = InputMgrImpl.GetDisplayBindInfo(infos);
+    EXPECT_EQ(ret, RET_OK);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetAllMmiSubscribedEvents_001
+ * @tc.desc: Test get all mmi subscribed events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetAllMmiSubscribedEvents_001, TestSize.Level1)
+{
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
+    ASSERT_EQ(InputMgrImpl.GetAllMmiSubscribedEvents(datas), RET_OK);
+    ASSERT_FALSE(datas.empty());
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetDisplayBind_001
+ * @tc.desc: Set diaplay bind information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetDisplayBind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 0;
+    int32_t displayId = -1;
+    std::string msg;
+    int32_t ret = InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
+    ASSERT_TRUE(ret != RET_OK);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_004
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::DisplayInfo info;
+    info.id = 0;
+    info.width = 1920;
+    info.height = 1080;
+    info.name = "Main Display";
+    OHOS::MMI::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.id = 111;
+    displayGroupInfo.name = "Main Display Group";
+    displayGroupInfo.type = OHOS::MMI::GroupType::GROUP_SPECIAL;
+    displayGroupInfo.focusWindowId = 111;
+    displayGroupInfo.mainDisplayId = info.id;
+    displayGroupInfo.displaysInfo.push_back(info);
+    OHOS::MMI::UserScreenInfo screenInfo;
+    screenInfo.userId = 100;
+    screenInfo.displayGroups.push_back(displayGroupInfo);
+    screenInfo.displayGroups.resize(10);
+    screenInfo.screens.resize(10);
+    auto result = InputMgrImpl.UpdateDisplayInfo(screenInfo);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_005
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_005, TestSize.Level1)
+{
+    WindowGroupInfo initialWindowGroupInfo;
+    for (int i = 0; i < 10; ++i) {
+        WindowInfo window;
+        initialWindowGroupInfo.windowsInfo.push_back(window);
+    }
+
+    UserScreenInfo userScreenInfo;
+    DisplayGroupInfo group;
+    for (int i = 0; i < MAX_WINDOW_SIZE - 1; ++i) {
+        WindowInfo window;
+        group.windowsInfo.push_back(window);
+    }
+    userScreenInfo.displayGroups.push_back(group);
+
+    DisplayInfo display;
+    group.displaysInfo.push_back(display);
+    userScreenInfo.screens.push_back(ScreenInfo());
+
+    int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_006
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_006, TestSize.Level1)
+{
+    UserScreenInfo userScreenInfo;
+
+    DisplayGroupInfo group;
+    group.id = 1;
+    group.name = "Main Display Group";
+    group.type = OHOS::MMI::GroupType::GROUP_DEFAULT;
+    group.focusWindowId = 1;
+    DisplayInfo display;
+    group.displaysInfo.push_back(display);
+    userScreenInfo.displayGroups.push_back(group);
+    ScreenInfo screen;
+    userScreenInfo.screens.push_back(screen);
+    for (int i = 0; i < MAX_WINDOW_SIZE; ++i) {
+        WindowInfo window;
+        group.windowsInfo.push_back(window);
+    }
+
+    int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_007
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_007, TestSize.Level1)
+{
+    UserScreenInfo userScreenInfo;
+    for (size_t i = 0; i < MAX_DISPLAY_GROUP_SIZE; ++i) {
+        DisplayGroupInfo group;
+        userScreenInfo.displayGroups.push_back(group);
+    }
+
+    for (size_t i = 0; i < MAX_SCREEN_SIZE; ++i) {
+        ScreenInfo screen;
+        userScreenInfo.screens.push_back(screen);
+    }
+
+    size_t totalDisplays = 0;
+    for (const auto& group : userScreenInfo.displayGroups) {
+        totalDisplays += group.displaysInfo.size();
+    }
+
+    if (totalDisplays <= MAX_DISPLAY_SIZE) {
+        int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
+        EXPECT_EQ(result, RET_ERR);
+    }
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateWindowInfo
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowGroupInfo initialWindowGroupInfo;
+    for (int i = 0; i < 10; ++i) {
+        WindowInfo window;
+        initialWindowGroupInfo.windowsInfo.push_back(window);
+    }
+
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.UpdateWindowInfo(initialWindowGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateWindowInfo_001
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo window;
+    window.id = 1;
+    window.pid = 1000;
+    window.uid = 10000;
+    Rect hotArea {
+        .x = 0,
+        .y = 0,
+        .width = 100,
+        .height = 100,
+    };
+    window.defaultHotAreas.push_back(hotArea);
+    window.pointerHotAreas.push_back(hotArea);
+    windowGroupInfo.windowsInfo.push_back(window);
+    int32_t result = InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateWindowInfo_002
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo window;
+    window.id = 1;
+    window.pid = 1000;
+    window.uid = 10000;
+
+    Rect pointerHotArea = {0, 0, 100, 100};
+    window.pointerHotAreas.push_back(pointerHotArea);
+    windowGroupInfo.windowsInfo.push_back(window);
+    int32_t result = InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    EXPECT_EQ(result, PARAM_INPUT_INVALID);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateWindowInfo_003
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo window;
+    window.id = 1;
+    window.pid = 1000;
+    window.uid = 10000;
+
+    Rect hotArea = {0, 0, 100, 100};
+    window.defaultHotAreas.push_back(hotArea);
+    window.pointerHotAreas.push_back(hotArea);
+
+    window.pointerChangeAreas.push_back(1);
+
+    windowGroupInfo.windowsInfo.push_back(window);
+
+    int32_t result = InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    EXPECT_EQ(result, PARAM_INPUT_INVALID);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateWindowInfo_004
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.focusWindowId = 10;
+    windowGroupInfo.displayId = 1;
+
+    WindowInfo window;
+    window.id = 1;
+    window.pid = 1000;
+    window.uid = 10000;
+    window.area = {0, 0, 1920, 1080};
+    Rect hotArea = {0, 0, 100, 100};
+    window.defaultHotAreas.push_back(hotArea);
+    window.pointerHotAreas.push_back(hotArea);
+    windowGroupInfo.windowsInfo.push_back(window);
+    int32_t result = InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UpdateWindowInfo_005
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.focusWindowId = 10;
+    windowGroupInfo.displayId = 1;
+    WindowInfo window;
+    window.id = 1;
+    window.pid = 1000;
+    window.uid = 10000;
+    window.area = {0, 0, 1920, 1080};
+    window.agentWindowId = 0;
+    window.flags = 0;
+    window.action = WINDOW_UPDATE_ACTION::ADD;
+    window.displayId = 1;
+    window.groupId = 1;
+    window.zOrder = 1.0;
+    Rect defaultHotArea = {0, 0, 1920, 1080};
+    Rect pointerHotArea = {0, 0, 1920, 1080};
+    window.defaultHotAreas.push_back(defaultHotArea);
+    window.pointerHotAreas.push_back(pointerHotArea);
+    for (int i = 0; i < WindowInfo::POINTER_CHANGEAREA_COUNT; i++) {
+        window.pointerChangeAreas.push_back(i);
+    }
+
+    for (int i = 0; i < WindowInfo::WINDOW_TRANSFORM_SIZE; i++) {
+        window.transform.push_back(1.0f);
+    }
+    windowGroupInfo.windowsInfo.push_back(window);
+
+    int32_t result = InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    EXPECT_EQ(result, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
