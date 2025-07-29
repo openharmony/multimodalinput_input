@@ -1048,9 +1048,20 @@ ohos_unittest("InputDeviceConsumerHandlerTest") {
 ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+  }
+
+  defines = input_default_defines
+  defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1062,23 +1073,22 @@ ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
 
   sources = [
     "src/remote_control_transform_processor_test_with_mock.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/remote_control_transform_processor.cpp",
   ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "c_utils:utilsbase",
-    "graphic_2d:librender_service_client",
+    "googletest:gtest_main",
+    "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
   ]
 }
 
