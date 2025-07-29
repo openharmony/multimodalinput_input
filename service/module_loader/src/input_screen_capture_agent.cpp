@@ -35,7 +35,7 @@ InputScreenCaptureAgent::~InputScreenCaptureAgent()
 {
     std::lock_guard<std::mutex> guard(agentMutex_);
     if (handle_.handle != nullptr) {
-        handle_.Free(agentMutex_);
+        handle_.Free();
     }
 }
 
@@ -59,14 +59,14 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
     handle_.isWorking = reinterpret_cast<int32_t (*)(int32_t)>(dlsym(handle_.handle, "IsScreenCaptureWorking"));
     if (handle_.isWorking == nullptr) {
         MMI_HILOGE("dlsym isWorking failed: error:%{public}s", dlerror());
-        handle_.Free(agentMutex_);
+        handle_.Free();
         return RET_ERR;
     }
     handle_.registerListener = reinterpret_cast<void (*)(ScreenCaptureCallback)>(
         dlsym(handle_.handle, "RegisterListener"));
     if (handle_.registerListener == nullptr) {
         MMI_HILOGE("dlsym registerListener failed: error:%{public}s", dlerror());
-        handle_.Free(agentMutex_);
+        handle_.Free();
         return RET_ERR;
     }
     return RET_OK;
@@ -134,7 +134,7 @@ int32_t InputScreenCaptureAgent::LoadAudioLibrary()
     handle_.isMusicActivate = reinterpret_cast<bool (*)()>(dlsym(handle_.handle, "IsMusicActivate"));
     if (handle_.isMusicActivate == nullptr) {
         MMI_HILOGE("dlsym isWorking failed: error:%{public}s", dlerror());
-        handle_.Free(agentMutex_);
+        handle_.Free();
         return RET_ERR;
     }
     return RET_OK;
