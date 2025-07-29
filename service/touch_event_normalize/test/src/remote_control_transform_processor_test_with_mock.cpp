@@ -323,14 +323,12 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_005, TestSize.Leve
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCH_MOTION));
     libinput_event_touch touchEvent;
-    EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(&touchEvent));
-    EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillOnce(Return(false));
+    EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(NULL));
     MouseLocation expectLocation = {3, 3, 3};
     EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
-    EXPECT_CALL(*WIN_MGR_MOCK, UpdateTargetPointer).WillRepeatedly(Return(0));
     processor.processedCount_ = PRINT_INTERVAL_COUNT - 1;
     libinput_event event;
-    ASSERT_EQ(processor.OnEvent(&event), processor.pointerEvent_);
+    ASSERT_EQ(processor.OnEvent(&event), nullptr);
     EXPECT_NE(processor.pointerEvent_, nullptr);
     EXPECT_EQ(processor.processedCount_, 0);
 }
@@ -380,7 +378,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_007, TestSize.Leve
     EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCH_MOTION));
     libinput_event_touch touchEvent;
     EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(&touchEvent));
-    EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillOnce(Return(false));
+    EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillOnce(Return(True));
     MouseLocation expectLocation = {3, 3, 3};
     EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
     EXPECT_CALL(*WIN_MGR_MOCK, UpdateTargetPointer).WillRepeatedly(Return(0));
@@ -410,7 +408,6 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_008, TestSize.Leve
     EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(NULL));
     MouseLocation expectLocation = {3, 3, 3};
     EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
-    EXPECT_CALL(*WIN_MGR_MOCK, UpdateTargetPointer).WillRepeatedly(Return(0));
     processor.processedCount_ = PRINT_INTERVAL_COUNT;
     libinput_event event;
     ASSERT_EQ(processor.OnEvent(&event), nullptr);
