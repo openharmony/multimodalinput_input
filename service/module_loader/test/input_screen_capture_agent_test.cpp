@@ -45,8 +45,6 @@ public:
     void SetUp();
     void TearDown();
     InputScreenCaptureAgent inputScreenCaptureAgent;
-private:
-    std::mutex agentMutex_;
 };
 void InputScreenCaptureAgentTest::SetUpTestCase(void)
 {}
@@ -64,9 +62,8 @@ void InputScreenCaptureAgentTest::SetUp()
 
 void InputScreenCaptureAgentTest::TearDown()
 {
-    std::lock_guard<std::mutex> guard(agentMutex_);
     if (inputScreenCaptureAgent.handle_.handle != nullptr) {
-        inputScreenCaptureAgent.handle_.Free(agentMutex_);
+        inputScreenCaptureAgent.handle_.Free();
     }
 }
 
