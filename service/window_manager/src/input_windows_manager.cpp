@@ -2665,10 +2665,11 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
             "area.x:%d, area.y:%d, area.width:%{public}d, area.height:%{public}d, "
             "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu, "
             "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d, "
-            "zOrder:%{public}f, privacyMode:%{public}d",
+            "zOrder:%{public}f, privacyMode:%{public}d, privacyProtect:%{public}d, windowType:%{public}d",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder, item.privacyMode);
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder, item.privacyMode,
+            item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%d, y:%d, width:%{public}d, height:%{public}d",
                 win.x, win.y, win.width, win.height);
@@ -6473,10 +6474,11 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
             "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
             "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
-            "| action:%d | displayId:%d | zOrder:%f \t",
+            "| action:%d | displayId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder,
+            item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
         for (const auto &win : item.defaultHotAreas) {
             mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                 win.x, win.y, win.width, win.height);
@@ -6793,7 +6795,7 @@ void InputWindowsManager::PrintChangedWindowBySync(const OLD::DisplayGroupInfo &
         if (iter == DisplaysInfo.end()) {
             continue;
         }
-        if (item.direction != iter->direction) {
+        if (item.direction != iter->direction || item.displayDirection != iter->displayDirection) {
             MMI_HILOGI("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d,"
                 "name:%{public}s,uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,"
                 "oldDirection:%{public}d,oldDisplayDirection:%{public}d", item.id, item.x, item.y, item.width,
