@@ -55,6 +55,7 @@ static bool GetResult(sptr<AsyncContext> asyncContext, napi_value * results, int
         MMI_HILOGE("results size less than 2");
         return false;
     }
+    CHKPF(asyncContext);
     napi_env env = asyncContext->env;
     if (asyncContext->errorCode != RET_OK) {
         if (asyncContext->errorCode == RET_ERR) {

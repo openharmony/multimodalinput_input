@@ -378,6 +378,7 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 
 std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
 {
+    CHKPS(keyOption);
     std::string subKeyNames;
     const std::set<int32_t>& preKeys = keyOption->GetPreKeys();
     int32_t finalKey = keyOption->GetFinalKey();
@@ -499,6 +500,7 @@ bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInf
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
+    CHKPF(event);
     if (argc == INPUT_PARAMETER_MAX) {
         napi_valuetype valueType = napi_undefined;
         CHKRF(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
