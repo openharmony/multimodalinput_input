@@ -55,7 +55,7 @@ void RemoteControlTransformProcessorTestWithMock::TearDown()
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_InitToolTypes_001
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_InitToolTypes_001
  * @tc.desc: Test the funcation InitToolTypes
  * @tc.type: FUNC
  * @tc.require:
@@ -85,7 +85,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, InitToolTypes_001, TestSiz
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_HandlePostInner_001
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_HandlePostInner_001
  * @tc.desc: Test HandlePostInner
  * @tc.type: FUNC
  * @tc.require:
@@ -102,7 +102,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_001, TestS
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_HandlePostInner_002
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_HandlePostInner_002
  * @tc.desc: Test HandlePostInner
  * @tc.type: FUNC
  * @tc.require:
@@ -123,7 +123,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_002, TestS
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_HandlePostInner_003
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_HandlePostInner_003
  * @tc.desc: Test HandlePostInner
  * @tc.type: FUNC
  * @tc.require:
@@ -140,17 +140,16 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_003, TestS
     NiceMock<LibinputInterfaceMock> libinputMock;
     libinput_event_touch touchEvent;
     EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
-    EXPECT_CALL(libinputMock, TouchEventGetMoveFlag).WillOnce(Return(100));
     EXPECT_CALL(libinputMock, TouchEventGetPressure).WillOnce(Return(100.0));
     EXPECT_CALL(libinputMock, TouchEventGetContactLongAxis).WillOnce(Return(100));
     EXPECT_CALL(libinputMock, TouchEventGetContactShortAxis).WillOnce(Return(100));
     EXPECT_CALL(libinputMock, TouchEventGetSeatSlot).WillOnce(Return(100));
-    libinput_event event:
+    libinput_event event;
     ASSERT_TRUE(processor.HandlePostInner(&event));
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEventTouchMotion_001
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEventTouchMotion_001
  * @tc.desc: Test OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
@@ -165,11 +164,11 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEventTouchMotion_001, Te
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTouchEvent).Times(0);
     libinput_event event;
-    ASSERT_FALSE(processor.HandlePostInner(&event));
+    ASSERT_FALSE(processor.OnEventTouchMotion(&event));
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEventTouchMotion_002
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEventTouchMotion_002
  * @tc.desc: Test OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
@@ -184,11 +183,11 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEventTouchMotion_002, Te
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(NULL));
     libinput_event event;
-    ASSERT_FALSE(processor.HandlePostInner(&event));
+    ASSERT_FALSE(processor.OnEventTouchMotion(&event));
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEventTouchMotion_003
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEventTouchMotion_003
  * @tc.desc: Test OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
@@ -205,12 +204,12 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEventTouchMotion_003, Te
     EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
     EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillRepeatedly(Return(false));
     libinput_event event;
-    ASSERT_FALSE(processor.HandlePostInner(&event));
+    ASSERT_FALSE(processor.OnEventTouchMotion(&event));
 }
 
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEventTouchMotion_004
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEventTouchMotion_004
  * @tc.desc: Test OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
@@ -227,11 +226,11 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEventTouchMotion_004, Te
     EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
     EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillRepeatedly(Return(true));
     libinput_event event;
-    ASSERT_TRUE(processor.HandlePostInner(&event));
+    ASSERT_TRUE(processor.OnEventTouchMotion(&event));
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_001
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_001
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -249,7 +248,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_001, TestSize.Leve
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_002
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_002
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -269,7 +268,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_002, TestSize.Leve
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_003
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_003
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -289,7 +288,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_003, TestSize.Leve
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_004
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_004
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -302,14 +301,14 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_004, TestSize.Leve
     processor.pointerEvent_ = nullptr;
     EXPECT_EQ(processor.pointerEvent_, nullptr);
     NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCH_CANCELL));
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCH_CANCEL));
     libinput_event event;
     ASSERT_EQ(processor.OnEvent(&event), nullptr);
     EXPECT_NE(processor.pointerEvent_, nullptr);
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_005
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_005
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -337,7 +336,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_005, TestSize.Leve
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_006
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_006
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -365,7 +364,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_006, TestSize.Leve
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_007
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_007
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:
@@ -393,7 +392,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_007, TestSize.Leve
 }
 
 /**
- * @tc.name: Remote_ControlTransformProcessorTest_OnEvent_008
+ * @tc.name: RemoteControlTransformProcessorTestWithMock_OnEvent_008
  * @tc.desc: Test OnEvent
  * @tc.type: FUNC
  * @tc.require:

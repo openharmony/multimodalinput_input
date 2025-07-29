@@ -1093,6 +1093,7 @@ ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
     "googletest:gtest_main",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
   ]
 }
