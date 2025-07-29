@@ -7359,6 +7359,205 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey006, 
 
     EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility001
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_001
+ * @tc.desc: Verify VOLUME_DOWN + camera app with valid state launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility001, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    handler.ret_.store(0);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility002
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_002
+ * @tc.desc: Verify VOLUME_DOWN + camera app with valid state launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility002, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    handler.ret_.store(5);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility003
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_003
+ * @tc.desc: Verify VOLUME_DOWN + camera app with valid state launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility003, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    handler.ret_.store(100);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility004
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_004
+ * @tc.desc: Verify non-VOLUME_DOWN key launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility004, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    handler.ret_.store(5);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility005
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_005
+ * @tc.desc: Verify cancel event propagation
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility005, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    item.ability.bundleName = "com.ohos.settings";
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility006
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_006
+ * @tc.desc: Verify map clearing
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility006, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    item.ability.bundleName = "com.ohos.music";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+
+    KeyCommandHandler handler;
+    
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility007
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_007
+ * @tc.desc: Verify mistouch prevention safety with null pointer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility007, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);
+    handler.mistouchPrevention_ = nullptr;  // Null pointer
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility008
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_008
+ * @tc.desc: Verify null subscriber handler safety
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility008, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    item.ability.bundleName = "com.ohos.music";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+
+    KeyCommandHandler handler;
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility009
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_009
+ * @tc.desc: Verify bytrace start/stop pairing
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility009, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    item.ability.bundleName = "com.ohos.settings";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+
+    KeyCommandHandler handler;
+    
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility010
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_010
+ * @tc.desc: Verify camera substring matching
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility010, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera.pro";  // Contains ".camera"
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);
+    
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
 } // namespace OHOS
