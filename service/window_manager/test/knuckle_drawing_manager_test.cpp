@@ -878,6 +878,140 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackCanvas_00
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_001
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is false
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = false;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_002
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true and
+ * destroyTimerId_ greater than 0
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = 1;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    kceDrawMgr.destroyTimerId_ = -1;
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_003
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true,
+ * destroyTimerId_ small than 0 and addTimerFunc_ is invalid
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = -1;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_004
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true,
+ * destroyTimerId_ small than 0, addTimerFunc_ is valid and addTimerFunc_ calling fail
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = -1;
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+
+    kceDrawMgr.addTimerFunc_ = [] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return -1;
+    };
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(kceDrawMgr.destroyTimerId_, -1);
+    ASSERT_EQ(kceDrawMgr.brushCanvasNode_, nullptr);
+    ASSERT_EQ(kceDrawMgr.trackCanvasNode_, nullptr);
+    ASSERT_EQ(kceDrawMgr.surfaceNode_, nullptr);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_005
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true,
+ * destroyTimerId_ small than 0, addTimerFunc_ is valid and addTimerFunc_ call success
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = -1;
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+
+    kceDrawMgr.addTimerFunc_ = [] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return 1;
+    };
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(kceDrawMgr.destroyTimerId_, 1);
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_UpdateEmitter_001
  * @tc.desc: Test Overrides UpdateEmitter function branches
  * @tc.type: Function
@@ -941,14 +1075,14 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_InitParticleEmitte
 HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RegisterAddTimer_001, TestSize.Level1)
 {
     knuckleDrawMgr_->RegisterAddTimer([] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-            const std::string &name) -> int32_t {
+        const std::string &name) -> int32_t {
         (void)intervalMs;
         (void)repeatCount;
         (void)callback;
         (void)name;
-        return RET_OK;
+        return 1;
     });
-    ASSERT_FALSE(knuckleDrawMgr_->addTimerFunc_);
+    ASSERT_TRUE(knuckleDrawMgr_->addTimerFunc_);
 }
 } // namespace MMI
 } // namespace OHOS
