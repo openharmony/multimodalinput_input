@@ -153,7 +153,8 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
 void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
-    isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
+    isChangedRotation_ = (displayInfo.direction == displayInfo_.direction &&
+        displayInfo.displayDirection == displayInfo_.displayDirection) ? false : true;
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
