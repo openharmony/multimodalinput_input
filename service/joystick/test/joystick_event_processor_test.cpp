@@ -103,6 +103,24 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnButtonEvent, T
 }
 
 /**
+ * @tc.name: JoystickEventProcessorTest_OnAxisEvent_001
+ * @tc.desc: Test OnAxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    auto joystickEventProcessor = std::make_shared<JoystickEventProcessor>(deviceId);
+        libinput_event libInputEvent = {
+        .type = LIBINPUT_EVENT_NONE,
+        .device = nullptr
+    };
+    ASSERT_EQ(joystickEventProcessor->OnButtonEvent(&libInputEvent), nullptr);
+}
+
+/**
  * @tc.name: JoystickEventProcessorTest_CheckIntention
  * @tc.desc: Test CheckIntention
  * @tc.type: FUNC
@@ -113,6 +131,46 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention, 
     CALL_TEST_DEBUG;
     auto JoystickEvent = new JoystickEventProcessor(2);
     std::shared_ptr<PointerEvent> pointerEvent;
+    ASSERT_NO_FATAL_FAILURE(
+        JoystickEvent->CheckIntention(pointerEvent, [=] (std::shared_ptr<OHOS::MMI::KeyEvent>) { return; }));
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_CheckIntention_002
+ * @tc.desc: Test CheckIntention
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
+    double axisValue = 0;
+    pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0X] = axisValue;
+    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_LEFT};
+    ASSERT_NO_FATAL_FAILURE(
+        JoystickEvent->CheckIntention(pointerEvent, [=] (std::shared_ptr<OHOS::MMI::KeyEvent>) { return; }));
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_CheckIntention_003
+ * @tc.desc: Test CheckIntention
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType( PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
+    double axisValue = 0;
+    pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0Y] = axisValue;
+    JoystickEvent->pressedButtons_ = {KeyEvent::KEYCODE_DPAD_DOWN};
     ASSERT_NO_FATAL_FAILURE(
         JoystickEvent->CheckIntention(pointerEvent, [=] (std::shared_ptr<OHOS::MMI::KeyEvent>) { return; }));
 }
@@ -368,6 +426,81 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize, TestS
     double low = 2.1f;
     double high = 1.3f;
     ASSERT_NE(JoystickEvent->Normalize(axis, low, high), 3.5f);
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_Normalize_002
+ * @tc.desc: Test Normalize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    const struct libinput_event_joystick_axis_abs_info axis = { 
+        .code = 1,
+        .value = 5,
+        .maximum = 0,
+        .minimum  = 10,
+        .fuzz = 0,
+        .flat = 0,
+        .resolution = 0,
+        .standardValue = 1.0
+    };
+    double low = 0.0f;
+    double high = 1.0f;
+    ASSERT_EQ(JoystickEvent->Normalize(axis, low, high), 0.0f);
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_Normalize_003
+ * @tc.desc: Test Normalize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    const struct libinput_event_joystick_axis_abs_info axis = { 
+        .code = 1,
+        .value = 20,
+        .maximum = 10,
+        .minimum  = 0,
+        .fuzz = 0,
+        .flat = 0,
+        .resolution = 0,
+        .standardValue = 1.0
+    };
+    double low = 0.0f;
+    double high = 1.0f;
+    ASSERT_EQ(JoystickEvent->Normalize(axis, low, high), 1.0f);
+}
+
+/**
+ * @tc.name: JoystickEventProcessorTest_Normalize_004
+ * @tc.desc: Test Normalize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto JoystickEvent = new JoystickEventProcessor(2);
+    const struct libinput_event_joystick_axis_abs_info axis = { 
+        .code = 1,
+        .value = 5,
+        .maximum = 10,
+        .minimum  = 0,
+        .fuzz = 0,
+        .flat = 0,
+        .resolution = 0,
+        .standardValue = 1.0
+    };
+    double low = 0.0f;
+    double high = 1.0f;
+    ASSERT_EQ(JoystickEvent->Normalize(axis, low, high), 0.5f);
 }
 } // namespace MMI
 } // namespace OHOS
