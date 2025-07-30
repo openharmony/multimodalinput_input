@@ -147,7 +147,6 @@ bool Remote_ControlTransformProcessor::HandlePostInner(struct libinput_event* ev
     pointerItem.SetDeviceId(deviceId_);
     auto touch = libinput_event_get_touch_event(event);
     CHKPF(touch);
-    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
