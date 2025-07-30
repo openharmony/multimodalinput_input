@@ -972,6 +972,5 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdge
     EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
 }
 
-}
 } // namespace MMI
 } // namespace OHOS
