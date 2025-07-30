@@ -276,6 +276,7 @@ static void HandleMouseButton(napi_env env, napi_value mouseHandle,
     } else {
         MMI_HILOGW("button:%{public}d is unknown", button);
     }
+    CHKPV(pointerEvent);
     pointerEvent->SetButtonId(button);
     if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN) {
         pointerEvent->SetButtonPressed(button);
@@ -322,6 +323,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
         MMI_HILOGE("Get action failed");
         return;
     }
+    CHKPV(pointerEvent);
     switch (action) {
         case JS_CALLBACK_MOUSE_ACTION_MOVE:
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -355,6 +357,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
 static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
 {
+    CHKPV(pointerEvent);
     int32_t screenX = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "screenX", screenX) != RET_OK) {
         MMI_HILOGE("Get screenX failed");
@@ -457,6 +460,7 @@ static int32_t HandleTouchAction(napi_env env, napi_value touchHandle,
         MMI_HILOGE("Get action failed");
         return RET_ERR;
     }
+    CHKPR(pointerEvent, RET_ERR);
     switch (action) {
         case JS_CALLBACK_TOUCH_ACTION_DOWN:
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -583,6 +587,7 @@ static void HandleTouchesProperty(napi_env env, std::shared_ptr<PointerEvent> po
 static bool HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
 {
+    CHKPF(pointerEvent);
     int32_t sourceType = 0;
     if (GetNamedPropertyInt32(env, touchHandle, "sourceType", sourceType) != RET_OK) {
         MMI_HILOGE("Get sourceType failed");
