@@ -377,7 +377,7 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, OnEvent_007, TestSize.Leve
     EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCH_MOTION));
     libinput_event_touch touchEvent;
     EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(&touchEvent));
-    EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillOnce(Return(True));
+    EXPECT_CALL(*WIN_MGR_MOCK, TouchPointToDisplayPoint).WillOnce(Return(true));
     MouseLocation expectLocation = {3, 3, 3};
     EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
     EXPECT_CALL(*WIN_MGR_MOCK, UpdateTargetPointer).WillRepeatedly(Return(0));
