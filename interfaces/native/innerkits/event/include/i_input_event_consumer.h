@@ -28,9 +28,9 @@ public:
     IInputEventConsumer() = default;
     virtual ~IInputEventConsumer() = default;
 
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const = 0;
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const = 0;
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const = 0;
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const;
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const;
 };
 } // namespace MMI
 } // namespace OHOS
