@@ -752,7 +752,7 @@ void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, RET_ERR);
+    CHKPR(mouseEvent, INT_MAX);
     return mouseEvent->globalX;
 }
 
@@ -766,7 +766,7 @@ void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, RET_ERR);
+    CHKPR(mouseEvent, INT_MAX);
     return mouseEvent->globalY;
 }
 
@@ -1050,7 +1050,7 @@ void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, RET_ERR);
+    CHKPR(touchEvent, INT_MAX);
     return touchEvent->globalX;
 }
 
@@ -1064,7 +1064,7 @@ void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, RET_ERR);
+    CHKPR(touchEvent, INT_MAX);
     return touchEvent->globalY;
 }
 
