@@ -2132,11 +2132,11 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
         } else {
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
         }
-        if (windowInfo == std::nullopt && isDisplayRemoved) {
+        if (windowInfo == std::nullopt) {
+            MMI_HILOGE("The windowInfo is nullptr");
             DrawPointer(isDisplayRemoved);
             return;
         }
-        CHKFRV(windowInfo, "The windowInfo is nullptr");
         int32_t windowPid = GetWindowPid(windowInfo->id);
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
         CursorDrawingComponent::GetInstance().OnWindowInfo(info);
@@ -4266,10 +4266,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             }
             if (GetHardCursorEnabled()) {
                 std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
-                if (cursorPos.size() < CURSOR_POSITION_EXPECTED_SIZE) {
-                    MMI_HILOGW("cursorPos is invalid");
-                    return RET_ERR;
-                }
+                CHKFR((cursorPos.size() >= CURSOR_POSITION_EXPECTED_SIZE), RET_ERR, "cursorPos is invalid");
                 CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
                     cursorPos[0], cursorPos[1]);
             } else {
