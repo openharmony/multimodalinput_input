@@ -2604,8 +2604,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
     pointerEvent->pointers_.push_back(item);
     WindowInfo windowInfo;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
-    item.displayX_ = 10;
-    item.displayY_ = 20;
+    item.SetDisplayX(10);
+    item.SetDisplayY(20);
     Rect rect = {0, 0, 30, 40};
     windowInfo.defaultHotAreas.push_back(rect);
     windowsInfo.push_back(windowInfo);

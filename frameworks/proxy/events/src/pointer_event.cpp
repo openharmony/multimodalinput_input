@@ -76,22 +76,22 @@ void PointerEvent::PointerItem::SetPressed(bool pressed)
 
 int32_t PointerEvent::PointerItem::GetDisplayX() const
 {
-    return displayX_;
+    return static_cast<int32_t>(GetDisplayXPos());
 }
 
 void PointerEvent::PointerItem::SetDisplayX(int32_t x)
 {
-    displayX_ = x;
+    SetDisplayXPos(x);
 }
 
 int32_t PointerEvent::PointerItem::GetDisplayY() const
 {
-    return displayY_;
+    return static_cast<int32_t>(GetDisplayYPos());
 }
 
 void PointerEvent::PointerItem::SetDisplayY(int32_t y)
 {
-    displayY_ = y;
+    SetDisplayYPos(y);
 }
 
 int32_t PointerEvent::PointerItem::GetWindowX() const
@@ -490,8 +490,6 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(pointerId_) &&
         out.WriteInt64(downTime_) &&
         out.WriteBool(pressed_) &&
-        out.WriteInt32(displayX_) &&
-        out.WriteInt32(displayY_) &&
         out.WriteInt32(windowX_) &&
         out.WriteInt32(windowY_) &&
         out.WriteInt32(width_) &&
@@ -534,8 +532,6 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(pointerId_) &&
         in.ReadInt64(downTime_) &&
         in.ReadBool(pressed_) &&
-        in.ReadInt32(displayX_) &&
-        in.ReadInt32(displayY_) &&
         in.ReadInt32(windowX_) &&
         in.ReadInt32(windowY_) &&
         in.ReadInt32(width_) &&
