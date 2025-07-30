@@ -49,7 +49,7 @@ void StartLogTraceId(int64_t, int32_t, int32_t);
 
 void EndLogTraceId(int64_t);
 
-const char *FormatLogTrace();
+__attribute__((noinline)) const char *FormatLogTrace();
 
 void ResetLogTrace();
 }
