@@ -2949,14 +2949,6 @@ void MMIService::OnDelegateTask(epoll_event &ev)
         MMI_HILOGW("Not epollin");
         return;
     }
-    DelegateTasks::TaskData data = {};
-    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
-    if (res == -1) {
-        MMI_HILOGW("Read failed erron:%{public}d", errno);
-    }
-    MMI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
-        ",taskId:%{public}d",
-        GetThisThreadId(), data.tid, data.taskId);
     delegateTasks_.ProcessTasks();
 }
 
