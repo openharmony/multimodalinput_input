@@ -78,6 +78,11 @@ bool InputScreenCaptureAgent::IsScreenCaptureWorking(int32_t capturePid)
         MMI_HILOGE("LoadLibrary fail");
         return {};
     }
+    std::lock_guard<std::mutex> guard(agentMutex_);
+    if (handle_.isWorking == nullptr) {
+        MMI_HILOGE("isWorking is null");
+        return {};
+    }
     return handle_.isWorking(capturePid);
 }
 
@@ -87,6 +92,11 @@ void InputScreenCaptureAgent::RegisterListener(ScreenCaptureCallback callback)
         MMI_HILOGE("LoadLibrary fail");
         return;
     }
+    std::lock_guard<std::mutex> guard(agentMutex_);
+    if (handle_.registerListener == nullptr) {
+        MMI_HILOGE("registerListener is null");
+        return;
+    }
     handle_.registerListener(callback);
 }
 
@@ -94,6 +104,11 @@ bool InputScreenCaptureAgent::IsMusicActivate()
 {
     if (LoadAudioLibrary() != RET_OK) {
         MMI_HILOGE("LoadLibrary fail");
+        return false;
+    }
+    std::lock_guard<std::mutex> guard(agentMutex_);
+    if (handle_.isMusicActivate == nullptr) {
+        MMI_HILOGE("isMusicActivate is null");
         return false;
     }
     return handle_.isMusicActivate();
