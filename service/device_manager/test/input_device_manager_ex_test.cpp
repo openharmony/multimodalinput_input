@@ -54,6 +54,13 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
+
+class MockIDeviceObserver : public IDeviceObserver {
+public:
+    MOCK_METHOD1(OnDeviceAdded, void(int32_t deviceId));
+    MOCK_METHOD1(OnDeviceRemoved, void(int32_t deviceId));
+    MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
+};
  
 /**
  * @tc.name: NotifyDevCallback_Test_001
@@ -147,6 +154,29 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_002, TestSize.Leve
     inDevice.inputDeviceOrigin = &libDev;
     inDevice.sysUid = "test";
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevRemoveCallback(deviceId, inDevice));
+}
+
+/**
+ * @tc.name: NotifyDeviceAdded_Test_001
+ * @tc.desc: Test the function NotifyDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, NotifyDeviceAdded_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    auto observer = std::make_shared<MockIDeviceObserver>();
+    inputDevice.Attach(observer);
+    std::shared_ptr<IDeviceObserver> observerNull = nullptr;
+    inputDevice.Attach(observerNull);
+
+    int32_t deviceId = 600;
+    EXPECT_CALL(*observer, OnDeviceAdded(_)).Times(1);
+    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDeviceAdded(deviceId));
+
+    EXPECT_CALL(*observer, OnDeviceRemoved(_)).Times(1);
+    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDeviceRemoved(deviceId));
 }
 } // namespace MMI
 } // namespace OHOS
