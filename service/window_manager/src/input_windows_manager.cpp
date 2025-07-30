@@ -4277,7 +4277,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-            int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime);
+            int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime());
             if (timeDT > SIMULATE_EVENT_LATENCY) {
                 MMI_HILOGI("Not touchWindow simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
                     pointerEvent->GetId(), timeDT);
@@ -4413,7 +4413,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             dragPointerStyle_ = globalStyle_;
         }
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime);
+        int64_t timeDT = GetTimeToMilli(GetSysClockTime() - pointerEvent->GetActionTime());
         if (timeDT > SIMULATE_EVENT_LATENCY) {
             MMI_HILOGI("simulate event latency, pointerId:%{public}d, timeDT:%{public}" PRId64,
                 pointerEvent->GetId(), timeDT);
