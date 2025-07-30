@@ -116,6 +116,10 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnAddUser_01, TestSize.Level1)
     EventFwk::CommonEventData data;
     data.SetCode(accountId);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnAddUser(data));
+
+    auto ret = ACCOUNT_MGR->accounts_.emplace(accountId, std::make_unique<AccountManager::AccountSetting>(accountId));
+    EXPECT_FALSE(ret.second);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnAddUser(data));
 }
 
 /**
@@ -148,6 +152,22 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_01, TestSize.Level
 }
 
 /**
+ * @tc.name: AccountManagerTest_OnCommonEvent_02
+ * @tc.desc: Test the funcation OnCommonEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    std::string action = data.GetWant().GetAction();
+    auto func = [](const EventFwk::CommonEventData &) {};
+    ACCOUNT_MGR->handlers_[action] = func;
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnCommonEvent(data));
+}
+
+/**
  * @tc.name: AccountManagerTest_OnSwitchUser_01
  * @tc.desc: Test OnSwitchUser with empty account
  * @tc.type: FUNC
@@ -159,6 +179,9 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_01, TestSize.Level1
     int32_t accountId = TEST_ACCOUNT_ID_002;
     EventFwk::CommonEventData data;
     data.SetCode(accountId);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+
+    EXPECT_EQ(ACCOUNT_MGR->currentAccountId_, accountId);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
 }
 
@@ -195,6 +218,24 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting_001, Te
     auto accountSetting = ACCOUNT_MGR->GetCurrentAccountSetting();
     int32_t accountId = accountSetting.GetAccountId();
     EXPECT_EQ(accountId, MAIN_ACCOUNT_ID);
+}
+
+/**
+ * @tc.name: AccountManagerTest_GetCurrentAccountSetting_002
+ * @tc.desc: Test the funcation GetCurrentAccountSetting
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AccountManager accountManager;
+    accountManager.timerId_ = 0;
+    accountManager.currentAccountId_ = 10;
+    accountManager.accounts_.clear();
+    auto accountSetting = accountManager.GetCurrentAccountSetting();
+    EXPECT_EQ(accountManager.accounts_.size(), 1);
+    EXPECT_EQ(accountSetting.GetAccountId(), 10);
 }
 
 /**
@@ -549,5 +590,62 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_04, TestSize.L
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
+/**
+ * @tc.name: AccountManagerTest_OnReceiveEvent
+ * @tc.desc: Test the funcation OnReceiveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnReceiveEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    auto subscriber = ACCOUNT_MGR->subscriber_;
+    ASSERT_NE(subscriber, nullptr);
+    ASSERT_NO_FATAL_FAILURE(subscriber->OnReceiveEvent(data));
+}
+
+/**
+ * @tc.name: AccountManagerTest_Operator
+ * @tc.desc: Test the funcation operator=
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_Operator, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 3;
+    int32_t timeout = 5000;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accShortcutEnabled_ = true;
+    accountSetting.accShortcutEnabledOnScreenLocked_ = true;
+    accountSetting.accShortcutTimeout_ = timeout;
+    AccountManager::AccountSetting accountSetting1 = accountSetting;
+    EXPECT_EQ(accountSetting1.accountId_, accountId);
+    EXPECT_TRUE(accountSetting1.accShortcutEnabled_);
+    EXPECT_TRUE(accountSetting1.accShortcutEnabledOnScreenLocked_);
+    EXPECT_EQ(accountSetting1.accShortcutTimeout_, timeout);
+}
+
+/**
+ * @tc.name: AccountManagerTest_SetupMainAccount
+ * @tc.desc: Test the funcation SetupMainAccount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_SetupMainAccount, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ACCOUNT_MGR->accounts_.clear();
+    auto ret = ACCOUNT_MGR->accounts_.emplace(MAIN_ACCOUNT_ID,
+                                                    std::make_unique<AccountManager::AccountSetting>(MAIN_ACCOUNT_ID));
+    EXPECT_TRUE(ret.second);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->SetupMainAccount());
+
+    ret = ACCOUNT_MGR->accounts_.emplace(MAIN_ACCOUNT_ID,
+                                                    std::make_unique<AccountManager::AccountSetting>(MAIN_ACCOUNT_ID));
+    EXPECT_FALSE(ret.second);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->SetupMainAccount());
+}
 } // namespace MMI
 } // namespace OHOS
