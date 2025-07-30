@@ -272,6 +272,7 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   ]
 
   deps = [
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]

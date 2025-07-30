@@ -71,6 +71,8 @@ enum libinput_event_type {
     LIBINPUT_EVENT_POINTER_BUTTON,
     LIBINPUT_EVENT_POINTER_MOTION,
     LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
+    LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN,
+    LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END,
 
     LIBINPUT_EVENT_TOUCH_DOWN = 500,
     LIBINPUT_EVENT_TOUCH_UP,
@@ -342,6 +344,14 @@ uint32_t libinput_event_pointer_get_button(struct libinput_event_pointer *event)
 int libinput_event_pointer_has_axis(struct libinput_event_pointer *event, enum libinput_pointer_axis axis);
 
 double libinput_event_pointer_get_axis_value(struct libinput_event_pointer *event, enum libinput_pointer_axis axis);
+
+uint32_t libinput_event_pointer_get_button_area(struct libinput_event_pointer *event);
+
+double libinput_touchpad_device_get_ppi(struct libinput_device *device);
+
+double libinput_touchpad_device_get_hypot_size(struct libinput_device *device);
+
+int32_t libinput_touchpad_device_get_frequency(struct libinput_device *device);
 
 #ifdef __cplusplus
 }

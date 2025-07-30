@@ -999,6 +999,9 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     if (type != LIBINPUT_EVENT_TOUCHPAD_DOWN && type != LIBINPUT_EVENT_TOUCHPAD_UP) {
         CHKPR(data, ERROR_NULL_POINTER);
     }
+    if (pointerEvent_->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    }
     pointerEvent_->ClearAxisValue();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     isVirtualDeviceEvent_ = IsEventFromVirtualSource(event);
