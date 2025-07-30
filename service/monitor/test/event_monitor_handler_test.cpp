@@ -299,6 +299,40 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed_003, Test
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_MarkConsumed_004
+ * @tc.desc: Test Overrides the if (state.isMonitorConsumed_) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_POINTER;
+    int32_t deviceId = 1;
+    int32_t eventId = 10;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetDeviceId(deviceId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->bitwise_ = 0x00000000;
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(1);
+    item.SetPointerId(0);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+    eventMonitorHandler.HandlePointerEvent(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.MarkConsumed(eventId, session));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_HandleEvent
  * @tc.desc: Test Overrides the if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) branch
  * @tc.type: FUNC
@@ -1005,6 +1039,25 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump_003, TestSize.Lev
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_Dump_004
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.Dump(fd, args));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_CheckHasInputHandler_001
  * @tc.desc: Test CheckHasInputHandler
  * @tc.type: FUNC
@@ -1045,6 +1098,40 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_002
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
     handlerType = InputHandlerType::NONE;
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveInputHandler_003
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_TOUCH;
+    std::shared_ptr<IInputEventHandler::IInputEventConsumer> callback = std::make_shared<MyInputEventConsumer>();
+    eventMonitorHandler.AddInputHandler(handlerType, eventType, callback);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveInputHandler_004
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_TOUCH;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
 }
 
 /**
@@ -1383,6 +1470,44 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_002, Tes
     ASSERT_FALSE(ret);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+/**
+ * @tc.name: EventMonitorHandlerTest_OnHandleEvent_003
+ * @tc.desc: Test OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t deviceId = 1;
+    pointerEvent->SetDeviceId(deviceId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->bitwise_ = 0x00000002;
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(1);
+    item.SetPointerId(0);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+    eventMonitorHandler.HandlePointerEvent(pointerEvent);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 /**
