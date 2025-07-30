@@ -53,6 +53,7 @@ std::string KeyEventInputSubscribeManager::MonitorIdentity::Dump() const
 
 bool KeyEventInputSubscribeManager::MonitorIdentity::Want(std::shared_ptr<KeyEvent> keyEvent) const
 {
+    CHKPF(keyEvent);
     return ((key_ == keyEvent->GetKeyCode()) &&
             (action_ == keyEvent->GetKeyAction()) &&
             (isRepeat_ ||

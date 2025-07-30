@@ -420,6 +420,7 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
     napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers)
 {
+    CHKPF(monitor);
     if ((monitor->GetTypeName() == typeName) && (typeName == "keyPressed" || monitor->GetFingers() == fingers)) {
         if (monitor->IsMatch(jsEnv, callback) == RET_OK) {
             return true;
@@ -431,6 +432,7 @@ bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMo
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
     napi_env jsEnv, const std::string &typeName, const int32_t fingers)
 {
+    CHKPF(monitor);
     if ((monitor->GetTypeName() == typeName) && (typeName == "keyPressed" || monitor->GetFingers() == fingers)) {
         if (monitor->IsMatch(jsEnv) == RET_OK) {
             return true;

@@ -153,6 +153,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetPointerVisible(env, visible);
     }
@@ -186,6 +187,7 @@ napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->SetPointerVisibleSync(env, visible);
 }
 
@@ -199,6 +201,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc < 1) {
         return jsPointerMgr->IsPointerVisible(env);
     }
@@ -217,6 +220,7 @@ napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->IsPointerVisibleSync(env);
 }
 
@@ -241,6 +245,7 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetPointerColor(env, color);
     }
@@ -261,6 +266,7 @@ napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc < 1) {
         return jsPointerMgr->GetPointerColor(env);
     }
@@ -294,6 +300,7 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->SetPointerColorSync(env, color);
 }
 
@@ -303,6 +310,7 @@ napi_value JsPointerContext::GetPointerColorSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->GetPointerColorSync(env);
 }
 
@@ -332,6 +340,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetPointerSpeed(env, pointerSpeed);
     }
@@ -369,6 +378,7 @@ napi_value JsPointerContext::SetPointerSpeedSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->SetPointerSpeedSync(env, pointerSpeed);
 }
 
@@ -381,6 +391,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc < 1) {
         return jsPointerMgr->GetPointerSpeed(env);
     }
@@ -399,6 +410,7 @@ napi_value JsPointerContext::GetPointerSpeedSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->GetPointerSpeedSync(env);
 }
 
@@ -428,6 +440,7 @@ napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetMouseScrollRows(env, rows);
     }
@@ -498,6 +511,7 @@ napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetPointerLocation(env, x, y);
     }
@@ -529,6 +543,7 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     bool isEx = CheckIsSetCustomCursorEx(env, argc, argv);
     if (isEx) {
         napi_value result = SetCustomCursorEx(env, jsPointerMgr, windowId, argc, argv);
@@ -592,6 +607,7 @@ napi_value JsPointerContext::SetCustomCursorSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     CursorFocus cursorFocus;
     if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetCustomCursorSync(env, windowId, (void *)pixelMap.get(), cursorFocus);
@@ -711,6 +727,7 @@ napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetPointerSize(env, size);
     }
@@ -769,6 +786,7 @@ napi_value JsPointerContext::SetPointerSizeSync(napi_env env, napi_callback_info
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->SetPointerSizeSync(env, size);
 }
 
@@ -819,6 +837,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle);
     }
@@ -868,6 +887,7 @@ napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->SetPointerStyleSync(env, windowid, pointerStyle);
 }
 
@@ -897,6 +917,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->GetPointerStyle(env, windowid);
     }
@@ -934,6 +955,7 @@ napi_value JsPointerContext::GetPointerStyleSync(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->GetPointerStyleSync(env, windowId);
 }
 
@@ -1155,6 +1177,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->EnterCaptureMode(env, windowId);
     }
@@ -1186,6 +1209,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->LeaveCaptureMode(env, windowId);
     }
@@ -1241,6 +1265,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetMousePrimaryButton(env, primaryButton);
     }
@@ -1261,6 +1286,7 @@ napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc < 1) {
         return jsPointerMgr->GetMousePrimaryButton(env);
     }
@@ -1294,6 +1320,7 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     if (argc == 1) {
         return jsPointerMgr->SetHoverScrollState(env, state);
     }
@@ -1698,6 +1725,7 @@ napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callba
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
     return jsPointerMgr->EnableHardwareCursorStats(env, enable);
 }
 
