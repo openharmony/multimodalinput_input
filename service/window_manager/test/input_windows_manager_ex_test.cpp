@@ -1521,6 +1521,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_013, TestSize.Level1)
     PointerEvent::PointerItem item;
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateMouseTarget(pointerEvent));
     it->second.displaysInfo.clear();
     inputWindowsManager->dragFlag_ = false;
@@ -4677,6 +4678,103 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest0
     EXPECT_CALL(*messageParcelMock_, HandleHardwareCursor(_, _, _)).WillOnce(Return(std::vector<int32_t>({ 1 })));
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
     EXPECT_EQ(inputWindowsManager->UpdateMouseTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest018
+ * @tc.desc: Test the function UpdateMouseTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTargetTest018, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 1024;
+    displayInfo.height = 768;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.direction = Direction::DIRECTION180;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(300);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    EXPECT_CALL(*messageParcelMock_, UpdateDisplayId(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, SelectWindowInfo(_, _, _)).WillOnce(Return(std::nullopt));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    EXPECT_EQ(inputWindowsManager->UpdateMouseTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTargetTest019
+ * @tc.desc: Test the function UpdateMouseTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_019, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetMouseDisplayState()).WillRepeatedly(Return(true));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.id = -1;
+    windowInfo.pid = 11;
+    windowInfo.transform.push_back(1.1);
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    inputWindowsManager->mouseDownInfo_.id = 1;
+    inputWindowsManager->dragFlag_ = true;
+    inputWindowsManager->isDragBorder_ = true;
+    inputWindowsManager->isUiExtension_ = false;
+    it->second.focusWindowId = -1;
+    inputWindowsManager->captureModeInfo_.isCaptureMode = true;
+    inputWindowsManager->captureModeInfo_.windowId = -1;
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.displayDirection = DIRECTION90;
+    it->second.displaysInfo.push_back(displayInfo);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateMouseTarget(pointerEvent));
+    it->second.displaysInfo.clear();
+    inputWindowsManager->dragFlag_ = false;
+    inputWindowsManager->isDragBorder_ = false;
+    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->captureModeInfo_.isCaptureMode = false;
+    inputWindowsManager->mouseDownInfo_.id = -1;
+    inputWindowsManager->udsServer_ = nullptr;
+    it->second.windowsInfo.clear();
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->extraData_.sourceType = -1;
 }
 
 #endif /* OHOS_BUILD_ENABLE_POINTER */

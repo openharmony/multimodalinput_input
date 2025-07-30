@@ -4264,14 +4264,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             } else {
                 CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             }
-            if (GetHardCursorEnabled()) {
-                std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
-                CHKFR((cursorPos.size() >= CURSOR_POSITION_EXPECTED_SIZE), RET_ERR, "cursorPos is invalid");
-                CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
-                    cursorPos[0], cursorPos[1]);
-            } else {
-                CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
-                    physicalX, physicalY);
+            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+                if (GetHardCursorEnabled()) {
+                    std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
+                    CHKFR((cursorPos.size() >= CURSOR_POSITION_EXPECTED_SIZE), RET_ERR, "cursorPos is invalid");
+                    CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
+                        cursorPos[0], cursorPos[1]);
+                } else {
+                    CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
+                        physicalX, physicalY);
+                }
             }
             MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
@@ -4400,7 +4402,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
+    if (IsMouseDrawing(pointerEvent->GetPointerAction()) &&
+        (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))) {
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) ||
             pointerItem.GetMoveFlag() == POINTER_MOVEFLAG) {
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
