@@ -4815,15 +4815,9 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    double physicalX = 0;
-    double physicalY = 0;
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-        physicalX = pointerItem.GetDisplayX();
-        physicalY = pointerItem.GetDisplayY();
-    } else {
-        physicalX = pointerItem.GetDisplayXPos();
-        physicalY = pointerItem.GetDisplayYPos();
-    }
+    double physicalX = pointerItem.GetDisplayXPos();
+    double physicalY = pointerItem.GetDisplayYPos();
+
     for (auto &item : windowsInfo) {
         if (IsValidNavigationWindow(item, physicalX, physicalY) &&
             !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION) && pointerEvent->GetZOrder() <= 0) {
@@ -4967,6 +4961,8 @@ void InputWindowsManager::ProcessInjectEventGlobalXY(std::shared_ptr<PointerEven
             pointerEvent->SetTargetDisplayId(display.id);
             pointerItem.SetDisplayX(static_cast<int32_t>(globalX - display.x));
             pointerItem.SetDisplayY(static_cast<int32_t>(globalY - display.y));
+            pointerItem.SetDisplayXPos(globalX - display.x);
+            pointerItem.SetDisplayYPos(globalY - display.y);
             pointerEvent->UpdatePointerItem(pointerId, pointerItem);
             return;
         }
@@ -5000,15 +4996,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    double physicalX = 0;
-    double physicalY = 0;
-    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-        physicalX = pointerItem.GetDisplayX();
-        physicalY = pointerItem.GetDisplayY();
-    } else {
-        physicalX = pointerItem.GetDisplayXPos();
-        physicalY = pointerItem.GetDisplayYPos();
-    }
+    double physicalX = pointerItem.GetDisplayXPos();
+    double physicalY = pointerItem.GetDisplayYPos();
+
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
         AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
     }

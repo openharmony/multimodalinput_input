@@ -563,8 +563,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_02, T
     pointerEvent->targetDisplayId_ = 10;
     pointerEvent->targetWindowId_ = 5;
     PointerEvent::PointerItem item;
-    item.displayX_ = 10;
-    item.displayY_ = 15;
+    item.SetDisplayX(10);
+    item.SetDisplayY(15);
 
     InputWindowsManager inputWindowsManager;
     WindowGroupInfo windowGroupInfo;
@@ -582,8 +582,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_02, T
     pointerEvent->targetWindowId_ = 1;
     int32_t rightDownX = 30;
     int32_t rightDownY = 40;
-    EXPECT_TRUE(item.displayX_ <= rightDownX);
-    EXPECT_TRUE(item.displayY_ <= rightDownY);
+    EXPECT_TRUE(item.GetDisplayX() <= rightDownX);
+    EXPECT_TRUE(item.GetDisplayY() <= rightDownY);
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
     ASSERT_FALSE(handler.CheckInputMethodArea(pointerEvent));
 
@@ -3836,8 +3836,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     PointerEvent::PointerItem item;
-    item.displayX_ = 8.0;
-    item.displayY_ = 8.0;
+    item.SetDisplayX(8.0);
+    item.SetDisplayY(8.0);
     handler.gestureLastX_ = 4.0;
     handler.gestureLastY_ = 4.0;
     handler.isGesturing_ = false;
