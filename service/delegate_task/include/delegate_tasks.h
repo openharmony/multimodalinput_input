@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace MMI {
 using DTaskCallback = std::function<int32_t()>;
-class DelegateTasks final : public IdFactory<int32_t> {
+class DelegateTasks {
 public:
     struct TaskData {
         uint64_t tid { 0 };
@@ -40,12 +40,12 @@ public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
         using TaskPtr = std::shared_ptr<DelegateTasks::Task>;
-        Task(int32_t id, DTaskCallback fun, std::shared_ptr<Promise> promise = nullptr)
+        Task(uint64_t id, DTaskCallback fun, std::shared_ptr<Promise> promise = nullptr)
             : id_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
         void ProcessTask();
 
-        int32_t GetId() const
+        uint64_t GetId() const
         {
             return id_;
         }
@@ -60,7 +60,7 @@ public:
 
     private:
         std::atomic_bool hasWaited_ { false };
-        int32_t id_ { 0 };
+        uint64_t id_ { 0 };
         DTaskCallback fun_;
         std::shared_ptr<Promise> promise_ { nullptr };
     };
@@ -97,8 +97,9 @@ private:
 private:
     uint64_t workerThreadId_ { 0 };
     int32_t fds_[2] = {};
-    std::mutex mux_;
+    std::timed_mutex mux_;
     std::queue<TaskPtr> tasks_;
+    uint64_t id_ {0};
 };
 } // namespace MMI
 } // namespace OHOS
