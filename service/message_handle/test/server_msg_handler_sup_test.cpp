@@ -20,9 +20,9 @@
 #include <gtest/gtest.h>
 
 #include "image_source.h"
-#include "running_process_info.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
+#include "running_process_info.h"
 
 #include "authorize_helper.h"
 #include "define_multimodal.h"
