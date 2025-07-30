@@ -289,7 +289,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         double displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height, CONST_TWO));
         if (displayInfo->validWidth != static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
             displayInfo->validHeight != static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
-            (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
+            (displayInfo->validWidth != displayInfo->width || displayInfo->validHeight != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
