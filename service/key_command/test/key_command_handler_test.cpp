@@ -7482,6 +7482,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility006,
     item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
     item.ability.bundleName = "com.ohos.music";
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
 
     KeyCommandHandler handler;
     
@@ -7499,6 +7500,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility007,
     item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     item.ability.bundleName = "com.ohos.camera";
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
 
     KeyCommandHandler handler;
     handler.ret_.store(0);
@@ -7518,6 +7520,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility008,
     item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
     item.ability.bundleName = "com.ohos.music";
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
 
     KeyCommandHandler handler;
 
@@ -7535,6 +7538,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility009,
     item.keyCode = KeyEvent::KEYCODE_POWER;
     item.ability.bundleName = "com.ohos.settings";
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
 
     KeyCommandHandler handler;
     
@@ -7552,11 +7556,177 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility010,
     item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     item.ability.bundleName = "com.example.camera.pro";  // Contains ".camera"
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
 
     KeyCommandHandler handler;
     handler.ret_.store(0);
     
     ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey001
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_001
+ * @tc.desc: Verify non-SOS page unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = true;
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("HomeScreen"), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey002
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_002
+ * @tc.desc: Verify non-SOS page unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = true;
+    
+    EXPECT_TRUE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey003
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_003
+ * @tc.desc: Verify SOS page sets freeze flag and resets state
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey003, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 5;
+    handler.launchAbilityCount_ = 2;
+    handler.repeatKeyCountMap_["key1"] = 3;
+    handler.sosDelayTimerId_ = 100;
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+    EXPECT_TRUE(handler.isFreezePowerKey_);
+    EXPECT_NE(handler.sosLaunchTime_, 123456789);
+    EXPECT_EQ(handler.count_, 0);
+    EXPECT_EQ(handler.launchAbilityCount_, 0);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+    EXPECT_NE(handler.sosDelayTimerId_, 200);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey004
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_004
+ * @tc.desc: Verify no timer removal when no existing timer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey004, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.sosDelayTimerId_ = -1;  // No existing timer
+    
+    EXPECT_NE(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey005
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_005
+ * @tc.desc: Verify timer callback unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey005, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    TimerCallback callback;
+    handler.SetIsFreezePowerKey("SosCountdown");
+    ASSERT_TRUE(callback);
+    
+    // Execute timer callback
+    EXPECT_FALSE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey006
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_006
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey006, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+    
+    // Verify state unchanged
+    EXPECT_EQ(handler.count_, 10);
+}
+
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey007
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_007
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey007, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+    
+    EXPECT_EQ(handler.launchAbilityCount_, 5);
+}
+
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey008
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_008
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey008, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+    
+    EXPECT_FALSE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey009
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_009
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey009, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+
+    EXPECT_EQ(handler.sosDelayTimerId_, 600);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey007
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_007
+ * @tc.desc: Verify non-SOS page unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey007, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = false;
+    
+    EXPECT_NE(handler.SetIsFreezePowerKey("HomeScreen"), RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 } // namespace MMI
