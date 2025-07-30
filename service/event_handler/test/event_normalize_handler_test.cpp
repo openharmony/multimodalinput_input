@@ -890,6 +890,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
         EXPECT_NO_FATAL_FAILURE(handler.HandleTouchEvent(event, frameTime));
         event = libinput_.Dispatch();
     }
+}
 
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_001, TestSize.Level1)
 {
