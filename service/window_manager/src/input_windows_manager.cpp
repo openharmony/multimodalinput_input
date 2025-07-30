@@ -2133,7 +2133,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
         }
         if (windowInfo == std::nullopt) {
-            MMI_HILOG("The windowInfo is nullptr");
+            MMI_HILOGE("The windowInfo is nullptr");
             DrawPointer(isDisplayRemoved);
             return;
         }
