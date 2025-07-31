@@ -77,6 +77,29 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_HandlePointerEve
 }
 
 /**
+ * @tc.name: EventPreMonitorHandlerTest_HandlePointerEvent_002
+ * @tc.desc: Test Overrides the if (HandlePointerEvent(pointerEvent)) branch of the HandlePointerEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_HandlePointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t deviceId = 1;
+    pointerEvent->bitwise_ = PointerEvent::EVENT_FLAG_NONE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(deviceId);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(deviceId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(eventPreMonitorHandler.HandlePointerEvent(pointerEvent));
+}
+
+/**
  * @tc.name: EventPreMonitorHandlerTest_HandleTouchEvent_001
  * @tc.desc: Test Overrides the if (HandleTouchEvent(pointerEvent)) branch of the HandleTouchEvent function
  * @tc.type: FUNC
@@ -88,6 +111,29 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_HandleTouchEvent
     EventPreMonitorHandler eventPreMonitorHandler;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(eventPreMonitorHandler.HandleTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventPreMonitorHandlerTest_HandleTouchEvent_002
+ * @tc.desc: Test Overrides the if (HandleTouchEvent(pointerEvent)) branch of the HandleTouchEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_HandleTouchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler eventPreMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t deviceId = 1;
+    pointerEvent->bitwise_ = PointerEvent::EVENT_FLAG_NONE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(deviceId);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(deviceId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->AddPointerItem(item);
     ASSERT_NO_FATAL_FAILURE(eventPreMonitorHandler.HandleTouchEvent(pointerEvent));
 }
 
@@ -272,7 +318,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_AddMonitor_001, 
 }
 
 /**
- * @tc.name: EventPreMonitorHandlerTest_RemoveMonitor_001
+ * @tc.name: EventPreMonitorHandlerTest_RemoveMonitor_002
  * @tc.desc: Verify the invalid and valid event type of RemoveMonitor
  * @tc.type: FUNC
  * @tc.require:
@@ -299,7 +345,7 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_RemoveMonitor_00
 }
 
 /**
- * @tc.name: EventPreMonitorHandlerTest_IsEqualsKeys_001
+ * @tc.name: EventPreMonitorHandlerTest_IsEqualsKeys_003
  * @tc.desc: Verify the invalid and valid event type of IsEqualsKeys
  * @tc.type: FUNC
  * @tc.require:
@@ -589,5 +635,23 @@ HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_OnHandleEvent_00
     ASSERT_FALSE(ret);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+/**
+ * @tc.name: EventPreMonitorHandlerTest_OnHandleEvent_002
+ * @tc.desc: Test Overrides the if (OnHandleEvent(PointerEvent)) branch of the OnHandleEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventPreMonitorHandlerTest, EventPreMonitorHandlerTest_HandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventPreMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    bool ret = monitorCollection.HandleEvent(pointerEvent);
+    ASSERT_FALSE(ret);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
