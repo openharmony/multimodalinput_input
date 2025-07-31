@@ -107,5 +107,29 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor, T
     int32_t deviceId = 2;
     ASSERT_EQ(joystickEvent->FindProcessor(deviceId), nullptr);
 }
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_FindProcessor_002
+ * @tc.desc: Test FindProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto joystickEvent = new JoystickEventNormalize();
+    int32_t deviceId = 2;
+    struct libinput_device libDev {
+        .udevDev { 2 },
+        .busType = 1,
+        .version = 1,
+        .product = 1,
+        .vendor = 1,
+        .name = "test",
+    };
+    auto joystickEventProcessor = std::make_shared<JoystickEventProcessor>(deviceId);
+    joystickEvent->processors_.insert(std::make_pair(&libDev, joystickEventProcessor));
+    ASSERT_EQ(joystickEvent->FindProcessor(deviceId), joystickEventProcessor);
+}
 } // namespace MMI
 } // namespace OHOS
