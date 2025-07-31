@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int32_t TIMED_WAIT = 2;
+    constexpr int32_t TIMED_WAIT_MS = 2;
 } // namespace
 void DelegateTasks::Task::ProcessTask()
 {
@@ -90,7 +90,7 @@ void DelegateTasks::ProcessTasks()
         it->ProcessTask();
     }
     std::vector<DelegateTasks::TaskData> datas = {};
-    datas.reserve(count);
+    datas.resize(count);
     auto res = read(fds_[0], datas.data(), sizeof(DelegateTasks::TaskData) * count);
     if (res == -1) {
         MMI_HILOGW("Read failed erron:%{public}d", errno);
@@ -137,7 +137,7 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     static constexpr int32_t onceProcessTaskLimit = 10;
-    if (mux_.try_lock_for(std::chrono::milliseconds(TIMED_WAIT))) {
+    if (mux_.try_lock_for(std::chrono::milliseconds(TIMED_WAIT_MS))) {
         for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
             if (tasks_.empty()) {
                 break;
