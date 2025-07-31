@@ -67,6 +67,26 @@ HWTEST_F(MMIClientTest, MarkIsEventHandlerChanged_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MarkIsEventHandlerChanged_002
+ * @tc.desc: Mark if eventHandler has changed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MarkIsEventHandlerChanged_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    std::string threadName1 = "mmi_client_test_1";
+    auto eventRunner1 = AppExecFwk::EventRunner::Create(threadName1);
+    EventHandlerPtr eventHandler1 = std::make_shared<AppExecFwk::EventHandler>(eventRunner1);
+    mmiClient.SetEventHandler(eventHandler1);
+    std::string threadName2 = "mmi_client_test_2";
+    auto eventRunner2 = AppExecFwk::EventRunner::Create(threadName2);
+    EventHandlerPtr eventHandler2 = std::make_shared<AppExecFwk::EventHandler>(eventRunner2);
+    ASSERT_NO_FATAL_FAILURE(mmiClient.SetEventHandler(eventHandler2));
+}
+
+/**
  * @tc.name: RegisterConnectedFunction
  * @tc.desc: Verify register connected
  * @tc.type: FUNC
