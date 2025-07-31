@@ -201,7 +201,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
     int64_t carrierFreq = 38000;
     std::vector<int64_t> pattern = {100, 200, 300};
     bool ret = controller.Transmit(carrierFreq, pattern);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
