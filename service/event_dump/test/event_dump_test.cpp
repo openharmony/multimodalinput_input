@@ -47,6 +47,7 @@ public:
     void SetUp() override
     {
         fd_ = open(TEST_FILE_NAME.c_str(), O_WRONLY);
+        ASSERT_NE(MMIEventDump, nullptr) << "MMIEventDump is null, cannot run test case";
     }
 
     void TearDown() override
@@ -497,19 +498,25 @@ HWTEST_F(EventDumpTest, EventDumpTest_DumpHelp_001, TestSize.Level1)
     const char *tmpFile = "/data/tmp_dumphelp.log";
     int fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
     ASSERT_GE(fd, 0);
+    ASSERT_NE(MMIEventDump, nullptr);
     MMIEventDump->DumpHelp(fd);
     close(fd);
     std::string content;
     {
         int fdRead = open(tmpFile, O_RDONLY);
         ASSERT_GE(fdRead, 0);
-        char buf[1024];
+        char buf[1024] = {};
         ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
         ASSERT_GT(bytes, 0);
-        buf[bytes] = '\0';
+        if (bytes < static_cast<ssize_t>(sizeof(buf))) {
+            buf[bytes] = '\0';
+        } else {
+            buf[sizeof(buf) - 1] = '\0';
+        }
         content = buf;
         close(fdRead);
     }
+
     EXPECT_NE(content.find("-h, --help"), std::string::npos);
     EXPECT_NE(content.find("-d, --device"), std::string::npos);
     EXPECT_NE(content.find("-l, --devicelist"), std::string::npos);
@@ -528,19 +535,24 @@ HWTEST_F(EventDumpTest, EventDumpTest_DumpEventHelp_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const char *tmpFile = "/data/tmp_dumpeventhelp.log";
-    int fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    int32_t fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
     ASSERT_GE(fd, 0);
+    ASSERT_NE(MMIEventDump, nullptr);
     std::vector<std::string> args = {"-h"};
     MMIEventDump->DumpEventHelp(fd, args);
     close(fd);
     std::string content;
     {
-        int fdRead = open(tmpFile, O_RDONLY);
+        int32_t fdRead = open(tmpFile, O_RDONLY);
         ASSERT_GE(fdRead, 0);
-        char buf[1024];
+        char buf[1024] = {};
         ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
         ASSERT_GT(bytes, 0);
-        buf[bytes] = '\0';
+        if (bytes < static_cast<ssize_t>(sizeof(buf))) {
+            buf[bytes] = '\0';
+        } else {
+            buf[sizeof(buf) - 1] = '\0';
+        }
         content = buf;
         close(fdRead);
     }
