@@ -515,6 +515,9 @@ static int32_t HandleMouseProperty(const struct Input_MouseEvent* mouseEvent,
     if (globalX != INT_MAX && globalY != INT_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
+    } else {
+        item.SetGlobalX(DBL_MAX);
+        item.SetGlobalY(DBL_MAX);
     }
     g_mouseEvent->SetPointerId(0);
     g_mouseEvent->UpdatePointerItem(g_mouseEvent->GetPointerId(), item);
@@ -833,13 +836,13 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
 }
 
 static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
-    OHOS::MMI::PointerEvent::PointerItem &item)
+    OHOS::MMI::PointerEvent::PointerItem &item, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     int32_t id = touchEvent->id;
     int32_t screenX = touchEvent->displayX;
     int32_t screenY = touchEvent->displayY;
-    if (screenX < 0 || screenY < 0) {
+    if (useCoordinate == PointerEvent::DISPLAY_COORDINATE && (screenX < 0 || screenY < 0)) {
         MMI_HILOGE("touch parameter is less 0, can not process");
         return INPUT_PARAMETER_ERROR;
     }
@@ -852,6 +855,9 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     if (globalX != INT_MAX && globalY != INT_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
+    } else {
+        item.SetGlobalX(DBL_MAX);
+        item.SetGlobalY(DBL_MAX);
     }
     item.SetPointerId(id);
     g_touchEvent->SetPointerId(id);
@@ -875,7 +881,7 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent)
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
-    result = HandleTouchProperty(touchEvent, item);
+    result = HandleTouchProperty(touchEvent, item, PointerEvent::DISPLAY_COORDINATE);
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
@@ -904,7 +910,7 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
-    result = HandleTouchProperty(touchEvent, item);
+    result = HandleTouchProperty(touchEvent, item, PointerEvent::GLOBAL_COORDINATE);
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
