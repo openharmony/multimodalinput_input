@@ -2724,6 +2724,125 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HangUpCallProcess, T
  * @tc.type: FUNC
  * @tc.require:
  */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = false;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = true;
+    handler.callEndKeyUp_ = false;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = true;
+    handler.callEndKeyUp_ = true;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ret = handler.HandleCallEnded(keyEvent);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
++HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = true;
+    handler.callEndKeyUp_ = true;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CAMERA);
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = true;
+    handler.callEndKeyUp_ = false;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = false;
+    handler.callBahaviorState_ = true;
+    handler.callEndKeyUp_ = false;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    DEVICE_MONITOR->callState_ = CALL_STATUS_DISCONNECTED;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
