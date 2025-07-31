@@ -597,7 +597,7 @@ int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEven
         true, PointerEvent::GLOBAL_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
-        return result;
+        return INPUT_PERMISSION_DENIED;
     }
     return INPUT_SUCCESS;
 }
@@ -927,6 +927,10 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
             MMI_HILOGD("This touch event is final finger up remove this finger");
             g_touchEvent->Reset();
         }
+    }
+    if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
+        MMI_HILOGE("Permission denied or occupied by other");
+        return INPUT_PERMISSION_DENIED;
     }
     return INPUT_SUCCESS;
 }
