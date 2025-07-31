@@ -98,6 +98,7 @@ public:
     bool CheckFilterMouseEvent(struct libinput_event *event);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     int32_t SetMouseAccelerateMotionSwitch(bool enable);
+    void OnDeviceRemoved();
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
