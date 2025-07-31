@@ -213,5 +213,149 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_LoadTouchDrawingHandle
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->LoadTouchDrawingHandler());
     EXPECT_NE(TOUCH_DRAWING_MGR->GetTouchDrawingHandler(), nullptr);
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_TouchDrawHandler
+ * @tc.desc: Test TouchDrawHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.width = 10;
+    displayInfo.height = 20;
+    displayInfo.validWidth = displayInfo.width;
+    displayInfo.validHeight = displayInfo.height;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.name = "Main Display";
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateDisplayInfo(displayInfo));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateLabels
+ * @tc.desc: Test UpdateLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = true;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
+
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateBubbleData
+ * @tc.desc: Test UpdateBubbleData
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateBubbleData, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = true;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateBubbleData());
+
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateBubbleData());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsWindowRotation
+ * @tc.desc: Test IsWindowRotation
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsWindowRotation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->IsWindowRotation());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_SetDelegateProxy
+ * @tc.desc: Test SetDelegateProxy
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetDelegateProxy, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    std::shared_ptr<DelegateInterface> proxy;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetDelegateProxy(proxy));
+    EXPECT_EQ(TOUCH_DRAWING_MGR->delegateProxy_, proxy);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_SetMultiWindowScreenId
+ * @tc.desc: Test SetMultiWindowScreenId
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetMultiWindowScreenId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    uint64_t screenId = 1000;
+    uint64_t displayNodeScreenId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    std::shared_ptr<DelegateInterface> proxy;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId));
+}
 } // namespace MMI
 } // namespace OHOS
