@@ -239,16 +239,20 @@ void PointerDrawingManager::DestroyPointerWindow()
     CALL_INFO_TRACE;
     CHKPV(delegateProxy_);
     delegateProxy_->OnPostSyncTask([this] {
-        auto surfaceNodePtr = GetSurfaceNode();
-        if (surfaceNodePtr != nullptr) {
+        {
+            auto surfaceNodePtr = GetSurfaceNode();
+            if (surfaceNodePtr == nullptr) {
+                MMI_HILOGW("SurfaceNode pointer is nullptr.");
+                return RET_OK;
+            }
             MMI_HILOGI("Pointer window destroy start screenId_ %{public}" PRIu64, screenId_);
             g_isRsRemoteDied = false;
             surfaceNodePtr->DetachToDisplay(screenId_);
             SetSurfaceNode(nullptr);
             MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
-            MMI_HILOGI("Pointer window destroy success");
         }
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGI("Pointer window destroy success");
         return RET_OK;
     });
 }
