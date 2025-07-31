@@ -914,14 +914,15 @@ void InputDeviceManager::PointerDeviceInit()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (POINTER_DEV_MGR.renderServiceIsOk) {
-        CursorDrawingComponent::GetInstance().InitPointerCallback();
-    }
-    if (POINTER_DEV_MGR.displayManagerServiceSaIdIsOk) {
-        CursorDrawingComponent::GetInstance().InitScreenInfo();
-        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
-    }
+    CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
+    POINTER_DEV_MGR.isFirstAddCommonEventService = false;
+    CursorDrawingComponent::GetInstance().InitPointerCallback();
+    POINTER_DEV_MGR.isFirstAddRenderService = false;
+    CursorDrawingComponent::GetInstance().InitScreenInfo();
+    CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
+    POINTER_DEV_MGR.isFirstAddDisplayManagerService = false;
     CursorDrawingComponent::GetInstance().InitPointerObserver();
+    POINTER_DEV_MGR.isFirstAdddistributedKVDataService = false;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     POINTER_DEV_MGR.isInit = true;
 }
