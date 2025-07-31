@@ -356,6 +356,9 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     return pointerEvent_;
 }
 
+void TouchTransformProcessor::OnDeviceRemoved()
+{}
+
 int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *data,
     struct libinput_device *device)
 {

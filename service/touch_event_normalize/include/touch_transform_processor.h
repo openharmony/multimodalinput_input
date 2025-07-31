@@ -30,6 +30,7 @@ public:
     ~TouchTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
+    void OnDeviceRemoved() override;
 
 private:
     bool OnEventTouchDown(struct libinput_event *event);

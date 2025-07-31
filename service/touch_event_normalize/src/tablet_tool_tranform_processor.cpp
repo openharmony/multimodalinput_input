@@ -79,6 +79,9 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
     return pointerEvent_;
 }
 
+void TabletToolTransformProcessor::OnDeviceRemoved()
+{}
+
 int32_t TabletToolTransformProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
 {
     int32_t toolType = libinput_event_tablet_tool_get_tool_type(tabletEvent);

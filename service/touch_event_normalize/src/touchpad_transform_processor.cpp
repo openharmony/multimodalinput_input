@@ -732,6 +732,9 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
     return pointerEvent_;
 }
 
+void TouchPadTransformProcessor::OnDeviceRemoved()
+{}
+
 void TouchPadTransformProcessor::RemoveSurplusPointerItem()
 {
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent_->GetAllPointerItems();
