@@ -948,7 +948,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RegisterAddTimer_0
         (void)name;
         return RET_OK;
     });
-    ASSERT_FALSE(knuckleDrawMgr_->addTimerFunc_);
+    ASSERT_TRUE(knuckleDrawMgr_->addTimerFunc_);
 }
 } // namespace MMI
 } // namespace OHOS

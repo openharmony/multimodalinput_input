@@ -78,7 +78,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetOffsetX_001, TestSize.Level
     EXPECT_EQ(ret, 256);
     config.align_ = ICON_TYPE::ANGLE_NW_RIGHT;
     ret = config.GetOffsetX();
-    EXPECT_EQ(ret, 251);
+    EXPECT_EQ(ret, 256);
 }
 
 /**

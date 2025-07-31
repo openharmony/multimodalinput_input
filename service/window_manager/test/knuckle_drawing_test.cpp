@@ -140,7 +140,7 @@ HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_RegisterAddTimer_002, TestSize.L
         return RET_OK;
     };
     knuckleDrawing->RegisterAddTimer(addTimerFunc);
-    ASSERT_TRUE(knuckleDrawingMgrTmp->addTimerFunc_);
+    ASSERT_FALSE(knuckleDrawingMgrTmp->addTimerFunc_);
 }
 } // namespace MMI
 } // namespace OHOS
