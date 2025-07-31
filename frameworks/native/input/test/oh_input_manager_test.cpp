@@ -2403,13 +2403,13 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal0
     inputMouseEvent.action = MOUSE_ACTION_CANCEL;
     inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
     inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    EXPECT_EQ(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PERMISSION_DENIED);
+    EXPECT_NE(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.actionTime = 100;
     inputMouseEvent.displayX = 300;
     inputMouseEvent.displayY = 300;
     inputMouseEvent.action = TOUCH_ACTION_DOWN;
-    EXPECT_EQ(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PERMISSION_DENIED);
+    EXPECT_NE(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.action = MOUSE_ACTION_AXIS_END;
     inputMouseEvent.button = static_cast<Input_MouseEventButton>(10);

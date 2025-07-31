@@ -240,7 +240,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     pointerStyle.id = 1;
     bool isUiExtension = false;
     int32_t ret = instance_->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
-    EXPECT_EQ(ret,RET_ERR);
+    EXPECT_EQ(ret, RET_ERR);
 
     EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
 
