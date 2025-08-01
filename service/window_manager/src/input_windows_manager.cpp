@@ -2844,9 +2844,9 @@ void InputWindowsManager::RotateScreen90(const OLD::DisplayInfo& info, PhysicalC
     double oldY = coord.y;
     double temp = coord.x;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        coord.x = info.validHeight - coord.y;
+        coord.x = info.validHeight - 1 - coord.y;
     } else {
-        coord.x = info.validWidth - coord.y;
+        coord.x = info.validWidth - 1 - coord.y;
     }
     coord.y = temp;
     MMI_HILOGD("DIRECTION90, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
@@ -2888,17 +2888,17 @@ void InputWindowsManager::RotateScreen(const OLD::DisplayInfo& info, PhysicalCoo
         return;
     }
     if (direction == DIRECTION180) {
-        coord.x = info.validWidth - coord.x;
-        coord.y = info.validHeight - coord.y;
+        coord.x = info.validWidth - 1 - coord.x;
+        coord.y = info.validHeight - 1 - coord.y;
         MMI_HILOGD("DIRECTION180, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION270) {
         double temp = coord.y;
         if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            coord.y = info.validWidth - coord.x;
+            coord.y = info.validWidth - 1 - coord.x;
         } else {
-            coord.y = info.validHeight - coord.x;
+            coord.y = info.validHeight - 1 - coord.x;
         }
         coord.x = temp;
         MMI_HILOGD("DIRECTION270, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
@@ -2918,9 +2918,9 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
     if (displayDirection == DIRECTION90) {
         double temp = coord.x;
         if (!isEnable) {
-            coord.x = info.validHeight - coord.y;
+            coord.x = info.validHeight - 1 - coord.y;
         } else {
-            coord.x = info.validWidth - coord.y;
+            coord.x = info.validWidth - 1 - coord.y;
         }
         coord.y = temp;
         MMI_HILOGD(
@@ -2928,8 +2928,8 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
         return;
     }
     if (displayDirection == DIRECTION180) {
-        coord.x = info.validWidth - coord.x;
-        coord.y = info.validHeight - coord.y;
+        coord.x = info.validWidth - 1 - coord.x;
+        coord.y = info.validHeight - 1 - coord.y;
         MMI_HILOGD(
             "DIRECTION180, IsSceneBoardEnabled:%d physicalXY:{%f,%f}->{%f,%f}", isEnable, oldX, oldY, coord.x, coord.y);
         return;
@@ -2937,9 +2937,9 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
     if (displayDirection == DIRECTION270) {
         double temp = coord.y;
         if (!isEnable) {
-            coord.y = info.validWidth - coord.x;
+            coord.y = info.validWidth - 1 - coord.x;
         } else {
-            coord.y = info.validHeight - coord.x;
+            coord.y = info.validHeight - 1 - coord.x;
         }
         coord.x = temp;
         MMI_HILOGD(
@@ -6071,19 +6071,19 @@ void InputWindowsManager::ReverseRotateScreen(const OLD::DisplayInfo& info, cons
             break;
         }
         case DIRECTION90: {
-            cursorPos.y = static_cast<double>(info.validWidth) - x;
+            cursorPos.y = static_cast<double>(info.validWidth) - 1 - x;
             cursorPos.x = y;
             MMI_HILOGD("DIRECTION90, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
-            cursorPos.x = static_cast<double>(info.validWidth) - x;
-            cursorPos.y = static_cast<double>(info.validHeight) - y;
+            cursorPos.x = static_cast<double>(info.validWidth) - 1 - x;
+            cursorPos.y = static_cast<double>(info.validHeight) - 1 - y;
             MMI_HILOGD("DIRECTION180, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
-            cursorPos.x = static_cast<double>(info.validHeight) - y;
+            cursorPos.x = static_cast<double>(info.validHeight) - 1 - y;
             cursorPos.y = x;
             MMI_HILOGD("DIRECTION270, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
@@ -6115,19 +6115,19 @@ void InputWindowsManager::ReverseRotateDisplayScreen(const OLD::DisplayInfo& inf
             break;
         }
         case DIRECTION90: {
-            cursorPos.y = static_cast<double>(info.validWidth) - x;
+            cursorPos.y = static_cast<double>(info.validWidth) - 1 - x;
             cursorPos.x = y;
             MMI_HILOGD("DIRECTION90, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
-            cursorPos.x = static_cast<double>(info.validWidth) - x;
-            cursorPos.y = static_cast<double>(info.validHeight) - y;
+            cursorPos.x = static_cast<double>(info.validWidth) - 1 - x;
+            cursorPos.y = static_cast<double>(info.validHeight) - 1 - y;
             MMI_HILOGD("DIRECTION180, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
-            cursorPos.x = static_cast<double>(info.validHeight) - y;
+            cursorPos.x = static_cast<double>(info.validHeight) - 1 - y;
             cursorPos.y = x;
             MMI_HILOGD("DIRECTION270, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
