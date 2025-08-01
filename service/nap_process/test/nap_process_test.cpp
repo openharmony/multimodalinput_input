@@ -65,6 +65,11 @@ HWTEST_F(NapProcessTest, NapProcessTest_NotifyBundleName_001, TestSize.Level1)
     int32_t syncState = 1;
     int32_t result = napProcess.NotifyBundleName(data, syncState);
     ASSERT_EQ(result, RET_ERR);
+
+    napProcess.napClientPid_ = 0;
+    result = napProcess.NotifyBundleName(data, syncState);
+    ASSERT_EQ(result, RET_ERR);
+    
     data.pid = 1234;
     result = napProcess.NotifyBundleName(data, syncState);
     ASSERT_EQ(result, RET_ERR);
@@ -207,6 +212,25 @@ HWTEST_F(NapProcessTest, NapProcessTest_GetAllMmiSubscribedEvents_001, TestSize.
     std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
     ASSERT_EQ(napProcess.GetAllMmiSubscribedEvents(datas), RET_OK);
     ASSERT_TRUE(datas.empty());
+}
+
+/**
+ * @tc.name: NapProcessTest_GetAllMmiSubscribedEvents_002
+ * @tc.desc: Test get all mmi subscribed events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(NapProcessTest, NapProcessTest_GetAllMmiSubscribedEvents_002, TestSize.Level1)
+{
+    NapProcess napProcess;
+    NapProcess::NapStatusData data;
+    data.pid = 1;
+    data.uid = 1;
+    data.bundleName = "bundleName";
+    napProcess.napMap_[data] = SUBSCRIBED;
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
+    ASSERT_EQ(napProcess.GetAllMmiSubscribedEvents(datas), RET_OK);
+    ASSERT_FALSE(datas.empty());
 }
 } // namespace MMI
 } // namespace OHOS
