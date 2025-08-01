@@ -47,6 +47,7 @@ constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
+constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
@@ -787,6 +788,120 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001,
  * @tc.require:
  */
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+    pointerDrawingManager.hasDisplay_ = false;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.hasDisplay_ = false;
+    pointerDrawingManager.hasPointerDevice_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.lastPhysicalX_ = -1;
+    pointerDrawingManager.lastPhysicalY_ = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.lastPhysicalX_ = 1;
+    pointerDrawingManager.lastPhysicalY_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.lastPhysicalX_ = -1;
+    pointerDrawingManager.lastPhysicalY_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+    pointerDrawingManager.lastPhysicalX_ = 1;
+    pointerDrawingManager.lastPhysicalY_ = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointerStyle_003
+ * @tc.desc: Test DrawPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointerStyle_004
+ * @tc.desc: Test DrawPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
+    pointerDrawingManager.lastPhysicalX_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointerStyle_006
+ * @tc.desc: Test DrawPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
+    pointerDrawingManager.lastPhysicalX_ = 2;
+    pointerDrawingManager.lastPhysicalY_ = 2;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointerStyle_007
+ * @tc.desc: Test DrawPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
@@ -2295,6 +2410,43 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_001, Tes
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DrawManager_002
+ * @tc.desc: Test DrawManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
+    pointerDrawingManager.lastPhysicalX_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawManager_003
+ * @tc.desc: Test DrawManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
+    pointerDrawingManager.lastPhysicalX_ = 2;
+    pointerDrawingManager.lastPhysicalY_ = 2;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_DeletePointerVisible_002
  * @tc.desc: Test DeletePointerVisible
  * @tc.type: FUNC
@@ -3369,6 +3521,46 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateBindDisplayI
     pointerDrawingManager.surfaceNode_ = nullptr;
     int32_t displayId = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateBindDisplayId(displayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_LoadCursorSvgWithColor_001
+ * @tc.desc: Test LoadCursorSvgWithColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_LoadCursorSvgWithColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    auto type = MOUSE_ICON::DEFAULT;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->LoadCursorSvgWithColor(type, MIN_POINTER_COLOR));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AoutPointer_001
+ * @tc.desc: Test AoutPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AoutPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerColor(MIN_POINTER_COLOR));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerSize(1));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(true, true, false));
+    pointerDrawingManager->pidInfos_.clear();
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->DeletePointerVisible(0));
+    PointerDrawingManager::PidInfo pidInfo1{1, false};
+    PointerDrawingManager::PidInfo pidInfo2{0, false};
+    pointerDrawingManager->hapPidInfos_.push_back(pidInfo1);
+    pointerDrawingManager->hapPidInfos_.push_back(pidInfo2);
+    pointerDrawingManager->pid_ = 0;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->GetPointerVisible(0));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerVisible(0, true, 0, true));
+    PointerStyle pointerStyle;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerStylePreference(pointerStyle));
 }
 } // namespace MMI
 } // namespace OHOS

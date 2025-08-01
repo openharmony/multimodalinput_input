@@ -1676,5 +1676,22 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_InitLabels_001, TestSi
     EXPECT_EQ(touchDrawingHandler.isDownAction_, true);
     EXPECT_EQ(touchDrawingHandler.maxPointerCount_, 0);
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ResetCanvasNode_001
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ResetCanvasNode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ResetCanvasNode(nullptr));
+
+    auto canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(canvasNode, nullptr);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ResetCanvasNode(canvasNode));
+}
 } // namespace MMI
 } // namespace OHOS

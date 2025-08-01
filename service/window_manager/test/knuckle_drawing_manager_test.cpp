@@ -255,6 +255,30 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_005
+ * @tc.desc: Test Overrides KnuckleDrawHandler function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    ASSERT_NE(pointerEvent_, nullptr);
+    pointerEvent_->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(150);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent_->AddPointerItem(item);
+    item.SetPointerId(2);
+    pointerEvent_->AddPointerItem(item);
+    kceDrawMgr.isRotate_ = true;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.KnuckleDrawHandler(pointerEvent_));
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_006
  * @tc.desc: Test KnuckleDrawHandler
  * @tc.type: Function
@@ -1074,6 +1098,41 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic002, Te
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent_), RET_ERR);
     kceDrawMgr.isActionUp_ = false;
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawGraphic(pointerEvent_));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_001
+ * @tc.desc: Test Overrides ProcessUpEvent function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_ERR);
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+
+    isNeedUpAnimation = false;
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
