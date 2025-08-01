@@ -1101,12 +1101,12 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic002, Te
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_001
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_006
  * @tc.desc: Test Overrides ProcessUpEvent function branches
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_001, TestSize.Level1)
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
