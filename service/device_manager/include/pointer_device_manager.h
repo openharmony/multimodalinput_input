@@ -31,10 +31,11 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 public:
-    std::atomic<bool> renderServiceIsOk { false };
-    std::atomic<bool> displayManagerServiceSaIdIsOk { false };
-    std::atomic<bool> distributedKVDataServiceAbilityIdIsOk { false };
     std::atomic<bool> isInit { false };
+    std::atomic<bool> isFirstAddCommonEventService { true };
+    std::atomic<bool> isFirstAddRenderService { true };
+    std::atomic<bool> isFirstAddDisplayManagerService { true };
+    std::atomic<bool> isFirstAdddistributedKVDataService { true };
 
 private:
     PointerDeviceManager() = default;

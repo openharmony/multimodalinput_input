@@ -1676,5 +1676,163 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_InitLabels_001, TestSi
     EXPECT_EQ(touchDrawingHandler.isDownAction_, true);
     EXPECT_EQ(touchDrawingHandler.maxPointerCount_, 0);
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_SetMultiWindowScreenId
+ * @tc.desc: Test SetMultiWindowScreenId
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_SetMultiWindowScreenId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    touchDrawingHandler.pointerEvent_->AddPointerItem(item);
+    touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    uint64_t screenId = 1;
+    uint64_t displayNodeScreenId = 1000;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.SetMultiWindowScreenId(screenId, displayNodeScreenId));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_Dump
+ * @tc.desc: Test Dump
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_Dump, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    touchDrawingHandler.pointerEvent_->AddPointerItem(item);
+    touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.Dump(fd, args));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_CalcDrawCoordinate
+ * @tc.desc: Test CalcDrawCoordinate
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_CalcDrawCoordinate, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayInfo.name = "Main Display";
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.rawDisplayX_ = 0;
+    item.rawDisplayY_ = 0;
+    touchDrawingHandler.pointerEvent_->AddPointerItem(item);
+    touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_TRUE(displayInfo.transform.empty());
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.CalcDrawCoordinate(displayInfo, item));
+
+    std::vector<float> transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+    displayInfo.transform = transform;
+    EXPECT_FALSE(displayInfo.transform.empty());
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.CalcDrawCoordinate(displayInfo, item));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_TransformDisplayXY
+ * @tc.desc: Test TransformDisplayXY
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_TransformDisplayXY, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.width = 10;
+    displayInfo.height = 20;
+    displayInfo.validWidth = displayInfo.width;
+    displayInfo.validHeight = displayInfo.height;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.name = "Main Display";
+
+    double logicX = 1280.00;
+    double logicY = 960.00;
+    auto transformSize = 9;
+    EXPECT_NE(displayInfo.transform.size(), transformSize);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.TransformDisplayXY(displayInfo, logicX, logicY));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_TransformDisplayXY_001
+ * @tc.desc: Test TransformDisplayXY
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_TransformDisplayXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.width = 10;
+    displayInfo.height = 20;
+    displayInfo.validWidth = displayInfo.width;
+    displayInfo.validHeight = displayInfo.height;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.name = "Main Display";
+    double logicX = 1280.00;
+    double logicY = 960.00;
+    std::vector<float> transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+    displayInfo.transform = transform;
+    EXPECT_FALSE(displayInfo.transform.empty());
+    auto transformSize = 9;
+    EXPECT_EQ(displayInfo.transform.size(), transformSize);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.TransformDisplayXY(displayInfo, logicX, logicY));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_StartTrace
+ * @tc.desc: Test StartTrace
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_StartTrace, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    touchDrawingHandler.pointerEvent_->AddPointerItem(item);
+    touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    int32_t pointerId = 1;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.StartTrace(pointerId));
+}
 } // namespace MMI
 } // namespace OHOS

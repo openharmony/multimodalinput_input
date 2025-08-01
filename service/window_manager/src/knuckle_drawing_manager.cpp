@@ -724,15 +724,28 @@ void KnuckleDrawingManager::DrawBrushCanvas()
 void KnuckleDrawingManager::ActionUpAnimation()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(trackCanvasNode_);
-    Rosen::RSAnimationTimingProtocol protocol;
-    protocol.SetDuration(PROTOCOL_DURATION);
-    protocol.SetRepeatCount(1);
-    auto animate = Rosen::RSNode::Animate(
-        protocol,
+    CHKPV(brushCanvasNode_);
+    Rosen::RSAnimationTimingProtocol brushProtocol;
+    brushProtocol.SetDuration(0);
+    brushProtocol.SetRepeatCount(1);
+    auto brushAnimate = Rosen::RSNode::Animate(
+        brushProtocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
-        [this]() {
-            trackCanvasNode_->SetAlpha(ALPHA_RANGE_END);
+        [brushCanvasNode = brushCanvasNode_]() {
+            CHKPV(brushCanvasNode);
+            brushCanvasNode->SetAlpha(ALPHA_RANGE_END);
+        });
+
+    CHKPV(trackCanvasNode_);
+    Rosen::RSAnimationTimingProtocol trackProtocol;
+    trackProtocol.SetDuration(PROTOCOL_DURATION);
+    trackProtocol.SetRepeatCount(1);
+    auto trackAnimate = Rosen::RSNode::Animate(
+        trackProtocol,
+        Rosen::RSAnimationTimingCurve::LINEAR,
+        [trackCanvasNode = trackCanvasNode_]() {
+            CHKPV(trackCanvasNode);
+            trackCanvasNode->SetAlpha(ALPHA_RANGE_END);
         });
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -748,19 +761,21 @@ int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
     trackColorR_ = 0x00;
     trackColorG_ = 0x00;
     trackColorB_ = 0x00;
-    if (ClearBrushCanvas() != RET_OK) {
-        MMI_HILOGE("ClearBrushCanvas failed");
-        return RET_ERR;
-    }
     if (isNeedUpAnimation) {
+        if (destroyTimerId_ >= 0) {
+            // There is no need to repeatedly register 'KnuckleDrawingManager' timer
+            MMI_HILOGD("The KnuckleDrawingManager timer is already exist");
+            return RET_OK;
+        }
         ActionUpAnimation();
         if (addTimerFunc_) {
             int32_t repeatTime = 1;
-            int32_t timerId = addTimerFunc_(PROTOCOL_DURATION, repeatTime, [this]() {
+            destroyTimerId_ = addTimerFunc_(PROTOCOL_DURATION, repeatTime, [this]() {
                 DestoryWindow();
+                destroyTimerId_ = -1;
             }, "KnuckleDrawingManager");
-            if (timerId < 0) {
-                MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+            if (destroyTimerId_ < 0) {
+                MMI_HILOGE("Add timer failed, timerId:%{public}d", destroyTimerId_);
                 DestoryWindow();
             }
         } else {

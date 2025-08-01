@@ -2308,13 +2308,35 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_BUILD_ENABLE_ANCO
         WIN_MGR->InitializeAnco();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (!POINTER_DEV_MGR.isFirstAddCommonEventService) {
+        CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (systemAbilityId == RENDER_SERVICE && !POINTER_DEV_MGR.isFirstAddRenderService) {
+        CursorDrawingComponent::GetInstance().InitPointerCallback();
+    }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID && !POINTER_DEV_MGR.isFirstAddDisplayManagerService) {
+        CursorDrawingComponent::GetInstance().InitScreenInfo();
+        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         WIN_MGR->SetFoldState();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         KeyEventHdr->Init();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if ((systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) &&
+        !POINTER_DEV_MGR.isFirstAdddistributedKVDataService) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            CursorDrawingComponent::GetInstance().InitPointerObserver();
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     if (systemAbilityId == SENSOR_SERVICE_ABILITY_ID) {
         MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);

@@ -114,7 +114,7 @@ HWTEST_F(KnuckleDrawingTest, KnuckleDrawingTest_RegisterAddTimer_001, TestSize.L
         return RET_OK;
     };
     knuckleDrawing->RegisterAddTimer(addTimerFunc);
-    ASSERT_NE(knuckleDrawing->knuckleDrawingMgr_->addTimerFunc_, nullptr);
+    ASSERT_TRUE(knuckleDrawing->knuckleDrawingMgr_->addTimerFunc_);
 }
 
 /**
