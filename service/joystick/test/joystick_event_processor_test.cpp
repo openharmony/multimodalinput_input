@@ -166,7 +166,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_0
     CALL_TEST_DEBUG;
     auto JoystickEvent = new JoystickEventProcessor(2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    pointerEvent->SetSourceType( PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
     double axisValue = 0;
     pointerEvent->axisValues_[PointerEvent::AXIS_TYPE_ABS_HAT0Y] = axisValue;
@@ -488,7 +488,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize_004, T
 {
     CALL_TEST_DEBUG;
     auto JoystickEvent = new JoystickEventProcessor(2);
-    const struct libinput_event_joystick_axis_abs_info axis = { 
+    const struct libinput_event_joystick_axis_abs_info axis = {
         .code = 1,
         .value = 5,
         .maximum = 10,
