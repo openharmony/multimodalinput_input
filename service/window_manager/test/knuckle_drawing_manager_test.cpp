@@ -59,10 +59,17 @@ public:
             knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
         }
         knuckleDrawMgr_->UpdateDisplayInfo(info);
+        pointerEvent_ = PointerEvent::Create();
+    }
+
+    void TearDown(void)
+    {
+        pointerEvent_ = nullptr;
     }
 
 private:
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ {nullptr};
+    std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
 };
 
 /**
@@ -878,6 +885,140 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawTrackCanvas_00
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_001
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is false
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = false;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_002
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true and
+ * destroyTimerId_ greater than 0
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = 1;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    kceDrawMgr.destroyTimerId_ = -1;
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_003
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true,
+ * destroyTimerId_ small than 0 and addTimerFunc_ is invalid
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = -1;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_004
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true,
+ * destroyTimerId_ small than 0, addTimerFunc_ is valid and addTimerFunc_ calling fail
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = -1;
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+
+    kceDrawMgr.addTimerFunc_ = [] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return -1;
+    };
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(kceDrawMgr.destroyTimerId_, -1);
+    ASSERT_EQ(kceDrawMgr.brushCanvasNode_, nullptr);
+    ASSERT_EQ(kceDrawMgr.trackCanvasNode_, nullptr);
+    ASSERT_EQ(kceDrawMgr.surfaceNode_, nullptr);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_005
+ * @tc.desc: Test Overrides ProcessUpEvent function branches when isNeedUpAnimation is true,
+ * destroyTimerId_ small than 0, addTimerFunc_ is valid and addTimerFunc_ call success
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    kceDrawMgr.destroyTimerId_ = -1;
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+
+    kceDrawMgr.addTimerFunc_ = [] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name) -> int32_t {
+        (void)intervalMs;
+        (void)repeatCount;
+        (void)callback;
+        (void)name;
+        return 1;
+    };
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(kceDrawMgr.destroyTimerId_, 1);
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_UpdateEmitter_001
  * @tc.desc: Test Overrides UpdateEmitter function branches
  * @tc.type: Function
@@ -941,14 +1082,132 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_InitParticleEmitte
 HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RegisterAddTimer_001, TestSize.Level1)
 {
     knuckleDrawMgr_->RegisterAddTimer([] (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-            const std::string &name) -> int32_t {
+        const std::string &name) -> int32_t {
         (void)intervalMs;
         (void)repeatCount;
         (void)callback;
         (void)name;
-        return RET_OK;
+        return 1;
     });
     ASSERT_TRUE(knuckleDrawMgr_->addTimerFunc_);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_IsValidAction_002
+ * @tc.desc: Test IsValidAction
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    ASSERT_NE(knuckleDrawMgr_, nullptr);
+    ASSERT_NE(pointerEvent_, nullptr);
+    kceDrawMgr.screenReadState_.state = "1";
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.IsValidAction(action));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_UpdateDisplayInfo_001
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(knuckleDrawMgr_, nullptr);
+    ASSERT_NE(pointerEvent_, nullptr);
+    OLD::DisplayInfo info;
+    info.id = 10;
+    info.x = 10;
+    info.y = 5;
+    info.width = 5;
+    info.height = 5;
+    int32_t displayDpi = 220;
+    info.dpi = displayDpi;
+    info.name = "display";
+    info.direction = Direction::DIRECTION90;
+    if (knuckleDrawMgr_ == nullptr)
+    {
+        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    }
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->UpdateDisplayInfo(info));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_UpdateEmitter001
+ * @tc.desc: Test Overrides UpdateEmitter function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateEmitter001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    ASSERT_NE(pointerEvent_, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->UpdateEmitter());
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic002
+ * @tc.desc: Test Overrides DrawGraphic function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    ASSERT_NE(pointerEvent_, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    pointerEvent_->AddPointerItem(item);
+    pointerEvent_->SetPointerId(1);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent_), RET_ERR);
+
+    kceDrawMgr.displayInfo_.width = 20;
+    kceDrawMgr.displayInfo_.height = 20;
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent_), RET_OK);
+
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    PointerInfo pointerInfo;
+    pointerInfo.x = 10;
+    pointerInfo.y = 10;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerEvent_->SetPointerId(0);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerInfo.x = 50;
+    pointerInfo.y = 50;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent_), RET_ERR);
+    kceDrawMgr.isActionUp_ = false;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawGraphic(pointerEvent_));
 }
 } // namespace MMI
 } // namespace OHOS

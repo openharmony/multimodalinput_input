@@ -96,6 +96,21 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_003, T
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_HandleKeyEvent_001
+ * @tc.desc: Test Overrides the if (HandleKeyEvent(keyEvent)) branch of the HandleKeyEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.HandleKeyEvent(keyEvent));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_HandlePointerEvent
  * @tc.desc: Test Overrides the if (OnHandleEvent(pointerEvent)) branch of the HandlePointerEvent function
  * @tc.type: FUNC
