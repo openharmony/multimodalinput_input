@@ -1488,8 +1488,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("This key event no need to CallEnded");
         return false;
     }
-    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    if (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+    if (DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         MMI_HILOGI("The current screen is not on, so not allow end call");
         return false;
     }
