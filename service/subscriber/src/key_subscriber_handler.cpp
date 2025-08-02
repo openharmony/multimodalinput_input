@@ -576,7 +576,7 @@ void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> 
 {
     OHOS::AAFwk::Want want;
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
-    want.SetParam("code", keyEvent->GetKeyCode());
+    want.SetParam("keyCode", keyEvent->GetKeyCode());
     EventFwk::CommonEventPublishInfo publishInfo;
     std::vector<std::string> permissionVec {"ohos.permission.NOTIFICATION_CONTROLLER"};
     publishInfo.SetSubscriberPermissions(permissionVec);
