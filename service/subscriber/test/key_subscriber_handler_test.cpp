@@ -2779,7 +2779,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded005, 
  * @tc.type: FUNC
  * @tc.require:
  */
-+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded006, TestSize.Level1)
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
