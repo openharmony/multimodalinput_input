@@ -155,6 +155,7 @@ KnuckleDrawingManager::KnuckleDrawingManager()
 KnuckleDrawingManager::~KnuckleDrawingManager()
 {
     if (screenReadObserver_ != nullptr) {
+        screenReadObserver_->SetUpdateFunc(nullptr);
         ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .UnregisterObserver(screenReadObserver_);
         MMI_HILOGI("Unregister setting observer, ret=%{public}d", ret);
