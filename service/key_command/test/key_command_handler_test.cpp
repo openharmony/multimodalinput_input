@@ -6626,6 +6626,49 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_003,
 }
 
 /**
+ * @tc.name: CheckSpecialRepeatKey_Normal_Branch_004
+ * @tc.desc: Test KEY_ACTION_UP and keyCode equl
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, CheckSpecialRepeatKey_Normal_Branch_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end())
+    {
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
+    }
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr =
+        std::make_shared<UDSSession>(repeatKey.ability.bundleName, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus("test");
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+    int32_t ret = keyEvent->GetKeyAction();
+    EXPECT_EQ(handler.repeatKey_.keyAction, ret);
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount_001
  * @tc.desc: Test if (walletLaunchDelayTimes_ != 0)
  * @tc.type: FUNC
