@@ -519,8 +519,10 @@ void InputDeviceManager::ScanPointerDevice()
         NotifyPointerDevice(false, false, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
         MMI_HILOGI("Set para input.pointer.device false");
-        POINTER_DEV_MGR.isInit = false;
-        CursorDrawingComponent::GetInstance().UnLoad();
+        if (POINTER_DEV_MGR.isInit) {
+            POINTER_DEV_MGR.isInit = false;
+            CursorDrawingComponent::GetInstance().UnLoad();
+        }
     }
 }
 
@@ -931,7 +933,7 @@ void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool e
 {
     MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
         existEnabledPointerDevice);
-    if (addNewPointerDevice) {
+    if (addNewPointerDevice && !POINTER_DEV_MGR.isInit) {
         PointerDeviceInit();
     }
     if (addNewPointerDevice && !existEnabledPointerDevice) {
@@ -961,8 +963,6 @@ void InputDeviceManager::NotifyRemovePointerDevice(bool removePointerDevice)
     if (removePointerDevice && !HasPointerDevice() && !HasVirtualPointerDevice() &&
         CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-        POINTER_DEV_MGR.isInit = false;
-        CursorDrawingComponent::GetInstance().UnLoad();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }

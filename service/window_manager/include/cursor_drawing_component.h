@@ -105,6 +105,8 @@ private:
     std::atomic<bool> isLoaded_ { false };
     void *soHandle_ { nullptr };
     IPointerDrawingManager* pointerInstance_ { nullptr };
+    int32_t timerId_ { -1 };
+    std::chrono::time_point<std::chrono::steady_clock> lastCallTime_ { std::chrono::steady_clock::now() };
 };
 } // namespace OHOS::MMI
 

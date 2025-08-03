@@ -1274,6 +1274,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1335,6 +1336,7 @@ ohos_unittest("PointerDrawingManagerSupTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1605,6 +1607,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utilsbase",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1684,6 +1687,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utilsbase",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
