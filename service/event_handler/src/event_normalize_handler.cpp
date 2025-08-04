@@ -619,7 +619,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto type = libinput_event_get_type(event);
     if ((type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_MOTION ||
             type == LIBINPUT_EVENT_TOUCHPAD_UP) &&
-        TouchPadKnuckleDoubleClickHandle(event)) {
+        (TouchPadKnuckleDoubleClickHandle(event) || HandleTouchPadEdgeSwipe(event))) {
         return RET_OK;
     }
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
@@ -1216,6 +1216,51 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return false;
+}
+
+bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
+{
+    CHKPF(event);
+    CHKPF(nextHandler_);
+    auto touchpadEvent = libinput_event_get_touchpad_event(event);
+    CHKPF(touchpadEvent);
+    double pressure = libinput_event_touchpad_get_pressure(touchpadEvent);
+    std::shared_ptr<MMI::KeyEvent> keyDownEvent = KeyEvent::Create();
+    std::shared_ptr<MMI::KeyEvent> keyUpEvent = KeyEvent::Create();
+    CHKPF(keyDownEvent);
+    CHKPF(keyUpEvent);
+    KeyEvent::KeyItem itemDown;
+    KeyEvent::KeyItem itemUp;
+    bool isKeyPressed = true;
+    int32_t keyCode = -1;
+    keyDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    int ret = -1;
+    if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE) {
+        keyCode = KeyEvent::KEYCODE_BRIGHTNESS_UP;
+    } else if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
+        keyCode = KeyEvent::KEYCODE_BRIGHTNESS_DOWN;
+    } else if (pressure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE) {
+        keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
+        keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    } else {
+        MMI_HILOGI("pressure is not in gesture list");
+        return false;
+    }
+    MMI_HILOGI("Current is touchpad edge swipe: type: %{public}f", pressure);
+    keyDownEvent->SetKeyCode(keyCode);
+    keyUpEvent->SetKeyCode(keyCode);
+    itemDown.SetKeyCode(keyCode);
+    itemUp.SetKeyCode(keyCode);
+    itemDown.SetPressed(isKeyPressed);
+    itemUp.SetPressed(!isKeyPressed);
+    keyDownEvent->AddPressedKeyItems(itemDown);
+    keyUpEvent->AddPressedKeyItems(itemUp);
+    nextHandler_->HandleKeyEvent(keyDownEvent);
+    nextHandler_->HandleKeyEvent(keyUpEvent);
+    return true;
 }
 
 int32_t EventNormalizeHandler::GetToolType(libinput_event* event)
