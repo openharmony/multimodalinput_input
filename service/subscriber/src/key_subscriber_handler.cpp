@@ -576,7 +576,7 @@ void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> 
 {
     OHOS::AAFwk::Want want;
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
-    want.SetParam("code", keyEvent->GetKeyCode());
+    want.SetParam("keyCode", keyEvent->GetKeyCode());
     EventFwk::CommonEventPublishInfo publishInfo;
     std::vector<std::string> permissionVec {"ohos.permission.NOTIFICATION_CONTROLLER"};
     publishInfo.SetSubscriberPermissions(permissionVec);
@@ -1478,14 +1478,17 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("CallBehaviorState is false");
         return false;
     }
+    if (callEndKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER &&
+        keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        callEndKeyUp_ = false;
+        return true;
+    }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER ||
-        (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN &&
-        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_UP)) {
+        keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
         MMI_HILOGE("This key event no need to CallEnded");
         return false;
     }
-    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    if (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+    if (DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         MMI_HILOGI("The current screen is not on, so not allow end call");
         return false;
     }
@@ -1500,12 +1503,14 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         case StateType::CALL_STATUS_DIALING: {
             HangUpCallProcess();
             needSkipPowerKeyUp_ = true;
+            callEndKeyUp_ = true;
             return true;
         }
         case StateType::CALL_STATUS_WAITING:
         case StateType::CALL_STATUS_INCOMING: {
             RejectCallProcess();
             needSkipPowerKeyUp_ = true;
+            callEndKeyUp_ = true;
             return true;
         }
         case StateType::CALL_STATUS_IDLE:

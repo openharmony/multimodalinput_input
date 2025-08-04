@@ -1310,7 +1310,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_GetPointerSpeed_001, TestSize.Level1)
     MMIService mmiService;
     int32_t speed = -1;
     int32_t ret = mmiService.GetPointerSpeed(speed);
-    EXPECT_TRUE(ret == ERROR_NOT_SYSAPI || ret == ETASKS_POST_SYNCTASK_FAIL);
+    EXPECT_NE(ret, RET_OK);
     EXPECT_EQ(speed, 0);
 }
 

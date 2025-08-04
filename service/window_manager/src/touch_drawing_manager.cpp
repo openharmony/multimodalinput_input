@@ -89,6 +89,11 @@ void TouchDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
     auto touchDrawingHandler = GetTouchDrawingHandler();
     if (touchDrawingHandler != nullptr) {
         touchDrawingHandler->UpdateDisplayInfo(displayInfo);
+
+        static std::once_flag flag;
+        std::call_once(flag, [this]() {
+            UpdateLabels();
+        });
     } else {
         displayInfo_ = displayInfo;
     }

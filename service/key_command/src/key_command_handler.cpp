@@ -1077,6 +1077,11 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        repeatKey_.keyCode = item.keyCode;
+        repeatKey_.keyAction = keyEvent->GetKeyAction();
+        MMI_HILOGI("Update repeatkey status");
+    }
     if (WIN_MGR->JudgeCameraInFore() &&
         (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked)) {
             return true;

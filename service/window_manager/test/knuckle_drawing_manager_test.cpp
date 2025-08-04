@@ -39,6 +39,8 @@ constexpr int32_t TRACK_PATH_LENGTH_500 {500};
 constexpr int32_t TRACK_PATH_LENGTH_1000 {1000};
 constexpr int32_t TRACK_PATH_LENGTH_1500 {1500};
 constexpr int32_t TRACK_PATH_LENGTH_2000 {2000};
+constexpr std::string_view SCREEN_READ_ENABLE { "1" };
+constexpr int32_t POINTER_NUMBER_TO_DRAW { 10 };
 } // namespace
 class KnuckleDrawingManagerTest : public testing::Test {
 public:
@@ -255,6 +257,30 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_005
+ * @tc.desc: Test Overrides KnuckleDrawHandler function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    ASSERT_NE(pointerEvent_, nullptr);
+    pointerEvent_->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(150);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent_->AddPointerItem(item);
+    item.SetPointerId(2);
+    pointerEvent_->AddPointerItem(item);
+    kceDrawMgr.isRotate_ = true;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.KnuckleDrawHandler(pointerEvent_));
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_006
  * @tc.desc: Test KnuckleDrawHandler
  * @tc.type: Function
@@ -443,6 +469,92 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     pointerInfo.y = 300;
     kceDrawMgr.pointerInfos_.push_back(pointerInfo);
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic_002
+ * @tc.desc: Test Overrides DrawGraphic function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 200;
+    pointerInfo.y = 200;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(500);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    kceDrawMgr.isActionUp_ = false;
+    pointerEvent->SetActionTime(200001);
+    kceDrawMgr.firstDownTime_ = 200000;
+    kceDrawMgr.pointerNum_ = POINTER_NUMBER_TO_DRAW;
+    auto ret = kceDrawMgr.DrawGraphic(pointerEvent);
+    EXPECT_FALSE(kceDrawMgr.isActionUp_);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic_003
+ * @tc.desc: Test Overrides DrawGraphic function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.pointerInfos_.clear();
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 200;
+    pointerInfo.y = 200;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(500);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    kceDrawMgr.isActionUp_ = false;
+    pointerEvent->SetActionTime(200001);
+    kceDrawMgr.firstDownTime_ = 100000;
+    kceDrawMgr.isNeedInitParticleEmitter_ = false;
+    auto ret = kceDrawMgr.DrawGraphic(pointerEvent);
+    EXPECT_EQ(ret, RET_ERR);
 }
 #else
 HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestSize.Level1)
@@ -670,6 +782,21 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction_001,
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_IsValidAction_003
+ * @tc.desc: Test Overrides IsValidAction function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    kceDrawMgr.screenReadState_.state = SCREEN_READ_ENABLE;
+    EXPECT_TRUE(kceDrawMgr.IsValidAction(action));
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow_001
  * @tc.desc: Test Overrides CreateTouchWindow function branches
  * @tc.type: Function
@@ -685,6 +812,25 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateTouchWindow_
     knuckleDrawMgr_->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     knuckleDrawMgr_->displayInfo_.displayMode = DisplayMode::MAIN;
     EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->CreateTouchWindow(displayId));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow_002
+ * @tc.desc: Test Overrides CreateTouchWindow function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateTouchWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 10;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    knuckleDrawMgr_->surfaceNode_ = nullptr;
+    knuckleDrawMgr_->displayInfo_.displayMode = DisplayMode::MAIN;
+    knuckleDrawMgr_->SetMultiWindowScreenId(10, 0);
+    knuckleDrawMgr_->CreateTouchWindow(displayId);
+    EXPECT_EQ(knuckleDrawMgr_->screenId_, 0);
 }
 
 /**
@@ -1032,6 +1178,36 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateEmitter_001,
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_UpdateEmitter_002
+ * @tc.desc: Test Overrides UpdateEmitter function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateEmitter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 200;
+    pointerInfo.y = 200;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.UpdateEmitter());
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_DrawBrushCanvas_001
  * @tc.desc: Test Overrides DrawBrushCanvas function branches
  * @tc.type: Function
@@ -1041,6 +1217,30 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawBrushCanvas_00
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawBrushCanvas());
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawBrushCanvas_002
+ * @tc.desc: Test Overrides DrawBrushCanvas function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawBrushCanvas_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    kceDrawMgr.DrawBrushCanvas();
+    EXPECT_EQ(kceDrawMgr.pathInfos_.size(), 8);
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawBrushCanvas());
 }
 
@@ -1071,7 +1271,46 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_InitParticleEmitte
     KnuckleDrawingManager kceDrawMgr;
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.InitParticleEmitter());
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_InitParticleEmitter_002
+ * @tc.desc: Test Overrides InitParticleEmitter function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_InitParticleEmitter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.InitParticleEmitter());
+    EXPECT_FALSE(kceDrawMgr.isNeedInitParticleEmitter_);
+}
 #endif
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_UpdateDisplayInfo_002
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateDisplayInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    OLD::DisplayInfo displayInfo;
+    kceDrawMgr.isRotate_ = false;
+    displayInfo.direction = Direction::DIRECTION90;
+    kceDrawMgr.displayInfo_.direction = Direction::DIRECTION90;
+    kceDrawMgr.UpdateDisplayInfo(displayInfo);
+    EXPECT_FALSE(kceDrawMgr.isRotate_);
+
+    displayInfo.direction = Direction::DIRECTION90;
+    kceDrawMgr.displayInfo_.direction = Direction::DIRECTION0;
+    kceDrawMgr.UpdateDisplayInfo(displayInfo);
+    EXPECT_TRUE(kceDrawMgr.isRotate_);
+}
 
 /**
  * @tc.name: KnuckleDrawingManagerTest_RegisterAddTimer_001
@@ -1208,6 +1447,41 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic002, Te
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent_), RET_ERR);
     kceDrawMgr.isActionUp_ = false;
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawGraphic(pointerEvent_));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessUpEvent_006
+ * @tc.desc: Test Overrides ProcessUpEvent function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    bool isNeedUpAnimation = true;
+    auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_ERR);
+
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
+
+    isNeedUpAnimation = false;
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
