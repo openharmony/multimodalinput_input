@@ -50,6 +50,7 @@ group("test") {
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "notifynaponline_fuzzer:fuzztest",
+    "pointerlocation_fuzzer:fuzztest",
     "pointerspeed_fuzzer:fuzztest",
     "pointerstyle_fuzzer:fuzztest",
     "pointervisible_fuzzer:fuzztest",
@@ -135,6 +136,7 @@ group("test") {
     "subscribekeyevent_fuzzer:fuzztest",
     "subscribeswitchevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
+    "touchpadscrollswitch_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
