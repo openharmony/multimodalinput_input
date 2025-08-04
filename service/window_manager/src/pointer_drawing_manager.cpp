@@ -49,7 +49,6 @@
 #include "timer_manager.h"
 #include "surface.h"
 #include "common_event_data.h"
-#include "common_event_manager.h"
 #include "common_event_support.h"
 
 #undef MMI_LOG_DOMAIN
@@ -193,7 +192,7 @@ static bool IsSingleDisplayFoldDevice()
     return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4'));
 }
 
-void RsRemoteDiedCallback()
+void PointerDrawingManager::RsRemoteDiedCallback()
 {
     CALL_INFO_TRACE;
     g_isRsRemoteDied = true;
@@ -211,9 +210,9 @@ void PointerDrawingManager::InitPointerCallback()
     MMI_HILOGI("Init RS Callback start");
     g_isRsRemoteDied = false;
     g_isRsRestart = false;
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    OnRemoteDiedCallback_ = [this]() -> void { this->RsRemoteDiedCallback(); };
     auto begin = std::chrono::high_resolution_clock::now();
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(OnRemoteDiedCallback_);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -316,7 +315,26 @@ PointerDrawingManager::~PointerDrawingManager()
         if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
             moveRetryThread_->join();
         }
+        if (commonEventSubscriber_ != nullptr) {
+            if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(commonEventSubscriber_)) {
+                MMI_HILOGW("UnSubscribeCommonEvent failed");
+            }
+            commonEventSubscriber_ = nullptr;
+        }
+        initDisplayStatusReceiverFlag_ = false;
+
+        if  (screenModeChangeListener_ != nullptr) {
+            auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().UnregisterScreenModeChangeListener(
+                screenModeChangeListener_);
+            if (ret != OHOS::Rosen::DMError::DM_OK) {
+                MMI_HILOGE("UnregisterScreenModeChangeListener failed, ret=%{public}d", ret);
+                return;
+            }
+            screenModeChangeListener_ = nullptr;
+        }
     }
+    INPUT_DEV_MGR->Detach(self_);
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
     MMI_HILOGI("~PointerDrawingManager complete");
 }
 
@@ -2389,12 +2407,17 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
             pointerVisible = (pointerVisible && IsPointerVisible());
         }
         SetPointerVisible(getpid(), pointerVisible, 0, false);
-} else {
+    } else {
         DeletePointerVisible(getpid());
     }
     DrawManager();
-    auto surfaceNodePtr = GetSurfaceNode();
-    if (!hasPointerDevice_ && (surfaceNodePtr != nullptr)) {
+    // This scope ensures that the reference count held by surfaceNodePtr is' 0 'before notifying the RS process Flush.
+    {
+        auto surfaceNodePtr = GetSurfaceNode();
+        if (hasPointerDevice_ || (surfaceNodePtr == nullptr)) {
+            MMI_HILOGD("There are still pointer devices present.");
+            return;
+        }
         if (GetHardCursorEnabled()) {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto sp : screenPointers_) {
@@ -2407,9 +2430,9 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Pointer window destroy success");
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    MMI_HILOGD("Pointer window destroy success");
 }
 
 void PointerDrawingManager::AttachAllSurfaceNode()
@@ -2506,8 +2529,8 @@ void PointerDrawingManager::InitPixelMaps()
 bool PointerDrawingManager::Init()
 {
     CALL_DEBUG_ENTER;
-    auto self = std::shared_ptr<PointerDrawingManager>(this, [](PointerDrawingManager*) {});
-    INPUT_DEV_MGR->Attach(self);
+    self_ = std::shared_ptr<PointerDrawingManager>(this, [](PointerDrawingManager*) {});
+    INPUT_DEV_MGR->Attach(self_);
     pidInfos_.clear();
     hapPidInfos_.clear();
     {
@@ -3030,8 +3053,12 @@ void PointerDrawingManager::RegisterDisplayStatusReceiver()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
-    initDisplayStatusReceiverFlag_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
-        std::make_shared<DisplayStatusReceiver>(commonEventSubscribeInfo));
+    commonEventSubscriber_ = std::make_shared<DisplayStatusReceiver>(commonEventSubscribeInfo);
+    bool ret = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(commonEventSubscriber_);
+    if (!ret) {
+        commonEventSubscriber_ = nullptr;
+    }
+    initDisplayStatusReceiverFlag_ = ret;
     MMI_HILOGI("Register display status receiver result:%{public}d", initDisplayStatusReceiverFlag_.load());
 }
 

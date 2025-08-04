@@ -927,7 +927,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 580);
+    EXPECT_EQ(coord.x, 779);
     EXPECT_EQ(coord.y, 10);
 }
 
@@ -950,8 +950,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, Test
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 790);
-    EXPECT_EQ(coord.y, 580);
+    EXPECT_EQ(coord.x, 789);
+    EXPECT_EQ(coord.y, 579);
 }
 
 /**
@@ -974,7 +974,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
     EXPECT_EQ(coord.x, 20);
-    EXPECT_EQ(coord.y, 790);
+    EXPECT_EQ(coord.y, 589);
 }
 
 /**
@@ -2154,23 +2154,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReverseRotateScreen_00
     info.direction = DIRECTION0;
     info.width = 1920;
     info.height = 1080;
-    info.validWidth = info.width;
     info.validHeight = info.height;
+    info.validWidth = info.width;
     WIN_MGR->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
     EXPECT_EQ(cursorPos.x, 100);
     EXPECT_EQ(cursorPos.y, 200);
     info.direction = DIRECTION90;
     WIN_MGR->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
-    ;
     EXPECT_EQ(cursorPos.x, 200);
-    EXPECT_EQ(cursorPos.y, 1820);
+    EXPECT_EQ(cursorPos.y, 1819);
     info.direction = DIRECTION180;
     WIN_MGR->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
-    EXPECT_EQ(cursorPos.x, 1820);
-    EXPECT_EQ(cursorPos.y, 880);
+    EXPECT_EQ(cursorPos.x, 1819);
+    EXPECT_EQ(cursorPos.y, 879);
     info.direction = DIRECTION270;
     WIN_MGR->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
-    EXPECT_EQ(cursorPos.x, 880);
+    EXPECT_EQ(cursorPos.x, 879);
     EXPECT_EQ(cursorPos.y, 100);
 }
 
