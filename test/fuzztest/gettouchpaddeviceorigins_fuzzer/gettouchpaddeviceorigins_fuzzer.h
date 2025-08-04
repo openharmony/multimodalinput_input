@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INPUTDEVICE_FUZZER
-#define INPUTDEVICE_FUZZER
+#ifndef GETTOUCHPADDEVICEORIGINS_FUZZER
+#define GETTOUCHPADDEVICEORIGINS_FUZZER
 
-#define FUZZ_PROJECT_NAME "inputdevice_fuzzer"
+#define FUZZ_PROJECT_NAME "gettouchpaddeviceorigins_fuzzer"
 
-#endif // INPUTDEVICEMANAGER_FUZZER
+#endif // GETTOUCHPADDEVICEORIGINS_FUZZER
