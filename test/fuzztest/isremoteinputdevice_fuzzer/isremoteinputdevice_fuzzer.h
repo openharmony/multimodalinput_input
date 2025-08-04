@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INPUTDEVICE_FUZZER
-#define INPUTDEVICE_FUZZER
+#ifndef ISREMOTEINPUTDEVICE_FUZZER
+#define ISREMOTEINPUTDEVICE_FUZZER
 
-#define FUZZ_PROJECT_NAME "inputdevice_fuzzer"
+#define FUZZ_PROJECT_NAME "isremoteinputdevice_fuzzer"
 
-#endif // INPUTDEVICEMANAGER_FUZZER
+#endif // ISREMOTEINPUTDEVICE_FUZZER
