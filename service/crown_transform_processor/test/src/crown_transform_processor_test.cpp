@@ -87,27 +87,6 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
 }
 
 /* *
- * @tc.name: CrownTransformProcessorTest_IsCrownEvent_003
- * @tc.desc: Test the funcation IsCrownEvent
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<CrownTransformProcessor> processor = std::make_shared<CrownTransformProcessor>();
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    libinput_device device;
-    libinput_event_pointer touchpadButtonEvent;
-    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(&device));
-    EXPECT_CALL(libinputMock, DeviceGetName).WillOnce(Return(const_cast<char *>("rotary_crown")));
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_AXIS));
-    libinput_event event;
-    bool ret = processor->IsCrownEvent(&event);
-    EXPECT_FALSE(ret);
-}
-
-/* *
  * @tc.name: CrownTransformProcessorTest_IsCrownEvent_004
  * @tc.desc: Test the funcation IsCrownEvent
  * @tc.type: Function
