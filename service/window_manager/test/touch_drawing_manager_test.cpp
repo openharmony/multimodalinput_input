@@ -357,5 +357,23 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetMultiWindowScreenId
     std::shared_ptr<DelegateInterface> proxy;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId));
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ResetTouchWindow
+ * @tc.desc: Test ResetTouchWindow
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ResetTouchWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.bubbleMode_.isShow = true;
+    touchDrawingMgr.pointerMode_.isShow = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.ResetTouchWindow());
+    touchDrawingMgr.touchDrawingHandler_ = ComponentManager::LoadLibrary<ITouchDrawingHandler>(nullptr,
+        "libmmi_touch_drawing_handler.z.so");
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.ResetTouchWindow());
+}
 } // namespace MMI
 } // namespace OHOS
