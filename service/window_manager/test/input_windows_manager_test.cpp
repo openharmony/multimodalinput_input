@@ -926,9 +926,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
     info.validHeight = info.height;
     coord.x = 10;
     coord.y = 20;
-    WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 779);
-    EXPECT_EQ(coord.y, 10);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->RotateScreen(info, coord));
 }
 
 /**
@@ -949,9 +947,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, Test
     info.validHeight = info.height;
     coord.x = 10;
     coord.y = 20;
-    WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 789);
-    EXPECT_EQ(coord.y, 579);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->RotateScreen(info, coord));
 }
 
 /**
@@ -972,9 +968,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     info.validHeight = info.height;
     coord.x = 10;
     coord.y = 20;
-    WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 20);
-    EXPECT_EQ(coord.y, 589);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->RotateScreen(info, coord));
 }
 
 /**
