@@ -21,7 +21,9 @@
 #include "key_option.h"
 #include "key_subscriber_handler.h"
 #include "key_shortcut_manager.h"
+#ifdef CALL_MANAGER_ENABLED
 #include "call_manager_client.h"
+#endif
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
@@ -721,6 +723,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, 
     ASSERT_NO_FATAL_FAILURE(handler.PrintKeyOption(keyOption));
 }
 
+#ifdef CALL_MANAGER_ENABLED
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_002
  * @tc.desc: Test HandleKeyUpWithDelay
@@ -942,6 +945,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
+#endif
 
 /**
  * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_002
@@ -1466,6 +1470,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsRepeatedKeyEvent, 
     ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
 }
 
+#ifdef CALL_MANAGER_ENABLED
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_010
  * @tc.desc: Test the funcation HandleRingMute
@@ -1501,6 +1506,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_010, 
     ret = handler.HandleRingMute(keyEvent);
     ASSERT_FALSE(ret);
 }
+#endif
 
 /**
  * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent_002
@@ -1776,6 +1782,8 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_004, Tes
     bool ret = handler.HandleKeyUp(keyEvent);
     ASSERT_FALSE(ret);
 }
+
+#ifdef CALL_MANAGER_ENABLED
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_01
  * @tc.desc: Test the funcation HandleRingMute
@@ -2029,6 +2037,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_11, T
     keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
+#endif
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_01
@@ -2640,6 +2649,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_InitDataShareListene
     EXPECT_NO_FATAL_FAILURE(handler.InitDataShareListener());
 }
 
+#ifdef CALL_MANAGER_ENABLED
 /**
  * @tc.name: KeySubscriberHandlerTest_RejectCallProcess
  * @tc.desc: Test RejectCallProcess
@@ -2726,6 +2736,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTime
     }
     EXPECT_NO_FATAL_FAILURE(handler.RemoveSubscriberTimer(keyEvent));
 }
+#endif
 
 /**
  * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
