@@ -2933,54 +2933,6 @@ ohos_unittest("ServerMsgHandlerTest") {
   }
 }
 
-ohos_unittest("ServerMsgHandlerSupTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [ "message_handle/test/server_msg_handler_sup_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:ability_connect_callback_stub",
-    "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "ffrt:libffrt",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_single",
-    "libinput:libinput-third-mmi",
-    "napi:ace_napi",
-    "preferences:native_preferences",
-    "window_manager:libwm",
-  ]
-
-  if (security_component_enable) {
-    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
-  }
-}
-
 ohos_unittest("PermissionHelperTest") {
   module_out_path = module_output_path
 

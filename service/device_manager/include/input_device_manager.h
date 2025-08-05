@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager final : public IDeviceObject {
+class InputDeviceManager final {
 private:
     struct InputDeviceInfo {
         struct libinput_device *inputDeviceOrigin { nullptr };
@@ -47,7 +47,6 @@ public:
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
-    bool IsRemoteInputDevice(int32_t deviceId) const;
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
