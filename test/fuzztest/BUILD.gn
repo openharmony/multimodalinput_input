@@ -64,7 +64,6 @@ group("test") {
     "inputevent_fuzzer:fuzztest",
     "isfocusedsession_fuzzer:fuzztest",
     "islocaldevice_fuzzer:fuzztest",
-    "isremoteinputdevice_fuzzer:fuzztest",
     "isscreenfold_fuzzer:fuzztest",
     "judgecamerainfore_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",

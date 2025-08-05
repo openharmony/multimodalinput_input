@@ -830,7 +830,6 @@ void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const str
 
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
-    inputDevice->SetVirtualDevice(true);
     virtualInputDevices_[deviceId] = inputDevice;
 }
 
@@ -984,12 +983,6 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
 #endif
     return RET_OK;
-}
-
-bool InputDeviceManager::IsRemoteInputDevice(int32_t deviceId) const
-{
-    auto iter = virtualInputDevices_.find(deviceId);
-    return ((iter != virtualInputDevices_.cend()) && (iter->second != nullptr) && iter->second->IsRemoteDevice());
 }
 
 int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
