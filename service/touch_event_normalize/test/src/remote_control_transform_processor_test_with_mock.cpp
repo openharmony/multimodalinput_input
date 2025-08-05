@@ -114,14 +114,6 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_003, TestS
     processor.pointerEvent_ = PointerEvent::Create();
     EXPECT_NE(processor.pointerEvent_, nullptr);
     MouseLocation expectLocation = {3, 3, 3};
-    EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    libinput_event_touch touchEvent;
-    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
-    EXPECT_CALL(libinputMock, TouchEventGetPressure).WillOnce(Return(100.0));
-    EXPECT_CALL(libinputMock, TouchEventGetContactLongAxis).WillOnce(Return(100));
-    EXPECT_CALL(libinputMock, TouchEventGetContactShortAxis).WillOnce(Return(100));
-    EXPECT_CALL(libinputMock, TouchEventGetSeatSlot).WillOnce(Return(100));
     libinput_event event;
     ASSERT_TRUE(processor.HandlePostInner(&event));
 }

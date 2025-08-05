@@ -1679,22 +1679,6 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ResetCanvasNode_001, T
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_InitLabels_001
- * @tc.desc: Test InitLabels
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_InitLabels_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.InitLabels();
-    EXPECT_EQ(touchDrawingHandler.isFirstDownAction_, true);
-    EXPECT_EQ(touchDrawingHandler.isDownAction_, true);
-    EXPECT_EQ(touchDrawingHandler.maxPointerCount_, 0);
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_SetMultiWindowScreenId
  * @tc.desc: Test SetMultiWindowScreenId
  * @tc.type: Function

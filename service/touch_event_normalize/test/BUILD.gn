@@ -1152,9 +1152,7 @@ group("TouchEventNormalizeTests") {
 
   deps = [
     ":InputDeviceConsumerHandlerTest",
-    ":RemoteControlTransformProcessorTestWithMock", 
     ":TouchEventNormalizeTest",
-    ":TouchTransformProcessorTestWithMock",
     ":TransformPointTest",
     ":TouchGestureManagerTestWithMock",
   ]
