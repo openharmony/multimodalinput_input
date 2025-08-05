@@ -805,8 +805,7 @@ bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent
 
 void KeyShortcutManager::UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) ||
-        (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL)) {
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         shortcutConsumed_.erase(keyEvent->GetKeyCode());
     }
 }
