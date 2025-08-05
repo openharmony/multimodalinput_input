@@ -506,7 +506,6 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
-    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     currentDirection_ = direction;
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
@@ -771,6 +770,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
         }
+        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
         hardwareCanvasSize_ = g_hardwareCanvasSize;
         // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
         // repeatedly obtain the surfaceBuffer.
