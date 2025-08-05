@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INPUTDEVICE_FUZZER
-#define INPUTDEVICE_FUZZER
+#ifndef NOTIFYINPUTDEVICEMESSAGE_FUZZER
+#define NOTIFYINPUTDEVICEMESSAGE_FUZZER
 
-#define FUZZ_PROJECT_NAME "inputdevice_fuzzer"
+#define FUZZ_PROJECT_NAME "notifyinputdevicemessage_fuzzer"
 
-#endif // INPUTDEVICE_FUZZER
+#endif // NOTIFYINPUTDEVICEMESSAGE_FUZZER
