@@ -322,5 +322,18 @@ void TouchDrawingManager::UnloadTouchDrawingHandler()
     }
     touchDrawingHandler_ = { nullptr, ComponentManager::Component<ITouchDrawingHandler>(nullptr, nullptr) };
 }
+
+void TouchDrawingManager::ResetTouchWindow()
+{
+    auto touchDrawingHandler = GetTouchDrawingHandler();
+    if (touchDrawingHandler != nullptr) {
+        touchDrawingHandler->UpdateLabels(false);
+        touchDrawingHandler->UpdateBubbleData(false);
+        UpdateLabels();
+        UpdateBubbleData();
+        MMI_HILOGI("Delete the original node, bubble:%{public}d,Label:%{public}d",
+            bubbleMode_.isShow, pointerMode_.isShow);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

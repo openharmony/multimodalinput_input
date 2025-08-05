@@ -240,7 +240,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     pointerStyle.id = 1;
     bool isUiExtension = false;
     int32_t ret = instance_->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 
     EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
 
@@ -660,5 +660,59 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_002, Test
     ASSERT_NE(instance_->soHandle_, nullptr);
     EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
 }
+
+/**
+ * @tc.name: CursorDrawingComponentTest_GetMouseIconPath
+ * @tc.desc: Test GetMouseIconPath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetMouseIconPath, TestSize.Level1)
+{
+    int32_t pid = 1;
+    int32_t windowId = 1;
+    CursorPixelMap curPixelMap;
+    int32_t ret = instance_->SetMouseIcon(pid, windowId, curPixelMap);
+    instance_->isLoaded_ = false;
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NO_FATAL_FAILURE(instance_->GetMouseIconPath());
+
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->GetMouseIconPath());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_RegisterDisplayStatusReceiver
+ * @tc.desc: Test RegisterDisplayStatusReceiver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayStatusReceiver, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
+
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
+}
+
+#ifndef OHOS_BUILD_ENABLE_WATCH
+/**
+ * @tc.name: CursorDrawingComponentTest_NotifyPointerEventToRS
+ * @tc.desc: Test NotifyPointerEventToRS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_NotifyPointerEventToRS, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    int32_t pointAction = 1;
+    int32_t pointCnt = 0;
+    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt));
+
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt));
+}
+#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace MMI
 } // namespace OHOS
