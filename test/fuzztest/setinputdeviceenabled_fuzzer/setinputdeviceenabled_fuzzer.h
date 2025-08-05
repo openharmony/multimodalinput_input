@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INPUTDEVICE_FUZZER
-#define INPUTDEVICE_FUZZER
+#ifndef SETINPUTDEVICEENABLED_FUZZER
+#define SETINPUTDEVICEENABLED_FUZZER
 
-#define FUZZ_PROJECT_NAME "inputdevice_fuzzer"
+#define FUZZ_PROJECT_NAME "setinputdeviceenabled_fuzzer"
 
-#endif // INPUTDEVICE_FUZZER
+#endif // SETINPUTDEVICEENABLED_FUZZER
