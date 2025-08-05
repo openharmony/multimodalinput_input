@@ -46,6 +46,7 @@ public:
     bool IsWindowRotation() const;
     void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+    void ResetTouchWindow();
 
 private:
     void SetupSettingObserver(int32_t nRetries);

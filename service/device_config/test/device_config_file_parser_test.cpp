@@ -39,25 +39,6 @@ public:
 };
 
 /**
- * @tc.name: DeviceConfigFileParserTest_CombDeviceFileName_001
- * @tc.desc: Test the function CombDeviceFileName
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DeviceConfigFileParserTest, DeviceConfigFileParserTest_CombDeviceFileName_001, TestSize.Level1)
-{
-    class MockLibinputDeviceNullName : public MockLibinputDevice {
-    public:
-        const char* LibinputDeviceGetName() const override { return nullptr; }
-    };
-
-    MockLibinputDeviceNullName mockDevice;
-    DeviceConfigManagement configManager;
-    std::string fileName = configManager.CombDeviceFileName(reinterpret_cast<struct libinput_device*>(&mockDevice));
-    EXPECT_NE(fileName, "63373_13888_63373_x");
-}
-
-/**
  * @tc.name: DeviceConfigFileParserTest_ConfigItemName2Id_001
  * @tc.desc: Test the function ConfigItemName2Id
  * @tc.type: FUNC

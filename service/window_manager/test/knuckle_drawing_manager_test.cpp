@@ -1287,6 +1287,45 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_InitParticleEmitte
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.InitParticleEmitter());
     EXPECT_FALSE(kceDrawMgr.isNeedInitParticleEmitter_);
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawBrushCanvas_003
+ * @tc.desc: Test Overrides DrawBrushCanvas function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawBrushCanvas_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "The test knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
+    kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(500);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawBrushCanvas());
+
+    auto pathSize = 8;
+    for (size_t i = 0; (i < pathSize); i++) {
+        Rosen::Drawing::Path path;
+        kceDrawMgr.pathInfos_.emplace_back(path);
+    }
+    EXPECT_GT(kceDrawMgr.pathInfos_.size(), pathSize);
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.DrawBrushCanvas());
+}
 #endif
 
 /**
