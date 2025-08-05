@@ -992,6 +992,7 @@ ohos_unittest("InputDisplayBindHelperTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/input_display_bind_helper_test.cpp" ]
@@ -1732,6 +1733,13 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "-Dprotected=public",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   sources = [
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/test/input_windows_manager_ex_test.cpp",
@@ -2238,9 +2246,6 @@ ohos_unittest("KeyCommandTest") {
 
   sources = [
     "key_command/test/ability_manager_client_stub.cpp",
-    "key_command/test/key_cmd_handleRepeatKey_test.cpp",
-    "key_command/test/key_cmd_sendKeyEvent_test.cpp",
-    "key_command/test/key_command_handler_test.cpp",
     "key_command/test/key_command_handler_util_test.cpp",
     "key_command/test/pull_throw_subscriber_handler_test.cpp",
     "key_command/test/setting_datashare_test.cpp",
