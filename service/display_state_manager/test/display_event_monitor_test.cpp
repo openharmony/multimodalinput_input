@@ -111,6 +111,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
     DisplayEventMonitor displayEventMonitor;
     displayEventMonitor.hasInit_ = false;
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
 }
 
 /**

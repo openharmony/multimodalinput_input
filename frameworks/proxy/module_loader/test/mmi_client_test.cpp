@@ -276,7 +276,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Stop_003, TestSize.Level1)
     auto eventRunner = AppExecFwk::EventRunner::Create(threadName);
     EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>(eventRunner);
     client->SetEventHandler(eventHandler);
-    client->Start();
+    ASSERT_TRUE(client->Start());
     ASSERT_NO_FATAL_FAILURE(client->Stop());
 }
 
@@ -309,6 +309,23 @@ HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
     client->OnDisconnect();
     ASSERT_NO_FATAL_FAILURE(client->OnDisconnect());
     client->Stop();
+}
+
+/**
+ * @tc.name: MMIClientTest_StartEventRunner_001
+ * @tc.desc: Start event runner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MMIClientTest_StartEventRunner_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->isConnected_ = true;
+    client->fd_ = 1;
+    client->eventHandler_ = nullptr;
+    bool result = client->StartEventRunner();
+    EXPECT_TRUE(result);
 }
 }
 } // namespace MMI
