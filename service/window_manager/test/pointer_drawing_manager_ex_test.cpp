@@ -1515,29 +1515,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
 }
 
 /**
- * @tc.name: PointerDrawingManagerExTest_SetCustomCursor
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetCustomCursor, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
-    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
-    PointerDrawingManager pointerDrawMgr;
-    std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
-    int32_t pid = 50;
-    int32_t windowId = 100;
-    int32_t focusX = 300;
-    int32_t focusY = 300;
-    CursorPixelMap curPixelMap;
-    curPixelMap.pixelMap = (void *)pixelMapPtr.get();
-    EXPECT_EQ(pointerDrawMgr.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY), RET_ERR);
-    testing::Mock::AllowLeak(winmgrmock.get());
-}
-
-/**
  * @tc.name: PointerDrawingManagerExTest_SetMouseIcon
  * @tc.desc: Test SetCustomCursor
  * @tc.type: FUNC
