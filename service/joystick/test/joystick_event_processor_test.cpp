@@ -440,7 +440,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize_002, T
 {
     CALL_TEST_DEBUG;
     auto JoystickEvent = new JoystickEventProcessor(2);
-    const struct libinput_event_joystick_axis_abs_info axis = { 
+    const struct libinput_event_joystick_axis_abs_info axis = {
         .code = 1,
         .value = 5,
         .maximum = 0,
@@ -465,7 +465,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_Normalize_003, T
 {
     CALL_TEST_DEBUG;
     auto JoystickEvent = new JoystickEventProcessor(2);
-    const struct libinput_event_joystick_axis_abs_info axis = { 
+    const struct libinput_event_joystick_axis_abs_info axis = {
         .code = 1,
         .value = 20,
         .maximum = 10,
