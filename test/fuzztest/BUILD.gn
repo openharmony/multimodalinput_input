@@ -136,7 +136,11 @@ group("test") {
     "subscribekeyevent_fuzzer:fuzztest",
     "subscribeswitchevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
+    "touchpadpinchswitch_fuzzer:fuzztest",
+    "touchpadpointerspeed_fuzzer:fuzztest",
+    "touchpadscrolldirection_fuzzer:fuzztest",
     "touchpadscrollswitch_fuzzer:fuzztest",
+    "touchpadtapswitch_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
