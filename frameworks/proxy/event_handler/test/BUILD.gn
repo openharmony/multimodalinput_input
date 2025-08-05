@@ -67,6 +67,7 @@ ohos_unittest("MultimodalEventHandlerTest") {
 
   sources = [
     "multimodal_event_handler_test.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_active_subscribe_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_device_consumer.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_manager_impl.cpp",
@@ -76,6 +77,7 @@ ohos_unittest("MultimodalEventHandlerTest") {
     "${mmi_path}/frameworks/proxy/event_handler/src/pre_monitor_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/switch_event_input_subscribe_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/tablet_event_input_subscribe_manager.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/input_manager.cpp",
   ]
 
   configs = [
@@ -91,6 +93,7 @@ ohos_unittest("MultimodalEventHandlerTest") {
   ]
 
   deps = [
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
     "${mmi_path}/util:libmmi-util",
   ]
