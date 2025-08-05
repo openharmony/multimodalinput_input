@@ -245,6 +245,7 @@ group("mmi_tests") {
     "tools/inject_event:InjectEventTest",
     "util:UdsClientTest",
     "util/common:UtilCommonTest",
+    "util/json_parser:JsonParserTest",
   ]
 
   if (input_feature_switch) {

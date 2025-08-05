@@ -101,6 +101,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [

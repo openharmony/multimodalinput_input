@@ -17,15 +17,10 @@
 #include "mmi_log.h"
 #include "define_multimodal.h"
 
-#include "cJSON.h"
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsonParser"
 namespace OHOS {
 namespace MMI {
-namespace {
-    constexpr int32_t maxJsonArraySize { 1000 };
-} // namespace
 
 JsonParser::JsonParser(const char *jsonStr)
 {
@@ -59,12 +54,12 @@ JsonParser& JsonParser::operator=(JsonParser&& other) noexcept
     return *this;
 }
 
-cJSON* JsonParser::Get() const
+const cJSON* JsonParser::Get() const
 {
     return json_;
 }
 
-int32_t JsonParser::ParseInt32(cJSON *json, const std::string &key, int32_t &value)
+int32_t JsonParser::ParseInt32(const cJSON *json, const std::string &key, int32_t &value)
 {
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
@@ -76,7 +71,7 @@ int32_t JsonParser::ParseInt32(cJSON *json, const std::string &key, int32_t &val
     return RET_OK;
 }
  
-int32_t JsonParser::ParseString(cJSON *json, const std::string &key, std::string &value)
+int32_t JsonParser::ParseString(const cJSON *json, const std::string &key, std::string &value)
 {
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
@@ -88,7 +83,7 @@ int32_t JsonParser::ParseString(cJSON *json, const std::string &key, std::string
     return RET_OK;
 }
  
-int32_t JsonParser::ParseBool(cJSON *json, const std::string &key, bool &value)
+int32_t JsonParser::ParseBool(const cJSON *json, const std::string &key, bool &value)
 {
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
@@ -100,7 +95,8 @@ int32_t JsonParser::ParseBool(cJSON *json, const std::string &key, bool &value)
     return RET_OK;
 }
  
-int32_t JsonParser::ParseStringArray(cJSON *json, const std::string &key, std::vector<std::string> &value, int32_t maxSize)
+int32_t JsonParser::ParseStringArray(const cJSON *json, const std::string &key, std::vector<std::string> &value,
+    int32_t maxSize)
 {
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
