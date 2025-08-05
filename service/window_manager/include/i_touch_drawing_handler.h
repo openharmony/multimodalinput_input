@@ -30,6 +30,7 @@ public:
     virtual void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual void RotationScreen() = 0;
     virtual void UpdateLabels(bool isOn) = 0;
+    virtual bool IsValidScaleInfo() = 0;
     virtual void UpdateBubbleData(bool isOn) = 0;
     virtual void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;

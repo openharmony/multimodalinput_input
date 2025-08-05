@@ -1851,5 +1851,69 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_StartTrace, TestSize.L
     int32_t pointerId = 1;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.StartTrace(pointerId));
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_001
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler handler;
+    handler.scaleW_ = 10;
+    handler.scaleH_ = 20;
+    bool result = handler.IsValidScaleInfo();
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_002
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler handler;
+    handler.scaleW_ = 0;
+    handler.scaleH_ = 0;
+    bool result = handler.IsValidScaleInfo();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_002
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler handler;
+    handler.scaleW_ = 0;
+    handler.scaleH_ = 2700;
+    bool result = handler.IsValidScaleInfo();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_002
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler handler;
+    handler.scaleW_ = 2700;
+    handler.scaleH_ = 0;
+    bool result = handler.IsValidScaleInfo();
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS

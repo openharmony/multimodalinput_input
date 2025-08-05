@@ -198,6 +198,14 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
     }
 }
 
+bool TouchDrawingHandler::IsValidScaleInfo()
+{
+    if (scaleW_ != 0 && scaleH_ != 0) {
+        return true;
+    }
+    return false;
+}
+
 void TouchDrawingHandler::UpdateLabels(bool isOn)
 {
     CALL_DEBUG_ENTER;
