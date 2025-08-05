@@ -71,7 +71,9 @@ private:
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
+#ifdef CALL_MANAGER_ENABLED
     bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);
+#endif
     bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber> &subscriber);
@@ -120,9 +122,11 @@ private:
     void GetForegroundPids(std::set<int32_t> &pidList);
     void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);
     void RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEvent);
+#ifdef CALL_MANAGER_ENABLED
     bool HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent);
     void HangUpCallProcess();
     void RejectCallProcess();
+#endif
 
 private:
     SubscriberCollection subscriberMap_;
