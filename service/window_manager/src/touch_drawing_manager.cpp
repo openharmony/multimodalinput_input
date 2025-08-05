@@ -33,6 +33,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t REPEAT_THIRTY_TIMES { 30 };
 constexpr int32_t REPEAT_COOLING_TIME { 500 };
 const std::string SHOW_CURSOR_SWITCH_NAME { "settings.input.show_touch_hint" };
 const std::string POINTER_POSITION_SWITCH_NAME { "settings.developer.show_touch_track" };
@@ -42,6 +43,7 @@ constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr char LIB_TOUCH_DRAWING_HANDLER_PATH[] { "libmmi_touch_drawing_handler.z.so" };
+constexpr int32_t DEFAULT_VALUE { -1 };
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager() {}
@@ -139,8 +141,13 @@ int32_t TouchDrawingManager::UpdateLabels()
             MMI_HILOGW("Failed to load touch drawing handler");
             return RET_ERR;
         }
-        touchDrawingHandler->UpdateLabels(true);
+        if (touchDrawingHandler->IsValidScaleInfo()) {
+            touchDrawingHandler->UpdateLabels(true);
+            return RET_OK;
+        }
+        AddUpdateLabelsTimer();
     } else {
+        RemoveUpdateLabelsTimer();
         auto touchDrawingHandler = GetTouchDrawingHandler();
         if (touchDrawingHandler == nullptr) {
             MMI_HILOGD("No touch drawing handler");
@@ -150,6 +157,33 @@ int32_t TouchDrawingManager::UpdateLabels()
         UnloadTouchDrawingHandler();
     }
     return RET_OK;
+}
+
+void TouchDrawingManager::RemoveUpdateLabelsTimer()
+{
+    if (timerId_ != DEFAULT_VALUE) {
+        TimerMgr->RemoveTimer(timerId_);
+        timerId_ = DEFAULT_VALUE;
+    }
+}
+
+void TouchDrawingManager::AddUpdateLabelsTimer()
+{
+    if (timerId_ != DEFAULT_VALUE) {
+        MMI_HILOGE("The timer is running");
+        return;
+    }
+    timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_THIRTY_TIMES, [this]() {
+        auto touchDrawingHandler = GetTouchDrawingHandler();
+        CHKPV(touchDrawingHandler);
+        if (!touchDrawingHandler->IsValidScaleInfo()) {
+            MMI_HILOGE("The scale info is invalid, need to retry");
+            return;
+        }
+        touchDrawingHandler->UpdateLabels(true);
+        TimerMgr->RemoveTimer(timerId_);
+        timerId_ = DEFAULT_VALUE;
+    });
 }
 
 int32_t TouchDrawingManager::UpdateBubbleData()
