@@ -77,8 +77,8 @@ struct Input_AxisEvent {
     int32_t axisAction;
     float displayX;
     float displayY;
-    int32_t globalX;
-    int32_t globalY;
+    int32_t globalX { INT_MAX  };
+    int32_t globalY { INT_MAX  };
     std::map<int32_t, double> axisValues;
     int64_t actionTime { -1 };
     int32_t sourceType;
