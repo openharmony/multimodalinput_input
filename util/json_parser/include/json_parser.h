@@ -18,8 +18,8 @@
 
 #include <cinttypes>
 #include <string>
+#include <vector>
 #include "cJSON.h"
-#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,12 +33,16 @@ public:
     JsonParser(JsonParser&& other) noexcept;
     JsonParser& operator=(JsonParser&& other);
     cJSON* Get() const;
-private:
-    cJSON* json_;
-public:
-    
-};
 
+private:
+    cJSON* json_ { nullptr };
+
+public:
+    static int32_t ParseInt32(cJSON *json, const std::string &key, int32_t &value);
+    static int32_t ParseString(cJSON *json, const std::string &key, std::string &value);
+    static int32_t ParseBool(cJSON *json, const std::string &key, bool &value);
+    static int32_t ParseStringArray(cJSON *json, const std::string &key, std::vector<std::string> &value, int32_t maxSize);
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_JSON_PARSER_H

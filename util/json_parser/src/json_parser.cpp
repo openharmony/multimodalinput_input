@@ -14,26 +14,35 @@
  */
 
 #include "json_parser.h"
+#include "mmi_log.h"
+#include "define_multimodal.h"
 
+#include "cJSON.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsonParser"
 namespace OHOS {
 namespace MMI {
-explicit JsonParser::JsonParser(const char *jsonStr)
+namespace {
+    constexpr int32_t maxJsonArraySize { 1000 };
+} // namespace
+
+JsonParser::JsonParser(const char *jsonStr)
 {
     json_ = cJSON_Parse(jsonStr);
-    if (!json_) {
-        MMI_HILOGE("json_ is nullptr");
-    }
+    CHKPV(json_);
 }
 
 JsonParser::~JsonParser()
 {
-    if (json_) {
+    if (json_ != nullptr) {
         cJSON_Delete(json_);
         json_ = nullptr;
     }
 }
 
-JsonParser::JsonParser(JsonParser&& other) noexcept : json_(other.json_) {
+JsonParser::JsonParser(JsonParser&& other) noexcept : json_(other.json_)
+{
     other.json_ = nullptr;
 }
 
@@ -42,7 +51,7 @@ JsonParser& JsonParser::operator=(JsonParser&& other) noexcept
     if (this == &other) {
         return *this;
     }
-    if (json_) {
+    if (json_ != nullptr) {
         cJSON_Delete(json_);
     }
     json_ = other.json_;

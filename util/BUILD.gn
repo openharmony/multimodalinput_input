@@ -76,6 +76,8 @@ ohos_rust_unittest("rust_mmi_key_config_test") {
   part_name = "input"
 }
 
+
+
 ohos_shared_library("libmmi-util") {
   sources = libmmi_util_sources
   public_configs = [
