@@ -6809,13 +6809,12 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser jsonData;
-    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData.json_)) {
+    JsonParser jsonData(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.Get())) {
         MMI_HILOGE("The json data is not object");
         return false;
     }
-    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "whiteList");
+    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.Get(), "whiteList");
     if (!cJSON_IsArray(whiteList)) {
         MMI_HILOGE("White list number must be array");
         return false;

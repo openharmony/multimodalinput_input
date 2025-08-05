@@ -31,17 +31,18 @@ public:
     JsonParser(const JsonParser&) = delete;
     JsonParser& operator=(const JsonParser&) = delete;
     JsonParser(JsonParser&& other) noexcept;
-    JsonParser& operator=(JsonParser&& other);
-    cJSON* Get() const;
+    JsonParser& operator=(JsonParser&& other) noexcept;
+    const cJSON* Get() const;
 
 private:
     cJSON* json_ { nullptr };
 
 public:
-    static int32_t ParseInt32(cJSON *json, const std::string &key, int32_t &value);
-    static int32_t ParseString(cJSON *json, const std::string &key, std::string &value);
-    static int32_t ParseBool(cJSON *json, const std::string &key, bool &value);
-    static int32_t ParseStringArray(cJSON *json, const std::string &key, std::vector<std::string> &value, int32_t maxSize);
+    static int32_t ParseInt32(const cJSON *json, const std::string &key, int32_t &value);
+    static int32_t ParseString(const cJSON *json, const std::string &key, std::string &value);
+    static int32_t ParseBool(const cJSON *json, const std::string &key, bool &value);
+    static int32_t ParseStringArray(const cJSON *json, const std::string &key, std::vector<std::string> &value,
+        int32_t maxSize);
 };
 } // namespace MMI
 } // namespace OHOS
