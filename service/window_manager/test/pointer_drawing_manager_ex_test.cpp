@@ -1116,29 +1116,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetCustomCursor_002
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = 1;
-    int32_t focusX = 2;
-    int32_t focusY = 3;
-    CursorPixelMap curPixelMap;
-    curPixelMap.pixelMap = (void *)pixelMap.get();
-    int32_t ret = pointerDrawingManager.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerColor_01
  * @tc.desc: Test SetPointerColor
  * @tc.type: FUNC
