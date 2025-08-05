@@ -240,7 +240,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Stop_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
-    client->Start();
+    ASSERT_TRUE(client->Start());
     ASSERT_NO_FATAL_FAILURE(client->Stop());
 }
 
@@ -258,7 +258,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Stop_002, TestSize.Level1)
     auto eventRunner = AppExecFwk::EventRunner::Create(threadName);
     EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>(eventRunner);
     client->SetEventHandler(eventHandler);
-    client->Start();
+    ASSERT_TRUE(client->Start());
     ASSERT_NO_FATAL_FAILURE(client->Stop());
 }
 
