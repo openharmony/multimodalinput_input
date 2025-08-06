@@ -229,7 +229,7 @@ HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_01, TestSize.Level1)
 
 /**
  * @tc.name: EventDispatchTest_AddFlagToEsc001
- * @tc.desc: Test DddFlagToEsc
+ * @tc.desc: Test AddFlagToEsc
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -272,7 +272,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc001, TestSize.Level0)
 
 /**
  * @tc.name: EventDispatchTest_AddFlagToEsc002
- * @tc.desc: Test DddFlagToEsc
+ * @tc.desc: Test AddFlagToEsc
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -317,7 +317,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc002, TestSize.Level1)
 
 /**
  * @tc.name: EventDispatchTest_AddFlagToEsc003
- * @tc.desc: Test DddFlagToEsc
+ * @tc.desc: Test AddFlagToEsc
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -354,7 +354,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc003, TestSize.Level1)
 
 /**
  * @tc.name: EventDispatchTest_AddFlagToEsc004
- * @tc.desc: Test DddFlagToEsc
+ * @tc.desc: Test AddFlagToEsc
  * @tc.type: FUNC
  * @tc.require:
  */
