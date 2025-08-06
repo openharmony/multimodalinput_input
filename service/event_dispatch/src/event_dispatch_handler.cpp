@@ -45,6 +45,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
+    AddFlagToEsc(keyEvent);
     DispatchKeyEventPid(*udsServer, keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -147,6 +148,33 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
         }
     }
     return false;
+}
+
+void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHPKV(keyEvent);
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_ESCAPE) {
+        return;
+    }
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE)) {
+        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    }
+
+    MMI_HILOGD("ESC in: %{public}s", keyEvent->ToString().c_str());
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN &&
+        keyEvent->GetKeyCode() == KeyEvent::KEYCODE_ESCAPE) {
+        escToBackFlag_ = true;
+        return;
+    }
+
+    if (escToBackFlag_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_ESCAPE &&
+        (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP ||
+        eyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) &&
+        keyEvent->GetKeyItems().size() == 1) {
+        MMI_HILOGI("Only esc up or cancel has added flag: %{public}s", keyEvent->ToString().c_str());
+        keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+        escToBackFlag_ = false;
+    }
 }
 
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
