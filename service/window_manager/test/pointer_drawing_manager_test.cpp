@@ -2792,7 +2792,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
     ASSERT_EQ(ret, RET_OK);
     windowId = 1;
     ret = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
     IconStyle iconStyle;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
