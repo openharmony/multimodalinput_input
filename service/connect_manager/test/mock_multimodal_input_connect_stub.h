@@ -23,7 +23,7 @@
 #include "input_event_handler.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_manager.h"
-#endif  // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_WATCH
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 
@@ -111,7 +111,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     MOCK_METHOD(int32_t, SubscribeKeyMonitor, (const KeyMonitorOption &keyOption), (override));
     MOCK_METHOD(int32_t, UnsubscribeKeyMonitor, (const KeyMonitorOption &keyOption), (override));
-#endif  // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
+#endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     MOCK_METHOD(int32_t, SubscribeSwitchEvent, (int32_t subscribeId, int32_t switchType), (override));
     MOCK_METHOD(int32_t, UnsubscribeSwitchEvent, (int32_t subscribeId), (override));
     MOCK_METHOD(int32_t, QuerySwitchStatus, (int32_t switchType, int32_t &state), (override));
@@ -171,7 +171,7 @@ public:
     MOCK_METHOD(int32_t, TransmitInfrared, (int64_t number, std::vector<int64_t> &pattern), (override));
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     MOCK_METHOD(int32_t, CreateVKeyboardDevice, (sptr<IRemoteObject> & vkeyboardDevice), (override));
-#endif  // OHOS_BUILD_ENABLE_VKEYBOARD
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t userId), (override));
     MOCK_METHOD(int32_t, SetTouchpadThreeFingersTapSwitch, (bool switchFlag), (override));
     MOCK_METHOD(int32_t, GetTouchpadThreeFingersTapSwitch, (bool &switchFlag), (override));
@@ -182,7 +182,7 @@ public:
     MOCK_METHOD(int32_t, GetIntervalSinceLastInput, (int64_t & timeInterval), (override));
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MOCK_METHOD(int32_t, GetPointerSnapshot, (void *pixelMapPtr), (override));
-#endif  // OHOS_BUILD_ENABLE_MAGICCURSOR
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     MOCK_METHOD(int32_t, SetClientInfo, (int32_t pid, uint64_t readThreadId), (override));
     MOCK_METHOD(int32_t, SetTouchpadScrollRows, (int32_t rows), (override));
     MOCK_METHOD(int32_t, GetTouchpadScrollRows, (int32_t & rows), (override));
@@ -190,7 +190,7 @@ public:
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel> channel), (override));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel> channel), (override));
     MOCK_METHOD(int32_t, CheckKnuckleEvent, (float pointX, float pointY, bool &isKnuckleType), (override));
-#endif  // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
     MOCK_METHOD(int32_t, TransferBinderClientSrv, (const sptr<IRemoteObject> &binderClientObject), (override));
     MOCK_METHOD(int32_t, SkipPointerLayer, (bool isSkip), (override));
     MOCK_METHOD(int32_t, GetAllSystemHotkeys, (std::vector<std::unique_ptr<KeyOption>> & keyOptions), (override));
@@ -208,6 +208,6 @@ public:
     MOCK_METHOD(int32_t, SetMouseAccelerateMotionSwitch, (int32_t deviceId, bool enable), (override));
     MOCK_METHOD(int32_t, SwitchScreenCapturePermission, (uint32_t permissionType, bool enable), (override));
 };
-}  // namespace MMI
-}  // namespace OHOS
-#endif  // MOCK_MULTIMODAL_INPUT_CONNECT_STUB_H
+} // namespace MMI
+} // namespace OHOS
+#endif // MOCK_MULTIMODAL_INPUT_CONNECT_STUB_H

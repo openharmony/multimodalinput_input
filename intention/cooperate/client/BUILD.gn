@@ -57,12 +57,9 @@ ohos_source_set("intention_cooperate_client") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "input:libmmi-client",
   ]
-
-  if (hitrace_enabled) {
-    external_deps += [ "hitrace:hitrace_meter" ]
-  }
 
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
