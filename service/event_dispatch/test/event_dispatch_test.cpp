@@ -327,8 +327,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc003, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    keyEvent::KeyItem item1;
-    keyEvent::KeyItem item2;
+    KeyEvent::KeyItem item1;
+    KeyEvent::KeyItem item2;
     keyEvent->AddPressedKeyItems(item1);
     keyEvent->AddPressedKeyItems(item2);
     EXPECT_EQ(keyEvent->GetKeyItems().size(), 2);
