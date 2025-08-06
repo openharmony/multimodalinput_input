@@ -25,15 +25,14 @@ namespace MMI {
 template <class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
+    if (data == nullptr || size < sizeof(T)) {
         return 0;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    errno_t ret = memcpy_s(&object, sizeof(T), data, sizeof(T));
     if (ret != EOK) {
         return 0;
     }
-    return objectSize;
+    return sizeof(T);
 }
 
 void TouchpadPinchSwitchFuzzTest(const uint8_t *data, size_t size)

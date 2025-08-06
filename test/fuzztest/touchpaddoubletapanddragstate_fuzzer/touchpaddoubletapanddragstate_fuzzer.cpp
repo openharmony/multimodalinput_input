@@ -19,35 +19,43 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchPadDoubleTapAndDragStateFuzzTest"
+
 namespace OHOS {
 namespace MMI {
 
 template <class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
+    if (data == nullptr || size < sizeof(T)) {
         return 0;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    errno_t ret = memcpy_s(&object, sizeof(T), data, sizeof(T));
     if (ret != EOK) {
         return 0;
     }
-    return objectSize;
+    return sizeof(T);
 }
 
 void TouchpadDoubleTapAndDragStateFuzzTest(const uint8_t *data, size_t size)
 {
+    if (data == nullptr || size < sizeof(bool)) {
+        return;
+    }
+
     bool switchFlag = false;
     size_t offset = GetObject<bool>(switchFlag, data, size);
     if (offset == 0) {
         return;
     }
 
-    InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(switchFlag);
+    int32_t ret = InputManager::GetInstance()->SetTouchpadDoubleTapAndDragState(switchFlag);
+    MMI_HILOGD("SetTouchpadDoubleTapAndDragState return:%{public}d", ret);
 
     bool outFlag = false;
-    InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(outFlag);
+    ret = InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(outFlag);
+    MMI_HILOGD("GetTouchpadDoubleTapAndDragState return:%{public}d, outFlag:%{public}d", ret, outFlag);
 }
 
 } // namespace MMI
