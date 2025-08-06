@@ -73,7 +73,7 @@ private:
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
 #ifdef CALL_MANAGER_ENABLED
     bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);
-#endif
+#endif // CALL_MANAGER_ENABLED
     bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber> &subscriber);
@@ -126,7 +126,7 @@ private:
     bool HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent);
     void HangUpCallProcess();
     void RejectCallProcess();
-#endif
+#endif // CALL_MANAGER_ENABLED
 
 private:
     SubscriberCollection subscriberMap_;
