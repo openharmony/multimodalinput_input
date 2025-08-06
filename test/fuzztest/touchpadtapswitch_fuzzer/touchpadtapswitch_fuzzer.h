@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TOUCHPAD_TAP_SWITCH_FUZZER_H
-#define TOUCHPAD_TAP_SWITCH_FUZZER_H
+#ifndef TOUCHPADTAPSWITCH_FUZZER_H
+#define TOUCHPADTAPSWITCH_FUZZER_H
 
 #include <cstddef>
 #include <cstdint>
@@ -25,4 +25,4 @@ void TouchpadTapSwitchFuzzTest(const uint8_t *data, size_t size);
 } // namespace MMI
 } // namespace OHOS
 
-#endif // TOUCHPAD_TAP_SWITCH_FUZZER_H
+#endif // TOUCHPADTAPSWITCH_FUZZER_H

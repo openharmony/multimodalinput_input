@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TOUCHPAD_POINTER_SPEED_FUZZER_H
-#define TOUCHPAD_POINTER_SPEED_FUZZER_H
+#ifndef TOUCHPADPOINTERSPEED_FUZZER_H
+#define TOUCHPADPOINTERSPEED_FUZZER_H
 
 #include <cstddef>
 #include <cstdint>
@@ -25,4 +25,4 @@ void TouchpadPointerSpeedFuzzTest(const uint8_t *data, size_t size);
 } // namespace MMI
 } // namespace OHOS
 
-#endif // TOUCHPAD_POINTER_SPEED_FUZZER_H
+#endif // TOUCHPADPOINTERSPEED_FUZZER_H
