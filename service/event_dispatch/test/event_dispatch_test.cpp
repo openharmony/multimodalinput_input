@@ -240,8 +240,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc001, TestSize.Level0)
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent::KeyItem item;
-    KeyEvent->AddPressedKeyItems(item);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
     EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
 
     EXPECT_EQ(dispatch.escToBackFlag_, false);
@@ -329,8 +329,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc003, TestSize.Level1)
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent::KeyItem item1;
     keyEvent::KeyItem item2;
-    KeyEvent->AddPressedKeyItems(item1);
-    KeyEvent->AddPressedKeyItems(item2);
+    keyEvent->AddPressedKeyItems(item1);
+    keyEvent->AddPressedKeyItems(item2);
     EXPECT_EQ(keyEvent->GetKeyItems().size(), 2);
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
 
@@ -364,8 +364,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc004, TestSize.Level1)
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    keyEvent::KeyItem item;
-    KeyEvent->AddPressedKeyItems(item);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
     EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
 
