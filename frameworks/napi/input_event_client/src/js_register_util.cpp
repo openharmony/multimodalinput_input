@@ -99,7 +99,6 @@ int32_t GetOptionalNamedPropertyInt32(const napi_env& env, const napi_value& obj
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Not number");
         return RET_ERR;
     }
     double doubleValue = 0.0;
@@ -112,7 +111,6 @@ int32_t GetOptionalNamedPropertyInt32(const napi_env& env, const napi_value& obj
     }
     if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
         MMI_HILOGE("NapiElement get int32 value failed");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Get int32 value is failed");
         return RET_ERR;
     }
     return RET_OK;
