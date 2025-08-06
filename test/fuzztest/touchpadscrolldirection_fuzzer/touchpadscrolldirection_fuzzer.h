@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TOUCHPAD_SCROLL_DIRECTION_FUZZER_H
-#define TOUCHPAD_SCROLL_DIRECTION_FUZZER_H
+#ifndef TOUCHPADSCROLLDIRECTION_FUZZER_H
+#define TOUCHPADSCROLLDIRECTION_FUZZER_H
 
 #include <cstddef>
 #include <cstdint>
@@ -25,4 +25,4 @@ void TouchpadScrollDirectionFuzzTest(const uint8_t *data, size_t size);
 } // namespace MMI
 } // namespace OHOS
 
-#endif // TOUCHPAD_SCROLL_DIRECTION_FUZZER_H
+#endif // TOUCHPADSCROLLDIRECTION_FUZZER_H

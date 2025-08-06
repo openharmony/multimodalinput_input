@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TOUCHPAD_PINCH_SWITCH_FUZZER_H
-#define TOUCHPAD_PINCH_SWITCH_FUZZER_H
+#ifndef TOUCHPADPINCHSWITCH_FUZZER_H
+#define TOUCHPADPINCHSWITCH_FUZZER_H
 
 #include <cstddef>
 #include <cstdint>
@@ -25,4 +25,4 @@ void TouchpadPinchSwitchFuzzTest(const uint8_t *data, size_t size);
 } // namespace MMI
 } // namespace OHOS
 
-#endif // TOUCHPAD_PINCH_SWITCH_FUZZER_H
+#endif // TOUCHPADPINCHSWITCH_FUZZER_H
