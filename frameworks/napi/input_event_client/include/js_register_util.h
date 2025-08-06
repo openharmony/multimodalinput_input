@@ -23,6 +23,8 @@ namespace MMI {
 int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name, bool& ret);
 int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name,
     int32_t& ret, bool required = true);
+int32_t GetOptionalNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name,
+    int32_t& ret);
 int32_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name, int64_t& ret);
 int32_t GetNamedPropertyDouble(const napi_env& env, const napi_value& object, const std::string& name, double& ret);
 bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type);
