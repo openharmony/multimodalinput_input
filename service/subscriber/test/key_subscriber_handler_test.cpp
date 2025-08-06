@@ -23,7 +23,7 @@
 #include "key_shortcut_manager.h"
 #ifdef CALL_MANAGER_ENABLED
 #include "call_manager_client.h"
-#endif
+#endif // CALL_MANAGER_ENABLED
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
@@ -945,7 +945,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
-#endif
+#endif // CALL_MANAGER_ENABLED
 
 /**
  * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_002
@@ -2037,7 +2037,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_11, T
     keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
-#endif
+#endif // CALL_MANAGER_ENABLED
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_01
@@ -2736,7 +2736,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTime
     }
     EXPECT_NO_FATAL_FAILURE(handler.RemoveSubscriberTimer(keyEvent));
 }
-#endif
+#endif // CALL_MANAGER_ENABLED
 
 /**
  * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
