@@ -2208,8 +2208,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
     keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     
-    keyEvent::KeyItem item;
-    KeyEvent->AddPressedKeyItems(item);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
     EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
