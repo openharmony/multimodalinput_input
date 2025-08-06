@@ -49,8 +49,8 @@ private:
     void UpdateButtonState(const KeyEvent::KeyItem &keyItem);
     void CheckHAT0X(std::shared_ptr<PointerEvent> pointerEvent, std::vector<KeyEvent::KeyItem> &buttonEvents) const;
     void CheckHAT0Y(std::shared_ptr<PointerEvent> pointerEvent, std::vector<KeyEvent::KeyItem> &buttonEvents) const;
-    std::shared_ptr<KeyEvent> FormatButtonEvent(const KeyEvent::KeyItem &button) const;
-    std::shared_ptr<KeyEvent> CleanUpKeyEvent() const;
+    std::shared_ptr<KeyEvent> FormatButtonEvent(const KeyEvent::KeyItem &button);
+    std::shared_ptr<KeyEvent> CleanUpKeyEvent();
     std::string DumpJoystickAxisEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
     static double Normalize(const struct libinput_event_joystick_axis_abs_info &axis, double low, double high);
 
@@ -58,6 +58,7 @@ private:
     const int32_t deviceId_ { -1 };
     std::set<int32_t> pressedButtons_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 
     const std::map<enum libinput_joystick_axis_source, AxisInfo> axesMap_ {
         {
