@@ -49,7 +49,7 @@ public:
     void ResetTouchWindow();
 
 private:
-    void SetupSettingObserver(int32_t nRetries);
+    void SetupSettingObserver();
     void CreateObserver();
     int32_t UpdateLabels();
     void RemoveUpdateLabelsTimer();
