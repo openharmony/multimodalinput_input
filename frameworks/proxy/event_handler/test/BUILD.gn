@@ -80,6 +80,13 @@ ohos_unittest("MultimodalEventHandlerTest") {
     "${mmi_path}/frameworks/proxy/events/src/input_manager.cpp",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./../../ipc_blocklist.txt"
+  }
+
   configs = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
     "${mmi_path}:coverage_flags",
