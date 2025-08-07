@@ -314,7 +314,7 @@ PointerDrawingManager::~PointerDrawingManager()
         }
         if (moveRetryRunner_ != nullptr) {
             moveRetryRunner_->Stop();
-        }   
+        }
         if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
             moveRetryThread_->join();
         }
