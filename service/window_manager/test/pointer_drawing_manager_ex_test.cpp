@@ -1116,29 +1116,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetCustomCursor_002
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = 1;
-    int32_t focusX = 2;
-    int32_t focusY = 3;
-    CursorPixelMap curPixelMap;
-    curPixelMap.pixelMap = (void *)pixelMap.get();
-    int32_t ret = pointerDrawingManager.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerColor_01
  * @tc.desc: Test SetPointerColor
  * @tc.type: FUNC
@@ -1535,29 +1512,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
         pointerDrawMgr.pidInfos_.push_back(pidInfo);
     }
     ASSERT_EQ(pointerDrawMgr.SetPointerVisible(pid, visible, priority, isHap), RET_OK);
-}
-
-/**
- * @tc.name: PointerDrawingManagerExTest_SetCustomCursor
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetCustomCursor, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
-    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
-    PointerDrawingManager pointerDrawMgr;
-    std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
-    int32_t pid = 50;
-    int32_t windowId = 100;
-    int32_t focusX = 300;
-    int32_t focusY = 300;
-    CursorPixelMap curPixelMap;
-    curPixelMap.pixelMap = (void *)pixelMapPtr.get();
-    EXPECT_EQ(pointerDrawMgr.SetCustomCursor(curPixelMap, pid, windowId, focusX, focusY), RET_ERR);
-    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**

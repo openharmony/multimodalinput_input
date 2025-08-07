@@ -198,5 +198,5 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_01, TestSize
     keyMonitorManager->OnSessionLost(session);
     EXPECT_EQ(keyMonitorManager->monitors_.size(), 0);
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

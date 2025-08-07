@@ -177,11 +177,11 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     struct stat statbuf;
 
     if (stat(devPath.c_str(), &statbuf) != 0) {
-        FI_HILOGW("Invalid device path:%{private}s", devPath.c_str());
+        FI_HILOGD("Invalid device path:%{private}s", devPath.c_str());
         return nullptr;
     }
     if (!S_ISCHR(statbuf.st_mode)) {
-        FI_HILOGW("Not character device:%{private}s", devPath.c_str());
+        FI_HILOGD("Not character device:%{private}s", devPath.c_str());
         return nullptr;
     }
 
@@ -193,14 +193,14 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 
     std::shared_ptr<IDevice> dev = FindDevice(devPath);
     if (dev != nullptr) {
-        FI_HILOGW("Already exists:%{private}s", devPath.c_str());
+        FI_HILOGD("Already exists:%{private}s", devPath.c_str());
         return dev;
     }
 
     const std::string lSysPath { SYS_INPUT_PATH + devNode };
     char rpath[PATH_MAX];
     if (realpath(lSysPath.c_str(), rpath) == nullptr) {
-        FI_HILOGW("Invalid sysPath:%{private}s", lSysPath.c_str());
+        FI_HILOGD("Invalid sysPath:%{private}s", lSysPath.c_str());
         return nullptr;
     }
 
@@ -213,7 +213,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     }
     auto ret = devices_.insert_or_assign(dev->GetId(), dev);
     if (ret.second) {
-        FI_HILOGI("\'%{public}s\' added", dev->GetName().c_str());
+        FI_HILOGD("\'%{public}s\' added", dev->GetName().c_str());
         OnDeviceAdded(dev);
     }
     return dev;

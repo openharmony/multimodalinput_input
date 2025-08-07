@@ -14,7 +14,7 @@
  */
 
 #include "hot_area.h"
-#include "display_manager_lite.h"
+#include "devicestatus_define.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HotArea"
