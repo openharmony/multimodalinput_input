@@ -736,6 +736,7 @@ void TouchDrawingHandler::ClearTracker()
 
 void TouchDrawingHandler::InitLabels()
 {
+    CHKPV(pointerEvent_);
     currentDeviceId_ = pointerEvent_->GetDeviceId();
     isFirstDownAction_ = true;
     isDownAction_ = true;
