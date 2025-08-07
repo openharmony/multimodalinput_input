@@ -38,7 +38,7 @@ private:
     cJSON* json_ { nullptr };
 
 private:
-    static bool IsInteger(const char *json);
+    static bool IsInteger(const cJSON *json);
 
 public:
     static int32_t ParseInt32(const cJSON *json, const std::string &key, int32_t &value);
