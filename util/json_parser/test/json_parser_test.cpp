@@ -32,8 +32,18 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-
-
+/**
+ * @tc.name:IsIntegerTest_001
+ * @tc.desc:Verify JsonParser
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, IsInteger_001, TestSize.Level1)
+{
+    JsonParser parser(nullptr);
+    EXPECT_FALSE(JsonParser::IsInteger(parser.Get()));
+}
+ 
 /**
  * @tc.name:JsonParserTest_001
  * @tc.desc:Verify JsonParser
@@ -48,7 +58,7 @@ HWTEST_F(JsonParserTest, JsonParser_001, TestSize.Level1)
     auto json = parser1.Get();
     EXPECT_NE(json, nullptr);
 }
-
+ 
 /**
  * @tc.name:JsonParserTest_002
  * @tc.desc:Verify JsonParser
@@ -62,7 +72,7 @@ HWTEST_F(JsonParserTest, JsonParser_002, TestSize.Level1)
     auto json = parser1.Get();
     EXPECT_NE(json, nullptr);
 }
-
+ 
 /**
  * @tc.name:ParseInt_001
  * @tc.desc:Verify ParseInt
@@ -76,7 +86,7 @@ HWTEST_F(JsonParserTest, ParseInt_001, TestSize.Level1)
     int32_t value;
     EXPECT_EQ(JsonParser::ParseInt32(parser.Get(), "Hello", value), RET_OK);
 }
-
+ 
 /**
  * @tc.name:ParseInt_002
  * @tc.desc:Verify ParseInt
@@ -89,6 +99,34 @@ HWTEST_F(JsonParserTest, ParseInt_002, TestSize.Level1)
     JsonParser parser(jsonData.c_str());
     int32_t value;
     EXPECT_NE(JsonParser::ParseInt32(parser.Get(), "Hello", value), RET_OK);
+}
+ 
+/**
+ * @tc.name:ParseInt_003
+ * @tc.desc:Verify ParseInt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseInt_003, TestSize.Level1)
+{
+    std::string jsonData = R"({"integer": 42.13})";
+    JsonParser parser(jsonData.c_str());
+    int32_t value;
+    EXPECT_NE(JsonParser::ParseInt32(parser.Get(), "integer", value), RET_OK);
+}
+ 
+/**
+ * @tc.name:ParseInt_004
+ * @tc.desc:Verify ParseInt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseInt_004, TestSize.Level1)
+{
+    std::string jsonData = R"({"integer": 21474836480})";
+    JsonParser parser(jsonData.c_str());
+    int32_t value;
+    EXPECT_NE(JsonParser::ParseInt32(parser.Get(), "integer", value), RET_OK);
 }
 
 /**
