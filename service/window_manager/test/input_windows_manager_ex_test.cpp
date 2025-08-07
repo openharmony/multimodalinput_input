@@ -4286,7 +4286,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillOnce(Return(1));
+    EXPECT_CALL(*messageParcelMock_, GetClientFd(_)).WillRepeatedly(Return(1));
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     EXPECT_CALL(*messageParcelMock_, GetSession(_)).WillOnce(Return(session));
     EXPECT_CALL(*messageParcelMock_, SendMsg(_)).WillOnce(Return(true));
@@ -5035,10 +5035,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_005, TestS
     int32_t pointerId = 200;
     inputWindowsManager.touchItemDownInfos_.clear();
     inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
-    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), -1);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), 1);
     winInfoEx.flag = true;
     inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
-    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), -1);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), 1);
 }
 
 /**
