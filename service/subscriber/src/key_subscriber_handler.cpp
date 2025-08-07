@@ -17,7 +17,9 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#ifdef CALL_MANAGER_ENABLED
 #include "call_manager_client.h"
+#endif // CALL_MANAGER_ENABLED
 #include "display_event_monitor.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -47,7 +49,9 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+#ifdef CALL_MANAGER_ENABLED
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
+#endif // CALL_MANAGER_ENABLED
 const std::string CALL_BEHAVIOR_KEY { "incall_power_button_behavior" };
 const std::string SETTINGS_DATA_SYSTEM_URI {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
@@ -561,6 +565,7 @@ void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> 
     EventFwk::CommonEventManager::PublishCommonEvent(commonData, publishInfo);
 }
 
+#ifdef CALL_MANAGER_ENABLED
 bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -616,11 +621,13 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     }
     return false;
 }
+#endif // CALL_MANAGER_ENABLED
 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+#ifdef CALL_MANAGER_ENABLED
     if (HandleRingMute(keyEvent)) {
         MMI_HILOGI("Mute Ring in subscribe keyEvent");
         RemoveSubscriberTimer(keyEvent);
@@ -630,6 +637,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGI("Call Ended in subscribe keyEvent");
         return true;
     }
+#endif // CALL_MANAGER_ENABLED
     if (!IsEnableCombineKey(keyEvent)) {
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
@@ -1371,6 +1379,7 @@ void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEv
     }
 }
 
+#ifdef CALL_MANAGER_ENABLED
 bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1467,6 +1476,7 @@ void KeySubscriberHandler::RejectCallProcess()
     }
     MMI_HILOGI("RejectCall success");
 }
+#endif // CALL_MANAGER_ENABLED
 
 void KeySubscriberHandler::InitDataShareListener()
 {
