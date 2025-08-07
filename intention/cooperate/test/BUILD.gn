@@ -61,15 +61,12 @@ ohos_unittest("CooperateClientTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
-
-  if (hitrace_enabled) {
-    external_deps += [ "hitrace:hitrace_meter" ]
-  }
 }
 
 ohos_unittest("CooperateServerTest") {
@@ -139,15 +136,12 @@ ohos_unittest("CooperateServerTest") {
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
-
-  if (hitrace_enabled) {
-    external_deps += [ "hitrace:hitrace_meter" ]
-  }
 }
 
 group("intention_cooperate_tests") {

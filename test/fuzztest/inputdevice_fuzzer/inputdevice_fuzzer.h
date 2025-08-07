@@ -18,4 +18,4 @@
 
 #define FUZZ_PROJECT_NAME "inputdevice_fuzzer"
 
-#endif // INPUTDEVICEMANAGER_FUZZER
+#endif // INPUTDEVICE_FUZZER

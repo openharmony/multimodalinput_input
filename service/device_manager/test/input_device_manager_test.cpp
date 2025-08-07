@@ -1731,7 +1731,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_KeyboardExtFlag_Verify_J
     }
     cJSON_Delete(root);
 }
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
+#endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
 
 /**
  * @tc.name: InputDeviceManagerTest_IsLocalDevice_Test_01

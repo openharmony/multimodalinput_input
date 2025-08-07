@@ -1114,14 +1114,13 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonStr.c_str());
-    if (parser.json_ == nullptr) {
-        MMI_HILOGE("cJSON_Parse failed");
+    JsonParser parser(jsonStr.c_str());
+    if (parser.Get() == nullptr) {
+        MMI_HILOGE("parser is nullptr");
         return false;
     }
-    if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("Parser.json_ is not object");
+    if (!cJSON_IsObject(parser.Get())) {
+        MMI_HILOGE("Parser.Get() is not object");
         return false;
     }
 
@@ -1155,10 +1154,13 @@ bool KeyCommandHandler::ParseExcludeJson(const std::string &configFile)
         MMI_HILOGE("Read excludeKey configFile failed");
         return false;
     }
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("Parser.json_ of excludeKey is not object");
+    JsonParser parser(jsonStr.c_str());
+    if (parser.Get() == nullptr) {
+        MMI_HILOGE("parser is nullptr");
+        return false;
+    }
+    if (!cJSON_IsObject(parser.Get())) {
+        MMI_HILOGE("Parser.Get() of excludeKey is not object");
         return false;
     }
     bool isParseExcludeKeys = ParseExcludeKeys(parser, excludeKeys_);
@@ -2904,17 +2906,20 @@ bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("Parser.json_ is not object");
+    JsonParser parser(jsonStr.c_str());
+    if (parser.Get() == nullptr) {
+        MMI_HILOGE("parse is nullptr");
+        return false;
+    }
+    if (!cJSON_IsArray(parser.Get())) {
+        MMI_HILOGE("Parser.Get() is not object");
         return false;
     }
 
     cJSON* item = nullptr;
     cJSON* enable = nullptr;
     cJSON* status = nullptr;
-    cJSON_ArrayForEach(item, parser.json_) {
+    cJSON_ArrayForEach(item, parser.Get()) {
         if (!cJSON_IsObject(item)) {
             continue;
         }
