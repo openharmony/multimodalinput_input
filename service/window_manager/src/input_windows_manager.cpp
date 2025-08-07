@@ -1737,7 +1737,7 @@ void InputWindowsManager::SendCancelEventWhenWindowChange(int32_t pointerId, int
     tmpEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportPointerEventExitTimes(PointerEventStatistics::TRANSFORM_CANCEL);
-#endif  // OHOS_BUILD_ENABLE_DFX_RADAR
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     tmpEvent->SetPointerId(pointerId);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
