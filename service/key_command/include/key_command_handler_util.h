@@ -16,7 +16,6 @@
 #ifndef KEY_COMMAND_HANDLER_UTIL_H
 #define KEY_COMMAND_HANDLER_UTIL_H
 
-#include "cJSON.h"
 #include "config_policy_utils.h"
 #include "system_ability_definition.h"
 
@@ -26,6 +25,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "i_preference_manager.h"
+#include "json_parser.h"
 #include "setting_datashare.h"
 #include "util_ex.h"
 
@@ -85,20 +85,6 @@ const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
     { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
     { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::KEY_DOWN_ACTION },
     { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::KEY_DOWN_ACTION }
-};
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-        }
-    }
-    operator cJSON *()
-    {
-        return json_;
-    }
-    cJSON *json_ { nullptr };
 };
 
 bool IsSpecialType(int32_t keyCode, SpecialType type);

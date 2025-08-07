@@ -219,13 +219,13 @@ void KeyShortcutManager::LoadSystemKeys()
 void KeyShortcutManager::ReadSystemKeys(const std::string &cfgPath)
 {
     std::string cfg = ReadJsonFile(cfgPath);
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(cfg.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
+    JsonParser parser(cfg.c_str());
+    if (!cJSON_IsObject(parser.Get())) {
         MMI_HILOGE("Not json format");
         return;
     }
-    cJSON* jsonSysKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "SystemKeys");
+    cJSON* jsonSysKeys = cJSON_GetObjectItemCaseSensitive(parser.Get(), "SystemKeys");
+    CHKPV(jsonSysKeys);
     if (!cJSON_IsArray(jsonSysKeys)) {
         MMI_HILOGE("The system keys is not array");
         return;
@@ -233,6 +233,7 @@ void KeyShortcutManager::ReadSystemKeys(const std::string &cfgPath)
     int32_t nSysKeys = cJSON_GetArraySize(jsonSysKeys);
     for (int32_t index = 0; index < nSysKeys; ++index) {
         cJSON *jsonSysKey = cJSON_GetArrayItem(jsonSysKeys, index);
+        CHKPC(jsonSysKey);
         ReadSystemKey(jsonSysKey);
     }
 }
@@ -304,13 +305,12 @@ void KeyShortcutManager::LoadExceptionalSystemKeys()
 void KeyShortcutManager::ReadExceptionalSystemKeys(const std::string &cfgPath)
 {
     std::string cfg = ReadJsonFile(cfgPath);
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(cfg.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
+    JsonParser parser(cfg.c_str());
+    if (!cJSON_IsObject(parser.Get())) {
         MMI_HILOGE("Not json format");
         return;
     }
-    cJSON* jsonSysKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "ExceptionalSystemKeys");
+    cJSON* jsonSysKeys = cJSON_GetObjectItemCaseSensitive(parser.Get(), "ExceptionalSystemKeys");
     if (!cJSON_IsArray(jsonSysKeys)) {
         MMI_HILOGE("The exceptional system keys is not array");
         return;
@@ -805,8 +805,7 @@ bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent
 
 void KeyShortcutManager::UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) ||
-        (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL)) {
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         shortcutConsumed_.erase(keyEvent->GetKeyCode());
     }
 }
@@ -924,13 +923,12 @@ void KeyShortcutManager::LoadHotkeys()
 void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
 {
     std::string cfg = ReadJsonFile(cfgPath);
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(cfg.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
+    JsonParser parser(cfg.c_str());
+    if (!cJSON_IsObject(parser.Get())) {
         MMI_HILOGE("Not json format");
         return;
     }
-    cJSON* jsonHotkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Hotkeys");
+    cJSON* jsonHotkeys = cJSON_GetObjectItemCaseSensitive(parser.Get(), "Hotkeys");
     if (!jsonHotkeys) {
         MMI_HILOGE("JsonHotkeys is nullptr");
         return;
@@ -943,8 +941,8 @@ void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
     for (int32_t index = 0; index < nSysKeys; ++index) {
         cJSON *jsonHotkey = cJSON_GetArrayItem(jsonHotkeys, index);
         if (!jsonHotkey) {
-        MMI_HILOGE("JsonHotkey is nullptr");
-        return;
+            MMI_HILOGE("JsonHotkey is nullptr");
+            return;
         }
         if (ReadHotkey(jsonHotkey) != RET_OK) {
             MMI_HILOGE("Read hotkey failed");

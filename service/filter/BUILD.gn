@@ -33,6 +33,7 @@ config("mmi_event_filter_config") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
     "${event_filter_path}/include",
+    "${mmi_path}/util/json_parser/include",
     "${target_gen_dir}",
   ]
 }

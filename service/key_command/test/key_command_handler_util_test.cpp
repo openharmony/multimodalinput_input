@@ -1774,7 +1774,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetAbilityStartDel
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ParseMultiFingersTap_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    JsonParser parser;
+    JsonParser parser("");
     std::string ability;
     MultiFingersTap mulFingersTap;
     EXPECT_FALSE(OHOS::MMI::ParseMultiFingersTap(parser, ability, mulFingersTap));
@@ -1790,9 +1790,9 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ParseMultiFingersT
 {
     CALL_TEST_DEBUG;
     std::string ability;
-    JsonParser parser;
+    std::string jsonData = R"({"ability": 1})";
+    JsonParser parser(jsonData.c_str());
     MultiFingersTap mulFingersTap;
-    cJSON_AddNumberToObject(parser, "ability", 1);
     EXPECT_FALSE(OHOS::MMI::ParseMultiFingersTap(parser, ability, mulFingersTap));
 }
 
@@ -1806,7 +1806,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsParseKnuckleGest
 {
     CALL_TEST_DEBUG;
     std::string ability;
-    JsonParser parser;
+    JsonParser parser("");
     KnuckleGesture knuckleGesture;
     EXPECT_FALSE(OHOS::MMI::IsParseKnuckleGesture(parser, ability, knuckleGesture));
 }
@@ -1821,9 +1821,9 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsParseKnuckleGest
 {
     CALL_TEST_DEBUG;
     std::string ability;
-    JsonParser parser;
+    std::string jsonData = R"({"ability": 1})";
+    JsonParser parser(jsonData.c_str());
     KnuckleGesture knuckleGesture;
-    cJSON_AddNumberToObject(parser, "ability", 1);
     EXPECT_FALSE(OHOS::MMI::IsParseKnuckleGesture(parser, ability, knuckleGesture));
 }
 } // namespace MMI
