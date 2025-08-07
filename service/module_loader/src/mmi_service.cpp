@@ -5099,13 +5099,12 @@ bool MMIService::ParseDeviceConsumerConfig()
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser jsonData;
-    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData.json_)) {
+    JsonParser jsonData(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.Get())) {
         MMI_HILOGE("The json data is not object");
         return false;
     }
-    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "consumers");
+    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.Get(), "consumers");
     if (!cJSON_IsArray(consumers)) {
         MMI_HILOGE("consumers number must be array");
         return false;
