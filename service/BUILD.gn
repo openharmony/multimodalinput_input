@@ -91,6 +91,7 @@ config("libmmi_server_config") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/util/napi/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   if (input_feature_product != "watch") {
@@ -277,6 +278,7 @@ ohos_shared_library("libmmi-server") {
     "delegate_task/include",
     "${mmi_path}/frameworks/proxy/events/include",
     "window_manager/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources += [
@@ -399,6 +401,8 @@ ohos_shared_library("libmmi-server") {
   }
 
   deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+
+  deps += [ "${mmi_path}/util:mmi_json_parser" ]
 
   if (input_ext_feature_keyboard_ext_flag) {
     include_dirs += [ "${mmi_ext_path}/keyboard_ext_flag/inc" ]
@@ -992,6 +996,7 @@ ohos_unittest("InputDisplayBindHelperTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/input_display_bind_helper_test.cpp" ]
@@ -1274,6 +1279,7 @@ ohos_unittest("PointerDrawingManagerExTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1335,6 +1341,7 @@ ohos_unittest("PointerDrawingManagerSupTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1605,6 +1612,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utilsbase",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1684,6 +1692,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
     "c_utils:utilsbase",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
@@ -1727,6 +1736,13 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
 
   sources = [
     "window_manager/src/input_windows_manager.cpp",
@@ -2234,9 +2250,6 @@ ohos_unittest("KeyCommandTest") {
 
   sources = [
     "key_command/test/ability_manager_client_stub.cpp",
-    "key_command/test/key_cmd_handleRepeatKey_test.cpp",
-    "key_command/test/key_cmd_sendKeyEvent_test.cpp",
-    "key_command/test/key_command_handler_test.cpp",
     "key_command/test/key_command_handler_util_test.cpp",
     "key_command/test/pull_throw_subscriber_handler_test.cpp",
     "key_command/test/setting_datashare_test.cpp",
@@ -2782,6 +2795,7 @@ ohos_unittest("EventHandlerEXTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
@@ -2918,6 +2932,54 @@ ohos_unittest("ServerMsgHandlerTest") {
   }
 }
 
+ohos_unittest("ServerMsgHandlerSupTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "message_handle/test/server_msg_handler_sup_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "ffrt:libffrt",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
+    "napi:ace_napi",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+  ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+}
+
 ohos_unittest("PermissionHelperTest") {
   module_out_path = module_output_path
 
@@ -3012,7 +3074,10 @@ ohos_unittest("DeviceManagerTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
-  sources = [ "device_manager/test/input_device_manager_test.cpp" ]
+  sources = [
+    "device_manager/test/input_device_manager_test.cpp",
+    "device_manager/test/pointer_device_manager_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",

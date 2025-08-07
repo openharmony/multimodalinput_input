@@ -146,6 +146,7 @@ private:
     std::atomic_bool needSkipPowerKeyUp_ { false };
     bool callBahaviorState_ { false };
     std::set<int32_t> pendingKeys_;
+    std::atomic_bool callEndKeyUp_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

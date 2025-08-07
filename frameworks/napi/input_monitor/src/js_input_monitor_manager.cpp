@@ -277,6 +277,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
         auto infoTemp = std::string("AddEnv GET_CB_INFO failed");
         napi_throw_error(env, nullptr, infoTemp.c_str());
         delete id;
+        id = nullptr;
         return false;
     }
     auto status = napi_wrap(env, thisVar, static_cast<void*>(id),
@@ -419,6 +420,7 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
     napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers)
 {
+    CHKPF(monitor);
     if ((monitor->GetTypeName() == typeName) && (typeName == "keyPressed" || monitor->GetFingers() == fingers)) {
         if (monitor->IsMatch(jsEnv, callback) == RET_OK) {
             return true;
@@ -430,6 +432,7 @@ bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMo
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
     napi_env jsEnv, const std::string &typeName, const int32_t fingers)
 {
+    CHKPF(monitor);
     if ((monitor->GetTypeName() == typeName) && (typeName == "keyPressed" || monitor->GetFingers() == fingers)) {
         if (monitor->IsMatch(jsEnv) == RET_OK) {
             return true;

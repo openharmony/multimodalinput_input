@@ -577,7 +577,7 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     MMI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d, pid:%{public}d",
         programName.c_str(), moduleType, pid);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
+        [this, programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
             return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
         }
         );
@@ -813,9 +813,6 @@ ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixe
     }
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, curPixelMap] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
         }
         ));
@@ -946,9 +943,7 @@ ErrCode MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerSize(int32_t &size)
 {
-    if (POINTER_DEV_MGR.isInit) {
-        size = CursorDrawingComponent::GetInstance().GetPointerSize();
-    }
+    size = CursorDrawingComponent::GetInstance().GetPointerSize();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -994,9 +989,6 @@ ErrCode MMIService::GetCursorSurfaceId(uint64_t &surfaceId)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto ret = delegateTasks_.PostSyncTask(
         [&surfaceId] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetCursorSurfaceId(surfaceId);
         });
     if (ret != RET_OK) {
@@ -2294,6 +2286,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+        TOUCH_DRAWING_MGR->ResetTouchWindow();
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -2316,13 +2311,35 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_BUILD_ENABLE_ANCO
         WIN_MGR->InitializeAnco();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (!POINTER_DEV_MGR.isFirstAddCommonEventService) {
+        CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (systemAbilityId == RENDER_SERVICE && !POINTER_DEV_MGR.isFirstAddRenderService) {
+        CursorDrawingComponent::GetInstance().InitPointerCallback();
+    }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID && !POINTER_DEV_MGR.isFirstAddDisplayManagerService) {
+        CursorDrawingComponent::GetInstance().InitScreenInfo();
+        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         WIN_MGR->SetFoldState();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         KeyEventHdr->Init();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if ((systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) &&
+        !POINTER_DEV_MGR.isFirstAdddistributedKVDataService) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            CursorDrawingComponent::GetInstance().InitPointerObserver();
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     if (systemAbilityId == SENSOR_SERVICE_ABILITY_ID) {
         MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
@@ -2957,14 +2974,6 @@ void MMIService::OnDelegateTask(epoll_event &ev)
         MMI_HILOGW("Not epollin");
         return;
     }
-    DelegateTasks::TaskData data = {};
-    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
-    if (res == -1) {
-        MMI_HILOGW("Read failed erron:%{public}d", errno);
-    }
-    MMI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
-        ",taskId:%{public}d",
-        GetThisThreadId(), data.tid, data.taskId);
     delegateTasks_.ProcessTasks();
 }
 
@@ -4441,9 +4450,6 @@ ErrCode MMIService::EnableHardwareCursorStats(bool enable)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid, enable] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().EnableHardwareCursorStats(pid, enable);
         }
         );
@@ -4468,9 +4474,6 @@ ErrCode MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [pid, &frameCount, &vsyncCount] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().GetHardwareCursorStats(pid, frameCount, vsyncCount);
         }
         );
@@ -4660,9 +4663,6 @@ ErrCode MMIService::SkipPointerLayer(bool isSkip)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [isSkip] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SkipPointerLayer(isSkip);
         }
         );
@@ -5099,13 +5099,12 @@ bool MMIService::ParseDeviceConsumerConfig()
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser jsonData;
-    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData.json_)) {
+    JsonParser jsonData(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.Get())) {
         MMI_HILOGE("The json data is not object");
         return false;
     }
-    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "consumers");
+    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.Get(), "consumers");
     if (!cJSON_IsArray(consumers)) {
         MMI_HILOGE("consumers number must be array");
         return false;

@@ -49,7 +49,6 @@
 #include "timer_manager.h"
 #include "surface.h"
 #include "common_event_data.h"
-#include "common_event_manager.h"
 #include "common_event_support.h"
 
 #undef MMI_LOG_DOMAIN
@@ -193,7 +192,7 @@ static bool IsSingleDisplayFoldDevice()
     return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4'));
 }
 
-void RsRemoteDiedCallback()
+void PointerDrawingManager::RsRemoteDiedCallback()
 {
     CALL_INFO_TRACE;
     g_isRsRemoteDied = true;
@@ -211,9 +210,9 @@ void PointerDrawingManager::InitPointerCallback()
     MMI_HILOGI("Init RS Callback start");
     g_isRsRemoteDied = false;
     g_isRsRestart = false;
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    OnRemoteDiedCallback_ = [this]() -> void { this->RsRemoteDiedCallback(); };
     auto begin = std::chrono::high_resolution_clock::now();
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(OnRemoteDiedCallback_);
     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
@@ -239,16 +238,20 @@ void PointerDrawingManager::DestroyPointerWindow()
     CALL_INFO_TRACE;
     CHKPV(delegateProxy_);
     delegateProxy_->OnPostSyncTask([this] {
-        auto surfaceNodePtr = GetSurfaceNode();
-        if (surfaceNodePtr != nullptr) {
+        {
+            auto surfaceNodePtr = GetSurfaceNode();
+            if (surfaceNodePtr == nullptr) {
+                MMI_HILOGW("SurfaceNode pointer is nullptr.");
+                return RET_OK;
+            }
             MMI_HILOGI("Pointer window destroy start screenId_ %{public}" PRIu64, screenId_);
             g_isRsRemoteDied = false;
             surfaceNodePtr->DetachToDisplay(screenId_);
             SetSurfaceNode(nullptr);
             MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
-            MMI_HILOGI("Pointer window destroy success");
         }
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGI("Pointer window destroy success");
         return RET_OK;
     });
 }
@@ -312,7 +315,26 @@ PointerDrawingManager::~PointerDrawingManager()
         if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
             moveRetryThread_->join();
         }
+        if (commonEventSubscriber_ != nullptr) {
+            if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(commonEventSubscriber_)) {
+                MMI_HILOGW("UnSubscribeCommonEvent failed");
+            }
+            commonEventSubscriber_ = nullptr;
+        }
+        initDisplayStatusReceiverFlag_ = false;
+
+        if  (screenModeChangeListener_ != nullptr) {
+            auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().UnregisterScreenModeChangeListener(
+                screenModeChangeListener_);
+            if (ret != OHOS::Rosen::DMError::DM_OK) {
+                MMI_HILOGE("UnregisterScreenModeChangeListener failed, ret=%{public}d", ret);
+                return;
+            }
+            screenModeChangeListener_ = nullptr;
+        }
     }
+    INPUT_DEV_MGR->Detach(self_);
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
     MMI_HILOGI("~PointerDrawingManager complete");
 }
 
@@ -484,7 +506,6 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
-    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     currentDirection_ = direction;
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
@@ -749,6 +770,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
         }
+        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
         hardwareCanvasSize_ = g_hardwareCanvasSize;
         // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
         // repeatedly obtain the surfaceBuffer.
@@ -937,6 +959,7 @@ std::shared_ptr<Rosen::Drawing::Image> PointerDrawingManager::ExtractDrawingImag
     if (image == nullptr) {
         MMI_HILOGE("ExtractDrawingImage image fail");
         delete releaseContext;
+        releaseContext = nullptr;
     }
     return image;
 }
@@ -2211,7 +2234,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
 {
     CALL_DEBUG_ENTER;
     if (GetHardCursorEnabled()) {
-        if (screenPointers_.count(static_cast<size_t>(displayInfo.rsId))) {
+        if (screenPointers_.count(displayInfo.rsId)) {
             auto sp = screenPointers_[displayInfo.rsId];
             CHKPV(sp);
             sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
@@ -2384,12 +2407,17 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
             pointerVisible = (pointerVisible && IsPointerVisible());
         }
         SetPointerVisible(getpid(), pointerVisible, 0, false);
-} else {
+    } else {
         DeletePointerVisible(getpid());
     }
     DrawManager();
-    auto surfaceNodePtr = GetSurfaceNode();
-    if (!hasPointerDevice_ && (surfaceNodePtr != nullptr)) {
+    // This scope ensures that the reference count held by surfaceNodePtr is' 0 'before notifying the RS process Flush.
+    {
+        auto surfaceNodePtr = GetSurfaceNode();
+        if (hasPointerDevice_ || (surfaceNodePtr == nullptr)) {
+            MMI_HILOGD("There are still pointer devices present.");
+            return;
+        }
         if (GetHardCursorEnabled()) {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto sp : screenPointers_) {
@@ -2402,9 +2430,9 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         surfaceNodePtr->DetachToDisplay(screenId_);
         SetSurfaceNode(nullptr);
         MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Pointer window destroy success");
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    MMI_HILOGD("Pointer window destroy success");
 }
 
 void PointerDrawingManager::AttachAllSurfaceNode()
@@ -2501,8 +2529,8 @@ void PointerDrawingManager::InitPixelMaps()
 bool PointerDrawingManager::Init()
 {
     CALL_DEBUG_ENTER;
-    auto self = std::shared_ptr<PointerDrawingManager>(this, [](PointerDrawingManager*) {});
-    INPUT_DEV_MGR->Attach(self);
+    self_ = std::shared_ptr<PointerDrawingManager>(this, [](PointerDrawingManager*) {});
+    INPUT_DEV_MGR->Attach(self_);
     pidInfos_.clear();
     hapPidInfos_.clear();
     {
@@ -3025,8 +3053,12 @@ void PointerDrawingManager::RegisterDisplayStatusReceiver()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
-    initDisplayStatusReceiverFlag_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
-        std::make_shared<DisplayStatusReceiver>(commonEventSubscribeInfo));
+    commonEventSubscriber_ = std::make_shared<DisplayStatusReceiver>(commonEventSubscribeInfo);
+    bool ret = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(commonEventSubscriber_);
+    if (!ret) {
+        commonEventSubscriber_ = nullptr;
+    }
+    initDisplayStatusReceiverFlag_ = ret;
     MMI_HILOGI("Register display status receiver result:%{public}d", initDisplayStatusReceiverFlag_.load());
 }
 
@@ -3240,11 +3272,9 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         std::lock_guard<std::mutex> lock(mtx_);
         // construct ScreenPointers for new screens
         for (auto si : screens) {
-            if (si->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
-                continue;
-            }
-            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-                si->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            CHKPC(si);
+            if (si->GetType() != OHOS::Rosen::ScreenType::REAL && !(si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND)) {
                 continue;
             }
             uint64_t sid = si->GetRsId();
@@ -3272,6 +3302,10 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                     MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}" PRIu64, sid);
                 }
             }
+            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+                screenPointers_[sid]->SetVirtualExtend(true);
+            }
         }
 
         // delete ScreenPointers that disappeared
@@ -3286,6 +3320,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
 
         // update screen scale and padding
         for (auto sp : screenPointers_) {
+            CHKPC(sp.second);
             if (sp.second->IsMirror()) {
                 sp.second->SetRotation(mainRotation);
                 sp.second->UpdatePadding(mainWidth, mainHeight);
@@ -3491,6 +3526,7 @@ std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScre
     std::vector<std::shared_ptr<ScreenPointer>> mirrors;
     std::lock_guard<std::mutex> lock(mtx_);
     for (auto it : screenPointers_) {
+        CHKPC(it.second);
         if (it.second->IsMirror()) {
             mirrors.push_back(it.second);
         }
@@ -3523,6 +3559,7 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         screenPointers = screenPointers_;
     }
     for (auto it : screenPointers) {
+        CHKPC(it.second);
         if (it.second->IsMirror()) {
             if (!it.second->Move(x, y, align)) {
                 ret = RET_ERR;
@@ -3562,6 +3599,7 @@ void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     sp->MoveSoft(x, y, align);
 
     for (auto& msp : GetMirrorScreenPointers()) {
+        CHKPC(msp);
         msp->MoveSoft(x, y, align);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -3626,6 +3664,7 @@ void PointerDrawingManager::HideHardwareCursors()
     }
 
     for (auto msp : GetMirrorScreenPointers()) {
+        CHKPC(msp);
         if (!msp->SetInvisible()) {
             MMI_HILOGE("Hide cursor of mirror screen failed, screenId_: %{public}" PRIu64, screenId_);
         }

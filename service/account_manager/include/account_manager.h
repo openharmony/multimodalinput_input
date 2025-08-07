@@ -76,6 +76,7 @@ public:
 
     void Initialize();
     AccountSetting GetCurrentAccountSetting();
+    void AccountManagerUnregister();
 
 private:
 #ifdef SCREENLOCK_MANAGER_ENABLED

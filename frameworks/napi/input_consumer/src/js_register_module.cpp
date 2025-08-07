@@ -339,7 +339,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::s
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    std::vector<sptr<KeyEventMonitorInfo>> info;
+    std::list<sptr<KeyEventMonitorInfo>> info;
     {
         std::lock_guard guard(sCallBacksMutex);
         auto iter = callbacks.find(keyOptionKey);
@@ -355,7 +355,9 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent, const std::s
             MMI_HILOGE("No Matches found for SubKeyEventCallback");
         }
     }
-    for (auto it : info) {
+    while (info.begin() != info.end()) {
+        auto it = info.front();
+        info.pop_front();
         EmitAsyncCallbackWork(it);
     }
 }
@@ -364,7 +366,7 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    std::vector<sptr<KeyEventMonitorInfo>> info;
+    std::list<sptr<KeyEventMonitorInfo>> info;
     {
         std::lock_guard guard(sCallBacksMutex);
         auto iter = hotkeyCallbacks.begin();
@@ -382,13 +384,16 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
             }
         }
     }
-    for (auto it : info) {
+    while (info.begin() != info.end()) {
+        auto it = info.front();
+        info.pop_front();
         EmitAsyncCallbackWork(it);
     }
 }
 
 std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
 {
+    CHKPS(keyOption);
     std::string subKeyNames;
     const std::set<int32_t>& preKeys = keyOption->GetPreKeys();
     int32_t finalKey = keyOption->GetFinalKey();
@@ -510,6 +515,7 @@ bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInf
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
         return false;
     }
+    CHKPF(event);
     if (argc == INPUT_PARAMETER_MAX) {
         napi_valuetype valueType = napi_undefined;
         CHKRF(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);

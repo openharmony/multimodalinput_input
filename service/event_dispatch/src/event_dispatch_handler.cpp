@@ -95,6 +95,7 @@ std::shared_ptr<WindowInfo> EventDispatchHandler::SearchCancelList (int32_t poin
     }
     auto windowList = cancelEventList_[pointerId];
     for (auto &info : windowList) {
+        CHKPC(info);
         if (info->id == windowId) {
             return info;
         }
@@ -140,6 +141,7 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
     std::shared_ptr<WindowInfo> targetWindow)
 {
     for (auto &window : windowList) {
+        CHKPC(window);
         if (window->id == targetWindow->id) {
             return true;
         }
@@ -185,14 +187,14 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
-        double windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
-        double windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
+        double windowX = pointerItem.GetDisplayXPos() - windowInfo->area.x;
+        double windowY = pointerItem.GetDisplayYPos() - windowInfo->area.y;
         auto physicalDisplayInfo = WIN_MGR->GetPhysicalDisplay(windowInfo->displayId);
         CHKPV(physicalDisplayInfo);
         if (!windowInfo->transform.empty()) {
             auto windowXY = WIN_MGR->TransformWindowXY(*windowInfo,
-                pointerItem.GetDisplayX() + physicalDisplayInfo->x,
-                pointerItem.GetDisplayY() + physicalDisplayInfo->y);
+                pointerItem.GetDisplayXPos() + physicalDisplayInfo->x,
+                pointerItem.GetDisplayYPos() + physicalDisplayInfo->y);
             windowX = windowXY.first;
             windowY = windowXY.second;
         }

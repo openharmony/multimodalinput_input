@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "shiftapppointerevent_fuzzer.h"
 
 #include "input_manager.h"
@@ -22,6 +23,7 @@
 
 
 namespace OHOS {
+constexpr uint32_t MAX_ENUM_VALUE = 10;
 namespace MMI {
 template<class T>
 size_t GetObject(T& object, const uint8_t* data, size_t size)
@@ -59,8 +61,24 @@ bool ShiftAppPointerEventNoHapTokenVerify(const uint8_t* data, const size_t size
 		
 bool ShiftAppPointerEventFuzzTest(const uint8_t* data, const size_t size)
 {
-    size_t startPos = 0;
-    if (ShiftAppPointerEvent(data, size, startPos) && ShiftAppPointerEventNoHapTokenVerify(data, size, startPos)) {
+    FuzzedDataProvider fdp(data, size);
+    int32_t sourceWindowId = fdp.ConsumeIntegral<int32_t>();
+    int32_t targetWindowId = fdp.ConsumeIntegral<int32_t>();
+    int32_t x = fdp.ConsumeIntegral<int32_t>();
+    int32_t y = fdp.ConsumeIntegral<int32_t>();
+    int32_t fingerId = fdp.ConsumeIntegral<int32_t>();
+    int32_t sourceType = fdp.ConsumeIntegral<int32_t>() % MAX_ENUM_VALUE;
+    bool autoGenDown = fdp.ConsumeBool();
+    OHOS::MMI::ShiftWindowParam param;
+    param.sourceWindowId = sourceWindowId;
+    param.targetWindowId = targetWindowId;
+    param.x = x;
+    param.y = y;
+    param.fingerId = fingerId;
+    param.sourceType = sourceType;
+    bool winRes = WIN_MGR->ShiftAppPointerEvent(param, autoGenDown);
+    bool mgrRes = InputManager::GetInstance()->ShiftAppPointerEvent(param, autoGenDown);
+    if (winRes && mgrRes) {
         return true;
     }
     return false;

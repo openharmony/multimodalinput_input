@@ -891,5 +891,86 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
         event = libinput_.Dispatch();
     }
 }
+
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 101);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_PRESSURE, LEFT_SILDE_UP_ABS_PRESSURE_VALUE);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
+}
+
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 101);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_PRESSURE, LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
+}
+
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 101);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_PRESSURE, RIGHT_SILDE_UP_ABS_PRESSURE_VALUE);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
+}
+
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 101);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_PRESSURE, RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
+}
+
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 101);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_PRESSURE, 200);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
+}
+
 } // namespace MMI
 } // namespace OHOS

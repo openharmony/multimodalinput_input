@@ -455,6 +455,7 @@ int32_t KeyGestureManager::AddKeyGesture(int32_t pid, std::shared_ptr<KeyOption>
 {
     CHKPR(keyOption, INVALID_ENTITY_ID);
     for (auto &keyGesture : keyGestures_) {
+        CHKPC(keyGesture);
         if (keyGesture->ShouldIntercept(keyOption)) {
             auto downDuration = std::max(keyOption->GetFinalKeyDownDuration(), COMBINATION_KEY_TIMEOUT);
             return keyGesture->AddHandler(pid, downDuration, callback);
@@ -477,6 +478,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
     CALL_INFO_TRACE;
     CHKPF(keyEvent);
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
+        CHKPC(*iter);
         if ((*iter)->Intercept(keyEvent)) {
             std::ostringstream output;
             (*iter)->Dump(output);
@@ -497,6 +499,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 void KeyGestureManager::ResetAll()
 {
     for (auto &keyGesture : keyGestures_) {
+        CHKPC(keyGesture);
         keyGesture->Reset();
     }
 }
@@ -505,6 +508,7 @@ void KeyGestureManager::Dump() const
 {
     for (const auto &keyGesture : keyGestures_) {
         std::ostringstream output;
+        CHKPC(keyGesture);
         keyGesture->Dump(output);
         MMI_HILOGI("%s", output.str().c_str());
     }

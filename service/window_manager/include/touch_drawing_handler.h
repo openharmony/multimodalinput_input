@@ -54,7 +54,7 @@ class TouchDrawingHandler final : public ITouchDrawingHandler {
 
 public:
     TouchDrawingHandler() = default;
-    ~TouchDrawingHandler() = default;
+    ~TouchDrawingHandler() override;
     DISALLOW_COPY_AND_MOVE(TouchDrawingHandler);
 
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo) override;
@@ -65,6 +65,7 @@ public:
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     bool IsWindowRotation() const override;
+    bool IsValidScaleInfo() override;
 
 private:
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,
@@ -113,6 +114,7 @@ private:
     Rosen::Drawing::Point lastPt_;
     DevMode bubbleMode_;
     DevMode pointerMode_;
+    int32_t currentDeviceId_ { -1 };
     int32_t currentPointerId_ { 0 };
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };

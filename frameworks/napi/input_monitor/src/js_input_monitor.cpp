@@ -2172,6 +2172,7 @@ bool JsInputMonitor::GetFunctionKeyState(const std::shared_ptr<KeyEvent> keyEven
     CALL_DEBUG_ENTER;
     // set capsLock
     napi_value capsLockValue = nullptr;
+    CHKPF(keyEvent);
     napi_status status =
         napi_get_boolean(jsEnv_, keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY), &capsLockValue);
     if (status != napi_ok) {
@@ -2222,6 +2223,7 @@ bool JsInputMonitor::GetKeys(
             THROWERR(jsEnv_, "Napi create element failed");
             return false;
         }
+        CHKPF(keyEvent);
         std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent->GetKeyItem(pressedKeyCode);
         if (!pressedKeyItem) {
             MMI_HILOGE("The pressedKeyItem is nullopt");

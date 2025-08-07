@@ -474,4 +474,24 @@ double libinput_event_pointer_get_axis_value(struct libinput_event_pointer *even
 {
     return g_instance->PointerGetAxisValue(event, axis);
 }
+
+uint32_t libinput_event_pointer_get_button_area(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetButtonArea(event);
+}
+
+double libinput_touchpad_device_get_ppi(struct libinput_device *device)
+{
+    return g_instance->TouchpadDeviceGetPpi(device);
+}
+
+double libinput_touchpad_device_get_hypot_size(struct libinput_device *device)
+{
+    return g_instance->TouchpadDeviceGetHypotSize(device);
+}
+
+int32_t libinput_touchpad_device_get_frequency(struct libinput_device *device)
+{
+    return g_instance->TouchpadDeviceGetFrequency(device);
+}
 } // extern "C"

@@ -53,6 +53,7 @@ std::string KeyEventInputSubscribeManager::MonitorIdentity::Dump() const
 
 bool KeyEventInputSubscribeManager::MonitorIdentity::Want(std::shared_ptr<KeyEvent> keyEvent) const
 {
+    CHKPF(keyEvent);
     return ((key_ == keyEvent->GetKeyCode()) &&
             (action_ == keyEvent->GetKeyAction()) &&
             (isRepeat_ ||
@@ -159,7 +160,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     }
     int32_t ret = MMIEventHdl.SubscribeKeyEvent(*tIter);
     if (ret != RET_OK) {
-        MMI_HILOGE("Subscribing key event failed");
+        MMI_HILOGW("Subscribing key event ret:%{public}d", ret);
         subscribeInfos_.erase(tIter);
         return ret;
     }

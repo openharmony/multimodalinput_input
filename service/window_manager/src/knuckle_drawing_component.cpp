@@ -79,7 +79,10 @@ IKnuckleDrawing *KnuckleDrawingComponent::Load()
         Unload();
         return nullptr;
     }
-
+    impl_->RegisterAddTimer([this]
+        (int32_t intervalMs, int32_t repeatCount, std::function<void()> callback, const std::string &name) -> int32_t {
+        return TimerMgr->AddTimer(intervalMs, repeatCount, callback, name);
+    });
     if (timerId_ > 0) {
         TimerMgr->RemoveTimer(timerId_);
     }

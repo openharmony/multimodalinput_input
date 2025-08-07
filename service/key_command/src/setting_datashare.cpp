@@ -135,11 +135,11 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
-    BytraceAdapter::StartDataShare(observer->GetKey());
     if (observer == nullptr) {
         BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
+    BytraceAdapter::StartDataShare(observer->GetKey());
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
     auto helper = CreateDataShareHelper(strUri);
@@ -160,11 +160,11 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
-    BytraceAdapter::StartDataShare(observer->GetKey());
     if (observer == nullptr) {
         BytraceAdapter::StopDataShare();
         return RET_ERR;
     }
+    BytraceAdapter::StartDataShare(observer->GetKey());
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey(), strUri);
     auto helper = CreateDataShareHelper(strUri);

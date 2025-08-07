@@ -80,6 +80,12 @@ constexpr char PRODUCT_PHONE[] { "phone" };
 constexpr char PRODUCT_TYPE_PC[] { "2in1" };
 } // namespace
 
+TouchDrawingHandler::~TouchDrawingHandler()
+{
+    UpdateLabels(false);
+    UpdateBubbleData(false);
+}
+
 void TouchDrawingHandler::RecordLabelsInfo()
 {
     CHKPV(pointerEvent_);
@@ -147,7 +153,8 @@ void TouchDrawingHandler::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
 void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
-    isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
+    isChangedRotation_ = (displayInfo.direction == displayInfo_.direction &&
+        displayInfo.displayDirection == displayInfo_.displayDirection) ? false : true;
     isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
     scaleH_ = displayInfo.validWidth > displayInfo.validHeight ? displayInfo.validWidth : displayInfo.validHeight;
@@ -189,6 +196,14 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
         }
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
+}
+
+bool TouchDrawingHandler::IsValidScaleInfo()
+{
+    if (scaleW_ != 0 && scaleH_ != 0) {
+        return true;
+    }
+    return false;
 }
 
 void TouchDrawingHandler::UpdateLabels(bool isOn)
@@ -423,6 +438,10 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
+    if ((pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) &&
+        (pointerEvent_->GetDeviceId() != currentDeviceId_)) {
+        return;
+    }
     UpdatePointerPosition();
     ClearTracker();
     RecordLabelsInfo();
@@ -717,11 +736,12 @@ void TouchDrawingHandler::ClearTracker()
 
 void TouchDrawingHandler::InitLabels()
 {
+    currentDeviceId_ = pointerEvent_->GetDeviceId();
     isFirstDownAction_ = true;
     isDownAction_ = true;
     maxPointerCount_ = 0;
     currentPointerCount_ = 0;
-    currentPointerId_ = 0;
+    currentPointerId_ = pointerEvent_->GetPointerId();
     xVelocity_ = 0.0;
     yVelocity_ = 0.0;
     lastPointerItem_.clear();
@@ -818,7 +838,7 @@ std::pair<double, double> TouchDrawingHandler::TransformDisplayXY(
     }
     Vector3f logicXY(logicX, logicY, 1.0);
     Vector3f displayXY = transform * logicXY;
-    return { std::round(displayXY[0]), std::round(displayXY[1]) };
+    return { displayXY[0], displayXY[1] };
 }
 
 void TouchDrawingHandler::StartTrace(int32_t pointerId)

@@ -292,5 +292,150 @@ HWTEST_F(InputEventTest, InputEventTest_DisplayBindInfo_Unmarshalling_001, TestS
     Parcel in;
     ASSERT_NO_FATAL_FAILURE(info.Unmarshalling(in));
 }
+
+/**
+ * @tc.name: InputEventTest_ReadFromParcel_002
+ * @tc.desc: Verify ReadFromParcel when extraDataLength_ == 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_ReadFromParcel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    Parcel in;
+    in.WriteInt32(InputEvent::EVENT_TYPE_KEY);
+    in.WriteInt32(1);
+    in.WriteInt64(100);
+    in.WriteUint64(200);
+    in.WriteInt32(2);
+    in.WriteInt64(300);
+    in.WriteInt32(10);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteUint32(0);
+    in.WriteBool(true);
+    in.WriteUint32(0);
+    bool ret = inputEvent->ReadFromParcel(in);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputEventTest_ReadFromParcel_003
+ * @tc.desc: Verify ReadFromParcel when extraDataLength_ > DATA_LENGTH_LIMIT
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_ReadFromParcel_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    Parcel in;
+    in.WriteInt32(InputEvent::EVENT_TYPE_KEY);
+    in.WriteInt32(1);
+    in.WriteInt64(100);
+    in.WriteUint64(200);
+    in.WriteInt32(2);
+    in.WriteInt64(300);
+    in.WriteInt32(10);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteUint32(0);
+    in.WriteBool(true);
+    in.WriteUint32(1024 + 1);
+    bool ret = inputEvent->ReadFromParcel(in);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputEventTest_ReadFromParcel_004
+ * @tc.desc: Verify ReadFromParcel when ReadBuffer returns nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_ReadFromParcel_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    Parcel in;
+    in.WriteInt32(InputEvent::EVENT_TYPE_KEY);
+    in.WriteInt32(1);
+    in.WriteInt64(100);
+    in.WriteUint64(200);
+    in.WriteInt32(2);
+    in.WriteInt64(300);
+    in.WriteInt32(10);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteInt32(1);
+    in.WriteUint32(0);
+    in.WriteBool(true);
+    in.WriteUint32(5);
+    bool ret = inputEvent->ReadFromParcel(in);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputEventTest_StartLogTraceId_001
+ * @tc.desc: Verify StartLogTraceId does nothing when traceId is -1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_StartLogTraceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t traceId = -1;
+    int32_t eventType = 100;
+    int32_t action = 200;
+    EXPECT_NO_FATAL_FAILURE(StartLogTraceId(traceId, eventType, action));
+}
+
+/**
+ * @tc.name: InputEventTest_StartLogTraceId_002
+ * @tc.desc: Verify StartLogTraceId inserts first traceId correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_StartLogTraceId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t traceId = 123;
+    int32_t eventType = 1;
+    int32_t action = 2;
+    EXPECT_NO_FATAL_FAILURE(StartLogTraceId(traceId, eventType, action));
+}
+
+/**
+ * @tc.name: InputEventTest_StartLogTraceId_003
+ * @tc.desc: Verify StartLogTraceId appends second traceId correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_StartLogTraceId_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    StartLogTraceId(456, 1, 2);
+    EXPECT_NO_FATAL_FAILURE(StartLogTraceId(789, 3, 4));
+}
+
+/**
+ * @tc.name: InputEventTest_StartLogTraceId_004
+ * @tc.desc: Verify StartLogTraceId updates existing traceId with new type and action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_StartLogTraceId_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t traceId = 888;
+    StartLogTraceId(traceId, 10, 20);
+    EXPECT_NO_FATAL_FAILURE(StartLogTraceId(traceId, 11, 21));
+}
 } // namespace MMI
 } // namespace OHOS

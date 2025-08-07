@@ -155,6 +155,8 @@ KnuckleDrawingManager::KnuckleDrawingManager()
 KnuckleDrawingManager::~KnuckleDrawingManager()
 {
     if (screenReadObserver_ != nullptr) {
+        SettingObserver::UpdateFunc updateFunc = nullptr;
+        screenReadObserver_->SetUpdateFunc(updateFunc);
         ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .UnregisterObserver(screenReadObserver_);
         MMI_HILOGI("Unregister setting observer, ret=%{public}d", ret);
@@ -387,6 +389,8 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t rsId)
     MMI_HILOGI("KnuckleDrawingManager screenId_:%{public}" PRIu64, screenId_);
     RotationCanvasNode(brushCanvasNode_, displayInfo_);
     RotationCanvasNode(trackCanvasNode_, displayInfo_);
+    CHKPV(brushCanvasNode_);
+    CHKPV(trackCanvasNode_);
     brushCanvasNode_->ResetSurface(scaleW_, scaleH_);
     trackCanvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -428,6 +432,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
         ", screenId_:%{public}" PRIu64, g_WindowScreenId, g_DisplayNodeScreenId, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     RotationCanvasNode(canvasNode_, displayInfo_);
+    CHKPV(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -721,15 +726,28 @@ void KnuckleDrawingManager::DrawBrushCanvas()
 void KnuckleDrawingManager::ActionUpAnimation()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(trackCanvasNode_);
-    Rosen::RSAnimationTimingProtocol protocol;
-    protocol.SetDuration(PROTOCOL_DURATION);
-    protocol.SetRepeatCount(1);
-    auto animate = Rosen::RSNode::Animate(
-        protocol,
+    CHKPV(brushCanvasNode_);
+    Rosen::RSAnimationTimingProtocol brushProtocol;
+    brushProtocol.SetDuration(0);
+    brushProtocol.SetRepeatCount(1);
+    auto brushAnimate = Rosen::RSNode::Animate(
+        brushProtocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
-        [this]() {
-            trackCanvasNode_->SetAlpha(ALPHA_RANGE_END);
+        [brushCanvasNode = brushCanvasNode_]() {
+            CHKPV(brushCanvasNode);
+            brushCanvasNode->SetAlpha(ALPHA_RANGE_END);
+        });
+
+    CHKPV(trackCanvasNode_);
+    Rosen::RSAnimationTimingProtocol trackProtocol;
+    trackProtocol.SetDuration(PROTOCOL_DURATION);
+    trackProtocol.SetRepeatCount(1);
+    auto trackAnimate = Rosen::RSNode::Animate(
+        trackProtocol,
+        Rosen::RSAnimationTimingCurve::LINEAR,
+        [trackCanvasNode = trackCanvasNode_]() {
+            CHKPV(trackCanvasNode);
+            trackCanvasNode->SetAlpha(ALPHA_RANGE_END);
         });
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -745,18 +763,25 @@ int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
     trackColorR_ = 0x00;
     trackColorG_ = 0x00;
     trackColorB_ = 0x00;
-    if (ClearBrushCanvas() != RET_OK) {
-        MMI_HILOGE("ClearBrushCanvas failed");
-        return RET_ERR;
-    }
     if (isNeedUpAnimation) {
+        if (destroyTimerId_ >= 0) {
+            // There is no need to repeatedly register 'KnuckleDrawingManager' timer
+            MMI_HILOGD("The KnuckleDrawingManager timer is already exist");
+            return RET_OK;
+        }
         ActionUpAnimation();
-        int32_t repeatTime = 1;
-        int32_t timerId = TimerMgr->AddTimer(PROTOCOL_DURATION, repeatTime, [this]() {
-            DestoryWindow();
-        }, "KnuckleDrawingManager");
-        if (timerId < 0) {
-            MMI_HILOGE("Add timer failed, timerId:%{public}d", timerId);
+        if (addTimerFunc_) {
+            int32_t repeatTime = 1;
+            destroyTimerId_ = addTimerFunc_(PROTOCOL_DURATION, repeatTime, [this]() {
+                DestoryWindow();
+                destroyTimerId_ = -1;
+            }, "KnuckleDrawingManager");
+            if (destroyTimerId_ < 0) {
+                MMI_HILOGE("Add timer failed, timerId:%{public}d", destroyTimerId_);
+                DestoryWindow();
+            }
+        } else {
+            MMI_HILOGE("addTimerFunc_ is invalid");
             DestoryWindow();
         }
     } else {
@@ -977,6 +1002,11 @@ void KnuckleDrawingManager::SetMultiWindowScreenId(uint64_t screenId, uint64_t d
 {
     g_WindowScreenId = screenId;
     g_DisplayNodeScreenId = displayNodeScreenId;
+}
+
+void KnuckleDrawingManager::RegisterAddTimer(AddTimerCallbackFunc addTimerFunc)
+{
+    addTimerFunc_ = addTimerFunc;
 }
 } // namespace MMI
 } // namespace OHOS

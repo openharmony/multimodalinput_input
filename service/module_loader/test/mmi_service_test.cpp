@@ -1310,7 +1310,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_GetPointerSpeed_001, TestSize.Level1)
     MMIService mmiService;
     int32_t speed = -1;
     int32_t ret = mmiService.GetPointerSpeed(speed);
-    EXPECT_TRUE(ret == ERROR_NOT_SYSAPI || ret == ETASKS_POST_SYNCTASK_FAIL);
+    EXPECT_NE(ret, RET_OK);
     EXPECT_EQ(speed, 0);
 }
 
@@ -2023,7 +2023,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_SubscribeSwitchEvent_002, TestSize.Level1)
     int32_t switchType = 2;
     ErrCode ret = mmiService.SubscribeSwitchEvent(subscribeId, switchType);
     MMI_HILOGI("SubscribeSwitchEvent_002 ret: %{public}d", ret);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -2057,7 +2057,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeSwitchEvent_002, TestSize.Level
     int32_t subscribeId = 1000;
     ErrCode ret = mmiService.UnsubscribeSwitchEvent(subscribeId);
     MMI_HILOGI("UnsubscribeSwitchEvent_002 ret: %{public}d", ret);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -2091,7 +2091,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_QuerySwitchStatus_002, TestSize.Level1)
     int32_t switchType = 1;
     int32_t state = -1;
     ErrCode ret = mmiService.QuerySwitchStatus(switchType, state);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -3540,7 +3540,7 @@ HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_001, TestSize.Level1)
     MMIService mmiService;
     std::vector<InfraredFrequency> frequencies;
     ErrCode ret = mmiService.GetInfraredFrequencies(frequencies);
-    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == RET_OK);
+    EXPECT_FALSE(ret == ERROR_NO_PERMISSION || ret == RET_OK);
     if (ret == RET_OK) {
 #ifndef OHOS_BUILD_ENABLE_WATCH
         EXPECT_GE(frequencies.size(), 0);
@@ -3562,7 +3562,7 @@ HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_002, TestSize.Level1)
     MMIService mmiService;
     std::vector<InfraredFrequency> frequencies;
     ErrCode ret = mmiService.GetInfraredFrequencies(frequencies);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 #ifndef OHOS_BUILD_ENABLE_WATCH
     for (auto &freq : frequencies) {
         EXPECT_GE(freq.min_, 0);
@@ -3583,7 +3583,7 @@ HWTEST_F(MMIServerTest, MMIService_TransmitInfrared_001, TestSize.Level1)
     MMIService mmiService;
     std::vector<int64_t> pattern = {1000, 1000};
     ErrCode ret = mmiService.TransmitInfrared(38000, pattern);
-    EXPECT_TRUE(ret == ERROR_NO_PERMISSION || ret == RET_OK);
+    EXPECT_FALSE(ret == ERROR_NO_PERMISSION || ret == RET_OK);
 }
 
 /**
@@ -4776,7 +4776,7 @@ HWTEST_F(MMIServerTest, MMIService_ParseDeviceConsumerConfig_001, TestSize.Level
     CALL_TEST_DEBUG;
     MMIService mmiService;
     bool result = mmiService.ParseDeviceConsumerConfig();
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 /**

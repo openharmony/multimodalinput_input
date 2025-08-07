@@ -98,6 +98,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
+        jsContext = nullptr;
         MMI_HILOGE("Failed to wrap native instance");
         return nullptr;
     }
@@ -170,6 +171,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     jsInputDeviceMgr->RegisterDevListener(env, type, argv[1]);
     return nullptr;
 }
@@ -204,6 +206,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         jsInputDeviceMgr->UnregisterDevListener(env, type);
         return nullptr;
@@ -231,6 +234,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc < 1) {
         return jsInputDeviceMgr->GetDeviceIds(env);
     }
@@ -260,6 +264,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         return jsInputDeviceMgr->GetDevice(env, id);
     }
@@ -458,6 +463,7 @@ napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc < 1) {
         return jsInputDeviceMgr->GetDeviceList(env);
     }
@@ -491,6 +497,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         return jsInputDeviceMgr->GetDeviceInfo(env, id);
     }
@@ -524,7 +531,7 @@ napi_value JsInputDeviceContext::GetDeviceInfoSync(napi_env env, napi_callback_i
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
-
+    CHKPP(jsInputDeviceMgr);
     return jsInputDeviceMgr->GetDeviceInfoSync(env, id);
 }
 
@@ -554,6 +561,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callb
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         return jsInputDeviceMgr->SetKeyboardRepeatDelay(env, repeatDelay);
     }
@@ -591,6 +599,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callba
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         return jsInputDeviceMgr->SetKeyboardRepeatRate(env, repeatRate);
     }
@@ -611,6 +620,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatDelay(napi_env env, napi_callb
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc < 1) {
         return jsInputDeviceMgr->GetKeyboardRepeatDelay(env);
     }
@@ -631,6 +641,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatRate(napi_env env, napi_callba
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc < 1) {
         return jsInputDeviceMgr->GetKeyboardRepeatRate(env);
     }
@@ -648,6 +659,7 @@ napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_ca
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     return jsInputDeviceMgr->GetIntervalSinceLastInput(env);
 }
 
@@ -687,6 +699,7 @@ napi_value JsInputDeviceContext::SetInputDeviceEnabled(napi_env env, napi_callba
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     return jsInputDeviceMgr->SetInputDeviceEnabled(env, deviceId, enable);
 }
 

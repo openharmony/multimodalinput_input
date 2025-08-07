@@ -92,9 +92,11 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
         MMI_HILOGI("jsvm ends");
         JsShortKeyContext *context = static_cast<JsShortKeyContext*>(data);
         delete context;
+        context = nullptr;
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
+        jsContext = nullptr;
         THROWERR(env, "Failed to wrap native instance");
         return nullptr;
     }

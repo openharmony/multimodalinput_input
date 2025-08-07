@@ -111,6 +111,7 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -277,6 +278,7 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -439,6 +441,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./../../ipc_blocklist.txt"
   }
 
   include_dirs = [
@@ -473,6 +476,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -643,6 +647,7 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -790,6 +795,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -872,6 +878,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
@@ -1053,9 +1060,20 @@ ohos_unittest("InputDeviceConsumerHandlerTest") {
 ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+  }
+
+  defines = input_default_defines
+  defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1067,24 +1085,71 @@ ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
 
   sources = [
     "src/remote_control_transform_processor_test_with_mock.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/remote_control_transform_processor.cpp",
   ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "c_utils:utilsbase",
-    "graphic_2d:librender_service_client",
+    "googletest:gmock_main",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
   ]
+}
+
+ohos_unittest("TouchGestureManagerTestWithMock") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./../../ipc_blocklist.txt"
+  }
+
+  include_dirs = [ "${mmi_path}/service/touch_event_normalize/include" ]
+
+  sources = [ "src/touch_gesture_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+  ]
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
 
 group("TouchEventNormalizeTests") {
@@ -1092,9 +1157,8 @@ group("TouchEventNormalizeTests") {
 
   deps = [
     ":InputDeviceConsumerHandlerTest",
-    ":RemoteControlTransformProcessorTestWithMock", 
     ":TouchEventNormalizeTest",
-    ":TouchTransformProcessorTestWithMock",
     ":TransformPointTest",
+    ":TouchGestureManagerTestWithMock",
   ]
 }

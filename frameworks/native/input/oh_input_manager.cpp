@@ -15,6 +15,8 @@
 
 #include "oh_input_manager.h"
 
+#include "securec.h"
+
 #include "event_log_helper.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
@@ -49,8 +51,8 @@ struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX { INT_MAX  };
-    int32_t globalY { INT_MAX  };
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
     int32_t button { -1 };
     int32_t axisType { -1 };
     float axisValue { 0.0f };
@@ -64,8 +66,8 @@ struct Input_TouchEvent {
     int32_t id;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX { INT_MAX  };
-    int32_t globalY { INT_MAX  };
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -75,8 +77,8 @@ struct Input_AxisEvent {
     int32_t axisAction;
     float displayX;
     float displayY;
-    int32_t globalX;
-    int32_t globalY;
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
     std::map<int32_t, double> axisValues;
     int64_t actionTime { -1 };
     int32_t sourceType;
@@ -180,14 +182,14 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         } else {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         }
         return INPUT_PARAMETER_ERROR;
     }
     if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
-        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
+        MMI_HILOGE("code is not within the query range:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -233,9 +235,9 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         } else {
-            MMI_HILOGE("keyCode is invaild");
+            MMI_HILOGE("Invaild");
         }
         return;
     }
@@ -297,9 +299,9 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
         if (!OHOS::MMI::EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("keyCode is less 0, can not process");
+            MMI_HILOGE("code is less 0, can not process");
         } else {
-            MMI_HILOGE("keyCode is less 0, can not process");
+            MMI_HILOGE("code is less 0, can not process");
         }
         return INPUT_PARAMETER_ERROR;
     }
@@ -510,9 +512,12 @@ static int32_t HandleMouseProperty(const struct Input_MouseEvent* mouseEvent,
     item.SetDisplayYPos(screenY);
     int32_t globalX = mouseEvent->globalX;
     int32_t globalY = mouseEvent->globalY;
-    if (globalX != INT_MAX && globalY != INT_MAX) {
+    if (globalX != INT32_MAX && globalY != INT32_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
+    } else {
+        item.SetGlobalX(DBL_MAX);
+        item.SetGlobalY(DBL_MAX);
     }
     g_mouseEvent->SetPointerId(0);
     g_mouseEvent->UpdatePointerItem(g_mouseEvent->GetPointerId(), item);
@@ -592,7 +597,7 @@ int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEven
         true, PointerEvent::GLOBAL_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
-        return result;
+        return INPUT_PERMISSION_DENIED;
     }
     return INPUT_SUCCESS;
 }
@@ -750,7 +755,7 @@ void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, RET_ERR);
+    CHKPR(mouseEvent, INT32_MAX);
     return mouseEvent->globalX;
 }
 
@@ -764,7 +769,7 @@ void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, RET_ERR);
+    CHKPR(mouseEvent, INT32_MAX);
     return mouseEvent->globalY;
 }
 
@@ -831,13 +836,13 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
 }
 
 static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
-    OHOS::MMI::PointerEvent::PointerItem &item)
+    OHOS::MMI::PointerEvent::PointerItem &item, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     int32_t id = touchEvent->id;
     int32_t screenX = touchEvent->displayX;
     int32_t screenY = touchEvent->displayY;
-    if (screenX < 0 || screenY < 0) {
+    if (useCoordinate == PointerEvent::DISPLAY_COORDINATE && (screenX < 0 || screenY < 0)) {
         MMI_HILOGE("touch parameter is less 0, can not process");
         return INPUT_PARAMETER_ERROR;
     }
@@ -847,9 +852,12 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     item.SetDisplayYPos(screenY);
     int32_t globalX = touchEvent->globalX;
     int32_t globalY = touchEvent->globalY;
-    if (globalX != INT_MAX && globalY != INT_MAX) {
+    if (globalX != INT32_MAX && globalY != INT32_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
+    } else {
+        item.SetGlobalX(DBL_MAX);
+        item.SetGlobalY(DBL_MAX);
     }
     item.SetPointerId(id);
     g_touchEvent->SetPointerId(id);
@@ -873,7 +881,7 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent)
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
-    result = HandleTouchProperty(touchEvent, item);
+    result = HandleTouchProperty(touchEvent, item, PointerEvent::DISPLAY_COORDINATE);
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
@@ -902,7 +910,7 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
-    result = HandleTouchProperty(touchEvent, item);
+    result = HandleTouchProperty(touchEvent, item, PointerEvent::GLOBAL_COORDINATE);
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
@@ -910,7 +918,7 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
         PointerEvent::GLOBAL_COORDINATE);
     if (touchEvent->action == TOUCH_ACTION_UP) {
         g_touchEvent->RemovePointerItem(g_touchEvent->GetPointerId());
@@ -919,6 +927,10 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
             MMI_HILOGD("This touch event is final finger up remove this finger");
             g_touchEvent->Reset();
         }
+    }
+    if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
+        MMI_HILOGE("Permission denied or occupied by other");
+        return INPUT_PERMISSION_DENIED;
     }
     return INPUT_SUCCESS;
 }
@@ -1048,7 +1060,7 @@ void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, RET_ERR);
+    CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalX;
 }
 
@@ -1062,7 +1074,7 @@ void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, RET_ERR);
+    CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalY;
 }
 
@@ -2366,12 +2378,14 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     info->keyOption = reportEvent->keyOption;
     if (info->keyOption == nullptr) {
         delete info;
+        info = nullptr;
         MMI_HILOGE("KeyOption is null");
         return;
     }
     info->callback = reportEvent->callback;
     if (info->callback == nullptr) {
         delete info;
+        info = nullptr;
         MMI_HILOGE("Callback is null");
         return;
     }
@@ -2382,6 +2396,7 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
     hotkey.isRepeat = info->keyOption->IsRepeat();
     info->callback(&hotkey);
     delete info;
+    info = nullptr;
 }
 
 static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
@@ -2413,6 +2428,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2425,16 +2441,19 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
         subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeHotkey(keyOption, HandleKeyEvent);
         if (subscribeId == OHOS::MMI::ERROR_UNSUPPORT) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_DEVICE_NOT_SUPPORTED;
         }
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_SYSTEM;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             delete hotkeyInfo;
+            hotkeyInfo = nullptr;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_OTHER;
         }
@@ -2445,6 +2464,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     }
     if (AddHotkeySubscribe(hotkeyInfo) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("AddHotkeySubscribe fail");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2471,6 +2491,7 @@ int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
+            monitorInfo = nullptr;
             MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
             continue;
         }
@@ -2481,6 +2502,7 @@ int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
                 subscribeId = monitorInfo->subscribeId;
             }
             delete monitorInfo;
+            monitorInfo = nullptr;
             MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
             return INPUT_SUCCESS;
         }
@@ -2514,6 +2536,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
     if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("MakeHotkeyInfo failed");
         return INPUT_PARAMETER_ERROR;
     }
@@ -2521,6 +2544,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     int32_t subscribeId = -1;
     if (DelEventCallback(hotkeyInfo, subscribeId) != INPUT_SUCCESS) {
         delete hotkeyInfo;
+        hotkeyInfo = nullptr;
         MMI_HILOGE("DelEventCallback failed");
         return INPUT_SERVICE_EXCEPTION;
     }
@@ -2529,6 +2553,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         OHOS::MMI::InputManager::GetInstance()->UnsubscribeHotkey(subscribeId);
     }
     delete hotkeyInfo;
+    hotkeyInfo = nullptr;
     return INPUT_SUCCESS;
 }
 
@@ -2791,7 +2816,7 @@ Input_Result OH_Input_GetFunctionKeyState(int32_t keyCode, int32_t *state)
 {
     CALL_DEBUG_ENTER;
     if (keyCode < 0 || keyCode != OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK) {
-        MMI_HILOGE("Invalid keycode:%{private}d", keyCode);
+        MMI_HILOGE("Invalid code:%{private}d", keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(state, INPUT_PARAMETER_ERROR);

@@ -115,6 +115,7 @@ void AniEventTarget::EmitAddedDeviceEvent(const std::shared_ptr<AniUtil::ReportD
         MMI_HILOGE("%{public}s: Find change event failed", __func__);
         return;
     }
+    CHKPV(reportData);
     for (const auto &item : addEvent->second) {
         CHKPC(item->env_);
         if (item->callback_ != reportData->ref) {
@@ -141,6 +142,7 @@ void AniEventTarget::EmitRemoveDeviceEvent(const std::shared_ptr<AniUtil::Report
         MMI_HILOGE("%{public}s: Find change event failed", __func__);
         return;
     }
+    CHKPV(reportData);
     for (const auto &item : removeEvent->second) {
         CHKPC(item->env_);
         if (item->callback_ != reportData->ref) {

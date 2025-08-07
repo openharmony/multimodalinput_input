@@ -17,7 +17,6 @@
 #include <gtest/gtest.h>
 #include <thread>
 
-#include "cJSON.h"
 #include "util.h"
 
 #include "ability_manager_client.h"
@@ -102,6 +101,18 @@ class KeyCommandHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    void SetUp(void)
+    {
+        touchEvent_ = PointerEvent::Create();
+        keyEvent_ = KeyEvent::Create();
+    }
+    void TearDown(void)
+    {
+        touchEvent_ = nullptr;
+        keyEvent_ = nullptr;
+    }
+    std::shared_ptr<PointerEvent> touchEvent_;
+    std::shared_ptr<KeyEvent> keyEvent_;
     std::shared_ptr<KeyEvent> SetupKeyEvent();
     std::shared_ptr<PointerEvent> SetupThreeFingerTapEvent();
     std::shared_ptr<PointerEvent> SetupFourFingerTapEvent();
@@ -563,8 +574,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_02, T
     pointerEvent->targetDisplayId_ = 10;
     pointerEvent->targetWindowId_ = 5;
     PointerEvent::PointerItem item;
-    item.displayX_ = 10;
-    item.displayY_ = 15;
+    item.SetDisplayX(10);
+    item.SetDisplayY(15);
 
     InputWindowsManager inputWindowsManager;
     WindowGroupInfo windowGroupInfo;
@@ -582,8 +593,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_02, T
     pointerEvent->targetWindowId_ = 1;
     int32_t rightDownX = 30;
     int32_t rightDownY = 40;
-    EXPECT_TRUE(item.displayX_ <= rightDownX);
-    EXPECT_TRUE(item.displayY_ <= rightDownY);
+    EXPECT_TRUE(item.GetDisplayX() <= rightDownX);
+    EXPECT_TRUE(item.GetDisplayY() <= rightDownY);
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
     ASSERT_FALSE(handler.CheckInputMethodArea(pointerEvent));
 
@@ -3084,6 +3095,47 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchD
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchDown_002
+ * @tc.desc: Test knuckle gesture touch down event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchDown_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    ASSERT_NE(touchEvent_, nullptr);
+
+    item.SetPointerId(0);
+    item.SetRawDisplayX(4);
+    item.SetRawDisplayY(4);
+    touchEvent_->SetPointerId(0);
+    touchEvent_->SetActionTime(1);
+    touchEvent_->AddPointerItem(item);
+    touchEvent_->SetTargetDisplayId(0);
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    displayGroupInfo.displaysInfo.emplace_back(displayInfo);
+    displayGroupInfo.groupId = 0;
+    inputWindowsManager->displayGroupInfoMap_[0] = displayGroupInfo;
+    inputWindowsManager->displayGroupInfo_ = displayGroupInfo;
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.HandleKnuckleGestureTouchDown(touchEvent_);
+    ASSERT_TRUE(handler.gestureTimeStamps_.empty());
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_001
  * @tc.desc: Test knuckle gesture touch move event
  * @tc.type: FUNC
@@ -3350,6 +3402,63 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsValidAction, TestSize.Le
     action = PointerEvent::POINTER_ACTION_UP;
     handler.gesturePoints_.assign(CIRCLE_COORDINATES.begin(), CIRCLE_COORDINATES.end());
     ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendNotSupportMsg_001
+ * @tc.desc: Test the funcation SendNotSupportMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendNotSupportMsg_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.SendNotSupportMsg(nullptr));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendNotSupportMsg_002
+ * @tc.desc: Test the funcation SendNotSupportMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendNotSupportMsg_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NE(touchEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PENCIL);
+    touchEvent_->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.SendNotSupportMsg(touchEvent_));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportRegionGesture
+ * @tc.desc: Test the funcation ReportRegionGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, ReportRegionGesture, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.ReportRegionGesture());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportLetterGesture
+ * @tc.desc: Test the funcation ReportLetterGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, ReportLetterGesture, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.ReportLetterGesture());
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
@@ -3836,8 +3945,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     PointerEvent::PointerItem item;
-    item.displayX_ = 8.0;
-    item.displayY_ = 8.0;
+    item.SetDisplayX(8.0);
+    item.SetDisplayY(8.0);
     handler.gestureLastX_ = 4.0;
     handler.gestureLastY_ = 4.0;
     handler.isGesturing_ = false;
@@ -4569,6 +4678,40 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_001, TestSiz
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_OnHandleEvent_003
+ * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NE(keyEvent_, nullptr);
+    keyEvent_->SetKeyCode(KeyEvent::KEYCODE_STYLUS_SCREEN);
+
+    STYLUS_HANDLER->stylusKey_.isLaunchAbility = true;
+    bool ret = handler.OnHandleEvent(keyEvent_);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_OnHandleEvent_004
+ * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NE(keyEvent_, nullptr);
+    
+    bool ret = handler.OnHandleEvent(keyEvent_);
+    EXPECT_TRUE(ret);
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_001
  * @tc.desc: Test the funcation HandleRepeatKey
  * @tc.type: FUNC
@@ -5051,6 +5194,22 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_001, TestSi
     handler.isParseStatusConfig_ = false;
     ret = handler.PreHandleEvent(key);
     ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_PreHandleEvent_002
+ * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    ASSERT_NE(keyEvent_, nullptr);
+    keyEvent_->SetKeyCode(KeyEvent::KEYCODE_F1);
+    handler.enableCombineKey_ = true;
+    bool ret = handler.PreHandleEvent(keyEvent_);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -5702,6 +5861,29 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
 }
 
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_010
+ * @tc.desc: Test CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].downTime = 0;
+    handler.twoFingerGesture_.touches[1].downTime = 1;
+
+    handler.twoFingerGesture_.touches[0].x = 600;
+    handler.twoFingerGesture_.touches[0].y = 600;
+
+    handler.twoFingerGesture_.touches[1].x = 601;
+    handler.twoFingerGesture_.touches[1].y = 601;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckTwoFingerGestureAction());
+}
+
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_005
  * @tc.desc: Verify if (vp <= 0)
@@ -6152,6 +6334,34 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_002, TestSize.Le
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_ParseExcludeJson
+ * @tc.desc: Test the funcation ParseExcludeJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseExcludeJson, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config2.json";
+    EXPECT_FALSE(handler.ParseExcludeJson(defaultConfig));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_003
+ * @tc.desc: Test the funcation ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config2.json";
+    EXPECT_FALSE(handler.ParseJson(defaultConfig));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleEvent_003
  * @tc.desc: Test the funcation HandleEvent
  * @tc.type: FUNC
@@ -6415,6 +6625,49 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey_003,
 }
 
 /**
+ * @tc.name: CheckSpecialRepeatKey_Normal_Branch_004
+ * @tc.desc: Test KEY_ACTION_UP and keyCode equl
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, CheckSpecialRepeatKey_Normal_Branch_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end())
+    {
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
+    }
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr =
+        std::make_shared<UDSSession>(repeatKey.ability.bundleName, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager->udsServer_, nullptr);
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    KeyCommandHandler handler;
+    DISPLAY_MONITOR->SetScreenStatus("test");
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckSpecialRepeatKey(repeatKey, keyEvent));
+    int32_t ret = keyEvent->GetKeyAction();
+    EXPECT_EQ(handler.repeatKey_.keyAction, ret);
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount_001
  * @tc.desc: Test if (walletLaunchDelayTimes_ != 0)
  * @tc.type: FUNC
@@ -6568,6 +6821,92 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_006, TestSi
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_007
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NE(keyEvent_, nullptr);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent_->AddKeyItem(item);
+    keyEvent_->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent_->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent_));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_008
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NE(keyEvent_, nullptr);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent_->AddKeyItem(item);
+    keyEvent_->SetKeyCode(KeyEvent::KEYCODE_MENU);
+    keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.existMenuDown_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent_));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_009
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ASSERT_NE(keyEvent_, nullptr);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent_->AddKeyItem(item);
+    keyEvent_->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    handler.isFreezePowerKey_ = true;
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_OFF;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent_));
+
+    DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupportTest::COMMON_EVENT_SCREEN_ON;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent_));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_010
+ * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+    handler.SetNext(handler.nextHandler_);
+    ASSERT_NE(keyEvent_, nullptr);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent_->AddKeyItem(item);
+    keyEvent_->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent_));
 }
 
 /**
@@ -7359,6 +7698,449 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckSpecialRepeatKey006, 
 
     EXPECT_FALSE(CheckSpecialRepeatKey(item, keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility001
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_001
+ * @tc.desc: Verify VOLUME_DOWN + camera app with valid state launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility001, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    handler.ret_.store(0);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility002
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_002
+ * @tc.desc: Verify VOLUME_DOWN + camera app with valid state launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility002, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    handler.ret_.store(5);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility003
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_003
+ * @tc.desc: Verify VOLUME_DOWN + camera app with valid state launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility003, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    handler.ret_.store(100);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility004
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_004
+ * @tc.desc: Verify non-VOLUME_DOWN key launches ability
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility004, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    keyEvent->SetKeyAction(KeyEvent::KEYCODE_VOLUME_DOWN);
+
+    handler.ret_.store(5);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+
+    handler.LaunchRepeatKeyAbility(item, keyEvent);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility005
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_005
+ * @tc.desc: Verify cancel event propagation
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility005, TestSize.Level1)
+{
+    RepeatKey item;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    item.ability.bundleName = "com.ohos.settings";
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility006
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_006
+ * @tc.desc: Verify map clearing
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility006, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    item.ability.bundleName = "com.ohos.music";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    KeyCommandHandler handler;
+    
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility007
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_007
+ * @tc.desc: Verify mistouch prevention safety with null pointer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility007, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.ohos.camera";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);
+    handler.mistouchPrevention_ = nullptr;  // Null pointer
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility008
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_008
+ * @tc.desc: Verify null subscriber handler safety
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility008, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    item.ability.bundleName = "com.ohos.music";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    KeyCommandHandler handler;
+
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility009
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_009
+ * @tc.desc: Verify bytrace start/stop pairing
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility009, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_POWER;
+    item.ability.bundleName = "com.ohos.settings";
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    KeyCommandHandler handler;
+    
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchRepeatKeyAbility010
+ * @tc.number: KeyCommandHandlerTest_LaunchRepeatKeyAbility_010
+ * @tc.desc: Verify camera substring matching
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchRepeatKeyAbility010, TestSize.Level1)
+{
+    RepeatKey item;
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.ability.bundleName = "com.example.camera.pro";  // Contains ".camera"
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    KeyCommandHandler handler;
+    handler.ret_.store(0);
+    
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(item.ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey001
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_001
+ * @tc.desc: Verify non-SOS page unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = true;
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("HomeScreen"), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey002
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_002
+ * @tc.desc: Verify non-SOS page unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = true;
+    
+    EXPECT_TRUE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey003
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_003
+ * @tc.desc: Verify SOS page sets freeze flag and resets state
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey003, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 5;
+    handler.launchAbilityCount_ = 2;
+    handler.repeatKeyCountMap_["key1"] = 3;
+    handler.sosDelayTimerId_ = 100;
+    
+    EXPECT_EQ(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+    EXPECT_TRUE(handler.isFreezePowerKey_);
+    EXPECT_NE(handler.sosLaunchTime_, 123456789);
+    EXPECT_EQ(handler.count_, 0);
+    EXPECT_EQ(handler.launchAbilityCount_, 0);
+    EXPECT_TRUE(handler.repeatKeyCountMap_.empty());
+    EXPECT_NE(handler.sosDelayTimerId_, 200);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey004
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_004
+ * @tc.desc: Verify no timer removal when no existing timer
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey004, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.sosDelayTimerId_ = -1;  // No existing timer
+    
+    EXPECT_NE(handler.SetIsFreezePowerKey("SosCountdown"), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey005
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_005
+ * @tc.desc: Verify timer callback unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey005, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    TimerCallback callback;
+    handler.SetIsFreezePowerKey("SosCountdown");
+    ASSERT_TRUE(callback);
+    
+    // Execute timer callback
+    EXPECT_FALSE(handler.isFreezePowerKey_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey006
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_006
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey006, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+    
+    // Verify state unchanged
+    EXPECT_EQ(handler.count_, 10);
+}
+
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey007
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_007
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey007, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+    
+    EXPECT_EQ(handler.launchAbilityCount_, 5);
+}
+
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey008
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_008
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey008, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+    
+    EXPECT_FALSE(handler.repeatKeyCountMap_.empty());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey009
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_009
+ * @tc.desc: Verify state preservation on non-SOS calls
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey009, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.count_ = 10;
+    handler.launchAbilityCount_ = 5;
+    handler.repeatKeyCountMap_["key2"] = 7;
+    handler.sosDelayTimerId_ = 600;
+    
+    handler.SetIsFreezePowerKey("LockScreen");
+
+    EXPECT_EQ(handler.sosDelayTimerId_, 600);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey007
+ * @tc.number: KeyCommandHandlerTest_SetIsFreezePowerKey_007
+ * @tc.desc: Verify non-SOS page unsets freeze flag
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey007, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.isFreezePowerKey_ = false;
+    
+    EXPECT_NE(handler.SetIsFreezePowerKey("HomeScreen"), RET_OK);
+}
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleGestureProcessor_002
+ * @tc.desc: Test KnuckleGestureProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureProcessor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    ASSERT_NE(touchEvent_, nullptr);
+    ASSERT_NE(keyEvent_, nullptr);
+    handler.tappingCount_ = 10;
+    ASSERT_NO_FATAL_FAILURE(
+        handler.KnuckleGestureProcessor(touchEvent_, knuckleGesture, KnuckleType::KNUCKLE_TYPE_DOUBLE));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportGestureInfo_002
+ * @tc.desc: Test ReportGestureInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportGestureInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    ASSERT_NE(touchEvent_, nullptr);
+    ASSERT_NE(keyEvent_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(handler.ReportGestureInfo());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsMatchedAbility_002
+ * @tc.desc: Test IsMatchedAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMatchedAbility_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    ASSERT_NE(touchEvent_, nullptr);
+    ASSERT_NE(keyEvent_, nullptr);
+    std::vector<float> gesturePoints;
+    gesturePoints.push_back(10.0);
+    gesturePoints.push_back(11.0);
+    gesturePoints.push_back(12.0);
+    float gestureLastX = 10.0;
+    float gestureLastY = 10.0;
+    ASSERT_NO_FATAL_FAILURE(handler.IsMatchedAbility(gesturePoints, gestureLastX, gestureLastY));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_005
+ * @tc.desc: Test IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    ASSERT_NE(touchEvent_, nullptr);
+    ASSERT_NE(keyEvent_, nullptr);
+    handler.enableCombineKey_ = false;
+    handler.isParseExcludeConfig_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.IsEnableCombineKey(keyEvent_));
+}
 } // namespace MMI
 } // namespace OHOS

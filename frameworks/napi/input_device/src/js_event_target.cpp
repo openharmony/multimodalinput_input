@@ -267,6 +267,7 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
 void JsEventTarget::EmitJsIdsInternal(sptr<JsUtil::CallbackInfo> cb)
 {
     uv_loop_s *loop = nullptr;
+    CHKPV(cb);
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
@@ -379,6 +380,7 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, int32_t deviceid)
 void JsEventTarget::EmitJsDevInternal(sptr<JsUtil::CallbackInfo> cb)
 {
     uv_loop_s *loop = nullptr;
+    CHKPV(cb);
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);

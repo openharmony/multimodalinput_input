@@ -1241,5 +1241,30 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_
     isStore = false;
     ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(id, name));
 }
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetDisplayBindInfo_02
+ * @tc.desc: Test GetDisplayBindInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayBindInfo_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayBindInfos infos;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    bindInfo.inputDeviceId_ = -1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 1;
+    bindInfo.displayName_ = "hp 223";
+    ASSERT_NO_FATAL_FAILURE(idh.GetDisplayBindInfo(infos));
+}
 } // namespace MMI
 } // namespace OHOS
