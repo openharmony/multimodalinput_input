@@ -60,7 +60,7 @@ void TouchPadThreeFingersTapSwitchFuzzTest(const uint8_t *data, size_t size)
         if (ret == 0) {
             MMI_HILOGD("GetTouchpadThreeFingersTapSwitch: status=%{public}d", status);
         } else {
-            MMI_HILOGW("GetTouchpadThreeFingersTapSwitch failed");
+            MMI_HILOGD("GetTouchpadThreeFingersTapSwitch failed");
         }
     }
 }

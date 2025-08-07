@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-int32_t BYTES_PER_COMBINATION = 2;
+constexpr int32_t BYTES_PER_COMBINATION = 2;
 constexpr size_t MAX_SHIELD_COMBINATIONS = 3;
 } // namespace
 
@@ -50,33 +50,33 @@ void ShieldStatusFuzzTest(const uint8_t *data, size_t size)
         int32_t shieldMode = 0;
         size_t readSize = GetObject(data + startPos, size - startPos, shieldMode);
         if (readSize == 0) {
-            MMI_HILOGW("Failed to read shieldMode");
+            MMI_HILOGD("Failed to read shieldMode");
             break;
         }
         startPos += readSize;
         int32_t random = 0;
         readSize = GetObject(data + startPos, size - startPos, random);
         if (readSize == 0) {
-            MMI_HILOGW("Failed to read random for isShield");
+            MMI_HILOGD("Failed to read random for isShield");
             break;
         }
         startPos += readSize;
         bool isShield = ((random % 2) == 0);
         int32_t retSet = InputManager::GetInstance()->SetShieldStatus(shieldMode, isShield);
         if (retSet != 0) {
-            MMI_HILOGW("SetShieldStatus failed. mode=%{public}d", shieldMode);
+            MMI_HILOGD("SetShieldStatus failed. mode=%{public}d", shieldMode);
             continue;
         }
         bool readBackShield = !isShield;
         int32_t retGet = InputManager::GetInstance()->GetShieldStatus(shieldMode, readBackShield);
         if (retGet != 0) {
-            MMI_HILOGW("GetShieldStatus failed. mode=%{public}d", shieldMode);
+            MMI_HILOGD("GetShieldStatus failed. mode=%{public}d", shieldMode);
             continue;
         }
 
         if (readBackShield != isShield) {
-            MMI_HILOGE("Mismatch: Set=%{public}d, Got=%{public}d, mode=%{public}d",
-                       isShield, readBackShield, shieldMode);
+            MMI_HILOGD("Mismatch: Set=%{public}d, mode=%{public}d",
+                       isShield, shieldMode);
         } else {
             MMI_HILOGD("Match: mode=%{public}d, state=%{public}d", shieldMode, isShield);
         }
