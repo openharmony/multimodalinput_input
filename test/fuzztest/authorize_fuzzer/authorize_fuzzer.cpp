@@ -53,7 +53,7 @@ void AuthorizeFuzzTest(const uint8_t *data, size_t size)
     if (retQuery == 0) {
         MMI_HILOGD("QueryAuthorizedStatus success, status = %{public}d", status);
     } else {
-        MMI_HILOGW("QueryAuthorizedStatus failed, ret = %{public}d", retQuery);
+        MMI_HILOGD("QueryAuthorizedStatus failed, ret = %{public}d", retQuery);
     }
 }
 
