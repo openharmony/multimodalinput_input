@@ -153,22 +153,20 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
 void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    MMI_HILOGD("add Flag to ESC in: %{public}s", keyEvent->ToString().c_str());
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_ESCAPE) {
         return;
     }
-    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE)) {
+    if (!escToBackFlag_ && keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE)) {
         keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
     }
 
-    MMI_HILOGD("ESC in: %{public}s", keyEvent->ToString().c_str());
-    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN &&
-        keyEvent->GetKeyCode() == KeyEvent::KEYCODE_ESCAPE) {
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         escToBackFlag_ = true;
         return;
     }
 
-    if (escToBackFlag_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_ESCAPE &&
-        (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP ||
+    if (escToBackFlag_ && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP ||
         keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) &&
         keyEvent->GetKeyItems().size() == 1) {
         MMI_HILOGI("Only esc up or cancel has added flag: %{public}s", keyEvent->ToString().c_str());
