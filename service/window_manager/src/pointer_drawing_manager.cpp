@@ -312,7 +312,7 @@ PointerDrawingManager::~PointerDrawingManager()
         if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
             softCursorRenderThread_->join();
         }
-        if (moveRetryRunner_ != nullptr){
+        if (moveRetryRunner_ != nullptr) {
             moveRetryRunner_->Stop();
         }   
         if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
