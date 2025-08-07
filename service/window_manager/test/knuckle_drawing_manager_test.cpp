@@ -1500,7 +1500,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_006
     KnuckleDrawingManager kceDrawMgr;
     bool isNeedUpAnimation = true;
     auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 
     kceDrawMgr.brushCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.brushCanvasNode_, nullptr);

@@ -265,6 +265,13 @@ ohos_unittest("MouseTransformProcessorEXTest") {
 
   cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./../../ipc_blocklist.txt"
+  }
+
   sources = [
     "src/mock.cpp",
     "src/mouse_transform_processor_ex_test.cpp",
