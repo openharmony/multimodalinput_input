@@ -16,34 +16,44 @@
 #include "cursor_drawing_component.h"
 
 #include <dlfcn.h>
+#include <securec.h>
+
 #include "mmi_log.h"
+#include "pointer_device_manager.h"
+#include "timer_manager.h"
 
 #define MMI_LOG_TAG "CursorDrawingComponent"
-#define CHK_IS_LOADV(isLoaded, pointerInstance)                       \
-    if ((!isLoaded) || ((pointerInstance) == nullptr)) {              \
+#define CHK_IS_LOADV(isLoaded, pointerInstance)                                                      \
+    if ((!isLoaded) || ((pointerInstance) == nullptr)) {                                             \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded or instance does not exist");       \
-        return;                                                         \
+        return;                                                                                      \
     }
 
-#define CHK_IS_LOADF(isLoaded, pointerInstance)                       \
-    if ((!isLoaded) || ((pointerInstance) == nullptr)) {              \
+#define CHK_IS_LOADF(isLoaded, pointerInstance)                                                      \
+    if ((!isLoaded) || ((pointerInstance) == nullptr)) {                                             \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded or instance does not exist");       \
-        return false;                                                   \
+        return false;                                                                                \
     }
 
-#define CHK_IS_LOADR(isLoaded, pointerInstance)                       \
-    if ((!isLoaded_) || ((pointerInstance_) == nullptr)) {              \
+#define CHK_IS_LOADR(isLoaded, pointerInstance)                                                      \
+    if ((!isLoaded_) || ((pointerInstance_) == nullptr)) {                                           \
         MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded or instance does not exist");       \
-        return RET_ERR;                                                 \
+        return RET_ERR;                                                                              \
     }
 
 namespace OHOS::MMI {
+namespace {
 static constexpr const char *MULTIMODAL_PATH_NAME = "libcursor_drawing_adapter.z.so";
+constexpr int32_t UNLOAD_TIME_MS = 2 * 60 * 1000; // 2 minutes
+constexpr int32_t CHECK_INTERVAL_MS = 20 * 1000;  // check every 20 seconds
+constexpr int32_t CHECK_COUNT = -1;
+}
 
 CursorDrawingComponent& CursorDrawingComponent::GetInstance()
 {
     static CursorDrawingComponent instance;
     instance.Load();
+    instance.lastCallTime_ = std::chrono::steady_clock::now();
     return instance;
 }
 
@@ -63,7 +73,7 @@ void CursorDrawingComponent::Load()
 {
     std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
     if (isLoaded_ && (soHandle_ != nullptr)) {
-        MMI_HILOGI("%{public}s has been Loaded", MULTIMODAL_PATH_NAME);
+        MMI_HILOGD("%{public}s has been Loaded", MULTIMODAL_PATH_NAME);
         return;
     }
 
@@ -95,6 +105,22 @@ void CursorDrawingComponent::Load()
     }
     pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(ptr);
     isLoaded_ = true;
+
+    if (timerId_ > 0) {
+        TimerMgr->RemoveTimer(timerId_);
+    }
+    timerId_ = TimerMgr->AddLongTimer(CHECK_INTERVAL_MS, CHECK_COUNT, [this] {
+        auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - lastCallTime_).count();
+        if ((idleTime >= UNLOAD_TIME_MS) && !POINTER_DEV_MGR.isInit) {
+            CursorDrawingComponent::GetInstance().UnLoad();
+        }
+    }, "libcursor_drawing_adapter-Unload");
+    if (timerId_ < 0) {
+        MMI_HILOGE("Add timer for unloading libcursor_drawing_adapter library fail");
+        UnLoad();
+        return;
+    }
     MMI_HILOGI("Load %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
@@ -110,6 +136,9 @@ void CursorDrawingComponent::UnLoad()
         MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
         return;
     }
+    if (dlclose(soHandle_) != 0) {
+        MMI_HILOGW("%{public}s has been unloaded, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
+    }
     isLoaded_ = false;
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
@@ -117,7 +146,7 @@ void CursorDrawingComponent::UnLoad()
     MMI_HILOGI("UnLoad %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
-void CursorDrawingComponent::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+void CursorDrawingComponent::DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
@@ -210,7 +239,7 @@ bool CursorDrawingComponent::IsPointerVisible()
     return pointerInstance_->IsPointerVisible();
 }
 
-void CursorDrawingComponent::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
+void CursorDrawingComponent::SetPointerLocation(int32_t x, int32_t y, uint64_t displayId)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->SetPointerLocation(x, y, displayId);
@@ -312,7 +341,7 @@ int32_t CursorDrawingComponent::SwitchPointerStyle()
     return pointerInstance_->SwitchPointerStyle();
 }
 
-void CursorDrawingComponent::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
+void CursorDrawingComponent::DrawMovePointer(uint64_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->DrawMovePointer(displayId, physicalX, physicalY);
@@ -421,7 +450,7 @@ void CursorDrawingComponent::RegisterDisplayStatusReceiver()
 }
 
 int32_t CursorDrawingComponent::UpdateMouseLayer(
-    const PointerStyle &pointerStyle, int32_t displayId, int32_t physicalX, int32_t physicalY)
+    const PointerStyle &pointerStyle, uint64_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
     return pointerInstance_->UpdateMouseLayer(pointerStyle, physicalX, physicalY);

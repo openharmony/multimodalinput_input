@@ -106,6 +106,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
         return;
     }
     ProximityData* proximityData = reinterpret_cast<ProximityData*>(event->data);
+    CHKPV(proximityData);
     int32_t distance = static_cast<int32_t>(proximityData->distance);
     MMI_HILOGI("Proximity distance %{public}d", distance);
     g_distance = distance;
@@ -119,7 +120,7 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
         return;
     }
     if (MenuClickHandle(keyEvent)) {
-        MMI_HILOGD("MenuClickHandle return true, keyCode:%{private}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("MenuClickHandle return true:%{private}d", keyEvent->GetKeyCode());
         return;
     }
     if (OnHandleEvent(keyEvent)) {
@@ -132,7 +133,7 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("The keyEvent start launch an ability:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
     }
@@ -942,8 +943,10 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
+    CHKFR(jsonArray, {}, "Invalid jsonArray");
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
+        CHKPC(jsonData);
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
         cJSON_AddItemToArray(jsonArray, jsonData);
@@ -1074,6 +1077,11 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        repeatKey_.keyCode = item.keyCode;
+        repeatKey_.keyAction = keyEvent->GetKeyAction();
+        MMI_HILOGI("Update repeatkey status");
+    }
     if (WIN_MGR->JudgeCameraInFore() &&
         (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked)) {
             return true;
@@ -1106,14 +1114,13 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonStr.c_str());
-    if (parser.json_ == nullptr) {
-        MMI_HILOGE("cJSON_Parse failed");
+    JsonParser parser(jsonStr.c_str());
+    if (parser.Get() == nullptr) {
+        MMI_HILOGE("parser is nullptr");
         return false;
     }
-    if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("Parser.json_ is not object");
+    if (!cJSON_IsObject(parser.Get())) {
+        MMI_HILOGE("Parser.Get() is not object");
         return false;
     }
 
@@ -1147,10 +1154,13 @@ bool KeyCommandHandler::ParseExcludeJson(const std::string &configFile)
         MMI_HILOGE("Read excludeKey configFile failed");
         return false;
     }
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("Parser.json_ of excludeKey is not object");
+    JsonParser parser(jsonStr.c_str());
+    if (parser.Get() == nullptr) {
+        MMI_HILOGE("parser is nullptr");
+        return false;
+    }
+    if (!cJSON_IsObject(parser.Get())) {
+        MMI_HILOGE("Parser.Get() of excludeKey is not object");
         return false;
     }
     bool isParseExcludeKeys = ParseExcludeKeys(parser, excludeKeys_);
@@ -1183,7 +1193,7 @@ void KeyCommandHandler::PrintExcludeKeys()
 {
     size_t keysSize = excludeKeys_.size();
     for (size_t i = 0; i < keysSize; i++) {
-        MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
+        MMI_HILOGD("code:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
                    excludeKeys_[i].keyCode, excludeKeys_[i].keyAction, excludeKeys_[i].delay);
     }
 }
@@ -1195,7 +1205,7 @@ void KeyCommandHandler::PrintSeq()
     for (const auto &item : sequences_) {
         MMI_HILOGI("The row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGI("The keyCode:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("code:%{private}d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
         MMI_HILOGI("Ability bundleName:%{public}s, abilityName:%{public}s",
@@ -1406,10 +1416,10 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
+        MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
             key->GetKeyCode(), key->GetKeyAction());
     } else {
-        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
+        MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
             key->GetKeyCode(), key->GetKeyAction());
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_F1) {
@@ -1787,6 +1797,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, const std:
         MMI_HILOGD("ret_ %{public}d", ret_.load());
         if (ret_ != LIGHT_STAY_AWAY) {
             LaunchAbility(item.ability);
+            launchAbilityCount_ = 0;
             CHKPV(mistouchPrevention_);
             MMI_HILOGI("Launch yes");
         }
@@ -2078,7 +2089,7 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     for (size_t i = keys_.size(); i > 0; --i) {
         if (keys_[i - 1].keyCode == sequenceKey.keyCode) {
             if (keys_[i - 1].keyAction == sequenceKey.keyAction) {
-                MMI_HILOGI("Is repeat key, keyCode:%{private}d", sequenceKey.keyCode);
+                MMI_HILOGI("Is repeat key:%{private}d", sequenceKey.keyCode);
                 return true;
             }
             MMI_HILOGI("Is not repeat key");
@@ -2317,7 +2328,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     }
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
-            MMI_HILOGD("The keyCode or keyAction not matching");
+            MMI_HILOGD("KeyAction not matching");
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
@@ -2745,7 +2756,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "Sequence: count = %zu", sequences_.size());
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
-            mprintf(fd, "keyCode: %{private}d | keyAction: %s",
+            mprintf(fd, "code: %{private}d | keyAction: %s",
                 sequenceKey.keyCode, ConvertKeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
@@ -2754,7 +2765,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
     mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
-        mprintf(fd, "keyCode: %{private}d | keyAction: %s", item.keyCode,
+        mprintf(fd, "code: %{private}d | keyAction: %s", item.keyCode,
             ConvertKeyActionToString(item.keyAction).c_str());
     }
     mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
@@ -2895,17 +2906,20 @@ bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("Parser.json_ is not object");
+    JsonParser parser(jsonStr.c_str());
+    if (parser.Get() == nullptr) {
+        MMI_HILOGE("parse is nullptr");
+        return false;
+    }
+    if (!cJSON_IsArray(parser.Get())) {
+        MMI_HILOGE("Parser.Get() is not object");
         return false;
     }
 
     cJSON* item = nullptr;
     cJSON* enable = nullptr;
     cJSON* status = nullptr;
-    cJSON_ArrayForEach(item, parser.json_) {
+    cJSON_ArrayForEach(item, parser.Get()) {
         if (!cJSON_IsObject(item)) {
             continue;
         }
@@ -3014,7 +3028,7 @@ void KeyCommandHandler::SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("The keyEvent start launch an ability:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
     }

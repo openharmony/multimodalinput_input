@@ -56,6 +56,7 @@ constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t COLOR_FIXEX_WIDTH { 6 };
 const std::string COLOR_PREFIX = "#";
 const char COLOR_FILL = '0';
+constexpr int64_t TIME_ROUND_UP { 999 };
 } // namespace
 
 int64_t GetSysClockTime()
@@ -88,6 +89,11 @@ int64_t GetMillisTime()
     auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
     return tmp.count();
+}
+
+int64_t GetTimeToMilli(int64_t timeDT)
+{
+    return (timeDT + TIME_ROUND_UP) / TIME_CONVERSION_UNIT;
 }
 
 static std::string GetThisThreadIdOfString()

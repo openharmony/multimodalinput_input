@@ -27,16 +27,19 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+    constexpr int32_t TIMED_WAIT_MS = 2;
+} // namespace
 void DelegateTasks::Task::ProcessTask()
 {
     CALL_DEBUG_ENTER;
     if (hasWaited_) {
-        MMI_HILOGE("Expired tasks will be discarded. id:%{public}d", id_);
+        MMI_HILOGE("Expired tasks will be discarded. id:%{public}" PRId64, id_);
         return;
     }
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
-    MMI_HILOGD("Process taskType:%{public}s, taskId:%{public}d, ret:%{public}d", taskType.c_str(), id_, ret);
+    MMI_HILOGD("Process taskType:%{public}s, taskId:%{public}" PRId64 ", ret:%{public}d", taskType.c_str(), id_, ret);
     if (!hasWaited_ && promise_ != nullptr) {
         promise_->set_value(ret);
     }
@@ -79,9 +82,20 @@ void DelegateTasks::ProcessTasks()
     CALL_DEBUG_ENTER;
     std::vector<TaskPtr> tasks;
     PopPendingTaskList(tasks);
+    size_t count = tasks.size();
+    if (count == 0) {
+        return;
+    }
     for (const auto &it : tasks) {
         it->ProcessTask();
     }
+    std::vector<DelegateTasks::TaskData> datas = {};
+    datas.resize(count);
+    auto res = read(fds_[0], datas.data(), sizeof(DelegateTasks::TaskData) * count);
+    if (res == -1) {
+        MMI_HILOGW("Read failed erron:%{public}d", errno);
+    }
+    MMI_HILOGD("count:%{public}zu", count);
 }
 
 int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
@@ -122,17 +136,18 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 
 void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
-    std::lock_guard<std::mutex> guard(mux_);
     static constexpr int32_t onceProcessTaskLimit = 10;
-    for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
-        if (tasks_.empty()) {
-            break;
+    if (mux_.try_lock_for(std::chrono::milliseconds(TIMED_WAIT_MS))) {
+        for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
+            if (tasks_.empty()) {
+                break;
+            }
+            auto task = tasks_.front();
+            CHKPB(task);
+            tasks.push_back(task->GetSharedPtr());
+            tasks_.pop();
         }
-        auto task = tasks_.front();
-        CHKPB(task);
-        RecoveryId(task->GetId());
-        tasks.push_back(task->GetSharedPtr());
-        tasks_.pop();
+        mux_.unlock();
     }
 }
 
@@ -142,27 +157,28 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, std::shar
         MMI_HILOGE("This interface cannot be called from a worker thread");
         return nullptr;
     }
-    std::lock_guard<std::mutex> guard(mux_);
-    MMI_HILOGD("tasks_ size:%{public}d", static_cast<int32_t>(tasks_.size()));
-    static constexpr int32_t maxTasksLimit = 1000;
-    auto tsize = tasks_.size();
-    if (tsize > maxTasksLimit) {
-        MMI_HILOGE("The task queue is full. size:%{public}zu, maxTasksLimit:%{public}d", tsize, maxTasksLimit);
-        return nullptr;
+    TaskPtr taskCopy = nullptr;
+    {
+        std::lock_guard<std::timed_mutex> guard(mux_);
+        MMI_HILOGD("tasks_ size:%{public}d", static_cast<int32_t>(tasks_.size()));
+        static constexpr int32_t maxTasksLimit = 1000;
+        auto tsize = tasks_.size();
+        if (tsize > maxTasksLimit) {
+            MMI_HILOGE("The task queue is full. size:%{public}zu, maxTasksLimit:%{public}d", tsize, maxTasksLimit);
+            return nullptr;
+        }
+        id_++;
+        TaskData data = { GetThisThreadId(), id_};
+        auto res = write(fds_[1], &data, sizeof(data));
+        if (res == -1) {
+            MMI_HILOGE("Pipe write failed, errno:%{public}d", errno);
+            return nullptr;
+        }
+        TaskPtr task = std::make_shared<Task>(id_, callback, promise);
+        tasks_.push(task);
+        taskCopy = task->GetSharedPtr();
     }
-    int32_t id = GenerateId();
-    TaskData data = { GetThisThreadId(), id };
-    auto res = write(fds_[1], &data, sizeof(data));
-    if (res == -1) {
-        RecoveryId(id);
-        MMI_HILOGE("Pipe write failed, errno:%{public}d", errno);
-        return nullptr;
-    }
-    TaskPtr task = std::make_shared<Task>(id, callback, promise);
-    tasks_.push(task);
-    std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
-    MMI_HILOGD("Post taskType:%{public}s", taskType.c_str());
-    return task->GetSharedPtr();
+    return taskCopy;
 }
 } // namespace MMI
 } // namespace OHOS

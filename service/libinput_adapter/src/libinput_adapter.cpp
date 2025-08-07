@@ -321,6 +321,7 @@ void LibinputAdapter::DelayInjectKeyEventCallback()
     int64_t frameTime = GetSysClockTime();
     funInputEvent_(vkbDelayedKeyEvent_, frameTime);
     free(vkbDelayedKeyEvent_);
+    vkbDelayedKeyEvent_ = nullptr;
     libinput_event_destroy(vkbDelayedEvent_);
     vkbDelayedEvent_ = nullptr;
 }
@@ -441,6 +442,7 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
             for (auto event : keyEvents) {
                 funInputEvent_(event, frameTime);
                 free(event);
+                event = nullptr;
             }
 
             if (libinputCapsLockOn != isCapsLockOn) {
@@ -453,6 +455,7 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
             for (auto event : keyEvents) {
                 funInputEvent_(event, frameTime);
                 free(event);
+                event = nullptr;
             }
 
             std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
@@ -485,6 +488,7 @@ void LibinputAdapter::HandleVTrackpadMessage(VTrackpadEventType eventType, std::
         libinput_event_type injectEventType = libinput_event_get_type(event);
         funInputEvent_(event, frameTime);
         free(event);
+        event = nullptr;
 
         if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
             InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN,
@@ -520,11 +524,13 @@ void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
     ltEvent = libinput_create_touch_event(touch, tEvent);
     funInputEvent_((libinput_event*)ltEvent, frameTime);
     free(ltEvent);
+    ltEvent = nullptr;
 
     tEvent.event_type = libinput_event_type::LIBINPUT_EVENT_TOUCH_UP;
     ltEvent = libinput_create_touch_event(touch, tEvent);
     funInputEvent_((libinput_event*)ltEvent, frameTime);
     free(ltEvent);
+    ltEvent = nullptr;
 
     event_pointer pEvent;
     pEvent.event_type = libinput_event_type::LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
@@ -533,6 +539,7 @@ void LibinputAdapter::InjectEventForCastWindow(libinput_event_touch* touch)
     libinput_event_pointer* lpEvent = libinput_create_pointer_event(touch, pEvent);
     funInputEvent_((libinput_event*)lpEvent, frameTime);
     free(lpEvent);
+    lpEvent = nullptr;
 }
 
 bool LibinputAdapter::IsCursorInCastWindow()

@@ -20,6 +20,10 @@
 #include "mmi_log.h"
 #include "mock.h"
 #include "mouse_transform_processor.h"
+#include "parameters.h"
+#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
+#include "libinput_mock.h"
  
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseTransformProcessorExTest"
@@ -56,6 +60,34 @@ void MouseTransformProcessorExTest::SetUp() {}
  
 void MouseTransformProcessorExTest::TearDown() {}
  
+/**
+ * @tc.name: MouseTransformProcessorExTest_GetDisplayDirection_001
+ * @tc.desc: Test the funcation GetDisplayDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetDisplayDirection_001, TestSize.Level1)
+{
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION0;
+    displayInfo.displayDirection = DIRECTION90;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
+    auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    Direction ret = processor.GetDisplayDirection(&displayInfo);
+    int32_t rotatePolicy = system::GetIntParameter("const.window.device.rotate_policy", 0);
+    if (inputWindowsManager->GetHardCursorEnabled()) {
+        if (rotatePolicy == 0) {
+            ASSERT_EQ(ret, DIRECTION270);
+        } else {
+            ASSERT_EQ(ret, DIRECTION0);
+        }
+    } else {
+        ASSERT_EQ(ret, DIRECTION270);
+    }
+}
+
 #ifndef OHOS_BUILD_ENABLE_WATCH
 /**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadLeftButton_001
@@ -66,8 +98,9 @@ void MouseTransformProcessorExTest::TearDown() {}
 HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchpadLeftButton_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, libinput_event_pointer_get_finger_count()).WillOnce(Return(1));
-    EXPECT_CALL(*messageParcelMock_, libinput_event_pointer_get_button_area()).WillOnce(Return(280));
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillOnce(Return(1));
+    EXPECT_CALL(libinputMock, PointerGetButtonArea).WillOnce(Return(280));
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     struct libinput_event_pointer* data = nullptr;
@@ -85,8 +118,9 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
 HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchpadLeftButton_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, libinput_event_pointer_get_finger_count()).WillOnce(Return(1));
-    EXPECT_CALL(*messageParcelMock_, libinput_event_pointer_get_button_area()).WillOnce(Return(273));
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillOnce(Return(1));
+    EXPECT_CALL(libinputMock, PointerGetButtonArea).WillOnce(Return(273));
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     struct libinput_event_pointer* data = nullptr;
@@ -114,6 +148,47 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetPointerLo
     EXPECT_EQ(displayId, -1);
     EXPECT_EQ(displayX, 0);
     EXPECT_EQ(displayY, 0);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_Normalize_001
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_Normalize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    libinput_event event {};
+    libinput_event_pointer pointer {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_MOTION));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointer));
+    processor.pointerEvent_ = PointerEvent::Create();
+    EXPECT_EQ(processor.Normalize(&event), RET_ERR);
+}
+ 
+/**
+ * @tc.name: MouseTransformProcessorExTest_Normalize_002
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_Normalize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    libinput_event event {};
+    libinput_event_pointer pointer {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_MOTION));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointer));
+    processor.pointerEvent_ = PointerEvent::Create();
+    processor.pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    EXPECT_EQ(processor.Normalize(&event), RET_ERR);
 }
 }
 }

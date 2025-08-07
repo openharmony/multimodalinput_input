@@ -61,7 +61,7 @@ bool HotplugDetector::Init(const callback& addFunc, const callback& removeFunc)
         auto errMsg = SystemError().message();
         MMI_HILOGE("Failed to initialize inotify. Error:%{public}s", errMsg.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
+        DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
             "Failed to initialize inotify. Error:" + errMsg);
 #endif
         return false;
@@ -70,7 +70,7 @@ bool HotplugDetector::Init(const callback& addFunc, const callback& removeFunc)
         auto errMsg = SystemError().message();
         MMI_HILOGE("Failed to add watch for input devices. Error:%{public}s", errMsg.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
+        DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
             "Failed to add watch for input devices. Error:" + errMsg);
 #endif
         return false;
@@ -92,7 +92,7 @@ bool HotplugDetector::Scan() const
         auto errMsg = SystemError().message();
         MMI_HILOGE("Failed to open device input dir. Error:%{public}s", errMsg.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
+        DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
             "Failed to open device input dir. Error:" + errMsg);
 #endif
         return false;
@@ -123,7 +123,7 @@ void HotplugDetector::OnEvent() const
         if (err != std::errc::resource_unavailable_try_again) {
             MMI_HILOGE("Failed to read inotify event. Error:%{public}s", errMsg.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-            DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
+            DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_SYS,
                                                    "Failed to read inotify event. Error:" + errMsg);
 #endif
         }

@@ -54,6 +54,7 @@ void KeyboardInject::InjectKeyEvent(uint16_t code, uint32_t value) const
     if (it == keyCodeMap_.end()) {
         return;
     }
+    CHKPV(injectThread_);
     InjectInputEvent injectInputEvent = { injectThread_->KEYBOARD_DEVICE_ID, EV_KEY, it->second, value };
     injectThread_->WaitFunc(injectInputEvent);
     InjectInputEvent injectInputSync = { injectThread_->KEYBOARD_DEVICE_ID, EV_SYN, SYN_REPORT, 0 };

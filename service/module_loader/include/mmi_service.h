@@ -20,8 +20,8 @@
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
-#include "cJSON.h"
 #include "input_event_handler.h"
+#include "json_parser.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -35,21 +35,6 @@ namespace MMI {
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 class TouchGestureManager;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-        }
-    }
-    operator cJSON *()
-    {
-        return json_;
-    }
-    cJSON *json_ { nullptr };
-};
 
 struct DeviceConsumer {
     std::string name {};

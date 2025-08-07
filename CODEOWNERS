@@ -13,3 +13,13 @@
 
 # any change to tools/multimodalinput_ipc_interface_code.h needs to be reviewed by @leonchan5
 tools/multimodalinput_ipc_interface_code.h @leonchan5
+
+# any change to key event needs to be reviewed by @kevin812085902
+service/key_command @kevin812085902
+service/key_event_normalize @kevin812085902
+service/subscriber @kevin812085902
+etc/ability_launch_config.json @kevin812085902
+etc/exceptional_system_keys_config.json @kevin812085902
+etc/exclude_keys_config.json @kevin812085902
+etc/system_hotkeys_config.json @kevin812085902
+etc/system_keys_config.json @kevin812085902

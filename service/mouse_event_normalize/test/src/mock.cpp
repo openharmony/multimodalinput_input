@@ -46,21 +46,5 @@ int32_t HandleMotionDynamicAccelerateTouchpad(const Offset* offset, bool mode, d
 {
     return 0;
 }
- 
-uint32_t libinput_event_pointer_get_finger_count(struct libinput_event_pointer *event)
-{
-    if (OHOS::MMI::DfsMessageParcel::messageParcel == nullptr) {
-        return 0;
-    }
-    return OHOS::MMI::DfsMessageParcel::messageParcel->libinput_event_pointer_get_finger_count();
-}
- 
-uint32_t libinput_event_pointer_get_button_area(struct libinput_event_pointer *event)
-{
-    if (OHOS::MMI::DfsMessageParcel::messageParcel == nullptr) {
-        return 0;
-    }
-    return OHOS::MMI::DfsMessageParcel::messageParcel->libinput_event_pointer_get_button_area();
-}
 }
 } // namespace OHOS

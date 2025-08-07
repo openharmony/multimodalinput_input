@@ -44,6 +44,7 @@ public:
 
     MOCK_METHOD2(Draw, void(const OLD::DisplayInfo&, const std::shared_ptr<PointerEvent>&));
     MOCK_METHOD2(SetMultiWindowScreenId, void(uint64_t, uint64_t));
+    MOCK_METHOD1(RegisterAddTimer, void(AddTimerFunc));
 };
 
 /**

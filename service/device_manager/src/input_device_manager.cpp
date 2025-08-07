@@ -420,7 +420,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     std::string errStr = "Parsing strName failed: \'" + strName + "\'";
     MMI_HILOGE("%{public}s", errStr.c_str());
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER, errStr);
+    DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER, errStr);
 #endif
     return RET_ERR;
 }
@@ -456,7 +456,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     NotifyDevCallback(deviceId, info);
     NotifyAddPointerDevice(info.isPointerDevice, existEnabledPointerDevice);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device added successfully");
+    DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device added successfully");
 #endif
 }
 
@@ -500,7 +500,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     ScanPointerDevice();
     if (deviceId == INVALID_DEVICE_ID) {
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-        DfxHisyseventDeivce::ReportDeviceFault(DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
+        DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
                                                "Device reomved failed becaused of not found");
 #endif
     }
@@ -519,8 +519,10 @@ void InputDeviceManager::ScanPointerDevice()
         NotifyPointerDevice(false, false, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
         MMI_HILOGI("Set para input.pointer.device false");
-        POINTER_DEV_MGR.isInit = false;
-        CursorDrawingComponent::GetInstance().UnLoad();
+        if (POINTER_DEV_MGR.isInit) {
+            POINTER_DEV_MGR.isInit = false;
+            CursorDrawingComponent::GetInstance().UnLoad();
+        }
     }
 }
 
@@ -581,6 +583,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisib
 {
     MMI_HILOGI("The observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
+        CHKPV(*observer);
         (*observer)->UpdatePointerDevice(hasPointerDevice, isVisible, isHotPlug);
     }
 }
@@ -785,7 +788,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     NotifyDevCallback(deviceId, deviceInfo);
     NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
+    DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
 #endif
     return RET_OK;
 }
@@ -797,8 +800,8 @@ bool InputDeviceManager::CheckDuplicateInputDevice(struct libinput_device *input
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-            DfxHisyseventDeivce::ReportDeviceFault(item.first,
-                DfxHisyseventDeivce::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
+            DfxHisyseventDevice::ReportDeviceFault(item.first,
+                DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
                 "The device is already existent");
 #endif
             return true;
@@ -840,7 +843,7 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
             deviceId = it->first;
             enable = it->second.enable;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-            DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "Device removed successfully");
+            DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device removed successfully");
 #endif
             MMI_HILOGI("Device removed successfully, deviceId:%{public}d, sys uid:%{public}s", deviceId,
                 it->second.sysUid.c_str());
@@ -913,14 +916,15 @@ void InputDeviceManager::PointerDeviceInit()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (POINTER_DEV_MGR.renderServiceIsOk) {
-        CursorDrawingComponent::GetInstance().InitPointerCallback();
-    }
-    if (POINTER_DEV_MGR.displayManagerServiceSaIdIsOk) {
-        CursorDrawingComponent::GetInstance().InitScreenInfo();
-        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
-    }
+    CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
+    POINTER_DEV_MGR.isFirstAddCommonEventService = false;
+    CursorDrawingComponent::GetInstance().InitPointerCallback();
+    POINTER_DEV_MGR.isFirstAddRenderService = false;
+    CursorDrawingComponent::GetInstance().InitScreenInfo();
+    CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
+    POINTER_DEV_MGR.isFirstAddDisplayManagerService = false;
     CursorDrawingComponent::GetInstance().InitPointerObserver();
+    POINTER_DEV_MGR.isFirstAdddistributedKVDataService = false;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     POINTER_DEV_MGR.isInit = true;
 }
@@ -929,7 +933,7 @@ void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool e
 {
     MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
         existEnabledPointerDevice);
-    if (addNewPointerDevice) {
+    if (addNewPointerDevice && !POINTER_DEV_MGR.isInit) {
         PointerDeviceInit();
     }
     if (addNewPointerDevice && !existEnabledPointerDevice) {
@@ -959,8 +963,6 @@ void InputDeviceManager::NotifyRemovePointerDevice(bool removePointerDevice)
     if (removePointerDevice && !HasPointerDevice() && !HasVirtualPointerDevice() &&
         CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-        POINTER_DEV_MGR.isInit = false;
-        CursorDrawingComponent::GetInstance().UnLoad();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
@@ -979,7 +981,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     NotifyDeviceRemoved(deviceId);
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisyseventDeivce::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
+    DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
 #endif
     return RET_OK;
 }

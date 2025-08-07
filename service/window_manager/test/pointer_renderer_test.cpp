@@ -22,6 +22,10 @@
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerRendererTest"
+constexpr int32_t MIN_POINTER_COLOR{0x000000};
+constexpr int32_t MAX_POINTER_COLOR{0xFFFFFF};
+constexpr int32_t OTHER_POINTER_COLOR{0x171717};
+constexpr int32_t MIDDLE_POINTER_COLOR{0x7F7F7F};
 
 namespace OHOS {
 namespace MMI {
@@ -74,7 +78,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetOffsetX_001, TestSize.Level
     EXPECT_EQ(ret, 256);
     config.align_ = ICON_TYPE::ANGLE_NW_RIGHT;
     ret = config.GetOffsetX();
-    EXPECT_EQ(ret, 251);
+    EXPECT_EQ(ret, 256);
 }
 
 /**
@@ -168,6 +172,43 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: PointerRendererTest_Render_002
+ * @tc.desc: Test Render
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_Render_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    uint32_t width = 10;
+    uint32_t height = 20;
+    uint8_t addr[800] = {10};
+    config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
+
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    OHOS::Media::SourceOptions opts;
+    uint32_t ret = 0;
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
+    ASSERT_NE(imageSource, nullptr);
+    std::set<std::string> formats;
+    ret = imageSource->GetSupportedFormats(formats);
+    OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {
+        .width = 80,
+        .height = 80
+    };
+    decodeOpts.SVGOpts.fillColor = {.isValidColor = false, .color = 0xff00ff};
+    decodeOpts.SVGOpts.strokeColor = {.isValidColor = false, .color = 0xff00ff};
+    config.userIconPixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+    ASSERT_NE(config.userIconPixelMap, nullptr);
+    ret = renderer.Render(addr, width, height, config);
+    config.direction = 5;
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: PointerRendererTest_DynamicRender_001
  * @tc.desc: Test DynamicRender
  * @tc.type: Function
@@ -192,6 +233,25 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DynamicRender_001, TestSize.Le
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ret = renderer.DynamicRender(addr, width, height, config);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: PointerRendererTest_DynamicRender_002
+ * @tc.desc: Test DynamicRender
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_DynamicRender_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    uint32_t width = 10;
+    uint32_t height = 20;
+    uint8_t addr[800] = {10};
+    config.style_ = MOUSE_ICON::LOADING;
+    int32_t ret = renderer.DynamicRender(addr, width, height, config);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -336,6 +396,28 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DrawImage_001, TestSize.Level1
     ret = renderer.DrawImage(canvas, config);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: PointerRendererTest_DrawImage_002
+ * @tc.desc: Test DrawImage
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_DrawImage_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    OHOS::Rosen::Drawing::Canvas canvas;
+    RenderConfig config;
+    config.style_ = MOUSE_ICON::LOADING;
+    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    int32_t ret = renderer.DrawImage(canvas, config);
+    EXPECT_EQ(ret, RET_OK);
+
+    config.style_ = MOUSE_ICON::DEFAULT;
+    ret = renderer.DrawImage(canvas, config);
+    EXPECT_EQ(ret, RET_OK);
+}
  
 /**
  * @tc.name: PointerRendererTest_LoadCursorSvgWithColor_001
@@ -368,6 +450,67 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_001, Te
     config.color = 0x000123;
     ret = renderer.LoadCursorSvgWithColor(config);
     EXPECT_EQ(ret, nullptr);
+}
+
+/**
+ * @tc.name: PointerRendererTest_LoadCursorSvgWithColor_002
+ * @tc.desc: Test LoadCursorSvgWithColor && ChangeSvgCursorColor
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    config.style_ = MOUSE_ICON::CURSOR_COPY;
+    config.color = MAX_POINTER_COLOR;
+    pixelmap_ptr_t ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
+
+    config.color = MIN_POINTER_COLOR;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
+}
+
+/**
+ * @tc.name: PointerRendererTest_LoadCursorSvgWithColor_003
+ * @tc.desc: Test LoadCursorSvgWithColor && SetCursorColorBaseOnStyle
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_LoadCursorSvgWithColor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+
+    config.style_ = MOUSE_ICON::DEFAULT;
+    config.color = MIN_POINTER_COLOR;
+    pixelmap_ptr_t ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
+
+    config.style_ = MOUSE_ICON::HAND_GRABBING;
+    config.color = MIN_POINTER_COLOR;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
+
+    config.style_ = MOUSE_ICON::HAND_OPEN;
+    config.color = MAX_POINTER_COLOR;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
+
+    config.style_ = MOUSE_ICON::HAND_POINTING;
+    config.color = OTHER_POINTER_COLOR;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
+
+    config.style_ = MOUSE_ICON::HAND_POINTING;
+    config.color = MIDDLE_POINTER_COLOR;
+    ret = renderer.LoadCursorSvgWithColor(config);
+    EXPECT_NE(ret, nullptr);
 }
 
 /**

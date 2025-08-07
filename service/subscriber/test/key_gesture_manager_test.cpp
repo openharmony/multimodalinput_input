@@ -620,6 +620,84 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_02, TestSize.L
 }
 
 /**
+ * @tc.name: LongPressCombinationKey_Intercept_03
+ * @tc.desc: Test the funcation LongPressCombinationKey::Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkActive(true);
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Intercept_04
+ * @tc.desc: Test the funcation LongPressCombinationKey::Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_FALSE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Intercept_05
+ * @tc.desc: Test the funcation LongPressCombinationKey::Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkKeyConsumed();
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_TRUE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Intercept_06
+ * @tc.desc: Test the funcation LongPressCombinationKey::Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_FALSE(longPressCombinationKey.Intercept(keyEvent));
+}
+
+/**
  * @tc.name: KeyGestureManagerTest_NotifyHandlers_01
  * @tc.desc: Test the funcation NotifyHandlers
  * @tc.type: FUNC
@@ -841,6 +919,119 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Dump, TestSize.Level1)
     std::ostringstream output;
     longPressCombinationKey.Dump(output);
     EXPECT_FALSE(output.str().empty());
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_MarkKeyConsumed
+ * @tc.desc: Test the funcation LongPressCombinationKey::MarkKeyConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_MarkKeyConsumed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    EXPECT_NO_FATAL_FAILURE(longPressCombinationKey.MarkKeyConsumed());
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_001
+ * @tc.desc: Test the funcation LongPressCombinationKey::UpdateConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkKeyConsumed();
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_TRUE(longPressCombinationKey.UpdateConsumed(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_002
+ * @tc.desc: Test the funcation LongPressCombinationKey::UpdateConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkKeyConsumed();
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    EXPECT_TRUE(longPressCombinationKey.UpdateConsumed(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_003
+ * @tc.desc: Test the funcation LongPressCombinationKey::UpdateConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkKeyConsumed();
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_FALSE(longPressCombinationKey.UpdateConsumed(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_004
+ * @tc.desc: Test the funcation LongPressCombinationKey::UpdateConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkKeyConsumed();
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_FALSE(longPressCombinationKey.UpdateConsumed(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_005
+ * @tc.desc: Test the funcation LongPressCombinationKey::UpdateConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_FALSE(longPressCombinationKey.UpdateConsumed(keyEvent));
 }
 
 /**

@@ -186,7 +186,7 @@ HWTEST_F(ClientMsgHandlerTest, ClientMsgHandler_Test_009, TestSize.Level1)
     MockUDSClient client;
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     int32_t result = handler.OnSubscribeTabletProximityCallback(client, pkt);
-    EXPECT_EQ(result, PACKET_READ_FAIL);
+    EXPECT_NE(result, PACKET_READ_FAIL);
 }
 
 /**

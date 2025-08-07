@@ -19,6 +19,7 @@
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
 
+#include "common_event_manager.h"
 #include "device_observer.h"
 #include "hardware_cursor_pointer_manager.h"
 #include "dm_common.h"
@@ -142,6 +143,7 @@ public:
 #ifndef OHOS_BUILD_ENABLE_WATCH
     void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt) override;
 #endif // OHOS_BUILD_ENABLE_WATCH
+    void RsRemoteDiedCallback();
 
 private:
     struct PixelMapInfo {
@@ -333,6 +335,9 @@ private:
     int32_t focusY_ { 0 };
     std::atomic<bool> initEventhandlerFlag_ { false };
     std::atomic<bool> initDisplayStatusReceiverFlag_ { false };
+    std::shared_ptr<PointerDrawingManager> self_ { nullptr };
+    Rosen::OnRemoteDiedCallback OnRemoteDiedCallback_ { nullptr };
+    std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

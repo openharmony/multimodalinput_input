@@ -289,7 +289,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         double displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height, CONST_TWO));
         if (displayInfo->validWidth != static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
             displayInfo->validHeight != static_cast<int32_t>(CONST_DOUBLE_ZERO) &&
-            (displayInfo->validWidth != displayInfo->width || displayInfo->validWidth != displayInfo->height)) {
+            (displayInfo->validWidth != displayInfo->width || displayInfo->validHeight != displayInfo->height)) {
             displaySize = sqrt(pow(displayInfo->validWidth, CONST_TWO) + pow(displayInfo->validHeight, CONST_TWO));
         }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -998,6 +998,9 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     auto data = libinput_event_get_pointer_event(event);
     if (type != LIBINPUT_EVENT_TOUCHPAD_DOWN && type != LIBINPUT_EVENT_TOUCHPAD_UP) {
         CHKPR(data, ERROR_NULL_POINTER);
+    }
+    if (pointerEvent_->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     }
     pointerEvent_->ClearAxisValue();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD

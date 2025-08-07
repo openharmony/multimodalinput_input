@@ -152,7 +152,7 @@ void JsInputDeviceManager::GetDeviceInfoSyncCallback(napi_env env, napi_value* r
     if (status != napi_ok) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "create object fail");
     }
-
+    CHKPV(cb);
     cb->env = env;
     cb->data.device = inputDevice;
     *result = JsUtil::GetDeviceInfo(cb);
