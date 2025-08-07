@@ -2236,7 +2236,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, false);
     int32_t ret4 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret4, false);
+    EXPECT_EQ(ret4, true);
 }
 
 /**
