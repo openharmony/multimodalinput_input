@@ -117,7 +117,7 @@ void PullThrowSubscriberHandler::HandleFingerGesturePullUpEvent(std::shared_ptr<
             deltaTime = 1.0 / 1e3;
         }
         double speed = distance / deltaTime;
-        //  provide a speed scale to improve success rate in spin area
+        // provide a speed scale to improve success rate in spin area
         if (item.GetDisplayY() > SPIN_UP_AREA_Y && item.GetDisplayY() < SPIN_DOWN_AREA_Y) {
             speed = speed * SPEED_SCALE;
         }
