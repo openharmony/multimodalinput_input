@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include "cJSON.h"
 #include "util.h"
 
 #include "ability_manager_client.h"

@@ -65,6 +65,7 @@ public:
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     bool IsWindowRotation() const override;
+    bool IsValidScaleInfo() override;
 
 private:
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode,

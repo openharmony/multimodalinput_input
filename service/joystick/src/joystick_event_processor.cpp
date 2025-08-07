@@ -183,7 +183,7 @@ void JoystickEventProcessor::UpdateButtonState(const KeyEvent::KeyItem &keyItem)
     }
 }
 
-std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEvent::KeyItem &button) const
+std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEvent::KeyItem &button)
 {
     auto keyEvent = CleanUpKeyEvent();
     CHKPP(keyEvent);
@@ -220,17 +220,18 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEve
     return keyEvent;
 }
 
-std::shared_ptr<KeyEvent> JoystickEventProcessor::CleanUpKeyEvent() const
+std::shared_ptr<KeyEvent> JoystickEventProcessor::CleanUpKeyEvent()
 {
-    auto keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPP(keyEvent);
-    if (keyEvent->GetAction() == KeyEvent::KEY_ACTION_UP) {
-        std::optional<KeyEvent::KeyItem> preUpKeyItem = keyEvent->GetKeyItem();
-        if (preUpKeyItem) {
-            keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
+    if (keyEvent_ == nullptr) {
+        keyEvent_ = KeyEvent::Create();
+        CHKPP(keyEvent_);
+    }
+    for (const auto &keyItem : keyEvent_->GetKeyItems()) {
+        if (!keyItem.IsPressed()) {
+            keyEvent_->RemoveReleasedKeyItems(keyItem);
         }
     }
-    return keyEvent;
+    return keyEvent_;
 }
 
 std::string JoystickEventProcessor::DumpJoystickAxisEvent(std::shared_ptr<PointerEvent> pointerEvent) const
