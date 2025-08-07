@@ -25,6 +25,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr size_t MAX_ITERATION_COUNT = 2;
+} // namespace
 
 template <typename T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
@@ -44,9 +47,7 @@ void TouchPadThreeFingersTapSwitchFuzzTest(const uint8_t *data, size_t size)
     }
 
     size_t startPos = 0;
-    constexpr size_t MAX_ITER = 2;
-
-    for (size_t i = 0; i < MAX_ITER && (startPos + sizeof(int32_t) <= size); ++i) {
+    for (size_t i = 0; i < MAX_ITERATION_COUNT && (startPos + sizeof(int32_t) <= size); ++i) {
         int32_t rnd = 0;
         startPos += GetObject(data + startPos, size - startPos, rnd);
         bool enable = (rnd % 2 == 0);

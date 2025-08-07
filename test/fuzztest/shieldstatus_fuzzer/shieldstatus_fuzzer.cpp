@@ -24,6 +24,10 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+int32_t BYTES_PER_COMBINATION = 2;
+constexpr size_t MAX_SHIELD_COMBINATIONS = 3;
+} // namespace
 
 template <class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
@@ -42,9 +46,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
 void ShieldStatusFuzzTest(const uint8_t *data, size_t size)
 {
     size_t startPos = 0;
-    constexpr size_t MAX_COMBINATIONS = 3;
-
-    for (size_t i = 0; i < MAX_COMBINATIONS && startPos + sizeof(int32_t) * 2 <= size; ++i) {
+    for (size_t i = 0; i < MAX_SHIELD_COMBINATIONS && startPos + sizeof(int32_t) * BYTES_PER_COMBINATION <= size; ++i) {
         int32_t shieldMode = 0;
         size_t readSize = GetObject(data + startPos, size - startPos, shieldMode);
         if (readSize == 0) {

@@ -60,7 +60,7 @@ void InjectionRequestFuzzTest(const uint8_t *data, size_t size)
         int32_t status = -1;
         int32_t reqId = -1;
         int32_t ret = MMIService::GetInstance()->RequestInjection(status, reqId);
-        MMI_HILOGD("RequestInjection (after cancel): ret=%{public}d, status=%{public}d, reqId=%{public}d", ret, status, reqId);
+        MMI_HILOGD("RequestInjection: ret=%{public}d, status=%{public}d, reqId=%{public}d", ret, status, reqId);
     }
 }
 
