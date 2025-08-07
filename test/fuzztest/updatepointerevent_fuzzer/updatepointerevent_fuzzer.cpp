@@ -58,7 +58,6 @@ bool UpdatePointerEventFuzzTest(const uint8_t *data, size_t size)
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetId(id);
     pointerEvent->AddFlag(flag);
-
     PointerEvent::PointerItem pointerItem;
     uint32_t pointerId;
     int32_t windowX;
@@ -70,7 +69,6 @@ bool UpdatePointerEventFuzzTest(const uint8_t *data, size_t size)
     pointerItem.SetToolWindowY(windowY);
     pointerItem.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
-
     int32_t coordX;
     int32_t coordY;
     int32_t toolType;
@@ -83,7 +81,6 @@ bool UpdatePointerEventFuzzTest(const uint8_t *data, size_t size)
         .toolType = toolType,
         .id = pointerId
     };
-
     auto outEvent = std::make_unique<EventResample::MotionEvent>();
     outEvent->InitializeFrom(pointerEvent);
     outEvent->pointers.insert(std::make_pair(pointerId, pointer));

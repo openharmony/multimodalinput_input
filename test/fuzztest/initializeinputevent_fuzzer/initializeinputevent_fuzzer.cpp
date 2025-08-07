@@ -37,7 +37,7 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
 }
 
 bool InitializeInputEventFuzzTest(const uint8_t *data, size_t size)
-{   
+{
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     size_t startPos = 0;
     int64_t actionTime;
