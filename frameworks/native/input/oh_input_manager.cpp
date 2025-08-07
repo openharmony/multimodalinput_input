@@ -51,8 +51,8 @@ struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX { INT_MAX  };
-    int32_t globalY { INT_MAX  };
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
     int32_t button { -1 };
     int32_t axisType { -1 };
     float axisValue { 0.0f };
@@ -66,8 +66,8 @@ struct Input_TouchEvent {
     int32_t id;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX { INT_MAX  };
-    int32_t globalY { INT_MAX  };
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -77,8 +77,8 @@ struct Input_AxisEvent {
     int32_t axisAction;
     float displayX;
     float displayY;
-    int32_t globalX { INT_MAX  };
-    int32_t globalY { INT_MAX  };
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
     std::map<int32_t, double> axisValues;
     int64_t actionTime { -1 };
     int32_t sourceType;
@@ -512,7 +512,7 @@ static int32_t HandleMouseProperty(const struct Input_MouseEvent* mouseEvent,
     item.SetDisplayYPos(screenY);
     int32_t globalX = mouseEvent->globalX;
     int32_t globalY = mouseEvent->globalY;
-    if (globalX != INT_MAX && globalY != INT_MAX) {
+    if (globalX != INT32_MAX && globalY != INT32_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
     } else {
@@ -755,7 +755,7 @@ void OH_Input_SetMouseEventGlobalX(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalX(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, INT_MAX);
+    CHKPR(mouseEvent, INT32_MAX);
     return mouseEvent->globalX;
 }
 
@@ -769,7 +769,7 @@ void OH_Input_SetMouseEventGlobalY(struct Input_MouseEvent* mouseEvent, int32_t 
 int32_t OH_Input_GetMouseEventGlobalY(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, INT_MAX);
+    CHKPR(mouseEvent, INT32_MAX);
     return mouseEvent->globalY;
 }
 
@@ -852,7 +852,7 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     item.SetDisplayYPos(screenY);
     int32_t globalX = touchEvent->globalX;
     int32_t globalY = touchEvent->globalY;
-    if (globalX != INT_MAX && globalY != INT_MAX) {
+    if (globalX != INT32_MAX && globalY != INT32_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
     } else {
@@ -918,7 +918,7 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
         PointerEvent::GLOBAL_COORDINATE);
     if (touchEvent->action == TOUCH_ACTION_UP) {
         g_touchEvent->RemovePointerItem(g_touchEvent->GetPointerId());
@@ -1060,7 +1060,7 @@ void OH_Input_SetTouchEventGlobalX(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalX(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, INT_MAX);
+    CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalX;
 }
 
@@ -1074,7 +1074,7 @@ void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t 
 int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, INT_MAX);
+    CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalY;
 }
 

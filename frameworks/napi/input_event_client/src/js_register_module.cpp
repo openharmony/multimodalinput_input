@@ -378,9 +378,9 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
     if (GetNamedPropertyInt32(env, mouseHandle, "screenId", screenId, false) != RET_OK) {
         MMI_HILOGW("Get screenId failed");
     }
-    int32_t globalX = INT_MAX;
+    int32_t globalX = INT32_MAX;
     GetOptionalNamedPropertyInt32(env, mouseHandle, "globalX", globalX);
-    int32_t globalY = INT_MAX;
+    int32_t globalY = INT32_MAX;
     GetOptionalNamedPropertyInt32(env, mouseHandle, "globalY", globalY);
 
     pointerEvent->SetSourceType(toolType);
@@ -390,7 +390,7 @@ static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
     item.SetDisplayY(screenY);
     item.SetDisplayXPos(screenX);
     item.SetDisplayYPos(screenY);
-    if (globalX != INT_MAX && globalY != INT_MAX) {
+    if (globalX != INT32_MAX && globalY != INT32_MAX) {
         item.SetGlobalX(globalX);
         item.SetGlobalY(globalY);
     }
@@ -536,9 +536,9 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     if (GetNamedPropertyDouble(env, touchObject, "pressure", pressure) != RET_OK) {
         MMI_HILOGE("Get pressure failed");
     }
-    int32_t globalX = INT_MAX;
+    int32_t globalX = INT32_MAX;
     GetOptionalNamedPropertyInt32(env, touchObject, "globalX", globalX);
-    int32_t globalY = INT_MAX;
+    int32_t globalY = INT32_MAX;
     GetOptionalNamedPropertyInt32(env, touchObject, "globalY", globalY);
 
     pointerItem.SetDisplayX(screenX);
@@ -548,7 +548,7 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     pointerItem.SetPointerId(pointerId);
     pointerItem.SetToolType(toolType);
     pointerItem.SetPressure(pressure);
-    if (globalX != INT_MAX && globalY != INT_MAX) {
+    if (globalX != INT32_MAX && globalY != INT32_MAX) {
         pointerItem.SetGlobalX(globalX);
         pointerItem.SetGlobalY(globalY);
     }
