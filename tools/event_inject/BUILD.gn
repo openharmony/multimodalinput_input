@@ -23,6 +23,7 @@ config("event_injection_config") {
     "include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 }
 
@@ -32,6 +33,7 @@ config("event_injection_public_config") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "//third_party/FreeBSD/sys/dev/evdev",
+    "${mmi_path}/util/json_parser/include",
   ]
 }
 
@@ -52,6 +54,7 @@ ohos_source_set("event-injection") {
     "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [

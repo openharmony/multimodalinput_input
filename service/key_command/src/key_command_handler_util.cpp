@@ -637,7 +637,7 @@ static int32_t RegisterSystemKey(const ShortcutKey &shortcutKey,
 bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap,
     std::vector<std::string>& businessIds)
 {
-    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
+    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.Get(), "Shortkeys");
     if (!cJSON_IsArray(shortkeys)) {
         MMI_HILOGE("The short keys is not array");
         return false;
@@ -672,7 +672,7 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
 
 bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec)
 {
-    cJSON* sequences = cJSON_GetObjectItemCaseSensitive(parser.json_, "Sequences");
+    cJSON* sequences = cJSON_GetObjectItemCaseSensitive(parser.Get(), "Sequences");
     if (!cJSON_IsArray(sequences)) {
         MMI_HILOGE("The sequences is not array");
         return false;
@@ -694,7 +694,7 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
 
 bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& excludeKeyVec)
 {
-    cJSON* excludeKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "excludeKeys");
+    cJSON* excludeKeys = cJSON_GetObjectItemCaseSensitive(parser.Get(), "excludeKeys");
     if (!cJSON_IsArray(excludeKeys)) {
         MMI_HILOGE("The exclude keys is not array");
         return false;
@@ -717,7 +717,7 @@ bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& exclude
 bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec,
     std::map<int32_t, int32_t>& repeatKeyMaxTimes)
 {
-    cJSON* repeatKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "RepeatKeys");
+    cJSON* repeatKeys = cJSON_GetObjectItemCaseSensitive(parser.Get(), "RepeatKeys");
     if (!cJSON_IsArray(repeatKeys)) {
         MMI_HILOGE("The repeat keys is not array");
         return false;
@@ -746,7 +746,7 @@ bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKey
 
 bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture)
 {
-    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "TwoFingerGesture");
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.Get(), "TwoFingerGesture");
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("Two finger gesture is not object");
         return false;
@@ -789,7 +789,7 @@ bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGes
 
 bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, KnuckleGesture &knuckleGesture)
 {
-    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "KnuckleGesture");
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.Get(), "KnuckleGesture");
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("Knuckle gesture is not object");
         return false;
@@ -818,7 +818,7 @@ bool IsEqual(float f1, float f2)
 
 bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap)
 {
-    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "TouchPadMultiFingersTap");
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.Get(), "TouchPadMultiFingersTap");
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("Multi fingers tap is not object");
         return false;
