@@ -80,7 +80,6 @@ ohos_fuzztest("InjectionRequestFuzzTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
 
