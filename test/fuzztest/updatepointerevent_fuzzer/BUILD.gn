@@ -53,7 +53,6 @@ ohos_fuzztest("UpdatePointerEventFuzzTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
 }
