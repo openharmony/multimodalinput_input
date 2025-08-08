@@ -20,6 +20,7 @@
 #include "util.h"
 
 #include "ability_manager_client.h"
+#include "bundle_name_parser.h"
 #include "common_event_support.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"

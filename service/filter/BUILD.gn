@@ -34,6 +34,8 @@ config("mmi_event_filter_config") {
     "${mmi_path}/util/socket/include",
     "${event_filter_path}/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/custom_config_parser/include",
     "${target_gen_dir}",
   ]
 }

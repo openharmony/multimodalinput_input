@@ -104,7 +104,6 @@ std::string SpecialInputDeviceParser::GetInputDevName(const std::string &alias)
     }
     MMI_HILOGW("No %{public}s matched.", alias.c_str());
     return "";
-
 }
 
 int32_t SpecialInputDeviceParser::ParseExactlyMatch(const JsonParser &jsonParser)
