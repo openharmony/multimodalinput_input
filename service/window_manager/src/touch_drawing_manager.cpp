@@ -34,7 +34,7 @@ namespace MMI {
 namespace {
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t REPEAT_THIRTY_TIMES { 30 };
-constexpr int32_t REPEAT_COOLING_TIME { 500 };
+constexpr int32_t REPEAT_COOLING_TIME { 1000 }; // ms
 const std::string SHOW_CURSOR_SWITCH_NAME { "settings.input.show_touch_hint" };
 const std::string POINTER_POSITION_SWITCH_NAME { "settings.developer.show_touch_track" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
@@ -52,23 +52,18 @@ TouchDrawingManager::~TouchDrawingManager() {}
 
 void TouchDrawingManager::Initialize()
 {
-    int32_t nRetries { 60 };
-    SetupSettingObserver(nRetries);
+    SetupSettingObserver();
 }
 
-void TouchDrawingManager::SetupSettingObserver(int32_t nRetries)
+void TouchDrawingManager::SetupSettingObserver()
 {
     CreateObserver();
     if (hasBubbleObserver_ && hasPointerObserver_) {
         return;
     }
-    if (nRetries <= 0) {
-        MMI_HILOGE("Failed to setup setting observer after tens of retries");
-        return;
-    }
     auto timerId = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE,
-        [this, nRetries]() {
-            SetupSettingObserver(nRetries - 1);
+        [this]() {
+            SetupSettingObserver();
         }, "TouchDrawingManager");
     if (timerId < 0) {
         MMI_HILOGE("AddTimer fail");

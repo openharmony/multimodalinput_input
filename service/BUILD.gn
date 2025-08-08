@@ -903,6 +903,7 @@ ohos_unittest("KeyShortcutManagerTest") {
   configs = [ "${mmi_path}/service/filter:mmi_event_filter_config" ]
 
   deps = [
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
