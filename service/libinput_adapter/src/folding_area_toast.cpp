@@ -22,6 +22,8 @@
 #include "timer_manager.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
+#include "product_type_parser.h"
+#include "product_name_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -42,7 +44,6 @@ namespace {
     const int16_t FOLDAREA_MAX_CLK_NUM = 5;
     const int16_t FOLDAREA_MAX_CLK_SAME_AREA = 100;
     const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-    const std::string DEVICE_TYPE_HPR { "HPR" };
 } // namespace
 
 FoldingAreaToast::FoldingAreaToast()
@@ -181,7 +182,7 @@ void FoldingAreaToast::FoldingAreaCheckDeviceId(struct libinput_event *event)
 
 void FoldingAreaToast::FoldingAreaProcess(struct libinput_event *event)
 {
-    if (PRODUCT_TYPE != DEVICE_TYPE_HPR) {
+    if (PRODUCT_TYPE != DEVICE_TYPE_FOLD_PC) {
         return;
     }
     FoldingAreaCheckDeviceId(event);

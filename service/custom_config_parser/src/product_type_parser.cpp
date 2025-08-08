@@ -31,7 +31,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr std::string_view productTypeDir { "/etc/multimodalinput/product_name_2_type_config.json" };
+constexpr std::string_view productTypeDir {
+    "/etc/multimodalinput/product_name_2_type_config.json" };
 constexpr int32_t maxJsonArraySize { 100 };
 } // namespace
 

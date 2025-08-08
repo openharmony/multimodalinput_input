@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- #ifndef PRODUCT_TYPE_PARSER_H
+#ifndef PRODUCT_TYPE_PARSER_H
 #define PRODUCT_TYPE_PARSER_H
  
 #include <shared_mutex>
@@ -58,7 +58,3 @@ private:
 } // namespace OHOS
 #define PRODUCT_TYPE_PARSER OHOS::MMI::ProductTypeParser::GetInstance()
 #endif // PRODUCT_TYPE_PARSER_H
-未读
-service/custom_config_parser/include/special_input_device_parser.h
-770
-0 → 100644

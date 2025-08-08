@@ -28,7 +28,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr std::string_view productNameDefinitionConfigDir { "/etc/multimodalinput/product_name_definition_config.json" };
+constexpr std::string_view productNameDefinitionConfigDir {
+    "/etc/multimodalinput/product_name_definition_config.json" };
 constexpr int32_t maxJsonArraySize { 100 };
 } // namespace
 
@@ -49,7 +50,7 @@ int32_t ProductNameDefinitionParser::Init()
         MMI_HILOGE("Read productName failed");
         return RET_ERR;
     }
-    JsonParser parser(jsonStr.c_str());;
+    JsonParser parser(jsonStr.c_str());
     if (!cJSON_IsObject(parser.Get())) {
         MMI_HILOGE("Not valid object");
         return RET_ERR;
@@ -103,7 +104,8 @@ int32_t ProductNameDefinitionParser::ParseProductNameMap(const JsonParser &jsonP
     return RET_OK;
 }
 
-int32_t ProductNameDefinitionParser::ParserProductNameItem(const cJSON *json, ProductNameDefinitionItem &productNameItem)
+int32_t ProductNameDefinitionParser::ParserProductNameItem(const cJSON *json,
+    ProductNameDefinitionItem &productNameItem)
 {
     if (JsonParser::ParseString(json, "product_alias", productNameItem.productAlias) != RET_OK) {
         MMI_HILOGE("Parse product_alias failed");

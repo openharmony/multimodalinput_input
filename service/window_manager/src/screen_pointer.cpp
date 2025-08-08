@@ -18,6 +18,8 @@
 #include "define_multimodal.h"
 #include "transaction/rs_transaction.h"
 #include "transaction/rs_interfaces.h"
+#include "product_type_parser.h"
+#include "product_name_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -41,7 +43,7 @@ constexpr int32_t BUFFER_TIMEOUT{150};
 constexpr int32_t STRIDE_ALIGNMENT{8};
 constexpr uint32_t RENDER_STRIDE{4};
 constexpr uint32_t POINTER_SIZE_DEFAULT { 1 };
-constexpr uint32_t POINTER_SIZE_HPR { 2 };
+constexpr uint32_t POINTER_SIZE_FOLD_PC { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 
@@ -113,8 +115,8 @@ bool ScreenPointer::Init(PointerRenderer &render)
         .dpi = this->GetDPI() * this->GetScale(),
         .isHard = true,
     };
-    if (OHOS::system::GetParameter("const.build.product", "HYM") == "HPR") {
-        defaultCursorCfg.size = POINTER_SIZE_HPR;
+    if (OHOS::system::GetParameter("const.build.product", "HYM") == DEVICE_TYPE_FOLD_PC) {
+        defaultCursorCfg.size = POINTER_SIZE_FOLD_PC;
     }
     defaultCursorCfg_ = defaultCursorCfg;
 

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- #ifndef PRODUCT_NAME_DEFINITION_PARSER_H
+#ifndef PRODUCT_NAME_DEFINITION_PARSER_H
 #define PRODUCT_NAME_DEFINITION_PARSER_H
  
 #include <shared_mutex>

@@ -316,6 +316,7 @@ protected:
     int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess);
     ErrCode SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
     ErrCode ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
+    ErrCode InitCustomConfig();
 private:
     MMIService();
     ~MMIService();
@@ -366,7 +367,7 @@ private:
     bool hasRegisterListener_ { false };
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    std::atomic_bool isHPR_ { false };
+    std::atomic_bool isFoldPC_ { false };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 };
 } // namespace MMI
