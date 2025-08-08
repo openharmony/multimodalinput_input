@@ -540,5 +540,5 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadPointerMotionMistouc
     inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH + 1;
     EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

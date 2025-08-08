@@ -20,3 +20,5 @@ src:*foundation/multimodalinput/input/service/filter/test/*
 src:*foundation/multimodalinput/input/service/connect_manager/test/*
 src:*foundation/multimodalinput/input/service/event_handler/test/*
 src:*foundation/multimodalinput/input/service/event_dump/test/*
+src:*foundation/multimodalinput/input/service/crown_transform_processor/test/*
+src:*foundation/multimodalinput/input/service/mouse_event_normalize/test/*

@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-#include "cJSON.h"
+#include "json_parser.h"
 #include "define_multimodal.h"
 
 #undef MMI_LOG_TAG
@@ -26,20 +26,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-        }
-    }
-    operator cJSON *()
-    {
-        return json_;
-    }
-    cJSON *json_ { nullptr };
-};
 
 void GetJsonData(cJSON *json, const std::string &key, std::string &val)
 {
@@ -232,16 +218,15 @@ std::string DeviceItem::ToString() const
 DeviceItems DataInit(const std::string& fileData, bool logStatus)
 {
     CALL_DEBUG_ENTER;
-    JsonParser parser;
-    parser.json_ = cJSON_Parse(fileData.c_str());
+    JsonParser parser(fileData.c_str());
     if (!cJSON_IsArray(parser.json_)) {
         MMI_HILOGE("The parser is not array");
         return {};
     }
-    int32_t arraysSize = cJSON_GetArraySize(parser.json_);
+    int32_t arraysSize = cJSON_GetArraySize(parser.Get());
     DeviceItems deviceItems;
     for (int32_t i = 0; i < arraysSize; ++i) {
-        cJSON* deviceInfo = cJSON_GetArrayItem(parser.json_, i);
+        cJSON* deviceInfo = cJSON_GetArrayItem(parser.Get(), i);
         if (!cJSON_IsObject(deviceInfo)) {
             MMI_HILOGE("The deviceInfo is not Object");
             return {};

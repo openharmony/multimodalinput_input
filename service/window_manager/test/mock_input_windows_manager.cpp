@@ -70,7 +70,7 @@ bool InputWindowsManager::IsAncoWindow(const WindowInfo &window) const
 }
 
 void InputWindowsManager::UpdateShellWindow(const WindowInfo &window) {}
-#endif  // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
 
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

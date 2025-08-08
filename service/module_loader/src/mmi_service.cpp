@@ -463,6 +463,10 @@ void MMIService::OnStart()
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
     FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
+    if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
+        MMI_HILOGI("Start enable fingersense");
+        FINGERSENSE_WRAPPER->enableFingersense_();
+    }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
@@ -2286,6 +2290,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+        TOUCH_DRAWING_MGR->ResetTouchWindow();
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -5096,13 +5103,12 @@ bool MMIService::ParseDeviceConsumerConfig()
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser jsonData;
-    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData.json_)) {
+    JsonParser jsonData(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.Get())) {
         MMI_HILOGE("The json data is not object");
         return false;
     }
-    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "consumers");
+    cJSON* consumers = cJSON_GetObjectItemCaseSensitive(jsonData.Get(), "consumers");
     if (!cJSON_IsArray(consumers)) {
         MMI_HILOGE("consumers number must be array");
         return false;

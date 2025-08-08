@@ -317,6 +317,11 @@ AccountManager::AccountManager()
 
 AccountManager::~AccountManager()
 {
+    AccountManagerUnregister();
+}
+
+void AccountManager::AccountManagerUnregister()
+{
     std::lock_guard<std::mutex> guard { lock_ };
     UnsubscribeCommonEvent();
     if (timerId_ >= 0) {

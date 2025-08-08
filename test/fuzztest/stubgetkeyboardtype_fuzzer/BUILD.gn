@@ -43,6 +43,7 @@ ohos_fuzztest("StubGetKeyboardTypeFuzzTest") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/util/json_parser/include",
   ]
   cflags = [
     "-g",
@@ -65,6 +66,7 @@ ohos_fuzztest("StubGetKeyboardTypeFuzzTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [

@@ -43,6 +43,7 @@ config("mmi_connect_manager_config") {
     "${mmi_path}/service/permission_helper/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
+    "${mmi_path}/util/json_parser/include",
     "${target_gen_dir}",
   ]
 }
