@@ -100,6 +100,21 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
 }
 
 /**
+ * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_002
+ * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
+}
+
+/**
  * @tc.name: DisplayEventMonitorTest_IsCommonEventSubscriberInit_001
  * @tc.desc: Test the funcation IsCommonEventSubscriberInit
  * @tc.type: FUNC
@@ -113,6 +128,19 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_IsCommonEventSubscribe
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.IsCommonEventSubscriberInit());
     displayEventMonitor.hasInit_ = false;
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.IsCommonEventSubscriberInit());
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_SendCancelEventWhenLock_001
+ * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_SendCancelEventWhenLock_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayEventMonitor displayEventMonitor;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.SendCancelEventWhenLock());
 }
 } // namespace MMI
 } // namespace OHOS

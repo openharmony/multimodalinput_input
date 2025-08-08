@@ -26,6 +26,9 @@
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#include "touch_drawing_manager.h"
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -115,6 +118,9 @@ public:
                 if (keyHandler != nullptr) {
                     keyHandler->InitKeyObserver();
                 }
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+                TOUCH_DRAWING_MGR->Initialize();
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
             }
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");

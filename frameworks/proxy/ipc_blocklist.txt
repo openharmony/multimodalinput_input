@@ -19,3 +19,4 @@ src:*foundation/multimodalinput/input/frameworks/proxy/events/test/input_manager
 src:*foundation/multimodalinput/input/frameworks/proxy/events/test/input_manager_test.cpp
 src:*foundation/multimodalinput/input/frameworks/proxy/events/test/input_manager_update_display_info_test.cpp
 src:*foundation/multimodalinput/input/frameworks/proxy/events/test/virtual_input_device_test.cpp
+src:*foundation/multimodalinput/input/frameworks/proxy/event_handler/test/*

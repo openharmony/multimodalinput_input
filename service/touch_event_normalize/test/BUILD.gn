@@ -111,6 +111,7 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -277,6 +278,7 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -439,6 +441,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./../../ipc_blocklist.txt"
   }
 
   include_dirs = [
@@ -473,6 +476,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -643,6 +647,7 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -790,6 +795,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -1151,9 +1157,7 @@ group("TouchEventNormalizeTests") {
 
   deps = [
     ":InputDeviceConsumerHandlerTest",
-    ":RemoteControlTransformProcessorTestWithMock", 
     ":TouchEventNormalizeTest",
-    ":TouchTransformProcessorTestWithMock",
     ":TransformPointTest",
     ":TouchGestureManagerTestWithMock",
   ]

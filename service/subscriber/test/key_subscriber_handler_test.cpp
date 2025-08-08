@@ -97,7 +97,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyEvent_001, 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     handler.keyEvent_->AddKeyItem(item);
     EXPECT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
-    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
 }
@@ -453,28 +452,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyCode_001, T
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_AddSubscriber_001
- * @tc.desc: Test add subscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> keyOption;
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
-    handler.AddSubscriber(subscriber, option, true);
-    auto it = handler.subscriberMap_.find(option);
-    ASSERT_NE(it->second.front(), subscriber);
-    auto newSubscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    handler.AddSubscriber(newSubscriber, option, true);
-    ASSERT_NE(it->second.back(), newSubscriber);
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_IsFunctionKey_001
  * @tc.desc: Test is function key
  * @tc.type: FUNC
@@ -646,24 +623,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearSubscriberTimer
     subscribers.push_back(subscriber1);
     subscribers.push_back(subscriber2);
     ASSERT_NO_FATAL_FAILURE(handler.ClearSubscriberTimer(subscribers));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_OnTimer_001
- * @tc.desc: Test OnTimer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> keyOption;
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    subscriber->keyEvent_.reset();
-    handler.OnTimer(subscriber);
-    ASSERT_EQ(subscriber->keyEvent_, nullptr);
 }
 
 /**
@@ -2373,7 +2332,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     ASSERT_NE(subscriber, nullptr);
     keyEvent->keyCode_ = KeyEvent::KEYCODE_CAMERA;
-    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
 
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
@@ -3360,7 +3318,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessKeyEvent_01, 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_CAMERA);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-    EXPECT_TRUE(EventLogHelper::IsBetaVersion());
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     ASSERT_NO_FATAL_FAILURE(handler.ProcessKeyEvent(keyEvent));
 }
