@@ -219,7 +219,7 @@ DeviceItems DataInit(const std::string& fileData, bool logStatus)
 {
     CALL_DEBUG_ENTER;
     JsonParser parser(fileData.c_str());
-    if (!cJSON_IsArray(parser.json_)) {
+    if (!cJSON_IsArray(parser.Get())) {
         MMI_HILOGE("The parser is not array");
         return {};
     }
