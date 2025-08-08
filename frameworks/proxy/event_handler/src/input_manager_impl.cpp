@@ -874,28 +874,6 @@ std::vector<std::string> InputManagerImpl::StringSplit(const std::string &str, c
     return elems;
 }
 
-bool InputManagerImpl::IsGRLOrHopper()
-{
-    std::regex reg("^([0-9],){3}[0-9]{1}$");
-    if (!std::regex_match(g_foldScreenType, reg)) {
-        MMI_HILOGE("invalid params g_foldScreenType:%s", g_foldScreenType.c_str());
-        return false;
-    }
-    std::vector<std::string> foldTypes = StringSplit(g_foldScreenType, ',');
-    if (foldTypes.empty()) {
-        return false;
-    }
-    std::string deviceType = foldTypes[0];
-    std::string grlType = "6";
-    std::string hprType = "5";
-    MMI_HILOGD("deviceType:%s", deviceType.c_str());
-    if (deviceType == grlType || deviceType == hprType) {
-        MMI_HILOGD("device is grl or hopper");
-        return true;
-    }
-    return false;
-}
-
 void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
