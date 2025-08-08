@@ -80,7 +80,7 @@ private:
         double y { 0.0 };
         double time { 0.0 }; // milliseconds
     };
-    std::vector<PositionRecord> positionHistory_; //  Store the most recent location record
+    std::vector<PositionRecord> positionHistory_; // Store the most recent location record
     static constexpr size_t MAX_HISTORY_SIZE = 10;
     static constexpr size_t MIN_HISTORY_SIZE = 3;
     
@@ -105,4 +105,4 @@ private:
 #define PULL_THROW_EVENT_HANDLER ::OHOS::DelayedSingleton<PullThrowSubscriberHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif  // PULL_THROW_SUBSCRIBER_HANDLER_H
+#endif // PULL_THROW_SUBSCRIBER_HANDLER_H

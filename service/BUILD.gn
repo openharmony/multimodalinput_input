@@ -91,6 +91,7 @@ config("libmmi_server_config") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/util/napi/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   if (input_feature_product != "watch") {
@@ -277,6 +278,7 @@ ohos_shared_library("libmmi-server") {
     "delegate_task/include",
     "${mmi_path}/frameworks/proxy/events/include",
     "window_manager/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources += [
@@ -399,6 +401,8 @@ ohos_shared_library("libmmi-server") {
   }
 
   deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+
+  deps += [ "${mmi_path}/util:mmi_json_parser" ]
 
   if (input_ext_feature_keyboard_ext_flag) {
     include_dirs += [ "${mmi_ext_path}/keyboard_ext_flag/inc" ]
@@ -899,6 +903,7 @@ ohos_unittest("KeyShortcutManagerTest") {
   configs = [ "${mmi_path}/service/filter:mmi_event_filter_config" ]
 
   deps = [
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
