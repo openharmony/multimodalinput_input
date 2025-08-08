@@ -80,12 +80,12 @@ bool CooperateFree::HasLocalKeyboardDevice() const
     return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
     CHKPF(dev);
     return (dev->IsKeyboard() && !dev->IsRemote());
-    }};
+    });
 }
 
 void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (event.isUnchained) {
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
@@ -156,7 +156,7 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 
 void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
     parent_.UnchainConnections(context, notice);
 }

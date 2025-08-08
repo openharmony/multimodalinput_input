@@ -23,3 +23,7 @@ etc/exceptional_system_keys_config.json @kevin812085902
 etc/exclude_keys_config.json @kevin812085902
 etc/system_hotkeys_config.json @kevin812085902
 etc/system_keys_config.json @kevin812085902
+
+# watch special multimodalinput.cfg
+multimodalinput.cfg @orient18
+watch/multimodalinput.cfg @orient18
