@@ -31,8 +31,8 @@ void JudgeCameraInForeFuzzTest(const uint8_t* data, size_t /* size */)
         return;
     }
     MMI_HILOGD("JudgeCameraInForeFuzzTest");
-    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->JudgeCameraInFore();
+    InputWindowsManager manager;
+    manager.JudgeCameraInFore();
 }
 } // MMI
 } // OHOS

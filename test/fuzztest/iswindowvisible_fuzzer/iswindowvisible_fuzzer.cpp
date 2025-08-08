@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "isfocusedsession_fuzzer.h"
+#include "iswindowvisible_fuzzer.h"
 
 #include "libinput.h"
 #include "input_device_manager.h"
@@ -22,20 +22,20 @@
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "IsFocusedSessionFuzzTest"
+#define MMI_LOG_TAG "IsWindowVisibleFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-void IsFocusedSessionFuzzTest(const uint8_t* data, size_t size)
+void IsWindowVisibleFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr) {
         return;
     }
-    MMI_HILOGD("IsFocusedSessionFuzzTest");
-    InputWindowsManager manager;
+    MMI_HILOGD("IsWindowVisibleFuzzTest");
     FuzzedDataProvider provider(data, size);
-    int32_t session = provider.ConsumeIntegral<int32_t>();
-    manager.IsFocusedSession(session);
+    InputWindowsManager manager;
+    int32_t pid = provider.ConsumeIntegral<int32_t>();
+    manager.IsWindowVisible(pid);
 }
 } // MMI
 } // OHOS
@@ -49,7 +49,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::MMI::IsFocusedSessionFuzzTest(data, size);
+    OHOS::MMI::IsWindowVisibleFuzzTest(data, size);
     return 0;
 }
-
