@@ -338,5 +338,5 @@ InputPlugin::~InputPlugin()
     }
     MMI_HILOGI("~InputPlugin");
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

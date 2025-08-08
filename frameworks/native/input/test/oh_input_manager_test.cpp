@@ -44,8 +44,8 @@ struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX { INT_MAX };
-    int32_t globalY { INT_MAX };
+    int32_t globalX { INT32_MAX };
+    int32_t globalY { INT32_MAX };
     int32_t button { -1 };
     int32_t axisType { -1 };
     float axisValue { 0.0f };
@@ -59,8 +59,8 @@ struct Input_TouchEvent {
     int32_t id;
     int32_t displayX;
     int32_t displayY;
-    int32_t globalX { INT_MAX };
-    int32_t globalY { INT_MAX };
+    int32_t globalX { INT32_MAX };
+    int32_t globalY { INT32_MAX };
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -222,16 +222,16 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestS
     inputMouseEvent.globalY = 300;
     EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
-    inputMouseEvent.globalX = INT_MAX;
+    inputMouseEvent.globalX = INT32_MAX;
     inputMouseEvent.globalY = 300;
     EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
     inputMouseEvent.globalX = 300;
-    inputMouseEvent.globalY = INT_MAX;
+    inputMouseEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 
-    inputMouseEvent.globalX = INT_MAX;
-    inputMouseEvent.globalY = INT_MAX;
+    inputMouseEvent.globalX = INT32_MAX;
+    inputMouseEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectMouseEvent(&inputMouseEvent), INPUT_PERMISSION_DENIED);
 }
 
@@ -349,16 +349,16 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_006, T
     inputTouchEvent.globalY = 300;
     EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_SUCCESS);
 
-    inputTouchEvent.globalX = INT_MAX;
-    inputTouchEvent.globalY = INT_MAX;
+    inputTouchEvent.globalX = INT32_MAX;
+    inputTouchEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_SUCCESS);
 
-    inputTouchEvent.globalX = INT_MAX;
+    inputTouchEvent.globalX = INT32_MAX;
     inputTouchEvent.globalY = 300;
     EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_SUCCESS);
 
     inputTouchEvent.globalX = 300;
-    inputTouchEvent.globalY = INT_MAX;
+    inputTouchEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_SUCCESS);
 }
 
@@ -1221,10 +1221,10 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal,
     touchEvent.displayY = 1;
     touchEvent.globalX = 1;
     touchEvent.globalY = 1;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), 0);
+    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PERMISSION_DENIED);
 
-    touchEvent.globalX = INT_MAX;
-    touchEvent.globalY = INT_MAX;
+    touchEvent.globalX = INT32_MAX;
+    touchEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PARAMETER_ERROR);
 
     touchEvent.displayX = -1;
@@ -2403,13 +2403,13 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal0
     inputMouseEvent.action = MOUSE_ACTION_CANCEL;
     inputMouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
     inputMouseEvent.button = MOUSE_BUTTON_LEFT;
-    EXPECT_EQ(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PERMISSION_DENIED);
+    EXPECT_EQ(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PARAMETER_ERROR);
 
     inputMouseEvent.actionTime = 100;
     inputMouseEvent.displayX = 300;
     inputMouseEvent.displayY = 300;
     inputMouseEvent.action = TOUCH_ACTION_DOWN;
-    EXPECT_EQ(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PERMISSION_DENIED);
+    EXPECT_EQ(OH_Input_InjectMouseEventGlobal(&inputMouseEvent), INPUT_PARAMETER_ERROR);
 
     inputMouseEvent.action = MOUSE_ACTION_AXIS_END;
     inputMouseEvent.button = static_cast<Input_MouseEventButton>(10);
@@ -3065,7 +3065,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
     touchEvent.globalY = 100;
     auto origin = g_touchEvent;
     g_touchEvent = nullptr;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PERMISSION_DENIED);
     g_touchEvent = origin;
 }
 
@@ -3100,8 +3100,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
     touchEvent.action = TOUCH_ACTION_DOWN;
     touchEvent.displayX = 100;
     touchEvent.displayY = 100;
-    touchEvent.globalX = INT_MAX;
-    touchEvent.globalY = INT_MAX;
+    touchEvent.globalX = INT32_MAX;
+    touchEvent.globalY = INT32_MAX;
     EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PARAMETER_ERROR);
 }
 
@@ -3120,7 +3120,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
     touchEvent.displayY = 10;
     touchEvent.globalX = 10;
     touchEvent.globalY = 10;
-    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_InjectTouchEventGlobal(&touchEvent), INPUT_PERMISSION_DENIED);
 }
 
 /**

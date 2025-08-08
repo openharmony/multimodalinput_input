@@ -46,11 +46,14 @@ public:
     bool IsWindowRotation() const;
     void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
+    void ResetTouchWindow();
 
 private:
-    void SetupSettingObserver(int32_t nRetries);
+    void SetupSettingObserver();
     void CreateObserver();
     int32_t UpdateLabels();
+    void RemoveUpdateLabelsTimer();
+    void AddUpdateLabelsTimer();
     int32_t UpdateBubbleData();
     template <class T>
     void CreateBubbleObserver(T& item);
@@ -71,6 +74,7 @@ private:
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     std::unique_ptr<ITouchDrawingHandler, ComponentManager::Component<ITouchDrawingHandler>> touchDrawingHandler_ {
         nullptr, ComponentManager::Component<ITouchDrawingHandler>(nullptr, nullptr) };
+    int32_t timerId_ { -1 };
 };
 
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()

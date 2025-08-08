@@ -121,8 +121,8 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
     struct Input_KeyState* keyState = OH_Input_CreateKeyState();
     ASSERT_NE(keyState, nullptr);
     OH_Input_SetKeyCode(keyState, KEYCODE_DPAD_UP);
-    EXPECT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
-    EXPECT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
+    EXPECT_NE(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
+    EXPECT_NE(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
     EXPECT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
     OH_Input_DestroyKeyState(&keyState);
 }

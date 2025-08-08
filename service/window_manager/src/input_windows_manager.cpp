@@ -1737,7 +1737,7 @@ void InputWindowsManager::SendCancelEventWhenWindowChange(int32_t pointerId, int
     tmpEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportPointerEventExitTimes(PointerEventStatistics::TRANSFORM_CANCEL);
-#endif  // OHOS_BUILD_ENABLE_DFX_RADAR
+#endif // OHOS_BUILD_ENABLE_DFX_RADAR
     tmpEvent->SetPointerId(pointerId);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
@@ -6809,13 +6809,12 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    JsonParser jsonData;
-    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData.json_)) {
+    JsonParser jsonData(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.Get())) {
         MMI_HILOGE("The json data is not object");
         return false;
     }
-    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "whiteList");
+    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.Get(), "whiteList");
     if (!cJSON_IsArray(whiteList)) {
         MMI_HILOGE("White list number must be array");
         return false;

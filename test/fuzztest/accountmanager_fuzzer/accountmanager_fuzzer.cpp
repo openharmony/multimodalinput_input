@@ -43,9 +43,7 @@ bool AccountManagerFuzzTest(const uint8_t *data, size_t size)
     int32_t rowsBefore;
     startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     ACCOUNT_MGR->GetCurrentAccountSetting();
-    ACCOUNT_MGR->SubscribeCommonEvent();
-    ACCOUNT_MGR->UnsubscribeCommonEvent();
-    ACCOUNT_MGR->SetupMainAccount();
+    ACCOUNT_MGR->AccountManagerUnregister();
     return true;
 }
 } // MMI

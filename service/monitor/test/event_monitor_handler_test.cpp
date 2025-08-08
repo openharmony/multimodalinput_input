@@ -403,6 +403,66 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_004, TestS
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_005
+ * @tc.desc: Test Overwrites the else branch of if (keyEvent->GetFourceMonitorFlag())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFourceMonitorFlag(true);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_006
+ * @tc.desc: Test Overwrites the else branch of if ((mon.session_ != nullptr && mon.session_->GetUid() == POWER_UID))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t uid = 5528;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, uid, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_007
+ * @tc.desc: Test Overwrites the else branch of ((SourceType == SOURCE_TYPE_TOUCHSCREEN or SOURCE_TYPE_TOUCHPAD ))
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t deviceId1 = 1;
+    int32_t deviceId2 = 2;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetDeviceId(deviceId1);
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId2, consumptionState));
+    ASSERT_FALSE(eventMonitorHandler.monitors_.HandleEvent(pointerEvent));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_Monitor
  * @tc.desc: Test Monitor
  * @tc.type: FUNC
@@ -437,12 +497,12 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor, TestSize.Leve
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_Monitor_01
+ * @tc.name: EventMonitorHandlerTest_Monitor_001
  * @tc.desc: Test Monitor
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor_01, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
@@ -477,6 +537,47 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor_01, TestSize.L
 
     NapProcess::GetInstance()->napClientPid_ = UNOBSERVED;
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_Monitor_002
+ * @tc.desc: Test Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_SWIPE_DOWN);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetButtonId(1);
+    pointerEvent->SetFingerCount(2);
+    pointerEvent->SetZOrder(100);
+    pointerEvent->SetDispatchTimes(1000);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_POINTER);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler{InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_POINTER, session};
+    std::set<int32_t> info = {1, 2, 3};
+    sessionHandler.gesture_.touchGestureInfo_.insert(std::make_pair(TOUCH_GESTURE_TYPE_SWIPE, info));
+    monitorCollection.monitors_.insert(sessionHandler);
+    NapProcess::GetInstance()->napClientPid_ = 2;
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = 2;
+    napData.uid = 3;
+    napData.bundleName = "programName";
+    EXPECT_FALSE(NapProcess::GetInstance()->IsNeedNotify(napData));
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.Monitor(pointerEvent));
 }
 
 /**
@@ -772,6 +873,24 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HasMonitor, TestSize.L
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_HasScreenCaptureMonitor
+ * @tc.desc: Test HasScreenCaptureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HasScreenCaptureMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+    std::set<EventMonitorHandler::SessionHandler> setIters = { sessionHandler };
+    ASSERT_FALSE(monitorCollection.HasScreenCaptureMonitor(session));
+    monitorCollection.endScreenCaptureMonitors_[g_pid] = setIters;
+    ASSERT_TRUE(monitorCollection.HasScreenCaptureMonitor(session));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_UpdateConsumptionState
  * @tc.desc: Test UpdateConsumptionState
  * @tc.type: FUNC
@@ -799,6 +918,30 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_UpdateConsumptionState
     ASSERT_NO_FATAL_FAILURE(monitorCollection.UpdateConsumptionState(pointerEvent));
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.UpdateConsumptionState(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_UpdateConsumptionState_002
+ * @tc.desc: Test UpdateConsumptionState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_UpdateConsumptionState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetDeviceId(deviceId);
+    PointerEvent::PointerItem item1;
+    item1.SetDeviceId(2);
+    pointerEvent->AddPointerItem(item1);
+    PointerEvent::PointerItem item2;
+    item2.SetDeviceId(3);
+    pointerEvent->AddPointerItem(item2);
     ASSERT_NO_FATAL_FAILURE(monitorCollection.UpdateConsumptionState(pointerEvent));
 }
 
@@ -1005,6 +1148,24 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump_003, TestSize.Lev
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_Dump_004
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler monitorone { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
+    eventMonitorHandler.monitors_.monitors_.emplace(monitorone);
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.Dump(fd, args));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_CheckHasInputHandler_001
  * @tc.desc: Test CheckHasInputHandler
  * @tc.type: FUNC
@@ -1045,6 +1206,40 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_002
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
     handlerType = InputHandlerType::NONE;
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveInputHandler_003
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_TOUCH;
+    std::shared_ptr<IInputEventHandler::IInputEventConsumer> callback = std::make_shared<MyInputEventConsumer>();
+    eventMonitorHandler.AddInputHandler(handlerType, eventType, callback);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, callback));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_RemoveInputHandler_004
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_TOUCH;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
 }
 
 /**
@@ -1095,6 +1290,17 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsRotate, TestSize.Lev
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
     ret = monitorCollection.IsRotate(pointerEvent);
     ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    ret = monitorCollection.IsRotate(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_END);
+    ret = monitorCollection.IsRotate(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    ret = monitorCollection.IsRotate(pointerEvent);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -1119,6 +1325,18 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsThreeFingersSwipe, T
     pointerEvent->SetFingerCount(THREE_FINGERS);
     ret = monitorCollection.IsThreeFingersSwipe(pointerEvent);
     ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    ret = monitorCollection.IsThreeFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ret = monitorCollection.IsThreeFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.IsThreeFingersSwipe(pointerEvent);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -1143,6 +1361,29 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFourFingersSwipe, Te
     pointerEvent->SetFingerCount(FOUR_FINGERS);
     ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
     ASSERT_TRUE(ret);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_TRUE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    ret = monitorCollection.IsFourFingersSwipe(pointerEvent);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -1167,6 +1408,18 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsThreeFingersTap, Tes
     pointerEvent->SetFingerCount(THREE_FINGERS);
     ret = monitorCollection.IsThreeFingersTap(pointerEvent);
     ASSERT_TRUE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    pointerEvent->SetFingerCount(FOUR_FINGERS);
+    ret = monitorCollection.IsThreeFingersTap(pointerEvent);
+    ASSERT_FALSE(ret);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_QUADTAP);
+    pointerEvent->SetFingerCount(THREE_FINGERS);
+    ret = monitorCollection.IsThreeFingersTap(pointerEvent);
+    ASSERT_FALSE(ret);
 }
 
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
@@ -1191,6 +1444,35 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint, TestSiz
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
     ret = monitorCollection.IsFingerprint(pointerEvent);
     ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_IsFingerprint_002
+ * @tc.desc: Test IsFingerprint_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ASSERT_FALSE(monitorCollection.IsFingerprint(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+    ASSERT_TRUE(monitorCollection.IsFingerprint(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
+    ASSERT_TRUE(monitorCollection.IsFingerprint(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL);
+    ASSERT_TRUE(monitorCollection.IsFingerprint(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
+    ASSERT_FALSE(monitorCollection.IsFingerprint(pointerEvent));
 }
 
 /**
@@ -1269,7 +1551,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     bool ret = false;
     std::unordered_set<int32_t> fingerFocusPidSet;
     ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
     ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
@@ -1383,6 +1665,44 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_002, Tes
     ASSERT_FALSE(ret);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+/**
+ * @tc.name: EventMonitorHandlerTest_OnHandleEvent_003
+ * @tc.desc: Test OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t deviceId = 1;
+    pointerEvent->SetDeviceId(deviceId);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->bitwise_ = 0x00000002;
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(1);
+    item.SetPointerId(0);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetPressure(5);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+    eventMonitorHandler.HandlePointerEvent(pointerEvent);
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 /**

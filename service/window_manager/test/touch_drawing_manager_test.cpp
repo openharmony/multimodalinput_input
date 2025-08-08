@@ -357,5 +357,86 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetMultiWindowScreenId
     std::shared_ptr<DelegateInterface> proxy;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId));
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ResetTouchWindow
+ * @tc.desc: Test ResetTouchWindow
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ResetTouchWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.bubbleMode_.isShow = true;
+    touchDrawingMgr.pointerMode_.isShow = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.ResetTouchWindow());
+    touchDrawingMgr.touchDrawingHandler_ = ComponentManager::LoadLibrary<ITouchDrawingHandler>(nullptr,
+        "libmmi_touch_drawing_handler.z.so");
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.ResetTouchWindow());
+}
+ 
+/**
+ * @tc.name: TouchDrawingManagerTest_AddUpdateLabelsTimer_ShouldDoNothing_WhenTimerIsRunning
+ * @tc.desc: Test AddUpdateLabelsTimer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_AddUpdateLabelsTimer_ShouldDoNothing_WhenTimerIsRunning,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.timerId_ = 1;
+    touchDrawingMgr.AddUpdateLabelsTimer();
+    EXPECT_EQ(touchDrawingMgr.timerId_, 1);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_AddUpdateLabelsTimer_ShouldDoNothing_WhenTimerIsRunning
+ * @tc.desc: Test AddUpdateLabelsTimer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_AddUpdateLabelsTimer_WhenTouchDrawingHandler,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.timerId_ = -1;
+    touchDrawingMgr.LoadTouchDrawingHandler();
+    touchDrawingMgr.AddUpdateLabelsTimer();
+    EXPECT_NE(touchDrawingMgr.timerId_, -1);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RemoveUpdateLabelsTimer_ShouldRemoveTimer
+ * @tc.desc: Test RemoveUpdateLabelsTimer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RemoveUpdateLabelsTimer_ShouldRemoveTimer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.timerId_ = 1;
+    touchDrawingMgr.RemoveUpdateLabelsTimer();
+    EXPECT_EQ(touchDrawingMgr.timerId_, -1);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RemoveUpdateLabelsTimer_ShouldRemoveTimer
+ * @tc.desc: Test RemoveUpdateLabelsTimer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RemoveUpdateLabelsTimer_ShouldNotRemoveTimer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.timerId_ = -1;
+    touchDrawingMgr.RemoveUpdateLabelsTimer();
+    EXPECT_EQ(touchDrawingMgr.timerId_, -1);
+}
 } // namespace MMI
 } // namespace OHOS

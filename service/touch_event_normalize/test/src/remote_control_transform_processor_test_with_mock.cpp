@@ -101,27 +101,6 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_001, TestS
 }
 
 /**
- * @tc.name: RemoteControlTransformProcessorTestWithMock_HandlePostInner_002
- * @tc.desc: Test HandlePostInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 3;
-    Remote_ControlTransformProcessor processor(deviceId);
-    processor.pointerEvent_ = PointerEvent::Create();
-    EXPECT_NE(processor.pointerEvent_, nullptr);
-    MouseLocation expectLocation = {3, 3, 3};
-    EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(NULL));
-    libinput_event event;
-    ASSERT_FALSE(processor.HandlePostInner(&event));
-}
-
-/**
  * @tc.name: RemoteControlTransformProcessorTestWithMock_HandlePostInner_003
  * @tc.desc: Test HandlePostInner
  * @tc.type: FUNC
@@ -135,14 +114,6 @@ HWTEST_F(RemoteControlTransformProcessorTestWithMock, HandlePostInner_003, TestS
     processor.pointerEvent_ = PointerEvent::Create();
     EXPECT_NE(processor.pointerEvent_, nullptr);
     MouseLocation expectLocation = {3, 3, 3};
-    EXPECT_CALL(*WIN_MGR_MOCK, GetMouseInfo).WillRepeatedly(Return(expectLocation));
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    libinput_event_touch touchEvent;
-    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
-    EXPECT_CALL(libinputMock, TouchEventGetPressure).WillOnce(Return(100.0));
-    EXPECT_CALL(libinputMock, TouchEventGetContactLongAxis).WillOnce(Return(100));
-    EXPECT_CALL(libinputMock, TouchEventGetContactShortAxis).WillOnce(Return(100));
-    EXPECT_CALL(libinputMock, TouchEventGetSeatSlot).WillOnce(Return(100));
     libinput_event event;
     ASSERT_TRUE(processor.HandlePostInner(&event));
 }

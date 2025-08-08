@@ -241,7 +241,6 @@ HWTEST_F(FingerprintEventProcessorTest,
         .WillOnce(Return(100));
     EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
         .WillRepeatedly(Return(LIBINPUT_KEY_STATE_RELEASED));
-    InputHandler->BuildInputHandlerChain();
     EXPECT_EQ(FingerprintEventHdr->AnalyseKeyEvent(&event), ERR_OK);
     EXPECT_EQ(FingerprintEventHdr->AnalyseKeyEvent(&event), ERR_OK);
     EXPECT_EQ(FingerprintEventHdr->AnalyseKeyEvent(&event), ERR_OK);
