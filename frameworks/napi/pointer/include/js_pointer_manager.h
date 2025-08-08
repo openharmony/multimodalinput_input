@@ -21,6 +21,7 @@
 #include "napi_constants.h"
 #include "stream_buffer.h"
 #include "util_napi_error.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,7 +50,7 @@ struct CustomCursorAsyncContext : AsyncContext {
     ~CustomCursorAsyncContext() override
     {
         if (cursor.pixelMap != nullptr) {
-            delete[] static_cast<uint8_t*>(cursor.pixelMap);
+            delete static_cast<Media::PixelMap*>(cursor.pixelMap);
             cursor.pixelMap = nullptr;
         }
     };
