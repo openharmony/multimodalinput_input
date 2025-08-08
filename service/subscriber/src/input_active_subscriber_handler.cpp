@@ -297,7 +297,7 @@ void InputActiveSubscriberHandler::NotifySubscriber(
     }
     int32_t fd = subscriber->sess_->GetFd();
     pkt << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id: %{public}d, pointerId:%{private}d, pid: %{public}d",
+    MMI_HILOGI("%{public}d|%{public}d|%{public}d",
         subscriber->id_, pointerEvent->GetPointerId(), subscriber->sess_->GetPid());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
