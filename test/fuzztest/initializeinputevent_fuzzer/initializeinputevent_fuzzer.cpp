@@ -48,7 +48,7 @@ bool InitializeInputEventFuzzTest(FuzzedDataProvider &provider)
     pointerItem.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
     
-    int64_t frameTime= provider.ConsumeIntegral<int64_t>();
+    int64_t frameTime = provider.ConsumeIntegral<int64_t>();
     EventResample eventResample;
     eventResample.InitializeInputEvent(pointerEvent, frameTime);
     return true;
