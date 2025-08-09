@@ -14,6 +14,10 @@
  */
 
 #include "json_parser.h"
+
+#include <cstdint>
+#include <cmath>
+
 #include "mmi_log.h"
 #include "define_multimodal.h"
 
@@ -59,12 +63,30 @@ const cJSON* JsonParser::Get() const
     return json_;
 }
 
+bool JsonParser::IsInteger(const cJSON *json)
+{
+    if (json == nullptr || json->type != cJSON_Number) {
+        return false;
+    }
+    double intPart;
+    return (modf(json->valuedouble, &intPart) == 0.0);
+}
+
 int32_t JsonParser::ParseInt32(const cJSON *json, const std::string &key, int32_t &value)
 {
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
     if (!cJSON_IsNumber(jsonNode)) {
         MMI_HILOGE("value is not number");
+        return RET_ERR;
+    }
+    if (!IsInteger(jsonNode)) {
+        MMI_HILOGE("value is not integer");
+        return RET_ERR;
+    }
+    if (jsonNode->valueint < std::numeric_limits<int32_t>::min() ||
+        jsonNode->valueint > std::numeric_limits<int32_t>::max()) {
+        MMI_HILOGE("value is out of int32_t bounds");
         return RET_ERR;
     }
     value = jsonNode->valueint;

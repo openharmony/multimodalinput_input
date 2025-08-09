@@ -664,7 +664,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGI("Call Ended in subscribe keyEvent");
         return true;
     }
-#endif  // OHOS_BUILD_ENABLE_CALL_MANAGER
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
     if (!IsEnableCombineKey(keyEvent)) {
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
