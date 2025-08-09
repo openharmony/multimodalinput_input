@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "event_resample.h"
 #include "addsample_fuzzer.h"
 #include "securec.h"
@@ -22,33 +23,13 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+bool AddSampleFuzzTest(FuzzedDataProvider &provider)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool AddSampleFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int64_t actionTime;
-    int32_t coordX;
-    int32_t coordY;
-    int32_t toolType;
-    uint32_t id;
-    startPos += GetObject<int64_t>(actionTime, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(coordX, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(coordY, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(toolType, data + startPos, size - startPos);
-    startPos += GetObject<uint32_t>(id, data + startPos, size - startPos);
+    int64_t actionTime = provider.ConsumeIntegral<int32_t>();
+    int32_t coordX = provider.ConsumeIntegral<int32_t>();
+    int32_t coordY = provider.ConsumeIntegral<int32_t>();
+    int32_t toolType = provider.ConsumeIntegral<int32_t>();
+    uint32_t id = provider.ConsumeIntegral<uint32_t>();
     auto event = std::make_unique<EventResample::MotionEvent>();
     event->actionTime = actionTime;
     EventResample::Pointer pointer = {
@@ -73,6 +54,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::MMI::AddSampleFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::MMI::AddSampleFuzzTest(provider);
     return 0;
 }

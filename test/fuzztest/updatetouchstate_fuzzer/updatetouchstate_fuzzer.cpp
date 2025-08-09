@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "event_resample.h"
 #include "updatetouchstate_fuzzer.h"
 #include "securec.h"
@@ -22,30 +23,12 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+bool UpdateTouchStateFuzzTest(FuzzedDataProvider &provider)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool UpdateTouchStateFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
     EventResample::MotionEvent event;
-    int32_t deviceId;
-    int32_t sourceType;
-    int32_t pointerAction;
-    startPos += GetObject<int32_t>(deviceId, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(sourceType, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(pointerAction, data + startPos, size - startPos);
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
+    int32_t sourceType = provider.ConsumeIntegral<int32_t>();
+    int32_t pointerAction = provider.ConsumeIntegral<int32_t>();
     event.deviceId = deviceId;
     event.sourceType = sourceType;
     event.pointerAction = pointerAction;
@@ -64,6 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::MMI::UpdateTouchStateFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::MMI::UpdateTouchStateFuzzTest(provider);
     return 0;
 }

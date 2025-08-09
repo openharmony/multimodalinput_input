@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "event_resample.h"
 #include "findtouchstate_fuzzer.h"
 #include "securec.h"
@@ -22,27 +23,10 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+bool FindTouchStateFuzzTest(FuzzedDataProvider &provider)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool FindTouchStateFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t deviceId;
-    int32_t source;
-    startPos += GetObject<int32_t>(deviceId, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(source, data + startPos, size - startPos);
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
+    int32_t source = provider.ConsumeIntegral<int32_t>();
     EventResample eventResample;
     eventResample.FindTouchState(deviceId, source);
     return true;
@@ -58,6 +42,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::MMI::FindTouchStateFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::MMI::FindTouchStateFuzzTest(provider);
     return 0;
 }
