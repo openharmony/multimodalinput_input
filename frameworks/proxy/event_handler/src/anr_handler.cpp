@@ -47,7 +47,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
         actionTime);
     processedCount_++;
     if (processedCount_ == PRINT_INTERVAL_COUNT) {
-        MMI_HILOG_FREEZEI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
+        MMI_HILOGD("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
         processedCount_ = 0;
         lastEventId_ = eventId;
     }
