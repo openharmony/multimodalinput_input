@@ -4410,7 +4410,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         } else {
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
         }
-        if (extraData_.drawCursor) {
+        if (extraData_.drawCursor && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_UP) {
             MMI_HILOGD("Cursor must be default, pointerStyle:%{public}d globalStyle:%{public}d",
                 dragPointerStyle_.id, globalStyle_.id);
             dragPointerStyle_ = globalStyle_;
