@@ -74,7 +74,7 @@ private:
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
     bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);
-#endif  // OHOS_BUILD_ENABLE_CALL_MANAGER
+#endif // OHOS_BUILD_ENABLE_CALL_MANAGER
     bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber> &subscriber);

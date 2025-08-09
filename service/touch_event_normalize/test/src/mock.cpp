@@ -47,5 +47,5 @@ void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callba
 {
     callback(MOCKHANDLER->mockSessionPara);
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

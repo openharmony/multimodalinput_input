@@ -29,7 +29,12 @@ constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 
 TabletToolTransformProcessor::TabletToolTransformProcessor(int32_t deviceId)
-    : deviceId_(deviceId) {}
+    : deviceId_(deviceId)
+{
+    current_ = [this]() {
+        DrawTouchGraphicIdle();
+    };
+}
 
 std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libinput_event* event)
 {
@@ -318,30 +323,22 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
 
 void TabletToolTransformProcessor::DrawTouchGraphic()
 {
+    CHKPV(current_);
+    current_();
+}
+
+void TabletToolTransformProcessor::DrawTouchGraphicIdle()
+{
     CHKPV(pointerEvent_);
     auto pointerAction = pointerEvent_->GetPointerAction();
     switch (pointerAction) {
-        case PointerEvent::POINTER_ACTION_PROXIMITY_IN: {
-            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-            break;
-        }
-        case PointerEvent::POINTER_ACTION_DOWN: {
-            if (lastAction_ == PointerEvent::POINTER_ACTION_DOWN) {
-                return;
-            }
-            break;
-        }
+        case PointerEvent::POINTER_ACTION_PROXIMITY_IN:
+        case PointerEvent::POINTER_ACTION_DOWN:
         case PointerEvent::POINTER_ACTION_MOVE: {
-            break;
-        }
-        case PointerEvent::POINTER_ACTION_UP: {
-            break;
-        }
-        case PointerEvent::POINTER_ACTION_PROXIMITY_OUT: {
-            if (lastAction_ == PointerEvent::POINTER_ACTION_UP) {
-                return;
-            }
-            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+            current_ = [this]() {
+                DrawTouchGraphicDrawing();
+            };
             break;
         }
         default: {
@@ -349,7 +346,39 @@ void TabletToolTransformProcessor::DrawTouchGraphic()
         }
     }
     WIN_MGR->DrawTouchGraphic(pointerEvent_);
-    lastAction_ = pointerEvent_->GetPointerAction();
+    pointerEvent_->SetPointerAction(pointerAction);
+}
+
+void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
+{
+    CHKPV(pointerEvent_);
+    auto pointerAction = pointerEvent_->GetPointerAction();
+    switch (pointerAction) {
+        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_UP: {
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_PROXIMITY_OUT: {
+            auto pointerEvent = std::make_shared<PointerEvent>(*pointerEvent_);
+            PointerEvent::PointerItem item {};
+            if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+                item.SetPressed(true);
+                pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                WIN_MGR->DrawTouchGraphic(pointerEvent);
+            }
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+            current_ = [this]() {
+                DrawTouchGraphicIdle();
+            };
+            break;
+        }
+        default: {
+            return;
+        }
+    }
+    WIN_MGR->DrawTouchGraphic(pointerEvent_);
     pointerEvent_->SetPointerAction(pointerAction);
 }
 } // namespace MMI
