@@ -12,42 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "event_resample.h"
 #include "transformsamplewindowxy_fuzzer.h"
 #include "securec.h"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TransformSampleWindowXYFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+bool TransformSampleWindowXYFuzzTest(FuzzedDataProvider &provider)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool TransformSampleWindowXYFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
     PointerEvent::PointerItem pointerItem;
-    int32_t windowX;
-    int32_t windowY;
-    double logicX;
-    double logicY;
-    startPos += GetObject<int32_t>(windowX, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(windowY, data + startPos, size - startPos);
-    startPos += GetObject<double>(logicX, data + startPos, size - startPos);
-    startPos += GetObject<double>(logicY, data + startPos, size - startPos);
+    int32_t windowX = provider.ConsumeIntegral<int32_t>();
+    int32_t windowY = provider.ConsumeIntegral<int32_t>();
+    double logicX = provider.ConsumeFloatingPoint<double>();
+    double logicY = provider.ConsumeFloatingPoint<double>();
     pointerItem.SetToolWindowX(windowX);
     pointerItem.SetToolWindowY(windowY);
     EventResample eventResample;
@@ -64,6 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::MMI::TransformSampleWindowXYFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::MMI::TransformSampleWindowXYFuzzTest(provider);
     return 0;
 }

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "event_resample.h"
 #include "updatepointerevent_fuzzer.h"
 #include "securec.h"
@@ -22,56 +23,33 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool UpdatePointerEventFuzzTest(const uint8_t *data, size_t size)
+bool UpdatePointerEventFuzzTest(FuzzedDataProvider &provider)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    size_t startPos = 0;
-    int64_t actionTime;
-    int32_t sourceType;
-    int32_t pointerAction;
-    int32_t id;
-    uint32_t flag;
-    startPos += GetObject<int64_t>(actionTime, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(sourceType, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(pointerAction, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(id, data + startPos, size - startPos);
-    startPos += GetObject<uint32_t>(flag, data + startPos, size - startPos);
+    int64_t actionTime = provider.ConsumeIntegral<int64_t>();
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
+    int32_t sourceType = provider.ConsumeIntegral<int32_t>();
+    int32_t pointerAction = provider.ConsumeIntegral<int32_t>();
+    int32_t id = provider.ConsumeIntegral<int32_t>();
+    uint32_t flag = provider.ConsumeIntegral<uint32_t>();
     pointerEvent->SetActionTime(actionTime);
+    pointerEvent->SetDeviceId(deviceId);
     pointerEvent->SetSourceType(sourceType);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetId(id);
     pointerEvent->AddFlag(flag);
     PointerEvent::PointerItem pointerItem;
-    uint32_t pointerId;
-    int32_t windowX;
-    int32_t windowY;
-    startPos += GetObject<uint32_t>(pointerId, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(windowX, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(windowY, data + startPos, size - startPos);
+    uint32_t pointerId = provider.ConsumeIntegral<uint32_t>();
+    int32_t windowX = provider.ConsumeIntegral<int32_t>();
+    int32_t windowY = provider.ConsumeIntegral<int32_t>();
     pointerItem.SetToolWindowX(windowX);
     pointerItem.SetToolWindowY(windowY);
     pointerItem.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
-    int32_t coordX;
-    int32_t coordY;
-    int32_t toolType;
-    startPos += GetObject<int32_t>(coordX, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(coordY, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(toolType, data + startPos, size - startPos);
+
+    int32_t coordX = provider.ConsumeIntegral<int32_t>();
+    int32_t coordY = provider.ConsumeIntegral<int32_t>();
+    int32_t toolType = provider.ConsumeIntegral<int32_t>();
     EventResample::Pointer pointer = {
         .coordX = coordX,
         .coordY = coordY,
@@ -96,6 +74,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::MMI::UpdatePointerEventFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::MMI::UpdatePointerEventFuzzTest(provider);
     return 0;
 }
