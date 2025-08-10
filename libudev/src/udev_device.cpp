@@ -420,13 +420,6 @@ private:
         }
 
         auto filename = syspath + "/uevent";
-        char realPath[PATH_MAX] = {};
-        CHKPV(realpath(filename.c_str(), realPath));
-        std::ifstream f(realPath, std::ios_base::in);
-        if (!f.is_open()) {
-            MMI_HILOGE("ReadUeventFile(): path:%{private}s, error:%{public}s", realPath, std::strerror(errno));
-            return;
-        }
         ueventLoaded = true;
 
         std::lock_guard<std::mutex> lock(mutex_);
