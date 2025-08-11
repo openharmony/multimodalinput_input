@@ -563,7 +563,7 @@ private:
     std::shared_ptr<PointerEvent> GetlastPointerEvent();
     void SetDragFlagByPointer(std::shared_ptr<PointerEvent> lastPointerEvent);
     std::mutex mtx_;
-    std::atomic_bool isHPR_ { false };
+    std::atomic_bool isFoldPC_ { false };
     std::mutex oneHandMtx_;
     int32_t scalePercent_ = 100;
     mutable int32_t lastWinX_ { 0 };

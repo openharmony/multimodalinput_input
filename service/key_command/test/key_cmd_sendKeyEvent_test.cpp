@@ -19,6 +19,7 @@
 
 #include "ability_manager_client.h"
 #include "common_event_support.h"
+#include "bundle_name_parser.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"

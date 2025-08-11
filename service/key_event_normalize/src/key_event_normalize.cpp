@@ -21,6 +21,7 @@
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"
+#include "misc_product_type_parser.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -312,9 +313,13 @@ void KeyEventNormalize::CheckProductParam(InputProductConfig &productConfig) con
     if (productConfig.volumeSwap_ != VolumeSwapConfig::NO_CONFIG) {
         return;
     }
-    const std::string theProduct { "UNKNOWN_PRODUCT" };
+    std::vector<std::string> flipVolumeProduct;
+    if (MISC_PRODUCT_TYPE_PARSER.GetFlipVolumeSupportedProduct(flipVolumeProduct) != RET_OK) {
+        MMI_HILOGE("GetFlipVolumeSupportedProduct failed");
+    }
     std::string product = OHOS::system::GetParameter("const.build.product", "");
-    if (product == theProduct) {
+    auto iter = std::find(flipVolumeProduct.begin(), flipVolumeProduct.end(), product);
+    if (iter != flipVolumeProduct.end()) {
         productConfig.volumeSwap_ = VolumeSwapConfig::SWAP_ON_FOLD;
     } else {
         productConfig.volumeSwap_ = VolumeSwapConfig::NO_VOLUME_SWAP;
