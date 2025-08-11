@@ -319,7 +319,7 @@ PointerDrawingManager::~PointerDrawingManager()
             moveRetryThread_->join();
         }
         if (commonEventSubscriber_ != nullptr) {
-            if (!OHOS::EventFwk::CommonEventManager::UnSubscribeCommonEvent(commonEventSubscriber_)) {
+            if (!OHOS::EventFwk::CommonEventManager::NewUnSubscribeCommonEventSync(commonEventSubscriber_)) {
                 MMI_HILOGW("UnSubscribeCommonEvent failed");
             }
             commonEventSubscriber_ = nullptr;
