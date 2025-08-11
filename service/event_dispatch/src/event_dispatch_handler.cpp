@@ -47,7 +47,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    if (CUREENT_DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
+    if (CURRENT_DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
         AddFlagToEsc(keyEvent);
     }
     DispatchKeyEventPid(*udsServer, keyEvent);
