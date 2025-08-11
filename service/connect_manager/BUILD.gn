@@ -44,6 +44,8 @@ config("mmi_connect_manager_config") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/custom_config_parser/include",
     "${target_gen_dir}",
   ]
 }
