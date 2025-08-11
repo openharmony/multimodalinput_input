@@ -16,6 +16,7 @@
 #include "mmi_log.h"
 #include "input_device_manager.h"
 #include "isinputdeviceenable_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 
 #include "securec.h"
 
@@ -25,26 +26,10 @@
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 bool IsInputDeviceEnableFuzzTest(const uint8_t *data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t deviceId = 1;
+    FuzzedDataProvider provider(data, size);
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
     INPUT_DEV_MGR->IsInputDeviceEnable(deviceId);
     return true;
 }
