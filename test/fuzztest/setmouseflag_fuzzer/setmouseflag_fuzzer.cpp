@@ -13,38 +13,43 @@
  * limitations under the License.
  */
 
-#include "mmi_log.h"
-#include "input_device_manager.h"
-#include "getvirtualkeyboardtype_fuzzer.h"
-#include "fuzzer/FuzzedDataProvider.h"
+#include "setmouseflag_fuzzer.h"
 
-#include "securec.h"
+#include "libinput.h"
+#include "input_device_manager.h"
+#include "input_windows_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetVirtualKeyboardTypeFuzzTest"
+#define MMI_LOG_TAG "SetMouseFlagFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-bool GetVirtualKeyboardTypeFuzzTest(const uint8_t *data, size_t size)
+void SetMouseFlagFuzzTest(const uint8_t* data, size_t size)
 {
+    if (data == nullptr) {
+        return;
+    }
+    MMI_HILOGD("SetMouseFlagFuzzTest");
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     FuzzedDataProvider provider(data, size);
-    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
-    int32_t keyboardType = provider.ConsumeIntegral<int32_t>();
-    INPUT_DEV_MGR->GetVirtualKeyboardType(deviceId, keyboardType);
-    return true;
+    bool state = provider.ConsumeBool();
+    inputWindowsManager->SetMouseFlag(state);
 }
-} // namespace OHOS
+} // MMI
+} // OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
-
-    OHOS::GetVirtualKeyboardTypeFuzzTest(data, size);
+    if (size < sizeof(int32_t)) {
+        return 0;
+    }
+    OHOS::MMI::SetMouseFlagFuzzTest(data, size);
     return 0;
 }
-} // namespace MMI
-} // namespace OHOS
+

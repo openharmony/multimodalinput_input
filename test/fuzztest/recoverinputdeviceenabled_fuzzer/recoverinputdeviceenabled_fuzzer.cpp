@@ -15,19 +15,20 @@
 
 #include "mmi_log.h"
 #include "input_device_manager.h"
-#include "hasenabledphysicalpointerdevice_fuzzer.h"
+#include "recoverinputdeviceenabled_fuzzer.h"
 
 #include "securec.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "HasEnabledPhysicalPointerDeviceFuzzTest"
+#define MMI_LOG_TAG "RecoverInputDeviceEnabledFuzzTest"
 
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
-bool HasEnabledPhysicalPointerDeviceFuzzTest(const uint8_t *data, size_t size)
+bool RecoverInputDeviceEnabledFuzzTest(const uint8_t *data, size_t size)
 {
-    INPUT_DEV_MGR->HasEnabledPhysicalPointerDevice();
+    SessionPtr session;
+    INPUT_DEV_MGR->RecoverInputDeviceEnabled(session);
     return true;
 }
 } // namespace OHOS
@@ -39,7 +40,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::HasEnabledPhysicalPointerDeviceFuzzTest(data, size);
+    OHOS::RecoverInputDeviceEnabledFuzzTest(data, size);
     return 0;
 }
 } // namespace MMI

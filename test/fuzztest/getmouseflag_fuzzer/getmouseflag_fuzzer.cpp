@@ -13,34 +13,40 @@
  * limitations under the License.
  */
 
-#include "mmi_log.h"
-#include "input_device_manager.h"
-#include "hasenabledphysicalpointerdevice_fuzzer.h"
+#include "getmouseflag_fuzzer.h"
 
-#include "securec.h"
+#include "libinput.h"
+#include "input_device_manager.h"
+#include "input_windows_manager.h"
+#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "HasEnabledPhysicalPointerDeviceFuzzTest"
+#define MMI_LOG_TAG "GetMouseFlagFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-bool HasEnabledPhysicalPointerDeviceFuzzTest(const uint8_t *data, size_t size)
+void GetMouseFlagFuzzTest(const uint8_t* data, size_t /* size */)
 {
-    INPUT_DEV_MGR->HasEnabledPhysicalPointerDevice();
-    return true;
+    if (data == nullptr) {
+        return;
+    }
+    MMI_HILOGD("GetMouseFlagFuzzTest");
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->GetMouseFlag();
 }
-} // namespace OHOS
+} // MMI
+} // OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
-
-    OHOS::HasEnabledPhysicalPointerDeviceFuzzTest(data, size);
+    if (size < sizeof(int32_t)) {
+        return 0;
+    }
+    OHOS::MMI::GetMouseFlagFuzzTest(data, size);
     return 0;
 }
-} // namespace MMI
-} // namespace OHOS
+
