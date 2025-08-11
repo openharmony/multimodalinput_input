@@ -185,6 +185,7 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
         MMI_HILOGE("GetKeyboardType failed");
         return RET_ERR;
     }
+    MMI_HILOGI("Send the keyboardType:%{public}d to client", keyboardType);
     callback(keyboardType);
     return RET_OK;
 }
