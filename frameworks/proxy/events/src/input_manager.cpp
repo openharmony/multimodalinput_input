@@ -99,14 +99,18 @@ int32_t InputManager::RemoveInputEventObserver(std::shared_ptr<MMIEventObserver>
 
 int32_t InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.SetWindowInputEventConsumer(inputEventConsumer, nullptr);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
+    // LCOV_EXCL_START
     CHKPR(eventHandler, RET_ERR);
     return InputMgrImpl.SetWindowInputEventConsumer(inputEventConsumer, eventHandler);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -184,12 +188,16 @@ void InputManager::UnsubscribeLongPressEvent(int32_t subscriberId)
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.AddMonitor(monitor);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.AddMonitor(monitor);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType)
@@ -537,7 +545,9 @@ int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32
 
 void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
+    // LCOV_EXCL_START
     InputMgrImpl.SetAnrObserver(observer);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)

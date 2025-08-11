@@ -226,7 +226,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     processedCount_++;
     if (processedCount_ == PRINT_INTERVAL_COUNT) {
-        MMI_HILOG_FREEZEI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
+        MMI_HILOGD("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
         processedCount_ = 0;
         lastEventId_ = pointerEvent->GetId();
     }

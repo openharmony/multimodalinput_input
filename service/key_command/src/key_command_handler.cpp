@@ -307,7 +307,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
     if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-        MMI_HILOGI("Finger movement distance greater than 20VP, defaultDistance:%{public}d, moveDistance:%{public}f",
+        MMI_HILOGD("Finger movement distance greater than 20VP, defaultDistance:%{public}d, moveDistance:%{public}f",
             ConvertVPToPX(TOUCH_MAX_THRESHOLD), moveDistance);
         StopTwoFingerGesture();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -2954,7 +2954,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
         return false;
     }
     if (appWhiteList_.find(bundleName) == appWhiteList_.end()) {
-        MMI_HILOGD("The app does not support long-press drag., bundle name:%{public}s", bundleName.c_str());
+        MMI_HILOGD("%{public}s not support long-press drag", bundleName.c_str());
         return false;
     }
     return true;

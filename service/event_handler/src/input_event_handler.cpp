@@ -103,7 +103,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     if (lostTime >= TIMEOUT_MS) {
-        MMI_HILOGE("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+        MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
     }
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
