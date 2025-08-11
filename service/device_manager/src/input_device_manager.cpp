@@ -260,7 +260,7 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
         keyboardType = KEYBOARD_TYPE_UNKNOWN;
         MMI_HILOGD("Undefined keyboard type");
     }
-    MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
+    MMI_HILOGI("Get keyboard type results by supporting keys:%{public}d", keyboardType);
     return RET_OK;
 }
 
@@ -282,6 +282,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     }
     if (GetDeviceConfig(deviceId, tempKeyboardType)) {
         keyboardType = tempKeyboardType;
+        MMI_HILOGI("The keyboardType:%{public}d", keyboardType);
         return RET_OK;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
