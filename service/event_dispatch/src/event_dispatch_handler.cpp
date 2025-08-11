@@ -37,6 +37,8 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
+const std::string DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_TABLET = "tablet";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -45,7 +47,9 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    AddFlagToEsc(keyEvent);
+    if (DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
+        AddFlagToEsc(keyEvent);
+    }
     DispatchKeyEventPid(*udsServer, keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
