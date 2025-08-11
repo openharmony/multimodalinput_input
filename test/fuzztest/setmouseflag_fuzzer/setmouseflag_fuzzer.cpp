@@ -18,6 +18,7 @@
 #include "libinput.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -25,14 +26,15 @@
 
 namespace OHOS {
 namespace MMI {
-void SetMouseFlagFuzzTest(const uint8_t* data, size_t /* size */)
+void SetMouseFlagFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr) {
         return;
     }
     MMI_HILOGD("SetMouseFlagFuzzTest");
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    bool state = true;
+    FuzzedDataProvider provider(data, size);
+    bool state = provider.ConsumeBool();
     inputWindowsManager->SetMouseFlag(state);
 }
 } // MMI

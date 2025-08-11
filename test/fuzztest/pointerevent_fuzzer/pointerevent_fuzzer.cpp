@@ -15,6 +15,7 @@
 
 #include "pointer_event.h"
 #include "pointerevent_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #include "securec.h"
@@ -24,21 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-#define ODDEVENFLAG 2
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 void PointEventGetFuncFuzzTest_Add(PointerEvent &pointEvent)
 {
     pointEvent.IsValidCheckMouseFunc();
@@ -94,9 +80,7 @@ void PointEventGetFuncFuzzTest(PointerEvent &pointEvent)
     pointEvent.GetButtonId();
     pointEvent.GetFingerCount();
     pointEvent.GetZOrder();
-    pointEvent.GetAxisValue(PointerEvent::AxisType::AXIS_TYPE_UNKNOWN);
     pointEvent.ClearAxisValue();
-    pointEvent.ClearAxisStatus(PointerEvent::AxisType::AXIS_TYPE_UNKNOWN);
     pointEvent.GetVelocity();
     pointEvent.GetPressedKeys();
     pointEvent.GetAxisEventType();
@@ -112,115 +96,118 @@ void PointEventGetFuncFuzzTest(PointerEvent &pointEvent)
     PointEventGetFuncFuzzTest_Add(pointEvent);
 }
 
-void PointerEventFuzzTest_Add(const uint8_t *data, size_t size, size_t &startPos,
-                              int32_t &rowsBefore, PointerEvent &pointEvent)
+void PointerEventFuzzTest_Add(FuzzedDataProvider &provider, PointerEvent &pointEvent)
 {
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    uint8_t data = provider.ConsumeIntegral<uint8_t>();
     std::vector<uint8_t> enhanceData;
-    enhanceData.push_back(rowsBefore);
+    enhanceData.push_back(data);
     pointEvent.SetEnhanceData(enhanceData);
 #endif
 
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetFingerprintDistanceX(rowsBefore);
+    double fingerPrintDistanceX = provider.ConsumeFloatingPoint<double>();
+    pointEvent.SetFingerprintDistanceX(fingerPrintDistanceX);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetFingerprintDistanceY(rowsBefore);
+    double fingerPrintDistanceY = provider.ConsumeFloatingPoint<double>();
+    pointEvent.SetFingerprintDistanceY(fingerPrintDistanceY);
 #endif
 
+    uint8_t buf = provider.ConsumeIntegral<uint8_t>();
     std::vector<uint8_t> buffer;
-    enhanceData.push_back(rowsBefore);
+    enhanceData.push_back(buf);
     pointEvent.SetBuffer(buffer);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetDispatchTimes(rowsBefore);
+    int32_t dispatchTimes = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetDispatchTimes(dispatchTimes);
 
+    int32_t pressedkey = provider.ConsumeIntegral<int32_t>();
     std::vector<int32_t> pressedKeys;
-    pressedKeys.push_back(rowsBefore);
+    pressedKeys.push_back(pressedkey);
     pointEvent.SetPressedKeys(pressedKeys);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetHandlerEventType(rowsBefore);
+    uint32_t handleEventType = provider.ConsumeIntegral<uint32_t>();
+    pointEvent.SetHandlerEventType(handleEventType);
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetAncoDeal(rowsBefore % ODDEVENFLAG == 0 ? true : false);
+    bool ancodeal = provider.ConsumeBool();
+    pointEvent.SetAncoDeal(ancodeal);
 #endif
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetAutoToVirtualScreen(rowsBefore % ODDEVENFLAG == 0 ? true : false);
+    bool autoToVirtualScreen = provider.ConsumeBool();
+    pointEvent.SetAutoToVirtualScreen(autoToVirtualScreen);
+
     pointEvent.SetFixedMode(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.ActionToShortStr(rowsBefore);
+    int32_t action = provider.ConsumeIntegral<int32_t>();
+    pointEvent.ActionToShortStr(action);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetScrollRows(rowsBefore);
+    int32_t scrollRows = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetScrollRows(scrollRows);
 }
 
 bool PointerEventFuzzTest(const uint8_t *data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-
-    PointerEvent pointEvent(rowsBefore);
+    FuzzedDataProvider provider(data, size);
+    int32_t eventType = provider.ConsumeIntegral<int32_t>();
+    PointerEvent pointEvent(eventType);
     pointEvent.Reset();
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetThrowAngle(rowsBefore);
+    double throwAngle = provider.ConsumeFloatingPoint<double>();
+    pointEvent.SetThrowAngle(throwAngle);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetThrowSpeed(rowsBefore);
+    double throwSpeed = provider.ConsumeFloatingPoint<double>();
+    pointEvent.SetThrowSpeed(throwSpeed);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetPointerAction(rowsBefore);
+    int32_t pointerAction = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetPointerAction(pointerAction);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetOriginPointerAction(rowsBefore);
+    int32_t originPointerAction = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetOriginPointerAction(originPointerAction);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetHandOption(rowsBefore);
+    int32_t handOption = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetHandOption(handOption);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetPointerId(rowsBefore);
+    int32_t pointerId = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetPointerId(pointerId);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     PointerEvent::PointerItem item;
     pointEvent.AddPointerItem(item);
-    pointEvent.UpdatePointerItem(rowsBefore, item);
-    pointEvent.GetPointerItem(rowsBefore, item);
-    pointEvent.GetOriginPointerItem(rowsBefore, item);
-    pointEvent.RemovePointerItem(rowsBefore);
+    pointEvent.UpdatePointerItem(pointerId, item);
+    pointEvent.GetPointerItem(pointerId, item);
+    pointEvent.GetOriginPointerItem(pointerId, item);
+    pointEvent.RemovePointerItem(pointerId);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetButtonPressed(rowsBefore);
-    pointEvent.IsButtonPressed(rowsBefore);
-    pointEvent.DeleteReleaseButton(rowsBefore);
+    int32_t buttonId = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetButtonId(buttonId);
+    pointEvent.SetButtonPressed(buttonId);
+    pointEvent.IsButtonPressed(buttonId);
+    pointEvent.DeleteReleaseButton(buttonId);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetButtonId(rowsBefore);
+    int32_t fingerCount = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetFingerCount(fingerCount);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetFingerCount(rowsBefore);
+    float zOrder = provider.ConsumeFloatingPoint<float>();
+    pointEvent.SetZOrder(zOrder);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetZOrder(rowsBefore);
+    double axisValue = provider.ConsumeFloatingPoint<double>();
+    PointerEvent::AxisType axisType = PointerEvent::AxisType::AXIS_TYPE_UNKNOWN;
+    pointEvent.SetAxisValue(axisType, axisValue);
+    pointEvent.GetAxisValue(axisType);
+    
+    int32_t axes = provider.ConsumeIntegral<int32_t>();
+    pointEvent.HasAxis(axes, axisType);
+    pointEvent.ClearAxisStatus(axisType);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_UNKNOWN, rowsBefore);
-    pointEvent.HasAxis(rowsBefore, PointerEvent::AxisType::AXIS_TYPE_UNKNOWN);
+    double velocity = provider.ConsumeFloatingPoint<double>();
+    pointEvent.SetVelocity(velocity);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetVelocity(rowsBefore);
+    int32_t axisEventType = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetAxisEventType(axisEventType);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetAxisEventType(rowsBefore);
+    int32_t pullId = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetPullId(pullId);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    pointEvent.SetPullId(rowsBefore);
-
-    PointerEventFuzzTest_Add(data, size, startPos, rowsBefore, pointEvent);
+    PointerEventFuzzTest_Add(provider, pointEvent);
     
     PointEventGetFuncFuzzTest(pointEvent);
     MMI_HILOGD("PointerEventFuzzTest");
