@@ -4354,8 +4354,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_EMULATOR
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN &&
-        !CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
+    if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
         pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
         CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
     }
