@@ -73,7 +73,6 @@ void CursorDrawingComponent::Load()
 {
     std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
     if (isLoaded_ && (soHandle_ != nullptr)) {
-        MMI_HILOGD("%{public}s has been Loaded", MULTIMODAL_PATH_NAME);
         return;
     }
 
