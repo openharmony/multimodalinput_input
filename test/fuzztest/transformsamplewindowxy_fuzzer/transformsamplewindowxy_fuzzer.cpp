@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <fuzzer/FuzzedDataProvider.h>
 #include "event_resample.h"
 #include "transformsamplewindowxy_fuzzer.h"
