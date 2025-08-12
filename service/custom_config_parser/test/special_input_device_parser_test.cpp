@@ -141,7 +141,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_006, TestSiz
 {
     CALL_TEST_DEBUG;
     std::string jsonStr = R"({
-        "exactly_match": [{},{}
+        "exactly_match": [{}, {}
         ]
     })";
     SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
