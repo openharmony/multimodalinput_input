@@ -18,6 +18,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
 #include "mmi_log.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #undef LOG_TAG
 #define LOG_TAG "RemoveVirtualInputDeviceFuzzTest"
@@ -26,31 +27,24 @@ namespace OHOS {
 namespace MMI {
 namespace OHOS {
 
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
 
-bool RemoveVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
+bool RemoveVirtualInputDeviceFuzzTest(FuzzedDataProvider &provider)
 {
-    if (data == nullptr || size < sizeof(int32_t)) {
-        return false;
-    }
-
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         return false;
     }
-
-    int32_t deviceId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
     if (!datas.WriteInt32(deviceId)) {
         return false;
     }
-
     if (!datas.RewindRead(0)) {
         return false;
     }
 
     MessageParcel reply;
     MessageOption option;
-
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_REMOVE_VIRTUAL_INPUT_DEVICE),
@@ -60,14 +54,13 @@ bool RemoveVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
 
 } // namespace OHOS
 
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
+    if (!data || size == 0) {
         return 0;
     }
-
-    OHOS::RemoveVirtualInputDeviceFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::RemoveVirtualInputDeviceFuzzTest(provider);
     return 0;
 }
 } // namespace MMI

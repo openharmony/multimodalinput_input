@@ -18,7 +18,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
 #include "mmi_log.h"
-#include "securec.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #undef LOG_TAG
 #define LOG_TAG "TouchpadScrollRowsFuzzTest"
@@ -27,49 +27,23 @@ namespace OHOS {
 namespace MMI {
 namespace OHOS {
 
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
 
 namespace {
-constexpr size_t MIN_SIZE_FOR_INT32 = sizeof(int32_t);
+constexpr int32_t ROWS_MIN = -1000;
+constexpr int32_t ROWS_MAX =  1000;
 } // namespace
 
-template <class T>
-size_t GetObjectSafe(const uint8_t *data, size_t size, T &object)
+bool SetTouchpadScrollRowsFuzzTest(FuzzedDataProvider &provider)
 {
-    if (data == nullptr || size < sizeof(T)) {
-        return 0;
-    }
-    size_t objectSize = sizeof(T);
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool SetTouchpadScrollRowsFuzzTest(const uint8_t* data, size_t size)
-{
-    if (data == nullptr || size < MIN_SIZE_FOR_INT32) {
-        return false;
-    }
-
-    size_t startPos = 0;
-    int32_t rows = 0;
-    size_t read = GetObjectSafe(data + startPos, size - startPos, rows);
-    if (read == 0) {
-        return false;
-    }
-    startPos += read;
-
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         return false;
     }
-
+    int32_t rows = provider.ConsumeIntegralInRange<int32_t>(ROWS_MIN, ROWS_MAX);
     if (!datas.WriteInt32(rows)) {
         return false;
     }
-
     if (!datas.RewindRead(0)) {
         return false;
     }
@@ -77,26 +51,19 @@ bool SetTouchpadScrollRowsFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_TOUCHPAD_SCROLL_ROWS),
         datas, reply, option);
-
     return true;
 }
 
-bool GetTouchpadScrollRowsFuzzTest(const uint8_t* data, size_t size)
+bool GetTouchpadScrollRowsFuzzTest(FuzzedDataProvider &provider)
 {
+    (void)provider;
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         return false;
     }
-
-    int32_t placeholder = -1;
-    if (!datas.WriteInt32(placeholder)) {
-        return false;
-    }
-
     if (!datas.RewindRead(0)) {
         return false;
     }
@@ -104,23 +71,21 @@ bool GetTouchpadScrollRowsFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_TOUCHPAD_SCROLL_ROWS),
         datas, reply, option);
-
     return true;
 }
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
+    if (!data || size == 0) {
         return 0;
     }
-
-    OHOS::SetTouchpadScrollRowsFuzzTest(data, size);
-    OHOS::GetTouchpadScrollRowsFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::SetTouchpadScrollRowsFuzzTest(provider);
+    OHOS::GetTouchpadScrollRowsFuzzTest(provider);
     return 0;
 }
 

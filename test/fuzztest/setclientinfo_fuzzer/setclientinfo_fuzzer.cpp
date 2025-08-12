@@ -18,7 +18,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
 #include "mmi_log.h"
-#include "securec.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #undef LOG_TAG
 #define LOG_TAG "SetClientInfoFuzzTest"
@@ -27,42 +27,18 @@ namespace OHOS {
 namespace MMI {
 namespace OHOS {
 
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
 
-namespace {
-constexpr size_t MIN_SIZE_NEEDED = sizeof(int32_t) + sizeof(uint64_t);
-}
-
-template <class T>
-size_t GetObjectSafe(const uint8_t *data, size_t size, T &object)
+bool SetClientInfoFuzzTest(FuzzedDataProvider &provider)
 {
-    if (data == nullptr || size < sizeof(T)) {
-        return 0;
-    }
-    size_t objectSize = sizeof(T);
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool SetClientInfoFuzzTest(const uint8_t* data, size_t size)
-{
-    if (data == nullptr || size < MIN_SIZE_NEEDED) {
-        return false;
-    }
-
-    size_t offset = 0;
-    int32_t pid = 0;
-    offset += GetObjectSafe(data + offset, size - offset, pid);
-    uint64_t readThreadId = 0;
-    offset += GetObjectSafe(data + offset, size - offset, readThreadId);
-
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         return false;
     }
+
+    int32_t pid = provider.ConsumeIntegral<int32_t>();
+    uint64_t readThreadId = provider.ConsumeIntegral<uint64_t>();
+
     if (!datas.WriteInt32(pid)) {
         return false;
     }
@@ -76,21 +52,20 @@ bool SetClientInfoFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_CLIENT_INFO),
         datas, reply, option);
-
     return true;
 }
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
+    if (!data || size == 0) {
         return 0;
     }
-    OHOS::SetClientInfoFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::SetClientInfoFuzzTest(provider);
     return 0;
 }
 
