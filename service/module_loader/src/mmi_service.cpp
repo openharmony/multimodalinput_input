@@ -24,6 +24,13 @@
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
 
+#include "bundle_name_parser.h"
+#include "misc_product_type_parser.h"
+#include "product_type_parser.h"
+#include "special_input_device_parser.h"
+#include "product_name_definition_parser.h"
+#include "json_parser.h"
+
 #include "ability_manager_client.h"
 #include "account_manager.h"
 #include "anr_manager.h"
@@ -154,7 +161,6 @@ const std::set<int32_t> g_keyCodeValueSet = {
 constexpr int32_t DEFAULT_USER_ID { 100 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-const std::string DEVICE_TYPE_HPR { "HPR" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 // Define vkeyboard functions from vendor
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
@@ -451,6 +457,7 @@ void MMIService::OnStart()
     pthread_setname_np(t_.native_handle(), THREAD_NAME);
     eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
     pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
+    InitCustomConfig();
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -666,7 +673,7 @@ void MMIService::OnConnected(SessionPtr s)
     CHKPV(s);
     MMI_HILOGI("Get fd:%{public}d", s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName() != SHELL_ASSISTANT) {
+    if (s->GetProgramName() != BUNDLE_NAME_PARSER.GetBundleName("SHELL_ASSISTANT")) {
         return;
     }
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
@@ -689,7 +696,7 @@ void MMIService::OnConnected(SessionPtr s)
         if (item.bundleNames.empty()) {
             continue;
         }
-        if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
+        if (BUNDLE_NAME_PARSER.GetBundleName("SHELL_ASSISTANT") == item.bundleNames[0].c_str()) {
             MMI_HILOGW("Record client processes pid %{public}d", item.pid_);
             shellAssitentPid_ = item.pid_;
         }
@@ -706,7 +713,8 @@ void MMIService::OnDisconnected(SessionPtr s)
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName() == SHELL_ASSISTANT && shellAssitentPid_ == s->GetPid()) {
+    if (s->GetProgramName() == BUNDLE_NAME_PARSER.GetBundleName("SHELL_ASSISTANT") &&
+        shellAssitentPid_ == s->GetPid()) {
         MMI_HILOGW("Clean all shell windows pid:%{public}d", s->GetPid());
         shellAssitentPid_ = -1;
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
@@ -4161,8 +4169,8 @@ ErrCode MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
         return ERROR_NOT_SYSAPI;
     }
     vkeyboardDevice = nullptr;
-    isHPR_ = PRODUCT_TYPE == DEVICE_TYPE_HPR;
-    if (!isHPR_) {
+    isFoldPC_ = PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
+    if (!isFoldPC_) {
         MMI_HILOGE("Failed to create vkeyboard device, feature not support");
         return RET_ERR;
     }
@@ -4220,7 +4228,7 @@ int32_t MMIService::OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice
 
 void MMIService::InitVKeyboardFuncHandler()
 {
-    if (isHPR_) {
+    if (isFoldPC_) {
         // Initialize vkeyboard handler
         g_VKeyboardHandle = dlopen(VKEYBOARD_PATH.c_str(), RTLD_NOW);
         if (g_VKeyboardHandle != nullptr) {
@@ -5179,6 +5187,33 @@ ErrCode MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& dev
         return ret;
     }
     return RET_OK;
+}
+
+ErrCode MMIService::InitCustomConfig()
+{
+    CALL_INFO_TRACE;
+    ErrCode errCode { RET_OK };
+    if (BUNDLE_NAME_PARSER.Init() != RET_OK) {
+        MMI_HILOGE("BUNDLE_NAME_PARSER.Init failed");
+        errCode = RET_ERR;
+    }
+    if (MISC_PRODUCT_TYPE_PARSER.Init() != RET_OK) {
+        MMI_HILOGE("MISC_PRODUCT_TYPE_PARSER.Init failed");
+        errCode = RET_ERR;
+    }
+    if (PRODUCT_TYPE_PARSER.Init() != RET_OK) {
+        MMI_HILOGE("PRODUCT_TYPE_PARSER.Init failed");
+        errCode = RET_ERR;
+    }
+    if (PRODUCT_NAME_DEFINITION_PARSER.Init() != RET_OK) {
+        MMI_HILOGE("PRODUCT_NAME_DEFINITION_PARSER.Init failed");
+        errCode = RET_ERR;
+    }
+    if (SPECIAL_INPUT_DEVICE_PARSER.Init() != RET_OK) {
+        MMI_HILOGE("SPECIAL_INPUT_DEVICE_PARSER.Init failed");
+        errCode = RET_ERR;
+    }
+    return errCode;
 }
 
 ErrCode MMIService::SubscribeInputActive(int32_t subscribeId, int64_t interval)
