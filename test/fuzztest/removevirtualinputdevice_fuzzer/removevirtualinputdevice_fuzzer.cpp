@@ -25,43 +25,42 @@
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
 
-const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
+namespace {
+const std::u16string kInterfaceToken{ u"ohos.multimodalinput.IConnectManager" };
+} // namespace
 
 bool RemoveVirtualInputDeviceFuzzTest(FuzzedDataProvider &provider)
 {
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+    if (!datas.WriteInterfaceToken(kInterfaceToken)) {
         return false;
     }
-    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
-    if (!datas.WriteInt32(deviceId)) {
-        return false;
-    }
-    if (!datas.RewindRead(0)) {
+
+    const int32_t deviceId = provider.ConsumeIntegral<int32_t>();
+    if (!datas.WriteInt32(deviceId) || !datas.RewindRead(0)) {
         return false;
     }
 
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-    MMIService::GetInstance()->OnRemoteRequest(
+    (void)MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_REMOVE_VIRTUAL_INPUT_DEVICE),
         datas, reply, option);
     return true;
 }
 
-} // namespace OHOS
-
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     if (!data || size == 0) {
         return 0;
     }
     FuzzedDataProvider provider(data, size);
-    OHOS::RemoveVirtualInputDeviceFuzzTest(provider);
+    (void)OHOS::MMI::RemoveVirtualInputDeviceFuzzTest(provider);
     return 0;
 }
+
 } // namespace MMI
 } // namespace OHOS
