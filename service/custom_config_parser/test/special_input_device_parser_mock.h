@@ -27,7 +27,7 @@ class SpecialInputDeviceParserInterface  {
 public:
     SpecialInputDeviceParserInterface() = default;
     virtual ~SpecialInputDeviceParserInterface() = default;
-    virtual std::string ReadJsonFile(const std::string& filePath) = 0;
+    virtual std::string ReadJsonFile(const std::string &filePath) = 0;
 };
 
 class SpecialInputDeviceParserMock : public SpecialInputDeviceParserInterface  {
@@ -36,10 +36,9 @@ public:
     {
         return mock.load();
     }
-
     SpecialInputDeviceParserMock();
     ~SpecialInputDeviceParserMock() override;
-    MOCK_METHOD(std::string, ReadJsonFile, (const std::string& filePath));
+    MOCK_METHOD(std::string, ReadJsonFile, (const std::string &filePath));
 private:
     static inline std::atomic<SpecialInputDeviceParserMock *> mock = nullptr;
 };
