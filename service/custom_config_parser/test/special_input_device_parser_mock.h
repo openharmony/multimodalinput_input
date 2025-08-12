@@ -42,7 +42,6 @@ public:
     MOCK_METHOD(std::string, ReadJsonFile, (const std::string &filePath));
 private:
     static inline std::atomic<SpecialInputDeviceParserMock *> mock = nullptr;
-
 };
 } // namespace OHOS::MMI
 #endif
