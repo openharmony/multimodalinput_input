@@ -40,7 +40,7 @@ namespace DeviceStatus {
 namespace {
 constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
 constexpr size_t EXPECTED_SUBMATCH { 1 };
-const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
+const std::string FINGER_PRINT { "fingerprint_mouse" };
 } // namespace
 
 DeviceManager::HotplugHandler::HotplugHandler(DeviceManager &devMgr)

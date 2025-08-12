@@ -25,6 +25,7 @@
 #include "cursor_drawing_component.h"
 #include "parameters.h"
 #include "pointer_device_manager.h"
+#include "special_input_device_parser.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -532,18 +533,11 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
     std::string name = libinput_device_get_name(device);
-    if (name == "hw_fingerprint_mouse") {
-        return false;
-    }
-    if (name.find("TouchPad") == std::string::npos) {
-        return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
-            EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
-    }
-    if (name.find("WATCH") != std::string::npos) {
-        return false;
+    if (bool isPointerDevice = false; SPECIAL_INPUT_DEVICE_PARSER.IsPointerDevice(name, isPointerDevice) == RET_OK) {
+        return isPointerDevice;
     }
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
-        EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+            EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
 }
 
 bool InputDeviceManager::IsKeyboardDevice(struct libinput_device *device) const
@@ -830,7 +824,6 @@ void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const str
 
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
-    inputDevice->SetVirtualDevice(true);
     virtualInputDevices_[deviceId] = inputDevice;
 }
 
@@ -984,12 +977,6 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "RemoveVirtualInputDevice successfully");
 #endif
     return RET_OK;
-}
-
-bool InputDeviceManager::IsRemoteInputDevice(int32_t deviceId) const
-{
-    auto iter = virtualInputDevices_.find(deviceId);
-    return ((iter != virtualInputDevices_.cend()) && (iter->second != nullptr) && iter->second->IsRemoteDevice());
 }
 
 int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)

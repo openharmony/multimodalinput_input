@@ -12,53 +12,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "mmi_log.h"
-#include "input_device_manager.h"
-#include "isremoteinputdevice_fuzzer.h"
-
+#include <fuzzer/FuzzedDataProvider.h>
+#include "event_resample.h"
+#include "transformsamplewindowxy_fuzzer.h"
 #include "securec.h"
 
+
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "IsRemoteInputDeviceFuzzTest"
+#define MMI_LOG_TAG "TransformSampleWindowXYFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+bool TransformSampleWindowXYFuzzTest(FuzzedDataProvider &provider)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool IsRemoteInputDeviceFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t deviceId = 1;
-    INPUT_DEV_MGR->IsRemoteInputDevice(deviceId);
+    PointerEvent::PointerItem pointerItem;
+    int32_t windowX = provider.ConsumeIntegral<int32_t>();
+    int32_t windowY = provider.ConsumeIntegral<int32_t>();
+    double logicX = provider.ConsumeFloatingPoint<double>();
+    double logicY = provider.ConsumeFloatingPoint<double>();
+    pointerItem.SetToolWindowX(windowX);
+    pointerItem.SetToolWindowY(windowY);
+    EventResample eventResample;
+    eventResample.TransformSampleWindowXY(nullptr, pointerItem, logicX, logicY);
     return true;
 }
-} // namespace OHOS
+} // MMI
+} // OHOS
 
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
-
-    OHOS::IsRemoteInputDeviceFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::MMI::TransformSampleWindowXYFuzzTest(provider);
     return 0;
 }
-} // namespace MMI
-} // namespace OHOS

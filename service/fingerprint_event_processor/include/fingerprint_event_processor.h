@@ -73,7 +73,6 @@ private:
     void ReportResSched(uint32_t resType, int64_t value);
 
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
-    const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
 
     using keyTimeMap = std::pair<int32_t, std::chrono::time_point<std::chrono::steady_clock>>;
     std::map<int32_t, keyTimeMap> keyStateMap_ {

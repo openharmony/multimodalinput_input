@@ -18,13 +18,13 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("IsRemoteInputDeviceFuzzTest") {
+ohos_fuzztest("AddSampleFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/isremoteinputdevice_fuzzer"
-  include_dirs = [
-    "${mmi_path}/service/device_manager/include",
-    "${mmi_path}/service/device_config/include",
-  ]
+  fuzz_config_file = "${mmi_path}/test/fuzztest/addsample_fuzzer"
+  include_dirs = [ 
+    "${mmi_path}/interfaces/util/common/include",
+    "${mmi_path}/service/event_resample/include"
+   ]
   cflags = [
     "-g",
     "-O0",
@@ -33,7 +33,7 @@ ohos_fuzztest("IsRemoteInputDeviceFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "isremoteinputdevice_fuzzer.cpp" ]
+  sources = [ "addsample_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -42,9 +42,18 @@ ohos_fuzztest("IsRemoteInputDeviceFuzzTest") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
+    "cJSON:cjson",
     "c_utils:utils",
-    "eventhandler:libeventhandler",
+    "common_event_service:cesfwk_core",
+    "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
+    "window_manager:libwm",
   ]
 }
 
@@ -54,7 +63,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":IsRemoteInputDeviceFuzzTest",
+    ":AddSampleFuzzTest",
   ]
 }
 ###############################################################################
