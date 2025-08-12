@@ -88,7 +88,7 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest003, TestSize.Level1)
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(""));
     int32_t result = parser.Init();
     EXPECT_EQ(result, RET_OK);
-}  
+}
 
 /**
  * @tc.name: ProductTypeParserTest_004
