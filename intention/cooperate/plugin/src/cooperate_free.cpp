@@ -27,7 +27,7 @@ namespace DeviceStatus {
 namespace Cooperate {
 
 namespace {
-const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
+const std::string FINGER_PRINT { "fingerprint_mouse" };
 }
 
 CooperateFree::CooperateFree(IStateMachine &parent, IContext *env) : ICooperateState(parent), env_(env)
