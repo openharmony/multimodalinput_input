@@ -25,9 +25,9 @@
 namespace OHOS::MMI  {
 class SpecialInputDeviceParserInterface  {
 public:
-    SpecialInputDeviceParserInterface () = default;
-    virtual ~SpecialInputDeviceParserInterface () = default;
-    virtual std::string ReadJsonFile(const std::string &filePath) = 0;
+    SpecialInputDeviceParserInterface() = default;
+    virtual ~SpecialInputDeviceParserInterface() = default;
+    virtual std::string ReadJsonFile(const std::string& filePath) = 0;
 };
 
 class SpecialInputDeviceParserMock : public SpecialInputDeviceParserInterface  {
@@ -39,9 +39,9 @@ public:
 
     SpecialInputDeviceParserMock();
     ~SpecialInputDeviceParserMock() override;
-    MOCK_METHOD(std::string, ReadJsonFile, (const std::string &filePath));
+    MOCK_METHOD(std::string, ReadJsonFile, (const std::string& filePath));
 private:
     static inline std::atomic<SpecialInputDeviceParserMock *> mock = nullptr;
 };
 } // namespace OHOS::MMI
-#endif
+#endif // define MESSAGE_PARCEL_MOCK_H
