@@ -102,12 +102,6 @@ bool InputDeviceFuzzTest(const uint8_t *data, size_t size)
     std::string uniq = "testUniq";
     inputDevice.SetUniq(uniq);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputDevice.SetVirtualDevice(rowsBefore % ODDEVENFLAG == 0 ? true : false);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputDevice.SetRemoteDevice(rowsBefore % ODDEVENFLAG == 0 ? true : false);
-
     inputDevice.AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
 
     startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
@@ -128,8 +122,6 @@ bool InputDeviceFuzzTest(const uint8_t *data, size_t size)
     inputDevice.GetVendor();
     inputDevice.GetPhys();
     inputDevice.GetUniq();
-    inputDevice.IsVirtualDevice();
-    inputDevice.IsRemoteDevice();
     inputDevice.HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     return true;
 }
