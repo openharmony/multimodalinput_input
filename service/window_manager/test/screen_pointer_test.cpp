@@ -18,6 +18,8 @@
 
 #include "mmi_log.h"
 #include "screen_pointer.h"
+#include "product_name_definition.h"
+#include "product_type_parser.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ScreenPointerTest"
@@ -599,7 +601,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1
         .dpi = screenpointer->GetDPI() * screenpointer->GetScale(),
         .isHard = true,
     };
-    if (OHOS::system::GetParameter("const.build.product", "HYM") == "HPR") {
+    if (OHOS::system::GetParameter("const.build.product", "HYM") == DEVICE_TYPE_FOLD_PC) {
         defaultCursorCfg.size = 2;
     }
     bool isCommoBuffer;

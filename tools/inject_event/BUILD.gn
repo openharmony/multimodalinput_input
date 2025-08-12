@@ -39,6 +39,9 @@ ohos_source_set("input-manager") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   deps = [
@@ -47,6 +50,7 @@ ohos_source_set("input-manager") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -72,7 +76,11 @@ ohos_executable("uinput") {
     cfi_cross_dso = true
     debug = false
   }
-  deps = [ "${mmi_path}/tools/inject_event:input-manager" ]
+  deps = [
+    "${mmi_path}/tools/inject_event:input-manager",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/util:mmi_json_parser",
+    ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
@@ -85,7 +93,12 @@ module_output_path = "input/input"
 ohos_unittest("InjectEventTest") {
   module_out_path = module_output_path
   configs = [ "${mmi_path}:coverage_flags" ]
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/util/json_parser/include"
+    ]
 
   sources = [ "test/inject_event_test.cpp" ]
   if (input_feature_event_recorder) {
@@ -102,6 +115,8 @@ ohos_unittest("InjectEventTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   if (input_feature_event_recorder) {

@@ -1919,17 +1919,17 @@ bool JsPointerContext::GetCustomCursorInfo(napi_env env, napi_value obj, CustomC
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The width or height of the pixelMap exceed 256");
         return false;
     }
-    Parcel* pixelMapData = new Parcel();
+    MessageParcel* pixelMapData = new MessageParcel();
     CHKPF(pixelMapData);
     pixelMap->Marshalling(*pixelMapData);
     cursor.pixelMap = pixelMapData;
     if (!GetFocusInfo(env, obj, "focusX", cursor.focusX, pixelMap->GetWidth())) {
-        delete static_cast<Parcel*>(cursor.pixelMap);
+        delete static_cast<MessageParcel*>(cursor.pixelMap);
         cursor.pixelMap = nullptr;
         return false;
     }
     if (!GetFocusInfo(env, obj, "focusY", cursor.focusY, pixelMap->GetHeight())) {
-        delete static_cast<Parcel*>(cursor.pixelMap);
+        delete static_cast<MessageParcel*>(cursor.pixelMap);
         cursor.pixelMap = nullptr;
         return false;
     }
@@ -1980,10 +1980,14 @@ napi_value JsPointerContext::SetCustomCursorEx(napi_env env, std::shared_ptr<JsP
     }
     if (!GetCursorOptions(env, argv[INPUT_PARAMETER], options)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "options", "CursorOptions");
-        delete static_cast<Parcel*>(cursor.pixelMap);
+        delete static_cast<MessageParcel*>(cursor.pixelMap);
+        cursor.pixelMap = nullptr;
         return nullptr;
     }
-    return jsPointerMgr->SetCustomCursor(env, windowId, cursor, options);
+    auto ret = jsPointerMgr->SetCustomCursor(env, windowId, cursor, options);
+    delete static_cast<MessageParcel*>(cursor.pixelMap);
+    cursor.pixelMap = nullptr;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -17,12 +17,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr uint32_t INPUT_DEVICE_FEATURE_NONE { 0U };
-constexpr uint32_t INPUT_DEVICE_FEATURE_VIRTUAL { 1U };
-constexpr uint32_t INPUT_DEVICE_FEATURE_REMOTE { 2U };
-}
-
 InputDevice::InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version,
     int32_t product, int32_t vendor, std::string phys, std::string uniq, const std::vector<AxisInfo>& axis)
     : id_(id), name_(name), type_(deviceType), bus_(bus), version_(version), product_(product),
@@ -116,34 +110,6 @@ void InputDevice::SetUniq(std::string uniq)
 std::string InputDevice::GetUniq() const
 {
     return uniq_;
-}
-
-void InputDevice::SetVirtualDevice(bool isVirtual)
-{
-    if (isVirtual) {
-        feature_ |= INPUT_DEVICE_FEATURE_VIRTUAL;
-    } else {
-        feature_ &= ~INPUT_DEVICE_FEATURE_VIRTUAL;
-    }
-}
-
-bool InputDevice::IsVirtualDevice() const
-{
-    return (feature_ & INPUT_DEVICE_FEATURE_VIRTUAL);
-}
-
-void InputDevice::SetRemoteDevice(bool isRemote)
-{
-    if (isRemote) {
-        feature_ |= INPUT_DEVICE_FEATURE_REMOTE;
-    } else {
-        feature_ &= ~INPUT_DEVICE_FEATURE_REMOTE;
-    }
-}
-
-bool InputDevice::IsRemoteDevice() const
-{
-    return (feature_ & INPUT_DEVICE_FEATURE_REMOTE);
 }
 
 void InputDevice::AddCapability(InputDeviceCapability cap)

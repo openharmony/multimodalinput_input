@@ -14,6 +14,7 @@
  */
 
 #include "key_command_handler_util.h"
+#include "json_parser.h"
 
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"

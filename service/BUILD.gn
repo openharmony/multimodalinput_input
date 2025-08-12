@@ -92,6 +92,9 @@ config("libmmi_server_config") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/util/napi/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_service_path}/product_property_config/include",
+    "${mmi_service_path}/custom_config_parser/include",
+
   ]
 
   if (input_feature_product != "watch") {
@@ -179,6 +182,8 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "${mmi_path}/util/network/include/",
     "${mmi_path}/util/socket/include/",
     "window_manager/include",
+    "${mmi_service_path}/product_property_config/include",
+    "${mmi_service_path}/custom_config_parser/include",
   ]
 
   if (input_ext_feature_magiccursor) {
@@ -207,6 +212,8 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -279,6 +286,7 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/frameworks/proxy/events/include",
     "window_manager/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_service_path}/product_property_config/include",
   ]
 
   sources += [
@@ -409,6 +417,8 @@ ohos_shared_library("libmmi-server") {
 
     deps += [ ":keyboard_ext_flag.json" ]
   }
+
+  deps += ["${mmi_path}/service/custom_config_parser:mmi_custom_config_parser"]
 
   external_deps = [
     "cJSON:cjson",
@@ -906,6 +916,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -1388,8 +1399,11 @@ ohos_unittest("TouchDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs =
-      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs = [
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/util/json_parser/include"
+  ]
+
   sources = [
     "window_manager/test/pointer_renderer_test.cpp",
     "window_manager/test/screen_pointer_test.cpp",
@@ -1607,6 +1621,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -2066,6 +2081,8 @@ ohos_unittest("ModuleLoaderTest") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/util/common/include",
+    "${mmi_service_path}/product_property_config/include",
+    "${mmi_service_path}/custom_config_parser/include",
   ]
 
   configs = [
@@ -2236,6 +2253,7 @@ ohos_unittest("KeyCommandTest") {
   include_dirs = [
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/test/unittest/common/include",
+    "${mmi_service_path}/product_property_config/include",
   ]
 
   configs = [
@@ -2260,6 +2278,7 @@ ohos_unittest("KeyCommandTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -2358,6 +2377,7 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -2800,6 +2820,7 @@ ohos_unittest("EventHandlerEXTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
   ]
 }
@@ -2916,54 +2937,6 @@ ohos_unittest("ServerMsgHandlerTest") {
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_single",
-    "libinput:libinput-third-mmi",
-    "napi:ace_napi",
-    "preferences:native_preferences",
-    "window_manager:libwm",
-  ]
-
-  if (security_component_enable) {
-    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
-  }
-}
-
-ohos_unittest("ServerMsgHandlerSupTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [ "message_handle/test/server_msg_handler_sup_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:ability_connect_callback_stub",
-    "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -3127,6 +3100,7 @@ ohos_unittest("DeviceManagerExTest") {
     "touch_event_normalize/include",
     "window_manager/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   configs = [
@@ -3311,7 +3285,11 @@ ohos_unittest("ConnectManagerProxyEXTest") {
 ohos_unittest("EventDumpTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+  include_dirs = [
+    "${mmi_path}/test/unittest/common/include",
+    "${mmi_service_path}/product_property_config/include",
+    "${mmi_service_path}/custom_config_parser/include"
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",

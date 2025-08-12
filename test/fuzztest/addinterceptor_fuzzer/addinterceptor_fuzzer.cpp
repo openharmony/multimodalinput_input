@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "addinterceptor_fuzzer.h"
 
 #include "input_manager.h"
@@ -33,16 +34,10 @@ public:
     void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
-void AddInterceptorFuzzTest(const uint8_t* data, size_t /* size */)
+void AddInterceptorFuzzTest(const uint8_t* data, size_t size)
 {
-    auto consumer = std::make_shared<InputEventConsumerTest>();
-    int32_t inceptorId = InputManager::GetInstance()->AddInterceptor(consumer);
-    InputManager::GetInstance()->RemoveInterceptor(inceptorId);
-
-    auto fun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        MMI_HILOGD("Add interceptor success");
-    };
-    inceptorId = InputManager::GetInstance()->AddInterceptor(fun);
+    FuzzedDataProvider fdp(data, size);
+    int32_t inceptorId = fdp.ConsumeIntegral<int32_t>();
     InputManager::GetInstance()->RemoveInterceptor(inceptorId);
 }
 } // namespace MMI

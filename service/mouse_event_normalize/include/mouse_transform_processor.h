@@ -16,9 +16,9 @@
 #ifndef MOUSE_TRANSFORM_PROCESSOR_H
 #define MOUSE_TRANSFORM_PROCESSOR_H
 
-#include "libinput.h"
-
 #include "aggregator.h"
+#include "device_type_definition.h"
+#include "libinput.h"
 #include "timer_manager.h"
 #include "pointer_event.h"
 #include "touchpad_control_display_gain.h"
@@ -32,18 +32,7 @@ extern "C" {
         double dx;
         double dy;
     };
-    enum class DeviceType {
-        DEVICE_UNKOWN = 0,
-        DEVICE_PC = 1,
-        DEVICE_SOFT_PC_PRO = 2,
-        DEVICE_HARD_PC_PRO = 3,
-        DEVICE_TABLET = 4,
-        DEVICE_FOLD_PC = 5,
-        DEVICE_M_PC = 6,
-        DEVICE_FOLD_PC_VIRT = 7,
-        DEVICE_M_TABLET = 8,
-        DEVICE_Q_TABLET = 9,
-    };
+
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
     int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,

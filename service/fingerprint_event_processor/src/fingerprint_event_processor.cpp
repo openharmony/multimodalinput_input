@@ -27,6 +27,7 @@
 #include "res_type.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
+#include "special_input_device_parser.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -71,7 +72,7 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, false);
     std::string name = libinput_device_get_name(device);
-    if (name != FINGERPRINT_SOURCE_KEY && name != FINGERPRINT_SOURCE_POINT) {
+    if (name != FINGERPRINT_SOURCE_KEY && name != SPECIAL_INPUT_DEVICE_PARSER.GetInputDevName("FINGER_PRINT_MOUSE")) {
         MMI_HILOGD("Not FingerprintEvent");
         return false;
     }
@@ -233,7 +234,7 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
     size_t pos = name.find("hand_status_dev");
     if (name == FINGERPRINT_SOURCE_KEY) {
         return AnalyseKeyEvent(event);
-    } else if (name == FINGERPRINT_SOURCE_POINT) {
+    } else if (name == SPECIAL_INPUT_DEVICE_PARSER.GetInputDevName("FINGER_PRINT_MOUSE")) {
         ProcessSlideEvent();
         return AnalysePointEvent(event);
     } else if (pos != std::string::npos) { // 设备名称包含hand_status_dev的即为合法设备

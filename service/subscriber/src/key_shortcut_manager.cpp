@@ -16,6 +16,7 @@
 #include "key_shortcut_manager.h"
 
 #include "app_state_observer.h"
+#include "json_parser.h"
 #include "key_command_handler_util.h"
 
 #undef MMI_LOG_DOMAIN

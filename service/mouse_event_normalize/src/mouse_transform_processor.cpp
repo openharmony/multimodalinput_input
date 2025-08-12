@@ -23,6 +23,9 @@
 #include "pointer_device_manager.h"
 #include "scene_board_judgement.h"
 #include "touchpad_transform_processor.h"
+#include "product_name_definition.h"
+#include "product_type_parser.h"
+
 #include "util_ex.h"
 #include "linux/input.h"
 
@@ -53,14 +56,7 @@ constexpr int32_t SOFT_PC_PRO_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_PC_PRO_DEVICE_HEIGHT { 2080 };
 constexpr int32_t TABLET_DEVICE_WIDTH { 2880 };
 constexpr int32_t TABLET_DEVICE_HEIGHT { 1920 };
-const char* DEVICE_TYPE_FOLD_PC { "FOLD_PC" };
-const char* DEVICE_TYPE_TABLET { "TABLET"};
-const char* DEVICE_TYPE_PC_PRO { "PC_PRO" };
-const char* DEVICE_TYPE_M_PC { "M_PC" };
-const char* DEVICE_TYPE_M_TABLET1 { "MRDI" };
-const char* DEVICE_TYPE_M_TABLET2 { "MRO" };
-const char* DEVICE_TYPE_M_TABLET3 { "MRDIL" };
-const char* DEVICE_TYPE_Q_TABLET { "QXS" };
+
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
@@ -785,24 +781,9 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
     DeviceType deviceType = DeviceType::DEVICE_PC;
-    if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
-        deviceType = DeviceType::DEVICE_SOFT_PC_PRO;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
-        deviceType = DeviceType::DEVICE_TABLET;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
-        deviceType = DeviceType::DEVICE_FOLD_PC;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_M_PC) {
-        deviceType = DeviceType::DEVICE_M_PC;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_M_TABLET1 || PRODUCT_TYPE == DEVICE_TYPE_M_TABLET2 ||
-        PRODUCT_TYPE == DEVICE_TYPE_M_TABLET3) {
-        deviceType = DeviceType::DEVICE_M_TABLET;
-    }
-    if (PRODUCT_TYPE == DEVICE_TYPE_Q_TABLET) {
-        deviceType = DeviceType::DEVICE_Q_TABLET;
+    std::string productType = PRODUCT_TYPE;
+    if (PRODUCT_TYPE_PARSER.GetProductType(productType, deviceType) != RET_OK) {
+        MMI_HILOGW("GetProductType failed, productTYpe:%{public}s", productType.c_str());
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
@@ -811,9 +792,8 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         axisValue = axisValue * speedAdjustCoef;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t ret =
-        HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
-    if (ret != RET_OK) {
+    if (HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType)) !=
+        RET_OK) {
         MMI_HILOGW("Fail accelerate axis");
         axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
     }

@@ -82,6 +82,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "ability_base:want",
     "ability_runtime:ability_manager",
     "c_utils:utils",

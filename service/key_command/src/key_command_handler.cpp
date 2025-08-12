@@ -18,6 +18,10 @@
 #include "ability_manager_client.h"
 #include "cursor_drawing_component.h"
 #include "device_event_monitor.h"
+#include "bundle_name_parser.h"
+#include "product_type_parser.h"
+#include "json_parser.h"
+#include "product_name_definition.h"
 #include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
 #include "input_screen_capture_agent.h"
@@ -59,20 +63,10 @@ constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
 constexpr int64_t SCREEN_TIME_OUT { 100 };
-const char* AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
-const char* SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const char* SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const char* SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const char* SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
-const char* WALLET_BUNDLE_NAME { "com.hmos.wallet" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int64_t POWER_ACTION_INTERVAL { 600 };
 constexpr int64_t SOS_WAIT_TIME { 3000 };
-const char* PC_PRO_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const char* PC_PRO_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
-const char* PC_PRO_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const char* PC_PRO_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 const char* KEY_ENABLE { "enable" };
 const char* KEY_STATUS { "status" };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
@@ -84,7 +78,6 @@ constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
 constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-const std::string DEVICE_TYPE_HPR { "HPR" };
 struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
 std::atomic<int32_t> g_distance { 0 };
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
@@ -200,7 +193,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
     InitializeLongPressConfigurations();
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
-            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
             }
             break;
@@ -212,7 +205,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         case PointerEvent::POINTER_ACTION_MOVE: {
             HandlePointerActionMoveEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
-            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
             }
             break;
@@ -264,7 +257,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             if (CheckBundleName(touchEvent)) {
                 LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
-            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
             break;
@@ -307,7 +300,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
     if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-        MMI_HILOGI("Finger movement distance greater than 20VP, defaultDistance:%{public}d, moveDistance:%{public}f",
+        MMI_HILOGD("Finger movement distance greater than 20VP, defaultDistance:%{public}d, moveDistance:%{public}f",
             ConvertVPToPX(TOUCH_MAX_THRESHOLD), moveDistance);
         StopTwoFingerGesture();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -327,7 +320,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
-            if (PRODUCT_TYPE == DEVICE_TYPE_HPR) {
+            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
             }
             break;
@@ -499,7 +492,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
             BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
             LaunchAbility(knuckleGesture.ability, NO_DELAY);
             BytraceAdapter::StopLaunchAbility();
-            if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
+            if (knuckleGesture.ability.bundleName == BUNDLE_NAME_PARSER.GetBundleName("SCREENRECORDER_BUNDLE_NAME")) {
                 DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
             }
             ReportKnuckleScreenCapture(touchEvent);
@@ -904,7 +897,7 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
     ability.abilityType = EXTENSION_ABILITY;
     if (type == NotifyType::REGIONGESTURE) {
         ability.abilityName = WAKEUP_ABILITY_NAME;
-        ability.bundleName = AIBASE_BUNDLE_NAME;
+        ability.bundleName = BUNDLE_NAME_PARSER.GetBundleName("AIBASE_BUNDLE_NAME");
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
         MMI_HILOGI("The isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
         if (!isStartBase_) {
@@ -916,8 +909,8 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
         }
         ability.params.emplace(std::make_pair("session_id", sessionKey_));
     } else if (type == NotifyType::LETTERGESTURE) {
-        ability.abilityName = SCREENSHOT_ABILITY_NAME;
-        ability.bundleName = SCREENSHOT_BUNDLE_NAME;
+        ability.abilityName = BUNDLE_NAME_PARSER.GetBundleName("SCREENSHOT_ABILITY_NAME");
+        ability.bundleName = BUNDLE_NAME_PARSER.GetBundleName("SCREENSHOT_BUNDLE_NAME");
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
         ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
     }
@@ -1054,7 +1047,7 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
         if (item.delay > tempDelay) {
             tempDelay = item.delay;
         }
-        if (item.ability.bundleName == WALLET_BUNDLE_NAME) {
+        if (item.ability.bundleName == BUNDLE_NAME_PARSER.GetBundleName("WALLET_BUNDLE_NAME")) {
             walletLaunchDelayTimes_ = item.delay;
         }
     }
@@ -1671,7 +1664,7 @@ bool KeyCommandHandler::IsMusicActivate()
 
 void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
 {
-    if (item.ability.bundleName == SOS_BUNDLE_NAME) {
+    if (item.ability.bundleName == BUNDLE_NAME_PARSER.GetBundleName("SOS_BUNDLE_NAME")) {
         if (downActionTime_ - lastDownActionTime_ < item.delay) {
             repeatKeyCountMap_[item.ability.bundleName]++;
         }
@@ -1706,7 +1699,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
     if (it == repeatKeyCountMap_.end()) {
         lastDownActionTime_ = downActionTime_;
-        if (item.ability.bundleName != SOS_BUNDLE_NAME ||
+        if (item.ability.bundleName != BUNDLE_NAME_PARSER.GetBundleName("SOS_BUNDLE_NAME") ||
             downActionTime_ - lastVolumeDownActionTime_ > SOS_INTERVAL_TIMES) {
             repeatKeyCountMap_.emplace(item.ability.bundleName, 1);
             powerKeyLogger();
@@ -2569,7 +2562,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }
-        if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
+        if (err == ERR_OK && ability.bundleName == BUNDLE_NAME_PARSER.GetBundleName("SOS_BUNDLE_NAME")) {
             if (isDownStart_) {
                 isDownStart_ = false;
             }
@@ -2864,13 +2857,15 @@ bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEven
             screenCapturePermission_);
     }
     if (actionType == KNUCKLE_1F_DOUBLE_CLICK && HasScreenCapturePermission(TOUCHPAD_KNUCKLE_SCREENSHOT)) {
-        TouchPadKnuckleDoubleClickProcess(
-            PC_PRO_SCREENSHOT_BUNDLE_NAME, PC_PRO_SCREENSHOT_ABILITY_NAME, "single_knuckle");
+        auto bundleName = BUNDLE_NAME_PARSER.GetBundleName("PC_PRO_SCREENSHOT_BUNDLE_NAME");
+        auto abilityName = BUNDLE_NAME_PARSER.GetBundleName("PC_PRO_SCREENSHOT_ABILITY_NAME");
+        TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, "single_knuckle");
         return true;
     }
     if (actionType == KNUCKLE_2F_DOUBLE_CLICK && HasScreenCapturePermission(TOUCHPAD_KNUCKLE_SCREEN_RECORDING)) {
-        TouchPadKnuckleDoubleClickProcess(
-            PC_PRO_SCREENRECORDER_BUNDLE_NAME, PC_PRO_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
+        auto bundleName = BUNDLE_NAME_PARSER.GetBundleName("PC_PRO_SCREENRECORDER_BUNDLE_NAME");
+        auto abilityName = BUNDLE_NAME_PARSER.GetBundleName("PC_PRO_SCREENRECORDER_ABILITY_NAME");
+        TouchPadKnuckleDoubleClickProcess(bundleName, abilityName, "double_knuckle");
         return true;
     }
     return false;
@@ -2954,7 +2949,7 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
         return false;
     }
     if (appWhiteList_.find(bundleName) == appWhiteList_.end()) {
-        MMI_HILOGD("The app does not support long-press drag., bundle name:%{public}s", bundleName.c_str());
+        MMI_HILOGD("%{public}s not support long-press drag", bundleName.c_str());
         return false;
     }
     return true;
