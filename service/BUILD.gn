@@ -3625,7 +3625,7 @@ ohos_unittest("ProductTypeParserTest") {
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/close_source_parser/include",
+    "${mmi_path}/service/custom_config_parser/include",
     "${mmi_service_path}/window_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/product_property_config/include",
@@ -3650,8 +3650,8 @@ ohos_unittest("ProductTypeParserTest") {
   cflags_cc = [ "-Wno-string-conversion" ]
 
   sources = [
-    "close_source_parser/test/product_type_parser_test.cpp",
-    "close_source_parser/test/product_type_parser_mock.cpp",
+    "custom_config_parser/test/product_type_parser_test.cpp",
+    "custom_config_parser/test/product_type_parser_mock.cpp",
   ]
 
   deps = [
@@ -3681,7 +3681,7 @@ ohos_unittest("SpecialInputDeviceParserTest") {
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/close_source_parser/include",
+    "${mmi_path}/service/custom_config_parser/include",
     "${mmi_service_path}/window_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/product_property_config/include",
@@ -3706,8 +3706,8 @@ ohos_unittest("SpecialInputDeviceParserTest") {
   cflags_cc = [ "-Wno-string-conversion" ]
 
   sources = [
-    "close_source_parser/test/special_input_device_parser_test.cpp",
-    "close_source_parser/test/special_input_device_parser_mock.cpp",
+    "custom_config_parser/test/special_input_device_parser_test.cpp",
+    "custom_config_parser/test/special_input_device_parser_mock.cpp",
   ]
 
   deps = [
