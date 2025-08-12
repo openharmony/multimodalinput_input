@@ -1887,7 +1887,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_0
     device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     inputDeviceManager.virtualInputDevices_[deviceId] = device;
     EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId, keyboardType), RET_OK);
-    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_DIGITALKEYBOARD);
+    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_ALPHABETICKEYBOARD);
 }
  
 /**
@@ -1912,11 +1912,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_0
     device2->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     inputDeviceManager.virtualInputDevices_[deviceId2] = device2;
     EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId, keyboardType), RET_OK);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_EQ(keyboardType, KEYBOARD_TYPE_ALPHABETICKEYBOARD);
-#else // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_DIGITALKEYBOARD);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
  
     EXPECT_EQ(inputDeviceManager.GetVirtualKeyboardType(deviceId2, keyboardType2), RET_OK);
     EXPECT_EQ(keyboardType2, KEYBOARD_TYPE_NONE);
