@@ -83,6 +83,7 @@ ohos_unittest("FingersenseWrapperTest") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
