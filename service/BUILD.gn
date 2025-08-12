@@ -3619,6 +3619,118 @@ ohos_unittest("KnuckleDrawingTest") {
   }
 }
 
+ohos_unittest("ProductTypeParserTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/close_source_parser/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/timer_manager/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
+
+  sources = [
+    "close_source_parser/test/product_type_parser_test.cpp",
+    "close_source_parser/test/product_type_parser_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
+  ]
+}
+
+ohos_unittest("SpecialInputDeviceParserTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/close_source_parser/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/timer_manager/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
+
+  sources = [
+    "close_source_parser/test/special_input_device_parser_test.cpp",
+    "close_source_parser/test/special_input_device_parser_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "window_manager:libdm_lite",
+  ]
+}
+
 group("mmi-service-tests") {
   testonly = true
   deps = [ "libinput_adapter/test" ]
