@@ -18,6 +18,7 @@
 
 #include "singleton.h"
 
+#include "json_parser.h"
 #include "long_press_event.h"
 #include "pointer_event.h"
 #include "uds_server.h"

@@ -172,6 +172,7 @@ ohos_unittest("GestureTransformTest") {
   deps = [
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
   ]
 
   external_deps = [
@@ -339,6 +340,7 @@ ohos_unittest("TabletToolTranformTest") {
   deps = [
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
   ]
 
   external_deps = [
@@ -542,6 +544,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
   ]
 
   external_deps = [

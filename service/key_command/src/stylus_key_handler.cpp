@@ -16,6 +16,7 @@
 #include "stylus_key_handler.h"
 
 #include "ability_manager_client.h"
+#include "bundle_name_parser.h"
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
@@ -28,9 +29,7 @@
 namespace OHOS {
 namespace MMI {
 const char* SHORTHAND_ABILITY_NAME { "HiNotePcMainAbility" };
-const char* SHORTHAND_BUNDLE_NAME { "com.hmos.hinote" };
 const char* MEMORANDUM_ABILITY_NAME { "QuickNoteAbility" };
-const char* MEMORANDUM_BUNDLE_NAME { "com.hmos.notepad" };
 const char* IS_SCREEN_OFF { "is_sceen_off" };
 const char* SHORTHAND_SWITCH { "shorthand_switch_state" };
 const char* SHORTHAND_TARGET { "shorthand_target" };
@@ -102,11 +101,11 @@ void StylusKeyHandler::IsLaunchAbility()
     if (stylusKey_.statusConfigValue && stylusKey_.lastEventIsStylus) {
         if (shortHandTarget_.statusConfigValue) {
             stylusKey_.ability.abilityName = SHORTHAND_ABILITY_NAME;
-            stylusKey_.ability.bundleName = SHORTHAND_BUNDLE_NAME;
+            stylusKey_.ability.bundleName = BUNDLE_NAME_PARSER.GetBundleName("SHORTHAND_BUNDLE_NAME");
             stylusKey_.ability.params.emplace(IS_SCREEN_OFF, "true");
         } else {
             stylusKey_.ability.abilityName = MEMORANDUM_ABILITY_NAME;
-            stylusKey_.ability.bundleName = MEMORANDUM_BUNDLE_NAME;
+            stylusKey_.ability.bundleName = BUNDLE_NAME_PARSER.GetBundleName("MEMORANDUM_BUNDLE_NAME");
         }
         LaunchAbility(stylusKey_.ability);
         stylusKey_.lastEventIsStylus = false;

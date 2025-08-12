@@ -278,7 +278,6 @@ private:
     int32_t GetDisplayMaxSize();
     int32_t GetWindowMaxSize(int32_t maxAreasCount);
     std::vector<std::string> StringSplit(const std::string &str, char delim);
-    bool IsGRLOrHopper();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();

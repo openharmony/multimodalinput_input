@@ -636,7 +636,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d", pointerEvent->GetId(), pointerEvent->GetButtonId());
         } else {
-            MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
+            MMI_HILOG_FREEZEI("recv");
         }
     }
     if (client->IsEventHandlerChanged()) {
@@ -872,28 +872,6 @@ std::vector<std::string> InputManagerImpl::StringSplit(const std::string &str, c
         elems.push_back(str.substr(previous));
     }
     return elems;
-}
-
-bool InputManagerImpl::IsGRLOrHopper()
-{
-    std::regex reg("^([0-9],){3}[0-9]{1}$");
-    if (!std::regex_match(g_foldScreenType, reg)) {
-        MMI_HILOGE("invalid params g_foldScreenType:%s", g_foldScreenType.c_str());
-        return false;
-    }
-    std::vector<std::string> foldTypes = StringSplit(g_foldScreenType, ',');
-    if (foldTypes.empty()) {
-        return false;
-    }
-    std::string deviceType = foldTypes[0];
-    std::string grlType = "6";
-    std::string hprType = "5";
-    MMI_HILOGD("deviceType:%s", deviceType.c_str());
-    if (deviceType == grlType || deviceType == hprType) {
-        MMI_HILOGD("device is grl or hopper");
-        return true;
-    }
-    return false;
 }
 
 void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)

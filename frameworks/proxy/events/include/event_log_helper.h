@@ -124,7 +124,6 @@ private:
 
     static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh)
     {
-        PrintInfoDict();
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
@@ -196,7 +195,6 @@ private:
             return;
         }
         PrintDebugDict();
-        PrintInfoDict();
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
         if (!IsBetaVersion()) {
@@ -270,7 +268,6 @@ private:
             event->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
             return;
         }
-        PrintInfoDict();
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         MMI_HILOGD("See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
@@ -292,24 +289,15 @@ private:
                     pointerId, item.IsPressed(), item.GetPressure(), item.GetMoveFlag(), item.GetTargetWindowId(),
                     item.GetOriginPointerId(), isSimulate.c_str(), item.GetTwist());
             } else {
-                if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d,"
-                        "P:%{public}.2f, MF:%{public}d, LA:%{public}d, SA:%{public}d, WI:%{public}d, "
-                        "DXP:%f, DYP:%f, WXP:%f, WYP:%f, OPI:%{public}d, T:%{public}d",
-                        pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                        item.GetPressure(), item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(),
-                        item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(),
-                        item.GetWindowYPos(), item.GetOriginPointerId(), item.GetTwist());
-                } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, "
-                        "DX:%{private}d, DY:%{private}d, P:%{public}.2f, MF:%{public}d, LA:%{public}d, SA:%{public}d, "
-                        "WI:%{public}d, DXP:%{private}f, DYP:%{private}f, WXP:%{private}f, WYP:%{private}f, "
-                        "OPI:%{public}d, SI:%{public}s, T:%{public}d",
-                        pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                        item.GetPressure(), item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(),
-                        item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(),
-                        item.GetWindowYPos(), item.GetOriginPointerId(), isSimulate.c_str(), item.GetTwist());
-                }
+                MMI_HILOG_HEADER(LOG_DEBUG, lh,"DX:%{private}d, DY:%{private}d, DXP:%{private}f, DYP:%{private}f,"
+                    "WXP:%{private}f, WYP:%{private}f, IP:%{public}d, P:%{public}.2f, MF:%{public}d,"
+                    "LA:%{public}d, SA:%{public}d, SI:%{public}s",
+                    item.GetDisplayX(), item.GetDisplayY(), item.GetDisplayXPos(), item.GetDisplayYPos(),
+                    item.GetWindowXPos(), item.GetWindowYPos(), item.IsPressed(), item.GetPressure(),
+                    item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(), isSimulate.c_str());
+                MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}d|%{public}d|%{public}d|%{public}d|%{public}" PRId64,
+                    pointerId, item.GetTargetWindowId(), item.GetOriginPointerId(),
+                    item.GetTwist(), item.GetDownTime());
             }
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();

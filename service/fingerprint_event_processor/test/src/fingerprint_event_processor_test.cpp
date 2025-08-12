@@ -21,6 +21,7 @@
 #include "fingerprint_event_processor.h"
 #include "input_event_handler.h"
 #include "libinput_mock.h"
+#include "special_input_device_parser.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -31,6 +32,7 @@ namespace MMI {
 namespace {
 using namespace testing;
 using namespace testing::ext;
+const std::string FINGERPRINT_MOUSE { SPECIAL_INPUT_DEVICE_PARSER.GetInputDevName("FINGER_PRINT_MOUSE")} ;
 }
 class FingerprintEventProcessorTest : public testing::Test {
 public:
@@ -69,7 +71,7 @@ HWTEST_F(FingerprintEventProcessorTest,
         .WillRepeatedly(Return(&device));
     EXPECT_CALL(mock, DeviceGetName)
         .WillOnce(Return(const_cast<char*>("not_fingerprint_source_key")))
-        .WillOnce(Return(const_cast<char*>("hw_fingerprint_mouse")));
+        .WillOnce(Return(const_cast<char*>(FINGERPRINT_MOUSE.c_str())));
     EXPECT_FALSE(FingerprintEventHdr->IsFingerprintEvent(&event));
     EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
 }
@@ -172,7 +174,7 @@ HWTEST_F(FingerprintEventProcessorTest,
     EXPECT_CALL(mock, GetDevice)
         .WillOnce(Return(&device));
     EXPECT_CALL(mock, DeviceGetName)
-        .WillOnce(Return(const_cast<char*>("hw_fingerprint_mouse")));
+        .WillOnce(Return(const_cast<char*>(FINGERPRINT_MOUSE.c_str())));
     EXPECT_CALL(mock, LibinputGetPointerEvent)
         .WillOnce(Return(&rawPointerEvent));
     EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);

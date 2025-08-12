@@ -42,6 +42,9 @@ ohos_unittest("PreferencesManagerTestWithMock") {
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/util/json_parser/include",
   ]
 
   sources = [
@@ -51,9 +54,11 @@ ohos_unittest("PreferencesManagerTestWithMock") {
 
   deps = [
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",

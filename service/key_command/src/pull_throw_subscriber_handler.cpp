@@ -24,6 +24,7 @@
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "json_parser.h"
 #include "key_command_handler.h"
 #include "key_command_handler_util.h"
 #include "net_packet.h"
