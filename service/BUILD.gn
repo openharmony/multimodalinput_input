@@ -268,6 +268,9 @@ ohos_shared_library("libcursor_drawing_adapter") {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
+  if (is_emulator) {
+    defines += [ "OHOS_BUILD_EMULATOR" ]
+  }
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
