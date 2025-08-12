@@ -18,6 +18,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
 #include "mmi_log.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #undef LOG_TAG
 #define LOG_TAG "EnableHardwareCursorStatsFuzzTest"
@@ -26,31 +27,24 @@ namespace OHOS {
 namespace MMI {
 namespace OHOS {
 
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
 
-bool EnableHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
+bool EnableHardwareCursorStatsFuzzTest(FuzzedDataProvider &provider)
 {
-    if (data == nullptr || size < sizeof(uint8_t)) {
-        return false;
-    }
-
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         return false;
     }
-
-    bool enable = (data[0] % 2) != 0;
+    bool enable = provider.ConsumeBool();
     if (!datas.WriteBool(enable)) {
         return false;
     }
-
     if (!datas.RewindRead(0)) {
         return false;
     }
 
     MessageParcel reply;
     MessageOption option;
-
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_ENABLE_HARDWARE_CURSOR_STATS),
@@ -58,17 +52,17 @@ bool EnableHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
-} // namespace OHOS
-
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
+    if (!data || size == 0) {
         return 0;
     }
-
-    OHOS::EnableHardwareCursorStatsFuzzTest(data, size);
+    FuzzedDataProvider provider(data, size);
+    OHOS::EnableHardwareCursorStatsFuzzTest(provider);
     return 0;
 }
+
+} // namespace OHOS
 } // namespace MMI
 } // namespace OHOS
