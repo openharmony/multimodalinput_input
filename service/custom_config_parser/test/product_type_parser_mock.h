@@ -25,8 +25,8 @@
 namespace OHOS::MMI  {
 class ProductTypeParserInterface  {
 public:
-    ProductTypeParserInterface () = default;
-    virtual ~ProductTypeParserInterface () = default;
+    ProductTypeParserInterface() = default;
+    virtual ~ProductTypeParserInterface() = default;
     virtual std::string ReadJsonFile(const std::string &filePath) = 0;
 };
 
