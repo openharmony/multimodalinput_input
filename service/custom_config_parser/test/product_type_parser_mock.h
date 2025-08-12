@@ -36,13 +36,12 @@ public:
     {
         return mock.load();
     }
-
     ProductTypeParserMock();
     ~ProductTypeParserMock() override;
     MOCK_METHOD(std::string, ReadJsonFile, (const std::string &filePath));
+
 private:
     static inline std::atomic<ProductTypeParserMock *> mock = nullptr;
-
 };
 } // namespace OHOS::MMI
-#endif
+#endif // define MESSAGE_PARCEL_MOCK_H
