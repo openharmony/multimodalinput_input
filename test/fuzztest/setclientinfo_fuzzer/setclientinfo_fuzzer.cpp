@@ -39,7 +39,6 @@ bool SetClientInfoFuzzTest(FuzzedDataProvider &provider)
 
     const int32_t pid = provider.ConsumeIntegral<int32_t>();
     const uint64_t readThreadId = provider.ConsumeIntegral<uint64_t>();
-
     if (!datas.WriteInt32(pid) || !datas.WriteUint64(readThreadId) || !datas.RewindRead(0)) {
         return false;
     }
