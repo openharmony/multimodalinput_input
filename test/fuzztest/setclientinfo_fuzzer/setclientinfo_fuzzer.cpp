@@ -25,34 +25,29 @@
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
 
-const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
+namespace {
+const std::u16string kInterfaceToken{ u"ohos.multimodalinput.IConnectManager" };
+} // namespace
 
 bool SetClientInfoFuzzTest(FuzzedDataProvider &provider)
 {
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+    if (!datas.WriteInterfaceToken(kInterfaceToken)) {
         return false;
     }
 
-    int32_t pid = provider.ConsumeIntegral<int32_t>();
-    uint64_t readThreadId = provider.ConsumeIntegral<uint64_t>();
+    const int32_t pid = provider.ConsumeIntegral<int32_t>();
+    const uint64_t readThreadId = provider.ConsumeIntegral<uint64_t>();
 
-    if (!datas.WriteInt32(pid)) {
-        return false;
-    }
-    if (!datas.WriteUint64(readThreadId)) {
-        return false;
-    }
-    if (!datas.RewindRead(0)) {
+    if (!datas.WriteInt32(pid) || !datas.WriteUint64(readThreadId) || !datas.RewindRead(0)) {
         return false;
     }
 
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-    MMIService::GetInstance()->OnRemoteRequest(
+    (void)MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_CLIENT_INFO),
         datas, reply, option);
     return true;
@@ -65,10 +60,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
     FuzzedDataProvider provider(data, size);
-    OHOS::SetClientInfoFuzzTest(provider);
+    (void)OHOS::MMI::SetClientInfoFuzzTest(provider);
     return 0;
 }
 
-} // namespace OHOS
 } // namespace MMI
 } // namespace OHOS

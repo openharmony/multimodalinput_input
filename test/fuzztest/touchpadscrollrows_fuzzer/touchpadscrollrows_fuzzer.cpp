@@ -25,11 +25,9 @@
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-
-const std::u16string FORMMGR_INTERFACE_TOKEN{ u"ohos.multimodalinput.IConnectManager" };
 
 namespace {
+const std::u16string kInterfaceToken{ u"ohos.multimodalinput.IConnectManager" };
 constexpr int32_t ROWS_MIN = -1000;
 constexpr int32_t ROWS_MAX =  1000;
 } // namespace
@@ -37,21 +35,19 @@ constexpr int32_t ROWS_MAX =  1000;
 bool SetTouchpadScrollRowsFuzzTest(FuzzedDataProvider &provider)
 {
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+    if (!datas.WriteInterfaceToken(kInterfaceToken)) {
         return false;
     }
-    int32_t rows = provider.ConsumeIntegralInRange<int32_t>(ROWS_MIN, ROWS_MAX);
-    if (!datas.WriteInt32(rows)) {
-        return false;
-    }
-    if (!datas.RewindRead(0)) {
+
+    const int32_t rows = provider.ConsumeIntegralInRange<int32_t>(ROWS_MIN, ROWS_MAX);
+    if (!datas.WriteInt32(rows) || !datas.RewindRead(0)) {
         return false;
     }
 
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-    MMIService::GetInstance()->OnRemoteRequest(
+    (void)MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_TOUCHPAD_SCROLL_ROWS),
         datas, reply, option);
     return true;
@@ -61,17 +57,14 @@ bool GetTouchpadScrollRowsFuzzTest(FuzzedDataProvider &provider)
 {
     (void)provider;
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        return false;
-    }
-    if (!datas.RewindRead(0)) {
+    if (!datas.WriteInterfaceToken(kInterfaceToken) || !datas.RewindRead(0)) {
         return false;
     }
 
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-    MMIService::GetInstance()->OnRemoteRequest(
+    (void)MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_GET_TOUCHPAD_SCROLL_ROWS),
         datas, reply, option);
     return true;
@@ -84,11 +77,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
     FuzzedDataProvider provider(data, size);
-    OHOS::SetTouchpadScrollRowsFuzzTest(provider);
-    OHOS::GetTouchpadScrollRowsFuzzTest(provider);
+    (void)OHOS::MMI::SetTouchpadScrollRowsFuzzTest(provider);
+    (void)OHOS::MMI::GetTouchpadScrollRowsFuzzTest(provider);
     return 0;
 }
 
-} // namespace OHOS
 } // namespace MMI
 } // namespace OHOS
