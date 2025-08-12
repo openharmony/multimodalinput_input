@@ -17,6 +17,7 @@
 
 #include <fstream>
 
+#include "bundle_name_parser.h"
 #include "i_input_windows_manager.h"
 #include "parameters.h"
 
@@ -58,11 +59,6 @@ const std::string NAME_INTERCEPT { "intercept" };
 const std::string NAME_SUBCRIBER { "subcriber" };
 const std::string NAME_FINGERPRINT { "fingerprint" };
 const std::string NAME_STYLUS { "stylus" };
-const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
-const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
-const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string WALLET_BUNDLE_NAME { "com.hmos.walletservice" };
-const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 const std::string NAME_CANCEL { "cancel" };
 const std::string TOUCH_SCREEN_ON { "screen on" };
 static constexpr char WATCH_CROWN_MUTE[] { "WATCH_CROWN_MUTE" };
@@ -1182,15 +1178,15 @@ void DfxHisysevent::ReportKeyEvent(std::string name)
         ReportKeyEventTimes(FINGERPRINT);
     } else if (name == NAME_STYLUS) {
         ReportKeyEventTimes(STYLUS_PEN);
-    } else if (name == AIBASE_BUNDLE_NAME) {
+    } else if (name == BUNDLE_NAME_PARSER.GetBundleName("AIBASE_BUNDLE_NAME")) {
         ReportKeyEventTimes(AIBASE_VOICE);
-    } else if (name == SCREENSHOT_BUNDLE_NAME) {
+    } else if (name == BUNDLE_NAME_PARSER.GetBundleName("SCREENSHOT_BUNDLE_NAME")) {
         ReportKeyEventTimes(SCREEN_SHOT);
-    } else if (name == SCREENRECORDER_BUNDLE_NAME) {
+    } else if (name == BUNDLE_NAME_PARSER.GetBundleName("SCREENRECORDER_BUNDLE_NAME")) {
         ReportKeyEventTimes(SCREEN_RECORDING);
-    } else if (name == WALLET_BUNDLE_NAME) {
+    } else if (name == BUNDLE_NAME_PARSER.GetBundleName("WALLET_BUNDLE_NAME")) {
         ReportKeyEventTimes(OPEN_WALLET);
-    } else if (name == SOS_BUNDLE_NAME) {
+    } else if (name == BUNDLE_NAME_PARSER.GetBundleName("SOS_BUNDLE_NAME")) {
         ReportKeyEventTimes(OPEN_SOS);
     } else if (name == NAME_CANCEL) {
         ReportKeyEventTimes(KEY_EVENT_CANCEL);

@@ -18,6 +18,7 @@
 
 #include "display_manager_lite.h"
 #include "event_log_helper.h"
+#include "json_parser.h"
 #include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
@@ -39,6 +40,8 @@
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent_device.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+#include "product_name_definition.h"
+#include "product_type_parser.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -79,8 +82,7 @@ const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
-const std::string DEVICE_TYPE_HPR { "HPR" };
-const std::string PRODUCT_TYPE_HPR = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string PRODUCT_TYPE_HYM = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
 const std::string PRODUCT_TYPE_PC = "2in1";
@@ -5348,8 +5350,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    isHPR_ = PRODUCT_TYPE_HPR == DEVICE_TYPE_HPR;
-    if (isHPR_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+    isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+    if (isFoldPC_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent);
     }
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,

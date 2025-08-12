@@ -18,6 +18,7 @@
 #include "mmi_log.h"
 #include "param_wrapper.h"
 #include "parameters.h"
+#include "product_name_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -36,13 +37,13 @@ constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t POINTER_COLOR { -1 };
 constexpr int32_t POINTER_SIZE_DEFAULT { 1 };
-constexpr int32_t POINTER_SIZE_HPR { 2 };
+constexpr int32_t POINTER_SIZE_FOLD_PC { 2 };
 
 int32_t GetPointSize()
 {
     const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (PRODUCT_TYPE == "HPR") {
-        return POINTER_SIZE_HPR;
+    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+        return POINTER_SIZE_FOLD_PC;
     }
     return POINTER_SIZE_DEFAULT;
 }

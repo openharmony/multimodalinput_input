@@ -250,7 +250,10 @@ ohos_unittest("MouseEventNormalizeEXTest") {
 ohos_unittest("MouseTransformProcessorEXTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "src/test" ]
+  include_dirs = [
+    "src/test",
+    "${mmi_path}/util/json_parser/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -286,6 +289,7 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "googletest:gmock_main",
     "hilog:libhilog",
     "hilog:libhilog_base",

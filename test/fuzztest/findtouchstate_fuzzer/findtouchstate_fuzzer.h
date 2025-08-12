@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ISREMOTEINPUTDEVICE_FUZZER
-#define ISREMOTEINPUTDEVICE_FUZZER
+#ifndef FINDTOUCHSTATE_FUZZER
+#define FINDTOUCHSTATE_FUZZER
 
-#define FUZZ_PROJECT_NAME "isremoteinputdevice_fuzzer"
+#define FUZZ_PROJECT_NAME "findtouchstate_fuzzer"
 
-#endif // ISREMOTEINPUTDEVICE_FUZZER
+#endif // FINDTOUCHSTATE_FUZZER
