@@ -21,6 +21,7 @@ group("test") {
     "addgesturemonitor_fuzzer:fuzztest",
     "addinputeventfilter_fuzzer:fuzztest",
     "addinterceptor_fuzzer:fuzztest",
+    "addsample_fuzzer:fuzztest",
     "appendextradata_fuzzer:fuzztest",
     "authorize_fuzzer:fuzztest",
     "axisevent_fuzzer:fuzztest",
@@ -29,6 +30,7 @@ group("test") {
     "displayeventmonitor_fuzzer:fuzztest",
     "enablecombinekey_fuzzer:fuzztest",
     "enableinputdevice_fuzzer:fuzztest",
+    "findtouchstate_fuzzer:fuzztest",
     "functionkeystate_fuzzer:fuzztest",
     "getallnapstatusdata_fuzzer:fuzztest",
     "getallsystemhotkeys_fuzzer:fuzztest",
@@ -55,6 +57,7 @@ group("test") {
     "gettouchpadscrollswitch_fuzzer:fuzztest",
     "gettprightclicktype_fuzzer:fuzztest",
     "getwindowpid_fuzzer:fuzztest",
+    "initializeinputevent_fuzzer:fuzztest",
     "hasiremitter_fuzzer:fuzztest",
     "initcommoneventsubscriber_fuzzer:fuzztest",
     "injectevent_fuzzer:fuzztest",
@@ -170,6 +173,7 @@ group("test") {
     "subscribekeyevent_fuzzer:fuzztest",
     "subscribeswitchevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
+    "transformsamplewindowxy_fuzzer:fuzztest",
     "touchpaddoubletapanddragstate_fuzzer:fuzztest",
     "touchpadpinchswitch_fuzzer:fuzztest",
     "touchpadpointerspeed_fuzzer:fuzztest",
@@ -183,5 +187,7 @@ group("test") {
     "transmitinfrared_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
+    "updatepointerevent_fuzzer:fuzztest",
+    "updatetouchstate_fuzzer:fuzztest"
   ]
 }
