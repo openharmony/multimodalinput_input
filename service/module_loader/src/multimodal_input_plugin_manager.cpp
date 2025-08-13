@@ -167,7 +167,9 @@ void InputPluginManager::PluginAssignmentCallBack(
         return;
     }
     for (auto &plugin : it->second) {
-        plugin->keyEventCallback_ = callback;
+        if (plugin != nullptr) {
+            plugin->keyEventCallback_ = callback;
+        }
     }
 }
 
