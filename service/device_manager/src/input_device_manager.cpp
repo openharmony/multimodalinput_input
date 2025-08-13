@@ -1251,12 +1251,7 @@ int32_t InputDeviceManager::GetVirtualKeyboardType(int32_t deviceId, int32_t &ke
             keyboardType = KEYBOARD_TYPE_NONE;
             return RET_OK;
         }
-        keyboardType = KEYBOARD_TYPE_DIGITALKEYBOARD;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        if (HasVirtualPointerDevice()) {
-            keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
-        }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+        keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
         MMI_HILOGI("Virtual device with id:%{public}d, type:%{public}d", deviceId, keyboardType);
         return RET_OK;
     }

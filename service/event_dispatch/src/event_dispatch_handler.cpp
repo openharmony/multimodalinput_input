@@ -37,6 +37,8 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
+const std::string CURRENT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_TABLET = "tablet";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -45,6 +47,9 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
+    if (CURRENT_DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
+        AddFlagToEsc(keyEvent);
+    }
     DispatchKeyEventPid(*udsServer, keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -147,6 +152,31 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
         }
     }
     return false;
+}
+
+void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    MMI_HILOGD("add Flag to ESC in: %{public}s", keyEvent->ToString().c_str());
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_ESCAPE) {
+        return;
+    }
+    if (!escToBackFlag_ && keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE)) {
+        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    }
+
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        escToBackFlag_ = true;
+        return;
+    }
+
+    if (escToBackFlag_ && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP ||
+        keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) &&
+        keyEvent->GetKeyItems().size() == 1) {
+        MMI_HILOGI("Only esc up or cancel has added flag: %{public}s", keyEvent->ToString().c_str());
+        keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+        escToBackFlag_ = false;
+    }
 }
 
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
