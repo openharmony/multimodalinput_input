@@ -5377,7 +5377,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 "AX:%{private}d,AY:%{private}d,flags:%{public}d,",
                 pointerEvent->DumpPointerAction(), logicalX, logicalY, physicalX, physicalY,
                 windowX, windowY, touchWindow->area.x, touchWindow->area.y, touchWindow->flags);
-            MMI_HILOG_FREEZEI("%{public}d|%{public}d|%{public}d|%{public}d|%{public}d"
+            MMI_HILOG_FREEZEI("%{public}d|%{public}d|%{public}d|%{public}d|%{public}d|"
                 "%{public}d|%{public}d|%{public}1f",
                 touchWindow->pid, touchWindow->id, focusWindowId,
                 touchWindow->area.width, touchWindow->area.height, displayId,
