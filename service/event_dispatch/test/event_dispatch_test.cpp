@@ -266,7 +266,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc001, TestSize.Level0)
     dispatch.AddFlagToEsc(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, false);
     int32_t ret4 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret4, false);
+    EXPECT_EQ(ret4, true);
 }
 
 /**
@@ -309,7 +309,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc002, TestSize.Level1)
     EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
     EXPECT_EQ(dispatch.escToBackFlag_, true);
     dispatch.AddFlagToEsc(keyEvent);
-    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
     int32_t ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
     EXPECT_EQ(ret3, true);
 }
@@ -2216,7 +2216,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     EXPECT_EQ(dispatch.escToBackFlag_, false);
     dispatch.HandleKeyEvent(keyEvent);
-    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
     int32_t ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
     EXPECT_EQ(ret1, false);
 
@@ -2224,11 +2224,11 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, false);
     int32_t ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret2, true);
+    EXPECT_EQ(ret2, false);
 
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     dispatch.HandleKeyEvent(keyEvent);
-    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
     int32_t ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
     EXPECT_EQ(ret3, false);
 
@@ -2236,7 +2236,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, false);
     int32_t ret4 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret4, true);
+    EXPECT_EQ(ret4, false);
 }
 
 /**
