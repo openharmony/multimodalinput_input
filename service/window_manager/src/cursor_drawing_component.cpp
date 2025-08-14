@@ -71,13 +71,15 @@ CursorDrawingComponent::~CursorDrawingComponent()
 
 void CursorDrawingComponent::Load()
 {
-    std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
-    if (isLoaded_ && (soHandle_ != nullptr)) {
-        return;
-    }
+    {
+        std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
+        if (isLoaded_ && (soHandle_ != nullptr)) {
+            return;
+        }
 
-    if (!LoadLibrary()) {
-        return;
+        if (!LoadLibrary()) {
+            return;
+        }
     }
 
     if (timerId_ > 0) {
