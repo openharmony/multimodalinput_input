@@ -51,6 +51,7 @@ void RemoteControlTransformProcessorTestWithMock::SetUp()
 
 void RemoteControlTransformProcessorTestWithMock::TearDown()
 {
+    WIN_MGR_MOCK->ReleaseInstance();
 }
 
 /**

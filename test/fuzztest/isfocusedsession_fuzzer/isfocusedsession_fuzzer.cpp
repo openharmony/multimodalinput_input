@@ -18,6 +18,7 @@
 #include "libinput.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -31,9 +32,10 @@ void IsFocusedSessionFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     MMI_HILOGD("IsFocusedSessionFuzzTest");
-    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    int32_t session = size;
-    inputWindowsManager->IsFocusedSession(session);
+    InputWindowsManager manager;
+    FuzzedDataProvider provider(data, size);
+    int32_t session = provider.ConsumeIntegral<int32_t>();
+    manager.IsFocusedSession(session);
 }
 } // MMI
 } // OHOS

@@ -1063,10 +1063,12 @@ ohos_unittest("InputDeviceConsumerHandlerTest") {
 ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
   module_out_path = module_output_path
 
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
+    blocklist = "./../../ipc_blocklist.txt"
   }
 
   defines = input_default_defines

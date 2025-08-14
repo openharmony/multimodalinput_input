@@ -13,34 +13,26 @@
  * limitations under the License.
  */
 
-#include "handlewindowinputtype_fuzzer.h"
+#include "getmouseiscapturemode_fuzzer.h"
 
 #include "libinput.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
-#include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "HandleWindowInputTypeFuzzTest"
+#define MMI_LOG_TAG "GetMouseIsCaptureModeFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-void HandleWindowInputTypeFuzzTest(const uint8_t* data, size_t size)
+void GetMouseIsCaptureModeFuzzTest(const uint8_t* data, size_t /* size */)
 {
     if (data == nullptr) {
         return;
     }
-    MMI_HILOGD("HandleWindowInputTypeFuzzTest");
-    FuzzedDataProvider provider(data, size);
+    MMI_HILOGD("GetMouseIsCaptureModeFuzzTest");
     InputWindowsManager manager;
-    WindowInfo window;
-    window.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    int32_t pointerId = provider.ConsumeIntegral<int32_t>();
-    pointerEvent->SetPointerId(pointerId);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    manager.HandleWindowInputType(window, pointerEvent);
+    manager.GetMouseIsCaptureMode();
 }
 } // MMI
 } // OHOS
@@ -54,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::MMI::HandleWindowInputTypeFuzzTest(data, size);
+    OHOS::MMI::GetMouseIsCaptureModeFuzzTest(data, size);
     return 0;
 }
 
