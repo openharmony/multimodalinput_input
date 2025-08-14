@@ -1573,6 +1573,49 @@ bool InputWindowsManager::IsCaptureMode()
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+bool InputWindowsManager::IsMouseDragging() const
+{
+    return (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE));
+}
+
+void InputWindowsManager::EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event)
+{
+    CHKPV(event);
+    if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        return;
+    }
+    if (IsMouseDragging()) {
+        return;
+    }
+    if (!event->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        return;
+    }
+    if ((event->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
+        (mouseDownInfo_.id >= 0) &&
+        (mouseDownInfo_.id != event->GetTargetWindowId())) {
+        MMI_HILOGD("Target window shift from %{private}d to %{private}d at button-up",
+            mouseDownInfo_.id, event->GetTargetWindowId());
+        event->SetTargetDisplayId(mouseDownInfo_.displayId);
+        event->SetTargetWindowId(mouseDownInfo_.id);
+        event->SetAgentWindowId(mouseDownInfo_.agentWindowId);
+    }
+}
+
+void InputWindowsManager::CleanMouseEventCycle(std::shared_ptr<PointerEvent> event)
+{
+    CHKPV(event);
+    if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        return;
+    }
+    if ((event->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) ||
+        (event->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL)) {
+        InitMouseDownInfo();
+        MMI_HILOGD("Clear button-down record at button-up");
+    }
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     if (lastPointerEventforGesture_ == nullptr) {
@@ -2209,7 +2252,6 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
     auto filter = InputHandler->GetFilterHandler();
     CHKPV(filter);
     filter->HandlePointerEvent(pointerEvent);
-    InitMouseDownInfo();
 }
 
 void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
@@ -4497,7 +4539,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
     }
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
-        InitMouseDownInfo();
         mouseDownEventId_ = -1;
         MMI_HILOGD("Mouse up, clear mouse down info");
     }
