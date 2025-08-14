@@ -42,6 +42,7 @@
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "product_name_definition.h"
 #include "product_type_parser.h"
+#include "bundle_name_parser.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -84,7 +85,6 @@ const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/De
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const std::string PRODUCT_TYPE_HYM = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
 const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
@@ -4676,7 +4676,7 @@ bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<Poin
     if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
         pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
         if (!isOpenPrivacyProtectionserver_) {
-            privacyProtection_.switchName = PRIVACY_SWITCH_NAME;
+            privacyProtection_.switchName = BUNDLE_NAME_PARSER.GetBundleName("PRIVACY_SWITCH_NAME");;
             CreatePrivacyProtectionObserver(privacyProtection_);
             isOpenPrivacyProtectionserver_ = true;
             SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
