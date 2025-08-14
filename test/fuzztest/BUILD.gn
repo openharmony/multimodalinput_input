@@ -22,6 +22,8 @@ group("test") {
     "addinputeventfilter_fuzzer:fuzztest",
     "addinterceptor_fuzzer:fuzztest",
     "addsample_fuzzer:fuzztest",
+    "ancoonehanddata_fuzzer:fuzztest",
+    "ancowindows_fuzzer:fuzztest",
     "appendextradata_fuzzer:fuzztest",
     "authorize_fuzzer:fuzztest",
     "axisevent_fuzzer:fuzztest",
