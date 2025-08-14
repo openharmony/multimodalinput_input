@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef HANDLEWINDOWINPUTTYPE_FUZZER_H
-#define HANDLEWINDOWINPUTTYPE_FUZZER_H
+#ifndef CLEARWINDOWPOINTERSTYLE_FUZZER_H
+#define CLEARWINDOWPOINTERSTYLE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "handlewindowinputtype_fuzzer"
+#define FUZZ_PROJECT_NAME "clearwindowpointerstyle_fuzzer"
 
-#endif // HANDLEWINDOWINPUTTYPE_FUZZER_H
+#endif // CLEARWINDOWPOINTERSTYLE_FUZZER_H

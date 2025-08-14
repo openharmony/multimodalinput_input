@@ -228,6 +228,164 @@ HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_01, TestSize.Level1)
 }
 
 /**
+ * @tc.name: EventDispatchTest_AddFlagToEsc001
+ * @tc.desc: Test AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc001, TestSize.Level0)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
+
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    int32_t ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret1, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    int32_t ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret2, true);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    int32_t ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret3, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    int32_t ret4 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret4, false);
+}
+
+/**
+ * @tc.name: EventDispatchTest_AddFlagToEsc002
+ * @tc.desc: Test AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc002, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(keyEvent, nullptr);
+
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    dispatch.AddFlagToEsc(keyEvent);
+    int32_t ret = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    dispatch.AddFlagToEsc(keyEvent);
+    int32_t ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret1, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    int32_t ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret2, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    dispatch.AddFlagToEsc(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    int32_t ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret3, true);
+}
+
+/**
+ * @tc.name: EventDispatchTest_AddFlagToEsc003
+ * @tc.desc: Test AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc003, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem item1;
+    KeyEvent::KeyItem item2;
+    keyEvent->AddPressedKeyItems(item1);
+    keyEvent->AddPressedKeyItems(item2);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 2);
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
+
+    dispatch.escToBackFlag_ = true;
+    dispatch.AddFlagToEsc(keyEvent);
+    int32_t ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret1, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 2);
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
+
+    dispatch.escToBackFlag_ = true;
+    dispatch.AddFlagToEsc(keyEvent);
+    int32_t ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret2, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+}
+
+/**
+ * @tc.name: EventDispatchTest_AddFlagToEsc004
+ * @tc.desc: Test AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc004, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
+
+    dispatch.escToBackFlag_ = false;
+    dispatch.AddFlagToEsc(keyEvent);
+    int32_t ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret1, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
+
+    dispatch.escToBackFlag_ = false;
+    dispatch.AddFlagToEsc(keyEvent);
+    int32_t ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret2, false);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+}
+
+/**
  * @tc.name: EventDispatchTest_DispatchKeyEventPid_01
  * @tc.desc: Test DispatchKeyEventPid
  * @tc.type: FUNC
@@ -2033,6 +2191,52 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_001, TestSize.Level
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleKeyEvent_002
+ * @tc.desc: Test the function HandleKeyEvent with AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(keyEvent, nullptr);
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    int32_t ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret1, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    int32_t ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret2, true);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    int32_t ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret3, false);
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    int32_t ret4 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    EXPECT_EQ(ret4, true);
 }
 
 /**
