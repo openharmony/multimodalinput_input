@@ -9955,8 +9955,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWi
 
 /**
  * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_004
- * @tc.desc: Test that IsPointInsideSpecialWindow should return true
-    when the window type is guide window, abd the point is within it
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return false
+    when the window name type is xiaoyi voice input window, but the point is not within it
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -9964,29 +9964,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWi
 {
     CALL_TEST_DEBUG;
     WindowInfo testWindow;
-    testWindow.windowType = GUIDE_WINDOW_TYPE;
-    Rect rect = {TEST_WINDOW_START, TEST_WINDOW_START, TEST_WINDOW_END, TEST_WINDOW_END};
-    testWindow.defaultHotAreas.push_back(rect);
-
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
-
-    bool result = manager.IsPointInsideSpecialWindow(0, 0);
-    EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_005
- * @tc.desc: Test that IsPointInsideSpecialWindow should return false
-    when the window zorder is xiaoyi voice input window, but the point is not within it
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowInfo testWindow;
-    testWindow.zOrder = 4000;
+    testWindow.windowNameType = 2;
     testWindow.area.x = TEST_WINDOW_START;
     testWindow.area.y = TEST_WINDOW_START;
     testWindow.area.width = TEST_WINDOW_END;
