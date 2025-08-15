@@ -147,7 +147,7 @@ private:
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
                     event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
             } else {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{private}d,"
+                MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{public}d,"
                     "AT:%{public} " PRId64 " , ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, "
                     "SL:%{public}d, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
                     event->GetId(), event->GetKeyCode(), event->GetActionTime(),
