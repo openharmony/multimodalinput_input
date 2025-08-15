@@ -58,7 +58,9 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
 void EventDispatchHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    EnsureMouseEventCycle(pointerEvent);
     HandlePointerEventInner(pointerEvent);
+    CleanMouseEventCycle(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -559,5 +561,17 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void EventDispatchHandler::EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event)
+{
+    WIN_MGR->EnsureMouseEventCycle(event);
+}
+
+void EventDispatchHandler::CleanMouseEventCycle(std::shared_ptr<PointerEvent> event)
+{
+    WIN_MGR->CleanMouseEventCycle(event);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS

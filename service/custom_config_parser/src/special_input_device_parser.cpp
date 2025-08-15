@@ -187,7 +187,7 @@ int32_t SpecialInputDeviceParser::ParseSpecialInputDevice(const JsonParser &json
             continue;
         }
         std::unique_lock<std::shared_mutex> lock(lock_);
-        specialInputDevices_.insert({ inputDev.inputDevAlias, inputDev.inpuDevName });
+        specialInputDevices_.insert({ inputDev.inputDevAlias, inputDev.inputDevName });
     }
     return RET_OK;
 }
@@ -226,7 +226,7 @@ int32_t SpecialInputDeviceParser::ParseSpecialInputDeviceItem(const cJSON *json,
         MMI_HILOGE("Parse input_device_alias failed");
         return RET_ERR;
     }
-    if (JsonParser::ParseString(json, "input_device_name", specialInputDev.inpuDevName) != RET_OK) {
+    if (JsonParser::ParseString(json, "input_device_name", specialInputDev.inputDevName) != RET_OK) {
         MMI_HILOGE("Parse input_device_name failed");
         return RET_ERR;
     }

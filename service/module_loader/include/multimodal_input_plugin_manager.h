@@ -51,14 +51,17 @@ public:
     int32_t Init(std::shared_ptr<IInputPlugin> pin);
     void UnInit();
     PluginResult HandleEvent(libinput_event *event, int64_t frameTime);
+    PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage);
 
     int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) override;
     int32_t RemoveTimer(int32_t id) override;
     void DispatchEvent(libinput_event *event, int64_t frameTime) override;
+    void DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage) override;
 
     int32_t timerCnt_ = 0;
     int32_t prio_ = 200;
     std::function<void(libinput_event*, int64_t)> callback_;
+    std::function<void(std::shared_ptr<KeyEvent>)> keyEventCallback_;
     UnintPlugin unintPlugin_ = nullptr;
     std::shared_ptr<IInputPlugin> plugin_;
     std::string name_;
@@ -76,9 +79,12 @@ public:
     int32_t Init();
     void Dump(int fd);
     int32_t HandleEvent(libinput_event* event, int64_t frameTime, InputPluginStage stage);
+    int32_t HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage);
     void PluginAssignmentCallBack(std::function<void(libinput_event*, int64_t)> callback, InputPluginStage stage);
+    void PluginAssignmentCallBack(std::function<void(std::shared_ptr<KeyEvent>)> callback, InputPluginStage stage);
     void PrintPlugins();
     int32_t DoHandleEvent(libinput_event *event, int64_t frameTime, InputPlugin *iplugin, InputPluginStage stage);
+    int32_t DoHandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPlugin *iplugin, InputPluginStage stage);
 
 private:
     bool IntermediateEndEvent(libinput_event *event);

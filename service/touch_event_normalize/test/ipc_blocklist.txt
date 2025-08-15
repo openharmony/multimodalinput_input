@@ -15,3 +15,4 @@
 src:*third_party/googletest/googletest/include/*
 src:*gesture_transform_processor_test.cpp
 src:*tablet_tool_tranform_processor_test.cpp
+src:*remote_control_transform_processor_test_with_mock.cpp

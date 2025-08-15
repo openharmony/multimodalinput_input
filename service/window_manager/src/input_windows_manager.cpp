@@ -42,6 +42,7 @@
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
 #include "product_name_definition.h"
 #include "product_type_parser.h"
+#include "bundle_name_parser.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
@@ -84,7 +85,6 @@ const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/De
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const std::string PRODUCT_TYPE_HYM = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRIVACY_SWITCH_NAME {"huaweicast.data.privacy_projection_state"};
 const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 constexpr int32_t REPEAT_COOLING_TIME { 100 };
@@ -1573,6 +1573,49 @@ bool InputWindowsManager::IsCaptureMode()
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+bool InputWindowsManager::IsMouseDragging() const
+{
+    return (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE));
+}
+
+void InputWindowsManager::EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event)
+{
+    CHKPV(event);
+    if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        return;
+    }
+    if (IsMouseDragging()) {
+        return;
+    }
+    if (!event->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        return;
+    }
+    if ((event->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
+        (mouseDownInfo_.id >= 0) &&
+        (mouseDownInfo_.id != event->GetTargetWindowId())) {
+        MMI_HILOGD("Target window shift from %{private}d to %{private}d at button-up",
+            mouseDownInfo_.id, event->GetTargetWindowId());
+        event->SetTargetDisplayId(mouseDownInfo_.displayId);
+        event->SetTargetWindowId(mouseDownInfo_.id);
+        event->SetAgentWindowId(mouseDownInfo_.agentWindowId);
+    }
+}
+
+void InputWindowsManager::CleanMouseEventCycle(std::shared_ptr<PointerEvent> event)
+{
+    CHKPV(event);
+    if (event->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        return;
+    }
+    if ((event->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) ||
+        (event->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL)) {
+        InitMouseDownInfo();
+        MMI_HILOGD("Clear button-down record at button-up");
+    }
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 void InputWindowsManager::CancelTouchScreenEventIfValidDisplayChange(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     if (lastPointerEventforGesture_ == nullptr) {
@@ -2209,7 +2252,6 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
     auto filter = InputHandler->GetFilterHandler();
     CHKPV(filter);
     filter->HandlePointerEvent(pointerEvent);
-    InitMouseDownInfo();
 }
 
 void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
@@ -4497,7 +4539,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
     }
     if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
-        InitMouseDownInfo();
         mouseDownEventId_ = -1;
         MMI_HILOGD("Mouse up, clear mouse down info");
     }
@@ -4635,7 +4676,7 @@ bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<Poin
     if (pointerEvent->GetDeviceId() == CAST_INPUT_DEVICEID ||
         pointerEvent->GetDeviceId() == CAST_SCREEN_DEVICEID) {
         if (!isOpenPrivacyProtectionserver_) {
-            privacyProtection_.switchName = PRIVACY_SWITCH_NAME;
+            privacyProtection_.switchName = BUNDLE_NAME_PARSER.GetBundleName("PRIVACY_SWITCH_NAME");;
             CreatePrivacyProtectionObserver(privacyProtection_);
             isOpenPrivacyProtectionserver_ = true;
             SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
@@ -5377,7 +5418,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 "AX:%{private}d,AY:%{private}d,flags:%{public}d,",
                 pointerEvent->DumpPointerAction(), logicalX, logicalY, physicalX, physicalY,
                 windowX, windowY, touchWindow->area.x, touchWindow->area.y, touchWindow->flags);
-            MMI_HILOG_FREEZEI("%{public}d|%{public}d|%{public}d|%{public}d|%{public}d"
+            MMI_HILOG_FREEZEI("%{public}d|%{public}d|%{public}d|%{public}d|%{public}d|"
                 "%{public}d|%{public}d|%{public}1f",
                 touchWindow->pid, touchWindow->id, focusWindowId,
                 touchWindow->area.width, touchWindow->area.height, displayId,

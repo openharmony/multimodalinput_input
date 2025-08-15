@@ -62,7 +62,7 @@ enum class InputDispatchStage {
 struct IPluginContext {
     virtual int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) = 0;
     virtual int32_t RemoveTimer(int32_t id) = 0;
-    void DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage  stage);
+    virtual void DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage) = 0;
     void DispatchEvent(std::shared_ptr<PointerEvent> pointerEvent, InputDispatchStage stage);
     void DispatchEvent(std::shared_ptr<AxisEvent> AxisEvent, InputDispatchStage stage);
     virtual void DispatchEvent(libinput_event *event, int64_t frameTime) = 0;
