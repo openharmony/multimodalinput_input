@@ -260,7 +260,6 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
         keyboardType = KEYBOARD_TYPE_UNKNOWN;
         MMI_HILOGD("Undefined keyboard type");
     }
-    MMI_HILOGI("Get keyboard type results by supporting keys:%{public}d", keyboardType);
     return RET_OK;
 }
 
@@ -282,7 +281,6 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     }
     if (GetDeviceConfig(deviceId, tempKeyboardType)) {
         keyboardType = tempKeyboardType;
-        MMI_HILOGI("The keyboardType:%{public}d", keyboardType);
         return RET_OK;
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -448,8 +446,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     AddPhysicalInputDeviceInner(deviceId, info);
-    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, info.sysUid:%{public}s, info.enable:%{public}d",
-        deviceId, info.sysUid.c_str(), info.enable);
+    int32_t keyboardType = 0;
+    GetKeyboardType(deviceId, keyboardType);
+    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, "
+        "info.sysUid:%{public}s, info.enable:%{public}d, keyboardType:%{public}d",
+        deviceId, info.sysUid.c_str(), info.enable, keyboardType);
     if (info.enable) {
         NotifyAddDeviceListeners(deviceId);
     }
