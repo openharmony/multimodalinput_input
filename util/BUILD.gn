@@ -120,15 +120,15 @@ ohos_shared_library("libmmi-util") {
   version_script = "libmmi-util-map"
   configs = [ ":libmmi_util_config" ]
   branch_protector_ret = "pac_ret"
-  deps = [ ":mmi_rust_key_config" ]
+  deps = [
+    ":mmi_rust_key_config",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-  ]
-  public_deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   if (security_component_enable) {

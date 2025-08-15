@@ -4706,66 +4706,6 @@ HWTEST_F(MMIServerTest, MMIService_UpdateConsumers_004, TestSize.Level1)
 }
 
 /**
- * @tc.name: MMIService_SetInputDeviceConsumer_001
- * @tc.desc: deviceNames size > MAX_DEVICE_NUM returns RET_ERR
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames(10 + 5, "testDevice");
-    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: MMIService_SetInputDeviceConsumer_002
- * @tc.desc: config parse fails (no config file), returns ERROR_NO_PERMISSION
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames = {"keyboard"};
-    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
-}
-
-/**
- * @tc.name: MMIService_SetInputDeviceConsumer_003
- * @tc.desc: deviceNames empty, FilterConsumers returns empty, returns ERROR_NO_PERMISSION
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames = {};
-    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
-}
-
-/**
- * @tc.name: MMIService_SetInputDeviceConsumer_004
- * @tc.desc: session is null, returns ERROR_NULL_POINTER
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_SetInputDeviceConsumer_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames = {"keyboard"};
-    ErrCode ret = mmiService.SetInputDeviceConsumer(deviceNames);
-    EXPECT_NE(ret, RET_OK);
-}
-
-/**
  * @tc.name: MMIService_ParseDeviceConsumerConfig_001
  * @tc.desc: GetOneCfgFile returns nullptr
  * @tc.type: FUNC
@@ -4777,66 +4717,6 @@ HWTEST_F(MMIServerTest, MMIService_ParseDeviceConsumerConfig_001, TestSize.Level
     MMIService mmiService;
     bool result = mmiService.ParseDeviceConsumerConfig();
     EXPECT_FALSE(result);
-}
-
-/**
- * @tc.name: MMIService_ClearInputDeviceConsumer_001
- * @tc.desc: deviceNames.size > MAX_DEVICE_NUM should return RET_ERR
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames(10 + 10, "device");
-    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: MMIService_ClearInputDeviceConsumer_002
- * @tc.desc: ParseDeviceConsumerConfig returns false, should return ERROR_NO_PERMISSION
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames = {"keyboard"};
-    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
-}
-
-/**
- * @tc.name: MMIService_ClearInputDeviceConsumer_003
- * @tc.desc: FilterConsumers returns empty, should return ERROR_NO_PERMISSION
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames = {};
-    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
-}
-
-/**
- * @tc.name: MMIService_ClearInputDeviceConsumer_004
- * @tc.desc: session not registered, PostSyncTask fails
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_ClearInputDeviceConsumer_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<std::string> deviceNames = {"keyboard"};
-    ErrCode ret = mmiService.ClearInputDeviceConsumer(deviceNames);
-    EXPECT_EQ(ret, ERROR_NO_PERMISSION);
 }
 
 /**
@@ -5061,6 +4941,22 @@ HWTEST_F(MMIServerTest, MMIService_QueryPointerRecord_002, TestSize.Level1)
     std::vector<std::shared_ptr<PointerEvent>> pointerList;
     ErrCode ret = mmiService.QueryPointerRecord(10, pointerList);
     EXPECT_TRUE(ret == ERROR_NOT_SYSAPI || ret == ERROR_NO_PERMISSION || ret == ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIService_GetPluginRemoteStub_001
+ * @tc.desc: No remote object, should return ERROR_NO_POINTER
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetPluginRemoteStub_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::string pluginName = "yunshuiqiao";
+    sptr<IRemoteObject> remoteObj = nullptr;
+    ErrCode ret = mmiService.GetPluginRemoteStub(pluginName, remoteObj);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
 }
 } // namespace MMI
 } // namespace OHOS

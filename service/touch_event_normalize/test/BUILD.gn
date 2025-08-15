@@ -1017,49 +1017,6 @@ ohos_unittest("TouchGestureManagerTest") {
   }
 }
 
-ohos_unittest("InputDeviceConsumerHandlerTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    "${mmi_path}/service:libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
-    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  cflags_cc = [ "-Wno-string-conversion" ]
-
-  sources = [
-    "src/input_device_consumer_handler_test.cpp",
-    "${mmi_path}/service/touch_event_normalize/src/input_device_consumer_handler.cpp",
-    "src/mock.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "c_utils:utilsbase",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
-    "preferences:native_preferences",
-  ]
-}
-
 ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
   module_out_path = module_output_path
 
@@ -1098,6 +1055,7 @@ ohos_unittest("RemoteControlTransformProcessorTestWithMock") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -1161,7 +1119,6 @@ group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
-    ":InputDeviceConsumerHandlerTest",
     ":TouchEventNormalizeTest",
     ":TransformPointTest",
     ":TouchGestureManagerTestWithMock",

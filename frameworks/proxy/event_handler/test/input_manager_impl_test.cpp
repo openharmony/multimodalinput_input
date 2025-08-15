@@ -23,6 +23,7 @@
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "net_packet.h"
+#include "iremote_object.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"
@@ -2239,6 +2240,21 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackWindowGroupInfo_002,
     int32_t result = InputMgrImpl.PackWindowGroupInfo(pkt);
     EXPECT_EQ(result, RET_OK);
     EXPECT_FALSE(pkt.ChkRWError());
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPluginRemoteStub_001
+ * @tc.desc: Test GetPluginRemoteStub
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPluginRemoteStub_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    auto ret = InputMgrImpl.GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    ASSERT_NE(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

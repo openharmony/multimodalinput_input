@@ -627,7 +627,9 @@ ohos_unittest("InputManagerInjectTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
@@ -854,7 +856,9 @@ ohos_unittest("PointerEventExTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",

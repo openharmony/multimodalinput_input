@@ -25,8 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-std::shared_ptr<InputPluginManager> InputPluginManager::instance_;
-std::once_flag InputPluginManager::init_flag_;
 
 const char *FILE_EXTENSION = ".so";
 const char *FOLDER_PATH = "/system/lib64/multimodalinput/autorun";
@@ -42,21 +40,22 @@ InputPluginManager::~InputPluginManager()
     MMI_HILOGI("~InputPluginManager");
 }
 
-std::shared_ptr<InputPluginManager> InputPluginManager::GetInstance(const std::string &directory)
+InputPluginManager* InputPluginManager::GetInstance(const std::string &directory)
 {
-    std::call_once(init_flag_, [&directory] {
+    std::call_once(init_flag_, [directory] {
         if (instance_ == nullptr) {
             MMI_HILOGI("New InputPluginManager");
             std::string dir = directory.empty() ? FOLDER_PATH : directory;
-            instance_ = std::make_shared<InputPluginManager>(dir);
+            instance_ = new InputPluginManager(dir);
         }
     });
     return instance_;
 }
 
-int32_t InputPluginManager::Init()
+int32_t InputPluginManager::Init(UDSServer& udsServer)
 {
     CALL_DEBUG_ENTER;
+    udsServer_ = udsServer;
     DIR *dir = opendir(directory_.c_str());
     if (!dir) {
         MMI_HILOGE("Failed to open error:%{private}s", strerror(errno));
@@ -157,6 +156,8 @@ void InputPluginManager::PluginAssignmentCallBack(
     }
 }
 
+PluginResult InputPluginManager::ProcessEvent(
+    PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data)
 void InputPluginManager::PluginAssignmentCallBack(
     std::function<void(std::shared_ptr<KeyEvent>)> callback, InputPluginStage stage)
 {
@@ -175,20 +176,33 @@ void InputPluginManager::PluginAssignmentCallBack(
 
 int32_t InputPluginManager::HandleEvent(libinput_event *event, int64_t frameTime, InputPluginStage stage)
 {
-    return DoHandleEvent(event, frameTime, nullptr, stage);
+    return std::visit(
+        overloaded{
+            [data, iplugin](libinput_event* evt) { return iplugin->HandleEvent(evt, data); },
+            [data, iplugin](std::shared_ptr<PointerEvent> evt) { return iplugin->HandleEvent(evt, data); },
+            [data, iplugin](std::shared_ptr<AxisEvent> evt) { return iplugin->HandleEvent(evt, data); },
+            [data, iplugin](std::shared_ptr<KeyEvent> evt) { return iplugin->HandleEvent(evt, data); }
+        }, event);
+}
+
+int32_t InputPluginManager::HandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data)
+{
+    return DoHandleEvent(event, data, nullptr);
 }
 
 int32_t InputPluginManager::DoHandleEvent(
-    libinput_event *event, int64_t frameTime, InputPlugin *iplugin, InputPluginStage stage)
+    PluginEventType event, std::shared_ptr<IPluginData> data, IPluginContext* iplugin)
 {
-    if (event == nullptr) {
+    CALL_DEBUG_ENTER;
+    InputPluginStage stage = data->stage;
+    if (checkPluginEventNull(event)) {
         return RET_NOTDO;
     }
     auto it = plugins_.find(stage);
     if (it == plugins_.end()) {
         return RET_NOTDO;
     }
-    CALL_DEBUG_ENTER;
+
     auto &plugins = it->second;
     auto start_plugin = plugins.begin();
     if (iplugin != nullptr) {
@@ -208,7 +222,7 @@ int32_t InputPluginManager::DoHandleEvent(
             continue;
         }
         beginTime = GetSysClockTime();
-        result = (*pluginIt)->HandleEvent(event, frameTime);
+        result = ProcessEvent(event, *pluginIt, data);
         endTime = GetSysClockTime();
         lostTime = endTime - beginTime;
         if (lostTime >= TIMEOUT_US) {
@@ -285,9 +299,13 @@ int32_t InputPluginManager::DoHandleEvent(
 
 // LIBINPUT_EVENT_TABLET_TOOL_BUTTON、LIBINPUT_EVENT_TABLET_PAD_BUTTON、LIBINPUT_EVENT_TABLET_PAD_KEY
 // These few existence termination events are currently not used and will be supplemented after use
-bool InputPluginManager::IntermediateEndEvent(libinput_event *event)
+bool InputPluginManager::IntermediateEndEvent(PluginEventType pluginEvent)
 {
-    const libinput_event_type type = libinput_event_get_type(event);
+    auto event = std::get_if<libinput_event*>(&pluginEvent);
+    if (!event) {
+        return false;
+    }
+    const libinput_event_type type = libinput_event_get_type(*event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
@@ -312,37 +330,84 @@ bool InputPluginManager::IntermediateEndEvent(libinput_event *event)
         case LIBINPUT_EVENT_GESTURE_HOLD_END:
             return true;
         case LIBINPUT_EVENT_KEYBOARD_KEY: {
-            struct libinput_event_keyboard *keyboardEvent = libinput_event_get_keyboard_event(event);
-            CHKPF(keyboardEvent);
+            struct libinput_event_keyboard *keyboardEvent = libinput_event_get_keyboard_event(*event);
+            CHKPR(keyboardEvent, false);
             return libinput_event_keyboard_get_key_state(keyboardEvent) == LIBINPUT_KEY_STATE_RELEASED;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON:
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD: {
-            auto touchpadButtonEvent = libinput_event_get_pointer_event(event);
-            CHKPF(touchpadButtonEvent);
+            auto touchpadButtonEvent = libinput_event_get_pointer_event(*event);
+            CHKPR(touchpadButtonEvent, false);
             return libinput_event_pointer_get_button_state(touchpadButtonEvent) == LIBINPUT_BUTTON_STATE_RELEASED;
         }
         case LIBINPUT_EVENT_JOYSTICK_BUTTON: {
-            auto rawBtnEvent = libinput_event_get_joystick_button_event(event);
-            CHKPF(rawBtnEvent);
+            auto rawBtnEvent = libinput_event_get_joystick_button_event(*event);
+            CHKPR(rawBtnEvent, false);
             return libinput_event_joystick_button_get_key_state(rawBtnEvent) == LIBINPUT_BUTTON_STATE_RELEASED;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY: {
-            auto tabletEvent = libinput_event_get_tablet_tool_event(event);
-            CHKPF(tabletEvent);
+            auto tabletEvent = libinput_event_get_tablet_tool_event(*event);
+            CHKPR(tabletEvent, false);
             return libinput_event_tablet_tool_get_proximity_state(tabletEvent) ==
                    LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_OUT;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
-            auto tabletEvent = libinput_event_get_tablet_tool_event(event);
-            CHKPF(tabletEvent);
+            auto tabletEvent = libinput_event_get_tablet_tool_event(*event);
+            CHKPR(tabletEvent, false);
             return libinput_event_tablet_tool_get_tip_state(tabletEvent) == LIBINPUT_TABLET_TOOL_TIP_UP;
         }
         default:
             break;
     }
     return false;
+}
+
+int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+{
+    MMI_HILOGD("Get stub from plugin: %{public}s start", pluginName.c_str());
+    std::list<std::shared_ptr<InputPlugin>> allPluginList;
+    for (auto &[stage, inputPluginList] : plugins_)
+    {
+        std::copy(inputPluginList.begin(), inputPluginList.end(), std::back_inserter(allPluginList));
+    }
+    std::list<std::shared_ptr<InputPlugin>>::iterator pluginIt =
+        std::find_if(allPluginList.begin(), allPluginList.end(), [pluginName](std::shared_ptr<InputPlugin> iplugin)
+                     { return iplugin->plugin_->GetName() == pluginName; });
+    if (pluginIt == allPluginList.end()) {
+        MMI_HILOGE("Get plugin stub failed due to there is no plugin named: %{public}s", pluginName.c_str());
+        return ERROR_NULL_POINTER;
+    }
+
+    pluginRemoteStub = (*pluginIt)->plugin_->GetPluginRemoteStub();
+    if (!pluginRemoteStub) {
+        MMI_HILOGE("Get plugin stub failed due to there is no plugin named: %{public}s", pluginName.c_str());
+        return ERROR_NULL_POINTER;
+    }
+    return RET_OK;
+}
+
+std::shared_ptr<IPluginData> InputPluginManager::GetPluginDataFromLibInput(libinput_event* event)
+{
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    auto touch = libinput_event_get_touch_event(event);
+    if (!touch) {
+        return data;
+    }
+    auto& libInputData = data->libInputEventData;
+    libInputData.orientation = libinput_event_touch_get_orientaion(touch);
+    libInputData.toolType = libinput_event_touch_get_tool_type(touch);
+    auto device = libinput_event_get_device(event);
+    if (!device) {
+        return data;
+    }
+    libInputData.deviceName = libinput_device_get_name(device);
+    return data;
+}
+
+UDSServer* InputPluginManager::GetUdsServer()
+{
+    return udsServer_;
 }
 
 int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
@@ -365,26 +430,50 @@ void InputPlugin::UnInit()
 
 void InputPlugin::DispatchEvent(libinput_event *event, int64_t frameTime)
 {
-    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(event, frameTime, this, stage_);
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->frameTime = frameTime;
+    data->stage = stage_;
+    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(event, data, this);
     if (result == RET_NOTDO) {
         CHKPV(callback_);
         callback_(event, frameTime);
     }
 }
 
-void InputPlugin::DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage)
+void InputPlugin::DispatchEvent(NetPacket& pkt, int32_t pid)
 {
-    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(keyEvent, this, stage_);
-    if (result == RET_NOTDO) {
-        CHKPV(keyEventCallback_);
-        keyEventCallback_(keyEvent);
+    auto session = InputPluginManager::GetInstance()->GetUdsServer()->GetSessionByPid(pid);
+    if (!session) {
+        MMI_HILOGE("Get session from uds server failed when plugin dispatch event");
+        return;
+    }
+    if (!session->SendMsg(pkt)) {
+        MMI_HILOGE("Send message to oid: %{public}d failed, errCode: %{public}d", pid, MSG_SEND_FAIL);
     }
 }
 
-PluginResult InputPlugin::HandleEvent(libinput_event *event, int64_t frameTime)
+PluginResult InputPlugin::HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data)
 {
     CHKPR(plugin_, PluginResult::NotUse);
-    return plugin_->HandleEvent(event, frameTime);
+    return plugin_->HandleEvent(event, data);
+}
+
+PluginResult InputPlugin::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data)
+{
+    CHKPR(plugin_, PluginResult::NotUse);
+    return plugin_->HandleEvent(pointerEvent, data);
+}
+
+PluginResult InputPlugin::HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data)
+{
+    CHKPR(plugin_, PluginResult::NotUse);
+    return plugin_->HandleEvent(keyEvent, data);
+}
+
+PluginResult InputPlugin::HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data)
+{
+    CHKPR(plugin_, PluginResult::NotUse);
+    return plugin_->HandleEvent(axisEvent, data);
 }
 
 PluginResult InputPlugin::HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage)

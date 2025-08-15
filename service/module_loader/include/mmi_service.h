@@ -28,7 +28,6 @@
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
-#include "input_device_consumer_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -314,8 +313,7 @@ protected:
     void InitVKeyboardFuncHandler();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess);
-    ErrCode SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
-    ErrCode ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override;
+    ErrCode GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub) override;
     ErrCode InitCustomConfig();
 private:
     MMIService();
