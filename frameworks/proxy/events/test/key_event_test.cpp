@@ -701,11 +701,10 @@ HWTEST_F(KeyEventTest, KeyEventTest_ToString_002, TestSize.Level1)
 HWTEST_F(KeyEventTest, KeyEventTest_KeyCodeToString_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t keyCode = KeyEvent::KEYCODE_A;
-    const char* result = nullptr;
-    ASSERT_NO_FATAL_FAILURE(result = KeyEvent::KeyCodeToString(keyCode));
-    EXPECT_STRNE(result, "KEYCODE_INVALID");
-    EXPECT_NE(std::string(result).find("A"), std::string::npos);
+    const int32_t keyCode = KeyEvent::KEYCODE_A;
+    const char* result = KeyEvent::KeyCodeToString(keyCode);
+    ASSERT_NE(result, nullptr);
+    EXPECT_STREQ(result, "KEYCODE_A");
 }
 
 /**
