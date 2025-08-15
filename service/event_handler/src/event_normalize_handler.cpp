@@ -301,6 +301,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 #endif
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    KeyEventHdr->SyncLedStateFromKeyEvent(device);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
