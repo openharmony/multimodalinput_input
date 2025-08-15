@@ -2169,7 +2169,6 @@ ohos_unittest("KeyEventNormalizeTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -2177,7 +2176,6 @@ ohos_unittest("KeyEventNormalizeTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utilsbase",
-    "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
@@ -2187,6 +2185,93 @@ ohos_unittest("KeyEventNormalizeTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("KeyEventNormalizeWithMockTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/test/facility/mock/include",
+    "${mmi_path}/test/unittest/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/napi/include",
+    "${mmi_path}/util/socket/include",
+    "${mmi_service_path}/account_manager/include",
+    "${mmi_service_path}/app_state_manager/include",
+    "${mmi_service_path}/connect_manager/include",
+    "${mmi_service_path}/crown_transform_processor/include",
+    "${mmi_service_path}/delegate_task/include",
+    "${mmi_service_path}/device_config/include",
+    "${mmi_service_path}/device_manager/include",
+    "${mmi_service_path}/device_state_manager/include",
+    "${mmi_service_path}/dfx/include",
+    "${mmi_service_path}/display_state_manager/include",
+    "${mmi_service_path}/event_dispatch/include",
+    "${mmi_service_path}/event_dump/include",
+    "${mmi_service_path}/event_handler/include",
+    "${mmi_service_path}/event_resample/include",
+    "${mmi_service_path}/filter/include",
+    "${mmi_service_path}/fingersense_wrapper/include",
+    "${mmi_service_path}/gesturesense_wrapper/include",
+    "${mmi_service_path}/interceptor/include",
+    "${mmi_service_path}/joystick/include",
+    "${mmi_service_path}/key_command/include",
+    "${mmi_service_path}/key_event_normalize/include",
+    "${mmi_service_path}/libinput_adapter/include",
+    "${mmi_service_path}/message_handle/include",
+    "${mmi_service_path}/module_loader/include",
+    "${mmi_service_path}/monitor/include",
+    "${mmi_service_path}/mouse_event_normalize/include",
+    "${mmi_service_path}/nap_process/include",
+    "${mmi_service_path}/permission_helper/include",
+    "${mmi_service_path}/subscriber/include",
+    "${mmi_service_path}/timer_manager/include",
+    "${mmi_service_path}/touch_event_normalize/include",
+    "${mmi_service_path}/window_manager/include",
+  ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [
+      "${mmi_path}/common/anco/comm/include",
+    ]
+  }
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_event_normalize/test/key_event_normalize_test_with_mock.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+  ]
+
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+  }
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "libinput:libinput-third-mmi",
   ]
 }
 
