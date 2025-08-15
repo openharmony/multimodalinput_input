@@ -260,6 +260,7 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
         keyboardType = KEYBOARD_TYPE_UNKNOWN;
         MMI_HILOGD("Undefined keyboard type");
     }
+    MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
     return RET_OK;
 }
 
