@@ -152,6 +152,18 @@
           "type": "so"
         },
         {
+          "name": "//foundation/multimodalinput/input/util:libmmi-util",
+          "header": {
+            "header_files": [
+              "network/include/net_packet.h",
+              "common/include/input_event_data_transformation.h",
+              "common/include/i_input_device_consumer.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/util"
+          },
+          "type": "so"
+        },
+        {
           "name": "//foundation/multimodalinput/input/frameworks/native/input:oh_input_manager",
           "header": {
             "header_files": [

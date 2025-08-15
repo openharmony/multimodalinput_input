@@ -65,6 +65,7 @@ ohos_unittest("InputActiveSubscriberHandlerTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

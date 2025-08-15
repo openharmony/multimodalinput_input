@@ -226,18 +226,22 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
     if (manager != nullptr) {
         manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
     }
-    funInputEvent_ = [manager, callback](void *event, int64_t frameTime) {
-        if (manager != nullptr) {
-            int32_t result = manager->HandleEvent(static_cast<libinput_event *>(event),
-                frameTime,
-                InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
-            if (result != RET_NOTDO) {
+    funInputEvent_ = [manager, callback](void *event, int64_t frameTime)
+    {
+        if (manager != nullptr)
+        {
+            std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+            data->frameTime = frameTime;
+            data->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
+            int32_t result = manager->HandleEvent(static_cast<libinput_event *>(event), data);
+            if (result != RET_NOTDO)
+            {
                 return;
             }
         }
         callback(static_cast<libinput_event *>(event), frameTime);
     };
-    
+
     input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
     CHKPF(input_);
     libinput_log_set_handler(input_, &HiLogFunc);

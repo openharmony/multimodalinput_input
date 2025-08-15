@@ -50,6 +50,7 @@ ohos_shared_library("ani_input_device") {
     "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

@@ -18,6 +18,7 @@
 
 #include <map>
 #include <mutex>
+#include "iremote_proxy.h"
 #include "nocopyable.h"
 #include <singleton.h>
 
@@ -37,6 +38,7 @@ public:
     void OnConnected();
 
     std::shared_ptr<IInputEventConsumer> deviceConsumer_ { nullptr };
+    sptr<IRemoteObject> inputDeviceStub_ { nullptr };
     std::vector<std::string> deviceNames_;
     std::mutex mtx_;
 };

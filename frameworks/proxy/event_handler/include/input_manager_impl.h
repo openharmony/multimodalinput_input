@@ -256,6 +256,7 @@ public:
     int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
     void UnsubscribeInputActive(int32_t subscribeId);
     int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
+    int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);

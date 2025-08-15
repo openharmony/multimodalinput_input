@@ -111,6 +111,7 @@ declare_args() {
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/scene_board_judgement.cpp",
+    "event_handler/src/input_device_consumer_proxy.cpp",
     "events/src/input_manager.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_fd_listener.cpp",

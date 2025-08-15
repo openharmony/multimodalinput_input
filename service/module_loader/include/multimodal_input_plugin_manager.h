@@ -22,6 +22,9 @@
 #include <dirent.h>
 #include <dlfcn.h>
 #include <map>
+#include "uds_server.h"
+#include "net_packet.h"
+#include "input_event_data_transformation.h"
 
 namespace OHOS {
 namespace MMI {
@@ -50,8 +53,10 @@ public:
     virtual ~InputPlugin();
     int32_t Init(std::shared_ptr<IInputPlugin> pin);
     void UnInit();
-    PluginResult HandleEvent(libinput_event *event, int64_t frameTime);
-    PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage);
+    PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) override;
+    PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data);
+    PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data);
+    PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data);
 
     int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) override;
     int32_t RemoveTimer(int32_t id) override;
@@ -73,27 +78,31 @@ private:
 
 struct InputPluginManager {
 public:
-    ~InputPluginManager();
-    explicit InputPluginManager(const std::string& directory) : directory_(directory) {};
-    static std::shared_ptr<InputPluginManager> GetInstance(const std::string &directory = "");
-    int32_t Init();
+    InputPluginManager(const InputPluginManager &) = delete;
+    InputPluginManager &operator=(const InputPluginManager &) = delete;
+    static InputPluginManager *GetInstance(const std::string &directory = "");
+    int32_t Init(UDSServer &udsServer);
     void Dump(int fd);
-    int32_t HandleEvent(libinput_event* event, int64_t frameTime, InputPluginStage stage);
-    int32_t HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage);
-    void PluginAssignmentCallBack(std::function<void(libinput_event*, int64_t)> callback, InputPluginStage stage);
-    void PluginAssignmentCallBack(std::function<void(std::shared_ptr<KeyEvent>)> callback, InputPluginStage stage);
+    void PluginAssignmentCallBack(std::function<void(libinput_event *, int64_t)> callback, InputPluginStage stage);
     void PrintPlugins();
-    int32_t DoHandleEvent(libinput_event *event, int64_t frameTime, InputPlugin *iplugin, InputPluginStage stage);
-    int32_t DoHandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPlugin *iplugin, InputPluginStage stage);
+    std::shared_ptr<IPluginData> GetPluginDataFromLibInput(libinput_event *event);
+    PluginResult ProcessEvent(PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data);
+    int32_t HandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data);
+    int32_t DoHandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data, InputPlugin *iplugin);
+    int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+    UDSServer *GetUdsServer();
 
 private:
-    bool IntermediateEndEvent(libinput_event *event);
+    explicit InputPluginManager(const std::string& directory) : directory_(directory) {};
+    ~InputPluginManager();
+    bool IntermediateEndEvent(PluginEventType event);
     bool LoadPlugin(const std::string &path);
 
+    UDSServer* udsServer_ {nullptr};
     std::string directory_;
     std::map<InputPluginStage, std::list<std::shared_ptr<InputPlugin>>> plugins_;
-    static std::shared_ptr<InputPluginManager> instance_;
-    static std::once_flag init_flag_;
+    inline static InputPluginManager* instance_ { nullptr };
+    inline static std::once_flag init_flag_;
 };
 } // namespace MMI
 } // namespace OHOS
