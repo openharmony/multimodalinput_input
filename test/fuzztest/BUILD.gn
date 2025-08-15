@@ -167,7 +167,9 @@ group("test") {
     "stubunsubscribekeyevent_fuzzer:fuzztest",
     "stubunsubscribeswitchevent_fuzzer:fuzztest",
     "subscribekeyevent_fuzzer:fuzztest",
+    "subscribelongpressevent_fuzzer:fuzztest",
     "subscribeswitchevent_fuzzer:fuzztest",
+    "subscribetabletproximity_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
     "touchpaddoubletapanddragstate_fuzzer:fuzztest",
     "touchpadpinchswitch_fuzzer:fuzztest",
@@ -181,6 +183,8 @@ group("test") {
     "touchpadtapswitch_fuzzer:fuzztest",
     "touchpadthreefingerstapswitch_fuzzer:fuzztest",
     "transmitinfrared_fuzzer:fuzztest",
+    "unsubscribelongpressevent_fuzzer:fuzztest",
+    "unsubscribetabletproximity_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
