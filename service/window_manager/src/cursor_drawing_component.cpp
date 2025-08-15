@@ -102,7 +102,7 @@ void CursorDrawingComponent::Load()
 
 bool CursorDrawingComponent::LoadLibrary()
 {
-    soHandle_ = dlopen(MULTIMODAL_PATH_NAME, RTLD_NOW | RTLD_NODELETE);
+    soHandle_ = dlopen(MULTIMODAL_PATH_NAME, RTLD_LAZY);
     if (soHandle_ == nullptr) {
         const char *errorMsg = dlerror();
         MMI_HILOGE("dlopen %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
@@ -123,9 +123,9 @@ bool CursorDrawingComponent::LoadLibrary()
         return false;
     }
 
-    auto ptr = getPointerInstance_();
-    if (ptr == nullptr) {
-        MMI_HILOGE("getInstance is failed");
+    pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(getPointerInstance_());
+    if (pointerInstance_ == nullptr) {
+        MMI_HILOGE("pointerInstance_ is nullptr");
         if (dlclose(soHandle_) != 0) {
             const char *errorMsg = dlerror();
             MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
@@ -135,7 +135,6 @@ bool CursorDrawingComponent::LoadLibrary()
         getPointerInstance_ = nullptr;
         return false;
     }
-    pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(ptr);
     isLoaded_ = true;
     return true;
 }
