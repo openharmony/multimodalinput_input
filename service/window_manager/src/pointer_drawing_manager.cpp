@@ -1727,6 +1727,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t phy
 #else
     surfaceNodePtr->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
+    surfaceNodePtr->SetVisible(false);
     return RET_OK;
 }
 
