@@ -3461,6 +3461,9 @@ void InputWindowsManager::SetGlobalDefaultPointerStyle()
         for (auto &item : iter.second) {
             if (item.second.id == CURSOR_CIRCLE_STYLE || item.second.id == AECH_DEVELOPER_DEFINED_STYLE) {
                 item.second.id = globalStyle_.id;
+            } else if (item.second.id == LASER_CURSOR || item.second.id == LASER_CURSOR_DOT ||
+                item.second.id == LASER_CURSOR_DOT_RED) {
+                item.second.id = globalStyle_.id;
             }
             item.second.options = globalStyle_.options;
         }
