@@ -3001,8 +3001,7 @@ void PointerDrawingManager::InitDefaultMouseIconPath()
             MMI_HILOGE("Cannot find the default style");
             return;
         }
-        std::string newIconPath;
-        newIconPath = iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath;
+        std::string newIconPath = iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath;
         MMI_HILOGI("default path has changed from %{private}s to %{private}s, target style is %{public}d",
             it->second.iconPath.c_str(), newIconPath.c_str(), curPointerStyle.id);
         it->second.iconPath = newIconPath;
