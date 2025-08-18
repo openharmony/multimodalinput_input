@@ -289,6 +289,7 @@ PointerDrawingManager::PointerDrawingManager()
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
+    InitDefaultMouseIconPath();
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     if (GetHardCursorEnabled()) {
         g_hardwareCanvasSize = GetCanvasSize();
@@ -2986,6 +2987,26 @@ void PointerDrawingManager::CheckMouseIconPath()
             continue;
         }
         ++iter;
+    }
+}
+
+void PointerDrawingManager::InitDefaultMouseIconPath()
+{
+    PointerStyle curPointerStyle;
+    GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
+        auto iconPath = GetMouseIconPath();
+        auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (it == iconPath.end()) {
+            MMI_HILOGE("Cannot find the default style");
+            return;
+        }
+        std::string newIconPath;
+        newIconPath = iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath;
+        MMI_HILOGI("default path has changed from %{private}s to %{private}s",
+            it->second.iconPath.c_str(), newIconPath.c_str());
+        it->second.iconPath = newIconPath;
+        UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), newIconPath);
     }
 }
 
