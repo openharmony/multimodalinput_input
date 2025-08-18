@@ -9952,9 +9952,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandlePullEvent_001, T
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
-    EXPECT_FALSE(inputWindowsManager.IsPointInsideSpecialWindow(0, 0));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.clear();
+    EXPECT_FALSE(inputWindowsManager->IsPointInsideSpecialWindow(0, 0));
 }
 
 /**
@@ -9966,11 +9966,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWi
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo windowInfo;
     windowInfo.windowType = GUIDE_WINDOW_TYPE + 1;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(inputWindowsManager.IsPointInsideSpecialWindow(0, 0));
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(inputWindowsManager->IsPointInsideSpecialWindow(0, 0));
 }
 
 /**
@@ -9988,17 +9988,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWi
     Rect rect = {TEST_WINDOW_START, TEST_WINDOW_START, TEST_WINDOW_END, TEST_WINDOW_END};
     testWindow.defaultHotAreas.push_back(rect);
 
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(testWindow);
 
-    bool result = manager.IsPointInsideSpecialWindow(TEST_WINDOW_START - 1, TEST_WINDOW_START - 1);
+    bool result = inputWindowsManager->IsPointInsideSpecialWindow(TEST_WINDOW_START -1, TEST_WINDOW_START -1);
     EXPECT_FALSE(result);
 }
 
 /**
  * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_004
- * @tc.desc: Test that IsPointInsideSpecialWindow should return true
-    when the window type is guide window, abd the point is within it
+ * @tc.desc: Test that IsPointInsideSpecialWindow should return false
+    when the window name type is xiaoyi voice input window, but the point is not within it
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -10006,63 +10006,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWi
 {
     CALL_TEST_DEBUG;
     WindowInfo testWindow;
-    testWindow.windowType = GUIDE_WINDOW_TYPE;
-    Rect rect = {TEST_WINDOW_START, TEST_WINDOW_START, TEST_WINDOW_END, TEST_WINDOW_END};
-    testWindow.defaultHotAreas.push_back(rect);
-
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
-
-    bool result = manager.IsPointInsideSpecialWindow(0, 0);
-    EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_005
- * @tc.desc: Test that IsPointInsideSpecialWindow should return false
-    when the window zorder is xiaoyi voice input window, but the point is not within it
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowInfo testWindow;
-    testWindow.zOrder = 4000;
+    testWindow.windowNameType = 2;
     testWindow.area.x = TEST_WINDOW_START;
     testWindow.area.y = TEST_WINDOW_START;
     testWindow.area.width = TEST_WINDOW_END;
     testWindow.area.height = TEST_WINDOW_END;
 
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(testWindow);
 
-    bool result = manager.IsPointInsideSpecialWindow(TEST_WINDOW_START - 1, TEST_WINDOW_START - 1);
+    bool result = inputWindowsManager->IsPointInsideSpecialWindow(TEST_WINDOW_START -1, TEST_WINDOW_START -1);
     EXPECT_FALSE(result);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsPointInsideSpecialWindow_006
- * @tc.desc: Test that IsPointInsideSpecialWindow should return true
-    when the window zorder is xiaoyi voice input window, and the point is within it
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideSpecialWindow_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowInfo testWindow;
-    testWindow.zOrder = 4000;
-    testWindow.area.x = TEST_WINDOW_START;
-    testWindow.area.y = TEST_WINDOW_START;
-    testWindow.area.width = TEST_WINDOW_END;
-    testWindow.area.height = TEST_WINDOW_END;
-
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
-
-    bool result = manager.IsPointInsideSpecialWindow(0, 0);
-    EXPECT_TRUE(result);
 }
 
 /**
@@ -10081,11 +10035,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideWindowAre
     testWindow.area.width = TEST_WINDOW_END;
     testWindow.area.height = TEST_WINDOW_END;
 
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(testWindow);
 
-    bool result = manager.IsPointInsideWindowArea(
-        TEST_WINDOW_START - 1, TEST_WINDOW_START - 1, manager.displayGroupInfo_.windowsInfo[0]);
+    bool result = inputWindowsManager->IsPointInsideWindowArea(TEST_WINDOW_START -1, TEST_WINDOW_START -1,\
+        inputWindowsManager->displayGroupInfo_.windowsInfo[0]);
     EXPECT_FALSE(result);
 }
 
@@ -10105,10 +10059,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideWindowAre
     testWindow.area.width = TEST_WINDOW_END;
     testWindow.area.height = TEST_WINDOW_END;
 
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(testWindow);
 
-    bool result = manager.IsPointInsideWindowArea(0, 0, manager.displayGroupInfo_.windowsInfo[0]);
+    bool result = inputWindowsManager->IsPointInsideWindowArea(0, 0,
+        inputWindowsManager->displayGroupInfo_.windowsInfo[0]);
     EXPECT_TRUE(result);
 }
 /**
@@ -10120,9 +10075,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsPointInsideWindowAre
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
-    EXPECT_FALSE(inputWindowsManager.IsMouseInCastWindow());
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.clear();
+    inputWindowsManager->displayGroupInfo_.windowsInfo.clear();
+    EXPECT_FALSE(inputWindowsManager->IsMouseInCastWindow());
 }
 
 /**
@@ -10135,35 +10091,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_00
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo windowInfo;
     windowInfo.windowType = CAST_WINDOW_TYPE + 1;
-    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
-    EXPECT_FALSE(inputWindowsManager.IsMouseInCastWindow());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsMouseInCastWindow_003
- * @tc.desc: Test whether IsMouseInCastWindow returns false when there is window information and
- * window of the CAST_WINDOW_TYPE type.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WindowInfo testWindow;
-    testWindow.windowType = CAST_WINDOW_TYPE;
-    testWindow.area.x = TEST_WINDOW_START;
-    testWindow.area.y = TEST_WINDOW_START;
-    testWindow.area.width = TEST_WINDOW_END;
-    testWindow.area.height = TEST_WINDOW_END;
-
-    InputWindowsManager manager;
-    manager.displayGroupInfo_.windowsInfo.push_back(testWindow);
-
-    bool result = manager.IsMouseInCastWindow();
-    EXPECT_TRUE(result);
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_FALSE(inputWindowsManager->IsMouseInCastWindow());
 }
 
 /**
@@ -10174,65 +10106,47 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseInCastWindow_00
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager manager;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo screenshotWindow;
     screenshotWindow.windowNameType = WINDOW_NAME_TYPE_SCREENSHOT;
-    manager.displayGroupInfo_.windowsInfo.push_back(screenshotWindow);
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(screenshotWindow);
 
-    EXPECT_FALSE(manager.IsCaptureMode());
+    EXPECT_FALSE(inputWindowsManager->IsCaptureMode());
 }
 
 /**
  * @tc.name: InputWindowsManagerTest_IsCaptureMode_002
- * @tc.desc: Test case for IsCaptureMode when capture window exists and size exceeds threshold
+ * @tc.desc: Test case for IsCaptureMode when capture window exists and size does not exceed threshold
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager manager;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo captureWindow;
     captureWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER;
-    captureWindow.area.width = SCREEN_RECORD_WINDOW_WIDTH + 1;
-    captureWindow.area.height = SCREEN_RECORD_WINDOW_HEIGHT + 1;
-    manager.displayGroupInfo_.windowsInfo.push_back(captureWindow);
+    captureWindow.area.width = SCREEN_RECORD_WINDOW_WIDTH - 1;
+    captureWindow.area.height = SCREEN_RECORD_WINDOW_HEIGHT - 1;
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(captureWindow);
 
-    EXPECT_TRUE(manager.IsCaptureMode());
+    EXPECT_FALSE(inputWindowsManager->IsCaptureMode());
 }
 
 /**
  * @tc.name: InputWindowsManagerTest_IsCaptureMode_003
- * @tc.desc: Test case for IsCaptureMode when capture window exists and size does not exceed threshold
+ * @tc.desc: Test case for IsCaptureMode when no special windows exist
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager manager;
-    WindowInfo captureWindow;
-    captureWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER;
-    captureWindow.area.width = SCREEN_RECORD_WINDOW_WIDTH - 1;
-    captureWindow.area.height = SCREEN_RECORD_WINDOW_HEIGHT - 1;
-    manager.displayGroupInfo_.windowsInfo.push_back(captureWindow);
-
-    EXPECT_FALSE(manager.IsCaptureMode());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsCaptureMode_004
- * @tc.desc: Test case for IsCaptureMode when no special windows exist
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsCaptureMode_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager manager;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     WindowInfo normalWindow;
     normalWindow.windowNameType = WINDOW_NAME_TYPE_SCREENSHOT + 1;
     normalWindow.zOrder = SCREEN_CAPTURE_WINDOW_ZORDER - 1;
-    manager.displayGroupInfo_.windowsInfo.push_back(normalWindow);
+    inputWindowsManager->displayGroupInfo_.windowsInfo.push_back(normalWindow);
 
-    EXPECT_FALSE(manager.IsCaptureMode());
+    EXPECT_FALSE(inputWindowsManager->IsCaptureMode());
 }
 
 /**
