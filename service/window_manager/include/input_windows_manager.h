@@ -215,6 +215,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
+    bool IsWindowRotation(const OLD::DisplayInfo *displayInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
@@ -290,6 +291,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::vector<int32_t> HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
         int32_t physicalX, int32_t physicalY);
+    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+        int32_t &physicalX, int32_t &physicalY);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
