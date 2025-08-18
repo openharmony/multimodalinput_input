@@ -18,6 +18,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "util_ex.h"
+#include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -32,7 +33,18 @@ void EventPreMonitorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyE
     CHKPV(keyEvent);
     OnHandleEvent(keyEvent);
     CHKPV(nextHandler_);
-    nextHandler_->HandleKeyEvent(keyEvent);
+    auto callback = [this](std::shared_ptr<KeyEvent> keyEvent) {
+        this->nextHandler_->HandleKeyEvent(keyEvent);
+    };
+    auto manager = InputPluginManager::GetInstance();
+    if (manager != nullptr) {
+        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+        int32_t result = manager->HandleEvent(keyEvent, InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+        if (result != 0) {
+            return;
+        }
+    }
+    callback(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

@@ -150,6 +150,11 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEventForGesture, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    MOCK_METHOD(bool, IsMouseDragging, (), (const));
+    MOCK_METHOD(void, EnsureMouseEventCycle, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, CleanMouseEventCycle, (std::shared_ptr<PointerEvent>));
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();

@@ -23,6 +23,7 @@ ability_runtime_path = "//foundation/ability/ability_runtime"
 security_component_path = "//base/security"
 c_utils_root = "//commonlibrary/c_utils"
 hilog_root = "//base/hiviewdfx/hilog"
+mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
 
 declare_args() {
   hitrace_enabled = false
@@ -392,7 +393,6 @@ if (input_feature_move_event_filters) {
 }
 
 if (input_ext_feature_anco) {
-  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
       [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
@@ -410,7 +410,6 @@ if (input_ext_feature_anco) {
 }
 
 if (input_ext_feature_keyboard_ext_flag) {
-  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG" ]
 
   libmmi_service_sources += [
@@ -439,7 +438,6 @@ if (input_feature_product == "watch") {
 }
 
 if (input_ext_feature_magiccursor) {
-  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
   g2d_path = "//foundation/graphic/graphic_2d"
   surface_path = "//foundation/graphic/graphic_surface"

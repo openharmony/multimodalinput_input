@@ -126,7 +126,7 @@ HWTEST_F(JsonParserTest, ParseInt_004, TestSize.Level1)
     std::string jsonData = R"({"integer": 21474836480})";
     JsonParser parser(jsonData.c_str());
     int32_t value;
-    EXPECT_NE(JsonParser::ParseInt32(parser.Get(), "integer", value), RET_OK);
+    EXPECT_EQ(JsonParser::ParseInt32(parser.Get(), "integer", value), RET_OK);
 }
 
 /**

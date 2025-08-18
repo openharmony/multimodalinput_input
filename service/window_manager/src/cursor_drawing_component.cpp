@@ -71,39 +71,16 @@ CursorDrawingComponent::~CursorDrawingComponent()
 
 void CursorDrawingComponent::Load()
 {
-    std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
-    if (isLoaded_ && (soHandle_ != nullptr)) {
-        return;
-    }
-
-    soHandle_ = dlopen(MULTIMODAL_PATH_NAME, RTLD_NOW | RTLD_NODELETE);
-    if (soHandle_ == nullptr) {
-        MMI_HILOGE("dlopen %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
-        return;
-    }
-
-    getPointerInstance_ = reinterpret_cast<GetPointerInstanceFunc>(dlsym(soHandle_, "GetPointerInstance"));
-    if (getPointerInstance_ == nullptr) {
-        MMI_HILOGE("dlsym GetInstanceFunc failed, err msg:%{public}s", dlerror());
-        if (dlclose(soHandle_) != 0) {
-            MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
+    {
+        std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
+        if (isLoaded_ && (soHandle_ != nullptr)) {
+            return;
         }
-        soHandle_ = nullptr;
-        return;
-    }
 
-    auto ptr = getPointerInstance_();
-    if (ptr == nullptr) {
-        MMI_HILOGE("getInstance is failed");
-        if (dlclose(soHandle_) != 0) {
-            MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
+        if (!LoadLibrary()) {
+            return;
         }
-        soHandle_ = nullptr;
-        getPointerInstance_ = nullptr;
-        return;
     }
-    pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(ptr);
-    isLoaded_ = true;
 
     if (timerId_ > 0) {
         TimerMgr->RemoveTimer(timerId_);
@@ -123,6 +100,45 @@ void CursorDrawingComponent::Load()
     MMI_HILOGI("Load %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
+bool CursorDrawingComponent::LoadLibrary()
+{
+    soHandle_ = dlopen(MULTIMODAL_PATH_NAME, RTLD_LAZY);
+    if (soHandle_ == nullptr) {
+        const char *errorMsg = dlerror();
+        MMI_HILOGE("dlopen %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
+            (errorMsg != nullptr) ? errorMsg : "");
+        return false;
+    }
+
+    getPointerInstance_ = reinterpret_cast<GetPointerInstanceFunc>(dlsym(soHandle_, "GetPointerInstance"));
+    if (getPointerInstance_ == nullptr) {
+        const char *errorMsg = dlerror();
+        MMI_HILOGE("dlsym GetInstanceFunc failed, err msg:%{public}s", (errorMsg != nullptr) ? errorMsg : "");
+        if (dlclose(soHandle_) != 0) {
+            errorMsg = dlerror();
+            MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
+                (errorMsg != nullptr) ? errorMsg : "");
+        }
+        soHandle_ = nullptr;
+        return false;
+    }
+
+    pointerInstance_ = reinterpret_cast<IPointerDrawingManager*>(getPointerInstance_());
+    if (pointerInstance_ == nullptr) {
+        MMI_HILOGE("pointerInstance_ is nullptr");
+        if (dlclose(soHandle_) != 0) {
+            const char *errorMsg = dlerror();
+            MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
+                (errorMsg != nullptr) ? errorMsg : "");
+        }
+        soHandle_ = nullptr;
+        getPointerInstance_ = nullptr;
+        return false;
+    }
+    isLoaded_ = true;
+    return true;
+}
+
 void CursorDrawingComponent::UnLoad()
 {
     std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
@@ -132,11 +148,15 @@ void CursorDrawingComponent::UnLoad()
     }
 
     if (dlclose(soHandle_) != 0) {
-        MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
+        const char *errorMsg = dlerror();
+        MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
+            (errorMsg != nullptr) ? errorMsg : "");
         return;
     }
     if (dlclose(soHandle_) != 0) {
-        MMI_HILOGW("%{public}s has been unloaded, err msg:%{public}s", MULTIMODAL_PATH_NAME, dlerror());
+        const char *errorMsg = dlerror();
+        MMI_HILOGW("%{public}s has been unloaded, err msg:%{public}s", MULTIMODAL_PATH_NAME,
+            (errorMsg != nullptr) ? errorMsg : "");
     }
     isLoaded_ = false;
     soHandle_ = nullptr;

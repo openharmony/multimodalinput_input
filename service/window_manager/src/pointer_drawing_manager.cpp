@@ -1727,6 +1727,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t phy
 #else
     surfaceNodePtr->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
+    surfaceNodePtr->SetVisible(false);
     return RET_OK;
 }
 
@@ -2204,9 +2205,11 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         if (HasMagicCursor()) {
             ret = MAGIC_CURSOR->SetPointerColor(color);
         } else {
+            CHKPR(surfaceNodePtr, RET_OK);
             ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         }
 #else
+        CHKPR(surfaceNodePtr, RET_OK);
         ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         if (ret != RET_OK) {
