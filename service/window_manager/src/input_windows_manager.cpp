@@ -102,10 +102,11 @@ constexpr int32_t DEFAULT_POSITION { 0 };
 constexpr int32_t MAIN_GROUPID { 0 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t WINDOW_NAME_TYPE_SCREENSHOT { 1 };
-constexpr float SCREEN_CAPTURE_WINDOW_ZORDER { 8000.0 };
+constexpr uint32_t WINDOW_NAME_TYPE_VOICEINPUT { 2 };
+constexpr uint32_t SCREEN_CAPTURE_WINDOW_ZORDER { 8000 };
 constexpr uint32_t CAST_WINDOW_TYPE { 2106 };
 constexpr uint32_t GUIDE_WINDOW_TYPE { 2500 };
-constexpr uint32_t VOICE_WINDOW_ZORDER { 4000.0 };
+constexpr uint32_t VOICE_WINDOW_ZORDER { 4000 };
 #define SCREEN_RECORD_WINDOW_WIDTH 400
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1518,8 +1519,8 @@ bool InputWindowsManager::IsPointerActiveRectValid(const OLD::DisplayInfo &curre
 }
 
 bool InputWindowsManager::IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const {
-    return (x > windowItem.area.x && x < (windowItem.area.x + windowItem.area.width)) &&
-        (y > windowItem.area.y && y < (windowItem.area.y + windowItem.area.height));
+    return (x >= windowItem.area.x && x <= (windowItem.area.x + windowItem.area.width)) &&
+            (y >= windowItem.area.y && y <= (windowItem.area.y + windowItem.area.height));
 }
 
 bool InputWindowsManager::IsPointInsideSpecialWindow(double pointX, double pointY)
@@ -1528,13 +1529,12 @@ bool InputWindowsManager::IsPointInsideSpecialWindow(double pointX, double point
     for (const auto& windowItem : WindowsInfo) {
         int32_t x = static_cast<int32_t>(pointX);
         int32_t y = static_cast<int32_t>(pointY);
-        if (windowItem.windowType == GUIDE_WINDOW_TYPE) {
-            for (const auto &win : windowItem.defaultHotAreas) {
-                return ((x > win.x && x < (win.x + win.width)) &&
-                    (y > win.y && y < (win.y + win.height)));
-            }
+        if (windowItem.windowType == GUIDE_WINDOW_TYPE && !windowItem.defaultHotAreas.empty()) {
+            const auto &win = windowItem.defaultHotAreas[0];
+            return (x >= win.x && x <= (win.x + win.width)) &&
+                (y >= win.y && y <= (win.y + win.height));
         }
-        if (windowItem.zOrder == VOICE_WINDOW_ZORDER) {
+        if (windowItem.windowNameType == WINDOW_NAME_TYPE_VOICEINPUT) {
             return IsPointInsideWindowArea(x, y, windowItem);
         }
     }
