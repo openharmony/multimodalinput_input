@@ -3176,13 +3176,13 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventInterceptor_
 HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventInterceptor_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    (void)OH_Input_RemoveKeyEventInterceptor();
     Input_Result ret1 = OH_Input_AddKeyEventInterceptor(DummyCallback, nullptr);
-    if (ret1 != INPUT_SUCCESS && ret1 != INPUT_REPEAT_INTERCEPTOR) {
-        EXPECT_EQ(ret1, INPUT_SUCCESS);
-        return;
-    }
+    EXPECT_EQ(ret1, INPUT_SUCCESS);
     Input_Result ret2 = OH_Input_AddKeyEventInterceptor(DummyCallback, nullptr);
     EXPECT_EQ(ret2, INPUT_REPEAT_INTERCEPTOR);
+    Input_Result retRm = OH_Input_RemoveKeyEventInterceptor();
+    EXPECT_EQ(retRm, INPUT_SUCCESS);
 }
 
 /**

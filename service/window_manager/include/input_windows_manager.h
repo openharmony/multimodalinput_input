@@ -231,6 +231,11 @@ public:
     bool IsMouseInCastWindow();
     bool IsCaptureMode();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    bool IsMouseDragging() const;
+    void EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event);
+    void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event);
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
     bool NeedTouchTracking(PointerEvent &event) const;

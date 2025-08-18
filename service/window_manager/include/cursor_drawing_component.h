@@ -96,6 +96,7 @@ public:
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();
+    bool LoadLibrary();
     DISALLOW_COPY_AND_MOVE(CursorDrawingComponent);
     using GetPointerInstanceFunc = void* (*)();
     GetPointerInstanceFunc getPointerInstance_;
