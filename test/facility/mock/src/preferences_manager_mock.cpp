@@ -23,13 +23,7 @@ std::mutex IPreferenceManager::mutex_;
 
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = PreferencesManagerMock::GetInstance();
-        }
-    }
-    return instance_;
+    return PreferencesManagerMock::GetInstance();
 }
 
 std::shared_ptr<PreferencesManagerMock> PreferencesManagerMock::instance_;
@@ -37,13 +31,17 @@ std::mutex PreferencesManagerMock::mutex_;
 
 std::shared_ptr<PreferencesManagerMock> PreferencesManagerMock::GetInstance()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = std::make_shared<PreferencesManagerMock>();
-        }
+        instance_ = std::make_shared<PreferencesManagerMock>();
     }
     return instance_;
+}
+
+void PreferencesManagerMock::ReleaseInstance()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    instance_.reset();
 }
 } // namespace MMI
 } // namespace OHOS
