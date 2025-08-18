@@ -153,11 +153,6 @@ void CursorDrawingComponent::UnLoad()
             (errorMsg != nullptr) ? errorMsg : "");
         return;
     }
-    if (dlclose(soHandle_) != 0) {
-        const char *errorMsg = dlerror();
-        MMI_HILOGW("%{public}s has been unloaded, err msg:%{public}s", MULTIMODAL_PATH_NAME,
-            (errorMsg != nullptr) ? errorMsg : "");
-    }
     isLoaded_ = false;
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
