@@ -56,6 +56,11 @@ namespace {
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
+constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
 constexpr int32_t SCALE_X { 0 };
@@ -4229,6 +4234,37 @@ bool InputWindowsManager::GetHoverScrollState() const
     return state;
 }
 
+void InputWindowsManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+    int32_t &physicalX, int32_t &physicalY)
+{
+    MMI_HILOGD("direction:%{public}d", direction);
+    switch (direction) {
+        case DIRECTION0: {
+            break;
+        }
+        case DIRECTION90: {
+            int32_t temp = physicalY;
+            physicalY = width - physicalX;
+            physicalX = temp;
+            break;
+        }
+        case DIRECTION180: {
+            physicalX = width - physicalX;
+            physicalY = height - physicalY;
+            break;
+        }
+        case DIRECTION270: {
+            int32_t temp = physicalX;
+            physicalX = height - physicalY;
+            physicalY = temp;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
 std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
     int32_t physicalX, int32_t physicalY)
 {
@@ -4239,7 +4275,7 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::Displa
     Direction direction = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = GetDisplayDirection(physicalDisplayInfo);
-        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
+        GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
     }
     cursorPos = {physicalX, physicalY};
@@ -6038,13 +6074,34 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
     }
 }
 
+bool InputWindowsManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo)
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    CHKPF(displayInfo);
+
+    bool foldableDevicePolicyMain = false;
+    bool foldableDevicePolicyFull = false;
+    if (!FOLDABLE_DEVICE_POLICY.empty()) {
+        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
+    }
+    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
+        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
+    }
+
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
+        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
+}
+
 Direction InputWindowsManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     CHKPR(displayInfo, DIRECTION0);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     if (GetHardCursorEnabled()) {
-        if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
+        if (IsWindowRotation(displayInfo)) {
             displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
                 ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         } else {
