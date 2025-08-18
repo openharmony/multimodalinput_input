@@ -2853,7 +2853,7 @@ bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyl
         return false;
     }
     if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle.id > MOUSE_ICON::SCREENRECORDER_CURSOR) {
+        pointerStyle.id > MOUSE_ICON::LASER_CURSOR_DOT_RED) {
         return false;
     }
     return true;
@@ -3121,6 +3121,9 @@ void PointerDrawingManager::InitStyle()
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
         {TRANSPARENT_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
         {SCREENRECORDER_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenRecorder_Cursor.svg"}},
+        {LASER_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Laser_Cursor.svg"}},
+        {LASER_CURSOR_DOT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Laser_Cursor_Dot.svg"}},
+        {LASER_CURSOR_DOT_RED, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Laser_Cursor_Dot_Red.svg"}},
     };
     CheckMouseIconPath();
 }
