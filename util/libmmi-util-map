@@ -61,6 +61,10 @@
             OHOS::MMI::IntToHexRGB*;
             OHOS::MMI::StringReplace*;
             OHOS::MMI::IsInteger*;
+            OHOS::MMI::CursorPixelMap;
+            "VTT for OHOS::MMI::CursorPixelMap";
+            "Vtable for OHOS::MMI::CursorPixelMap";
+
         };
     local:
         *;
