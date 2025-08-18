@@ -63,8 +63,7 @@
             OHOS::MMI::IsInteger*;
             OHOS::MMI::CursorPixelMap;
             "VTT for OHOS::MMI::CursorPixelMap";
-            "Vtable for OHOS::MMI::CursorPixelMap";
-
+            "vtable for OHOS::MMI::CursorPixelMap";
         };
     local:
         *;
