@@ -83,9 +83,12 @@ ohos_fuzztest("StubMmiServiceFuzzTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
 
   if (enable_player_framework) {
     external_deps += [ "player_framework:media_client" ]
