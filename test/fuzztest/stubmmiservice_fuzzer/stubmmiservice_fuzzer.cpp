@@ -28,10 +28,12 @@ using SessionPtr = std::shared_ptr<UDSSession>;
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr size_t MAX_BUNDLE_NAME_LEN = 128;
 } // namespace
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
-void SetCustomCursorPixelMapFuzz(FuzzedDataProvider &fdp) {
+void SetCustomCursorPixelMapFuzz(FuzzedDataProvider &fdp)
+{
     int32_t windowId = fdp.ConsumeIntegral<int32_t>();
     int32_t focusX   = fdp.ConsumeIntegral<int32_t>();
     int32_t focusY   = fdp.ConsumeIntegral<int32_t>();
@@ -39,7 +41,8 @@ void SetCustomCursorPixelMapFuzz(FuzzedDataProvider &fdp) {
     MMIService::GetInstance()->SetCustomCursorPixelMap(windowId, focusX, focusY, cur);
 }
 
-void SetMouseHotSpotFuzz(FuzzedDataProvider &fdp) {
+void SetMouseHotSpotFuzz(FuzzedDataProvider &fdp)
+{
     int32_t pid = fdp.ConsumeIntegral<int32_t>();
     int32_t windowId = fdp.ConsumeIntegral<int32_t>();
     int32_t hotX = fdp.ConsumeIntegral<int32_t>();
@@ -47,10 +50,11 @@ void SetMouseHotSpotFuzz(FuzzedDataProvider &fdp) {
     MMIService::GetInstance()->SetMouseHotSpot(pid, windowId, hotX, hotY);
 }
 
-void SetNapStatusFuzz(FuzzedDataProvider &fdp) {
+void SetNapStatusFuzz(FuzzedDataProvider &fdp)
+{
     int32_t pid = fdp.ConsumeIntegral<int32_t>();
     int32_t uid = fdp.ConsumeIntegral<int32_t>();
-    std::string bundle = fdp.ConsumeRandomLengthString(fdp.ConsumeIntegralInRange<size_t>(0,128));
+    std::string bundle = fdp.ConsumeRandomLengthString(fdp.ConsumeIntegralInRange<size_t>(0, MAX_BUNDLE_NAME_LEN));
     int32_t status = fdp.ConsumeIntegral<int32_t>();
     MMIService::GetInstance()->SetNapStatus(pid, uid, bundle, status);
 }
@@ -61,7 +65,8 @@ void GetMouseScrollRowsFuzz(FuzzedDataProvider &fdp)
     MMIService::GetInstance()->GetMouseScrollRows(rows);
 }
 
-void SetPointerSizeFuzz(FuzzedDataProvider &fdp) {
+void SetPointerSizeFuzz(FuzzedDataProvider &fdp)
+{
     int32_t sizeArg = fdp.ConsumeIntegral<int32_t>();
     MMIService::GetInstance()->SetPointerSize(sizeArg);
 }
@@ -249,8 +254,11 @@ bool StubMmiServiceFuzzTest(FuzzedDataProvider &provider)
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
-    if (!data || size == 0) return 0;
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    if (!data || size == 0) {
+        return 0;
+    }
 
     FuzzedDataProvider provider(data, size);
     OHOS::MMI::StubMmiServiceFuzzTest(provider);
