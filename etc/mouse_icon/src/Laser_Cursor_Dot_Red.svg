@@ -1,9 +1,9 @@
-<svg width="72.000000" height="72.000000" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="64.000000" height="64.000000" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 	<desc>
 			Created with Pixso.
 	</desc>
 	<defs>
-		<filter id="filter_789_44900_dd" x="0.000000" y="0.000000" width="72.000000" height="72.000000" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+		<filter id="filter_849_44926_dd" x="0.000000" y="0.000000" width="64.000000" height="64.000000" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
 			<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
 			<feOffset dx="0" dy="0"/>
@@ -14,10 +14,10 @@
 			<feBlend mode="normal" in="SourceGraphic" in2="effect_dropShadow_1" result="shape"/>
 		</filter>
 	</defs>
-	<g filter="url(#filter_789_44900_dd)">
-		<circle id="椭圆形" cx="36.000000" cy="36.000000" r="16.000000" fill="#DA3B26" fill-opacity="0.100000"/>
-		<circle id="椭圆形" cx="36.000000" cy="36.000000" r="14.000000" stroke="#DA3B26" stroke-opacity="1.000000" stroke-width="4.000000" style=""/>
-		<rect id="矩形备份" x="32.000000" y="32.000000" rx="4.000000" width="8.000000" height="8.000000" fill="#E84026" fill-opacity="1.000000"/>
-		<rect id="矩形备份" x="32.666748" y="32.666992" rx="3.333333" width="6.666667" height="6.666667" stroke="#979797" stroke-opacity="0" stroke-width="1.333333"/>
+	<g filter="url(#filter_849_44926_dd)">
+		<circle id="椭圆形" cx="32.000000" cy="32.000000" r="12.000000" fill="#DA3B26" fill-opacity="0.100000"/>
+		<circle id="椭圆形" cx="32.000000" cy="32.000000" r="10.500000" stroke="#DA3B26" stroke-opacity="1.000000" stroke-width="3.000000" style=""/>
+		<rect id="矩形备份" x="29.000000" y="29.000000" rx="3.000000" width="6.000000" height="6.000000" fill="#E84026" fill-opacity="1.000000"/>
+		<rect id="矩形备份" x="29.500000" y="29.500000" rx="2.500000" width="5.000000" height="5.000000" stroke="#979797" stroke-opacity="0" stroke-width="1.000000"/>
 	</g>
 </svg>
