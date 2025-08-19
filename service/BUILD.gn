@@ -210,7 +210,6 @@ ohos_shared_library("libcursor_drawing_adapter") {
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
     "${mmi_path}/util:mmi_json_parser",
@@ -224,6 +223,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "ffrt:libffrt",
+    "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "graphic_surface:surface",
@@ -234,6 +234,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwsutils",
+    "eventhandler:libeventhandler",
   ]
 
   if (input_feature_pointer_drawing) {
