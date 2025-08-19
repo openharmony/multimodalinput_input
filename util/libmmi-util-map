@@ -64,6 +64,8 @@
             OHOS::MMI::CursorPixelMap;
             "VTT for OHOS::MMI::CursorPixelMap";
             "vtable for OHOS::MMI::CursorPixelMap";
+            "virtual thunk to OHOS::MMI::PointerEvent::~PointerEvent()";
+            "virtual thunk to OHOS::MMI::InputEvent::~InputEvent()";
         };
     local:
         *;
