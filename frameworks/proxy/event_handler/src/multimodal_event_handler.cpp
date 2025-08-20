@@ -232,6 +232,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     int32_t useCoordinate)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject, useCoordinate);
     if (ret != 0) {
