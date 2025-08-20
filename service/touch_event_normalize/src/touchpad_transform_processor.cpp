@@ -396,7 +396,7 @@ void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>&
     bool isMissing = false;
     Coords coordDelta {0, 0};
     int32_t historyFingerCount = 0;
-    td::lock_guard<std::mutex> guard(swipeHistoryMutex_);
+    std::lock_guard<std::mutex> guard(swipeHistoryMutex_);
     for (int32_t i = 0; i < fingerCount; ++i) {
         if (static_cast<int32_t>(swipeHistory_.size()) <= i) {
             swipeHistory_.emplace_back(std::deque<Coords>());
