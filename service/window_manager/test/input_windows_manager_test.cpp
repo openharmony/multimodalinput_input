@@ -4430,12 +4430,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation, Te
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_PrintChangedWindowBySync
+ * @tc.name: InputWindowsManagerTest_PrintChangedWindowBySync_001
  * @tc.desc: Test PrintChangedWindowBySync
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowBySync, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowBySync_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
@@ -4452,6 +4452,48 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowBySy
     windowInfo.id = 2;
     newDisplayInfo.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PrintChangedWindowBySync(newDisplayInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PrintChangedWindowBySync_002
+ * @tc.desc: Test PrintChangedWindowBySync
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowBySync_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayGroupInfo newDisplayGroupInfo;
+    OLD::DisplayInfo newDisplayInfo;
+    newDisplayInfo.direction = DIRECTION0;
+    newDisplayInfo.displayDirection = DIRECTION0;
+    newDisplayInfo.width = 200;
+    newDisplayInfo.height = 300;
+    newDisplayGroupInfo.displaysInfo.push_back(newDisplayInfo);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION0;
+    displayInfo.displayDirection = DIRECTION0;
+    displayInfo.width = 200;
+    displayInfo.height = 300;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PrintChangedWindowBySync(newDisplayGroupInfo));
+
+    newDisplayInfo.direction = DIRECTION90;
+    newDisplayGroupInfo.displaysInfo.clear();
+    newDisplayGroupInfo.displaysInfo.push_back(newDisplayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PrintChangedWindowBySync(newDisplayGroupInfo));
+
+    displayInfo.direction = DIRECTION90;
+    auto iter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.clear();
+        iter->second.displaysInfo.push_back(displayInfo);
+    }
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PrintChangedWindowBySync(newDisplayGroupInfo));
 }
 
 /**
