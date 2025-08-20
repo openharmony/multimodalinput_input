@@ -160,6 +160,11 @@ enum libinput_pointer_axis {
     LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL = 1,
 };
 
+enum libinput_tablet_tool_proximity_state {
+    LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_OUT = 0,
+    LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_IN = 1,
+};
+
 struct udev_device;
 struct libinput_device;
 struct libinput_event;

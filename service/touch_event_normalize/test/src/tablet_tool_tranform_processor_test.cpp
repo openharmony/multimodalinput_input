@@ -87,7 +87,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&event));
     EXPECT_CALL(libinputMock, TabletToolGetTipState).WillOnce(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
-
+    processor.pointerEvent_ = PointerEvent::Create();
     bool ret = processor.OnTip(&event.base);
     EXPECT_FALSE(ret);
 }
@@ -109,6 +109,62 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipD
 }
 
 /**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipDown_002
+ * @tc.desc: Test the OnTipDown method in the TabletToolTranformProcessor class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipDown_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event = {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    processor.pointerEvent_ = PointerEvent::Create();
+    EXPECT_NO_FATAL_FAILURE(processor.OnTipDown(&event));
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipDown_003
+ * @tc.desc: Test the OnTipDown method in the TabletToolTranformProcessor class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipDown_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event = {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    processor.pointerEvent_ = PointerEvent::Create();
+    PointerEvent::PointerItem pointerItem = {};
+    pointerItem.SetPointerId(0);
+    processor.pointerEvent_->AddPointerItem(pointerItem);
+    EXPECT_NO_FATAL_FAILURE(processor.OnTipDown(&event));
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipDown_004
+ * @tc.desc: Test the OnTipDown method in the TabletToolTranformProcessor class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipDown_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(true));
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event = {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    processor.pointerEvent_ = PointerEvent::Create();
+    EXPECT_TRUE(processor.OnTipDown(&event));
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
  * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_001
  * @tc.desc: Test the response of TabletToolTranformProcessor when the tip is moving
  * @tc.type: FUNC
@@ -122,6 +178,110 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipM
     libinput_event *event = nullptr;
     bool ret = processor.OnTipMotion(event);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_002
+ * @tc.desc: Test the function OnTipMotion in TabletToolTranformProcessorTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_NO_FATAL_FAILURE(processor.OnTipMotion(&event));
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_003
+ * @tc.desc: Test the function OnTipMotion in TabletToolTranformProcessorTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(true));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_TRUE(processor.OnTipMotion(&event));
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipProximity_001
+ * @tc.desc: Test the function TabletToolTranformProcessorTest_OnTipProximity_001
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipProximity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event *event = nullptr;
+    bool ret = processor.OnTipProximity(event);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipProximity_002
+ * @tc.desc: Test the function TabletToolTranformProcessorTest_OnTipProximity_002
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipProximity_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    event.type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
+    libinput_event_tablet_tool eventTabletTool {};
+    eventTabletTool.base = event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_CALL(libinputMock, TabletToolGetProximityState).WillOnce(
+        Return(libinput_tablet_tool_proximity_state::LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_OUT));
+    processor.pointerEvent_ = PointerEvent::Create();
+    EXPECT_FALSE(processor.OnTipProximity(&event));
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipProximity_003
+ * @tc.desc: Test the function TabletToolTranformProcessorTest_OnTipProximity_003
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipProximity_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(true));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    event.type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
+    libinput_event_tablet_tool eventTabletTool {};
+    eventTabletTool.base = event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_CALL(libinputMock, TabletToolGetProximityState).WillOnce(
+        Return(libinput_tablet_tool_proximity_state::LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_OUT));
+    processor.pointerEvent_ = PointerEvent::Create();
+    EXPECT_TRUE(processor.OnTipProximity(&event));
+    InputWindowsManagerMock::ReleaseInstance();
 }
 
 /**
