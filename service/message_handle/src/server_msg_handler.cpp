@@ -319,17 +319,23 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     MMI_HILOGI("Check : current PointerEvent's info :Id=>%{public}d, pointerId=>%{public}d",
         pointerEvent->GetId(), pointerEvent->GetPointerId());
     std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
-    if (touchEvent != nullptr) {
-        std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
-        for (auto &item : listPtItems) {
-            MMI_HILOGI("Check : current Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
-                item.GetPointerId(), item.GetOriginPointerId());
-            if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) !=
-                (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID) && item.IsPressed()) {
-                pointerEvent->AddPointerItem(item);
-                MMI_HILOGI("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
-                    item.GetPointerId(), item.GetOriginPointerId());
+    CHKPV(touchEvent);
+    std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
+    for (auto &item : listPtItems) {
+        if(!item.IsPressed()) {
+            continue;
+        }
+        auto iter = pointerItems.begin();
+        for (; iter != pointerItems.end(); iter++) {
+            if(item.GetOriginPointerId() == iter->GetOriginPointerId()) {
+                break;
             }
+        }
+        if (iter == pointerItems.end()) {
+            pointerEvent->AddPointerItem(item);
+            MMI_HILOGD("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
+                item.GetPointerId(), item.GetOriginPointerId());
         }
     }
 }
@@ -674,22 +680,22 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
     const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
 {
     CHKPR(pointerEvent, RET_ERR);
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return RET_ERR;
-    }
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     if (bNeedResetPointerId) {
         if (diffPointerId <= 0) {
             MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", pointerId);
             return RET_ERR;
         }
-        pointerEvent->RemovePointerItem(pointerId);
-        pointerId += diffPointerId;
-        pointerItem.SetPointerId(pointerId);
-        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-        pointerEvent->SetPointerId(pointerId);
+        pointerEvent->RemoveAllPointerItem();
+        for (auto &pointerItem : pointerItems) {
+            int32_t pointId = pointerItem.GetPointerId();
+            pointerId += diffPointerId;
+            pointerItem.SetPointerId(pointerId);
+            pointerEvent->AddPointerItem(pointerItem);
+        }
+        if (pointerEvent->GetPointerId() <= INT32_MAX - diffPointerId) {
+            pointerEvent->SetPointerId(pointerEvent->GetPointerId() + diffPointerId);
+        }
     }
     auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
     if (iter != targetWindowIdMap.end()) {
