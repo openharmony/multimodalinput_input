@@ -320,19 +320,19 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
         pointerEvent->GetId(), pointerEvent->GetPointerId());
     std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
     CHKPV(touchEvent);
-    std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
-    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
-    for (auto &item : listPtItems) {
+    std::list<PointerEvent::PointerItem> lastPointerItems = touchEvent->GetAllPointerItems();
+    std::list<PointerEvent::PointerItem> currenPointerItems = pointerEvent->GetAllPointerItems();
+    for (auto &item : lastPointerItems) {
         if (!item.IsPressed()) {
             continue;
         }
-        auto iter = pointerItems.begin();
-        for (; iter != pointerItems.end(); iter++) {
-            if(item.GetOriginPointerId() == iter->GetOriginPointerId()) {
+        auto iter = currenPointerItems.begin();
+        for (; iter != currenPointerItems.end(); iter++) {
+            if (item.GetOriginPointerId() == iter->GetOriginPointerId()) {
                 break;
             }
         }
-        if (iter == pointerItems.end()) {
+        if (iter == currenPointerItems.end()) {
             pointerEvent->AddPointerItem(item);
             MMI_HILOGD("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
                 item.GetPointerId(), item.GetOriginPointerId());
@@ -689,8 +689,8 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
         pointerEvent->RemoveAllPointerItems();
         for (auto &pointerItem : pointerItems) {
             int32_t pointId = pointerItem.GetPointerId();
-            pointerId += diffPointerId;
-            pointerItem.SetPointerId(pointerId);
+            pointId += diffPointerId;
+            pointerItem.SetPointerId(pointId);
             pointerEvent->AddPointerItem(pointerItem);
         }
         if (pointerEvent->GetPointerId() <= INT32_MAX - diffPointerId) {
