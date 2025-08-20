@@ -3117,7 +3117,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
-    PhysicalCoordinate& coord, int32_t& displayId)
+    PhysicalCoordinate& coord, int32_t& displayId, PointerEvent::PointerItem& pointerItem)
 {
     CHKPF(tip);
     auto displayInfo = FindPhysicalDisplayInfo("default0");
@@ -3147,16 +3147,18 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
         phys.x, phys.y, pos.x, pos.y);
     coord.x = pos.x;
     coord.y = pos.y;
-    RotateScreen(*displayInfo, coord);
+    if (IsWritePen(pointerItem)) {
+        RotateScreen(*displayInfo, coord);
+    }
     MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f, displayId:%{public}d", pos.x, pos.y, displayId);
     return true;
 }
 
 bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-    int32_t& targetDisplayId, PhysicalCoordinate& coord)
+    int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem)
 {
     CHKPF(tip);
-    return TransformTipPoint(tip, coord, targetDisplayId);
+    return TransformTipPoint(tip, coord, targetDisplayId, pointerItem);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -4643,7 +4645,15 @@ bool InputWindowsManager::GetMouseIsCaptureMode() const
     return false;
 }
 
-bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const
+bool InputWindowsManager::IsWritePen(PointerEvent::PointerItem &pointerItem) const
+{
+    if (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_PEN) {
+        return false;
+    }
+    return !IsWriteTablet(pointerItem);
+}
+
+bool InputWindowsManager::IsWriteTablet(PointerEvent::PointerItem &pointerItem) const
 {
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
         static int32_t lastDeviceId = -1;
@@ -4667,6 +4677,11 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
         }
     }
     return false;
+}
+
+bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const
+{
+    return IsWriteTablet(pointerItem);
 }
 
 bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent,
@@ -5443,8 +5458,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         CursorDrawingComponent::GetInstance().OnWindowInfo(info);
-        CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId,
-            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
+        auto displayInfo = GetPhysicalDisplay(displayId);
+        CHKPR(displayInfo, RET_ERR);
+        Coordinate2D cursorPos = {};
+        ReverseRotateDisplayScreen(*displayInfo,  pointerItem.GetDisplayXPos(), pointerItem.GetDisplayYPos(),
+            cursorPos);
+        Direction displayDirection = GetDisplayDirection(displayInfo);
+        CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId, static_cast<int32_t>(cursorPos.x),
+            static_cast<int32_t>(cursorPos.y), pointerStyle, physicDisplayInfo->direction);
     } else if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
