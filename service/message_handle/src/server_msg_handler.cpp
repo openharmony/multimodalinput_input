@@ -323,7 +323,7 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     for (auto &item : listPtItems) {
-        if(!item.IsPressed()) {
+        if (!item.IsPressed()) {
             continue;
         }
         auto iter = pointerItems.begin();
