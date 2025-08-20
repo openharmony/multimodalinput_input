@@ -683,10 +683,10 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     if (bNeedResetPointerId) {
         if (diffPointerId <= 0) {
-            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", pointerId);
+            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", diffPointerId);
             return RET_ERR;
         }
-        pointerEvent->RemoveAllPointerItem();
+        pointerEvent->RemoveAllPointerItems();
         for (auto &pointerItem : pointerItems) {
             int32_t pointId = pointerItem.GetPointerId();
             pointerId += diffPointerId;
