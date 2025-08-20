@@ -39,7 +39,7 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
     }
     return objectSize;
 }
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+const std::u16string FORMMGR_INTERFACE_TOKEN = IMultimodalInputConnect::GetDescriptor();
 
 bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
 {

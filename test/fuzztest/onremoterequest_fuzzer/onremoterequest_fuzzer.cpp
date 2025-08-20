@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,36 +13,39 @@
  * limitations under the License.
  */
 
-#include "stubsetpointerlocation_fuzzer.h"
+#include "onremoterequest_fuzzer.h"
 
-#include "mmi_log.h"
-#include "mmi_service.h"
 #include "multimodal_input_connect_stub.h"
+#include "fuzzer/FuzzedDataProvider.h"
+#include "mmi_service.h"
+#include "mmi_log.h"
 
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "StubSetPointerLocationFuzzTest"
+#undef LOG_TAG
+#define LOG_TAG "OnRemoteRequestFuzzTest"
 
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
+const std::u16string FORMMGR_INTERFACE_TOKEN = IMultimodalInputConnect::GetDescriptor();
 
-bool StubSetPointerLocationFuzzTest(const uint8_t* data, size_t size)
+bool OnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN = IMultimodalInputConnect::GetDescriptor();
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
-        !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
         return false;
     }
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
-    MMIService::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_SET_POINTER_LOCATION), datas, reply, option);
+    FuzzedDataProvider provider(data, size);
+    uint32_t enumMax = static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_QUERY_POINTER_RECORD);
+    uint32_t code = provider.ConsumeIntegralInRange<uint32_t>(0, enumMax + 1);
+    MMIService::GetInstance()->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
 } // namespace OHOS
 
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
@@ -50,7 +53,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::StubSetPointerLocationFuzzTest(data, size);
+    OHOS::OnRemoteRequestFuzzTest(data, size);
     return 0;
 }
 } // namespace MMI
