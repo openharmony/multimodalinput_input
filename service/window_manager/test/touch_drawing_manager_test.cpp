@@ -393,7 +393,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_AddUpdateLabelsTimer_S
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_AddUpdateLabelsTimer_ShouldDoNothing_WhenTimerIsRunning
+ * @tc.name: TouchDrawingManagerTest_AddUpdateLabelsTimer_WhenTouchDrawingHandler
  * @tc.desc: Test AddUpdateLabelsTimer
  * @tc.type: Function
  * @tc.require:
@@ -425,7 +425,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RemoveUpdateLabelsTime
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_RemoveUpdateLabelsTimer_ShouldRemoveTimer
+ * @tc.name: TouchDrawingManagerTest_RemoveUpdateLabelsTimer_ShouldNotRemoveTimer
  * @tc.desc: Test RemoveUpdateLabelsTimer
  * @tc.type: Function
  * @tc.require:
