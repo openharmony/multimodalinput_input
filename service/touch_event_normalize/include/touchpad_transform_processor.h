@@ -17,6 +17,7 @@
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
 #include <deque>
+#include <mutex>
 
 #include "aggregator.h"
 #include "timer_manager.h"
