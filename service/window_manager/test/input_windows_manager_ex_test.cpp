@@ -605,7 +605,9 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_001, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -633,7 +635,9 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_002, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -660,7 +664,9 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_003, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -683,7 +689,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_004,
     coord.x = 5.5;
     coord.y = 3.2;
     int32_t displayId = 2;
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -706,7 +714,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_005,
     coord.x = 6.5;
     coord.y = 8.2;
     int32_t displayId = 3;
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -729,7 +739,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006,
     coord.x = 6.5;
     coord.y = 8.2;
     int32_t displayId = 3;
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -946,7 +958,9 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_001, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord, pointerItem));
 }
 
 /**
@@ -972,7 +986,9 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_002, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -994,9 +1010,11 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_003, TestSize.Level1)
     PhysicalCoordinate coord;
     coord.x = 3.5;
     coord.y = 5.2;
-    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId, pointerItem);
     EXPECT_FALSE(result);
-    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord);
+    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -5236,6 +5254,43 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenWin
     pointerItem.pressed_ = true;
     inputWindowsManager->lastPointerEventforWindowChange_->pointers_.push_back(pointerItem);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendCancelEventWhenWindowChange(pointerId));
+}
+
+/**
+ * @tc.name: IsWritePen_001
+ * @tc.desc: Test the function IsWritePen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWritePen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
+}
+
+/**
+ * @tc.name: IsWritePen_002
+ * @tc.desc: Test the function IsWritePen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWritePen_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetBus(BUS_USB);
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_TRUE(inputWindowsManager->IsWritePen(pointerItem));
 }
 } // namespace MMI
 } // namespace OHOS
