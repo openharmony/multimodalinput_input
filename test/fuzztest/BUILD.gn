@@ -94,6 +94,7 @@ group("test") {
     "keyoption_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
+    "onremoterequest_fuzzer:fuzztest",
     "notifyadddevicelisteners_fuzzer:fuzztest",
     "notifydeviceadded_fuzzer:fuzztest",
     "notifydeviceremoved_fuzzer:fuzztest",

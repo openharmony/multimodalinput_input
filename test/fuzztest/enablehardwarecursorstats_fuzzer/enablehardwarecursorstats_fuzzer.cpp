@@ -27,7 +27,7 @@ namespace OHOS {
 namespace MMI {
 
 namespace {
-const std::u16string kInterfaceToken{ u"ohos.multimodalinput.IConnectManager" };
+const std::u16string kInterfaceToken = IMultimodalInputConnect::GetDescriptor();
 } // namespace
 
 bool EnableHardwareCursorStatsFuzzTest(FuzzedDataProvider &provider)
