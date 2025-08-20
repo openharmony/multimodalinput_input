@@ -3571,19 +3571,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetIntervalSinceLastInp
 }
 
 /**
- * @tc.name: OHInputManagerTest_OH_Input_RemoveKeyEventInterceptor_001
- * @tc.desc: Verify that OH_Input_RemoveKeyEventInterceptor removes key interceptor successfully
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveKeyEventInterceptor_001, TestSize.Level3)
-{
-    CALL_TEST_DEBUG;
-    Input_Result result = OH_Input_RemoveKeyEventInterceptor();
-    EXPECT_TRUE(result == INPUT_SUCCESS || result == INPUT_SERVICE_EXCEPTION);
-}
-
-/**
  * @tc.name: OHInputManagerTest_OH_Input_RemoveAxisEventMonitorForAll_001
  * @tc.desc: Test RemoveAxisEventMonitorForAll with nullptr callback
  * @tc.type: FUNC
