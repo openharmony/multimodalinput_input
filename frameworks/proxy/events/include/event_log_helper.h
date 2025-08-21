@@ -127,37 +127,29 @@ private:
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
-        if (!IsBetaVersion()) {
-            MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d" ", ET:%{public}s,"
-                "KA:%{public}s, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
-                event->GetId(), InputEvent::EventTypeToString(event->GetEventType()),
-                KeyEvent::ActionToString(event->GetKeyAction()), eventItems.size(),
+        if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
+            MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d,"
+                "KC:%{private}d, AT:%{public}" PRId64
+                ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%zu, "
+                "DI:%{public}d, IR:%{public}s, SI:%{public}s",
+                event->GetId(), event->GetKeyCode(), event->GetActionTime(),
+                InputEvent::EventTypeToString(event->GetEventType()),
+                KeyEvent::ActionToString(event->GetKeyAction()),
+                event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
                 event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || IsEnterableKey(event->GetKeyCode())) {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d,"
-                    "KC:%{private}d, AT:%{public}" PRId64
-                    ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%zu, "
-                    "DI:%{public}d, IR:%{public}s, SI:%{public}s",
-                    event->GetId(), event->GetKeyCode(), event->GetActionTime(),
-                    InputEvent::EventTypeToString(event->GetEventType()),
-                    KeyEvent::ActionToString(event->GetKeyAction()),
-                    event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
-                    event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-                    event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
-                    event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
-            } else {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{private}d,"
-                    "AT:%{public} " PRId64 " , ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, "
-                    "SL:%{public}d, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
-                    event->GetId(), event->GetKeyCode(), event->GetActionTime(),
-                    InputEvent::EventTypeToString(event->GetEventType()),
-                    KeyEvent::ActionToString(event->GetKeyAction()),
-                    event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
-                    event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-                    event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
-                    event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
-            }
+            MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{public}d,"
+                "AT:%{public} " PRId64 " , ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, "
+                "SL:%{public}d, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
+                event->GetId(), event->GetKeyCode(), event->GetActionTime(),
+                InputEvent::EventTypeToString(event->GetEventType()),
+                KeyEvent::ActionToString(event->GetKeyAction()),
+                event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
+                event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         }
 
         for (const auto &item : eventItems) {
@@ -197,34 +189,27 @@ private:
         PrintDebugDict();
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         bool isJudgeMode = IsEnterableKey(event->GetKeyCode());
-        if (!IsBetaVersion()) {
-            MMI_HILOG_HEADER(LOG_DEBUG, lh, "KI:%{public}d, " "ET:%{public}s, F:%{public}d, KA:%{public}s, "
-                "EN:%{public}d , KIC:%{public}zu",
-                event->GetKeyIntention(), InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
-                KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
+        if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || isJudgeMode) {
+            MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d,"
+                "AT:%{public}" PRId64 ", AST:%{public}" PRId64
+                ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
+                ", EN:%{public}d, KIC:%{public}zu",
+                event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
+                event->GetActionStartTime(), InputEvent::EventTypeToString(event->GetEventType()),
+                event->GetFlag(), KeyEvent::ActionToString(event->GetKeyAction()),
+                event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) || isJudgeMode) {
-                    MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d,"
-                        "AT:%{public}" PRId64 ", AST:%{public}" PRId64
-                        ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
-                        ", EN:%{public}d, KIC:%{public}zu",
-                        event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
-                        event->GetActionStartTime(), InputEvent::EventTypeToString(event->GetEventType()),
-                        event->GetFlag(), KeyEvent::ActionToString(event->GetKeyAction()),
-                        event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
-                        event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-                        event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
-            } else {
-                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{private}d, KI:%{public}d, AT:%{public}" PRId64 ","
-                    "AST:%{public}" PRId64 ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, "
-                    "CL:%{public}d, SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
-                    event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
-                    InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
-                    KeyEvent::ActionToString(event->GetKeyAction()),
-                    event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
-                    event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-                    event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
-            }
+            MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{public}d, KI:%{public}d, AT:%{public}" PRId64 ","
+                "AST:%{public}" PRId64 ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, "
+                "CL:%{public}d, SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
+                event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
+                InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
+                KeyEvent::ActionToString(event->GetKeyAction()),
+                event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+                event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
         }
         for (const auto &item : eventItems) {
             if (!IsBetaVersion()) {
