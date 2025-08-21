@@ -170,6 +170,7 @@ group("test") {
     "stubinjectpointerevent_fuzzer:fuzztest",
     "stubispointervisible_fuzzer:fuzztest",
     "stubmarkprocessed_fuzzer:fuzztest",
+    "stubmoduleloader_fuzzer:fuzztest",
     "stubmovemouseevent_fuzzer:fuzztest",
     "stubregisterinputdevicemonitor_fuzzer:fuzztest",
     "stubremoveinputeventfilter_fuzzer:fuzztest",
