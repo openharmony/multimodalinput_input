@@ -29,6 +29,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr size_t MAX_BUNDLE_NAME_LEN = 128;
+constexpr size_t MAX_PREINPUT_KEYS = 8;
+constexpr int32_t MAX_GESTURE_FINGERS = 10;
 } // namespace
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
@@ -189,6 +191,331 @@ void GetHoverScrollStateFuzz(FuzzedDataProvider &fdp)
     MMIService::GetInstance()->GetHoverScrollState(state);
 }
 
+void OnSupportKeysFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    std::vector<int32_t> keys = {
+        fdp.ConsumeIntegral<int32_t>(),
+        fdp.ConsumeIntegral<int32_t>(),
+        fdp.ConsumeIntegral<int32_t>(),
+        fdp.ConsumeIntegral<int32_t>()
+    };
+    std::vector<bool> keystroke = {
+        fdp.ConsumeBool(),
+        fdp.ConsumeBool()
+    };
+
+    MMIService::GetInstance()->OnSupportKeys(deviceId, keys, keystroke);
+}
+
+void OnGetDeviceIdsFuzz(FuzzedDataProvider &fdp)
+{
+    std::vector<int32_t> ids = {
+        fdp.ConsumeIntegral<int32_t>(),
+        fdp.ConsumeIntegral<int32_t>(),
+        fdp.ConsumeIntegral<int32_t>(),
+        fdp.ConsumeIntegral<int32_t>()
+    };
+
+    MMIService::GetInstance()->OnGetDeviceIds(ids);
+}
+
+void GetDeviceFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    InputDevice inputDevice;
+    MMIService::GetInstance()->GetDevice(deviceId, inputDevice);
+}
+
+void OnRegisterDevListenerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->OnRegisterDevListener(pid);
+}
+
+void RegisterDevListenerFuzz(FuzzedDataProvider &fdp)
+{
+    bool callTwice = fdp.ConsumeBool();
+    MMIService::GetInstance()->RegisterDevListener();
+    if (callTwice) {
+        MMIService::GetInstance()->RegisterDevListener();
+    }
+}
+
+void OnUnregisterDevListenerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->OnUnregisterDevListener(pid);
+}
+
+void UnregisterDevListenerFuzz(FuzzedDataProvider &fdp)
+{
+    bool callTwice = fdp.ConsumeBool();
+    MMIService::GetInstance()->UnregisterDevListener();
+    if (callTwice) {
+        MMIService::GetInstance()->UnregisterDevListener();
+    }
+}
+
+void GetKeyboardTypeFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    int32_t keyboardType = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->GetKeyboardType(deviceId, keyboardType);
+}
+
+void SetKeyboardRepeatRateFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t rate = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->SetKeyboardRepeatRate(rate);
+}
+
+void GetKeyboardRepeatDelayFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t delay = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->GetKeyboardRepeatDelay(delay);
+}
+
+void GetKeyboardRepeatRateFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t rate = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->GetKeyboardRepeatRate(rate);
+}
+
+void CheckInputHandlerVaildFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t ht = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->CheckInputHandlerVaild(static_cast<InputHandlerType>(ht));
+}
+
+void AddInputHandlerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t handlerType = fdp.ConsumeIntegral<int32_t>();
+    uint32_t eventType = fdp.ConsumeIntegral<uint32_t>();
+    int32_t priority = fdp.ConsumeIntegral<int32_t>();
+    uint32_t deviceTags = fdp.ConsumeIntegral<uint32_t>();
+    MMIService::GetInstance()->AddInputHandler(handlerType, eventType, priority, deviceTags);
+}
+
+void AddPreInputHandlerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t handlerId = fdp.ConsumeIntegral<int32_t>();
+    uint32_t eventType = fdp.ConsumeIntegral<uint32_t>();
+    size_t n = fdp.ConsumeIntegralInRange<size_t>(0, MAX_PREINPUT_KEYS);
+    std::vector<int32_t> keys;
+    keys.reserve(n);
+    for (size_t i = 0; i < n; ++i) {
+        keys.push_back(fdp.ConsumeIntegral<int32_t>());
+    }
+    MMIService::GetInstance()->AddPreInputHandler(handlerId, eventType, keys);
+}
+
+void RemovePreInputHandlerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t handlerId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->RemovePreInputHandler(handlerId);
+}
+
+void ObserverAddInputHandlerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->ObserverAddInputHandler(pid);
+}
+
+void AddGestureMonitorFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t handlerType = fdp.ConsumeIntegral<int32_t>();
+    uint32_t eventType = fdp.ConsumeIntegral<uint32_t>();
+    uint32_t gestureType = fdp.ConsumeIntegral<uint32_t>();
+    int32_t fingers = fdp.ConsumeIntegralInRange<int32_t>(0, MAX_GESTURE_FINGERS);
+
+    MMIService::GetInstance()->AddGestureMonitor(handlerType, eventType, gestureType, fingers);
+}
+
+void RemoveGestureMonitorFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t handlerType = fdp.ConsumeIntegral<int32_t>();
+    uint32_t eventType = fdp.ConsumeIntegral<uint32_t>();
+    uint32_t gestureType = fdp.ConsumeIntegral<uint32_t>();
+    int32_t fingers = fdp.ConsumeIntegralInRange<int32_t>(0, MAX_GESTURE_FINGERS);
+
+    MMIService::GetInstance()->RemoveGestureMonitor(handlerType, eventType, gestureType, fingers);
+}
+
+void CheckMarkConsumedFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    int32_t eventId = fdp.ConsumeIntegral<int32_t>();
+
+    MMIService::GetInstance()->CheckMarkConsumed(pid, eventId);
+}
+
+void InjectKeyEventFuzz(FuzzedDataProvider &fdp)
+{
+    auto keyEvent = KeyEvent::Create();
+    if (!keyEvent) {
+        return;
+    }
+    keyEvent->SetKeyCode(fdp.ConsumeIntegral<int32_t>());
+    keyEvent->SetKeyAction(fdp.ConsumeIntegral<int32_t>());
+    bool isNativeInject = fdp.ConsumeBool();
+
+    MMIService::GetInstance()->InjectKeyEvent(*keyEvent, isNativeInject);
+}
+
+void CheckInjectKeyEventFuzz(FuzzedDataProvider &fdp)
+{
+    auto keyEvent = KeyEvent::Create();
+    if (!keyEvent) {
+        return;
+    }
+    keyEvent->SetKeyCode(fdp.ConsumeIntegral<int32_t>());
+    keyEvent->SetKeyAction(fdp.ConsumeIntegral<int32_t>());
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    bool isNativeInject = fdp.ConsumeBool();
+
+    MMIService::GetInstance()->CheckInjectKeyEvent(keyEvent, pid, isNativeInject);
+}
+
+void OnGetKeyStateFuzz(FuzzedDataProvider &fdp)
+{
+    std::vector<int32_t> pressedKeys;
+    std::unordered_map<int32_t, int32_t> specialKeysState;
+
+    MMIService::GetInstance()->OnGetKeyState(pressedKeys, specialKeysState);
+}
+
+void CheckInjectPointerEventFuzz(FuzzedDataProvider &fdp)
+{
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    if (!pointerEvent) {
+        return;
+    }
+
+    pointerEvent->pointerAction_ = fdp.ConsumeIntegral<int32_t>();
+    pointerEvent->originPointerAction_ = fdp.ConsumeIntegral<int32_t>();
+    pointerEvent->buttonId_ = fdp.ConsumeIntegral<int32_t>();
+    pointerEvent->fingerCount_ = fdp.ConsumeIntegral<int32_t>();
+    pointerEvent->pullId_ = fdp.ConsumeIntegral<int32_t>();
+
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    bool isNativeInject = fdp.ConsumeBool();
+    bool isShell = fdp.ConsumeBool();
+    int32_t useCoordinate = fdp.ConsumeIntegral<int32_t>();
+
+    MMIService::GetInstance()->CheckInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell, useCoordinate);
+}
+
+void ScreenCaptureCallbackFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    bool isStart = fdp.ConsumeBool();
+    MMIService::ScreenCaptureCallback(pid, isStart);
+}
+
+void SubscribeHotkeyFuzz(FuzzedDataProvider &fdp)
+{
+    KeyOption keyOption;
+    keyOption.finalKey_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.isFinalKeyDown_ = fdp.ConsumeBool();
+    keyOption.finalKeyDownDuration_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.finalKeyUpDelay_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.isRepeat_ = fdp.ConsumeBool();
+    keyOption.priority_ = SubscribePriority::PRIORITY_0;
+
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->SubscribeHotkey(subscribeId, keyOption);
+}
+
+void UnsubscribeHotkeyFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->UnsubscribeHotkey(subscribeId);
+}
+
+void UnsubscribeSwitchEventFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->UnsubscribeSwitchEvent(subscribeId);
+}
+
+void QuerySwitchStatusFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t switchType = fdp.ConsumeIntegral<int32_t>();
+    int32_t state = 0;
+    MMIService::GetInstance()->QuerySwitchStatus(switchType, state);
+}
+
+void SubscribeTabletProximityFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->SubscribeTabletProximity(subscribeId);
+}
+
+void UnsubscribeTabletProximityFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->UnsubscribetabletProximity(subscribeId);
+}
+
+void SubscribeLongPressEventFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+
+    LongPressRequest req;
+    req.fingerCount = fdp.ConsumeIntegral<int32_t>();
+    req.duration = fdp.ConsumeIntegral<int32_t>();
+
+    MMIService::GetInstance()->SubscribeLongPressEvent(subscribeId, req);
+}
+
+void UnsubscribeLongPressEventFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    MMIService::GetInstance()->UnsubscribeLongPressEvent(subscribeId);
+}
+
+void SetAnrObserverFuzz(FuzzedDataProvider &fdp)
+{
+    bool callTwice = fdp.ConsumeBool();
+    MMIService::GetInstance()->SetAnrObserver();
+    if (callTwice) {
+        MMIService::GetInstance()->SetAnrObserver();
+    }
+}
+
+void GetDisplayBindInfoFuzz(FuzzedDataProvider &fdp)
+{
+    std::vector<DisplayBindInfo> infos;
+    MMIService::GetInstance()->GetDisplayBindInfo(infos);
+}
+
+void GetAllMmiSubscribedEventsFuzz(FuzzedDataProvider &fdp)
+{
+    MmiEventMap eventMap;
+    bool callTwice = fdp.ConsumeBool();
+    MMIService::GetInstance()->GetAllMmiSubscribedEvents(eventMap);
+    if (callTwice) {
+        MMIService::GetInstance()->GetAllMmiSubscribedEvents(eventMap);
+    }
+}
+
+void GetFunctionKeyStateFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t funcKey = fdp.ConsumeIntegral<int32_t>();
+    bool state = fdp.ConsumeBool();
+    MMIService::GetInstance()->GetFunctionKeyState(funcKey, state);
+}
+
+void GetPointerLocationFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t displayId = fdp.ConsumeIntegral<int32_t>();
+    double displayX = fdp.ConsumeFloatingPoint<double>();
+    double displayY = fdp.ConsumeFloatingPoint<double>();
+
+    (void)MMIService::GetInstance()->GetPointerLocation(displayId, displayX, displayY);
+}
+
 void MmiServiceFuzzFirstGroup(FuzzedDataProvider &provider)
 {
     SetCustomCursorPixelMapFuzz(provider);
@@ -213,6 +540,47 @@ void MmiServiceFuzzFirstGroup(FuzzedDataProvider &provider)
     GetPointerStyleFuzz(provider);
     SetHoverScrollStateFuzz(provider);
     GetHoverScrollStateFuzz(provider);
+}
+
+void MmiServiceFuzzSecondGroup(FuzzedDataProvider &provider)
+{
+    OnSupportKeysFuzz(provider);
+    OnGetDeviceIdsFuzz(provider);
+    GetDeviceFuzzTest(provider);
+    OnRegisterDevListenerFuzz(provider);
+    RegisterDevListenerFuzz(provider);
+    OnUnregisterDevListenerFuzz(provider);
+    UnregisterDevListenerFuzz(provider);
+    GetKeyboardTypeFuzz(provider);
+    SetKeyboardRepeatRateFuzz(provider);
+    GetKeyboardRepeatDelayFuzz(provider);
+    GetKeyboardRepeatRateFuzz(provider);
+    CheckInputHandlerVaildFuzz(provider);
+    AddInputHandlerFuzz(provider);
+    AddPreInputHandlerFuzz(provider);
+    RemovePreInputHandlerFuzz(provider);
+    ObserverAddInputHandlerFuzz(provider);
+    AddGestureMonitorFuzz(provider);
+    RemoveGestureMonitorFuzz(provider);
+    CheckMarkConsumedFuzz(provider);
+    InjectKeyEventFuzz(provider);
+    CheckInjectKeyEventFuzz(provider);
+    OnGetKeyStateFuzz(provider);
+    CheckInjectPointerEventFuzz(provider);
+    ScreenCaptureCallbackFuzz(provider);
+    SubscribeHotkeyFuzz(provider);
+    UnsubscribeHotkeyFuzz(provider);
+    UnsubscribeSwitchEventFuzz(provider);
+    QuerySwitchStatusFuzz(provider);
+    SubscribeTabletProximityFuzz(provider);
+    UnsubscribeTabletProximityFuzz(provider);
+    SubscribeLongPressEventFuzz(provider);
+    UnsubscribeLongPressEventFuzz(provider);
+    SetAnrObserverFuzz(provider);
+    GetDisplayBindInfoFuzz(provider);
+    GetAllMmiSubscribedEventsFuzz(provider);
+    GetFunctionKeyStateFuzz(provider);
+    GetPointerLocationFuzz(provider);
 }
 
 bool StubMmiServiceFuzzTest(FuzzedDataProvider &provider)
@@ -241,6 +609,7 @@ bool StubMmiServiceFuzzTest(FuzzedDataProvider &provider)
     MMIService::GetInstance()->CancelInjection();
     MMIService::GetInstance()->OnCancelInjection();
     MmiServiceFuzzFirstGroup(provider);
+    MmiServiceFuzzSecondGroup(provider);
 
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMIService::GetInstance()->GetPointerSnapshot(pixelMap);
