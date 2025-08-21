@@ -243,8 +243,6 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    MMI_HILOGI("sgd : current PointerEvent's info :Id=>%{public}d, pointerId=>%{public}d, rows:%{public}d",
-        pointerEvent->GetId(), pointerEvent->GetPointerId(), pointerEvent->GetScrollRows());
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
         int32_t checkReturn = NativeInjectCheck(pid);
