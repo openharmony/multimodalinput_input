@@ -780,7 +780,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     NotifyAddDeviceListeners(deviceId);
     NotifyDeviceAdded(deviceId);
     NotifyDevCallback(deviceId, deviceInfo);
-    NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice);
+NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice, true);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
 #endif
@@ -922,7 +922,8 @@ void InputDeviceManager::PointerDeviceInit()
     POINTER_DEV_MGR.isInit = true;
 }
 
-void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice)
+void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice,
+    bool isVirtualPointerDev)
 {
     MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
         existEnabledPointerDevice);
@@ -931,7 +932,7 @@ void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool e
     }
     if (addNewPointerDevice && !existEnabledPointerDevice) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        if (HasTouchDevice()) {
+        if (HasTouchDevice() && !isVirtualPointerDev) {
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
