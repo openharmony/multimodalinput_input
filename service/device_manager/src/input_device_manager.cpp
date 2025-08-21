@@ -448,8 +448,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     AddPhysicalInputDeviceInner(deviceId, info);
-    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, info.sysUid:%{public}s, info.enable:%{public}d",
-        deviceId, info.sysUid.c_str(), info.enable);
+    int32_t keyboardType = 0;
+    GetKeyboardType(deviceId, keyboardType);
+    MMI_HILOGI("OnInputDeviceAdded successfully, deviceId:%{public}d, "
+        "info.sysUid:%{public}s, info.enable:%{public}d, keyboardType:%{public}d",
+        deviceId, info.sysUid.c_str(), info.enable, keyboardType);
     if (info.enable) {
         NotifyAddDeviceListeners(deviceId);
     }
