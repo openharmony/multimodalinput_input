@@ -81,6 +81,7 @@ group("test") {
     "injectpointerevent_fuzzer:fuzztest",
     "inputdevice_fuzzer:fuzztest",
     "inputdevicemanager_fuzzer:fuzztest",
+    "inputdevicemanagerone_fuzzer:fuzztest",
     "inputevent_fuzzer:fuzztest",
     "isinputdeviceenable_fuzzer:fuzztest",
     "isfocusedsession_fuzzer:fuzztest",
