@@ -780,7 +780,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     NotifyAddDeviceListeners(deviceId);
     NotifyDeviceAdded(deviceId);
     NotifyDevCallback(deviceId, deviceInfo);
-NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice, true);
+    NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice, true);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
 #endif
