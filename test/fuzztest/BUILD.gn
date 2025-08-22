@@ -18,6 +18,7 @@ group("test") {
 
   deps = [
     "accountmanager_fuzzer:fuzztest",
+    "accountsetting_fuzzer:fuzztest",
     "addgesturemonitor_fuzzer:fuzztest",
     "addinputeventfilter_fuzzer:fuzztest",
     "addinterceptor_fuzzer:fuzztest",
