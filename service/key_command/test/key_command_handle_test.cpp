@@ -29,8 +29,8 @@ using namespace testing::ext;
 
 class KeyCommandHandlerUtilTest : public testing::Test {
 public:
-static void SetUpTestCase(void) {}
-static void TearDownTestCase(void) {}
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 };
 
 /**
@@ -41,23 +41,23 @@ static void TearDownTestCase(void) {}
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_001, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-SpecialType type = SPECIAL_ALL;
-int32_t keyCode = 1;
-bool result = OHOS::MMI::IsSpecialType(keyCode, type);
-EXPECT_FALSE(result);
-type = SUBSCRIBER_BEFORE_DELAY;
-keyCode = 2;
-result = OHOS::MMI::IsSpecialType(keyCode, type);
-EXPECT_FALSE(result);
-type = KEY_DOWN_ACTION;
-keyCode = 3;
-result = OHOS::MMI::IsSpecialType(keyCode, type);
-EXPECT_FALSE(result);
-type = KEY_DOWN_ACTION;
-keyCode = -1;
-result = OHOS::MMI::IsSpecialType(keyCode, type);
-EXPECT_FALSE(result);
+    CALL_TEST_DEBUG;
+    SpecialType type = SPECIAL_ALL;
+    int32_t keyCode = 1;
+    bool result = OHOS::MMI::IsSpecialType(keyCode, type);
+    EXPECT_FALSE(result);
+    type = SUBSCRIBER_BEFORE_DELAY;
+    keyCode = 2;
+    result = OHOS::MMI::IsSpecialType(keyCode, type);
+    EXPECT_FALSE(result);
+    type = KEY_DOWN_ACTION;
+    keyCode = 3;
+    result = OHOS::MMI::IsSpecialType(keyCode, type);
+    EXPECT_FALSE(result);
+    type = KEY_DOWN_ACTION;
+    keyCode = -1;
+    result = OHOS::MMI::IsSpecialType(keyCode, type);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -68,13 +68,13 @@ EXPECT_FALSE(result);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetBusinessId_001, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON *jsonData = cJSON_CreateString("not an object");
-std::string businessIdValue;
-std::vector<std::string> businessIds;
-bool result = OHOS::MMI::GetBusinessId(jsonData, businessIdValue, businessIds);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateString("not an object");
+    std::string businessIdValue;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::GetBusinessId(jsonData, businessIdValue, businessIds);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -85,14 +85,14 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetBusinessId_002, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON *jsonData = cJSON_CreateObject();
-cJSON_AddItemToObject(jsonData, "businessId", cJSON_CreateNumber(123));
-std::string businessIdValue;
-std::vector<std::string> businessIds;
-bool result = OHOS::MMI::GetBusinessId(jsonData, businessIdValue, businessIds);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "businessId", cJSON_CreateNumber(123));
+    std::string businessIdValue;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::GetBusinessId(jsonData, businessIdValue, businessIds);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -103,12 +103,12 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_001, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON* jsonData = cJSON_CreateObject();
-ShortcutKey shortcutKey;
-bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    ShortcutKey shortcutKey;
+    bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -119,17 +119,17 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_002, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON* jsonData = cJSON_CreateObject();
-cJSON* preKey = cJSON_CreateArray();
-for (int i = 0; i < MAX_PREKEYS_NUM + 1; ++i) {
-    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
-}
-cJSON_AddItemToObject(jsonData, "preKey", preKey);
-ShortcutKey shortcutKey;
-bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    for (int i = 0; i < MAX_PREKEYS_NUM + 1; ++i) {
+        cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
+    }
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    ShortcutKey shortcutKey;
+    bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -140,13 +140,13 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_003, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON* jsonData = cJSON_CreateObject();
-cJSON_AddItemToObject(jsonData, "preKey", cJSON_CreateString("invalid"));
-ShortcutKey shortcutKey;
-bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "preKey", cJSON_CreateString("invalid"));
+    ShortcutKey shortcutKey;
+    bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -157,15 +157,15 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_004, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON* jsonData = cJSON_CreateObject();
-cJSON* preKey = cJSON_CreateArray();
-cJSON_AddItemToArray(preKey, cJSON_CreateNumber(-1));
-cJSON_AddItemToObject(jsonData, "preKey", preKey);
-ShortcutKey shortcutKey;
-bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(-1));
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    ShortcutKey shortcutKey;
+    bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -176,16 +176,16 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_005, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON* jsonData = cJSON_CreateObject();
-cJSON* preKey = cJSON_CreateArray();
-cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
-cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
-cJSON_AddItemToObject(jsonData, "preKey", preKey);
-ShortcutKey shortcutKey;
-bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    ShortcutKey shortcutKey;
+    bool result = OHOS::MMI::GetPreKeys(jsonData, shortcutKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
@@ -196,10 +196,10 @@ cJSON_Delete(jsonData);
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_002, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-int32_t keyCode = 999;
-SpecialType type = SpecialType::SPECIAL_ALL;
-EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 999;
+    SpecialType type = SpecialType::SPECIAL_ALL;
+    EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
 }
 
 /**
@@ -210,10 +210,10 @@ EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_003, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-int32_t keyCode = 16;
-SpecialType type = SpecialType::SPECIAL_ALL;
-EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 16;
+    SpecialType type = SpecialType::SPECIAL_ALL;
+    EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
 }
 
 /**
@@ -224,10 +224,10 @@ EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_004, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-int32_t keyCode = 0;
-SpecialType type = SpecialType::SPECIAL_ALL;
-EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 0;
+    SpecialType type = SpecialType::SPECIAL_ALL;
+    EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
 }
 
 /**
@@ -238,13 +238,13 @@ EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
  */
 HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetBusinessId_003, TestSize.Level1)
 {
-CALL_TEST_DEBUG;
-cJSON *jsonData = nullptr;
-std::string businessIdValue;
-std::vector<std::string> businessIds;
-bool result = OHOS::MMI::GetBusinessId(jsonData, businessIdValue, businessIds);
-EXPECT_FALSE(result);
-cJSON_Delete(jsonData);
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = nullptr;
+    std::string businessIdValue;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::GetBusinessId(jsonData, businessIdValue, businessIds);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
 }
 
 /**
