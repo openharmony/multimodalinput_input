@@ -117,6 +117,7 @@ constexpr uint32_t VOICE_WINDOW_ZORDER { 4000 };
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t CURSOR_POSITION_EXPECTED_SIZE { 2 };
+constexpr int32_t ENABLE_OUT_SCREEN_TOUCH { 1 };
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 constexpr int64_t SIMULATE_EVENT_LATENCY { 5 };
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
@@ -2999,7 +3000,7 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
+bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
     const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear)
 {
     PrintDisplayInfo(info);
@@ -3020,13 +3021,15 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         width, height, coord.x, coord.y);
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true)) {
-        MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
-            "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
-        if (isNeedClear) {
-            int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
-            TriggerTouchUpOnInvalidAreaEntry(seatSlot);
+        if (INPUT_DEV_MGR->GetVendorConfig(deviceId).enableOutScreen != ENABLE_OUT_SCREEN_TOUCH) {
+            MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
+                "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
+            if (isNeedClear) {
+                int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+                TriggerTouchUpOnInvalidAreaEntry(seatSlot);
+            }
+            return false;
         }
-        return false;
     }
     MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
         coord.x, coord.y, pos.x, pos.y);
@@ -3119,7 +3122,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
         MMI_HILOGE("Get OLD::DisplayInfo is error");
         return false;
     }
-    return GetPhysicalDisplayCoord(touch, *info, touchInfo, isNeedClear);
+    return GetPhysicalDisplayCoord(deviceId, touch, *info, touchInfo, isNeedClear);
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
@@ -5096,7 +5099,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     double physicalX = pointerItem.GetDisplayXPos();
     double physicalY = pointerItem.GetDisplayYPos();
 
-    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+        (INPUT_DEV_MGR->GetVendorConfig(pointerEvent->GetDeviceId()).enableOutScreen != ENABLE_OUT_SCREEN_TOUCH)) {
         AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
     }
     int32_t logicalX1 = 0;

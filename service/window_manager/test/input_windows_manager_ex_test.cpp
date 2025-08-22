@@ -904,6 +904,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     libinput_event_touch *touch = nullptr;
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
 
+    int32_t deviceId = 0;
     OLD::DisplayInfo info;
     info.direction = DIRECTION90;
     info.direction = DIRECTION270;
@@ -915,7 +916,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     touchInfo.toolRect.point.y = 600;
     touchInfo.toolRect.width = 720;
     touchInfo.toolRect.height = 1000;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->GetPhysicalDisplayCoord(touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->GetPhysicalDisplayCoord(deviceId, touch, info, touchInfo));
 }
 
 /**
@@ -2558,12 +2559,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     libinput_event_touch touch {};
     OLD::DisplayInfo info;
     EventTouch touchInfo;
+    int32_t deviceId = 0;
     info.direction = DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
     info.direction = DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
     info.direction = DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
 }
 
 /**
