@@ -94,6 +94,7 @@ group("test") {
     "keyitem_fuzzer:fuzztest",
     "keymonitoroption_fuzzer:fuzztest",
     "keyoption_fuzzer:fuzztest",
+    "libinputdevicemanager_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "notifyadddevicelisteners_fuzzer:fuzztest",
