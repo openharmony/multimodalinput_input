@@ -5502,7 +5502,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         Coordinate2D cursorPos = {};
         ReverseRotateDisplayScreen(*displayInfo,  pointerItem.GetDisplayXPos(), pointerItem.GetDisplayYPos(),
             cursorPos);
-        Direction displayDirection = GetDisplayDirection(displayInfo);
         CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId, static_cast<int32_t>(cursorPos.x),
             static_cast<int32_t>(cursorPos.y), pointerStyle, physicDisplayInfo->direction);
     } else if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
