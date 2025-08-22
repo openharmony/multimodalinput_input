@@ -424,11 +424,14 @@ void TouchDrawingHandler::DrawBubble()
         canvas->AttachBrush(brush);
         canvas->DrawCircle(centerPt, bubble_.innerCircleRadius);
         canvas->DetachBrush();
+        CHKPV(surfaceNode_);
         if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
             pointerEvent_->GetPointerId() == pointerId) {
-            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{private}d,"
-                " physicalY:%{private}d, width:%{public}d, height:%{public}d", pointerEvent_->GetPointerAction(),
-                pointerEvent_->GetPointerId(), displayXY.first, displayXY.second, scaleW_, scaleH_);
+            MMI_HILOGI("Bubble is draw success, %{public}d|%{public}d|%{private}d|%{private}d|%{public}d|%{public}d|"
+                "%{public}.2f|%{public}.2f|%{public}" PRIu64, pointerEvent_->GetPointerAction(),
+                pointerEvent_->GetPointerId(), displayXY.first, displayXY.second, scaleW_, scaleH_,
+                surfaceNode_->GetStagingProperties().GetRotation(),
+                bubbleCanvasNode_->GetStagingProperties().GetRotation(), bubbleCanvasNode_->GetId());
         }
     }
     bubbleCanvasNode_->FinishRecording();
