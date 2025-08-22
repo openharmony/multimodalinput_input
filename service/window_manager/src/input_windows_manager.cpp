@@ -6552,7 +6552,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    auto proxy = POINTER_DEV_MGR.GetDelegateProxy();
+    auto proxy = PointerDrawingManager::GetInstance().GetDelegateProxy();
     if (proxy != nullptr) {
         CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
     }
