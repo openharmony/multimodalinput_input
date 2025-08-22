@@ -31,6 +31,7 @@ namespace {
 constexpr size_t MAX_BUNDLE_NAME_LEN = 128;
 constexpr size_t MAX_PREINPUT_KEYS = 8;
 constexpr int32_t MAX_GESTURE_FINGERS = 10;
+constexpr int32_t OUT_INIT = -1;
 } // namespace
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
@@ -73,9 +74,9 @@ void SetPointerSizeFuzz(FuzzedDataProvider &fdp)
     MMIService::GetInstance()->SetPointerSize(sizeArg);
 }
 
-void GetPointerSizeFuzz(FuzzedDataProvider &fdp)
+void GetPointerSizeFuzz()
 {
-    int32_t size = fdp.ConsumeIntegral<int32_t>();
+    int32_t size = OUT_INIT;
     MMIService::GetInstance()->GetPointerSize(size);
 }
 
@@ -104,9 +105,9 @@ void SetPointerVisibleFuzz(FuzzedDataProvider &fdp)
     MMIService::GetInstance()->SetPointerVisible(visible, priority);
 }
 
-void IsPointerVisibleFuzz(FuzzedDataProvider &fdp)
+void IsPointerVisibleFuzz()
 {
-    bool visible = fdp.ConsumeBool();
+    bool visible = false;
     MMIService::GetInstance()->IsPointerVisible(visible);
 }
 
@@ -260,7 +261,7 @@ void UnregisterDevListenerFuzz(FuzzedDataProvider &fdp)
 void GetKeyboardTypeFuzz(FuzzedDataProvider &fdp)
 {
     int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
-    int32_t keyboardType = fdp.ConsumeIntegral<int32_t>();
+    int32_t keyboardType = OUT_INIT;
     MMIService::GetInstance()->GetKeyboardType(deviceId, keyboardType);
 }
 
@@ -284,8 +285,12 @@ void GetKeyboardRepeatRateFuzz(FuzzedDataProvider &fdp)
 
 void CheckInputHandlerVaildFuzz(FuzzedDataProvider &fdp)
 {
-    int32_t ht = fdp.ConsumeIntegral<int32_t>();
-    MMIService::GetInstance()->CheckInputHandlerVaild(static_cast<InputHandlerType>(ht));
+    int32_t raw = fdp.ConsumeIntegralInRange<int32_t>(
+        static_cast<int32_t>(InputHandlerType::INTERCEPTOR),
+        static_cast<int32_t>(InputHandlerType::MONITOR)
+    );
+    InputHandlerType ht = static_cast<InputHandlerType>(raw);
+    MMIService::GetInstance()->CheckInputHandlerVaild(ht);
 }
 
 void AddInputHandlerFuzz(FuzzedDataProvider &fdp)
@@ -523,12 +528,12 @@ void MmiServiceFuzzFirstGroup(FuzzedDataProvider &provider)
     SetNapStatusFuzz(provider);
     GetMouseScrollRowsFuzz(provider);
     SetPointerSizeFuzz(provider);
-    GetPointerSizeFuzz(provider);
+    GetPointerSizeFuzz();
     GetCursorSurfaceIdFuzz(provider);
     SetMousePrimaryButtonFuzz(provider);
     GetMousePrimaryButtonFuzz(provider);
     SetPointerVisibleFuzz(provider);
-    IsPointerVisibleFuzz(provider);
+    IsPointerVisibleFuzz();
     SetPointerColorFuzz(provider);
     GetPointerColorFuzz(provider);
     SetPointerSpeedFuzz(provider);
