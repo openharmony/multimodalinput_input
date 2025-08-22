@@ -111,6 +111,7 @@ public:
     ~TouchPadTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
+    void OnDeviceRemoved() override;
     static int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     static int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);

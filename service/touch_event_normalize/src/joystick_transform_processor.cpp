@@ -142,5 +142,8 @@ std::shared_ptr<PointerEvent> JoystickTransformProcessor::OnEvent(struct libinpu
    
     return pointerEvent_;
 }
+
+void JoystickTransformProcessor::OnDeviceRemoved()
+{}
 } // namespace MMI
 } // namespace OHOS
