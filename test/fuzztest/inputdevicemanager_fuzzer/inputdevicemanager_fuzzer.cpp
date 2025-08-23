@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "mmi_log.h"
 #include "input_device_manager.h"
 #include "inputdevicemanager_fuzzer.h"
@@ -25,42 +26,40 @@
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
+#undef MAX_VECTOR_SIZE
+constexpr int32_t MAX_VECTOR_SIZE { 20 };
 bool InputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t id = 1;
-    int32_t deviceId = 1;
-    int32_t keyboardType = 1;
-    std::string type = "hello";
-    bool checked = true;
-    bool enable = true;
-    bool hasPointerDevice = true;
-    bool isVisible = true;
-    bool isHotPlug = true;
+    FuzzedDataProvider fdp(data, size);
+    int32_t id = fdp.ConsumeIntegral<int32_t>();
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    int32_t keyboardType = fdp.ConsumeIntegral<int32_t>();
+    std::string type = fdp.ConsumeRandomLengthString();
+    bool checked = fdp.ConsumeBool();
+    bool enable = fdp.ConsumeBool();
+    bool hasPointerDevice = fdp.ConsumeBool();
+    bool isVisible = fdp.ConsumeBool();
+    bool isHotPlug = fdp.ConsumeBool();
     libinput_device* deviceOrigin = nullptr;
     std::shared_ptr<InputDevice> inputDevice;
     std::shared_ptr<IDeviceObserver> observer;
     std::shared_ptr<InputDevice> devicePtr = std::make_shared<InputDevice>();
     struct libinput_device* structDevice = nullptr;
-    std::vector<int32_t> keyCodes = {1};
-    std::vector<bool> keystroke = {true};
-    std::vector<std::string> args = {"hello"};
+    size_t bytesSize = fdp.ConsumeIntegralInRange<size_t>(0, MAX_VECTOR_SIZE);
+    std::vector<int32_t> keyCodes;
+    for (int i = 0; i < bytesSize; i++) {
+        keyCodes.push_back(fdp.ConsumeIntegral<int32_t>());
+    }
+    bytesSize = fdp.ConsumeIntegralInRange<size_t>(0, MAX_VECTOR_SIZE);
+    std::vector<bool> keystroke;
+    for (int i = 0; i < bytesSize; i++) {
+        keystroke.push_back(fdp.ConsumeBool());
+    }
+    bytesSize = fdp.ConsumeIntegralInRange<size_t>(0, MAX_VECTOR_SIZE);
+    std::vector<std::string> args;
+    for (int i = 0; i < bytesSize; i++) {
+        args.push_back(fdp.ConsumeRandomLengthString());
+    }
     SessionPtr session;
     InputDeviceManager::InputDeviceInfo inDevice;
 
