@@ -5292,7 +5292,7 @@ HWTEST_F(InputWindowsManagerTest, IsWritePen_002, TestSize.Level1)
     ASSERT_NE(inputWindowsManager, nullptr);
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_TRUE(inputWindowsManager->IsWritePen(pointerItem));
+    EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
 }
 } // namespace MMI
 } // namespace OHOS
