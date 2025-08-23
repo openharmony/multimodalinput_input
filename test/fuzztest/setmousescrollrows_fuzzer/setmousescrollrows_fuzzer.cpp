@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "setmousescrollrows_fuzzer.h"
 
 #include "securec.h"
@@ -25,26 +26,11 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 void SetMouseScrollRowsFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
+    FuzzedDataProvider fdp(data, size);
+    int32_t rowsBefore = fdp.ConsumeIntegral<int32_t>();
     int32_t rowsAfter;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     MMI_HILOGD("SetMouseScrollRows start");
     InputManager::GetInstance()->SetMouseScrollRows(rowsBefore);
     InputManager::GetInstance()->GetMouseScrollRows(rowsAfter);
@@ -52,19 +38,15 @@ void SetMouseScrollRowsFuzzTest(const uint8_t* data, size_t size)
 
 void SetPointerSizeFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t pointerSizeBefore;
+    FuzzedDataProvider fdp(data, size);
+    int32_t pointerSizeBefore = fdp.ConsumeIntegral<int32_t>();
     int32_t pointerSizeAfter;
-    startPos += GetObject<int32_t>(pointerSizeBefore, data + startPos, size - startPos);
     InputManager::GetInstance()->SetPointerSize(pointerSizeBefore);
     InputManager::GetInstance()->GetPointerSize(pointerSizeAfter);
 }
 
 void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
     std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> map;
     MMI_HILOGD("GetAllMmiSubscribedEventsFuzzTest start");
     InputManager::GetInstance()->GetAllMmiSubscribedEvents(map);
@@ -72,56 +54,42 @@ void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
 
 void SetNapStatusFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t pid = 10;
-    int32_t uid = 20;
-    std::string bundleName = "name";
-    int32_t state = 2;
+    FuzzedDataProvider fdp(data, size);
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    int32_t uid = fdp.ConsumeIntegral<int32_t>();
+    std::string bundleName = fdp.ConsumeRandomLengthString();
+    int32_t state = fdp.ConsumeIntegral<int32_t>();
     InputManager::GetInstance()->SetNapStatus(pid, uid, bundleName, state);
 }
 
 void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    bool isHoverState = true;
-    InputManager::GetInstance()->SetHoverScrollState(isHoverState);
-    bool notHoverState = false;
-    InputManager::GetInstance()->SetHoverScrollState(notHoverState);
-    bool getHoverState = true;
-    InputManager::GetInstance()->GetHoverScrollState(getHoverState);
+    FuzzedDataProvider fdp(data, size);
+    bool state = fdp.ConsumeBool();
+    InputManager::GetInstance()->SetHoverScrollState(state);
+    InputManager::GetInstance()->GetHoverScrollState(state);
 }
 
 void PointerColorFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t firstColor = 0xA946F1;
-    InputManager::GetInstance()->SetPointerColor(firstColor);
-    int32_t getColor = 3;
-    InputManager::GetInstance()->GetPointerColor(getColor);
+    FuzzedDataProvider fdp(data, size);
+    int32_t color = fdp.ConsumeIntegralInRange(0, 0x00FFFFFF);
+    InputManager::GetInstance()->SetPointerColor(color);
+    InputManager::GetInstance()->GetPointerColor(color);
 }
 
 void ClearWindowPointerStyleFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t pid = 0;
-    int32_t uid = 0;
+    FuzzedDataProvider fdp(data, size);
+    int32_t pid = fdp.ConsumeIntegral<int32_t>();
+    int32_t uid = fdp.ConsumeIntegral<int32_t>();
     InputManager::GetInstance()->ClearWindowPointerStyle(pid, uid);
 }
 
 void SetKeyboardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t delayTime = 10;
+    FuzzedDataProvider fdp(data, size);
+    int32_t delayTime = fdp.ConsumeIntegral<int32_t>();
     InputManager::GetInstance()->SetKeyboardRepeatDelay(delayTime);
 }
 } // MMI
