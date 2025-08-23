@@ -498,5 +498,32 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
     auto pointerEvent = processor.OnEvent(&event.base);
     ASSERT_TRUE(pointerEvent == nullptr);
 }
+
+/**
+ * @tc.name: DrawTouchGraphicDrawing_006
+ * @tc.desc: Test the funcation DrawTouchGraphicDrawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, DrawTouchGraphicDrawing_006, TestSize.Level1)
+{
+    EXPECT_CALL(*WIN_MGR_MOCK, DrawTouchGraphic).Times(Exactly(1));
+    int32_t deviceId { 2 };
+    TabletToolTransformProcessor processor(deviceId);
+    processor.pointerevent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerevent_, nullptr);
+    processor.pointerevent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE)
+    EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicDrawing());
+
+    int32_t pointerId = 1;
+    PointerEvent::PointerItem item {};
+    item.SetPressed(false);
+    item.SetPointerId(pointerId);
+    processor.pointerevent_->RemoveAllPointerItems();
+    processor.pointerevent_->UpdatePointerItem(pointerId, item);
+    EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicDrawing());
+    EXPECT_EQ(processor.pointerevent_->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
+    InputWindowsManagerMock::ReleaseInstance();
+}
 } // namespace MMI
 } // namespace OHOS
