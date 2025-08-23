@@ -197,6 +197,20 @@ struct DisplayInfo {
      * @since 18
      */
     uint64_t rsId { 0 };
+
+    /**
+     * The angle of the screen content relative to the sensor 0 degrees.
+     *
+     * @since 20
+     */
+    Direction deviceRotation;
+
+    /**
+     * The angle of the rotation correction.
+     *
+     * @since 20
+     */
+    Direction rotationCorrection;
 };
 
 struct DisplayGroupInfo {
