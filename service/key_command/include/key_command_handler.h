@@ -430,8 +430,7 @@ private:
     int64_t sosLaunchTime_ { -1 };
     int64_t powerUpTime_ { 0 };
     int32_t currentUserId_ { -1 };
-    int64_t lastMenuDownTime_ {0};
-    bool existMenuDown_ { false };
+    int32_t menuPressedTimerId_ { -1 };
     std::shared_ptr<KeyEvent> tmpkeyEvent_ {nullptr};
     bool gameForbidFingerKnuckle_ { false };
     bool hasRegisteredSensor_ { false };
