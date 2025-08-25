@@ -16,6 +16,6 @@
 #ifndef STUBMMISERVICE_FUZZER_H
 #define STUBMMISERVICE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "stubmmiseivice_fuzzer"
+#define FUZZ_PROJECT_NAME "stubmmiservice_fuzzer"
 
 #endif // STUBMMISERVICE_FUZZER_H
