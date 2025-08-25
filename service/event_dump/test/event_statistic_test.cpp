@@ -697,7 +697,7 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_006, TestSize
     eventStatistic.PushPointerRecord(pointerEvent);
     EXPECT_EQ(eventStatistic.QueryPointerRecord(1, pointerList), RET_OK);
     EXPECT_EQ(pointerList.size(), 1u);
-    EXPECT_EQ(pointerList[0]->GetAllPointerItems().size(), 1u);
+    EXPECT_EQ(pointerList[0]->GetAllPointerItems().size(), 2u);
 }
 
 /**
