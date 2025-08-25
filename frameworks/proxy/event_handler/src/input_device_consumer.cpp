@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "input_device_consumer_proxy.h"
+#include "input_device_consumer.h"
 #include "input_device_consumer_proxy.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
