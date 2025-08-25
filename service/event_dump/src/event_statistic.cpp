@@ -238,10 +238,12 @@ void EventStatistic::PushEventStr(std::string eventStr)
 void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
 {
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
+    std::vector<int32_t> pointerIds;
     std::vector<double> pressures;
     std::vector<double> tiltXs;
     std::vector<double> tiltYs;
     for (auto it = pointerItems.begin(); it != pointerItems.end(); ++it) {
+        pointerIds.push_back(it->GetPointerId());
         pressures.push_back(it->GetPressure());
         tiltXs.push_back(it->GetTiltX());
         tiltYs.push_back(it->GetTiltY());
@@ -249,6 +251,7 @@ void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
     pointerRecordDeque_.emplace_back(eventPtr->GetActionTime(),
         eventPtr->GetSourceType(),
         eventPtr->HasFlag(InputEvent::EVENT_FLAG_SIMULATE),
+        pointerIds,
         pressures,
         tiltXs,
         tiltYs);
@@ -271,10 +274,13 @@ int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::share
         if (it->isInject) {
             pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
         }
+        auto pointerIdIt = it->pointerIds.begin();
         for (auto pressuresIt = it->pressures.begin(), tiltXsIt = it->tiltXs.begin(), tiltYsIt = it->tiltYs.begin();
-             pressuresIt != it->pressures.end() && tiltXsIt != it->tiltXs.end() && tiltYsIt != it->tiltYs.end();
-             ++pressuresIt, ++tiltXsIt, ++tiltYsIt) {
+             pointerIdIt != it->pointerIds.end() && pressuresIt != it->pressures.end() &&
+             tiltXsIt != it->tiltXs.end() && tiltYsIt != it->tiltYs.end();
+             ++pointerIdIt, ++pressuresIt, ++tiltXsIt, ++tiltYsIt) {
             PointerEvent::PointerItem pointerItem;
+            pointerItem.SetPointerId(*pointerIdIt);
             pointerItem.SetPressure(*pressuresIt);
             pointerItem.SetTiltX(*tiltXsIt);
             pointerItem.SetTiltY(*tiltYsIt);
