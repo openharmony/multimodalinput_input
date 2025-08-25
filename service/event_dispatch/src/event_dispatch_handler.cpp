@@ -175,7 +175,7 @@ void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent
     if (escToBackFlag_ && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP ||
         keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) &&
         keyEvent->GetKeyItems().size() == 1) {
-        MMI_HILOGI("Only esc up or cancel has added flag: %{public}s", keyEvent->ToString().c_str());
+        MMI_HILOGI("Esc up or cancel, add flag");
         keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
         escToBackFlag_ = false;
     }
