@@ -270,8 +270,8 @@ private:
                     item.GetTargetWindowId(), item.GetOriginPointerId(), isSimulate.c_str(), item.GetTwist());
             } else {
                 MMI_HILOG_HEADER(LOG_DEBUG, lh,"DX:%{private}d, DY:%{private}d, DXP:%{private}f, DYP:%{private}f,"
-                    "FXP:%{private}f, FYP:%{private}f, WXP:%{private}f, WYP:%{private}f, IP:%{public}d, P:%{public}.2f, MF:%{public}d,"
-                    "LA:%{public}d, SA:%{public}d, SI:%{public}s",
+                    "FXP:%{private}f, FYP:%{private}f, WXP:%{private}f, WYP:%{private}f, IP:%{public}d,"
+                    " P:%{public}.2f, MF:%{public}d, LA:%{public}d, SA:%{public}d, SI:%{public}s",
                     item.GetDisplayX(), item.GetDisplayY(), item.GetDisplayXPos(), item.GetDisplayYPos(),
                     item.GetFixedDisplayXPos(), item.GetFixedDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
                     item.IsPressed(), item.GetPressure(), item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(),
