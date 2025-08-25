@@ -349,7 +349,7 @@ private:
                         "ToolWY:%d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
                         "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
                         "RawDisplayY:%d, T:%{public}d, DXP:%f, DYP:%f, FXP:%f, FYP:%f, WXP:%f, WYP:%f",
-                        pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                        item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
                         item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                         item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
@@ -366,7 +366,7 @@ private:
                         ", RawDisplayX:%{private}d, RawDisplayY:%{private}d, T:%{public}d"
                         ", DXP:%{private}f, DYP:%{private}f, FXP:%{private}f, FYP:%{private}f, WXP:%{private}f,"
                         " WYP:%{private}f",
-                        pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                        item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
                         item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                         item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
