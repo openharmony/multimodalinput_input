@@ -1593,6 +1593,9 @@ int32_t MouseTransformProcessor::SetMouseAccelerateMotionSwitch(bool enable)
     return RET_OK;
 }
 
+void MouseTransformProcessor::OnDeviceRemoved()
+{}
+
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
 void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)
 {

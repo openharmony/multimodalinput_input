@@ -45,6 +45,7 @@ public:
         const NativePreferences::PreferencesValue &setValue));
 
     static std::shared_ptr<PreferencesManagerMock> GetInstance();
+    static void ReleaseInstance();
 
 private:
     static std::mutex mutex_;

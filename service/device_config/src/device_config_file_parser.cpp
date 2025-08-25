@@ -69,6 +69,7 @@ ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name
 {
     static const std::map<const std::string, ConfigFileItem> configList = {
         { "speed", ConfigFileItem::POINTER_SPEED },
+        { "enableOutScreen", ConfigFileItem::POINTER_ENABLE_OUT_SCREEN },
     };
 
     auto iter = configList.find(name);
@@ -131,11 +132,15 @@ VendorConfig DeviceConfigManagement::GetVendorConfig(struct libinput_device *dev
         MMI_HILOGE("The configList is empty");
         return vendorConfigTmp;
     }
-    if (configList.find(ConfigFileItem::POINTER_SPEED) == configList.end()) {
+    if (configList.find(ConfigFileItem::POINTER_SPEED) != configList.end()) {
+        vendorConfigTmp.pointerSpeed = configList[ConfigFileItem::POINTER_SPEED];
+    } else {
         MMI_HILOGE("The configList not find POINTER_SPEED");
-        return vendorConfigTmp;
     }
-    vendorConfigTmp.pointerSpeed = configList[ConfigFileItem::POINTER_SPEED];
+    if (configList.find(ConfigFileItem::POINTER_ENABLE_OUT_SCREEN) != configList.end()) {
+        vendorConfigTmp.enableOutScreen = configList[ConfigFileItem::POINTER_ENABLE_OUT_SCREEN];
+        MMI_HILOGI("The configList add POINTER_ENABLE_OUT_SCREEN");
+    }
     return vendorConfigTmp;
 }
 } // namespace MMI

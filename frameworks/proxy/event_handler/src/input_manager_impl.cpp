@@ -797,7 +797,7 @@ int32_t InputManagerImpl::PackDisplaysInfo(NetPacket &pkt,
             << item.displayMode << item.transform << item.scalePercent << item.expandHeight
             << item.isCurrentOffScreenRendering << item.displaySourceMode << item.oneHandX
             << item.oneHandY << item.screenArea << item.rsId << item.offsetX << item.offsetY
-            << item.pointerActiveWidth << item.pointerActiveHeight;
+            << item.pointerActiveWidth << item.pointerActiveHeight << item.deviceRotation << item.rotationCorrection;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write displays data failed");
