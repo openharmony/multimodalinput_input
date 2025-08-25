@@ -336,6 +336,27 @@ ohos_prebuilt_etc("drawing_pointer_image_ScreenRecorder_Cursor") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
+ohos_prebuilt_etc("drawing_pointer_image_Laser_Cursor") {
+  source = "src/Laser_Cursor.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Laser_Cursor_Dot") {
+  source = "src/Laser_Cursor_Dot.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Laser_Cursor_Dot_Red") {
+  source = "src/Laser_Cursor_Dot_Red.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   source = "${mmi_path}/etc/ability_launch_config.json"
   part_name = "input"
@@ -433,6 +454,9 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_West_East",
     ":drawing_pointer_image_Zoom_In",
     ":drawing_pointer_image_Zoom_Out",
+    ":drawing_pointer_image_Laser_Cursor",
+    ":drawing_pointer_image_Laser_Cursor_Dot",
+    ":drawing_pointer_image_Laser_Cursor_Dot_Red",
     ":multimodalinput.config.exceptional_system_keys",
     ":multimodalinput.config.system_hotkeys",
     ":multimodalinput.config.system_keys",

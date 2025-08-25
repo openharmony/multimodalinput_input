@@ -31,6 +31,7 @@
 #include "pointer_drawing_manager.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "preferences_manager_mock.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PointerDrawingManagerExTest"
@@ -55,6 +56,7 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 } // namespace
 
 class PointerDrawingManagerExTest : public testing::Test {
@@ -1808,6 +1810,71 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_IsWindowRotati
     } else {
         ASSERT_EQ(ret, false);
     }
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_001
+ * @tc.desc: Test the funcation InitDefaultMouseIconPath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMouseIconPath_001, TestSize.Level1)
+{
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(41));
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(1)).RetiresOnSaturation();
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(0)).RetiresOnSaturation();
+    PointerDrawingManager pointerDrawingManager;
+    auto iconPath = pointerDrawingManager.GetMouseIconPath();
+    PointerStyle curPointerStyle;
+    curPointerStyle.id = 0;
+    std::string newIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
+    ASSERT_EQ(iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath, newIconPath);
+    PreferencesManagerMock::ReleaseInstance();
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_002
+ * @tc.desc: Test the funcation InitDefaultMouseIconPath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMouseIconPath_002, TestSize.Level1)
+{
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(47));
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(1)).RetiresOnSaturation();
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(0)).RetiresOnSaturation();
+    PointerDrawingManager pointerDrawingManager;
+    auto iconPath = pointerDrawingManager.GetMouseIconPath();
+    PointerStyle curPointerStyle;
+    curPointerStyle.id = 0;
+    std::string newIconPath = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
+    ASSERT_EQ(iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath, newIconPath);
+    PreferencesManagerMock::ReleaseInstance();
+}
+ 
+/**
+ * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_003
+ * @tc.desc: Test the funcation InitDefaultMouseIconPath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMouseIconPath_003, TestSize.Level1)
+{
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(41));
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(1)).RetiresOnSaturation();
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(0)).RetiresOnSaturation();
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(41)).RetiresOnSaturation();
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(1)).RetiresOnSaturation();
+    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(0)).RetiresOnSaturation();
+    PointerDrawingManager pointerDrawingManager;
+    std::string invalidIconPath = IMAGE_POINTER_DEFAULT_PATH + "invalid.svg";
+    pointerDrawingManager.UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), invalidIconPath);
+    pointerDrawingManager.CheckMouseIconPath();
+    pointerDrawingManager.InitDefaultMouseIconPath();
+    auto iconPath = pointerDrawingManager.GetMouseIconPath();
+    auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+    ASSERT_EQ(it, iconPath.end());
+    PreferencesManagerMock::ReleaseInstance();
 }
 } // namespace MMI
 } // namespace OHOS

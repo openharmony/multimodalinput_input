@@ -77,6 +77,8 @@ public:
     MOCK_METHOD(double, TouchpadDeviceGetPpi, (struct libinput_device *));
     MOCK_METHOD(double, TouchpadDeviceGetHypotSize, (struct libinput_device *));
     MOCK_METHOD(int32_t, TouchpadDeviceGetFrequency, (struct libinput_device *));
+    MOCK_METHOD(enum libinput_tablet_tool_proximity_state, TabletToolGetProximityState,
+        (struct libinput_event_tablet_tool *));
 };
 } // namespace MMI
 } // namespace OHOS

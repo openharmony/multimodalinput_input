@@ -60,7 +60,7 @@ enum VKeyboardEventType {
     NormalKeyboardEvent = 0,
     HideCursor = 1,
     UpdateCaps = 2,
-    StopLongpress = 3
+    StopLongPress = 3
 };
 
 enum VTrackpadEventType {
@@ -140,7 +140,7 @@ public:
         );
 
 private:
-    void MultiKeyboardSetLedState(bool oldCapsLockState);
+    void MultiKeyboardSetLedState(bool newCapsLockState);
     void MultiKeyboardSetFuncState(libinput_event* event);
     void OnEventHandler();
     void OnDeviceAdded(std::string path);
@@ -150,9 +150,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
-    void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> keyEvents,
+    void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> &keyboardEvents,
                                 int64_t frameTime);
-    void HandleVTrackpadMessage(VTrackpadEventType eventType, std::vector<libinput_event*> events,
+    void HandleVTrackpadMessage(VTrackpadEventType eventType, std::vector<libinput_event*> &events,
                                 int64_t frameTime, libinput_event_touch *touch);
     bool IsVKeyboardActivationDropEvent(libinput_event_touch* touch, libinput_event_type eventType);
     void InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch,

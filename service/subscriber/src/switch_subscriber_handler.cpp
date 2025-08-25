@@ -82,7 +82,7 @@ int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t s
     }
     CHKPR(sess, ERROR_NULL_POINTER);
 
-    MMI_HILOGD("subscribeId:%{public}d switchType:%{public}d", subscribeId, switchType);
+    MMI_HILOGI("subscribeId:%{public}d switchType:%{public}d", subscribeId, switchType);
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, switchType);
     InsertSubScriber(std::move(subscriber));
     InitSessionDeleteCallback();

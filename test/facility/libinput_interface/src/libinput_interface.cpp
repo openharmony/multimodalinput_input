@@ -493,4 +493,10 @@ int32_t libinput_touchpad_device_get_frequency(struct libinput_device *device)
 {
     return g_instance->TouchpadDeviceGetFrequency(device);
 }
+
+enum libinput_tablet_tool_proximity_state libinput_event_tablet_tool_get_proximity_state(
+    struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetProximityState(event);
+}
 } // extern "C"

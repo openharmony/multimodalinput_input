@@ -17,6 +17,7 @@
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
 #include <deque>
+#include <mutex>
 
 #include "aggregator.h"
 #include "timer_manager.h"
@@ -110,6 +111,7 @@ public:
     ~TouchPadTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
+    void OnDeviceRemoved() override;
     static int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
     static int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);
@@ -155,6 +157,7 @@ private:
     double rotateAngle_ { 0.0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::deque<Coords>> swipeHistory_;
+    std::mutex swipeHistoryMutex_;
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {

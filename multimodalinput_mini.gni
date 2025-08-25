@@ -294,6 +294,15 @@ declare_args() {
   ]
 }
 
+if (defined(global_parts_info) &&
+    (!defined(global_parts_info.multimodalinput_input_ext) ||
+     !global_parts_info.multimodalinput_input_ext)) {
+  input_ext_feature_anco = false
+  input_ext_feature_magiccursor = false
+  input_ext_feature_keyboard_ext_flag = false
+  input_feature_mistouch_prevention = false
+}
+
 if (input_feature_joystick) {
   input_feature_mouse = true
 }
