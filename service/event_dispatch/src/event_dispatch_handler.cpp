@@ -159,7 +159,7 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
 void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    MMI_HILOGD("add Flag to ESC in: %{public}s", keyEvent->ToString().c_str());
+    MMI_HILOGD("add Flag to ESC in");
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_ESCAPE) {
         return;
     }
