@@ -250,6 +250,7 @@ void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
     }
     pointerRecordDeque_.emplace_back(eventPtr->GetActionTime(),
         eventPtr->GetSourceType(),
+        eventPtr->GetPointerId(),
         eventPtr->HasFlag(InputEvent::EVENT_FLAG_SIMULATE),
         pointerIds,
         pressures,
@@ -271,6 +272,7 @@ int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::share
         auto pointerEvent = PointerEvent::Create();
         pointerEvent->SetActionTime(it->actionTime);
         pointerEvent->SetSourceType(it->sourceType);
+        pointerEvent->SetPointerId(it->pointerId);
         if (it->isInject) {
             pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
         }
