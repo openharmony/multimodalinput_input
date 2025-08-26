@@ -18,6 +18,8 @@
 static { loadLibrary("InputDevice.z") }
 """)
 
+from ohos.multimodalInput.keyCode use KeyCode;
+
 enum changedType: String {
     ADD = "add",
     REMOVE = "remove"
@@ -94,3 +96,20 @@ struct InputDeviceData {
     phys: String;
     uniq: String;
 }
+@gen_async("getDeviceList")
+@gen_promise("getDeviceList")
+function GetDeviceIdsAsync(): Array<i32>;
+@gen_async("getDeviceInfo")
+@gen_promise("getDeviceInfo")
+function GetDeviceInfoAsync(deviceId: i32): InputDeviceData;
+
+@!sts_inject("""
+    function on(type: 'change', callback: (info: DeviceListener) => void) {
+        return onKey(callback, callback);
+    }
+    function off(type: 'change', callback?: (info: DeviceListener) => void) {
+        return offKey(callback);
+    }
+""")
+function onKey(f: (info: DeviceListener) => void, opq: Opaque);
+function offKey(opq: Optional<Opaque>);
