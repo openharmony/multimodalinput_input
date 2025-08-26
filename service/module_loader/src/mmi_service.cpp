@@ -492,6 +492,11 @@ void MMIService::OnStart()
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
     InitPreferences();
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (POINTER_DEV_MGR.isInitDefaultMouseIconPath) {
+        CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #if OHOS_BUILD_ENABLE_POINTER
     bool switchFlag = false;
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
