@@ -35,6 +35,7 @@
 #include "pointer_style.h"
 #include "touchpad_control_display_gain.h"
 #include "shift_info.h"
+#include "iremote_broker.h"
 
 namespace OHOS {
 namespace MMI {
