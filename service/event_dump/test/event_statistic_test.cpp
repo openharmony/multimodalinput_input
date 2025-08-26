@@ -685,11 +685,13 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_006, TestSize
     pointerEvent->SetActionTime(123456);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     PointerEvent::PointerItem item1;
+    item1.SetPointerId(0);
     item1.SetPressure(1.0f);
     item1.SetTiltX(10.0f);
     item1.SetTiltY(30.0f);
     pointerEvent->AddPointerItem(item1);
     PointerEvent::PointerItem item2;
+    item1.SetPointerId(1);
     item2.SetPressure(0.5f);
     item2.SetTiltX(20.0f);
     item2.SetTiltY(40.0f);
