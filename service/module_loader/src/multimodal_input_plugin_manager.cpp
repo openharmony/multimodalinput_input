@@ -63,7 +63,7 @@ InputPluginManager* InputPluginManager::GetInstance(const std::string &directory
 int32_t InputPluginManager::Init(UDSServer& udsServer)
 {
     CALL_DEBUG_ENTER;
-    udsServer_ = udsServer;
+    udsServer_ = &udsServer;
     DIR *dir = opendir(directory_.c_str());
     if (!dir) {
         MMI_HILOGE("Failed to open error:%{private}s", strerror(errno));
@@ -212,7 +212,7 @@ int32_t InputPluginManager::DoHandleEvent(
         endTime = GetSysClockTime();
         lostTime = endTime - beginTime;
         if (lostTime >= TIMEOUT_US) {
-            MMI_HILOGE("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
+            MMI_HILOGW("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
                 (*pluginIt)->GetName().c_str(), endTime, lostTime);
         }
         if (result == PluginResult::UseNeedReissue) {
@@ -232,7 +232,7 @@ int32_t InputPluginManager::DoHandleEvent(
 
 int32_t InputPluginManager::HandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data)
 {
-    return DoHandleEvent(keyEvent, data, nullptr);
+    return DoHandleEvent(event, data, nullptr);
 }
 
 // LIBINPUT_EVENT_TABLET_TOOL_BUTTON、LIBINPUT_EVENT_TABLET_PAD_BUTTON、LIBINPUT_EVENT_TABLET_PAD_KEY
@@ -305,8 +305,7 @@ int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, s
 {
     MMI_HILOGD("Get stub from plugin: %{public}s start", pluginName.c_str());
     std::list<std::shared_ptr<IPluginContext>> allPluginList;
-    for (auto &[stage, inputPluginList] : plugins_)
-    {
+    for (auto &[stage, inputPluginList] : plugins_) {
         std::copy(inputPluginList.begin(), inputPluginList.end(), std::back_inserter(allPluginList));
     }
     std::list<std::shared_ptr<IPluginContext>>::iterator pluginIt =
@@ -319,7 +318,7 @@ int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, s
 
     pluginRemoteStub = (*pluginIt)->GetPlugin()->GetPluginRemoteStub();
     if (!pluginRemoteStub) {
-        MMI_HILOGE("Get plugin stub failed due to there is no plugin named: %{public}s", pluginName.c_str());
+        MMI_HILOGE("Plugin named: %{public}s is not initialized", pluginName.c_str());
         return ERROR_NULL_POINTER;
     }
     return RET_OK;
@@ -366,15 +365,15 @@ void InputPlugin::UnInit()
     }
 }
 
-void InputPlugin::DispatchEvent(PluginEventType event, int64_t frameTime)
+void InputPlugin::DispatchEvent(PluginEventType pluginEvent, int64_t frameTime)
 {
     std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
     data->frameTime = frameTime;
     data->stage = stage_;
-    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(event, data, this);
+    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(pluginEvent, data, this);
     if (result == RET_NOTDO) {
         CHKPV(callback_);
-        callback_(event, frameTime);
+        callback_(pluginEvent, frameTime);
     }
 }
 
@@ -403,7 +402,7 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
     std::visit(overloaded{
         [&eventHandler](std::shared_ptr<KeyEvent> evt) { return eventHandler->HandleKeyEvent(evt); },
         [&eventHandler](std::shared_ptr<PointerEvent> evt) { return eventHandler->HandlePointerEvent(evt); },
-        [](libinput* evt) { return; }
+        [](libinput_event* evt) { return; }
         [](std::shared_ptr<AxisEvent> evt) { return; }
     }, pluginEvent);
 }
@@ -416,7 +415,7 @@ void InputPlugin::DispatchEvent(NetPacket& pkt, int32_t pid)
         return;
     }
     if (!session->SendMsg(pkt)) {
-        MMI_HILOGE("Send message to oid: %{public}d failed, errCode: %{public}d", pid, MSG_SEND_FAIL);
+        MMI_HILOGE("Send message to pid: %{public}d failed, errCode: %{public}d", pid, MSG_SEND_FAIL);
     }
 }
 
@@ -442,12 +441,6 @@ PluginResult InputPlugin::HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std:
 {
     CHKPR(plugin_, PluginResult::NotUse);
     return plugin_->HandleEvent(axisEvent, data);
-}
-
-PluginResult InputPlugin::HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage)
-{
-    CHKPR(plugin_, PluginResult::NotUse);
-    return plugin_->HandleEvent(keyEvent, stage);
 }
 
 int32_t InputPlugin::AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount)

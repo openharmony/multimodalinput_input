@@ -425,12 +425,12 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPoi
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_GetPluginRmoteStub
- * @tc.desc: Test the function GetPluginRmoteStub
+ * @tc.name: MultimodalInputConnectProxyTest_GetPluginRemoteStub
+ * @tc.desc: Test the function GetPluginRemoteStub
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPluginRmoteStub, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPluginRemoteStub, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));

@@ -1219,7 +1219,7 @@ int32_t MultimodalInputConnectManager::GetPluginRemoteStub(
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetPluginRemoteStub(count, pointerList);
+    return multimodalInputConnectService_->GetPluginRemoteStub(pluginName, pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS
