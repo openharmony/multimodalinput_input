@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "setcurrentshieldmode_fuzzer.h"
-
+#include "fuzzer/FuzzedDataProvider.h"
 #include "input_device_manager.h"
 #include "key_event_normalize.h"
 #include "libinput.h"
 #include "mmi_log.h"
+#include "setcurrentshieldmode_fuzzer.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SetCurrentShieldModeFuzzTest"
@@ -31,8 +31,8 @@ void SetCurrentShieldModeFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     MMI_HILOGD("SetCurrentShieldModeFuzzTest");
-
-    int32_t shieldMode = size;
+    FuzzedDataProvider provider(data, size);
+    int32_t shieldMode = provider.ConsumeIntegral<int32_t>();
     KeyEventHdr->SetCurrentShieldMode(shieldMode);
 }
 } // MMI

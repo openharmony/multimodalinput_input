@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "mmi_log.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "input_device_manager.h"
+#include "mmi_log.h"
 #include "setinputdeviceenabled_fuzzer.h"
 
 #include "securec.h"
@@ -24,34 +25,17 @@
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void SetInputDeviceEnabledFuzzTest(const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool SetInputDeviceEnabledFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int32_t deviceId = 1;
-    SessionPtr session;
-    bool enable = true;
-    int32_t index = 1;
-    int32_t pid = 1;
+    FuzzedDataProvider provider(data, size);
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    bool enable = provider.ConsumeBool();
+    int32_t index = provider.ConsumeIntegral<int32_t>();
+    int32_t pid = provider.ConsumeIntegral<int32_t>();
     INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, enable, index, pid, session);
-    return true;
 }
+} // namespace MMI
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
@@ -61,8 +45,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::SetInputDeviceEnabledFuzzTest(data, size);
+    OHOS::MMI::SetInputDeviceEnabledFuzzTest(data, size);
     return 0;
 }
-} // namespace MMI
-} // namespace OHOS

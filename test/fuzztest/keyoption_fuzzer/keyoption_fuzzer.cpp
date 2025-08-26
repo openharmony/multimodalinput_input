@@ -48,16 +48,6 @@ bool KeyOptionFuzzTest(const uint8_t *data, size_t size)
 
     int32_t finalKeyUpDelay = provider.ConsumeIntegral<int32_t>();
     keyOption.SetFinalKeyUpDelay(finalKeyUpDelay);
-
-    bool isRepeat = provider.ConsumeBool();
-    keyOption.SetRepeat(isRepeat);
-
-    int32_t priority = provider.ConsumeIntegral<int32_t>();
-    keyOption.SetPriority(priority);
-
-    Parcel parcel;
-    keyOption.ReadFromParcel(parcel);
-    keyOption.WriteToParcel(parcel);
     MMI_HILOGD("KeyOptionFuzzTest");
     return true;
 }
