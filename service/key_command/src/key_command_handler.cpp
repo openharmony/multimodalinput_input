@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -489,11 +489,12 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
         knuckleCount_ = 0;
         if ((type == KnuckleType::KNUCKLE_TYPE_SINGLE && HasScreenCapturePermission(KNUCKLE_SCREENSHOT)) ||
             (type == KnuckleType::KNUCKLE_TYPE_DOUBLE && HasScreenCapturePermission(KNUCKLE_SCREEN_RECORDING))) {
-            DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
             BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
             LaunchAbility(knuckleGesture.ability, NO_DELAY);
             BytraceAdapter::StopLaunchAbility();
-            if (knuckleGesture.ability.bundleName == BUNDLE_NAME_PARSER.GetBundleName("SCREENRECORDER_BUNDLE_NAME")) {
+            if (type == KnuckleType::KNUCKLE_TYPE_SINGLE) {
+                DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
+            } else if (type == KnuckleType::KNUCKLE_TYPE_DOUBLE) {
                 DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
             }
             ReportKnuckleScreenCapture(touchEvent);
@@ -505,8 +506,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
             MMI_HILOGW("Time ready:%{public}d, distance ready:%{public}d", isTimeIntervalReady, isDistanceReady);
             if (!isTimeIntervalReady) {
                 DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
-            }
-            if (!isDistanceReady) {
+            } else if (!isDistanceReady) {
                 DfxHisysevent::ReportFailIfInvalidDistance(touchEvent, downToPrevDownDistance);
             }
         }
