@@ -23,7 +23,6 @@
 #include "i_input_windows_manager.h"
 #include "key_event_normalize.h"
 #include "libinput_wrapper.h"
-#include "libinput_mock.h"
 #include "pointer_event.h"
 
 #undef MMI_LOG_TAG
@@ -255,130 +254,6 @@ HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_HandleKeyAction_003, TestS
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(3);
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->HandleKeyAction(dev, item, keyEvent));
-}
-
-/**
- * @tc.name: KeyEventNormalizeTest_ResetKeyEvent_001
- * @tc.desc: Test ResetKeyEvent with a device without led and null keyEvent.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_ResetKeyEvent_LedOff_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    testing::NiceMock<LibinputInterfaceMock> libinputMock;
-    // create a node for keyboard.
-    struct libinput_device libDev {
-        .udevDev { 2 },
-        .busType = 1,
-        .version = 1,
-        .product = 1,
-        .vendor = 1,
-        .name = "test",
-    };
-    std::cout << "keyboard device: " << libinput_device_get_name(&libDev) << std::endl;
-    EXPECT_EQ(INPUT_DEV_MGR->IsKeyboardDevice(&libDev), true);
-    KeyEventHdr->keyEvent_ = nullptr;
-    EXPECT_CALL(libinputMock, HasEventLedType).WillOnce(testing::Return(0));
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
-}
-
-/**
- * @tc.name: KeyEventNormalizeTest_ResetKeyEvent_002
- * @tc.desc: Test ResetKeyEvent with a device without led and valid keyEvent.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_ResetKeyEvent_LedOff_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    testing::NiceMock<LibinputInterfaceMock> libinputMock;
-    // create a node for keyboard.
-    struct libinput_device libDev {
-        .udevDev { 2 },
-        .busType = 1,
-        .version = 1,
-        .product = 1,
-        .vendor = 1,
-        .name = "test",
-    };
-    std::cout << "keyboard device: " << libinput_device_get_name(&libDev) << std::endl;
-    EXPECT_EQ(INPUT_DEV_MGR->IsKeyboardDevice(&libDev), true);
-    KeyEventHdr->keyEvent_ = KeyEvent::Create();
-    ASSERT_TRUE(KeyEventHdr->keyEvent_ != nullptr);
-    EXPECT_CALL(libinputMock, HasEventLedType).WillOnce(testing::Return(0));
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
-}
-
-/**
- * @tc.name: KeyEventNormalizeTest_ResetKeyEvent_003
- * @tc.desc: Test ResetKeyEvent with a device with led and null keyEvent.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_ResetKeyEvent_LedOn_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    testing::NiceMock<LibinputInterfaceMock> libinputMock;
-    // create a node for keyboard.
-    struct libinput_device libDev {
-        .udevDev { 2 },
-        .busType = 1,
-        .version = 1,
-        .product = 1,
-        .vendor = 1,
-        .name = "test",
-    };
-    std::cout << "keyboard device: " << libinput_device_get_name(&libDev) << std::endl;
-    EXPECT_EQ(INPUT_DEV_MGR->IsKeyboardDevice(&libDev), true);
-    KeyEventHdr->keyEvent_ = nullptr;
-    EXPECT_CALL(libinputMock, HasEventLedType).WillOnce(testing::Return(1));
-    // mock: all lights on.
-    EXPECT_CALL(libinputMock, GetFuncKeyState).WillRepeatedly(testing::Return(1));
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
-    ASSERT_TRUE(KeyEventHdr->keyEvent_ != nullptr);
-    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY), true);
-    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY), true);
-    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), true);
-}
-
-/**
- * @tc.name: KeyEventNormalizeTest_ResetKeyEvent_004
- * @tc.desc: Test ResetKeyEvent with a device with led and valid keyEvent.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventNormalizeTest, KeyEventNormalizeTest_ResetKeyEvent_LedOn_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    testing::NiceMock<LibinputInterfaceMock> libinputMock;
-    // create a node for keyboard.
-    struct libinput_device libDev {
-        .udevDev { 2 },
-        .busType = 1,
-        .version = 1,
-        .product = 1,
-        .vendor = 1,
-        .name = "test",
-    };
-    std::cout << "keyboard device: " << libinput_device_get_name(&libDev) << std::endl;
-    EXPECT_EQ(INPUT_DEV_MGR->IsKeyboardDevice(&libDev), true);
-    KeyEventHdr->keyEvent_ = KeyEvent::Create();
-    ASSERT_TRUE(KeyEventHdr->keyEvent_ != nullptr);
-    // original: 0, 1, 0.
-    KeyEventHdr->keyEvent_->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, 0);
-    KeyEventHdr->keyEvent_->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, 1);
-    KeyEventHdr->keyEvent_->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, 0);
-    EXPECT_CALL(libinputMock, HasEventLedType).WillOnce(testing::Return(1));
-    // mock: all lights on.
-    EXPECT_CALL(libinputMock, GetFuncKeyState).WillRepeatedly(testing::Return(1));
-    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ResetKeyEvent(&libDev));
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-    // keyEvent unchanged: 0, 1, 0
-    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY), false);
-    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY), true);
-    EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), false);
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 /**

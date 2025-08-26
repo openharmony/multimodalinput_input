@@ -605,7 +605,9 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_001, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -633,7 +635,9 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_002, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -660,7 +664,9 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_003, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -683,7 +689,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_004,
     coord.x = 5.5;
     coord.y = 3.2;
     int32_t displayId = 2;
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -706,7 +714,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_005,
     coord.x = 6.5;
     coord.y = 8.2;
     int32_t displayId = 3;
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -729,7 +739,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006,
     coord.x = 6.5;
     coord.y = 8.2;
     int32_t displayId = 3;
-    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -892,6 +904,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     libinput_event_touch *touch = nullptr;
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
 
+    int32_t deviceId = 0;
     OLD::DisplayInfo info;
     info.direction = DIRECTION90;
     info.direction = DIRECTION270;
@@ -903,7 +916,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     touchInfo.toolRect.point.y = 600;
     touchInfo.toolRect.width = 720;
     touchInfo.toolRect.height = 1000;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->GetPhysicalDisplayCoord(touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->GetPhysicalDisplayCoord(deviceId, touch, info, touchInfo));
 }
 
 /**
@@ -946,7 +959,9 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_001, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord, pointerItem));
 }
 
 /**
@@ -972,7 +987,9 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_002, TestSize.Level1)
     libinput_event_tablet_tool event {};
     PhysicalCoordinate coord;
     int32_t displayId;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord));
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord, pointerItem));
     it->second.displaysInfo.clear();
 }
 
@@ -994,9 +1011,11 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_003, TestSize.Level1)
     PhysicalCoordinate coord;
     coord.x = 3.5;
     coord.y = 5.2;
-    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId);
+    PointerEvent::PointerItem pointerItem {};
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId, pointerItem);
     EXPECT_FALSE(result);
-    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord);
+    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord, pointerItem);
     EXPECT_FALSE(ret);
 }
 
@@ -2540,12 +2559,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     libinput_event_touch touch {};
     OLD::DisplayInfo info;
     EventTouch touchInfo;
+    int32_t deviceId = 0;
     info.direction = DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
     info.direction = DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
     info.direction = DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
 }
 
 /**
@@ -4507,6 +4527,91 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_002
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_001
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    inputWindowsManager->GetOriginalTouchScreenCoordinates(DIRECTION0, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 50);
+    EXPECT_EQ(physicalY, 60);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_002
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    inputWindowsManager->GetOriginalTouchScreenCoordinates(DIRECTION90, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 60);
+    EXPECT_EQ(physicalY, 50);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_003
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    inputWindowsManager->GetOriginalTouchScreenCoordinates(DIRECTION180, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 50);
+    EXPECT_EQ(physicalY, 140);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_004
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginalTouchScreenCoordinates_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    inputWindowsManager->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 140);
+    EXPECT_EQ(physicalY, 50);
+}
+
 /**
  * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest001
  * @tc.desc: Test the function HandleHardWareCursor
@@ -5151,6 +5256,43 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenWin
     pointerItem.pressed_ = true;
     inputWindowsManager->lastPointerEventforWindowChange_->pointers_.push_back(pointerItem);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendCancelEventWhenWindowChange(pointerId));
+}
+
+/**
+ * @tc.name: IsWritePen_001
+ * @tc.desc: Test the function IsWritePen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWritePen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
+}
+
+/**
+ * @tc.name: IsWritePen_002
+ * @tc.desc: Test the function IsWritePen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsWritePen_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    inputDevice->SetBus(BUS_USB);
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
 }
 } // namespace MMI
 } // namespace OHOS

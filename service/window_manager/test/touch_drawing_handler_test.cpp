@@ -1837,8 +1837,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_StartTrace, TestSize.L
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_001
- * @tc.desc: Test ResetCanvasNode
+ * @tc.name: TouchDrawingHandlerTest_IsValidScaleInfo_001
+ * @tc.desc: Test IsValidScaleInfo
  * @tc.type: Function
  * @tc.require:
  */
@@ -1853,8 +1853,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_001, 
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_002
- * @tc.desc: Test ResetCanvasNode
+ * @tc.name: TouchDrawingHandlerTest_IsValidScaleInfo_002
+ * @tc.desc: Test IsValidScaleInfo
  * @tc.type: Function
  * @tc.require:
  */
@@ -1869,8 +1869,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_002, 
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_002
- * @tc.desc: Test ResetCanvasNode
+ * @tc.name: TouchDrawingHandlerTest_IsValidScaleInfo_003
+ * @tc.desc: Test IsValidScaleInfo
  * @tc.type: Function
  * @tc.require:
  */
@@ -1885,8 +1885,8 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingHandlerTest_IsValidScaleInfo_003, 
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_IsValidScaleInfo_002
- * @tc.desc: Test ResetCanvasNode
+ * @tc.name: TouchDrawingHandlerTest_IsValidScaleInfo_004
+ * @tc.desc: Test IsValidScaleInfo
  * @tc.type: Function
  * @tc.require:
  */

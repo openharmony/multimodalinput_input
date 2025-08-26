@@ -41,6 +41,7 @@ public:
     std::shared_ptr<KeyEvent> GetKeyEvent();
     void Init();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
+    void SyncLedStateFromKeyEvent(struct libinput_device* device);
     void ResetKeyEvent(struct libinput_device* device);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);

@@ -6861,7 +6861,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_008, TestSi
     keyEvent_->AddKeyItem(item);
     keyEvent_->SetKeyCode(KeyEvent::KEYCODE_MENU);
     keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    handler.existMenuDown_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent_));
 }
 
@@ -7328,7 +7327,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_001, TestS
         event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, true);
-        EXPECT_EQ(handler.existMenuDown_, true);
+        EXPECT_GE(handler.menuPressedTimerId_, 0);
     }
 }
 
@@ -7351,12 +7350,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_002, TestS
         event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, true);
-        EXPECT_EQ(handler.existMenuDown_, true);
+        EXPECT_GE(handler.menuPressedTimerId_, 0);
 
         event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
         std::this_thread::sleep_for(std::chrono::seconds(1));
         ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(handler.existMenuDown_, false);
+        EXPECT_EQ(handler.menuPressedTimerId_, -1);
         EXPECT_EQ(handler.tmpkeyEvent_, nullptr);
         EXPECT_EQ(ret, true);
     }
@@ -7381,7 +7380,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_003, TestS
         event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, true);
-        EXPECT_EQ(handler.existMenuDown_, true);
+        EXPECT_GE(handler.menuPressedTimerId_, 0);
 
         event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
         ret = handler.MenuClickHandle(event);
@@ -7408,7 +7407,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_004, TestS
         event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, false);
-        EXPECT_EQ(handler.existMenuDown_, false);
+        EXPECT_EQ(handler.menuPressedTimerId_, -1);
     }
 }
 
@@ -7431,17 +7430,15 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestS
         event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, false);
-        EXPECT_EQ(handler.existMenuDown_, false);
+        EXPECT_EQ(handler.menuPressedTimerId_, -1);
 
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, false);
 
-        handler.existMenuDown_ = true;
         event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, true);
 
-        handler.existMenuDown_ = false;
         event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
         ret = handler.MenuClickHandle(event);
         EXPECT_EQ(ret, false);

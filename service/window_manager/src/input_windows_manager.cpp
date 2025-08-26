@@ -40,6 +40,7 @@
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent_device.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+#include "pointer_device_manager.h"
 #include "product_name_definition.h"
 #include "product_type_parser.h"
 #include "bundle_name_parser.h"
@@ -56,6 +57,11 @@ namespace {
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
+constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
 constexpr int32_t SCALE_X { 0 };
@@ -111,6 +117,7 @@ constexpr uint32_t VOICE_WINDOW_ZORDER { 4000 };
 #define SCREEN_RECORD_WINDOW_HEIGHT 200
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t CURSOR_POSITION_EXPECTED_SIZE { 2 };
+constexpr int32_t ENABLE_OUT_SCREEN_TOUCH { 1 };
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 constexpr int64_t SIMULATE_EVENT_LATENCY { 5 };
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
@@ -2993,7 +3000,7 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
+bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
     const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear)
 {
     PrintDisplayInfo(info);
@@ -3014,13 +3021,15 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         width, height, coord.x, coord.y);
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
     if (IsPositionOutValidDisplay(pos, info, true)) {
-        MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
-            "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
-        if (isNeedClear) {
-            int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
-            TriggerTouchUpOnInvalidAreaEntry(seatSlot);
+        if (INPUT_DEV_MGR->GetVendorConfig(deviceId).enableOutScreen != ENABLE_OUT_SCREEN_TOUCH) {
+            MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
+                "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
+            if (isNeedClear) {
+                int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+                TriggerTouchUpOnInvalidAreaEntry(seatSlot);
+            }
+            return false;
         }
-        return false;
     }
     MMI_HILOGD("IsPositionOutValidDisplay physicalXY:{%{private}f %{private}f}->{%{private}f %{private}f}",
         coord.x, coord.y, pos.x, pos.y);
@@ -3113,11 +3122,11 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
         MMI_HILOGE("Get OLD::DisplayInfo is error");
         return false;
     }
-    return GetPhysicalDisplayCoord(touch, *info, touchInfo, isNeedClear);
+    return GetPhysicalDisplayCoord(deviceId, touch, *info, touchInfo, isNeedClear);
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
-    PhysicalCoordinate& coord, int32_t& displayId)
+    PhysicalCoordinate& coord, int32_t& displayId, PointerEvent::PointerItem& pointerItem)
 {
     CHKPF(tip);
     auto displayInfo = FindPhysicalDisplayInfo("default0");
@@ -3147,16 +3156,18 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
         phys.x, phys.y, pos.x, pos.y);
     coord.x = pos.x;
     coord.y = pos.y;
-    RotateScreen(*displayInfo, coord);
+    if (IsWritePen(pointerItem)) {
+        RotateScreen(*displayInfo, coord);
+    }
     MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f, displayId:%{public}d", pos.x, pos.y, displayId);
     return true;
 }
 
 bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-    int32_t& targetDisplayId, PhysicalCoordinate& coord)
+    int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem)
 {
     CHKPF(tip);
-    return TransformTipPoint(tip, coord, targetDisplayId);
+    return TransformTipPoint(tip, coord, targetDisplayId, pointerItem);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -4232,6 +4243,37 @@ bool InputWindowsManager::GetHoverScrollState() const
     return state;
 }
 
+void InputWindowsManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+    int32_t &physicalX, int32_t &physicalY)
+{
+    MMI_HILOGD("direction:%{public}d", direction);
+    switch (direction) {
+        case DIRECTION0: {
+            break;
+        }
+        case DIRECTION90: {
+            int32_t temp = physicalY;
+            physicalY = width - physicalX;
+            physicalX = temp;
+            break;
+        }
+        case DIRECTION180: {
+            physicalX = width - physicalX;
+            physicalY = height - physicalY;
+            break;
+        }
+        case DIRECTION270: {
+            int32_t temp = physicalX;
+            physicalX = height - physicalY;
+            physicalY = temp;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
 std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
     int32_t physicalX, int32_t physicalY)
 {
@@ -4242,7 +4284,7 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::Displa
     Direction direction = DIRECTION0;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = GetDisplayDirection(physicalDisplayInfo);
-        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
+        GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->validWidth,
             physicalDisplayInfo->validHeight, physicalX, physicalY);
     }
     cursorPos = {physicalX, physicalY};
@@ -4646,7 +4688,15 @@ bool InputWindowsManager::GetMouseIsCaptureMode() const
     return false;
 }
 
-bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const
+bool InputWindowsManager::IsWritePen(PointerEvent::PointerItem &pointerItem) const
+{
+    if (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_PEN) {
+        return false;
+    }
+    return !IsWriteTablet(pointerItem);
+}
+
+bool InputWindowsManager::IsWriteTablet(PointerEvent::PointerItem &pointerItem) const
 {
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
         static int32_t lastDeviceId = -1;
@@ -4670,6 +4720,11 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
         }
     }
     return false;
+}
+
+bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const
+{
+    return IsWriteTablet(pointerItem);
 }
 
 bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent,
@@ -5044,7 +5099,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     double physicalX = pointerItem.GetDisplayXPos();
     double physicalY = pointerItem.GetDisplayYPos();
 
-    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+        (INPUT_DEV_MGR->GetVendorConfig(pointerEvent->GetDeviceId()).enableOutScreen != ENABLE_OUT_SCREEN_TOUCH)) {
         AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
     }
     int32_t logicalX1 = 0;
@@ -5411,18 +5467,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
                 "FWI:%{public}d,EID:%{public}d, flags:%{public}d,DID:%{public}d"
-                "AWI:%{public}d,zOrder:%{public}1f",
+                "AWI:%{public}d,zOrder:%{public}.1f",
                 pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
                 focusWindowId, pointerEvent->GetId(), touchWindow->flags,
                 displayId, pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
         } else {
-            MMI_HILOGD("PA:%{public}s,LX:%{private}1f,LY:%{private}1f,"
-                "DX:%{private}1f,DY:%{private}1f,WX:%{private}1f,WY:%{private}1f,"
+            MMI_HILOGD("PA:%{public}s,LX:%{private}.1f,LY:%{private}.1f,"
+                "DX:%{private}.1f,DY:%{private}.1f,WX:%{private}.1f,WY:%{private}.1f,"
                 "AX:%{private}d,AY:%{private}d,flags:%{public}d,",
                 pointerEvent->DumpPointerAction(), logicalX, logicalY, physicalX, physicalY,
                 windowX, windowY, touchWindow->area.x, touchWindow->area.y, touchWindow->flags);
             MMI_HILOG_FREEZEI("%{public}d|%{public}d|%{public}d|%{public}d|%{public}d|"
-                "%{public}d|%{public}d|%{public}1f",
+                "%{public}d|%{public}d|%{public}.1f",
                 touchWindow->pid, touchWindow->id, focusWindowId,
                 touchWindow->area.width, touchWindow->area.height, displayId,
                 pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
@@ -5446,8 +5502,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         CursorDrawingComponent::GetInstance().OnWindowInfo(info);
-        CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId,
-            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
+        auto displayInfo = GetPhysicalDisplay(displayId);
+        CHKPR(displayInfo, RET_ERR);
+        Coordinate2D cursorPos = {};
+        ReverseRotateDisplayScreen(*displayInfo,  pointerItem.GetDisplayXPos(), pointerItem.GetDisplayYPos(),
+            cursorPos);
+        CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId, static_cast<int32_t>(cursorPos.x),
+            static_cast<int32_t>(cursorPos.y), pointerStyle, physicDisplayInfo->direction);
     } else if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
@@ -6041,13 +6102,34 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
     }
 }
 
+bool InputWindowsManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo)
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    CHKPF(displayInfo);
+
+    bool foldableDevicePolicyMain = false;
+    bool foldableDevicePolicyFull = false;
+    if (!FOLDABLE_DEVICE_POLICY.empty()) {
+        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
+    }
+    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
+        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
+    }
+
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
+        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
+}
+
 Direction InputWindowsManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     CHKPR(displayInfo, DIRECTION0);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     if (GetHardCursorEnabled()) {
-        if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
+        if (IsWindowRotation(displayInfo)) {
             displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
                 ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         } else {
@@ -6473,6 +6555,12 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<OLD::Dis
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    auto proxy = POINTER_DEV_MGR.GetDelegateProxy();
+    if (proxy != nullptr) {
+        CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
+    }
+    #endif  // OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::shared_ptr<DelegateInterface> delegateProxy =
         CursorDrawingComponent::GetInstance().GetDelegateProxy();
     CHKPV(delegateProxy);

@@ -37,8 +37,20 @@
 
 namespace OHOS {
 namespace MMI {
-TouchEventNormalize::TouchEventNormalize() {}
-TouchEventNormalize::~TouchEventNormalize() {}
+void TouchEventNormalize::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
+{
+    TOUCH_EVENT_HDR->OnDeviceRemoved(deviceId);
+}
+
+TouchEventNormalize::TouchEventNormalize()
+{
+    SetUpDeviceObserver();
+}
+
+TouchEventNormalize::~TouchEventNormalize()
+{
+    TearDownDeviceObserver();
+}
 
 std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_event *event, DeviceType deviceType)
 {
@@ -214,5 +226,49 @@ int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) 
     return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
+
+void TouchEventNormalize::SetUpDeviceObserver()
+{
+    if (inputDevObserver_ == nullptr) {
+        inputDevObserver_ = std::make_shared<InputDeviceObserver>();
+        INPUT_DEV_MGR->Attach(inputDevObserver_);
+    }
+}
+
+void TouchEventNormalize::TearDownDeviceObserver()
+{
+    if (inputDevObserver_ != nullptr) {
+        INPUT_DEV_MGR->Detach(inputDevObserver_);
+        inputDevObserver_ = nullptr;
+    }
+}
+
+void TouchEventNormalize::OnDeviceRemoved(int32_t deviceId)
+{
+    if (auto iter = processors_.find(deviceId); iter != processors_.end()) {
+        MMI_HILOGI("Clear processor attached to device(%{public}d)", deviceId);
+        auto processor = iter->second;
+        processors_.erase(iter);
+        if (processor != nullptr) {
+            processor->OnDeviceRemoved();
+        }
+    }
+    if (auto iter = touchpad_processors_.find(deviceId); iter != touchpad_processors_.end()) {
+        MMI_HILOGI("Clear touchpad processor attached to device(%{public}d)", deviceId);
+        auto processor = iter->second;
+        touchpad_processors_.erase(iter);
+        if (processor != nullptr) {
+            processor->OnDeviceRemoved();
+        }
+    }
+    if (auto iter = remote_control_processors_.find(deviceId); iter != remote_control_processors_.end()) {
+        MMI_HILOGI("Clear remote-control processor attached to device(%{public}d)", deviceId);
+        auto processor = iter->second;
+        remote_control_processors_.erase(iter);
+        if (processor != nullptr) {
+            processor->OnDeviceRemoved();
+        }
+    }
+}
 } // namespace MMI
 } // namespace OHOS
