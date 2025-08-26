@@ -136,6 +136,7 @@ bool CursorDrawingComponent::LoadLibrary()
         return false;
     }
     isLoaded_ = true;
+    POINTER_DEV_MGR.isInitDefaultMouseIconPath = true;
     return true;
 }
 
