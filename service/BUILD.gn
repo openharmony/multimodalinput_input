@@ -2041,6 +2041,7 @@ ohos_unittest("NapProcessTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -3080,6 +3081,7 @@ ohos_unittest("PermissionHelperTest") {
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
   ]
 
@@ -3470,6 +3472,7 @@ ohos_unittest("DeviceEventMonitorTest") {
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
