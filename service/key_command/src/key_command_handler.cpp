@@ -52,6 +52,7 @@ constexpr float MOVE_TOLERANCE { 3.0f };
 constexpr float MIN_GESTURE_STROKE_LENGTH { 200.0f };
 constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
 constexpr float MIN_START_GESTURE { 60.0f };
+constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t POINTER_NUMBER { 2 };
 constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
@@ -2219,7 +2220,7 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
         return true;
     }
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
-        MMI_HILOGI("Timer callback");
+        MMI_HILOGI("Timer callback, screenshot delay %{public}d milisecond", LONG_ABILITY_START_DELAY);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         DfxHisysevent::ReportKeyEvent(sequence.ability.bundleName);
         LaunchAbility(sequence);
@@ -2300,7 +2301,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
         }
     } else {
         if (bundleName == matchName && isScreenLocked) {
-            MMI_HILOGI("Screen locked, screenshot delay 2000 milisecond");
+            MMI_HILOGI("Screen On and locked, screenshot delay 100 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
     }
@@ -2977,37 +2978,38 @@ bool KeyCommandHandler::MenuClickHandle(std::shared_ptr<KeyEvent> event)
         return false;
     }
     CHKPF(event);
-    auto keycode = event->GetKeyCode();
-    if (keycode != KeyEvent::KEYCODE_MENU) {
-        return false;
-    }
-    auto actionType = event->GetKeyAction();
-    if ((actionType == KeyEvent::KEY_ACTION_DOWN) && (!existMenuDown_)) {
-        lastMenuDownTime_ = OHOS::MMI::GetSysClockTime();
-        existMenuDown_ = true;
-        tmpkeyEvent_ = KeyEvent::Clone(event);
-        return true;
-    } else if ((actionType == KeyEvent::KEY_ACTION_UP) && existMenuDown_) {
-        auto time = OHOS::MMI::GetSysClockTime();
-        auto duration = (time - lastMenuDownTime_);
-        lastMenuDownTime_ = 0;
-        existMenuDown_ = false;
-        if (duration >= (MENU_KEY_DOWN_DELAY*TIME_CONVERSION_UNIT)) {
-            MMI_HILOGD("Key menu long press, send bundlname to TV");
-            tmpkeyEvent_.reset();
-            MenuClickProcess(TV_MENU_BUNDLE_NAME, TV_MENU_ABILITY_NAME, "key_menu_longpress");
-            return true;
-        } else {
-            MMI_HILOGD("Key menu short press.");
-            if (tmpkeyEvent_) {
-                SendSaveEvent(tmpkeyEvent_);
-            }
-            return false;
+    if ((event->GetKeyCode() == KeyEvent::KEYCODE_MENU) && (event->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
+        if (menuPressedTimerId_ < 0) {
+            MMI_HILOGD("Trigger key menu long press detection");
+            tmpkeyEvent_ = KeyEvent::Clone(event);
+            menuPressedTimerId_ = TimerMgr->AddTimer(MENU_KEY_DOWN_DELAY, REPEAT_ONCE,
+                [this]() {
+                    tmpkeyEvent_ = nullptr;
+                    menuPressedTimerId_ = std::numeric_limits<int32_t>::max();
+                    MMI_HILOGD("Key menu long press, send bundlname to TV");
+                    MenuClickProcess(TV_MENU_BUNDLE_NAME, TV_MENU_ABILITY_NAME, "key_menu_longpress");
+                });
         }
-    } else {
-        MMI_HILOGI("Menu key is pressed and has not been lifted. This key will not be distributed for now");
         return true;
     }
+    bool keyMenuConsumed { false };
+
+    if (menuPressedTimerId_ >= 0) {
+        TimerMgr->RemoveTimer(menuPressedTimerId_);
+        if ((event->GetKeyCode() == KeyEvent::KEYCODE_MENU) && (event->GetKeyAction() == KeyEvent::KEY_ACTION_UP)) {
+            if (menuPressedTimerId_ == std::numeric_limits<int32_t>::max()) {
+                keyMenuConsumed = true;
+            }
+            MMI_HILOGD("Reset key menu long press detection");
+            menuPressedTimerId_ = -1;
+        }
+    }
+    if (tmpkeyEvent_ != nullptr) {
+        MMI_HILOGD("Key menu short press");
+        SendSaveEvent(tmpkeyEvent_);
+        tmpkeyEvent_ = nullptr;
+    }
+    return keyMenuConsumed;
 }
 
 void KeyCommandHandler::SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent)

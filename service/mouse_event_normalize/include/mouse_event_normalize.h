@@ -16,12 +16,23 @@
 #ifndef MOUSE_EVENT_NORMALIZE_H
 #define MOUSE_EVENT_NORMALIZE_H
 
+#include "device_observer.h"
 #include "mouse_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
 class MouseEventNormalize final : public std::enable_shared_from_this<MouseEventNormalize> {
+    class InputDeviceObserver final : public IDeviceObserver {
+    public:
+        InputDeviceObserver() = default;
+        ~InputDeviceObserver() override = default;
+        void OnDeviceAdded(int32_t deviceId) override {}
+        void OnDeviceRemoved(int32_t deviceId) override;
+        void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
+    };
+
     DECLARE_DELAYED_SINGLETON(MouseEventNormalize);
+
 public:
     DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
     std::shared_ptr<PointerEvent> GetPointerEvent();
@@ -64,13 +75,18 @@ private:
     std::shared_ptr<MouseTransformProcessor> GetCurrentProcessor() const;
     void SetCurrentDeviceId(int32_t deviceId);
     int32_t GetCurrentDeviceId() const;
+    void SetUpDeviceObserver();
+    void TearDownDeviceObserver();
+    void OnDeviceRemoved(int32_t deviceId);
 
 private:
     int32_t buttonId_ { -1 };
+    int32_t currentDeviceId_ { -1 };
     bool isPressed_ { false };
     std::map<int32_t, std::shared_ptr<MouseTransformProcessor>> processors_;
-    int32_t currentDeviceId_ { -1 };
+    std::shared_ptr<IDeviceObserver> inputDevObserver_;
 };
+
 #define MouseEventHdr ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS

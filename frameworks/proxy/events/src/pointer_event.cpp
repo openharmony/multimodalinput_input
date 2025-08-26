@@ -1104,6 +1104,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     WRITEINT32(out, handOption_);
     WRITEINT32(out, static_cast<int32_t>(fixedMode_));
+    WRITEINT32(out, settings_.scrollRows_);
     WRITEBOOL(out, autoToVirtualScreen_);
     return true;
 }
@@ -1193,6 +1194,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!ReadFixedModeFromParcel(in)) {
         return false;
     }
+    READINT32(in, settings_.scrollRows_);
     READBOOL(in, autoToVirtualScreen_);
     return true;
 }

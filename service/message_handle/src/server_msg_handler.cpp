@@ -319,17 +319,23 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     MMI_HILOGI("Check : current PointerEvent's info :Id=>%{public}d, pointerId=>%{public}d",
         pointerEvent->GetId(), pointerEvent->GetPointerId());
     std::shared_ptr<PointerEvent> touchEvent = WIN_MGR->GetLastPointerEventForGesture();
-    if (touchEvent != nullptr) {
-        std::list<PointerEvent::PointerItem> listPtItems = touchEvent->GetAllPointerItems();
-        for (auto &item : listPtItems) {
-            MMI_HILOGI("Check : current Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
-                item.GetPointerId(), item.GetOriginPointerId());
-            if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) !=
-                (pointerEvent->GetPointerId() % SIMULATE_EVENT_START_ID) && item.IsPressed()) {
-                pointerEvent->AddPointerItem(item);
-                MMI_HILOGI("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
-                    item.GetPointerId(), item.GetOriginPointerId());
+    CHKPV(touchEvent);
+    std::list<PointerEvent::PointerItem> lastPointerItems = touchEvent->GetAllPointerItems();
+    std::list<PointerEvent::PointerItem> currenPointerItems = pointerEvent->GetAllPointerItems();
+    for (auto &item : lastPointerItems) {
+        if (!item.IsPressed()) {
+            continue;
+        }
+        auto iter = currenPointerItems.begin();
+        for (; iter != currenPointerItems.end(); iter++) {
+            if (item.GetOriginPointerId() == iter->GetOriginPointerId()) {
+                break;
             }
+        }
+        if (iter == currenPointerItems.end()) {
+            pointerEvent->AddPointerItem(item);
+            MMI_HILOGD("Check : add Item : pointerId=>%{public}d, OriginPointerId=>%{public}d",
+                item.GetPointerId(), item.GetOriginPointerId());
         }
     }
 }
@@ -674,22 +680,22 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
     const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
 {
     CHKPR(pointerEvent, RET_ERR);
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return RET_ERR;
-    }
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     if (bNeedResetPointerId) {
         if (diffPointerId <= 0) {
-            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", pointerId);
+            MMI_HILOGE("Parameter diffPointerId error, diffPointerId:%{public}d", diffPointerId);
             return RET_ERR;
         }
-        pointerEvent->RemovePointerItem(pointerId);
-        pointerId += diffPointerId;
-        pointerItem.SetPointerId(pointerId);
-        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-        pointerEvent->SetPointerId(pointerId);
+        pointerEvent->RemoveAllPointerItems();
+        for (auto &pointerItem : pointerItems) {
+            int32_t pointId = pointerItem.GetPointerId();
+            pointId += diffPointerId;
+            pointerItem.SetPointerId(pointId);
+            pointerEvent->AddPointerItem(pointerItem);
+        }
+        if (pointerEvent->GetPointerId() <= INT32_MAX - diffPointerId) {
+            pointerEvent->SetPointerId(pointerEvent->GetPointerId() + diffPointerId);
+        }
     }
     auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
     if (iter != targetWindowIdMap.end()) {
@@ -848,7 +854,8 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
             >> info.direction >> info.displayDirection >> info.displayMode >> info.transform
             >> info.scalePercent >> info.expandHeight >> info.isCurrentOffScreenRendering
             >> info.displaySourceMode >> info.oneHandX >> info.oneHandY >> info.screenArea >> info.rsId
-            >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight;
+            >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight
+            >> info.deviceRotation >> info.rotationCorrection;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -1114,6 +1121,8 @@ void ServerMsgHandler::ChangeToOld(size_t num, const std::vector<DisplayInfo>& d
             .pointerActiveWidth = display.pointerActiveWidth,
             .pointerActiveHeight = display.pointerActiveHeight,
             .rsId = display.rsId,
+            .deviceRotation = display.deviceRotation,
+            .rotationCorrection = display.rotationCorrection
         };
         for (auto &screen : screens) {
             if (screen.id == display.screenArea.id) {
@@ -1177,7 +1186,7 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 "isCurrentOffScreenRendering:%{public}d,displaySourceMode:%{public}d,oneHandX:%{private}d,"
                 "oneHandY:%{private}d, screenArea:{%{private}d:{%{private}d,%{public}d,%{public}d,%{public}d},"
                 "rsId:%{public}" PRIu64 "},offsetX:%{private}d,offsetY:%{private}d,pointerActiveWidth:%{public}d,"
-                "pointerActiveHeight:%{public}d,transform:",
+                "pointerActiveHeight:%{public}d,deviceRotation:%{public}d,rotationCorrection:%{public}d,transform:",
                 numDisplayInfo, itemDisplay.id, itemDisplay.x, itemDisplay.y, itemDisplay.width, itemDisplay.height,
                 itemDisplay.dpi, itemDisplay.direction, itemDisplay.displayDirection,
                 itemDisplay.displayMode, itemDisplay.scalePercent, itemDisplay.expandHeight,
@@ -1185,7 +1194,8 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 itemDisplay.oneHandY, itemDisplay.screenArea.id, itemDisplay.screenArea.area.x,
                 itemDisplay.screenArea.area.y, itemDisplay.screenArea.area.width, itemDisplay.screenArea.area.height,
                 itemDisplay.rsId, itemDisplay.offsetX, itemDisplay.offsetY,
-                itemDisplay.pointerActiveWidth, itemDisplay.pointerActiveHeight);
+                itemDisplay.pointerActiveWidth, itemDisplay.pointerActiveHeight,
+                itemDisplay.deviceRotation, itemDisplay.rotationCorrection);
             for (auto& transform : itemDisplay.transform) {
                 MMI_HILOGD("%{public}f,", transform);
             }

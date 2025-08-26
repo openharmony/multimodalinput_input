@@ -25,8 +25,20 @@
 
 namespace OHOS {
 namespace MMI {
-MouseEventNormalize::MouseEventNormalize() {}
-MouseEventNormalize::~MouseEventNormalize() {}
+void MouseEventNormalize::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
+{
+    MouseEventHdr->OnDeviceRemoved(deviceId);
+}
+
+MouseEventNormalize::MouseEventNormalize()
+{
+    SetUpDeviceObserver();
+}
+
+MouseEventNormalize::~MouseEventNormalize()
+{
+    TearDownDeviceObserver();
+}
 
 std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetProcessor(int32_t deviceId) const
 {
@@ -283,6 +295,34 @@ int32_t MouseEventNormalize::SetMouseAccelerateMotionSwitch(int32_t deviceId, bo
     CHKPR(processor, RET_ERR);
     processor->SetMouseAccelerateMotionSwitch(enable);
     return RET_OK;
+}
+
+void MouseEventNormalize::SetUpDeviceObserver()
+{
+    if (inputDevObserver_ == nullptr) {
+        inputDevObserver_ = std::make_shared<InputDeviceObserver>();
+        INPUT_DEV_MGR->Attach(inputDevObserver_);
+    }
+}
+
+void MouseEventNormalize::TearDownDeviceObserver()
+{
+    if (inputDevObserver_ != nullptr) {
+        INPUT_DEV_MGR->Detach(inputDevObserver_);
+        inputDevObserver_ = nullptr;
+    }
+}
+
+void MouseEventNormalize::OnDeviceRemoved(int32_t deviceId)
+{
+    if (auto iter = processors_.find(deviceId); iter != processors_.end()) {
+        MMI_HILOGI("Clear processor attached to device(%{public}d)", deviceId);
+        auto processor = iter->second;
+        processors_.erase(iter);
+        if (processor != nullptr) {
+            processor->OnDeviceRemoved();
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS
