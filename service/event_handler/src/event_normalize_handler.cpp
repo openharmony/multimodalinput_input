@@ -53,6 +53,7 @@
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 #include "x_key_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_X_KEY
+#include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
