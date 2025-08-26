@@ -349,14 +349,15 @@ private:
                         "ToolWY:%d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, MF:%{public}d, "
                         "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d, RawDisplayX:%d, "
                         "RawDisplayY:%d, T:%{public}d, DXP:%f, DYP:%f, FXP:%f, FYP:%f, WXP:%f, WYP:%f",
-                        item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                        item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
-                        item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
-                        item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
-                        item.GetMoveFlag(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
-                        item.GetRawDx(), item.GetRawDy(), item.GetRawDisplayX(), item.GetRawDisplayY(),
-                        item.GetTwist(), item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetFixedDisplayXPos(),
-                        item.GetFixedDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos());
+                        item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
+                        item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
+                        item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
+                        item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
+                        item.GetPressure(), item.GetMoveFlag(), item.GetToolType(), item.GetLongAxis(),
+                        item.GetShortAxis(), item.GetRawDx(), item.GetRawDy(), item.GetRawDisplayX(),
+                        item.GetRawDisplayY(), item.GetTwist(), item.GetDisplayXPos(), item.GetDisplayYPos(),
+                        item.GetFixedDisplayXPos(), item.GetFixedDisplayYPos(), item.GetWindowXPos(),
+                        item.GetWindowYPos());
                 } else {
                     MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, "
                         "DX:%{private}d, DY:%{private}d, WX:%{private}d, WY:%{private}d, W:%{public}d, H:%{public}d, "
