@@ -85,21 +85,6 @@ enum class InputDispatchStage {
     Monitor,
 };
 
-struct IPluginContext {
-    virtual ~IPluginContext() = default;
-    virtual int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) = 0;
-    virtual int32_t RemoveTimer(int32_t id) = 0;
-    virtual void DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage) = 0;
-    void DispatchEvent(std::shared_ptr<PointerEvent> pointerEvent, InputDispatchStage stage);
-    void DispatchEvent(std::shared_ptr<AxisEvent> AxisEvent, InputDispatchStage stage);
-    virtual void DispatchEvent(libinput_event *event, int64_t frameTime) = 0;
-    virtual void DispatchEvent(NetPacket &pkt, int32_t pid) = 0;
-    virtual PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) =  0;
-    virtual PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
-    virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) =  0;
-    virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
-};
-
 struct IInputPlugin {
     virtual int32_t GetPriority() const = 0;
     virtual const std::string GetVersion() const = 0;
@@ -114,6 +99,23 @@ struct IInputPlugin {
     virtual PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual sptr<IRemoteObject> GetPluginRemoteStub() { return nullptr;}
+};
+
+struct IPluginContext {
+    virtual ~IPluginContext() = default;
+    virtual std::string GetName() = 0;
+    virtual int32_t GetPriority() = 0;
+    virtual std::shared_ptr<IInputPlugin> GetPlugin() = 0;
+    virtual void SetCallback(std::function<void(PluginEventType, int64_t)>& callback) = 0;
+    virtual int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) = 0;
+    virtual int32_t RemoveTimer(int32_t id) = 0;
+    virtual void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) = 0;
+    virtual void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) = 0;
+    virtual void DispatchEvent(NetPacket &pkt, int32_t pid) = 0;
+    virtual PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) =  0;
+    virtual PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
+    virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) =  0;
+    virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event) {

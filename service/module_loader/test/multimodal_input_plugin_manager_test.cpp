@@ -52,9 +52,14 @@ void MultimodalInputPluginManagerTest::TearDownTestCase(void)
 class MockInputPluginContext : public IPluginContext {
 public:
     virtual ~MockInputPluginContext() = default;
+    MOCK_METHOD(std::string, GetName, (), (override));
+    MOCK_METHOD(int32_t, GetPriority, (), (override));
+    MOCK_METHOD(std::shared_ptr<IInputPlugin>, GetPlugin, (), (override));
+    MOCK_METHOD(void, SetCallback, (std::function<void(PluginEventType, int64_t)>& callback), (override));
     MOCK_METHOD(int32_t, AddTimer, (std::function<void()> func, int32_t intervalMs, int32_t repeatCount), (override));
     MOCK_METHOD(int32_t, RemoveTimer, (int32_t id), (override));
-    MOCK_METHOD(void, DispatchEvent, (libinput_event *event, int64_t frameTime), (override));
+    MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, int64_t frameTime), (override));
+    MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, InputDispatchStage stage), (override));
     MOCK_METHOD(void, DispatchEvent, (NetPacket& pkt, int32_t pid), (override));
     MOCK_METHOD(PluginResult, HandleEvent, (libinput_event *event, std::shared_ptr<IPluginData> data), (override));
     MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override));
@@ -91,6 +96,18 @@ public:
     MockUDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
         const int32_t pid) : UDSSession(programName, moduleType, fd, uid, pid) {}
 }
+
+class RemoteObjectTest : public IRemoteObject {
+public:
+    explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
+    ~RemoteObjectTest() {}
+
+    int32_t GetObjectRefCount() { return 0; }
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { return 0; }
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    int Dump(int fd, const std::vector<std::u16string> &args) { return 0; }
+};
 
 /**
  * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_001
@@ -171,15 +188,64 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string pluginName = "";
-    pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    std::string pluginName = "yunshuiqiao";
     sptr<IRemoteObject> inputDevicePluginStub = nullptr;
     int32_t result = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
-    EXPECT_EQ(ret, RET_OK);
-
-    pluginName = "yunshuiqiao";
-    ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_002
+ * @tc.desc: Test_GetPluginRemoteStub_002
+ * @tc.require: test GetPluginRemoteStub
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
+    EXPECT_CALL(*mockInputPlugin, GetPluginRemoteStub()).WillOnce(Return(remote));
+    EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
+    std::list<std::shared_ptr<IPluginContext>> pluginLists;
+    pluginLists.push_back(MockInputPluginContext);
+    InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
+
+    int32_t ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    EXPECT_EQ(ret, RET_OK);
+    InputPluginManager::GetInstance()->plugins_.clear();
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_003
+ * @tc.desc: Test_GetPluginRemoteStub_003
+ * @tc.require: test GetPluginRemoteStub
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
+    EXPECT_CALL(*mockInputPlugin, GetPluginRemoteStub()).WillOnce(Return(nullptr));
+    EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
+    std::list<std::shared_ptr<IPluginContext>> pluginLists;
+    pluginLists.push_back(MockInputPluginContext);
+    InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
+
+    int32_t ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    InputPluginManager::GetInstance()->plugins_.clear();
 }
 
 /**
@@ -381,7 +447,37 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_HandleEvent__001
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_004
+ * @tc.desc: Test_DispatchEvent_004
+ * @tc.require: test DispatchEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDispatchStage filterStage = InputDispatchStage::Filter;
+    InputDispatchStage InterceptStage = InputDispatchStage::Intercept;
+    InputDispatchStage KeyCommandStage = InputDispatchStage::KeyCommand;
+    InputDispatchStage MonitorStage = InputDispatchStage::Monitor;
+
+    libinput_event* event = nullptr;
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, filterStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, InterceptStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, KeyCommandStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, MonitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(pointerEvent, MonitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(axisEvent, MonitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(keyEvent, MonitorStage));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleEvent_001
  * @tc.desc: Test_HandleEvent_001
  * @tc.require: test HandleEvent
  */
@@ -421,6 +517,70 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_CALL(*mockInputPlugin, HandleEvent(keyEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(keyEvent, data);
     EXPECT_EQ(result, PluginResult::UseNeedReissue);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_GetName_001
+ * @tc.desc: Test_GetName_001
+ * @tc.require: test GetName
+ */
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    inputPluginContext->name_ = "yunshuiqiao";
+    std::string pluginName = inputPluginContext->GetName();
+    EXPECT_EQ(pluginName, "yunshuiqiao");
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_GetPriority_001
+ * @tc.desc: Test_GetPriority_001
+ * @tc.require: test GetPriority
+ */
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPriority_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    inputPluginContext->prio_ = 300;
+    int32_t priority = inputPluginContext->GetPriority();
+    EXPECT_EQ(priority, 300);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_SetCallback_001
+ * @tc.desc: Test_SetCallback_001
+ * @tc.require: test SetCallback
+ */
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_SetCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
+    inputPluginContext->SetCallback(callback);
+    EXPECT_NE(inputPluginContext->callback_ nullptr);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_GetPlugin_001
+ * @tc.desc: Test_GetPriority_001
+ * @tc.require: test GetPriority
+ */
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPriority_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillOnce(Return(201));
+    EXPECT_CALL(*mockInputPlugin, GetStage()).WillOnce(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
+    inputPluginContext->Init(mockInputPlugin);
+    std::shared_ptr<IInputPlugin> inputPlugin = inputPluginContext->GetPlugin();
+    EXPECT_NE(inputPlugin, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

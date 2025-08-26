@@ -18,9 +18,9 @@
 
 #include <map>
 #include <mutex>
+#include <singleton.h>
 #include "iremote_proxy.h"
 #include "nocopyable.h"
-#include <singleton.h>
 
 #include "input_device.h"
 #include "i_input_event_consumer.h"
