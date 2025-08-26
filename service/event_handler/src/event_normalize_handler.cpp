@@ -19,7 +19,6 @@
 #include "crown_transform_processor.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
-#include "input_device_consumer_handler.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
