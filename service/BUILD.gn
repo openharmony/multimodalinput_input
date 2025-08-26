@@ -2135,7 +2135,7 @@ ohos_unittest("ModuleLoaderTest") {
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources"，
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
   ]
 
   external_deps = [
