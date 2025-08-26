@@ -28,8 +28,10 @@ using SessionPtr = std::shared_ptr<UDSSession>;
 namespace OHOS {
 namespace MMI {
 namespace {
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
 constexpr size_t MAX_BUNDLE_NAME_LEN = 128;
 constexpr size_t MAX_NAME_COUNT = 8;
+#endif
 } // namespace
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
@@ -222,30 +224,6 @@ void GetMaxMultiTouchPointNumFuzz(FuzzedDataProvider &fdp)
     MMIService::GetInstance()->GetMaxMultiTouchPointNum(pointNum);
 }
 
-void SetInputDeviceConsumerFuzz(FuzzedDataProvider &fdp)
-{
-    size_t n = fdp.ConsumeIntegralInRange<size_t>(0, MAX_NAME_COUNT);
-    std::vector<std::string> names;
-    names.reserve(n);
-    for (size_t i = 0; i < n; ++i) {
-        size_t len = fdp.ConsumeIntegralInRange<size_t>(0, MAX_BUNDLE_NAME_LEN);
-        names.emplace_back(fdp.ConsumeRandomLengthString(len));
-    }
-    MMIService::GetInstance()->SetInputDeviceConsumer(names);
-}
-
-void ClearInputDeviceConsumerFuzz(FuzzedDataProvider &fdp)
-{
-    size_t n = fdp.ConsumeIntegralInRange<size_t>(0, MAX_NAME_COUNT);
-    std::vector<std::string> names;
-    names.reserve(n);
-    for (size_t i = 0; i < n; ++i) {
-        size_t len = fdp.ConsumeIntegralInRange<size_t>(0, MAX_BUNDLE_NAME_LEN);
-        names.emplace_back(fdp.ConsumeRandomLengthString(len));
-    }
-    MMIService::GetInstance()->ClearInputDeviceConsumer(names);
-}
-
 void SubscribeInputActiveFuzz(FuzzedDataProvider &fdp)
 {
     int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
@@ -322,8 +300,6 @@ void MmiServiceFuzzSecondGroup(FuzzedDataProvider &provider)
     SetKnuckleSwitchFuzz(provider);
     LaunchAiScreenAbilityFuzz(provider);
     GetMaxMultiTouchPointNumFuzz(provider);
-    SetInputDeviceConsumerFuzz(provider);
-    ClearInputDeviceConsumerFuzz(provider);
     SubscribeInputActiveFuzz(provider);
     UnsubscribeInputActiveFuzz(provider);
     SetMouseAccelerateMotionSwitchFuzz(provider);

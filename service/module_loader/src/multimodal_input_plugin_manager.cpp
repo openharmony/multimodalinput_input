@@ -329,7 +329,7 @@ std::shared_ptr<IPluginData> InputPluginManager::GetPluginDataFromLibInput(libin
         return data;
     }
     auto& libInputData = data->libInputEventData;
-    libInputData.orientation = libinput_event_touch_get_orientaion(touch);
+    libInputData.orientation = libinput_event_touch_get_orientation(touch);
     libInputData.toolType = libinput_event_touch_get_tool_type(touch);
     auto device = libinput_event_get_device(event);
     if (!device) {

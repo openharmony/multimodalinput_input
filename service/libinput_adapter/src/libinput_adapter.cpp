@@ -225,8 +225,10 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
         funInputEvent(static_cast<void *>(*event), frameTime);
     };
 
-    InputPluginManager::GetInstance()->PluginAssignmentCallBack(
-        callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
+    auto manager = InputPluginManager::GetInstance();
+    if (manager != nullptr) {
+        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
+    }
     funInputEvent_ = [manager, callback](void *event, int64_t frameTime)
     {
         if (manager != nullptr)
