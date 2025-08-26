@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "mmi_log.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "input_device_manager.h"
+#include "mmi_log.h"
 #include "notifyinputdevicemessage_fuzzer.h"
 
 #include "securec.h"
@@ -24,32 +25,15 @@
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void NotifyInputdeviceMessageFuzzTest(const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-bool NotifyInputdeviceMessageFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    SessionPtr session;
-    int32_t index = 1;
-    int32_t result = 1;
+    FuzzedDataProvider provider(data, size);
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    int32_t index = provider.ConsumeIntegral<int32_t>();
+    int32_t result = provider.ConsumeIntegral<int32_t>();
     INPUT_DEV_MGR->NotifyInputdeviceMessage(session, index, result);
-    return true;
 }
+} // namespace MMI
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
@@ -59,8 +43,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::NotifyInputdeviceMessageFuzzTest(data, size);
+    OHOS::MMI::NotifyInputdeviceMessageFuzzTest(data, size);
     return 0;
 }
-} // namespace MMI
-} // namespace OHOS
