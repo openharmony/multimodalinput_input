@@ -156,7 +156,6 @@ private:
     double rotateAngle_ { 0.0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::deque<Coords>> swipeHistory_;
-    std::mutex swipeHistoryMutex_;
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
