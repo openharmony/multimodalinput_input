@@ -496,5 +496,11 @@ void CursorDrawingComponent::NotifyPointerEventToRS(int32_t pointAction, int32_t
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->NotifyPointerEventToRS(pointAction, pointCnt);
 }
+
+void CursorDrawingComponent::InitDefaultMouseIconPath()
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    return pointerInstance_->InitDefaultMouseIconPath();
+}
 #endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace OHOS
