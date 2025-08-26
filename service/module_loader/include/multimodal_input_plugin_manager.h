@@ -53,6 +53,10 @@ public:
     virtual ~InputPlugin();
     int32_t Init(std::shared_ptr<IInputPlugin> pin);
     void UnInit();
+    std::string GetName() override;
+    int32_t GetPriority() override;
+    std::shared_ptr<IInputPlugin> GetPlugin() override;
+    void SetCallback(std::function<void(PluginEventType, int64_t)>& callback) override;
     PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) override;
     PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data);
     PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data);
@@ -62,11 +66,13 @@ public:
     int32_t RemoveTimer(int32_t id) override;
     void DispatchEvent(libinput_event *event, int64_t frameTime) override;
     void DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage) override;
+    void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) override;
+    void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) override;
+    void DispatchEvent(NetPacket &pkt, int32_t pid) override;
 
-    int32_t timerCnt_ = 0;
+
     int32_t prio_ = 200;
-    std::function<void(libinput_event*, int64_t)> callback_;
-    std::function<void(std::shared_ptr<KeyEvent>)> keyEventCallback_;
+    std::function<void(PluginEventType, int64_t)> callback_;
     UnintPlugin unintPlugin_ = nullptr;
     std::shared_ptr<IInputPlugin> plugin_;
     std::string name_;
@@ -74,6 +80,7 @@ public:
 
 private:
     InputPluginStage stage_;
+    int32_t timerCnt_ = 0;
 };
 
 struct InputPluginManager {
@@ -83,7 +90,7 @@ public:
     static InputPluginManager *GetInstance(const std::string &directory = "");
     int32_t Init(UDSServer &udsServer);
     void Dump(int fd);
-    void PluginAssignmentCallBack(std::function<void(libinput_event *, int64_t)> callback, InputPluginStage stage);
+    void PluginAssignmentCallBack(std::function<void(PluginEventType, int64_t)> callback, InputPluginStage stage);
     void PrintPlugins();
     std::shared_ptr<IPluginData> GetPluginDataFromLibInput(libinput_event *event);
     PluginResult ProcessEvent(PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data);

@@ -219,7 +219,9 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
     CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
 
-    auto callback = [funInputEvent](libinput_event *event, int64_t frameTime) {
+    auto callback = [funInputEvent](PluginEventType pluginEvent, int64_t frameTime) {
+        auto event = std::get_if<libinput_event*>(&pluginEvent);
+        if (!event) return;
         funInputEvent(static_cast<void *>(event), frameTime);
     };
     auto manager = InputPluginManager::GetInstance();

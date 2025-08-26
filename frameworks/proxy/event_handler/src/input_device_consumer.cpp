@@ -75,7 +75,7 @@ void InputDeviceConsumer::OnConnected()
         sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDevicePluginStub);
     if (!inputDevicePluginProxy) {
         MMI_HILOGE("Transfer input device plugin stub to proxy failed");
-        return ERROR_NO_PERMISSION;
+        return;
     }
     inputDevicePluginProxy->SetInputDeviceConsumerHandler(deviceNames_);
 }
