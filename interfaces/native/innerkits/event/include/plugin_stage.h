@@ -32,9 +32,9 @@ using PluginEventType = std::variant<libinput_event *, std::shared_ptr<PointerEv
                                      std::shared_ptr<KeyEvent>>;
 
 template<class... Ts>
-sruct overloaded : Ts... {
+struct overloaded : Ts... {
     using Ts::operator()...;
-}
+};
 
 template<class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
@@ -59,18 +59,6 @@ enum class InputPluginStage {
     INPUT_STAGE_BUTT,
 };
 
-struct LibInputEventData {
-    int32_t orientation;
-    int32_t toolType;
-    std::string deviceName;
-};
-
-struct IPluginData {
-    int64_t frameTime;
-    InputPluginStage stage;
-    LibInputEventData libInputEventData;
-};
-
 enum class PluginResult {
     Error = -1,
     UseNeedReissue = 0,
@@ -83,6 +71,18 @@ enum class InputDispatchStage {
     Intercept,
     KeyCommand,
     Monitor,
+};
+
+struct LibInputEventData {
+    int32_t orientation;
+    int32_t toolType;
+    std::string deviceName;
+};
+
+struct IPluginData {
+    int64_t frameTime;
+    InputPluginStage stage;
+    LibInputEventData libInputEventData;
 };
 
 struct IInputPlugin {

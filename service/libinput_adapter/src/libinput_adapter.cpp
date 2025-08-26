@@ -222,12 +222,11 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
     auto callback = [funInputEvent](PluginEventType pluginEvent, int64_t frameTime) {
         auto event = std::get_if<libinput_event*>(&pluginEvent);
         if (!event) return;
-        funInputEvent(static_cast<void *>(event), frameTime);
+        funInputEvent(static_cast<void *>(*event), frameTime);
     };
-    auto manager = InputPluginManager::GetInstance();
-    if (manager != nullptr) {
-        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
-    }
+
+    InputPluginManager::GetInstance()->PluginAssignmentCallBack(
+        callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
     funInputEvent_ = [manager, callback](void *event, int64_t frameTime)
     {
         if (manager != nullptr)
@@ -236,8 +235,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
             data->frameTime = frameTime;
             data->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
             int32_t result = manager->HandleEvent(static_cast<libinput_event *>(event), data);
-            if (result != RET_NOTDO)
-            {
+            if (result != RET_NOTDO) {
                 return;
             }
         }

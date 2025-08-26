@@ -25,33 +25,34 @@
 
 namespace OHOS {
 namespace MMI {
-int32_t IInputDeviceConsumerProxy::SendInputDeviceConsumerHandler(const std::vector<std::string> &deviceNames, CODE code)
+int32_t IInputDeviceConsumerProxy::SendInputDeviceConsumerHandler(
+    const std::vector<std::string> &deviceNames, CODE code)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInterfaceToken(IInputEventConsumer::GetDescriptor())) {
-        MMI_HILOGE("Write interface token failed");
+    if (!data.WriteInterfaceToken(IInputDeviceConsumer::GetDescriptor())) {
+        MMI_HILOGE("Write interface token failed!");
         return MSG_SEND_FAIL;
     }
 
     uint32_t size = deviceNames.size();
     if (!data.WriteUint32(size)) {
-        MMI_HILOGE("Write device name size failed");
+        MMI_HILOGE("Write device name size failed!");
         return MSG_SEND_FAIL;
     }
     for (const auto& name : deviceNames) {
         if (!data.WriteString(name)) {
-            MMI_HILOGE("Write device name failed");
+            MMI_HILOGE("Write device name failed!");
             return MSG_SEND_FAIL;
         }
     }
 
     int32_t ret = Remote()->SendRequest(code, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed");
-        return MSG_HEAD_H;
+        MMI_HILOGE("Send request failed!");
+        return MSG_SEND_FAIL;
     }
     return RET_OK;
 }

@@ -58,18 +58,15 @@ public:
     std::shared_ptr<IInputPlugin> GetPlugin() override;
     void SetCallback(std::function<void(PluginEventType, int64_t)>& callback) override;
     PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) override;
-    PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data);
-    PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data);
-    PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data);
+    PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) override;
+    PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) override;
+    PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) override;
 
     int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) override;
     int32_t RemoveTimer(int32_t id) override;
-    void DispatchEvent(libinput_event *event, int64_t frameTime) override;
-    void DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage) override;
     void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) override;
     void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) override;
     void DispatchEvent(NetPacket &pkt, int32_t pid) override;
-
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
@@ -93,21 +90,22 @@ public:
     void PluginAssignmentCallBack(std::function<void(PluginEventType, int64_t)> callback, InputPluginStage stage);
     void PrintPlugins();
     std::shared_ptr<IPluginData> GetPluginDataFromLibInput(libinput_event *event);
-    PluginResult ProcessEvent(PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data);
+    PluginResult ProcessEvent(
+        PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data);
     int32_t HandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data);
-    int32_t DoHandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data, InputPlugin *iplugin);
+    int32_t DoHandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data, IPluginContext *iplugin);
     int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
     UDSServer *GetUdsServer();
 
 private:
     explicit InputPluginManager(const std::string& directory) : directory_(directory) {};
     ~InputPluginManager();
-    bool IntermediateEndEvent(PluginEventType event);
+    bool IntermediateEndEvent(PluginEventType pluginEvent);
     bool LoadPlugin(const std::string &path);
 
     UDSServer* udsServer_ {nullptr};
     std::string directory_;
-    std::map<InputPluginStage, std::list<std::shared_ptr<InputPlugin>>> plugins_;
+    std::map<InputPluginStage, std::list<std::shared_ptr<IPluginContext>>> plugins_;
     inline static InputPluginManager* instance_ { nullptr };
     inline static std::once_flag init_flag_;
 };

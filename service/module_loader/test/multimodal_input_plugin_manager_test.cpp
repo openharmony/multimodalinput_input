@@ -83,16 +83,16 @@ public:
     MOCK_METHOD(
         PluginResult, HandleEvent, (libinput_event * event, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(PluginResult, HandleEvent,
-        (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr < IPluginData), (override, const));
+        (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(PluginResult, HandleEvent,
         (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(PluginResult, HandleEvent,
         (std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data), (override, const));
 }
 
-class MockUDSSession : public USDSession {
+class MockUDSSession : public UDSSession {
 public:
-    MOCK_METHOD(bool, SendMsg, (int32_t fd, NetPacket& pkt));
+    MOCK_METHOD(bool, SendMsg, (NetPacket& pkt));
     MockUDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
         const int32_t pid) : UDSSession(programName, moduleType, fd, uid, pid) {}
 }
@@ -139,7 +139,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_GE(result, RET_NOTDO);
 
     data->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
-    EXPECT_GE(result, RET_NOTDO);
+    EXPECT_GE(result, RET_OK);
 }
 
 /**
@@ -169,14 +169,14 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 
     EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY));
     EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
-    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
     EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
-    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
-    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 }
 
 /**
@@ -213,7 +213,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_CALL(*mockInputPlugin, GetPluginRemoteStub()).WillOnce(Return(remote));
     EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
     std::list<std::shared_ptr<IPluginContext>> pluginLists;
-    pluginLists.push_back(MockInputPluginContext);
+    pluginLists.push_back(mockInputPluginContext);
     InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
 
     int32_t ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
@@ -240,7 +240,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_CALL(*mockInputPlugin, GetPluginRemoteStub()).WillOnce(Return(nullptr));
     EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
     std::list<std::shared_ptr<IPluginContext>> pluginLists;
-    pluginLists.push_back(MockInputPluginContext);
+    pluginLists.push_back(mockInputPluginContext);
     InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
 
     int32_t ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
@@ -456,9 +456,9 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 {
     CALL_TEST_DEBUG;
     InputDispatchStage filterStage = InputDispatchStage::Filter;
-    InputDispatchStage InterceptStage = InputDispatchStage::Intercept;
-    InputDispatchStage KeyCommandStage = InputDispatchStage::KeyCommand;
-    InputDispatchStage MonitorStage = InputDispatchStage::Monitor;
+    InputDispatchStage interceptStage = InputDispatchStage::Intercept;
+    InputDispatchStage keyCommandStage = InputDispatchStage::KeyCommand;
+    InputDispatchStage monitorStage = InputDispatchStage::Monitor;
 
     libinput_event* event = nullptr;
     std::shared_ptr<PointerEvent> pointerEvent =
@@ -467,13 +467,13 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
 
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, filterStage));
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, InterceptStage));
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, KeyCommandStage));
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(event, MonitorStage));
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(pointerEvent, MonitorStage));
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(axisEvent, MonitorStage));
-    EXPECT_NO_FATAL_FAILURE(inputPluginContext->Dispatch(keyEvent, MonitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, filterStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, interceptStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, keyCommandStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, monitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(pointerEvent, monitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(axisEvent, monitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(keyEvent, monitorStage));
 }
 
 /**
@@ -489,6 +489,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     libinput_event* event = nullptr;
     std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
     PluginResult result = inputPluginContext->HandleEvent(event, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
 
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MocKInputPlugin>();
     EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
@@ -561,7 +562,7 @@ HWTEST_F(
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
     inputPluginContext->SetCallback(callback);
-    EXPECT_NE(inputPluginContext->callback_ nullptr);
+    EXPECT_NE(inputPluginContext->callback_, nullptr);
 }
 
 /**

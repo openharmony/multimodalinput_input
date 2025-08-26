@@ -34,9 +34,9 @@ void EventPreMonitorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyE
     OnHandleEvent(keyEvent);
     CHKPV(nextHandler_);
     auto callback = [this](PluginEventType pluginEvent, int64_t frameTime) {
-        auto keyEvent = std::get_if(std::shared_ptr<KeyEvent>(&pluginEvent));
-        if (!event) return;
-        this->nextHandler_->HandleKeyEvent(keyEvent);
+        auto keyEvent = std::get_if<std::shared_ptr<KeyEvent>>(&pluginEvent);
+        if (!keyEvent) return;
+        this->nextHandler_->HandleKeyEvent(*keyEvent);
     };
     auto manager = InputPluginManager::GetInstance();
     if (manager != nullptr) {

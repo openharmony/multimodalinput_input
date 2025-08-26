@@ -643,6 +643,7 @@ ohos_unittest("event_resample_test") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -922,8 +923,8 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/util:mmi_json_parser",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -1789,6 +1790,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
