@@ -89,6 +89,7 @@ group("test") {
     "isinputdeviceenable_fuzzer:fuzztest",
     "isfocusedsession_fuzzer:fuzztest",
     "islocaldevice_fuzzer:fuzztest",
+    "ismatchkeys_fuzzer:fuzztest",
     "isscreenfold_fuzzer:fuzztest",
     "iswindowvisible_fuzzer:fuzztest",
     "judgecamerainfore_fuzzer:fuzztest",
