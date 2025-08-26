@@ -88,18 +88,9 @@ ohos_prebuilt_etc("input_device_etc") {
   deps = [ ":input_device" ]
 }
 
-generate_static_abc("input_device_taihe_test") {
-  base_url = "${mmi_path}/frameworks/ets/input_device"
-  files = [ "$base_url/test/test_main.ets" ]
-  is_boot_abc = "True"
-  device_dst_file = "/system/framework/input_device.abc"
-}
-
-
 group("ets_inputDevice_package") {
   deps = [
     ":input_device_etc",
-    ":InputDevice",
-    ":input_device_taihe_test"
+    ":InputDevice"
   ]
 }
