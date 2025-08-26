@@ -23,9 +23,6 @@
 #include "mmi_log.h"
 #include "multimodal_input_plugin_manager.h"
 
-
-
-
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
@@ -402,7 +399,7 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
     std::visit(overloaded{
         [&eventHandler](std::shared_ptr<KeyEvent> evt) { return eventHandler->HandleKeyEvent(evt); },
         [&eventHandler](std::shared_ptr<PointerEvent> evt) { return eventHandler->HandlePointerEvent(evt); },
-        [](libinput_event* evt) { return; }
+        [](libinput_event* evt) { return; },
         [](std::shared_ptr<AxisEvent> evt) { return; }
     }, pluginEvent);
 }

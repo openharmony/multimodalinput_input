@@ -16,12 +16,11 @@
 #ifndef MULTIMODAL_INPUT_PLUGIN_MANAGER_H
 #define MULTIMODAL_INPUT_PLUGIN_MANAGER_H
 
-#include <plugin_stage.h>
-#include <timer_manager.h>
-
 #include <dirent.h>
 #include <dlfcn.h>
 #include <map>
+#include "plugin_stage.h"
+#include "timer_manager.h"
 #include "uds_server.h"
 #include "net_packet.h"
 #include "input_event_data_transformation.h"
