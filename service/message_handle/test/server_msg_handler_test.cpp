@@ -2604,7 +2604,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers_002, Tes
     item2.SetOriginPointerId(1);
     item2.SetPressed(false);
     touchEvent->AddPointerItem(item2);
-    auto winMgr = std::static_cast<InputWindowsManager>(WIN_MGR);
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(winMgr, nullptr);
     winMgr->lastPointerEventforGesture_ = touchEvent;
 

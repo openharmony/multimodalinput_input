@@ -365,8 +365,8 @@ private:
                         "ToolType:%{public}d, LA:%{public}d, SA:%{public}d, RawDx:%{private}d, RawDy:%{private}d"
                         ", RawDisplayX:%{private}d, RawDisplayY:%{private}d, T:%{public}d"
                         ", DXP:%{private}f, DYP:%{private}f, FXP:%{private}f, FYP:%{private}f, WXP:%{private}f,"
-                        " WYP:%{private}f",
-                        item.GetPointerId(), item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                        " WYP:%{private}f", item.GetPointerId(),
+                        item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
                         item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                         item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
