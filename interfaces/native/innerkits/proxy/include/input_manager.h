@@ -1273,7 +1273,7 @@ public:
     * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
     * @since 20
     */
-   int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+    int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
 private:
     InputManager() = default;

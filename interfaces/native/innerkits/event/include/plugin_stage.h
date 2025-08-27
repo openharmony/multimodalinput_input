@@ -96,8 +96,10 @@ struct IInputPlugin {
     virtual void DeviceDidRemoved(std::shared_ptr<InputDevice> inputDevice){};
     virtual PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) const = 0;
     virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) const = 0;
-    virtual PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) const = 0;
-    virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
+    virtual PluginResult HandleEvent(
+        std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) const = 0;
+    virtual PluginResult HandleEvent(
+        std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual sptr<IRemoteObject> GetPluginRemoteStub() { return nullptr;}
 };
 
@@ -113,13 +115,15 @@ struct IPluginContext {
     virtual void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) = 0;
     virtual void DispatchEvent(NetPacket &pkt, int32_t pid) = 0;
     virtual PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) =  0;
-    virtual PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
+    virtual PluginResult HandleEvent(
+        std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
 };
 
-inline bool checkPluginEventNull(PluginEventType &event) {
-    return std::visit([](auto &&v) { return v == nullptr; }, event);
+inline bool checkPluginEventNull(PluginEventType &event)
+{
+  return std::visit([](auto &&v) { return v == nullptr; }, event);
 }
 } // namespace MMI
 } // namespace OHOS

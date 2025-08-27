@@ -231,8 +231,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
     }
     funInputEvent_ = [manager, callback](void *event, int64_t frameTime)
     {
-        if (manager != nullptr)
-        {
+        if (manager != nullptr) {
             std::shared_ptr<IPluginData> pData = std::make_shared<IPluginData>();
             pData->frameTime = frameTime;
             pData->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
