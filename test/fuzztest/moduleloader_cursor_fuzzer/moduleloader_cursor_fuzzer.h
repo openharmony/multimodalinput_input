@@ -6,16 +6,16 @@
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or enforced by applicable law, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
-#ifndef STUBMMISERVICE_FUZZER_H
-#define STUBMMISERVICE_FUZZER_H
+#ifndef MODULELOADER_CURSOR_FUZZER_H
+#define MODULELOADER_CURSOR_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "stubmmiservice_fuzzer"
+#define FUZZ_PROJECT_NAME "moduleloader_cursor_fuzzer"
 
-#endif // STUBMMISERVICE_FUZZER_H
+#endif // MODULELOADER_CURSOR_FUZZER_H

@@ -334,10 +334,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
-        {
-            std::lock_guard<std::mutex> lock(swipeHistoryMutex_);
-            swipeHistory_.clear();
-        }
+        swipeHistory_.clear();
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
 
@@ -396,7 +393,6 @@ void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>&
     bool isMissing = false;
     Coords coordDelta {0, 0};
     int32_t historyFingerCount = 0;
-    std::lock_guard<std::mutex> guard(swipeHistoryMutex_);
     for (int32_t i = 0; i < fingerCount; ++i) {
         if (static_cast<int32_t>(swipeHistory_.size()) <= i) {
             swipeHistory_.emplace_back(std::deque<Coords>());
@@ -425,7 +421,8 @@ void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>&
     }
     for (int32_t i = 0; i < fingerCount; ++i) {
         if (fingerCoords[i].x == 0 && fingerCoords[i].y == 0) {
-            fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
+            bool isEmpty = swipeHistory_[i].empty();
+            fingerCoords[i] = isEmpty ? coordDelta : (swipeHistory_[i].back() + coordDelta);
             swipeHistory_[i].push_back(fingerCoords[i]);
         }
         if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
