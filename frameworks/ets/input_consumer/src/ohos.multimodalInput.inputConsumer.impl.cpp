@@ -189,6 +189,8 @@ bool UnregisterListener(std::string const &type, taihe::optional_view<uintptr_t>
     const auto it = std::find_if(callbacks.begin(), callbacks.end(), pred);
     if (it != callbacks.end()) {
         callbacks.erase(it);
+    } else {
+        return false;
     }
     if (callbacks.empty()) {
         jsCbMap_.erase(iter);
@@ -238,9 +240,9 @@ bool ParseKeyMonitorOption(KeyPressedConfig const& options, KeyMonitor &keyMonit
 {
     CALL_DEBUG_ENTER;
     keyMonitor.keyOption.SetKey(options.key);
-    keyMonitor.keyOption.SetAction(options.action);
+    keyMonitor.keyOption.SetAction(EtsKeyActionToKeyAction(options.action));
     keyMonitor.keyOption.SetRepeat(options.isRepeat);
-    if (CheckKeyMonitorOption(keyMonitor.keyOption)) {
+    if (!CheckKeyMonitorOption(keyMonitor.keyOption)) {
         MMI_HILOGE("Input for KeyPressedConfig is invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Input for KeyPressedConfig is invalid");
         return false;
@@ -297,7 +299,7 @@ void UnsubscribeKeyMonitor(taihe::optional_view<uintptr_t> opq)
     for (auto iter = monitors_.begin(); iter != monitors_.end(); ++iter) {
         if (!UnregisterListener(std::to_string(iter->first), opq)) {
             MMI_HILOGE("UnregisterListener fail");
-            return;
+            continue;
         }
         MMI_HILOGI("[NAPI] Unsubscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)",
             iter->first, iter->second.subscriberId);
