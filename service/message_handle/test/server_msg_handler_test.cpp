@@ -1299,6 +1299,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandler_001, TestS
     EXPECT_EQ(ret, RET_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_001
  * @tc.desc: Test the function OnMoveMouse
@@ -1316,6 +1318,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_001, TestSize.Le
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnCancelInjection_001
@@ -2273,6 +2277,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSi
     EXPECT_EQ(result, ERR_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
  * @tc.desc: Test the function OnMoveMouse
@@ -2290,6 +2296,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Le
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnAuthorize_004

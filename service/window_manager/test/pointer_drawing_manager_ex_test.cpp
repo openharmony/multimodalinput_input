@@ -284,9 +284,15 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
     int32_t ret3 = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret3, RET_OK);
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_FALSE(INPUT_DEV_MGR->HasPointerDevice());
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_FALSE(WIN_MGR->IsMouseSimulate());
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(windowId));
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
     int32_t ret4 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret4, RET_OK);
 }

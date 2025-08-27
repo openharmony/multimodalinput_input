@@ -127,8 +127,12 @@ public:
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
     virtual bool IsMouseSimulate() = 0;
     virtual bool HasMouseHideFlag() = 0;
-    virtual void UpdatePointerDrawingManagerWindowInfo() = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    virtual void UpdatePointerDrawingManagerWindowInfo() = 0;
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual bool IsNeedRefreshLayer(int32_t windowId) = 0;

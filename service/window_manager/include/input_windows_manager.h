@@ -126,8 +126,12 @@ public:
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate();
     bool HasMouseHideFlag();
-    void UpdatePointerDrawingManagerWindowInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    void UpdatePointerDrawingManagerWindowInfo();
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
     PointerStyle GetLastPointerStyle() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
