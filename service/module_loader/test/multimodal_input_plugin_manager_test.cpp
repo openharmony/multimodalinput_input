@@ -61,14 +61,17 @@ public:
     MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, int64_t frameTime), (override));
     MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, InputDispatchStage stage), (override));
     MOCK_METHOD(void, DispatchEvent, (NetPacket& pkt, int32_t pid), (override));
-    MOCK_METHOD(PluginResult, HandleEvent, (libinput_event *event, std::shared_ptr<IPluginData> data), (override));
-    MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override));
-    MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override));
-    MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent,
+                (libinput_event * event, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent,
+                (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent,
+                (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<AxisEvent> axisEvent,
+                std::shared_ptr<IPluginData> data), (override));
 }
 
-class MockInputPlugin : public IInputPlugin
-{
+class MockInputPlugin : public IInputPlugin {
 public:
     virtual ~MockInputPlugin() = default;
     MOCK_METHOD(int32_t, GetPriority, (), (override, const));
@@ -253,8 +256,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
  * @tc.desc: Test_GetPluginDataFromLibInput_001
  * @tc.require: test GetPluginDataFromLibInput
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_001,
-    TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     libinput_device touchpadDevice;
@@ -278,8 +281,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
  * @tc.desc: Test_GetPluginDataFromLibInput_002
  * @tc.require: test GetPluginDataFromLibInput
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_002,
-    TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     libinput_event event;
@@ -295,13 +298,14 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
  * @tc.desc: Test_GetPluginDataFromLibInput_003
  * @tc.require: test GetPluginDataFromLibInput
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    libinput_event event;
-    IPluginData* data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
-    EXPECT_EQ(data->libInputEventData.toolType, 0);
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003, TestSize.Level1) {
+  CALL_TEST_DEBUG;
+  libinput_event event;
+  IPluginData *data = InputPluginManager::GetInstance()
+                          ->GetPluginDataFromLibInput(&event)
+                          .get();
+  EXPECT_EQ(data->libInputEventData.toolType, 0);
 }
 
 /**
@@ -397,7 +401,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     libinput_event* event = nullptr;
-    int64_t frameTime = 100; 
+    int64_t frameTime = 100;
     inputPluginContext->DispatchEvent(event, frameTime);
     EXPECT_EQ(frameTime, 100);
 }

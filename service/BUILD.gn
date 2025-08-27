@@ -2162,6 +2162,14 @@ ohos_unittest("ModuleLoaderTest") {
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
+
+  defines = [
+    "OHOS_BUILD_ENABLE_POINTER",
+    "OHOS_BUILD_ENABLE_TOUCH",
+    "OHOS_BUILD_ENABLE_INTERCEPTOR",
+    "OHOS_BUILD_ENABLE_KEYBOARD",
+    "OHOS_BUILD_ENABLE_MONITOR",
+  ]
 }
 
 ohos_unittest("KeyEventNormalizeTest") {

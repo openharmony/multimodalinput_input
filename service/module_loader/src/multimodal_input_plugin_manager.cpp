@@ -306,8 +306,10 @@ int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, s
         std::copy(inputPluginList.begin(), inputPluginList.end(), std::back_inserter(allPluginList));
     }
     std::list<std::shared_ptr<IPluginContext>>::iterator pluginIt =
-        std::find_if(allPluginList.begin(), allPluginList.end(), [pluginName](std::shared_ptr<IPluginContext> iplugin)
-                     { return iplugin->GetPlugin()->GetName() == pluginName; });
+        std::find_if(allPluginList.begin(), allPluginList.end(),
+                     [pluginName](std::shared_ptr<IPluginContext> iplugin) {
+                       return iplugin->GetPlugin()->GetName() == pluginName;
+                     });
     if (pluginIt == allPluginList.end()) {
         MMI_HILOGE("Get plugin stub failed due to there is no plugin named: %{public}s", pluginName.c_str());
         return ERROR_NULL_POINTER;
@@ -379,16 +381,24 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
     std::shared_ptr<IInputEventHandler> eventHandler = nullptr;
     switch (stage) {
         case InputDispatchStage::Filter: {
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
             eventHandler = std::make_shared<EventFilterHandler>();
+#endif
         }
         case InputDispatchStage::Intercept: {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             eventHandler = std::make_shared<EventInterceptorHandler>();
+#endif
         }
         case InputDispatchStage::KeyCommand: {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
             eventHandler = std::make_shared<KeyCommandHandler>();
+#endif
         }
         case InputDispatchStage::Monitor: {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             eventHandler = std::make_shared<EventMonitorHandler>();
+#endif
         }
         default: {
             MMI_HILOGD("Abnormal input dispatch stage");
