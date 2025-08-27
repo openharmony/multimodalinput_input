@@ -772,7 +772,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             nextHandler_->HandlePointerEvent(pointerEvent);
         } else {
-            std::shared_ptr<IPluginData> pData = InputPluginManager::GetInstance()->getPluginDataFromLibInput(event);
+            std::shared_ptr<IPluginData> pData = std::make_shared<IPluginData>();
             pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
             int32_t result = InputPluginManager::GetInstance()->HandleEvent(pointerEvent, pData);
             if (result == RET_NOTDO) {
