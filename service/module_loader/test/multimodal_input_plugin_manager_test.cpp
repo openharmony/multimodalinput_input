@@ -69,7 +69,7 @@ public:
                 (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override));
     MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<AxisEvent> axisEvent,
                 std::shared_ptr<IPluginData> data), (override));
-}
+};
 
 class MockInputPlugin : public IInputPlugin {
 public:
@@ -91,14 +91,14 @@ public:
         (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(PluginResult, HandleEvent,
         (std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data), (override, const));
-}
+};
 
 class MockUDSSession : public UDSSession {
 public:
     MOCK_METHOD(bool, SendMsg, (NetPacket& pkt));
     MockUDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
         const int32_t pid) : UDSSession(programName, moduleType, fd, uid, pid) {}
-}
+};
 
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -194,7 +194,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     std::string pluginName = "yunshuiqiao";
     sptr<IRemoteObject> inputDevicePluginStub = nullptr;
     int32_t result = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
-    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
 }
 
 /**
@@ -442,11 +442,9 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     int32_t pid = 4;
     std::shared_ptr<MockUDSSession> session = std::make_shared<MockUDSSession>
         (programName, moduleType, fd, uid, pid);
-    udsServer_->AddSession(session);
     InputPluginManager::GetInstance()->udsServer_ = udsServer.get();
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
-    MockInputPluginContext->DispatchEvent(pkt, pid);
-    InputPluginManager::GetInstance()->udsServer_ = nullptr;
+    inputPluginContext->DispatchEvent(pkt, pid);
     EXPECT_EQ(pid, 4);
 }
 
@@ -495,7 +493,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     PluginResult result = inputPluginContext->HandleEvent(event, data);
     EXPECT_EQ(result, PluginResult::NotUse);
 
-    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MocKInputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
     EXPECT_CALL(*mockInputPlugin, GetPriority()).WillOnce(Return(201));
     EXPECT_CALL(*mockInputPlugin, GetStage()).WillOnce(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
@@ -571,11 +569,11 @@ HWTEST_F(
 
 /**
  * @tc.name: MultimodalInputPluginManagerTest_GetPlugin_001
- * @tc.desc: Test_GetPriority_001
- * @tc.require: test GetPriority
+ * @tc.desc: Test_GetPlugin_001
+ * @tc.require: test GetPlugin
  */
 HWTEST_F(
-    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPriority_001, TestSize.Level1)
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPlugin_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();

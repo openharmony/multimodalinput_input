@@ -1720,6 +1720,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -2120,7 +2121,6 @@ ohos_unittest("ModuleLoaderTest") {
 
   sources = [
     "module_loader/src/input_screen_capture_agent.cpp",
-    "module_loader/src/multimodal_input_plugin_manager.cpp",
     "module_loader/test/input_screen_capture_agent_test.cpp",
     "module_loader/test/mmi_service_test.cpp",
     "module_loader/test/multimodal_input_plugin_manager_test.cpp",
