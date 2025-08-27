@@ -1229,7 +1229,9 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_SetMultiWindowScre
     KnuckleDrawingManager kceDrawMgr;
     uint64_t screenId = 1;
     uint64_t displayNodeScreenId = 2;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.SetMultiWindowScreenId(screenId, displayNodeScreenId));
+    kceDrawMgr.SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    ASSERT_EQ(kceDrawMgr.windowScreenId_, 1);
+    ASSERT_EQ(kceDrawMgr.displayNodeScreenId_, 2);
 }
 
 /**
