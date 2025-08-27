@@ -2220,7 +2220,7 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
         return true;
     }
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
-        MMI_HILOGI("Timer callback");
+        MMI_HILOGI("Timer callback, screenshot delay %{public}d milisecond", LONG_ABILITY_START_DELAY);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         DfxHisysevent::ReportKeyEvent(sequence.ability.bundleName);
         LaunchAbility(sequence);
@@ -2301,7 +2301,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
         }
     } else {
         if (bundleName == matchName && isScreenLocked) {
-            MMI_HILOGI("Screen locked, screenshot delay 2000 milisecond");
+            MMI_HILOGI("Screen On and locked, screenshot delay 100 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
     }
