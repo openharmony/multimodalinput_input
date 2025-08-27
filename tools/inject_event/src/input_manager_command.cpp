@@ -2349,8 +2349,8 @@ void InputManagerCommand::FillPointerItem(PointerEvent::PointerItem &item, int32
 int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, int32_t scalePercentNumerator)
 {
     CALL_DEBUG_ENTER;
-    constexpr int32_t hundred = 100;
-    constexpr int32_t fingerCount = 2;
+    int32_t hundred = 100;
+    int32_t fingerCount = 2;
     int32_t timesForSleep = hundred * hundred;
     int32_t times = hundred / (fingerCount * fingerCount * fingerCount);
     int32_t actionType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
