@@ -296,9 +296,9 @@ bool ScreenPointer::InitSurface()
 void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 {
     CHKPV(si);
+    CHKPV(surfaceNode_);
     auto id = si->GetRsId();
     if (screenId_ != id) {
-        CHKPV(surfaceNode_);
         surfaceNode_->AttachToDisplay(id);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
@@ -309,7 +309,6 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
-    CHKPV(surfaceNode_);
     surfaceNode_->AttachToDisplay(screenId_);
     Rosen::RSTransaction::FlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
