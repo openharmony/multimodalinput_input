@@ -4167,6 +4167,10 @@ ErrCode MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
         MMI_HILOGE("StubCreateVKeyboardDevice Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Controller permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     vkeyboardDevice = nullptr;
     isFoldPC_ = PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
     if (!isFoldPC_) {

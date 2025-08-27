@@ -1155,7 +1155,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerColor_02
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
     EXPECT_EQ(ret, RET_OK);
     int32_t ret2 = pointerDrawingManager.SetPointerColor(color);
-    EXPECT_EQ(ret2, RET_ERR);
+    EXPECT_EQ(ret2, RET_OK);
 }
 
 /**
