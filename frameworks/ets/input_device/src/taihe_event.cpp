@@ -44,6 +44,7 @@ std::shared_ptr<TaiheEvent> TaiheEvent::GetInstance()
 
 bool TaiheEvent::AddCallback(std::string const &type, callbackTypes &&cb, uintptr_t opq)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(taiheCbMapMutex);
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
     ani_ref callbackRef;
@@ -70,6 +71,7 @@ bool TaiheEvent::AddCallback(std::string const &type, callbackTypes &&cb, uintpt
 
 bool TaiheEvent::RemoveCallback(std::string const &type, uintptr_t opq)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(taiheCbMapMutex);
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
     ani_env *env = taihe::get_env();
@@ -187,11 +189,11 @@ TaiheEvent::~TaiheEvent()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    devListener_.clear();
-    auto ret = InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
+    auto ret = InputManager::GetInstance()->UnregisterDevListener("change");
     if (ret != RET_OK) {
         MMI_HILOGE("UnregisterDevListener fail, error:%{public}d", ret);
     }
+    devListener_.clear();
 }
 
 void TaiheEvent::OnDeviceAdded(int32_t deviceId, const std::string &type)
