@@ -45,6 +45,8 @@ private:
     IKnuckleDrawing *impl_ {nullptr};
     int32_t timerId_ {-1};
     std::chrono::time_point<std::chrono::steady_clock> lastCallTime_ {std::chrono::steady_clock::now()};
+    uint64_t windowScreenId_ {0};
+    uint64_t displayNodeScreenId_ {0};
 };
 } // namespace MMI
 } // namespace OHOS
