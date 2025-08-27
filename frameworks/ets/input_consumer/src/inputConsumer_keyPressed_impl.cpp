@@ -51,6 +51,20 @@ ohos::multimodalInput::keyEvent::KeyEvent TaiheInvalidKeyPressed()
     };
 }
 
+int32_t EtsKeyActionToKeyAction(int32_t action)
+{
+    static const std::map<int32_t, int32_t> keyActionMap {
+        { EtsKeyAction::ETS_KEY_ACTION_CANCEL, KeyEvent::KEY_ACTION_CANCEL },
+        { EtsKeyAction::ETS_KEY_ACTION_DOWN, KeyEvent::KEY_ACTION_DOWN },
+        { EtsKeyAction::ETS_KEY_ACTION_UP, KeyEvent::KEY_ACTION_UP },
+    };
+    if (auto iter = keyActionMap.find(action); iter != keyActionMap.cend()) {
+        return iter->second;
+    } else {
+        return KeyEvent::KEY_ACTION_UNKNOWN;
+    }
+}
+
 EtsKeyAction KeyActionEtsKeyAction(int32_t action)
 {
     static const std::map<int32_t, EtsKeyAction> keyActionMap {
