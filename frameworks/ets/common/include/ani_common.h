@@ -34,8 +34,6 @@
 
 namespace OHOS {
 namespace MMI {
-
-
 using namespace ohos::multimodalInput::keyCode;
 using TaiheKeyCode = ::ohos::multimodalInput::keyCode::KeyCode;
 
@@ -72,7 +70,8 @@ enum TH_MOUSE_BUTTON {
 
 const std::map<int32_t, TaiheError> TAIHE_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR,
-        { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
+        { COMMON_PERMISSION_CHECK_ERROR,
+            "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
     { COMMON_USE_SYSAPI_ERROR,
         { COMMON_USE_SYSAPI_ERROR, "Permission denied, non-system application called system api." } },
     { COMMON_PARAMETER_ERROR, { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." } },
