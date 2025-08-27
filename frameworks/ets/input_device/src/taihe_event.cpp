@@ -194,7 +194,6 @@ TaiheEvent::~TaiheEvent()
     }
 }
 
-// 执行动作
 void TaiheEvent::OnDeviceAdded(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
