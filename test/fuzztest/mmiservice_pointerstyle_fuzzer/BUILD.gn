@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("StubMmiServiceFuzzTest") {
+ohos_fuzztest("MmiservicePointerStyleFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/stubmmiservice_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/mmiservice_pointerstyle_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -42,8 +42,6 @@ ohos_fuzztest("StubMmiServiceFuzzTest") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/common/anco/comm/include",
   ]
   cflags = [
     "-g",
@@ -60,11 +58,10 @@ ohos_fuzztest("StubMmiServiceFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "stubmmiservice_fuzzer.cpp" ]
+  sources = [ "mmiservice_pointerstyle_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -101,7 +98,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":StubMmiServiceFuzzTest",
+    ":MmiservicePointerStyleFuzzTest",
   ]
 }
 ###############################################################################

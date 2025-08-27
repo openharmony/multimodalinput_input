@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("StubModuleLoaderFuzzTest") {
+ohos_fuzztest("MmiserviceMouseFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/stubmoduleloader_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/mmiservice_mouse_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -42,8 +42,6 @@ ohos_fuzztest("StubModuleLoaderFuzzTest") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/common/anco/comm/include",
   ]
   cflags = [
     "-g",
@@ -60,11 +58,10 @@ ohos_fuzztest("StubModuleLoaderFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "stubmoduleloader_fuzzer.cpp" ]
+  sources = [ "mmiservice_mouse_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -85,7 +82,7 @@ ohos_fuzztest("StubModuleLoaderFuzzTest") {
     "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
-  
+
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
@@ -101,7 +98,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":StubModuleLoaderFuzzTest",
+    ":MmiserviceMouseFuzzTest",
   ]
 }
 ###############################################################################
