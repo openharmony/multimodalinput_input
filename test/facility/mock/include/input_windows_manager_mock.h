@@ -90,8 +90,11 @@ public:
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
-    void UpdatePointerDrawingManagerWindowInfo() override {}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    void UpdatePointerDrawingManagerWindowInfo() override {}
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING

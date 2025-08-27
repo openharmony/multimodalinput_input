@@ -1237,6 +1237,8 @@ HWTEST_F(InputDeviceManagerTest, RemoveDevListener_Test_001, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(inputDevice.RemoveDevListener(session));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: HasPointerDevice_Test_001
  * @tc.desc: Test the function HasPointerDevice
@@ -1252,6 +1254,8 @@ HWTEST_F(InputDeviceManagerTest, HasPointerDevice_Test_001, TestSize.Level1)
     ret = inputDevice.HasTouchDevice();
     EXPECT_FALSE(ret);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: NotifyDevCallback_Test_001

@@ -110,6 +110,8 @@ void MouseEventNormalizeTest::TearDown()
     MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch_);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: MouseEventNormalizeTest_GetDisplayId()_001
  * @tc.desc: Test GetDisplayId()
@@ -121,6 +123,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetDisplayId_001, Test
     int32_t idNames = -1;
     ASSERT_EQ(MouseEventHdr->GetDisplayId(), idNames);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: MouseEventNormalizeTest_GetPointerEvent_002
@@ -226,6 +230,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: MouseEventNormalizeTest_NormalizeMoveMouse_004
  * @tc.desc: Test NormalizeMoveMouse
@@ -239,6 +245,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeMoveMouse_004
     int32_t offsetY = 0;
     ASSERT_EQ(MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY), isNormalize);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: MouseEventNormalizeTest_Dump_005
