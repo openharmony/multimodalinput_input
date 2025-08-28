@@ -43,7 +43,7 @@ public:
         bool Want(std::shared_ptr<KeyEvent> keyEvent) const;
     };
 
-    enum SubcriberType : int32_t {
+    enum MonitorType : int32_t {
         MONITOR_ACTION_UNKNOWN = 0,
         MONITOR_ACTION_CANCEL = 1,
         MONITOR_ACTION_ONLY_DOWN = 2,

@@ -875,7 +875,7 @@ bool JsInputConsumer::KeyMonitor::ParseKeyMonitorOption(napi_env env, napi_value
     keyOption_.SetRepeat(isRepeat);
 
     if (!JsInputConsumer::CheckKeyMonitorOption(keyOption_)) {
-        MMI_HILOGE("Invalid KeyPressedConfig, [action_:%{public}d]", keyOption_.GetAction());
+        MMI_HILOGE("Invalid KeyPressedConfig, [%{public}d]", keyOption_.GetAction());
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input for KeyPressedConfig is invalid");
         return false;
     }
@@ -920,7 +920,7 @@ void JsInputConsumer::SubscribeKeyMonitor(napi_env env, napi_callback_info info)
     std::lock_guard guard(mutex_);
     KeyMonitor keyMonitor {};
 
-    if (!keyMonitor.Parse(env, info)) 
+    if (!keyMonitor.Parse(env, info)) {
         MMI_HILOGE("Unexpected key monitor");
         return;
     }

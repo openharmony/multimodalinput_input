@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
 constexpr size_t PRE_KEYS_NUM { 4 };
-enum MonitorType : int32_t {
+enum SubcriberType : int32_t {
     ACTION_UNKNOWN = 0,
     ACTION_CANCEL = 1,
     ACTION_ONLY_DOWN = 2,
@@ -73,14 +73,14 @@ bool KeyEventInputSubscribeManager::MonitorIdentity::Want(std::shared_ptr<KeyEve
 
     bool isRepeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (!isKeyRepeat) : isKeyRepeat;
     bool flag = false;
-    if (action_ == MonitorType::ACTION_ONLY_DOWN) {
+    if (action_ == SubcriberType::ACTION_ONLY_DOWN) {
         flag = (keyAction == KeyEvent::KEY_ACTION_DOWN) &&
             (isRepeat_ || !isKeyRepeat);
-    } else if (action_ == MonitorType::ACTION_DOWN_AND_UP) {
+    } else if (action_ == SubcriberType::ACTION_DOWN_AND_UP) {
         flag = ((keyAction == KeyEvent::KEY_ACTION_DOWN) ||
             (keyAction == KeyEvent::KEY_ACTION_UP)) && (isRepeat_ || isRepeatValue);
     }  else  {
-        MMI_HILOGW("Invalid MonitorType");
+        MMI_HILOGW("Invalid SubcriberType");
         flag = false;
     }
     return flag;
