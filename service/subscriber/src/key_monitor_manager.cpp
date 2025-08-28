@@ -243,7 +243,7 @@ bool KeyMonitorManager::CheckMonitor(const Monitor &monitor)
 {
     CALL_DEBUG_ENTER;
     if (allowedKeys_.find(monitor.key_) == allowedKeys_.cend()) {
-        MMI_HILOGE("Invalid pressKey [key:%{public}d]", monitor.key_);
+        MMI_HILOGE("Invalid pressKey [%{public}d]", monitor.key_);
         return false;
     }
     return (monitor.action_ == MonitorType::MONITOR_ACTION_ONLY_DOWN) ||
