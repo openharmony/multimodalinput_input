@@ -95,6 +95,9 @@ int32_t InputActiveSubscriberHandler::UnsubscribeInputActive(SessionPtr sess, in
             return false;
         });
     if (findResult != subscribers_.end()) {
+        if ((*findResult)->timerId_ >= 0) {
+            TimerMgr->RemoveTimer((*findResult)->timerId_);
+        }
         subscribers_.erase(findResult);
     } else {
         MMI_HILOGE("UnsubscribeInputActive failed with subscribeId(%{public}d)", subscribeId);
