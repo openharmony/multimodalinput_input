@@ -1248,8 +1248,8 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
         keyCode = KeyEvent::KEYCODE_VOLUME_UP;
     } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    } else {
-        MMI_HILOGI("pressure is not in gesture list");
+    } else if (pressure < 0 || pressure > DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+        MMI_HILOGE("pressure is error!");
         return false;
     }
     MMI_HILOGI("Current is touchpad edge swipe: type: %{public}f", pressure);
