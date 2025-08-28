@@ -435,7 +435,6 @@ void KeyGestureManager::PullUpAccessibility::OnTriggerAll(std::shared_ptr<KeyEve
 
 KeyGestureManager::KeyGestureManager()
 {
-    // hgc 1 构造函数中对keyCode_进行初始化，仅涉及音量加减，音量减键
     keyGestures_.push_back(std::make_unique<PullUpAccessibility>());
     keyGestures_.push_back(std::make_unique<LongPressSingleKey>(KeyEvent::KEYCODE_VOLUME_DOWN));
     keyGestures_.push_back(std::make_unique<LongPressSingleKey>(KeyEvent::KEYCODE_VOLUME_UP));
