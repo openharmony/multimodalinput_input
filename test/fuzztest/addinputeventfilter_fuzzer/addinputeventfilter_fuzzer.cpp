@@ -39,7 +39,6 @@ void AddInputEventFilterFuzzTest(FuzzedDataProvider &fdp)
 
     auto filter = std::make_shared<TestFilter>();
     int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority, touchTags);
-
     if (filterId != -1) {
         InputManager::GetInstance()->RemoveInputEventFilter(filterId);
     }
