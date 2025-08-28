@@ -13,12 +13,10 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "skippointerlayer_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SkipPointerLayerFuzzTest"
@@ -26,25 +24,9 @@
 namespace OHOS {
 namespace MMI {
 
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+void SkipPointerLayerFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-void SkipPointerLayerTest(const uint8_t* data, size_t size)
-{
-    int32_t isSkip;
-    size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, isSkip);
+    bool isSkip = fdp.ConsumeBool();
     InputManager::GetInstance()->SkipPointerLayer(isSkip);
 }
 } // namespace MMI
@@ -53,7 +35,11 @@ void SkipPointerLayerTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::SkipPointerLayerTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+    
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::SkipPointerLayerFuzzTest(fdp);
     return 0;
 }

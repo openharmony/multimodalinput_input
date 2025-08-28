@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "simulateinputevent_fuzzer.h"
-
-#include "securec.h"
 
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -26,117 +25,95 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectNum = sizeof(object);
-    if (objectNum > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectNum, data, objectNum);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectNum;
-}
-
-bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPos)
+bool SimulateInjectEvent(FuzzedDataProvider &fdp)
 {
     auto injectDownEvent = KeyEvent::Create();
-    CHKPF(injectDownEvent);
-    int32_t keyCode;
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int32_t>(keyCode, data + startPos, size - startPos);
+    if (!injectDownEvent) {
+        return false;
+    }
+    int32_t keyCode = fdp.ConsumeIntegral<int32_t>();
     injectDownEvent->SetKeyCode(keyCode);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    int64_t downTime;
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
+
     KeyEvent::KeyItem kitDown;
-    kitDown.SetDownTime(downTime);
-    int32_t keyCodePressed;
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int32_t>(keyCodePressed, data + startPos, size - startPos);
-    kitDown.SetKeyCode(keyCodePressed);
+    kitDown.SetDownTime(fdp.ConsumeIntegral<int64_t>());
+    kitDown.SetKeyCode(fdp.ConsumeIntegral<int32_t>());
     kitDown.SetPressed(true);
     injectDownEvent->AddPressedKeyItems(kitDown);
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     auto injectUpEvent = KeyEvent::Create();
-    CHKPF(injectUpEvent);
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
+    if (!injectUpEvent) {
+        return false;
+    }
     KeyEvent::KeyItem kitUp;
-    kitUp.SetDownTime(downTime);
-    kitUp.SetKeyCode(keyCodePressed);
+    kitUp.SetDownTime(fdp.ConsumeIntegral<int64_t>());
+    kitUp.SetKeyCode(kitDown.GetKeyCode());
     kitUp.SetPressed(false);
     injectUpEvent->SetKeyCode(keyCode);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+
     return true;
 }
 
-bool SimulatePointerEvent(const uint8_t* data, const size_t size, size_t &startPos)
+bool SimulatePointerEvent(FuzzedDataProvider &fdp)
 {
     auto pointerDownEvent = PointerEvent::Create();
-    CHKPF(pointerDownEvent);
+    if (!pointerDownEvent) {
+        return false;
+    }
     PointerEvent::PointerItem downitem;
     downitem.SetPointerId(0);
-    int32_t physicalX;
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int32_t>(physicalX, data + startPos, size - startPos);
-    downitem.SetDisplayX(physicalX);
-    int32_t physicalY;
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int32_t>(physicalY, data + startPos, size - startPos);
-    downitem.SetDisplayY(physicalY);
-    int32_t pressure;
-    CHECKSIZE(startPos, size);
-    startPos += GetObject<int32_t>(pressure, data + startPos, size - startPos);
-    downitem.SetPressure(pressure);
+    downitem.SetDisplayX(fdp.ConsumeIntegral<int32_t>());
+    downitem.SetDisplayY(fdp.ConsumeIntegral<int32_t>());
+    downitem.SetPressure(fdp.ConsumeIntegral<int32_t>());
     downitem.SetDeviceId(1);
     pointerDownEvent->AddPointerItem(downitem);
-    pointerDownEvent->SetId(std::numeric_limits<int32_t>::max());
+    pointerDownEvent->SetId(fdp.ConsumeIntegral<int32_t>());
     pointerDownEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerDownEvent->SetPointerId(0);
     pointerDownEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerDownEvent);
 
     auto pointerUpEvent = PointerEvent::Create();
-    CHKPF(pointerUpEvent);
+    if (!pointerUpEvent) {
+        return false;
+    }
     PointerEvent::PointerItem upitem;
     upitem.SetPointerId(0);
-    upitem.SetDisplayX(physicalX);
-    upitem.SetDisplayY(physicalY);
-    upitem.SetPressure(pressure);
+    upitem.SetDisplayX(downitem.GetDisplayX());
+    upitem.SetDisplayY(downitem.GetDisplayY());
+    upitem.SetPressure(downitem.GetPressure());
     upitem.SetDeviceId(1);
     pointerUpEvent->AddPointerItem(upitem);
-    pointerUpEvent->SetId(std::numeric_limits<int32_t>::max());
+    pointerUpEvent->SetId(fdp.ConsumeIntegral<int32_t>());
     pointerUpEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerUpEvent->SetPointerId(0);
     pointerUpEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerUpEvent);
+
     return true;
 }
 
-bool SimulateInputEventFuzzTest(const uint8_t* data, const size_t size)
+bool SimulateInputEventFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t startPos = 0;
-    if (SimulateInjectEvent(data, size, startPos) && SimulatePointerEvent(data, size, startPos)) {
-        return true;
-    }
-    return false;
+    bool ok1 = SimulateInjectEvent(fdp);
+    bool ok2 = SimulatePointerEvent(fdp);
+    return ok1 || ok2;
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::SimulateInputEventFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::SimulateInputEventFuzzTest(fdp);
     return 0;
 }
