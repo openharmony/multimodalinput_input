@@ -2194,6 +2194,12 @@ ohos_unittest("KeyEventNormalizeTest") {
 ohos_unittest("KeyEventNormalizeWithMockTest") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  
   include_dirs = [
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
