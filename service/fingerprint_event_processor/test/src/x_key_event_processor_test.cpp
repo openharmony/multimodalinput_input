@@ -314,13 +314,13 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_StartXKeyIfNeeded_001, T
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
     XKeyEventHdr->isStartedXKey_ = true;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
-    xKeyEventType = 2:
+    xKeyEventType = 2;
     XKeyEventHdr->isStartedXKey_ = false;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
-    xKeyEventType = 3:
+    xKeyEventType = 3;
     XKeyEventHdr->isStartedXKey_ = false;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
-    xKeyEventType = 4:
+    xKeyEventType = 4;
     XKeyEventHdr->isStartedXKey_ = false;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
 }
