@@ -123,7 +123,7 @@ struct IPluginContext {
 
 inline bool checkPluginEventNull(PluginEventType &event)
 {
-  return std::visit([](auto &&v) { return v == nullptr; }, event);
+    return std::visit([](auto &&v) { return v == nullptr; }, event);
 }
 } // namespace MMI
 } // namespace OHOS
