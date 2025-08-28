@@ -60,8 +60,8 @@ private:
         PointerEventRecord(int64_t actionTime, int32_t sourceType, int32_t pointerId, bool isInject,
             std::vector<int32_t> pointerIds, std::vector<double> pressures, std::vector<double> tiltXs,
             std::vector<double> tiltYs)
-            : actionTime(actionTime), sourceType(sourceType), isInject(isInject), pointerIds(pointerIds),
-              pressures(pressures), tiltXs(tiltXs), tiltYs(tiltYs)
+            : actionTime(actionTime), sourceType(sourceType), pointerId(pointerId), isInject(isInject),
+              pointerIds(pointerIds), pressures(pressures), tiltXs(tiltXs), tiltYs(tiltYs)
         {}
     };
     static std::queue<std::string> eventQueue_;
