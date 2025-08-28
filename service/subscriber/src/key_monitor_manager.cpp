@@ -97,14 +97,14 @@ bool KeyMonitorManager::Monitor::Want(std::shared_ptr<KeyEvent> keyEvent) const
     bool repeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ?
         (keyCode != repeatCode) : (keyCode == repeatCode);
     bool flag = false;
-    if (action_ == SubcriberType::MONITOR_ACTION_ONLY_DOWN) {
+    if (action_ == MonitorType::MONITOR_ACTION_ONLY_DOWN) {
         flag = (keyAction == KeyEvent::KEY_ACTION_DOWN) &&
             (isRepeat_ || (keyCode != repeatCode));
-    } else if (action_ == SubcriberType::MONITOR_ACTION_DOWN_AND_UP) {
+    } else if (action_ == MonitorType::MONITOR_ACTION_DOWN_AND_UP) {
         flag = ((keyAction == KeyEvent::KEY_ACTION_DOWN) ||
             (keyAction == KeyEvent::KEY_ACTION_UP)) && (isRepeat_ || repeatValue);
     } else  {
-        MMI_HILOGW("Invalid SubcriberType");
+        MMI_HILOGW("Invalid MonitorType");
         flag = false;
     }
     return flag;
@@ -246,8 +246,8 @@ bool KeyMonitorManager::CheckMonitor(const Monitor &monitor)
         MMI_HILOGE("Invalid pressKey [key:%{public}d]", monitor.key_);
         return false;
     }
-    return (monitor.action_ == SubcriberType::MONITOR_ACTION_ONLY_DOWN) ||
-           (monitor.action_ == SubcriberType::MONITOR_ACTION_DOWN_AND_UP);
+    return (monitor.action_ == MonitorType::MONITOR_ACTION_ONLY_DOWN) ||
+           (monitor.action_ == MonitorType::MONITOR_ACTION_DOWN_AND_UP);
 }
 
 void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session)
