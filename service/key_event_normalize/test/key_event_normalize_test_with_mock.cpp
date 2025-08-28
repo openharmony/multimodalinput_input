@@ -200,6 +200,7 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_ResetKeyEv
     EXPECT_EQ(KeyEventHdr->keyEvent_->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), true);
 }
 
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 /**
  * @tc.name: KeyEventNormalizeWithMockTest_SyncLedStateFromKeyEvent_NonKbd_LedOff_001
  * @tc.desc: Test SyncLedStateFromKeyEvent with a non-kbd device without led.
@@ -228,11 +229,9 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     vKeyboard->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     INPUT_DEV_MGR->AddVirtualInputDevice(vKeyboard, vKeyboardDeviceId);
     KeyEventHdr->keyEvent_ = nullptr;
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     EXPECT_EQ(INPUT_DEV_MGR->IsVirtualKeyboardDeviceEverConnected(), true);
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
@@ -267,11 +266,9 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     vKeyboard->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     INPUT_DEV_MGR->AddVirtualInputDevice(vKeyboard, vKeyboardDeviceId);
     KeyEventHdr->keyEvent_ = nullptr;
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     EXPECT_EQ(INPUT_DEV_MGR->IsVirtualKeyboardDeviceEverConnected(), true);
     // led off
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(0));
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
@@ -299,22 +296,21 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
         .name = "test",
     };
     EXPECT_EQ(INPUT_DEV_MGR->IsKeyboardDevice(&libDev), true);
+    KeyEventHdr->keyEvent_ = nullptr;
     int32_t vKeyboardDeviceId = 0;
     auto vKeyboard = std::make_shared<InputDevice>();
     CHKPV(vKeyboard);
     vKeyboard->SetName("VirtualKeyboardTest");
     vKeyboard->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     INPUT_DEV_MGR->AddVirtualInputDevice(vKeyboard, vKeyboardDeviceId);
-    KeyEventHdr->keyEvent_ = nullptr;
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     EXPECT_EQ(INPUT_DEV_MGR->IsVirtualKeyboardDeviceEverConnected(), true);
     // led on
     EXPECT_CALL(libinputMock, HasEventLedType).Times(testing::AtMost(1)).WillOnce(testing::Return(1));
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncLedStateFromKeyEvent(&libDev));
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
 }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 }
