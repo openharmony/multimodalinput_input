@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "markconsumed_fuzzer.h"
-
-#include "securec.h"
 
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -28,36 +27,28 @@ namespace OHOS {
 namespace MMI {
 class InputEventConsumerTest : public IInputEventConsumer {
 public:
-    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override{};
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {}
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
         MMI_HILOGD("Report pointer event success");
-    };
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override{};
+    }
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
 };
 
-template <class T> size_t GetObject(const uint8_t *data, size_t size, T &object)
+void MarkConsumedFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-void MarkConsumedFuzzTest(const uint8_t *data, size_t size)
-{
-    CALL_DEBUG_ENTER;
-    int32_t eventId;
-    GetObject<int32_t>(data, size, eventId);
+    int32_t eventId = fdp.ConsumeIntegral<int32_t>();
     auto consumer = std::make_shared<InputEventConsumerTest>();
+
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(consumer);
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    MarkConsumedFuzzTest(fdp);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
@@ -65,7 +56,10 @@ void MarkConsumedFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::MarkConsumedFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
