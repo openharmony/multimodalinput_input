@@ -793,6 +793,9 @@ KeyEventMonitorInfo::~KeyEventMonitorInfo()
 const std::set<int32_t> JsInputConsumer::allowedKeys_ {
     KeyEvent::KEYCODE_VOLUME_DOWN,
     KeyEvent::KEYCODE_VOLUME_UP,
+    KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE,
+    KeyEvent::KEYCODE_MEDIA_NEXT,
+    KeyEvent::KEYCODE_MEDIA_PREVIOUS,
 };
 
 std::shared_ptr<JsInputConsumer> JsInputConsumer::GetInstance()
@@ -872,7 +875,6 @@ bool JsInputConsumer::KeyMonitor::ParseKeyMonitorOption(napi_env env, napi_value
     keyOption_.SetRepeat(isRepeat);
 
     if (!JsInputConsumer::CheckKeyMonitorOption(keyOption_)) {
-        MMI_HILOGE("Input for KeyPressedConfig is invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Input for KeyPressedConfig is invalid");
         return false;
     }
@@ -918,7 +920,6 @@ void JsInputConsumer::SubscribeKeyMonitor(napi_env env, napi_callback_info info)
     KeyMonitor keyMonitor {};
 
     if (!keyMonitor.Parse(env, info)) {
-        MMI_HILOGE("Unexpected key monitor");
         return;
     }
     MMI_HILOGI("[NAPI] Subscribe key monitor");
@@ -1181,8 +1182,12 @@ void JsInputConsumer::NotifyKeyMonitorScoped(const KeyMonitor &keyMonitor, std::
 
 bool JsInputConsumer::CheckKeyMonitorOption(const KeyMonitorOption &keyOption)
 {
-    return ((allowedKeys_.find(keyOption.GetKey()) != allowedKeys_.cend()) &&
-            (keyOption.GetAction() == KeyEvent::KEY_ACTION_DOWN));
+    if (allowedKeys_.find(keyOption.GetKey()) == allowedKeys_.cend()) {
+        MMI_HILOGE("Invalid pressKey [key:%{public}d]", keyOption.GetKey());
+        return false;
+    }
+    return ((keyOption.GetAction() == KeyEvent::KEY_ACTION_DOWN) ||
+           (keyOption.GetAction() == KeyEvent::KEY_ACTION_UP));
 }
 
 napi_value JsInputConsumer::KeyEvent2JsKeyEvent(napi_env env, std::shared_ptr<KeyEvent> keyEvent)

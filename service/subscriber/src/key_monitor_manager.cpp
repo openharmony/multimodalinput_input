@@ -36,6 +36,9 @@ constexpr int32_t REPEAT_ONCE { 1 };
 const std::set<int32_t> KeyMonitorManager::allowedKeys_ {
     KeyEvent::KEYCODE_VOLUME_DOWN,
     KeyEvent::KEYCODE_VOLUME_UP,
+    KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE,
+    KeyEvent::KEYCODE_MEDIA_NEXT,
+    KeyEvent::KEYCODE_MEDIA_PREVIOUS,
 };
 
 std::shared_ptr<KeyMonitorManager> KeyMonitorManager::GetInstance()
@@ -78,11 +81,33 @@ bool KeyMonitorManager::Monitor::IsFocused() const
 
 bool KeyMonitorManager::Monitor::Want(std::shared_ptr<KeyEvent> keyEvent) const
 {
-    return ((key_ == keyEvent->GetKeyCode()) &&
-            (action_ == keyEvent->GetKeyAction()) &&
-            (isRepeat_ ||
-             (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) ||
-             (keyEvent->GetKeyCode() != KeyRepeat->GetRepeatKeyCode())));
+    CHKPF(keyEvent);
+    int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t keyAction = keyEvent->GetKeyAction();
+    int32_t repeatCode = KeyRepeat->GetRepeatKeyCode();
+    MMI_HILOGD("[key_:%{public}d, KC:%{private}d], [action_:%{public}d, KA:%{public}d]"
+        "[isRepeat_:%{public}d, repeatCode:%{private}d]",
+        key_, keyCode, action_, keyAction, isRepeat_, repeatCode);
+
+    if (key_ != keyCode) {
+        MMI_HILOGE("Invalid subscription key:%{private}d", keyCode);
+        return false;
+    }
+
+    bool repeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ?
+        (keyCode != repeatCode) : (keyCode == repeatCode);
+    bool flag = false;
+    if (action_ == SubcriberType::MONITOR_ACTION_ONLY_DOWN) {
+        flag = (keyAction == KeyEvent::KEY_ACTION_DOWN) &&
+            (isRepeat_ || (keyCode != repeatCode));
+    } else if (action_ == SubcriberType::MONITOR_ACTION_DOWN_AND_UP) {
+        flag = ((keyAction == KeyEvent::KEY_ACTION_DOWN) ||
+            (keyAction == KeyEvent::KEY_ACTION_UP)) && (isRepeat_ || repeatValue);
+    } else  {
+        MMI_HILOGW("Invalid SubcriberType");
+        flag = false;
+    }
+    return flag;
 }
 
 KeyMonitorManager::KeyMonitorManager()
@@ -216,8 +241,13 @@ void KeyMonitorManager::OnSessionLost(int32_t session)
 
 bool KeyMonitorManager::CheckMonitor(const Monitor &monitor)
 {
-    return ((allowedKeys_.find(monitor.key_) != allowedKeys_.cend()) &&
-            (monitor.action_ == KeyEvent::KEY_ACTION_DOWN));
+    CALL_DEBUG_ENTER;
+    if (allowedKeys_.find(monitor.key_) == allowedKeys_.cend()) {
+        MMI_HILOGE("Invalid pressKey [key:%{public}d]", monitor.key_);
+        return false;
+    }
+    return (monitor.action_ == SubcriberType::MONITOR_ACTION_ONLY_DOWN) ||
+           (monitor.action_ == SubcriberType::MONITOR_ACTION_DOWN_AND_UP);
 }
 
 void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session)
