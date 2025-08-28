@@ -93,6 +93,7 @@ ohos_unittest("InputNativeHotkeyTest") {
     "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
+    "ipc:ipc_single",
     "eventhandler:libeventhandler",
   ]
 
