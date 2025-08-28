@@ -78,6 +78,7 @@ ohos_unittest("FingersenseWrapperTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
