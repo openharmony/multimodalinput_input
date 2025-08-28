@@ -575,14 +575,14 @@ struct DisplayInfo {
     /**
      * The angle of the screen content relative to the sensor 0 degrees.
      *
-     * @since 20
+     * @since 21
      */
     Direction deviceRotation;
 
     /**
      * The angle of the rotation correction.
      *
-     * @since 20
+     * @since 21
      */
     Direction rotationCorrection;
 };
