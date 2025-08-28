@@ -62,8 +62,6 @@ ohos_unittest("FingerprintEventProcessorTest") {
   ]
 
   sources = [
-    "${mmi_path}/frameworks/proxy/events/src/input_event.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/pointer_event.cpp",
     "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
     "${mmi_path}/service/fingerprint_event_processor/src/fingerprint_event_processor.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
@@ -79,6 +77,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

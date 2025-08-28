@@ -229,8 +229,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
     if (manager != nullptr) {
         manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
     }
-    funInputEvent_ = [manager, callback](void *event, int64_t frameTime)
-    {
+    funInputEvent_ = [manager, callback](void *event, int64_t frameTime) {
         if (manager != nullptr) {
             std::shared_ptr<IPluginData> pData = std::make_shared<IPluginData>();
             pData->frameTime = frameTime;

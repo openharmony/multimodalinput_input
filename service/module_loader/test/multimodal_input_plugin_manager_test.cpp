@@ -300,12 +300,10 @@ HWTEST_F(MultimodalInputPluginManagerTest,
  */
 HWTEST_F(MultimodalInputPluginManagerTest,
     MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003, TestSize.Level1) {
-  CALL_TEST_DEBUG;
-  libinput_event event;
-  IPluginData *data = InputPluginManager::GetInstance()
-                          ->GetPluginDataFromLibInput(&event)
-                          .get();
-  EXPECT_EQ(data->libInputEventData.toolType, 0);
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    IPluginData *data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
+    EXPECT_EQ(data->libInputEventData.toolType, 0);
 }
 
 /**

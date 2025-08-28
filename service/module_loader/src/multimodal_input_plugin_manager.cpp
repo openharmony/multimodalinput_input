@@ -307,9 +307,9 @@ int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, s
     }
     std::list<std::shared_ptr<IPluginContext>>::iterator pluginIt =
         std::find_if(allPluginList.begin(), allPluginList.end(),
-                     [pluginName](std::shared_ptr<IPluginContext> iplugin) {
-                       return iplugin->GetPlugin()->GetName() == pluginName;
-                     });
+                    [pluginName](std::shared_ptr<IPluginContext> iplugin) {
+                        return iplugin->GetPlugin()->GetName() == pluginName;
+                    });
     if (pluginIt == allPluginList.end()) {
         MMI_HILOGE("Get plugin stub failed due to there is no plugin named: %{public}s", pluginName.c_str());
         return ERROR_NULL_POINTER;
