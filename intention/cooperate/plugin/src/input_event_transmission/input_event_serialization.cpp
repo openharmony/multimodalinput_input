@@ -31,6 +31,8 @@ namespace DeviceStatus {
 namespace Cooperate {
 namespace {
 constexpr int32_t MAX_KEY_SIZE { 395 };
+constexpr size_t MAX_N_PRESSED_KEYS { 10 };
+constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 } // namespace
 
 int32_t InputEventSerialization::KeyEventToNetPacket(const std::shared_ptr<MMI::KeyEvent> key, NetPacket &pkt)
@@ -299,14 +301,13 @@ int32_t InputEventSerialization::DeserializePressedButtons(NetPacket &pkt, std::
     int32_t btnId {};
 
     pkt >> nPressed;
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(nPressed, MAX_N_PRESSED_BUTTONS, RET_ERR);
 
     for (; nPressed > 0; --nPressed) {
         pkt >> btnId;
+        CHKRWER(pkt, RET_ERR);
         event->SetButtonPressed(btnId);
-    }
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Failed to deserialize pressed buttons");
-        return RET_ERR;
     }
     return RET_OK;
 }
@@ -400,17 +401,16 @@ int32_t InputEventSerialization::DeserializePressedKeys(NetPacket &pkt, std::sha
 {
     std::vector<int32_t>::size_type nPressed {};
     pkt >> nPressed;
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(nPressed, MAX_N_PRESSED_KEYS, RET_ERR);
 
     std::vector<int32_t> pressedKeys;
     int32_t keyCode {};
 
     for (; nPressed > 0; --nPressed) {
         pkt >> keyCode;
+        CHKRWER(pkt, RET_ERR);
         pressedKeys.push_back(keyCode);
-    }
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Failed to deserialize pressed keys");
-        return RET_ERR;
     }
     event->SetPressedKeys(pressedKeys);
     return RET_OK;
@@ -579,6 +579,8 @@ int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::s
 {
     uint32_t enHanceDataLen;
     pkt >> enHanceDataLen;
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(enHanceDataLen, MAX_ENHANCE_DATA_LEN, RET_ERR);
     if (enHanceDataLen == 0) {
         return RET_OK;
     }
@@ -586,11 +588,8 @@ int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::s
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
         pkt >> enhanceDataBuf[i];
+        CHKRWER(pkt, RET_ERR);
         enhanceData.push_back(enhanceDataBuf[i]);
-    }
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("UnmarshallingEnhanceData pointer event failed");
-        return RET_ERR;
     }
     event->SetEnhanceData(enhanceData);
     return RET_OK;
@@ -642,11 +641,8 @@ int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::s
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
         pkt >> enhanceDataBuf[i];
+        CHKRWER(pkt, RET_ERR);
         enhanceData.push_back(enhanceDataBuf[i]);
-    }
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("UnmarshallingEnhanceData key event failed");
-        return RET_ERR;
     }
     event->SetEnhanceData(enhanceData);
     return RET_OK;

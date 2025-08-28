@@ -461,7 +461,7 @@ public:
         return result;
     }
 
-    static const char* MMI_GenerateTag(std::string_viewtag, std::string_view func,
+    static const char* MMI_GenerateTag(std::string_view tag, std::string_view func,
         int32_t line, std::string_view traceId)
     {
         const std::string traceInfo = MMI_ReplaceColon(traceId);
