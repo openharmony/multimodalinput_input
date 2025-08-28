@@ -13,48 +13,43 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "registerdevListener_fuzzer.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
 #include "i_input_device_listener.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "RegisterDevListenerFuzzTest"
 
 namespace OHOS {
 namespace MMI {
 class InputDeviceListenerTest : public IInputDeviceListener {
 public:
-    InputDeviceListenerTest() : IInputDeviceListener() {}
-    void OnDeviceAdded(int32_t deviceId, const std::string &type) override
-    {
-        MMI_HILOGD("Add device success");
-    };
-    void OnDeviceRemoved(int32_t deviceId, const std::string &type) override
-    {
-        MMI_HILOGD("Remove device success");
-    };
+    void OnDeviceAdded(int32_t deviceId, const std::string &type) override {}
+    void OnDeviceRemoved(int32_t deviceId, const std::string &type) override {}
 };
 
-void RegisterDevListenerFuzzTest(const uint8_t* data, size_t size)
+void RegisterDevListenerFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size <= 0)) {
-        return;
-    }
-    MMI_HILOGD("RegisterDevListenerFuzzTest");
-    const std::string type(reinterpret_cast<const char*>(data), size);
-    std::shared_ptr<InputDeviceListenerTest> listener = std::make_shared<InputDeviceListenerTest>();
+    std::string type = fdp.ConsumeRandomLengthString(fdp.remaining_bytes());
+    auto listener = std::make_shared<InputDeviceListenerTest>();
     InputManager::GetInstance()->RegisterDevListener(type, listener);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    RegisterDevListenerFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::RegisterDevListenerFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

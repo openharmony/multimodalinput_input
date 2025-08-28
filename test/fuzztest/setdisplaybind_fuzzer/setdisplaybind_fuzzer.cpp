@@ -13,51 +13,41 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "setdisplaybind_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "SetDisplayBindFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+namespace {
+constexpr size_t MAX_MSG_LEN = 128;
 }
-
-void SetDisplayBindFuzzTest(const uint8_t* data, size_t size)
+void SetDisplayBindFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t startPos = 0;
-    int32_t deviceId;
-    startPos += GetObject<int32_t>(deviceId, data + startPos, size - startPos);
-    int32_t displayId;
-    startPos += GetObject<int32_t>(displayId, data + startPos, size - startPos);
-    std::string msg(reinterpret_cast<const char*>(data), size);
-    MMI_HILOGD("SetDisplayBind start");
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    int32_t displayId = fdp.ConsumeIntegral<int32_t>();
+    std::string msg = fdp.ConsumeRandomLengthString(MAX_MSG_LEN);
+
     InputManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    SetDisplayBindFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::SetDisplayBindFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

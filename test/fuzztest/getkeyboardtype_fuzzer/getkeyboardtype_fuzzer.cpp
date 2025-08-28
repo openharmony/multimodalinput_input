@@ -13,49 +13,37 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "getkeyboardtype_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetKeyboardTypeFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+void GetKeyboardTypeFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    auto callback = [](int32_t) {};
+    InputManager::GetInstance()->GetKeyboardType(deviceId, callback);
 }
 
-void GetKeyboardTypeFuzzTest(const uint8_t* data, size_t size)
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t deviceId;
-    size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, deviceId);
-    auto fun = [](int32_t keyboardType) {
-        MMI_HILOGD("Get keyboard type success");
-    };
-    InputManager::GetInstance()->GetKeyboardType(deviceId, fun);
+    GetKeyboardTypeFuzzTest(fdp);
+    return true;
 }
+
 } // namespace MMI
 } // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::GetKeyboardTypeFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
