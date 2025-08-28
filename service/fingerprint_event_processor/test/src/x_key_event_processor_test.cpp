@@ -68,9 +68,19 @@ libinput_event *XKeyEventProcessorTest::GetEvent()
  */
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_IsXKeyEvent_001, TestSize.Level1)
 {
-    libinput_event *event = GetEvent();
-    bool ret = XKeyEventHdr->IsXKeyEvent(event);
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    bool ret = XKeyEventHdr->IsXKeyEvent(&event);
     EXPECT_FALSE(ret);
+    EXPECT_CALL(mock, GetDevice)
+        .WillRepeatedly(Return(&device));
+    EXPECT_CALL(mock, DeviceGetName)
+        .WillRepeatedly(Return(const_cast<char*>("not_xKey")));
+    EXPECT_FALSE(XKeyEventHdr->IsXKeyEvent(&event));
+    EXPECT_CALL(mock, DeviceGetName)
+        .WillRepeatedly(Return(const_cast<char*>("fkey")));
+    EXPECT_TRUE(XKeyEventHdr->IsXKeyEvent(&event));
 }
 
 /**
@@ -81,9 +91,39 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_IsXKeyEvent_001, TestSiz
  */
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_HandleXKeyEvent_001, TestSize.Level1)
 {
-    libinput_event *event = GetEvent();
-    int32_t ret = XKeyEventHdr->HandleXKeyEvent(event);
-    EXPECT_EQ(ret, 65142786);
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, GetDevice)
+        .WillRepeatedly(Return(&device));
+    EXPECT_CALL(mock, DeviceGetName)
+        .WillRepeatedly(Return(const_cast<char*>("fkey")));
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillOnce(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
+        .WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED));
+    int32_t ret = XKeyEventHdr->HandleXKeyEvent(&event);
+    EXPECT_EQ(ret, ERR_OK);
+}
+
+/**
+ * @tc.name: XKeyEventProcessorTest_HandleXKeyEvent_002
+ * @tc.desc: Test HandleXKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_HandleXKeyEvent_002, TestSize.Level1)
+{
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    EXPECT_CALL(mock, GetDevice)
+        .WillRepeatedly(Return(&device));
+    EXPECT_CALL(mock, DeviceGetName)
+        .WillRepeatedly(Return(const_cast<char*>("not fkey")));
+    int32_t ret = XKeyEventHdr->HandleXKeyEvent(&event);
+    EXPECT_EQ(ret, PARAM_INPUT_INVALID);
 }
 
 /**
@@ -94,9 +134,32 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_HandleXKeyEvent_001, Tes
  */
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_AnalyseKeyEvent_001, TestSize.Level1)
 {
-    libinput_event *event = GetEvent();
-    int32_t ret = XKeyEventHdr->AnalyseKeyEvent(event);
-    EXPECT_EQ(ret, 65142786);
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillOnce(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
+        .WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED));
+    EXPECT_EQ(XKeyEventHdr->AnalyseKeyEvent(&event), ERR_OK);
+}
+
+/**
+ * @tc.name: XKeyEventProcessorTest_AnalyseKeyEvent_002
+ * @tc.desc: Test AnalyseKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_AnalyseKeyEvent_002, TestSize.Level1)
+{
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillOnce(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
+        .WillRepeatedly(Return(LIBINPUT_KEY_STATE_RELEASED));
+    EXPECT_EQ(XKeyEventHdr->AnalyseKeyEvent(&event), ERR_OK);
 }
 
 /**
@@ -110,6 +173,8 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_InterceptXKeyDown_001, T
     XKeyEventHdr->pressCount_ = 0;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->InterceptXKeyDown());
     XKeyEventHdr->pressCount_ = 2;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->InterceptXKeyDown());
+    XKeyEventHdr->pressCount_ = 1;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->InterceptXKeyDown());
 }
 
@@ -133,6 +198,12 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_StartLongPressTimer_001,
     XKeyEventHdr->pressCount_ = 5;
     XKeyEventHdr->handledLongPress_ = false;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartLongPressTimer());
+    XKeyEventHdr->pressCount_ = 2;
+    XKeyEventHdr->handledLongPress_ = true;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartLongPressTimer());
+    XKeyEventHdr->pressCount_ = 2;
+    XKeyEventHdr->handledLongPress_ = false;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartLongPressTimer());
 }
 
 /**
@@ -143,8 +214,6 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_StartLongPressTimer_001,
  */
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_InterceptXKeyUp_001, TestSize.Level1)
 {
-    XKeyEventHdr->pressCount_ = 1;
-    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->InterceptXKeyUp());
     XKeyEventHdr->pressCount_ = 2;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->InterceptXKeyUp());
     XKeyEventHdr->pressCount_ = 5;
@@ -160,6 +229,8 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_InterceptXKeyUp_001, Tes
 HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_StartSingleClickTimer_001, TestSize.Level1)
 {
     XKeyEventHdr->pressCount_ = 1;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartSingleClickTimer());
+    XKeyEventHdr->pressCount_ = 2;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartSingleClickTimer());
     XKeyEventHdr->pressCount_ = 5;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartSingleClickTimer());
@@ -195,6 +266,15 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_HandleQuickAccessMenu_00
     int32_t ret = XKeyEventHdr->HandleQuickAccessMenu(xKeyEventType);
     ASSERT_EQ(ret, RET_OK);
     xKeyEventType = 1;
+    ret = XKeyEventHdr->HandleQuickAccessMenu(xKeyEventType);
+    ASSERT_EQ(ret, RET_OK);
+    xKeyEventType = 2;
+    ret = XKeyEventHdr->HandleQuickAccessMenu(xKeyEventType);
+    ASSERT_EQ(ret, RET_OK);
+    xKeyEventType = 3;
+    ret = XKeyEventHdr->HandleQuickAccessMenu(xKeyEventType);
+    ASSERT_EQ(ret, RET_OK);
+    xKeyEventType = 4;
     ret = XKeyEventHdr->HandleQuickAccessMenu(xKeyEventType);
     ASSERT_EQ(ret, RET_OK);
     xKeyEventType = 5;
@@ -233,6 +313,15 @@ HWTEST_F(XKeyEventProcessorTest, XKeyEventProcessorTest_StartXKeyIfNeeded_001, T
     XKeyEventHdr->isStartedXKey_ = false;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
     XKeyEventHdr->isStartedXKey_ = true;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
+    xKeyEventType = 2:
+    XKeyEventHdr->isStartedXKey_ = false;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
+    xKeyEventType = 3:
+    XKeyEventHdr->isStartedXKey_ = false;
+    ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
+    xKeyEventType = 4:
+    XKeyEventHdr->isStartedXKey_ = false;
     ASSERT_NO_FATAL_FAILURE(XKeyEventHdr->StartXKeyIfNeeded(xKeyEventType));
 }
 #endif // OHOS_BUILD_ENABLE_X_KEY
