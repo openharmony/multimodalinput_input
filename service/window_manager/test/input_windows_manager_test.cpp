@@ -9482,12 +9482,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_004, Test
 }
 
 /* *
- * @tc.name: InputWindowsManagerTest_GetCursorPos_005
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_006
  * @tc.desc: Test the function GetCursorPos
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_005, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -9513,12 +9513,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_005, Test
 }
 
 /* *
- * @tc.name: InputWindowsManagerTest_GetCursorPos_006
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_007
  * @tc.desc: Test the function GetCursorPos
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_006, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -9538,12 +9538,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_006, Test
 }
 
 /* *
- * @tc.name: InputWindowsManagerTest_GetCursorPos_007
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_008
  * @tc.desc: Test the function GetCursorPos
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_007, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -9561,12 +9561,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_007, Test
 }
 
 /* *
- * @tc.name: InputWindowsManagerTest_GetCursorPos_008
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_009
  * @tc.desc: Test the function GetCursorPos
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_008, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
