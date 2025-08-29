@@ -47,6 +47,7 @@ constexpr int32_t MAX_PIXEL_MAP_WIDTH {600};
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT {600};
 constexpr int32_t INT32_BYTE {4};
 constexpr int32_t NUMBER_TWO {2};
+constexpr double HALF_RATIO { 0.5 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 constexpr int32_t WINDOW_ROTATE { 0 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -3887,7 +3888,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_002, Test
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displaysInfo);
     }
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetCursorPos());
+    CursorPosition result = inputWindowsManager.GetCursorPos();
+    EXPECT_EQ(result.displayId, 2);
+    EXPECT_EQ(result.cursorPos.x, 15);
+    EXPECT_EQ(result.cursorPos.y, 20);
 }
 
 /**
@@ -9475,6 +9479,108 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_004, Test
     }
     cursorPosRef.displayId = -1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetCursorPos());
+}
+
+/* *
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_005
+ * @tc.desc: Test the function GetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    std::map<int32_t, CursorPosition> cursorPosMap_;
+    std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap_;
+    OLD::DisplayInfo displaysInfo = {.id = 2, .validWidth = 30, .validHeight = 40,
+        .direction = Direction::DIRECTION90, .displayDirection = Direction::DIRECTION0};
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    displayGroupInfo.displaysInfo[0].displaySourceMode = DisplaySourceMode::SCREEN_MAIN;
+    cursorPosMap_[0] = {-1, Direction::DIRECTION0, Direction::DIRECTION0, {0, 0}};
+    displayGroupInfoMap_[0] = displayGroupInfo;
+    inputWindowsManager->cursorPosMap_ = cursorPosMap_;
+    inputWindowsManager->displayGroupInfoMap_ = displayGroupInfoMap_;
+ 
+    CursorPosition cursorPosRef;
+    cursorPosRef = inputWindowsManager->GetCursorPos();
+    EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);
+    EXPECT_EQ(cursorPosRef.direction, displaysInfo.direction);
+    EXPECT_EQ(cursorPosRef.displayDirection, displaysInfo.displayDirection);
+    EXPECT_EQ(cursorPosRef.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(cursorPosRef.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_006
+ * @tc.desc: Test the function GetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    CursorPosition cursorPosRef;
+    OLD::DisplayInfo displaysInfo = {.id = 2, .validWidth = 30, .validHeight = 40,
+        .direction = Direction::DIRECTION270, .displayDirection = Direction::DIRECTION0};
+    auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
+        iter->second.displaysInfo.push_back(displaysInfo);
+    }
+    cursorPosRef = inputWindowsManager->GetCursorPos();
+    EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);
+    EXPECT_EQ(cursorPosRef.direction, displaysInfo.direction);
+    EXPECT_EQ(cursorPosRef.displayDirection, displaysInfo.displayDirection);
+    EXPECT_EQ(cursorPosRef.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(cursorPosRef.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_007
+ * @tc.desc: Test the function GetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    CursorPosition cursorPosRef;
+    OLD::DisplayInfo displaysInfo = {.id = 2, .validWidth = 30, .validHeight = 40,
+        .direction = Direction::DIRECTION90, .displayDirection = Direction::DIRECTION0};
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    cursorPosRef = inputWindowsManager->GetCursorPos(displayGroupInfo);
+    EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);
+    EXPECT_EQ(cursorPosRef.direction, displaysInfo.direction);
+    EXPECT_EQ(cursorPosRef.displayDirection, displaysInfo.displayDirection);
+    EXPECT_EQ(cursorPosRef.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(cursorPosRef.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_008
+ * @tc.desc: Test the function GetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    CursorPosition cursorPosRef;
+    OLD::DisplayInfo displaysInfo = {.id = 2, .validWidth = 30, .validHeight = 40,
+        .direction = Direction::DIRECTION270, .displayDirection = Direction::DIRECTION0};
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    cursorPosRef = inputWindowsManager->GetCursorPos(displayGroupInfo);
+    EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);
+    EXPECT_EQ(cursorPosRef.direction, displaysInfo.direction);
+    EXPECT_EQ(cursorPosRef.displayDirection, displaysInfo.displayDirection);
+    EXPECT_EQ(cursorPosRef.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(cursorPosRef.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
 }
 
 /* *
