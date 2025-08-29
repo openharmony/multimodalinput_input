@@ -4428,6 +4428,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId02, TestSiz
     int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 
+    pointerEvent->SetPointerId(INT32_MAX - 1);
+    diffPointerId = 2;
+    result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
+    EXPECT_EQ(result, RET_ERR);
+
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     pointerEvent->AddPointerItem(item);

@@ -199,6 +199,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
             cancelEventList_.erase(pointerId);
         }
     }
+    WIN_MGR->FoldScreenRotation(point);
     for (auto windowId : windowIds) {
         auto pointerEvent = std::make_shared<PointerEvent>(*point);
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
