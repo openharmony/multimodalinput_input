@@ -5367,18 +5367,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
                 "FWI:%{public}d,EID:%{public}d, flags:%{public}d,DID:%{public}d"
-                "AWI:%{public}d,zOrder:%{public}.1f",
+                "AWI:%{public}d,zOrder:%{public}1f",
                 pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
                 focusWindowId, pointerEvent->GetId(), touchWindow->flags,
                 displayId, pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
         } else {
-            MMI_HILOGD("PA:%{public}s,LX:%{private}.1f,LY:%{private}.1f,"
-                "DX:%{private}.1f,DY:%{private}.1f,WX:%{private}.1f,WY:%{private}.1f,"
+            MMI_HILOGD("PA:%{public}s,LX:%{private}1f,LY:%{private}1f,"
+                "DX:%{private}1f,DY:%{private}1f,WX:%{private}1f,WY:%{private}1f,"
                 "AX:%{private}d,AY:%{private}d,flags:%{public}d,",
                 pointerEvent->DumpPointerAction(), logicalX, logicalY, physicalX, physicalY,
                 windowX, windowY, touchWindow->area.x, touchWindow->area.y, touchWindow->flags);
             MMI_HILOG_FREEZEI("%{public}d|%{public}d|%{public}d|%{public}d|%{public}d|"
-                "%{public}d|%{public}d|%{public}.1f",
+                "%{public}d|%{public}d|%{public}1f",
                 touchWindow->pid, touchWindow->id, focusWindowId,
                 touchWindow->area.width, touchWindow->area.height, displayId,
                 pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
