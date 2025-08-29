@@ -2581,6 +2581,48 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers_001, Tes
 }
 
 /**
+ * @tc.name: ServerMsgHandlerTest_DealGesturePointers_002
+ * @tc.desc: Test the function DealGesturePointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->SetId(1);
+    touchEvent->SetPointerId(10001);
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(10000);
+    item1.SetOriginPointerId(0);
+    item1.SetPressed(true);
+    touchEvent->AddPointerItem(item1);
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(1);
+    item2.SetOriginPointerId(1);
+    item2.SetPressed(false);
+    touchEvent->AddPointerItem(item2);
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+    winMgr->lastPointerEventforGesture_ = touchEvent;
+
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetId(2);
+    pointerEvent->SetPointerId(10002);
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(10002);
+    item3.SetOriginPointerId(2);
+    item3.SetPressed(false);
+    pointerEvent->AddPointerItem(item3);
+    handler.DealGesturePointers(pointerEvent);
+    bool ret = pointerEvent->GetPointerItem(10002, item3);
+    EXPECT_EQ(ret, true);
+}
+
+/**
 @tc.name: ServerMsgHandlerTest_ScreenFactor_001
 @tc.desc: Test the function ScreenFactor
 @tc.type: FUNC
