@@ -139,7 +139,7 @@ public:
     virtual bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord) = 0;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem) = 0;
     virtual const OLD::DisplayInfo *GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
     virtual void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent) = 0;
@@ -184,6 +184,11 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     virtual std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) = 0;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    virtual bool IsMouseDragging() const = 0;
+    virtual void EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event) = 0;
+    virtual void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event) = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();

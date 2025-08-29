@@ -112,7 +112,10 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
 void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("Change(%{public}s) of input device(%{public}d)", type.c_str(), deviceId);
+    int32_t keyboardType = 0;
+    MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardType(deviceId, keyboardType);
+    MMI_HILOGI("Change(%{public}s) of input device(%{public}d), keyboardType:%{public}d",
+        type.c_str(), deviceId, keyboardType);
 
     std::vector<InputDevListenerPtr> listenersToNotify;
     {

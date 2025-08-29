@@ -64,6 +64,10 @@ private:
     void UpdateDisplayXY(const std::shared_ptr<PointerEvent> &point);
     void AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent);
     void ResetDisplayXY(const std::shared_ptr<PointerEvent> &point);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event);
+    void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event);
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };

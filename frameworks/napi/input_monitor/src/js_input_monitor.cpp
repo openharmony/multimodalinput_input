@@ -890,6 +890,9 @@ int32_t JsInputMonitor::TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> 
     }
     PointerEvent::PointerItem pointeritem;
     int32_t pointerId = 0;
+    if (INJECTION_EVENT_FLAG <= pointerEvent->GetPointerId()) {
+        pointerId = pointerEvent->GetPointerId();
+    }
     if (!pointerEvent->GetPointerItem(pointerId, pointeritem)) {
         MMI_HILOGE("Can't find this pointerItem");
         return RET_ERR;

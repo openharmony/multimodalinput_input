@@ -13,70 +13,41 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "addinputeventfilter_fuzzer.h"
 
 #include "input_manager.h"
 #include "define_multimodal.h"
-#include "mmi_log.h"
-
-#include "securec.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "AddInputEventFilterFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void AddInputEventFilterFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
+    int32_t priority = fdp.ConsumeIntegralInRange<int32_t>(0, 500);
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
 
     struct TestFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            CHKPF(keyEvent);
-            MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,key code:%{private}d", keyEvent->GetKeyCode());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
         {
-            CHKPF(pointerEvent);
-            MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,pointer id:%{public}d", pointerEvent->GetPointerId());
             return false;
         }
     };
+
     auto filter = std::make_shared<TestFilter>();
-    const auto priority = 200 + (size % 100);
-    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
-    const auto filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority, touchTags);
-    if (filterId == -1) {
-        MMI_HILOGE("Add filter,ret:%{public}d", filterId);
-        return;
-    } else {
-        MMI_HILOGE("Add filter success,filterId:%{public}d", filterId);
+    int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority, touchTags);
+    if (filterId != -1) {
+        InputManager::GetInstance()->RemoveInputEventFilter(filterId);
     }
-    auto ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Remove filter,ret:%{public}d", ret);
-        return;
-    } else {
-        MMI_HILOGE("Remove filter,success,filterId:%{public}d", filterId);
-    }
+}
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    AddInputEventFilterFuzzTest(fdp);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
@@ -84,7 +55,11 @@ void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::AddInputEventFilterFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

@@ -421,7 +421,8 @@ void TouchPadTransformProcessor::SmoothMultifingerSwipeData(std::vector<Coords>&
     }
     for (int32_t i = 0; i < fingerCount; ++i) {
         if (fingerCoords[i].x == 0 && fingerCoords[i].y == 0) {
-            fingerCoords[i] = swipeHistory_[i].back() + coordDelta;
+            bool isEmpty = swipeHistory_[i].empty();
+            fingerCoords[i] = isEmpty ? coordDelta : (swipeHistory_[i].back() + coordDelta);
             swipeHistory_[i].push_back(fingerCoords[i]);
         }
         if (static_cast<int32_t>(swipeHistory_[i].size()) > fingerCount) {
@@ -731,6 +732,9 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
 {
     return pointerEvent_;
 }
+
+void TouchPadTransformProcessor::OnDeviceRemoved()
+{}
 
 void TouchPadTransformProcessor::RemoveSurplusPointerItem()
 {

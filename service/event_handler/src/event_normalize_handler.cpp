@@ -301,6 +301,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
 #endif
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    KeyEventHdr->SyncLedStateFromKeyEvent(device);
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1245,8 +1248,8 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
         keyCode = KeyEvent::KEYCODE_VOLUME_UP;
     } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    } else {
-        MMI_HILOGI("pressure is not in gesture list");
+    } else if (pressure < 0 || pressure > DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+        MMI_HILOGE("pressure is error!");
         return false;
     }
     MMI_HILOGI("Current is touchpad edge swipe: type: %{public}f", pressure);
