@@ -111,17 +111,40 @@ void ResetLogTrace();
 #define MMI_LINE_INFO MMI_FILE_NAME, __LINE__
 #endif
 
+inline std::string MMI_ExtractUpper(const std::string& str)
+{
+    std::string result;
+    std::copy_if(str.begin(), str.end(), std::back_inserter(result), ::isupper);
+    return result;
+}
+
+inline std::string MMI_ReplaceColon(const std::string& str)
+{
+    std::string result = str;
+    std::replace(result.begin(), result.end(), ':', '_');
+    return result;
+}
+
+inline std::string MMI_GenerateTag(const std::string& tag, const std::string& func, int32_t line)
+{
+    const std::string traceInfo = MMI_ReplaceColon(MMI_TRACE_ID);
+    const std::string upperTag = MMI_ExtractUpper(tag);
+    const size_t totalLength = upperTag.size() + traceInfo.size() + std::to_string(line).size();
+    const std::string subFunc = (30 - totalLength > 0) ? func.substr(0, 30 - totalLength) : "";
+    return upperTag + "_" + subFunc + std::to_string(line) + traceInfo;
+}
+
 #define MMI_HILOG_BASE(type, level, domain, tag, fmt, ...) do { \
-    const char* tagStr = OHOS::MMI::LogHeader::MMI_GenerateTag(tag, __FUNCTION__, __LINE__, MMI_TRACE_ID); \
-    HILOG_IMPL(type, level, domain, tagStr, fmt, ##__VA_ARGS__); \
+    const std::string tagStr = MMI_GenerateTag(tag, __FUNCTION__, __LINE__); \
+    HILOG_IMPL(type, level, domain, tagStr.c_str(), fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HEADER(level, lh, fmt, ...) do { \
-    const char* tagStr = OHOS::MMI::LogHeader::MMI_GenerateTag(lh.tag, lh.func, lh.line, MMI_TRACE_ID); \
-    HILOG_IMPL(LOG_CORE, level, lh.domain, tagStr, fmt, ##__VA_ARGS__); \
+    const std::string tagStr = MMI_GenerateTag(lh.tag, lh.func, lh.line); \
+    HILOG_IMPL(LOG_CORE, level, lh.domain, tagStr.c_str(), fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HEADER_NO_RELEASE(level, lh, fmt, ...) do { \
-    const char* tagStr = OHOS::MMI::LogHeader::MMI_GenerateTag(lh.tag, lh.func, lh.line, MMI_TRACE_ID); \
-    HILOG_IMPL(LOG_ONLY_PRERELEASE, level, lh.domain, tagStr, fmt, ##__VA_ARGS__); \
+    const std::string tagStr = MMI_GenerateTag(lh.tag, lh.func, lh.line); \
+    HILOG_IMPL(LOG_ONLY_PRERELEASE, level, lh.domain, tagStr.c_str(), fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGD(fmt, ...) do { \
@@ -444,42 +467,6 @@ inline constexpr int32_t POINTER_ACTION_UP { 4 };
 inline constexpr int32_t POINTER_ACTION_MOVE { 3 };
 inline constexpr int32_t FINAL_FINGER { 1 };
 
-class LogHelper {
-public:
-    static std::string MMI_ExtractUpper(std::string_view str)
-    {
-        std::string result;
-        result.reserve(str.size());
-        std::copy_if(str.begin(), str.end(), std::back_inserter(result), ::isupper);
-        return result;
-    }
-
-    static std::string MMI_ReplaceColon(std::string_view str)
-    {
-        std::string result(str);
-        std::replace(result.begin(), result.end(), ':', '_');
-        return result;
-    }
-
-    static const char* MMI_GenerateTag(std::string_view tag, std::string_view func,
-        int32_t line, std::string_view traceId)
-    {
-        const std::string traceInfo = MMI_ReplaceColon(traceId);
-        const std::string upperTag = MMI_ExtractUpper(tag);
-        const std::string lineStr = std::to_string(line);
-        const size_t totalLength = upperTag.size() + traceInfo.size() + lineStr.size() + 1;
-        std::string subFunc;
-        if (totalLength < MAX_TAG_SIZE) {
-            subFunc = func.substr(0, MAX_TAG_SIZE - totalLength);
-        }
-        std::string result;
-        result.reserve(subFunc.size() + totalLength);
-        result.append(upperTag).append("_").append(subFunc).append(lineStr).append(traceInfo);
-        return result.c_str();
-    }
-private:
-    static constexpr size_t MAX_TAG_SIZE = 31;
-}
 class InnerFunctionTracer {
 public:
     InnerFunctionTracer(LogLevel level, const char* tag, const char* logfn, uint32_t logline)
@@ -487,8 +474,8 @@ public:
     {
         if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                const char* tagStr = OHOS::MMI::LogHeader::MMI_GenerateTag(tag_, logfn_, logline_, MMI_TRACE_ID);
-                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tagStr, "enter");
+                const std::string tagStr = MMI_GenerateTag(tag_, logfn_, logline_);
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tagStr.c_str(), "enter");
             }
         }
     }
@@ -496,8 +483,8 @@ public:
     {
         if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                const char* tagStr = OHOS::MMI::LogHeader::MMI_GenerateTag(tag_, logfn_, logline_, MMI_TRACE_ID);
-                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tagStr, "leave");
+                const std::string tagStr = MMI_GenerateTag(tag_, logfn_, logline_);
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tagStr.c_str(), "leave");
             }
         }
     }
