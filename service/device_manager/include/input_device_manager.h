@@ -76,6 +76,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool HasVirtualKeyboardDevice();
+    bool IsVirtualKeyboardDeviceEverConnected();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     bool CheckDuplicateInputDevice(struct libinput_device *inputDevice);
     bool CheckDuplicateInputDevice(std::shared_ptr<InputDevice> inputDevice);
@@ -150,6 +151,7 @@ private:
     DeviceConfigManagement configManagement_;
 #endif // OHOS_BUILD_ENABLE_WATCH
     bool sessionLostCallbackInitialized_ { false };
+    bool virtualKeyboardEverConnected_ { false };
 
     static std::shared_ptr<InputDeviceManager> instance_;
     static std::mutex mutex_;
