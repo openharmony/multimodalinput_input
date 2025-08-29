@@ -118,6 +118,9 @@ void KnuckleGlowPoint::UpdateMatrix()
     CALL_DEBUG_ENTER;
     CHKPV(traceShadow_);
     traceMatrix_.Reset();
+    if (traceShadow_->GetWidth() == 0) {
+        return;
+    }
     float proportion = traceSize_ / traceShadow_->GetWidth();
     traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
 }
