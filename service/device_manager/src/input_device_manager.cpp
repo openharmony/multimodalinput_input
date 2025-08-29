@@ -344,6 +344,11 @@ bool InputDeviceManager::HasVirtualKeyboardDevice()
     }
     return false;
 }
+
+bool InputDeviceManager::IsVirtualKeyboardDeviceEverConnected()
+{
+    return virtualKeyboardEverConnected_;
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 bool InputDeviceManager::HasTouchDevice()
@@ -828,6 +833,10 @@ void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const str
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
     virtualInputDevices_[deviceId] = inputDevice;
+    if (IsKeyboardDevice(inputDevice)) {
+        // mark true if vkbd has ever connected before; (does not set to false during disconnection)
+        virtualKeyboardEverConnected_ = true;
+    }
 }
 
 void InputDeviceManager::RemovePhysicalInputDeviceInner(
