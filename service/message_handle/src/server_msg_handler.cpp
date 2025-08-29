@@ -831,7 +831,8 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
             >> info.direction >> info.displayDirection >> info.displayMode >> info.transform
             >> info.scalePercent >> info.expandHeight >> info.isCurrentOffScreenRendering
             >> info.displaySourceMode >> info.oneHandX >> info.oneHandY >> info.screenArea >> info.rsId
-            >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight;
+            >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight
+            >> info.deviceRotation >> info.rotationCorrection;
         CHKRWER(pkt, RET_ERR);
         displayGroupInfo.displaysInfo.push_back(info);
     }
