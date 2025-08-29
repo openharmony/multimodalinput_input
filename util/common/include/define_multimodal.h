@@ -449,6 +449,38 @@ inline constexpr int32_t INVALID_PID { -1 };
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)
+
+#define CHKRWER(pkt, ret) \
+    do { \
+        if ((pkt).ChkRWError()) { \
+            MMI_HILOGE("Packet read failed"); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHKRANGE(var, minValue, maxValue, ret) \
+    do { \
+        if ((var) > (maxValue) || (var) < (minValue)) { \
+            MMI_HILOGE(#var" is invalid"); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHKUPPER(var, maxValue, ret) \
+    do { \
+        if ((var) > (maxValue)) { \
+            MMI_HILOGE(#var" is invalid"); \
+            return ret; \
+        } \
+    } while (0)
+
+#define CHKLOWER(var, minValue, ret) \
+    do { \
+        if ((var) < (minValue)) { \
+            MMI_HILOGE(#var" is invalid"); \
+            return ret; \
+        } \
+    } while (0)
 } // namespace MMI
 } // namespace OHOS
 #endif // DEFINE_MULTIMODAL_H
