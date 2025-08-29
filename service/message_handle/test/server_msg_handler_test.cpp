@@ -30,6 +30,7 @@
 #include "inject_notice_manager.h"
 #include "input_device_manager.h"
 #include "input_manager_impl.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "running_process_info.h"
