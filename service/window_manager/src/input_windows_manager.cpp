@@ -3816,7 +3816,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
         ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN) &&
-        (pointerEvent->GetPressedButtons().empty()));
+        (pointerEvent->GetPressedButtons().empty())) || (action == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
@@ -5753,23 +5753,28 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
         case PointerEvent::POINTER_ACTION_BUTTON_UP:
         case PointerEvent::POINTER_ACTION_MOVE: {
+            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
             return UpdateMouseTarget(pointerEvent);
         }
         case PointerEvent::POINTER_ACTION_DOWN: {
+            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
             pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
             pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
             return UpdateMouseTarget(pointerEvent);
         }
         case PointerEvent::POINTER_ACTION_UP: {
+            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
             pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
             pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+            return UpdateMouseTarget(pointerEvent);
+        }
+        case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION: {
             return UpdateMouseTarget(pointerEvent);
         }
         default: {

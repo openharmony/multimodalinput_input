@@ -218,6 +218,10 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_TOUCHPAD_ACTION: {
+            HandleTouchPadAction(event);
+            break;
+        }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE:
         case LIBINPUT_EVENT_GESTURE_SWIPE_END:
@@ -661,6 +665,25 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     MMI_HILOGD("Button ids count:%{public}d, action:%{public}d",
         static_cast<int32_t>(buttonIds_.size()), pointerEvent->GetPointerAction());
     return RET_OK;
+#else
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::HandleTouchPadAction(libinput_event* event)
+{
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    nextHandler_->HandlePointerEvent(pointerEvent);
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCHPAD_ACTION) {
+        pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_NO_MONITOR);
+    }
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1239,7 +1262,6 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     keyDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 
-    int ret = -1;
     if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE) {
         keyCode = KeyEvent::KEYCODE_BRIGHTNESS_UP;
     } else if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
