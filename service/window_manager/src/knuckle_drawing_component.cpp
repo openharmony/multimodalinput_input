@@ -55,6 +55,8 @@ void KnuckleDrawingComponent::SetMultiWindowScreenId(uint64_t screenId, uint64_t
     IKnuckleDrawing *impl = Load();
     CHKPRV(impl, "load knuckle lib fail");
     impl->SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    windowScreenId_ = screenId;
+    displayNodeScreenId_ = displayNodeScreenId;
 }
 
 KnuckleDrawingComponent::~KnuckleDrawingComponent()
@@ -98,6 +100,7 @@ IKnuckleDrawing *KnuckleDrawingComponent::Load()
         Unload();
         return nullptr;
     }
+    impl_ ->SetMultiWindowScreenId(windowScreenId_, displayNodeScreenId_);
     MMI_HILOGD("success to Load KnuckleDrawing");
     return impl_;
 }

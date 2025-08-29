@@ -13,35 +13,40 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "getallsystemhotkeys_fuzzer.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetAllSystemHotkeysFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-void GetAllSystemHotkeysFuzzTest(const uint8_t* data, size_t /* size */)
+void GetAllSystemHotkeysFuzzTest(FuzzedDataProvider &fdp)
 {
     std::vector<std::unique_ptr<KeyOption>> keyOptions;
     int32_t count = 0;
-    OHOS::MMI::InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
-    if (!keyOptions.empty()) {
-        MMI_HILOGD("Get all system hot key success");
-    } else {
-        MMI_HILOGD("Get all system hot key failed");
+
+    InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
+
+    if (fdp.ConsumeBool()) {
+        InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
     }
 }
-} // MMI
-} // OHOS
 
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
 {
-    /* Run your code on data */
-    OHOS::MMI::GetAllSystemHotkeysFuzzTest(data, size);
+    GetAllSystemHotkeysFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

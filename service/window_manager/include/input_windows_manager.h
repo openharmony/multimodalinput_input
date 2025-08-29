@@ -150,9 +150,10 @@ public:
     void RotateDisplayScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId);
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId,
+        PointerEvent::PointerItem& pointerItem);
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, PhysicalCoordinate& coord);
+        int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem);
     const OLD::DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -215,6 +216,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
+    bool IsWindowRotation(const OLD::DisplayInfo *displayInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
@@ -231,6 +233,11 @@ public:
     bool IsMouseInCastWindow();
     bool IsCaptureMode();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    bool IsMouseDragging() const;
+    void EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event);
+    void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event);
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
@@ -253,6 +260,8 @@ private:
     void UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle);
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
+    bool IsWritePen(PointerEvent::PointerItem &pointerItem) const;
+    bool IsWriteTablet(PointerEvent::PointerItem &pointerItem) const;
     void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, OLD::DisplayGroupInfo &displayGroupInfo);
     void UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
@@ -285,6 +294,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::vector<int32_t> HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
         int32_t physicalX, int32_t physicalY);
+    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+        int32_t &physicalX, int32_t &physicalY);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
@@ -374,7 +385,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
-    bool GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
+    bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
         const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
     void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
     void SetAntiMisTake(bool state);

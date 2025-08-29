@@ -20,11 +20,22 @@
 
 #include "singleton.h"
 
+#include "device_observer.h"
 #include "transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
 class TouchEventNormalize final {
+private:
+    class InputDeviceObserver final : public IDeviceObserver {
+    public:
+        InputDeviceObserver() = default;
+        ~InputDeviceObserver() override = default;
+        void OnDeviceAdded(int32_t deviceId) override {}
+        void OnDeviceRemoved(int32_t deviceId) override;
+        void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
+    };
+
     DECLARE_DELAYED_SINGLETON(TouchEventNormalize);
 
 public:
@@ -68,11 +79,15 @@ public:
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(
         int32_t deviceId, DeviceType deviceType) const;
+    void SetUpDeviceObserver();
+    void TearDownDeviceObserver();
+    void OnDeviceRemoved(int32_t deviceId);
 
 private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
     std::map<int32_t, std::shared_ptr<TransformProcessor>> touchpad_processors_;
     std::map<int32_t, std::shared_ptr<TransformProcessor>> remote_control_processors_;
+    std::shared_ptr<IDeviceObserver> inputDevObserver_;
 };
 
 #define TOUCH_EVENT_HDR ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()

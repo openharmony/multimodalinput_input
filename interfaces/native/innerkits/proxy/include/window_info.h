@@ -571,6 +571,20 @@ struct DisplayInfo {
      * @since 12
      */
     int32_t pointerActiveHeight { 0 };
+
+    /**
+     * The angle of the screen content relative to the sensor 0 degrees.
+     *
+     * @since 21
+     */
+    Direction deviceRotation;
+
+    /**
+     * The angle of the rotation correction.
+     *
+     * @since 21
+     */
+    Direction rotationCorrection;
 };
 /**
 * Screen type.

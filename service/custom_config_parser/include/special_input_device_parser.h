@@ -52,7 +52,7 @@ private:
  
     struct SpecialInputDevice {
         std::string inputDevAlias;
-        std::string inpuDevName;
+        std::string inputDevName;
     };
  
 private:

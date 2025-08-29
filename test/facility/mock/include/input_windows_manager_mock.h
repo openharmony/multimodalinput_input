@@ -101,7 +101,8 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(bool, TouchPointToDisplayPoint, (int32_t, struct libinput_event_touch*, EventTouch&, int32_t&, bool));
-    MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&));
+    MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&,
+        PointerEvent::PointerItem&));
     MOCK_METHOD(const OLD::DisplayInfo *, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
     MOCK_METHOD(void, SendCancelEventWhenLock, ());
@@ -150,6 +151,11 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEventForGesture, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    MOCK_METHOD(bool, IsMouseDragging, (), (const));
+    MOCK_METHOD(void, EnsureMouseEventCycle, (std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, CleanMouseEventCycle, (std::shared_ptr<PointerEvent>));
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();

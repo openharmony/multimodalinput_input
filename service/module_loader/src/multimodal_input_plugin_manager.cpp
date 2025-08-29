@@ -157,6 +157,22 @@ void InputPluginManager::PluginAssignmentCallBack(
     }
 }
 
+void InputPluginManager::PluginAssignmentCallBack(
+    std::function<void(std::shared_ptr<KeyEvent>)> callback, InputPluginStage stage)
+{
+    CALL_DEBUG_ENTER;
+    auto it = plugins_.find(stage);
+    if (it == plugins_.end()) {
+        MMI_HILOGI("plugins_ not stage:%{public}d.", stage);
+        return;
+    }
+    for (auto &plugin : it->second) {
+        if (plugin != nullptr) {
+            plugin->keyEventCallback_ = callback;
+        }
+    }
+}
+
 int32_t InputPluginManager::HandleEvent(libinput_event *event, int64_t frameTime, InputPluginStage stage)
 {
     return DoHandleEvent(event, frameTime, nullptr, stage);
@@ -204,6 +220,59 @@ int32_t InputPluginManager::DoHandleEvent(
                 MMI_HILOGE("pluginIt is intermediate or end event");
                 continue;
             }
+            return RET_DO;
+        } else if (result == PluginResult::UseNoNeedReissue) {
+            return RET_DO;
+        } else if (result == PluginResult::Error) {
+            MMI_HILOGE("pluginIt err name:%{public}s", (*pluginIt)->name_.c_str());
+        }
+    }
+    return RET_NOTDO;
+}
+
+int32_t InputPluginManager::HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage)
+{
+    return DoHandleEvent(keyEvent, nullptr, stage);
+}
+
+int32_t InputPluginManager::DoHandleEvent(
+    std::shared_ptr<KeyEvent> keyEvent, InputPlugin *iplugin, InputPluginStage stage)
+{
+    if (keyEvent == nullptr) {
+        return RET_NOTDO;
+    }
+    auto it = plugins_.find(stage);
+    if (it == plugins_.end()) {
+        return RET_NOTDO;
+    }
+    CALL_DEBUG_ENTER;
+    auto &plugins = it->second;
+    auto start_plugin = plugins.begin();
+    if (iplugin != nullptr) {
+        auto cur_plugin = std::find_if(plugins.begin(), plugins.end(),
+            [iplugin](const std::shared_ptr<InputPlugin> &plugin) { return plugin.get() == iplugin; });
+        if (cur_plugin == plugins.end()) {
+            return RET_NOTDO;
+        }
+        start_plugin = std::next(cur_plugin);
+    }
+    int64_t beginTime = 0;
+    PluginResult result;
+    int64_t endTime = 0;
+    int64_t lostTime = 0;
+    for (auto pluginIt = start_plugin; pluginIt != plugins.end(); ++pluginIt) {
+        if ((*pluginIt) == nullptr) {
+            continue;
+        }
+        beginTime = GetSysClockTime();
+        result = (*pluginIt)->HandleEvent(keyEvent, stage);
+        endTime = GetSysClockTime();
+        lostTime = endTime - beginTime;
+        if (lostTime >= TIMEOUT_US) {
+            MMI_HILOGE("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
+                (*pluginIt)->name_.c_str(), endTime, lostTime);
+        }
+        if (result == PluginResult::UseNeedReissue) {
             return RET_DO;
         } else if (result == PluginResult::UseNoNeedReissue) {
             return RET_DO;
@@ -303,10 +372,25 @@ void InputPlugin::DispatchEvent(libinput_event *event, int64_t frameTime)
     }
 }
 
+void InputPlugin::DispatchEvent(std::shared_ptr<KeyEvent> keyEvent, InputDispatchStage stage)
+{
+    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(keyEvent, this, stage_);
+    if (result == RET_NOTDO) {
+        CHKPV(keyEventCallback_);
+        keyEventCallback_(keyEvent);
+    }
+}
+
 PluginResult InputPlugin::HandleEvent(libinput_event *event, int64_t frameTime)
 {
     CHKPR(plugin_, PluginResult::NotUse);
     return plugin_->HandleEvent(event, frameTime);
+}
+
+PluginResult InputPlugin::HandleEvent(std::shared_ptr<KeyEvent> keyEvent, InputPluginStage stage)
+{
+    CHKPR(plugin_, PluginResult::NotUse);
+    return plugin_->HandleEvent(keyEvent, stage);
 }
 
 int32_t InputPlugin::AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount)

@@ -112,10 +112,13 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_00
 {
     CALL_DEBUG_ENTER;
     ApplicationStateObserver observer;
-    OHOS::sptr<OHOS::AppExecFwk::IAppMgr> appMgrFirst = observer.GetAppMgr();
-    EXPECT_TRUE(appMgrFirst == nullptr || appMgrFirst != nullptr);
-    OHOS::sptr<OHOS::AppExecFwk::IAppMgr> appMgrSecond = observer.GetAppMgr();
+    auto appMgrFirst = observer.GetAppMgr();
+    auto appMgrSecond = observer.GetAppMgr();
+    EXPECT_EQ(appMgrFirst, appMgrSecond);
     EXPECT_EQ(appMgrSecond, observer.GetAppMgr());
+    if (appMgrFirst != nullptr) {
+        EXPECT_NE(appMgrFirst->AsObject(), nullptr);
+    }
 }
 
 /**

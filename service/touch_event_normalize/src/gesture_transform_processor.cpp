@@ -160,5 +160,8 @@ std::shared_ptr<PointerEvent> GestureTransformProcessor::OnEvent(struct libinput
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     return pointerEvent_;
 }
+
+void GestureTransformProcessor::OnDeviceRemoved()
+{}
 } // namespace MMI
 } // namespace OHOS

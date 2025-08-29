@@ -86,7 +86,8 @@ public:
     bool HasEnabledPhysicalPointerDevice();
     void NotifyAddDeviceListeners(int32_t deviceId);
     void NotifyRemoveDeviceListeners(int32_t deviceId);
-    void NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice);
+    void NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice,
+        bool isVirtualPointerDev = false);
     void NotifyRemovePointerDevice(bool removePointerDevice);
     bool HasTouchDevice();
     const std::string& GetScreenId(int32_t deviceId) const;

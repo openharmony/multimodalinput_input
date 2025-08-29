@@ -289,6 +289,7 @@ PointerDrawingManager::PointerDrawingManager()
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
+    InitDefaultMouseIconPath();
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
     if (GetHardCursorEnabled()) {
         g_hardwareCanvasSize = GetCanvasSize();
@@ -1727,6 +1728,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t phy
 #else
     surfaceNodePtr->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
+    surfaceNodePtr->SetVisible(false);
     return RET_OK;
 }
 
@@ -2204,9 +2206,11 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         if (HasMagicCursor()) {
             ret = MAGIC_CURSOR->SetPointerColor(color);
         } else {
+            CHKPR(surfaceNodePtr, RET_OK);
             ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         }
 #else
+        CHKPR(surfaceNodePtr, RET_OK);
         ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         if (ret != RET_OK) {
@@ -2853,7 +2857,7 @@ bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyl
         return false;
     }
     if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle.id > MOUSE_ICON::SCREENRECORDER_CURSOR) {
+        pointerStyle.id > MOUSE_ICON::LASER_CURSOR_DOT_RED) {
         return false;
     }
     return true;
@@ -2983,6 +2987,25 @@ void PointerDrawingManager::CheckMouseIconPath()
             continue;
         }
         ++iter;
+    }
+}
+
+void PointerDrawingManager::InitDefaultMouseIconPath()
+{
+    PointerStyle curPointerStyle;
+    GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
+        auto iconPath = GetMouseIconPath();
+        auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (it == iconPath.end()) {
+            MMI_HILOGE("Cannot find the default style");
+            return;
+        }
+        std::string newIconPath = iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath;
+        MMI_HILOGD("default path has changed from %{private}s to %{private}s, target style is %{public}d",
+            it->second.iconPath.c_str(), newIconPath.c_str(), curPointerStyle.id);
+        it->second.iconPath = newIconPath;
+        UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), newIconPath);
     }
 }
 
@@ -3121,6 +3144,9 @@ void PointerDrawingManager::InitStyle()
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
         {TRANSPARENT_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
         {SCREENRECORDER_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenRecorder_Cursor.svg"}},
+        {LASER_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Laser_Cursor.svg"}},
+        {LASER_CURSOR_DOT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Laser_Cursor_Dot.svg"}},
+        {LASER_CURSOR_DOT_RED, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Laser_Cursor_Dot_Red.svg"}},
     };
     CheckMouseIconPath();
 }
