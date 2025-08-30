@@ -1984,7 +1984,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         return true;
     }
     DfxHisysevent::GetComboStartTime();
-    for (const auto lastkey : lastMatchedKeys_) {
+    for (const auto &lastkey : lastMatchedKeys_) {
         auto it = shortcutKeys_.find(lastkey);
         if (it == shortcutKeys_.end()) {
             continue;
