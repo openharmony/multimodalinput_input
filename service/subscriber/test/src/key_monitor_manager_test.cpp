@@ -199,7 +199,6 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_01, TestSize
     EXPECT_EQ(keyMonitorManager->monitors_.size(), 0);
 }
 
-
 /**
  * @tc.name: KeyMonitorManagerTest_Want_01
  * @tc.desc: Verify the Want function
@@ -210,16 +209,21 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
-    KeyMonitorManager::Monitor monitorT{
-        .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_UP, .isRepeat_ = true};
+    KeyMonitorManager::Monitor monitorT {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyEvent::KEY_ACTION_UP,
+        .isRepeat_ = true
+    };
     keyMonitorManager->monitors_.emplace(monitorT);
     std::shared_ptr<KeyEvent> keyEventT = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_VOLUME_UP);
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    monitorT.Want(keyEventT);
-    EXPECT_FALSE(monitorT.Want(keyEventT));
+    bool ret = monitorT.Want(keyEventT);
+    EXPECT_FALSE(ret);
 
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
-    EXPECT_FALSE(monitorT.Want(keyEventT));
+    ret = monitorT.Want(keyEventT);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -233,12 +237,16 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_02, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
     KeyMonitorManager::Monitor monitorT{
-        .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_UNKNOWN, .isRepeat_ = true};
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyEvent::KEY_ACTION_UNKNOWN,
+        .isRepeat_ = true
+    };
     keyMonitorManager->monitors_.emplace(monitorT);
     std::shared_ptr<KeyEvent> keyEventT = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_VOLUME_UP);
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    monitorT.Want(keyEventT);
-    EXPECT_FALSE(monitorT.Want(keyEventT));
+    bool ret = monitorT.Want(keyEventT);
+    EXPECT_FALSE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
