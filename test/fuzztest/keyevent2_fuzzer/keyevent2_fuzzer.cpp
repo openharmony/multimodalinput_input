@@ -13,20 +13,19 @@
  * limitations under the License.
  */
 
-#include "key_event.h"
-#include "keyevent_fuzzer.h"
 #include "fuzzer/FuzzedDataProvider.h"
+#include "key_event.h"
 #include "mmi_log.h"
 
 #include "securec.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "KeyEventFuzzTest"
+#define MMI_LOG_TAG "KeyEvent2FuzzTest"
 
 namespace OHOS {
 namespace MMI {
 
-void KeyEventFuzzTest(const uint8_t *data, size_t size)
+void KeyEvent2FuzzTest(const uint8_t *data, size_t size)
 {
     KeyEvent::from(nullptr);
     KeyEvent::Create();
@@ -36,21 +35,22 @@ void KeyEventFuzzTest(const uint8_t *data, size_t size)
     int32_t eventType = provider.ConsumeIntegral<int32_t>();
     KeyEvent keyEvent(eventType);
 
-    bool repeat = provider.ConsumeBool();
-    keyEvent.SetRepeat(repeat);
+    int32_t keyAction = provider.ConsumeIntegral<int32_t>();
+    keyEvent.SetKeyAction(keyAction);
 
-    bool repeatKey = provider.ConsumeBool();
-    keyEvent.SetRepeatKey(repeatKey);
+    KeyEvent::KeyItem item;
+    keyCode = provider.ConsumeIntegral<int32_t>();
+    item.SetKeyCode(keyCode);
+    keyEvent.AddKeyItem(item);
 
-    int32_t action = provider.ConsumeIntegral<int32_t>();
-    keyEvent.ActionToShortStr(action);
+    std::vector<KeyEvent::KeyItem> items;
+    items.push_back(item);
+    keyEvent.SetKeyItem(items);
 
-    keyEvent.Reset();
+    keyEvent.AddPressedKeyItems(item);
 
-    int32_t keyCode = provider.ConsumeIntegral<int32_t>();
-    keyEvent.SetKeyCode(keyCode);
-
-    MMI_HILOGD("KeyEventFuzzTest");
+    keyCode = provider.ConsumeIntegral<int32_t>();
+    keyEvent.GetKeyItem(keyCode);
 }
 } // MMI
 } // OHOS
@@ -63,6 +63,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::MMI::KeyEventFuzzTest(data, size);
+    OHOS::MMI::KeyEvent2FuzzTest(data, size);
     return 0;
 }
