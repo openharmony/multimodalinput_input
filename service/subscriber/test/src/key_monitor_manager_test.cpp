@@ -217,9 +217,12 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_01, TestSize.Level1)
     };
     keyMonitorManager->monitors_.emplace(monitorT);
     std::shared_ptr<KeyEvent> keyEventT = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_VOLUME_UP);
-    keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     bool ret = monitorT.Want(keyEventT);
     EXPECT_FALSE(ret);
+    keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ret = monitorT.Want(keyEventT);
+    EXPECT_TRUE(ret);
 
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
     ret = monitorT.Want(keyEventT);
