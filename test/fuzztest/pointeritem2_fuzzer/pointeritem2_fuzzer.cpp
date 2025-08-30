@@ -14,39 +14,38 @@
  */
 
 #include "pointer_event.h"
-#include "pointeritem_fuzzer.h"
+#include "pointeritem2_fuzzer.h"
 #include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #include "securec.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "PointerItemFuzzTest"
+#define MMI_LOG_TAG "PointerItem2FuzzTest"
 
 namespace OHOS {
 namespace MMI {
 
-bool PointerItemFuzzTest(const uint8_t *data, size_t size)
+void PointerItem2FuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
     PointerEvent::PointerItem item;
-    int32_t pointerId = provider.ConsumeIntegral<int32_t>();
-    item.SetPointerId(pointerId);
 
-    int64_t downTime = provider.ConsumeIntegral<int64_t>();
-    item.SetDownTime(downTime);
+    int32_t windowX = provider.ConsumeIntegral<int32_t>();
+    item.SetWindowX(windowX);
 
-    bool pressed = provider.ConsumeBool();
-    item.SetPressed(pressed);
+    int32_t windowY = provider.ConsumeIntegral<int32_t>();
+    item.SetWindowY(windowY);
 
-    int32_t displayX = provider.ConsumeIntegral<int32_t>();
-    item.SetDisplayX(displayX);
+    double displayXPos = provider.ConsumeFloatingPoint<double>();
+    item.SetDisplayXPos(displayXPos);
 
-    int32_t displayY = provider.ConsumeIntegral<int32_t>();
-    item.SetDisplayY(displayY);
+    double displayYPos = provider.ConsumeFloatingPoint<double>();
+    item.SetDisplayYPos(displayYPos);
 
-    MMI_HILOGD("PointerItemFuzzTest");
-    return true;
+    double windowXPos = provider.ConsumeFloatingPoint<double>();
+    item.SetWindowXPos(windowXPos);
+    MMI_HILOGD("PointerItem2FuzzTest");
 }
 } // MMI
 } // OHOS
@@ -59,6 +58,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::MMI::PointerItemFuzzTest(data, size);
+    OHOS::MMI::PointerItem2FuzzTest(data, size);
     return 0;
 }
