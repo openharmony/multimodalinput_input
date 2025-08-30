@@ -6451,7 +6451,7 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<OLD::Dis
     mprintf(fd, "Displays information:\t");
     mprintf(fd, "displayInfos,num:%zu", displaysInfo.size());
     for (const auto &item : displaysInfo) {
-        mprintf(fd, "\t displayInfos: rsId:%d | displaySourceMode:%d id:%d | x:%d"
+        mprintf(fd, "\t displayInfos: rsId:%" PRIu64 " | displaySourceMode:%d id:%d | x:%d"
                     "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
                     "| displayDirection:%d | displayMode:%u | offsetX:%d | offsetY:%d"
                     "| validWidth:%d | validHeight:%d | pointerActiveWidth:%d | pointerActiveHeight:%d\t",
