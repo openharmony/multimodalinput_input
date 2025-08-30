@@ -22,6 +22,7 @@
 #include "event_dispatch_handler.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
+#include "parameters.h"
 
 #undef protected
 #undef private
@@ -34,6 +35,7 @@ static constexpr char PROGRAM_NAME[] { "uds_sesion_test" };
 int32_t g_moduleType { 3 };
 int32_t g_pid { 0 };
 int32_t g_writeFd { -1 };
+const bool ESC_TO_BACK_SUPPORT = system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false);
 } // namespace
 
 class EventDispatchTest : public testing::Test {
@@ -2195,7 +2197,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_001, TestSize.Level
 
 /**
  * @tc.name: EventDispatchTest_HandleKeyEvent_002
- * @tc.desc: Test the function HandleKeyEvent with AddFlagToEsc
+ * @tc.desc: Test the function HandleKeyEvent with nullptr
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2217,6 +2219,35 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
 
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_NE(InputHandler->udsServer_, nullptr);
+    InputHandler->udsServer_ = nullptr;
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleKeyEvent_003
+ * @tc.desc: Test the function HandleKeyEvent with AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_003, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
+
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
+    dispatch.HandleKeyEvent(keyEvent);
+    if (ESC_TO_BACK_SUPPORT) {
+        EXPECT_EQ(dispatch.escToBackFlag_, true);
+    } else {
+        EXPECT_EQ(dispatch.escToBackFlag_, true);
+    }
     InputHandler->udsServer_ = nullptr;
 }
 
