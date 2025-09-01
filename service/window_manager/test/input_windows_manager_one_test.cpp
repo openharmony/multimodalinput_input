@@ -2897,18 +2897,19 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTargetTouc
     WindowInfo winInfo;
     int32_t pointerId = 1;
     PointerEvent::PointerItem pointerItem;
-    inputWindowsManager->targetTouchWinIds_[1] = {10, 20, 30};
-    inputWindowsManager->targetTouchWinIds_[2] = {10, 20, 30};
+
+    inputWindowsManager->targetTouchWinIds_[1][1] = {10, 20, 30};
+    inputWindowsManager->targetTouchWinIds_[1][2] = {10, 20, 30};
     pointerItem.SetDisplayXPos(0.0);
     pointerItem.SetDisplayYPos(0.0);
     winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
-    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1);
+    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
     winInfo.windowInputType = WindowInputType::TRANSMIT_EXCEPT_MOVE;
-    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1);
-    EXPECT_TRUE(!inputWindowsManager->targetTouchWinIds_[pointerId].empty());
-    inputWindowsManager->targetTouchWinIds_.clear();
-    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1);
-    EXPECT_TRUE(inputWindowsManager->targetTouchWinIds_[pointerId].empty());
+    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
+    EXPECT_TRUE(!inputWindowsManager->targetTouchWinIds_[1][pointerId].empty());
+    inputWindowsManager->targetTouchWinIds_[1].clear();
+    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
+    EXPECT_TRUE(inputWindowsManager->targetTouchWinIds_[1][pointerId].empty());
 }
 
 /* *

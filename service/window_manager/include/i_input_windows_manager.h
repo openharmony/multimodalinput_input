@@ -91,7 +91,8 @@ public:
     virtual ExtraData GetExtraData() const = 0;
     virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
-    virtual void ClearTargetWindowId(int32_t pointerId) = 0;
+    virtual void ClearTargetDeviceWindowId(int32_t deviceId) = 0;
+    virtual void ClearTargetWindowId(int32_t pointerId, int32_t deviceId) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info,
         double logicX, double logicY) const = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
@@ -157,7 +158,8 @@ public:
     virtual bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
-    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds) = 0;
+    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds,
+        int32_t deviceId) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
     virtual void SetWindowStateNotifyPid(int32_t pid) = 0;

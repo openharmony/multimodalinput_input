@@ -37,9 +37,6 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
-const std::string CURRENT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRODUCT_TYPE_TABLET = "tablet";
-constexpr int32_t PEN_ID { 101 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -188,10 +185,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     CALL_DEBUG_ENTER;
     CHKPV(point);
     std::vector<int32_t> windowIds;
-    int32_t devicePointerId = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL) ?
-        pointerItem.GetPointerId() + PEN_ID : pointerItem.GetPointerId();
-    WIN_MGR->GetTargetWindowIds(devicePointerId, point->GetSourceType(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds, point->GetDeviceId());
     int32_t count = 0;
     int32_t pointerId = point->GetPointerId();
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
@@ -249,7 +243,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_THROW ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
-        WIN_MGR->ClearTargetWindowId(devicePointerId);
+        WIN_MGR->ClearTargetWindowId(pointerId, point->GetDeviceId());
     }
 }
 
@@ -320,10 +314,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
     UpdateDisplayXY(point);
     std::vector<int32_t> windowIds;
-    int32_t devicePointerId = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
-        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL) ?
-        pointerItem.GetPointerId() + PEN_ID : pointerItem.GetPointerId();
-    WIN_MGR->GetTargetWindowIds(devicePointerId, point->GetSourceType(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds, point->GetDeviceId());
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         ResetDisplayXY(point);
