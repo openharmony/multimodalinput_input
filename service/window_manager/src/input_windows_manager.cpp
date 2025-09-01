@@ -1366,17 +1366,31 @@ void InputWindowsManager::HandleValidDisplayChange(const OLD::DisplayGroupInfo &
 
 CursorPosition InputWindowsManager::GetCursorPos(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
+    CursorPosition cursorPosition;
     int32_t groupId = displayGroupInfo.groupId;
-    if ((cursorPosMap_[groupId].displayId < 0) && !displayGroupInfoMap_[groupId].displaysInfo.empty()) {
-        OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
-        if (GetHardCursorEnabled()) {
-            (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+    const auto iter = cursorPosMap_.find(groupId);
+    if (iter != cursorPosMap_.end()) {
+        cursorPosition = iter->second;
+        if ((cursorPosition.displayId < 0) && !displayGroupInfo.displaysInfo.empty()) {
+            OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
+            if (GetHardCursorEnabled()) {
+                (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+            }
+            int32_t validW = displayInfo.validWidth;
+            int32_t validH = displayInfo.validHeight;
+            Direction direction = GetDisplayDirection(&displayInfo);
+            if (direction == DIRECTION90 || direction == DIRECTION270) {
+                std::swap(validW, validH);
+            }
+            cursorPosMap_[groupId].displayId = displayInfo.id;
+            cursorPosMap_[groupId].cursorPos.x = validW * HALF_RATIO;
+            cursorPosMap_[groupId].cursorPos.y = validH * HALF_RATIO;
+            cursorPosMap_[groupId].direction = displayInfo.direction;
+            cursorPosMap_[groupId].displayDirection = displayInfo.displayDirection;
+            cursorPosition = cursorPosMap_[groupId];
         }
-        cursorPosMap_[groupId].displayId = displayInfo.id;
-        cursorPosMap_[groupId].cursorPos.x = displayInfo.validWidth * HALF_RATIO;
-        cursorPosMap_[groupId].cursorPos.y = displayInfo.validHeight * HALF_RATIO;
     }
-    return cursorPosMap_[groupId];
+    return cursorPosition;
 }
 
 void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const OLD::DisplayGroupInfo &displayGroupInfo)
@@ -6413,9 +6427,18 @@ CursorPosition InputWindowsManager::GetCursorPos()
         }
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
         if (iter != cursorPosMap_.end()) {
+            int32_t validW = displayInfo.validWidth;
+            int32_t validH = displayInfo.validHeight;
+            Direction direction = GetDisplayDirection(&displayInfo);
+            if (direction == DIRECTION90 || direction == DIRECTION270) {
+                std::swap(validW, validH);
+            }
             cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.x = displayInfo.validWidth * HALF_RATIO;
-            cursorPosMap_[MAIN_GROUPID].cursorPos.y = displayInfo.validHeight * HALF_RATIO;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.x = validW * HALF_RATIO;
+            cursorPosMap_[MAIN_GROUPID].cursorPos.y = validH * HALF_RATIO;
+            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
+            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
+            cursorPos = cursorPosMap_[MAIN_GROUPID];
         }
     }
     return cursorPos;
