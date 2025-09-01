@@ -2246,7 +2246,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_003, TestSize.Level
     if (ESC_TO_BACK_SUPPORT) {
         EXPECT_EQ(dispatch.escToBackFlag_, true);
     } else {
-        EXPECT_EQ(dispatch.escToBackFlag_, true);
+        EXPECT_EQ(dispatch.escToBackFlag_, false);
     }
     InputHandler->udsServer_ = nullptr;
 }
