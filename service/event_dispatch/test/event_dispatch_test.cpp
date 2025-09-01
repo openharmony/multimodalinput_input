@@ -1804,6 +1804,8 @@ HWTEST_F(EventDispatchTest, DispatchPointerEventInner_06, TestSize.Level1)
     std::shared_ptr<PointerEvent> point = PointerEvent::Create();
     ASSERT_NE(point, nullptr);
     int32_t fd = -5;
+    UDSServer udsServer;
+    InputHandler->udsServer_ = &udsServer;
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->actionTime_ = 3100;
