@@ -2948,13 +2948,13 @@ ohos_unittest("EventDispatchTest") {
   include_dirs = [
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/device_manager/include",
     "dfx/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/events/include",
-    "${mmi_path}/utils/common/include",
+    "${mmi_path}/util/common/include",
   ]
 
   sources = [
