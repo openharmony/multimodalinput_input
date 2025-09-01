@@ -2945,6 +2945,13 @@ ohos_unittest("EventDispatchTest") {
     "-Dprotected=public",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   include_dirs = [
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
