@@ -2908,6 +2908,7 @@ ohos_unittest("EventHandlerEXTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -2919,6 +2920,7 @@ ohos_unittest("EventHandlerEXTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
   if (resource_schedule_service_enabled) {
