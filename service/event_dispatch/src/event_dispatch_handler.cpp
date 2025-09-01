@@ -47,7 +47,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    if (SC_TO_BACK_SUPPORT) {
+    if (ESC_TO_BACK_SUPPORT) {
         AddFlagToEsc(keyEvent);
     }
     DispatchKeyEventPid(*udsServer, keyEvent);
