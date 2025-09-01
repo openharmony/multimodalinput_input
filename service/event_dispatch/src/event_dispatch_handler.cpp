@@ -37,7 +37,6 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
-const bool ESC_TO_BACK_SUPPORT = system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false);
 constexpr int32_t PEN_ID { 101 };
 } // namespace
 
@@ -47,7 +46,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    if (ESC_TO_BACK_SUPPORT) {
+    if (system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false)) {
         AddFlagToEsc(keyEvent);
     }
     DispatchKeyEventPid(*udsServer, keyEvent);
@@ -257,17 +256,17 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
 {
     (void)programName;
     (void)pid;
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    auto begin = std::chrono::high_resolution_clock::now();
-    if (POINTER_DEV_MGR.isInit) {
-        CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
-    }
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - begin).count();
-#ifdef OHOS_BUILD_ENABLE_DFX_RADAR
-    DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
-#endif // OHOS_BUILD_ENABLE_DFX_RADAR
-#endif // OHOS_BUILD_ENABLE_WATCH
+// #ifndef OHOS_BUILD_ENABLE_WATCH
+//     auto begin = std::chrono::high_resolution_clock::now();
+//     if (POINTER_DEV_MGR.isInit) {
+//         CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
+//     }
+//     auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+//         std::chrono::high_resolution_clock::now() - begin).count();
+// #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
+//     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
+// #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+// #endif // OHOS_BUILD_ENABLE_WATCH
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
