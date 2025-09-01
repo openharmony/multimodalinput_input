@@ -42,8 +42,6 @@
             "vtable for OHOS::MMI::SwitchSubscriberHandler";
             "vtable for OHOS::MMI::EventPreMonitorHandler";
             "vtable for OHOS::MMI::EventPreMonitorHandler::MonitorCollection";
-            "virtual thunk to OHOS::MMI::PointerEvent::~PointerEvent()";
-            "virtual thunk to OHOS::MMI::InputEvent::~InputEvent()";
             "vtable for OHOS::MMI::InputPlugin";
         };
     local:
