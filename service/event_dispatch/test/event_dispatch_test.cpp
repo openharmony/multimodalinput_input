@@ -27,6 +27,21 @@
 #undef protected
 #undef private
 namespace OHOS {
+namespace system {
+
+bool g_returnFlag { false };
+
+void SetBoolParameter(const std::string& key, bool def)
+{
+    g_returnFlag = def;
+}
+
+bool GetBoolParameter(const std::string& key, bool def)
+{
+    return g_returnFlag;
+}
+} // namespace system
+
 namespace MMI {
 namespace {
 using namespace testing::ext;
@@ -35,7 +50,6 @@ static constexpr char PROGRAM_NAME[] { "uds_sesion_test" };
 int32_t g_moduleType { 3 };
 int32_t g_pid { 0 };
 int32_t g_writeFd { -1 };
-const bool ESC_TO_BACK_SUPPORT = system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false);
 } // namespace
 
 class EventDispatchTest : public testing::Test {
@@ -2244,12 +2258,14 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_003, TestSize.Level
     auto udsServer = std::make_unique<UDSServer>();
     InputHandler->udsServer_ = udsServer.get();
     EXPECT_NE(InputHandler->udsServer_, nullptr);
+
+    system::SetBoolParameter("const.multimodalinput.esc_to_back_support", true);
     dispatch.HandleKeyEvent(keyEvent);
-    if (ESC_TO_BACK_SUPPORT) {
-        EXPECT_EQ(dispatch.escToBackFlag_, true);
-    } else {
-        EXPECT_EQ(dispatch.escToBackFlag_, false);
-    }
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+
+    system::SetBoolParameter("const.multimodalinput.esc_to_back_support", false);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
     InputHandler->udsServer_ = nullptr;
 }
 
