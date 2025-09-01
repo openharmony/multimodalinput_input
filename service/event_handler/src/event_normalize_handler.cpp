@@ -729,7 +729,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             OHOS::ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
             OHOS::ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN_MMI,
             mapPayload);
-        auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+        [[ maybe_unused ]] auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
         DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
