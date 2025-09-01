@@ -2259,13 +2259,14 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_003, TestSize.Level
     InputHandler->udsServer_ = udsServer.get();
     EXPECT_NE(InputHandler->udsServer_, nullptr);
 
+    system::SetBoolParameter("const.multimodalinput.esc_to_back_support", false);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+
     system::SetBoolParameter("const.multimodalinput.esc_to_back_support", true);
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, true);
 
-    system::SetBoolParameter("const.multimodalinput.esc_to_back_support", false);
-    dispatch.HandleKeyEvent(keyEvent);
-    EXPECT_EQ(dispatch.escToBackFlag_, false);
     InputHandler->udsServer_ = nullptr;
 }
 
