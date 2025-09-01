@@ -37,8 +37,6 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
-const std::string CURRENT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRODUCT_TYPE_TABLET = "tablet";
 constexpr int32_t PEN_ID { 101 };
 } // namespace
 
@@ -48,7 +46,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    if (CURRENT_DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
+    if (system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false)) {
         AddFlagToEsc(keyEvent);
     }
     DispatchKeyEventPid(*udsServer, keyEvent);
@@ -263,7 +261,7 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     if (POINTER_DEV_MGR.isInit) {
         CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
     }
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+    [[maybe_unused]] auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
