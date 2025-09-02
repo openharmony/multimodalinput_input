@@ -296,9 +296,9 @@ bool ScreenPointer::InitSurface()
 void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
 {
     CHKPV(si);
+    CHKPV(surfaceNode_);
     auto id = si->GetRsId();
     if (screenId_ != id) {
-        CHKPV(surfaceNode_);
         surfaceNode_->AttachToDisplay(id);
         Rosen::RSTransaction::FlushImplicitTransaction();
     }

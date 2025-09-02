@@ -37,8 +37,7 @@ constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
-const std::string CURRENT_DEVICE_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRODUCT_TYPE_TABLET = "tablet";
+constexpr int32_t PEN_ID { 101 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -47,7 +46,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    if (CURRENT_DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
+    if (system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false)) {
         AddFlagToEsc(keyEvent);
     }
     DispatchKeyEventPid(*udsServer, keyEvent);
@@ -159,7 +158,7 @@ bool EventDispatchHandler::SearchWindow(std::vector<std::shared_ptr<WindowInfo>>
 void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    MMI_HILOGD("add Flag to ESC in: %{public}s", keyEvent->ToString().c_str());
+    MMI_HILOGD("add Flag to ESC in");
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_ESCAPE) {
         return;
     }
@@ -175,7 +174,7 @@ void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent
     if (escToBackFlag_ && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP ||
         keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) &&
         keyEvent->GetKeyItems().size() == 1) {
-        MMI_HILOGI("Only esc up or cancel has added flag: %{public}s", keyEvent->ToString().c_str());
+        MMI_HILOGI("Esc up or cancel, add flag");
         keyEvent->AddFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
         escToBackFlag_ = false;
     }
@@ -187,7 +186,10 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     CALL_DEBUG_ENTER;
     CHKPV(point);
     std::vector<int32_t> windowIds;
-    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
+    int32_t devicePointerId = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL) ?
+        pointerItem.GetPointerId() + PEN_ID : pointerItem.GetPointerId();
+    WIN_MGR->GetTargetWindowIds(devicePointerId, point->GetSourceType(), windowIds);
     int32_t count = 0;
     int32_t pointerId = point->GetPointerId();
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
@@ -195,6 +197,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
             cancelEventList_.erase(pointerId);
         }
     }
+    WIN_MGR->FoldScreenRotation(point);
     for (auto windowId : windowIds) {
         auto pointerEvent = std::make_shared<PointerEvent>(*point);
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
@@ -244,7 +247,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_THROW ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
-        WIN_MGR->ClearTargetWindowId(pointerId);
+        WIN_MGR->ClearTargetWindowId(devicePointerId);
     }
 }
 
@@ -258,7 +261,7 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     if (POINTER_DEV_MGR.isInit) {
         CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
     }
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+    [[maybe_unused]] auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);
@@ -315,7 +318,10 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
     UpdateDisplayXY(point);
     std::vector<int32_t> windowIds;
-    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
+    int32_t devicePointerId = (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
+        pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL) ?
+        pointerItem.GetPointerId() + PEN_ID : pointerItem.GetPointerId();
+    WIN_MGR->GetTargetWindowIds(devicePointerId, point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         ResetDisplayXY(point);

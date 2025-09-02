@@ -3459,8 +3459,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplaysInfo_002, TestSi
         << info.displayDirection << info.displayMode << info.transform << info.scalePercent << info.expandHeight
         << info.isCurrentOffScreenRendering << info.displaySourceMode << info.oneHandX << info.oneHandY
         << info.screenArea << info.rsId << info.offsetX << info.offsetY << info.pointerActiveWidth
-        << info.pointerActiveHeight;
-    ;
+        << info.pointerActiveHeight << info.deviceRotation << info.rotationCorrection;
     EXPECT_EQ(handler.ReadDisplaysInfo(pkt, displayGroupInfo), RET_OK);
 }
 
@@ -4429,6 +4428,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId02, TestSiz
     int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 
+    pointerEvent->SetPointerId(INT32_MAX - 1);
+    diffPointerId = 2;
+    result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
+    EXPECT_EQ(result, RET_ERR);
+
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     pointerEvent->AddPointerItem(item);
@@ -4472,7 +4476,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_08, TestSize.L
         << displayInfo.displayMode << displayInfo.transform << displayInfo.scalePercent << displayInfo.expandHeight
         << displayInfo.isCurrentOffScreenRendering << displayInfo.displaySourceMode << displayInfo.oneHandX
         << displayInfo.oneHandY << displayInfo.screenArea << displayInfo.rsId << displayInfo.offsetX
-        << displayInfo.offsetY << displayInfo.pointerActiveWidth << displayInfo.pointerActiveHeight;
+        << displayInfo.offsetY << displayInfo.pointerActiveWidth << displayInfo.pointerActiveHeight
+        << displayInfo.deviceRotation << displayInfo.rotationCorrection;
     uint32_t windowNum = 1;
     pkt << windowNum;
     WindowInfo windowInfo;

@@ -3770,8 +3770,8 @@ void PointerDrawingManager::SetSurfaceNodeBounds()
         return;
     }
     if (canvasWidth_ < cursorWidth_ && canvasHeight_ < cursorHeight_) {
-        canvasWidth_ = cursorWidth_;
-        canvasHeight_ = cursorHeight_;
+        canvasWidth_ = (cursorWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+        canvasHeight_ = (cursorHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
