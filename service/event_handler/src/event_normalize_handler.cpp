@@ -218,7 +218,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
-        case LIBINPUT_EVENT_TOUCHPAD_ACTION: {
+        case LIBINPUT_EVENT_TOUCHPAD_ACTIVE: {
             HandleTouchPadAction(event);
             break;
         }
@@ -681,7 +681,7 @@ int32_t EventNormalizeHandler::HandleTouchPadAction(libinput_event* event)
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCHPAD_ACTION) {
+    if (type == LIBINPUT_EVENT_TOUCHPAD_ACTIVE) {
         pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_NO_MONITOR);
     }
 #else

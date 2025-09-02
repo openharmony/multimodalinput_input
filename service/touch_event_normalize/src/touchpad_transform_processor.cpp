@@ -201,7 +201,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadAction(struct libinput_event 
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_NO_MONITOR);
 
@@ -213,7 +213,7 @@ void TouchPadTransformProcessor::SetActionPointerItem(int64_t time)
 {
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
-    pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetPressed(false);
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
@@ -253,7 +253,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
             ret = OnEventTouchPadMotion(event);
             break;
         }
-        case LIBINPUT_EVENT_TOUCHPAD_ACTION: {
+        case LIBINPUT_EVENT_TOUCHPAD_ACTIVE: {
             ret = OnEventTouchPadAction(event);
             break;
         }

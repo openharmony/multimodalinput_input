@@ -756,7 +756,7 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::TOUCH_ACTION_GESTURE_END, "touch-gesture-end" },
     { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
     { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
-    { PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION, "touchpad-action" },
+    { PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE, "touchpad-active" },
 };
 
 const char* PointerEvent::DumpPointerAction() const
@@ -1632,7 +1632,7 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:FCA:";
         case PointerEvent::POINTER_ACTION_UNKNOWN:
             return "P:UK:";
-        case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION:
+        case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE:
             return "P:TA:";
         default:
             return "P:?:";

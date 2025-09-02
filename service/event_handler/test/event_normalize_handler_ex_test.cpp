@@ -25,15 +25,15 @@
 #define MMI_LOG_TAG "EventNormalizeHandlerEXTest"
 
 struct udev_device {
-    uint32_t tags;
+    uint32_t tags { 0 };
 };
 
 struct libinput_device {
     struct udev_device udevDev;
-    unsigned int busType;
-    unsigned int version;
-    unsigned int product;
-    unsigned int vendor;
+    unsigned int busType { 0 };
+    unsigned int version { 0 };
+    unsigned int product { 0 };
+    unsigned int vendor { 0 };
     char name[9];
 };
 
@@ -113,7 +113,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleEvent_00
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
     libinput_event event;
-    event.type = LIBINPUT_EVENT_TOUCHPAD_ACTION;
+    event.type = LIBINPUT_EVENT_TOUCHPAD_ACTIVE;
     struct libinput_device libDev {
         .udevDev { 2 },
         .busType = 1,
@@ -164,7 +164,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchPad
     CALL_TEST_DEBUG;
     EventNormalizeHandler handler;
     libinput_event event;
-    event.type = LIBINPUT_EVENT_TOUCHPAD_ACTION;
+    event.type = LIBINPUT_EVENT_TOUCHPAD_ACTIVE;
     struct libinput_device libDev {
         .udevDev { 2 },
         .busType = 1,
