@@ -291,6 +291,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_00
     ASSERT_EQ(WIN_MGR->UpdateTargetPointer(pointerEvent), RET_ERR);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_006
  * @tc.desc: Test IsNeedRefreshLayer
@@ -316,6 +319,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006
         ASSERT_EQ(WIN_MGR->IsNeedRefreshLayer(-2), false);
     }
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
 
 /**
  * @tc.name: InputWindowsManagerTest_SetMouseCaptureMode_008
@@ -699,6 +705,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_001,
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: InputWindowsManagerTest_NeedUpdatePointDrawFlag_001
  * @tc.desc: Test whether the point draw flag needs to be updated
@@ -719,6 +727,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NeedUpdatePointDrawFla
     windows3.back().action = OHOS::MMI::WINDOW_UPDATE_ACTION::ADD_END;
     EXPECT_TRUE(WIN_MGR->NeedUpdatePointDrawFlag(windows3));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: InputWindowsManagerTest_DispatchPointer_001
@@ -974,6 +984,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, Test
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->RotateScreen(info, coord));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_001
  * @tc.desc: Test whether layer refresh is needed
@@ -989,6 +1002,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_001
     WIN_MGR->GetWindowInfo(0, 0)->id = 3;
     EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(1));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
 
 /**
  * @tc.name: InputWindowsManagerTest_OnSessionLost_001
@@ -4569,6 +4585,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPidAndUpdateTarget(keyEvent));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_002
  * @tc.desc: Test the funcation IsNeedRefreshLayer
@@ -4588,6 +4607,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     inputEvent->targetDisplayId_ = 11;
     EXPECT_FALSE(ret);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
 
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_003
@@ -6521,6 +6543,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_DispatchPointerCancel
  * @tc.desc: Test DispatchPointerCancel
@@ -6558,6 +6583,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel,
     it->second.windowsInfo.push_back(winInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerTest_GetPidByWindowId
@@ -6954,6 +6982,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEven
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueCancelTouchEvent(pointerEvent));
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_SetPointerEvent
  * @tc.desc: Test the funcation SetPointerEvent
@@ -6984,6 +7015,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerEvent, TestS
     inputWindowsManager.lastPointerEvent_->UpdatePointerItem(100, item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerEvent(pointerAction, pointerEvent));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowPointerHotArea
@@ -7130,6 +7164,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_001
     EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_DispatchPointerCancel_001
  * @tc.desc: Test the funcation DispatchPointerCancel
@@ -7181,6 +7218,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel_
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(10, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointerCancel(displayId));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateWindowsInfoPerDisplay
@@ -8447,6 +8487,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelMouseEvent_002, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelMouseEvent());
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: InputWindowsManagerTest_UpdatePointerDrawingManagerWindowInfo_001
  * @tc.desc: Test if (lastPointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
@@ -8485,6 +8527,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     inputWindowsManager.lastPointerEvent_->pressedButtons_.insert(0);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerDrawingManagerWindowInfo());
 }
+
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
 /**
  * @tc.name: InputWindowsManagerTest_PrintHighZorder_001
@@ -9267,6 +9311,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo_002
  * @tc.desc: Test PointerDrawingManagerOnDisplayInfo
@@ -9402,6 +9448,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerDrawingMa
     }
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdatePointerDrawingManagerWindowInfo());
 }
+
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayIdAndName_004
@@ -10584,6 +10632,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_003, Te
     EXPECT_EQ(result.cursorPos.y, 0);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo004
  * @tc.desc: Test PointerDrawingManagerOnDisplayInfo
@@ -10678,6 +10728,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerO
     WIN_MGR->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
 }
+
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayIdAndName_005
