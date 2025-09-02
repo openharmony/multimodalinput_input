@@ -191,7 +191,6 @@ group("mmi_tests") {
     "service:InfraredEmitterTest",
     "service:InputDisplayBindHelperTest",
     "service:InputEventHandlerTest",
-    "service:InputWindowsManagerEXTest",
     "service:InputWindowsManagerOneTest",
     "service:InputWindowsManagerTest",
     "service:InterceptorTest",
@@ -216,9 +215,6 @@ group("mmi_tests") {
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
-    "service:PointerDrawingManagerExTest",
-    "service:PointerDrawingManagerSupTest",
-    "service:PointerDrawingManagerTest",
     "service:ProductTypeParserTest",
     "service:ServerMsgHandlerTest",
     "service:SpecialInputDeviceParserTest",
@@ -246,6 +242,15 @@ group("mmi_tests") {
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
   ]
+
+  if (input_feature_pointer_drawing) {
+    deps +=[
+      "service:InputWindowsManagerEXTest",
+      "service:PointerDrawingManagerTest",
+      "service:PointerDrawingManagerExTest",
+      "service:PointerDrawingManagerSupTest",
+    ]
+  }
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]

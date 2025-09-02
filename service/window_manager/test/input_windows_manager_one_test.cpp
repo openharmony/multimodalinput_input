@@ -2994,6 +2994,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchEnterLeaveE
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerOneTest_AdjustDisplayRotation_001
  * @tc.desc: Test the funcation AdjustDisplayRotation
@@ -3017,6 +3020,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AdjustDisplayRot
     it->second.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerOneTest_FoldScreenRotation_010

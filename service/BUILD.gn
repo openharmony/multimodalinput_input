@@ -1409,11 +1409,14 @@ ohos_unittest("TouchDrawingManagerTest") {
     "${mmi_path}/util/json_parser/include"
   ]
 
-  sources = [
-    "window_manager/test/pointer_renderer_test.cpp",
-    "window_manager/test/screen_pointer_test.cpp",
-    "window_manager/test/touch_drawing_manager_test.cpp",
-  ]
+  sources = [ "window_manager/test/touch_drawing_manager_test.cpp" ]
+
+  if (input_feature_pointer_drawing) {
+    sources += [
+      "window_manager/test/pointer_renderer_test.cpp",
+      "window_manager/test/screen_pointer_test.cpp",
+    ]
+  }
 
   deps = [
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
