@@ -366,6 +366,8 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
                 pointerItem.SetPressed(true);
                 pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
             }
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+            break;
         }
         case PointerEvent::POINTER_ACTION_UP: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);

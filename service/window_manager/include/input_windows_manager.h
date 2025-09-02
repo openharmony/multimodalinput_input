@@ -195,9 +195,11 @@ public:
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId);
-    void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds);
-    void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId);
-    void ClearTargetWindowId(int32_t pointerId);
+    void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds,
+        int32_t deviceId);
+    void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId, int32_t deviceId);
+    void ClearTargetDeviceWindowId(int32_t deviceId);
+    void ClearTargetWindowId(int32_t pointerId, int32_t deviceId);
     bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
@@ -373,8 +375,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void HandleGestureInjection(bool gestureInject);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
-        std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId);
-    void ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId);
+        std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId, int32_t deviceId);
+    void ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId, int32_t deviceId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -555,7 +557,7 @@ private:
         {}
     };
     std::map<int32_t, ActiveTouchWin> activeTouchWinTypes_;
-    std::map<int32_t, std::vector<int32_t>> targetTouchWinIds_;
+    std::map<int32_t, std::map<int32_t, std::vector<int32_t>>> targetTouchWinIds_;
     std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
