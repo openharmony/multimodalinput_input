@@ -45,7 +45,7 @@ void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    if (CURRENT_DEVICE_TYPE == PRODUCT_TYPE_TABLET) {
+    if (system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false)) {
         AddFlagToEsc(keyEvent);
     }
     DispatchKeyEventPid(*udsServer, keyEvent);
@@ -257,7 +257,7 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     if (POINTER_DEV_MGR.isInit) {
         CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
     }
-    auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
+    [[maybe_unused]] auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::RS_NOTIFY_TOUCH_EVENT, durationMS);

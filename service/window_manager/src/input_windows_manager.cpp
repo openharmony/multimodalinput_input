@@ -2940,26 +2940,6 @@ void InputWindowsManager::RotateScreen(const OLD::DisplayInfo& info, PhysicalCoo
     const Direction direction = info.direction;
     int32_t groupId = FindDisplayGroupId(info.id);
     if (direction == DIRECTION0) {
-        int32_t groupId = FindDisplayGroupId(info.id);
-        Direction directiontemp = Direction::DIRECTION0 ;
-        Direction displaydirectiontemp = Direction::DIRECTION0 ;
-
-        const auto iter = cursorPosMap_.find(groupId);
-        if (iter != cursorPosMap_.end()) {
-            directiontemp = iter->second.direction;
-            displaydirectiontemp = iter->second.displayDirection;
-        }
-        if (displaydirectiontemp != info.displayDirection && directiontemp != info.direction) {
-            if (directiontemp == Direction::DIRECTION90) {
-                double temp = coord.y;
-                coord.y = info.validHeight - coord.x;
-                coord.x = temp;
-            } else if (directiontemp == Direction::DIRECTION270) {
-                double temp = coord.x;
-                coord.x = info.validWidth - coord.y;
-                coord.y = temp;
-            }
-        }
         MMI_HILOGD("DIRECTION0, physicalXY:{%f %f}->{%f %f}", oldX, oldY, coord.x, coord.y);
         return;
     }
