@@ -507,7 +507,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
  */
 HWTEST_F(TabletToolTranformProcessorTest, DrawTouchGraphicDrawing_006, TestSize.Level1)
 {
-    EXPECT_CALL(*WIN_MGR_MOCK, DrawTouchGraphic).Times(Exactly(1));
+    EXPECT_CALL(*WIN_MGR_MOCK, DrawTouchGraphic).Times(Exactly(2));
     int32_t deviceId { 2 };
     TabletToolTransformProcessor processor(deviceId);
     processor.pointerevent_ = PointerEvent::Create();
