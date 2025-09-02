@@ -1892,7 +1892,7 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         const auto &displayInfo = displayGroupInfo.displaysInfo.front();
         std::lock_guard<std::mutex> lock(oneHandMtx_);
         if (scalePercent_ != displayInfo.scalePercent) {
-            MMI_HILOGI("Send one hand data to anco, scalePercent:%{public}d", displayInfo.scalePercent);
+            MMI_HILOGD("Send one hand data to anco, scalePercent:%{public}d", displayInfo.scalePercent);
             UpdateOneHandDataExt(displayInfo);
             scalePercent_ = displayInfo.scalePercent;
         }
