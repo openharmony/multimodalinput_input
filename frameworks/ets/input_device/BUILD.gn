@@ -53,7 +53,7 @@ taihe_shared_library("InputDevice") {
     "src/ani_constructor.cpp",
     "src/ohos.multimodalInput.inputDevice.impl.cpp",
     "src/taihe_event.cpp",
-    "src/taihe_inputdevice_utils.cpp",
+    "src/taihe_input_device_utils.cpp",
   ]
   deps = [
     ":run_taihe",

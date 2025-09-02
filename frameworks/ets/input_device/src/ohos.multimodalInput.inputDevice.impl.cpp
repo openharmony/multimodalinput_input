@@ -25,7 +25,7 @@
 #include <ani.h>
 #include "ohos.multimodalInput.inputDevice.impl.h"
 #include "taihe_event.h"
-#include "taihe_inputdevice_utils.h"
+#include "taihe_input_device_utils.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TaiheInputDeviceImpl"
@@ -33,7 +33,6 @@
 using namespace taihe;
 using namespace OHOS::MMI;
 using namespace ohos::multimodalInput::inputDevice;
-using TaiheKeyCode = ohos::multimodalInput::keyCode::KeyCode;
 using TaiheFunctionKey = ohos::multimodalInput::inputDevice::FunctionKey;
 using TaiheKeyboardType = ohos::multimodalInput::inputDevice::KeyboardType;
 using InputDevice_t = OHOS::MMI::InputDevice;
