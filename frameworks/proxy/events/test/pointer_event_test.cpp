@@ -1529,7 +1529,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_005, TestSize.Level
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    int32_t action = PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION;
+    int32_t action = PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE;
     auto ret = pointerEvent->ActionToShortStr(action);
     ASSERT_EQ(ret, "P:TA:");
 }

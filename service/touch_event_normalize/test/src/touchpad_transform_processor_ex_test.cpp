@@ -84,7 +84,7 @@ HWTEST_F(TouchPadTransformProcessorEXTest, TouchPadTransformProcessorEXTest_OnEv
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     libinput_event event;
-    event.type = LIBINPUT_EVENT_TOUCHPAD_ACTION;
+    event.type = LIBINPUT_EVENT_TOUCHPAD_ACTIVE;
     struct libinput_device libDev {
         .udevDev { 2 },
         .busType = 1,

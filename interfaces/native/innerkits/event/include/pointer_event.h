@@ -204,7 +204,7 @@ public:
 
     static constexpr int32_t POINTER_ACTION_PULL_THROW = 40;
 
-    static constexpr int32_t POINTER_ACTION_TOUCHPAD_ACTION = 50;
+    static constexpr int32_t POINTER_ACTION_TOUCHPAD_ACTIVE = 50;
 
     /**
      * 表示触屏手势动作

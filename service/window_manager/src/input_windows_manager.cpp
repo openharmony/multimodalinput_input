@@ -3816,7 +3816,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
         ((action == PointerEvent::POINTER_ACTION_AXIS_BEGIN || action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN) &&
-        (pointerEvent->GetPressedButtons().empty())) || (action == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION);
+        (pointerEvent->GetPressedButtons().empty())) || (action == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
@@ -5774,7 +5774,7 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
             pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
             return UpdateMouseTarget(pointerEvent);
         }
-        case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTION: {
+        case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE: {
             return UpdateMouseTarget(pointerEvent);
         }
         default: {
