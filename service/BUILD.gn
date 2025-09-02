@@ -2945,7 +2945,29 @@ ohos_unittest("EventDispatchTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "event_dispatch/test/event_dispatch_test.cpp" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/device_manager/include",
+    "dfx/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/events/include",
+    "${mmi_path}/util/common/include",
+  ]
+
+  sources = [
+    "event_dispatch/test/event_dispatch_test.cpp",
+    "event_dispatch/src/event_dispatch_handler.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -2955,6 +2977,7 @@ ohos_unittest("EventDispatchTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
@@ -2962,6 +2985,8 @@ ohos_unittest("EventDispatchTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",

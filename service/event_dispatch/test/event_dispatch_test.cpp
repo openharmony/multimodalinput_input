@@ -22,10 +22,26 @@
 #include "event_dispatch_handler.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
+#include "parameters.h"
 
 #undef protected
 #undef private
 namespace OHOS {
+namespace system {
+
+bool g_returnFlag { false };
+
+void SetBoolParameter(const std::string& key, bool def)
+{
+    g_returnFlag = def;
+}
+
+bool GetBoolParameter(const std::string& key, bool def)
+{
+    return g_returnFlag;
+}
+} // namespace system
+
 namespace MMI {
 namespace {
 using namespace testing::ext;
@@ -1802,6 +1818,8 @@ HWTEST_F(EventDispatchTest, DispatchPointerEventInner_06, TestSize.Level1)
     std::shared_ptr<PointerEvent> point = PointerEvent::Create();
     ASSERT_NE(point, nullptr);
     int32_t fd = -5;
+    UDSServer udsServer;
+    InputHandler->udsServer_ = &udsServer;
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->actionTime_ = 3100;
@@ -2195,7 +2213,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_001, TestSize.Level
 
 /**
  * @tc.name: EventDispatchTest_HandleKeyEvent_002
- * @tc.desc: Test the function HandleKeyEvent with AddFlagToEsc
+ * @tc.desc: Test the function HandleKeyEvent with nullptr
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2217,6 +2235,38 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
 
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_NE(InputHandler->udsServer_, nullptr);
+    InputHandler->udsServer_ = nullptr;
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleKeyEvent_003
+ * @tc.desc: Test the function HandleKeyEvent with AddFlagToEsc
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_003, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item;
+    keyEvent->AddPressedKeyItems(item);
+    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
+
+    auto udsServer = std::make_unique<UDSServer>();
+    InputHandler->udsServer_ = udsServer.get();
+    EXPECT_NE(InputHandler->udsServer_, nullptr);
+
+    system::SetBoolParameter("const.multimodalinput.esc_to_back_support", false);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, false);
+
+    system::SetBoolParameter("const.multimodalinput.esc_to_back_support", true);
+    dispatch.HandleKeyEvent(keyEvent);
+    EXPECT_EQ(dispatch.escToBackFlag_, true);
+
     InputHandler->udsServer_ = nullptr;
 }
 
