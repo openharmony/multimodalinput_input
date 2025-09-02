@@ -492,6 +492,11 @@ void MMIService::OnStart()
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
     InitPreferences();
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (POINTER_DEV_MGR.isInitDefaultMouseIconPath) {
+        CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #if OHOS_BUILD_ENABLE_POINTER
     bool switchFlag = false;
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
@@ -1157,9 +1162,6 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [color] {
-            if (!POINTER_DEV_MGR.isInit) {
-                return RET_ERR;
-            }
             return CursorDrawingComponent::GetInstance().SetPointerColor(color);
         }
         );
@@ -4166,6 +4168,10 @@ ErrCode MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubCreateVKeyboardDevice Verify system APP failed");
         return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Controller permission check failed");
+        return ERROR_NO_PERMISSION;
     }
     vkeyboardDevice = nullptr;
     isFoldPC_ = PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;

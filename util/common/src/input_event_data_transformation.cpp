@@ -383,12 +383,11 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
-    if (nPressed > MAX_PRESSED_BUTTONS) {
-        MMI_HILOGE("Invalid nPressed:%{public}zu", nPressed);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(nPressed, MAX_PRESSED_BUTTONS, RET_ERR);
     while (nPressed-- > 0) {
         pkt >> tField;
+        CHKRWER(pkt, RET_ERR);
         event->SetButtonPressed(tField);
     }
     return RET_OK;
@@ -399,10 +398,8 @@ int32_t InputEventDataTransformation::DeserializePointerIds(std::shared_ptr<Poin
     CHKPR(event, ERROR_NULL_POINTER);
     std::vector<int32_t>::size_type pointerCnt;
     pkt >> pointerCnt;
-    if (pointerCnt > MAX_POINTER_COUNT) {
-        MMI_HILOGE("Invalid pointerCnt:%{public}zu", pointerCnt);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(pointerCnt, MAX_POINTER_COUNT, RET_ERR);
     while (pointerCnt-- > 0) {
         PointerEvent::PointerItem item;
         if (DeserializePointerItem(pkt, item) != RET_OK) {
@@ -444,43 +441,35 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     std::vector<int32_t>::size_type pressedKeySize;
     int32_t tField;
     pkt >> pressedKeySize;
-    if (pressedKeySize > MAX_PRESSED_KEY_NUM) {
-        MMI_HILOGE("Invalid pressedKeySize:%{public}zu", pressedKeySize);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(pressedKeySize, MAX_PRESSED_KEY_NUM, RET_ERR);
     while (pressedKeySize-- > 0) {
         pkt >> tField;
+        CHKRWER(pkt, RET_ERR);
         pressedKeys.push_back(tField);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Unmarshalling pointer event failed");
-        return RET_ERR;
     }
     event->SetPressedKeys(pressedKeys);
 
     std::vector<uint8_t> buffer;
     std::vector<uint8_t>::size_type bufferSize;
     pkt >> bufferSize;
-    if (bufferSize > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("Invalid bufferSize:%{public}zu", bufferSize);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(bufferSize, ExtraData::MAX_BUFFER_SIZE, RET_ERR);
     uint8_t buff = 0;
     while (bufferSize-- > 0) {
         pkt >> buff;
+        CHKRWER(pkt, RET_ERR);
         buffer.push_back(buff);
     }
     pkt >> tField;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Unmarshalling pointer event failed");
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
     event->SetBuffer(buffer);
     event->SetPullId(tField);
     double throwAngle {0.0};
     double throwSpeed {0.0};
     pkt >> throwAngle;
     pkt >> throwSpeed;
+    CHKRWER(pkt, RET_ERR);
     event->SetThrowAngle(throwAngle);
     event->SetThrowSpeed(throwSpeed);
 
@@ -586,22 +575,17 @@ int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, s
 {
     uint32_t enHanceDataLen;
     pkt >> enHanceDataLen;
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(enHanceDataLen, MAX_ENHANCE_DATA_LEN, RET_ERR);
     if (enHanceDataLen == 0) {
         return RET_OK;
-    }
-    if (enHanceDataLen > MAX_ENHANCE_DATA_LEN) {
-        MMI_HILOGE("Invalid enHanceDataLen:%{public}u", enHanceDataLen);
-        return RET_ERR;
     }
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
         pkt >> enhanceDataBuf[i];
+        CHKRWER(pkt, RET_ERR);
         enhanceData.push_back(enhanceDataBuf[i]);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("UnmarshallingEnhanceData pointer event failed");
-        return RET_ERR;
     }
     event->SetEnhanceData(enhanceData);
     return RET_OK;
@@ -652,11 +636,8 @@ int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, s
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
         pkt >> enhanceDataBuf[i];
+        CHKRWER(pkt, RET_ERR);
         enhanceData.push_back(enhanceDataBuf[i]);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("UnmarshallingEnhanceData key event failed");
-        return RET_ERR;
     }
     event->SetEnhanceData(enhanceData);
     return RET_OK;
