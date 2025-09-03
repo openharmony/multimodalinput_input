@@ -187,6 +187,48 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *eve
     return RET_OK;
 }
 
+int32_t TouchPadTransformProcessor::OnEventTouchPadAction(struct libinput_event *event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, RET_ERR);
+    int64_t time = GetSysClockTime();
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
+    SetActionPointerItem(time);
+
+    pointerEvent_->SetDeviceId(deviceId_);
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+    pointerEvent_->SetTargetWindowId(-1);
+    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_NO_MONITOR);
+
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    return RET_OK;
+}
+
+void TouchPadTransformProcessor::SetActionPointerItem(int64_t time)
+{
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetDownTime(time);
+    pointerItem.SetPressed(false);
+    pointerItem.SetDeviceId(deviceId_);
+    pointerItem.SetPointerId(DEFAULT_POINTER_ID);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
+    pointerItem.SetWindowXPos(0.0);
+    pointerItem.SetWindowYPos(0.0);
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetDisplayXPos(mouseInfo.physicalX);
+    pointerItem.SetDisplayYPos(mouseInfo.physicalY);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
+}
+
 std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
@@ -209,6 +251,10 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         }
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
             ret = OnEventTouchPadMotion(event);
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCHPAD_ACTIVE: {
+            ret = OnEventTouchPadAction(event);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN: {
