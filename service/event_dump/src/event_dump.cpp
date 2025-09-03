@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,9 @@
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "key_command_handler.h"
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+#include "key_event_hook_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_subscriber_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
@@ -174,6 +177,11 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #else
                 mprintf(fd, "Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+                KEY_EVENT_HOOK_MGR.Dump(fd, args);
+#else
+                mprintf(fd, "Hook function does not support");
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
                 break;
             }
             case 'f': {

@@ -47,6 +47,7 @@ public:
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
     bool CheckAuthorize();
+    bool CheckKeyEventHook();
     bool CheckInputDeviceController();
     bool CheckFunctionKeyEnabled();
 
@@ -54,6 +55,8 @@ private:
     PermissionHelper() {}
     bool CheckHapPermission(uint32_t tokenId, const std::string &permissionCode);
     bool CheckHapPermission(const std::string &permissionCode);
+    bool AddPermissionUsedRecord(Security::AccessToken::AccessTokenID tokenId, const std::string &permissionName,
+        int32_t successCount, int32_t failCount);
 };
 
 #define PER_HELPER PermissionHelper::GetInstance()

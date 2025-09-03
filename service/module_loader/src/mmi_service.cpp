@@ -30,7 +30,9 @@
 #include "special_input_device_parser.h"
 #include "product_name_definition_parser.h"
 #include "json_parser.h"
-
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+#include "key_event_hook_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "ability_manager_client.h"
 #include "account_manager.h"
 #include "anr_manager.h"
@@ -5372,6 +5374,78 @@ ErrCode MMIService::QueryPointerRecord(int32_t count, std::vector<std::shared_pt
         return ret;
     }
     return RET_OK;
+}
+
+ErrCode MMIService::AddKeyEventHook(int32_t &hookId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    if (!PER_HELPER->CheckKeyEventHook()) {
+        MMI_HILOGE("CheckKeyEventHook failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([this, pid, &hookId] () -> int32_t {
+        auto session = GetSessionByPid(pid);
+        CHKPR(session, ERROR_NULL_POINTER);
+        if (int32_t result = KEY_EVENT_HOOK_MGR.AddKeyEventHook(pid, session, hookId); result != RET_OK) {
+            MMI_HILOGE("AddKeyEventHook failed, ret:%{public}d", result);
+            return result;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask AddKeyEventHook failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+ErrCode MMIService::RemoveKeyEventHook(int32_t hookId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([pid, hookId] () -> int32_t {
+        if (int32_t ret = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId); ret != RET_OK) {
+            MMI_HILOGE("RemoveKeyEventHook failed, pid:%{public}d, ret:%{public}d", pid, ret);
+            return ret;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask RemoveKeyEventHook failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+ErrCode MMIService::DispatchToNextHandler(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask([pid, eventId] () -> int32_t {
+        if (int32_t ret = KEY_EVENT_HOOK_MGR.DispatchToNextHandler(pid, eventId); ret != RET_OK) {
+            MMI_HILOGE("DispatchToNextHandler failed, ret:%{public}d", ret);
+            return ret;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask DispatchToNextHandler failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
 } // namespace MMI
 } // namespace OHOS

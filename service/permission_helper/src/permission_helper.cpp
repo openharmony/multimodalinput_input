@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "permission_helper.h"
 
 #include "ipc_skeleton.h"
+#include "privacy_kit.h"
 #include "tokenid_kit.h"
 
 #include "mmi_log.h"
@@ -37,6 +38,7 @@ namespace {
     const std::string FILTER_PERMISSION_CODE = "ohos.permission.FILTER_INPUT_EVENT";
     const std::string DEVICE_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_DEVICE_CONTROLLER";
     const std::string KEYBOARD_CONTROLLER_PERMISSION_CODE = "ohos.permission.INPUT_KEYBOARD_CONTROLLER";
+    const std::string KEY_EVENT_HOOK_PERMISSION_CODE = "ohos.permission.HOOK_KEY_EVENT";
 } // namespace
 bool PermissionHelper::VerifySystemApp()
 {
@@ -98,6 +100,34 @@ bool PermissionHelper::CheckAuthorize()
 {
     CALL_DEBUG_ENTER;
     return CheckHapPermission(INJECT_PERMISSION_CODE);
+}
+
+bool PermissionHelper::CheckKeyEventHook()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (!CheckHapPermission(KEY_EVENT_HOOK_PERMISSION_CODE)) {
+        MMI_HILOGE("CheckHapPermission %{public}s failed", KEY_EVENT_HOOK_PERMISSION_CODE.c_str());
+        AddPermissionUsedRecord(tokenId, KEY_EVENT_HOOK_PERMISSION_CODE, 0, 1);
+        return false;
+    }
+    MMI_HILOGI("CheckHapPermission %{public}s success", KEY_EVENT_HOOK_PERMISSION_CODE.c_str());
+    AddPermissionUsedRecord(tokenId, KEY_EVENT_HOOK_PERMISSION_CODE, 1, 0);
+    return true;
+}
+
+bool PermissionHelper::AddPermissionUsedRecord(Security::AccessToken::AccessTokenID tokenID,
+    const std::string& permissionName, int32_t successCount, int32_t failCount)
+{
+    if (int32_t ret = Security::AccessToken::PrivacyKit::AddPermissionUsedRecord(
+        tokenID, permissionName, successCount, failCount) != RET_OK) {
+        MMI_HILOGW("AddPermissionUsedRecord %{public}s failed, succ:%{public}d, fail:%{public}d",
+            permissionName.c_str(), successCount, failCount);
+        return false;
+    }
+    MMI_HILOGI("AddPermissionUsedRecord %{public}s success, succ:%{public}d, fail:%{public}d",
+        permissionName.c_str(), successCount, failCount);
+    return true;
 }
 
 bool PermissionHelper::CheckHapPermission(const std::string &permissionCode)
