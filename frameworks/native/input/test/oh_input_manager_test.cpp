@@ -17,8 +17,10 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <map>
+#include <utility>
 
 #include "oh_input_manager.h"
+#include "oh_key_code.h"
 #include "input_manager.h"
 #include "pointer_event.h"
 #include "mmi_log.h"
@@ -33,8 +35,9 @@ struct Input_KeyState {
 };
 
 struct Input_KeyEvent {
-    int32_t action;
-    int32_t keyCode;
+    int32_t id { -1 };
+    int32_t action { -1 };
+    int32_t keyCode { -1 };
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -92,6 +95,18 @@ void DummyCallback(const Input_KeyEvent* keyEvent)
 {
     return;
 }
+
+void HookCallback(const Input_KeyEvent* keyEvent)
+{
+    int32_t eventId { -1 };
+    if (OH_Input_GetKeyEventId(keyEvent, &eventId) != INPUT_SUCCESS) {
+        MMI_HILOGW("GetKeyEventId failed");
+        return;
+    }
+    int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
+    MMI_HILOGI("EventId:%{public}d, keyCode:%{private}d", eventId, keyCode);
+}
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -103,6 +118,7 @@ constexpr int32_t UNKNOWN_MULTI_TOUCH_POINT_NUM { -1 };
 constexpr int32_t DEFAULT_GLOBAL_X { -1 };
 constexpr int32_t DEFAULT_GLOBAL_Y { -1 };
 constexpr int32_t REQUEST_INJECTION_TIME_MS { 4000 };
+constexpr int32_t HOOK_WAIT_TIME_MS { 6000 };
 } // namespace
 
 class OHInputManagerTest : public testing::Test {
@@ -3876,6 +3892,169 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddTouchEventMonitor_00
     EXPECT_EQ(firstResult, INPUT_SUCCESS);
     Input_Result secondResult = OH_Input_AddTouchEventMonitor(callback);
     EXPECT_EQ(secondResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventId_001
+ * @tc.desc: Test OH_Input_GetKeyEventId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyEvent keyEvent;
+    int32_t eventId { -1 };
+    EXPECT_EQ(OH_Input_GetKeyEventId(&keyEvent, &eventId), INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_001
+ * @tc.desc: Test OH_Input_AddKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddKeyEventHook(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_002
+ * @tc.desc: Test OH_Input_AddKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    ret = OH_Input_AddKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    ret = OH_Input_RemoveKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_003
+ * @tc.desc: Test OH_Input_AddKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    auto testHook = [](const Input_KeyEvent* keyEvent) {};
+    ret = OH_Input_AddKeyEventHook(testHook);
+    EXPECT_EQ(ret, INPUT_REPEAT_INTERCEPTOR);
+    ret = OH_Input_RemoveKeyEventHook(testHook);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    ret = OH_Input_RemoveKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_004
+ * @tc.desc: Test OH_Input_AddKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::milliseconds(HOOK_WAIT_TIME_MS));
+    ret = OH_Input_RemoveKeyEventHook(HookCallback);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_RemoveKeyEventHook_001
+ * @tc.desc: Test OH_Input_RemoveKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveKeyEventHook_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_RemoveKeyEventHook(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    auto testHook = [](const Input_KeyEvent* keyEvent) {};
+    ret = OH_Input_RemoveKeyEventHook(testHook);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_001
+ * @tc.desc: Test OH_Input_DispatchToNextHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto numberHook = [] (const Input_KeyEvent* keyEvent) {
+        static std::pair<int32_t, int32_t> numberKeyCodeRange { KEYCODE_0, KEYCODE_9 };
+        static std::pair<int32_t, int32_t> numberPadKeyCodeRange { KEYCODE_NUMPAD_0, KEYCODE_NUMPAD_9 };
+        CHKPV(keyEvent);
+        int32_t eventId { -1 };
+        if (OH_Input_GetKeyEventId(keyEvent, &eventId) != INPUT_SUCCESS) {
+            MMI_HILOGW("GetEventId failed");
+            return;
+        }
+        int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
+        int32_t keyAction = OH_Input_GetKeyEventAction(keyEvent);
+        MMI_HILOGI("EventId:%{public}d, keyCode:%{private}d", eventId, keyCode);
+        if ((keyCode >= numberKeyCodeRange.first && keyCode <= numberKeyCodeRange.second) ||
+            (keyCode >= numberPadKeyCodeRange.first && keyCode <= numberPadKeyCodeRange.second)) {
+            MMI_HILOGI("Accept number eventId:%{public}d, keyCode:%{private}d, keyAction:%{public}d",
+                eventId, keyCode, keyAction);
+        } else {
+            int32_t ret = OH_Input_DispatchToNextHandler(eventId);
+            EXPECT_EQ(ret, INPUT_SUCCESS);
+        }
+    };
+    Input_Result ret = OH_Input_AddKeyEventHook(numberHook);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::milliseconds(HOOK_WAIT_TIME_MS));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_002
+ * @tc.desc: Test OH_Input_DispatchToNextHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto alphabetHook = [](const Input_KeyEvent* keyEvent) {
+        static std::pair<int32_t, int32_t> alphabetKeyCodeRange { KEYCODE_A, KEYCODE_Z };
+        CHKPV(keyEvent);
+        int32_t eventId { -1 };
+        if (OH_Input_GetKeyEventId(keyEvent, &eventId) != INPUT_SUCCESS) {
+            MMI_HILOGW("GetEventId failed");
+        }
+        int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
+        int32_t keyAction = OH_Input_GetKeyEventAction(keyEvent);
+        MMI_HILOGI("EventId:%{public}d, keyCode:%{private}d", eventId, keyCode);
+        if (keyCode >= alphabetKeyCodeRange.first && keyCode <= alphabetKeyCodeRange.second) {
+            MMI_HILOGI("Accept alphabet eventId:%{public}d, keyCode:%{private}d, keyAction:%{public}d",
+                eventId, keyCode, keyAction);
+        } else {
+            int32_t ret = OH_Input_DispatchToNextHandler(eventId);
+            EXPECT_EQ(ret, INPUT_SUCCESS);
+        }
+    };
+    Input_Result ret = OH_Input_AddKeyEventHook(alphabetHook);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::milliseconds(HOOK_WAIT_TIME_MS));
 }
 } // namespace MMI
 } // namespace OHOS

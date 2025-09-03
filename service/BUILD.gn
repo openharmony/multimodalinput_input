@@ -136,6 +136,10 @@ config("libmmi_server_config") {
   if (input_feature_joystick) {
     include_dirs += [ "${mmi_service_path}/joystick/include" ]
   }
+
+  if (input_feature_key_hook) {
+    include_dirs += [ "${mmi_service_path}/event_hook/include" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {
@@ -390,6 +394,14 @@ ohos_shared_library("libmmi-server") {
     sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
   }
 
+if (input_feature_key_hook) {
+    sources += [
+      "event_hook/src/key_event_hook_manager.cpp",
+      "event_hook/src/event_loop_closure_checker.cpp",
+      "event_hook/src/event_dispatch_order_checker.cpp"
+    ]
+  }
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -475,6 +487,7 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "access_token:libtokenid_sdk",
+    "access_token:libprivacy_sdk",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "faultloggerd:libbacktrace_local",
