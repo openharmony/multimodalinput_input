@@ -2904,19 +2904,20 @@ ohos_unittest("EventHandlerEXTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "event_handler/test/event_normalize_handler_ex_test.cpp" ]
+  sources = [
+    "event_handler/src/event_normalize_handler.cpp",
+    "event_handler/test/event_normalize_handler_ex_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -2928,8 +2929,12 @@ ohos_unittest("EventHandlerEXTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
 }
 
 ohos_unittest("EventDispatchTest") {

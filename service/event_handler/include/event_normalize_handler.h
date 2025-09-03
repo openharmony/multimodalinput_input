@@ -55,6 +55,7 @@ private:
     bool HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_WATCH
     int32_t HandleTouchPadEvent(libinput_event* event);
+    int32_t HandleTouchPadAction(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
 #endif // OHOS_BUILD_ENABLE_WATCH

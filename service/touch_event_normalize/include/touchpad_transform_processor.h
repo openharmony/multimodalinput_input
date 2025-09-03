@@ -132,6 +132,8 @@ private:
     int32_t OnEventTouchPadDown(struct libinput_event *event);
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
+    int32_t OnEventTouchPadAction(struct libinput_event *event);
+    void SetActionPointerItem(int64_t time);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
     int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
     void SmoothMultifingerSwipeData(std::vector<Coords>& fingerCoords, const int32_t fingerCount);

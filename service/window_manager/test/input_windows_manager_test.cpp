@@ -2026,6 +2026,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchPadTarget_0
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     result = WIN_MGR->UpdateTouchPadTarget(pointerEvent);
     EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    result = WIN_MGR->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
     pointerEvent->SetPointerAction(9999);
     result = WIN_MGR->UpdateTouchPadTarget(pointerEvent);
     EXPECT_EQ(result, RET_ERR);

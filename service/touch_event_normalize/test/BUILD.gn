@@ -677,6 +677,7 @@ ohos_unittest("TouchpadGestureTest") {
 
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/custom_config_parser/src/product_name_definition_parser.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
     "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
     "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
@@ -728,6 +729,7 @@ ohos_unittest("TouchpadGestureTest") {
   deps = [
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -1179,12 +1181,57 @@ ohos_unittest("TouchGestureManagerTestWithMock") {
   }
 }
 
+ohos_unittest("TouchpadTransformProcessorEXTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "src/touchpad_transform_processor_ex_test.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+  ]
+}
+
 group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
     ":InputDeviceConsumerHandlerTest",
     ":TouchEventNormalizeTest",
+    ":TouchpadTransformProcessorEXTest",
     ":TransformPointTest",
     ":TouchGestureManagerTestWithMock",
   ]
