@@ -100,7 +100,7 @@ struct IInputPlugin {
         std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual PluginResult HandleEvent(
         std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
-    virtual sptr<IRemoteObject> GetPluginRemoteStub() { return nullptr;}
+    virtual sptr<IRemoteObject> GetExternalObject() { return nullptr;}
 };
 
 struct IPluginContext {

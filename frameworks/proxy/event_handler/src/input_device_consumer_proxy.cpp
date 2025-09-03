@@ -14,11 +14,11 @@
  */
 
 #include <message_parcel.h>
+#include "input_device_consumer_proxy.h"
 #include "parcel.h"
 #include "string_ex.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_device_consumer_proxy.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputDeviceConsumerProxy"

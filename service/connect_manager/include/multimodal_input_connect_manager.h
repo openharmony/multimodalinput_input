@@ -193,7 +193,7 @@ public:
     int32_t SwitchScreenCapturePermission(uint32_t permissionType, bool enable);
     int32_t ClearMouseHideFlag(int32_t eventId);
     int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
-    int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
 private:
     MultimodalInputConnectManager() = default;

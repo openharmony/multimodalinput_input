@@ -1214,12 +1214,12 @@ int32_t MultimodalInputConnectManager::QueryPointerRecord(
     return multimodalInputConnectService_->QueryPointerRecord(count, pointerList);
 }
 
-int32_t MultimodalInputConnectManager::GetPluginRemoteStub(
+int32_t MultimodalInputConnectManager::GetExternalObject(
     const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetPluginRemoteStub(pluginName, pluginRemoteStub);
+    return multimodalInputConnectService_->GetExternalObject(pluginName, pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS

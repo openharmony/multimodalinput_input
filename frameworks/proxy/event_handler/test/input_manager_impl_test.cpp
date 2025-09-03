@@ -18,12 +18,13 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_scene_board_judgement.h"
 #include "input_manager_impl.h"
+#include "input_scene_board_judgement.h"
+#include "iremote_object.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "net_packet.h"
-#include "iremote_object.h"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"
@@ -2243,17 +2244,17 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackWindowGroupInfo_002,
 }
 
 /**
- * @tc.name: InputManagerImplTest_GetPluginRemoteStub_001
- * @tc.desc: Test GetPluginRemoteStub
+ * @tc.name: InputManagerImplTest_GetExternalObject_001
+ * @tc.desc: Test GetExternalObject
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPluginRemoteStub_001, TestSize.Level1)
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetExternalObject_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
     sptr<IRemoteObject> inputDevicePluginStub = nullptr;
-    auto ret = InputMgrImpl.GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    auto ret = InputMgrImpl.GetExternalObject(pluginName, inputDevicePluginStub);
     ASSERT_NE(ret, RET_OK);
 }
 } // namespace MMI

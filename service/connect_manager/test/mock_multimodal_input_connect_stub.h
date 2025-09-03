@@ -203,7 +203,7 @@ public:
     MOCK_METHOD(int32_t, SubscribeInputActive, (int32_t subscribeId, int64_t interval), (override));
     MOCK_METHOD(int32_t, UnsubscribeInputActive, (int32_t subscribeId), (override));
     MOCK_METHOD(bool, IsRunning, (), (const override));
-    MOCK_METHOD(int32_t, GetPluginRemoteStub,
+    MOCK_METHOD(int32_t, GetExternalObject,
         (const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub), (override));
     MOCK_METHOD(int32_t, SetMouseAccelerateMotionSwitch, (int32_t deviceId, bool enable), (override));
     MOCK_METHOD(int32_t, SwitchScreenCapturePermission, (uint32_t permissionType, bool enable), (override));

@@ -425,12 +425,12 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPoi
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_GetPluginRemoteStub
- * @tc.desc: Test the function GetPluginRemoteStub
+ * @tc.name: MultimodalInputConnectProxyTest_GetExternalObject
+ * @tc.desc: Test the function GetExternalObject
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPluginRemoteStub, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetExternalObject, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
@@ -438,7 +438,7 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPlu
     MultimodalInputConnectProxy proxy(remote);
     std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
     sptr<IRemoteObject> inputDevicePluginStub = nullptr;
-    auto ret = proxy.GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    auto ret = proxy.GetExternalObject(pluginName, inputDevicePluginStub);
     EXPECT_NE(ret, RET_OK);
 }
 

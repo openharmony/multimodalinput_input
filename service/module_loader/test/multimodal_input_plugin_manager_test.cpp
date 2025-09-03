@@ -17,14 +17,14 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "net_packet.h"
-#include "libinput_mock.h"
+#include "multimodal_input_plugin_manager.h"
 #include "general_mouse.h"
 #include "general_touchpad.h"
-#include "libinput_interface.h"
-#include "libinput_wrapper.h"
 #include "input_event_handler.h"
-#include "multimodal_input_plugin_manager.h"
+#include "libinput_interface.h"
+#include "libinput_mock.h"
+#include "libinput_wrapper.h"
+#include "net_packet.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputPluginManagerTest"
@@ -82,7 +82,7 @@ public:
     MOCK_METHOD(void, DeviceDidAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
     MOCK_METHOD(void, DeviceWillRemoved, (std::shared_ptr<InputDevice> inputDevice), (override));
     MOCK_METHOD(void, DeviceDidRemoved, (std::shared_ptr<InputDevice> inputDevice), (override));
-    MOCK_METHOD(sptr<IRemoteObject>, GetPluginRemoteStub, (), (override));
+    MOCK_METHOD(sptr<IRemoteObject>, GetExternalObject, (), (override));
     MOCK_METHOD(
         PluginResult, HandleEvent, (libinput_event * event, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(PluginResult, HandleEvent,
@@ -183,26 +183,26 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_001
- * @tc.desc: Test_GetPluginRemoteStub_001
- * @tc.require: test GetPluginRemoteStub
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_001
+ * @tc.desc: Test_GetExternalObject_001
+ * @tc.require: test GetExternalObject
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_001,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_001,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string pluginName = "yunshuiqiao";
     sptr<IRemoteObject> inputDevicePluginStub = nullptr;
-    int32_t result = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    int32_t result = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
     EXPECT_EQ(result, ERROR_NULL_POINTER);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_002
- * @tc.desc: Test_GetPluginRemoteStub_002
- * @tc.require: test GetPluginRemoteStub
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_002
+ * @tc.desc: Test_GetExternalObject_002
+ * @tc.require: test GetExternalObject
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_002,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_002,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -213,23 +213,23 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
 
     EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
-    EXPECT_CALL(*mockInputPlugin, GetPluginRemoteStub()).WillOnce(Return(remote));
+    EXPECT_CALL(*mockInputPlugin, GetExternalObject()).WillOnce(Return(remote));
     EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
     std::list<std::shared_ptr<IPluginContext>> pluginLists;
     pluginLists.push_back(mockInputPluginContext);
     InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
 
-    int32_t ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    int32_t ret = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
     EXPECT_EQ(ret, RET_OK);
     InputPluginManager::GetInstance()->plugins_.clear();
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_003
- * @tc.desc: Test_GetPluginRemoteStub_003
- * @tc.require: test GetPluginRemoteStub
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_003
+ * @tc.desc: Test_GetExternalObject_003
+ * @tc.require: test GetExternalObject
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetPluginRemoteStub_003,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_003,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -240,13 +240,13 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
 
     EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
-    EXPECT_CALL(*mockInputPlugin, GetPluginRemoteStub()).WillOnce(Return(nullptr));
+    EXPECT_CALL(*mockInputPlugin, GetExternalObject()).WillOnce(Return(nullptr));
     EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
     std::list<std::shared_ptr<IPluginContext>> pluginLists;
     pluginLists.push_back(mockInputPluginContext);
     InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
 
-    int32_t ret = InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, inputDevicePluginStub);
+    int32_t ret = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
     InputPluginManager::GetInstance()->plugins_.clear();
 }
