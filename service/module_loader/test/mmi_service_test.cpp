@@ -4864,18 +4864,18 @@ HWTEST_F(MMIServerTest, MMIService_QueryPointerRecord_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: MMIService_GetPluginRemoteStub_001
+ * @tc.name: MMIService_GetExternalObject_001
  * @tc.desc: No remote object, should return ERROR_NO_POINTER
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MMIServerTest, MMIService_GetPluginRemoteStub_001, TestSize.Level1)
+HWTEST_F(MMIServerTest, MMIService_GetExternalObject_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     MMIService mmiService;
     std::string pluginName = "yunshuiqiao";
     sptr<IRemoteObject> remoteObj = nullptr;
-    ErrCode ret = mmiService.GetPluginRemoteStub(pluginName, remoteObj);
+    ErrCode ret = mmiService.GetExternalObject(pluginName, remoteObj);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
 }
 } // namespace MMI

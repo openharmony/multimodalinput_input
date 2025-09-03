@@ -13,15 +13,11 @@
  * limitations under the License.
  */
 
-#include <memory>
 #include <iostream>
-#include "i_input_event_handler.h"
-#include "event_filter_handler.h"
-#include "event_interceptor_handler.h"
-#include "key_command_handler.h"
-#include "event_monitor_handler.h"
-#include "mmi_log.h"
+#include <memory>
 #include "multimodal_input_plugin_manager.h"
+#include "i_input_event_handler.h"
+#include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -298,7 +294,7 @@ bool InputPluginManager::IntermediateEndEvent(PluginEventType pluginEvent)
     return false;
 }
 
-int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+int32_t InputPluginManager::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
 {
     MMI_HILOGD("Get stub from plugin: %{public}s start", pluginName.c_str());
     std::list<std::shared_ptr<IPluginContext>> allPluginList;
@@ -315,7 +311,7 @@ int32_t InputPluginManager::GetPluginRemoteStub(const std::string &pluginName, s
         return ERROR_NULL_POINTER;
     }
 
-    pluginRemoteStub = (*pluginIt)->GetPlugin()->GetPluginRemoteStub();
+    pluginRemoteStub = (*pluginIt)->GetPlugin()->GetExternalObject();
     if (!pluginRemoteStub) {
         MMI_HILOGE("Plugin named: %{public}s is not initialized", pluginName.c_str());
         return ERROR_NULL_POINTER;
@@ -382,22 +378,26 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
     switch (stage) {
         case InputDispatchStage::Filter: {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-            eventHandler = std::make_shared<EventFilterHandler>();
+            eventHandler = InputHandler->GetFilterHandler();
+            break;
 #endif
         }
         case InputDispatchStage::Intercept: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            eventHandler = std::make_shared<EventInterceptorHandler>();
+            eventHandler = InputHandler->GetInterceptorHandler();
+            break;
 #endif
         }
         case InputDispatchStage::KeyCommand: {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-            eventHandler = std::make_shared<KeyCommandHandler>();
+            eventHandler = InputHandler->GetKeyCommandHandler();
+            break;
 #endif
         }
         case InputDispatchStage::Monitor: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            eventHandler = std::make_shared<EventMonitorHandler>();
+            eventHandler = InputHandler->GetMonitorHandler();
+            break;
 #endif
         }
         default: {

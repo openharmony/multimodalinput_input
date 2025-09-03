@@ -5313,10 +5313,10 @@ ErrCode MMIService::QueryPointerRecord(int32_t count, std::vector<std::shared_pt
     return RET_OK;
 }
 
-ErrCode MMIService::GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+ErrCode MMIService::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
 {
     CALL_INFO_TRACE;
-    return InputPluginManager::GetInstance()->GetPluginRemoteStub(pluginName, pluginRemoteStub);
+    return InputPluginManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS

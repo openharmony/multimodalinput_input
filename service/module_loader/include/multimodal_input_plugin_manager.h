@@ -93,7 +93,7 @@ public:
         PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data);
     int32_t HandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data);
     int32_t DoHandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data, IPluginContext *iplugin);
-    int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
     UDSServer *GetUdsServer();
 
 private:

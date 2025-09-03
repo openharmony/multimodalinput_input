@@ -2934,9 +2934,9 @@ int32_t InputManagerImpl::QueryPointerRecord(int32_t count, std::vector<std::sha
     return MULTIMODAL_INPUT_CONNECT_MGR->QueryPointerRecord(count, pointerList);
 }
 
-int32_t InputManagerImpl::GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+int32_t InputManagerImpl::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
 {
-    return MULTIMODAL_INPUT_CONNECT_MGR->GetPluginRemoteStub(pluginName, pluginRemoteStub);
+    return MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS

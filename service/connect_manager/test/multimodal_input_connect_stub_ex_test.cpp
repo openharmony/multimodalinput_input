@@ -393,7 +393,7 @@ public:
 
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override { return RET_OK; }
 
-    int32_t GetPluginRemoteStub(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub) override
+    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub) override
     {
         return RET_OK;
     }
