@@ -17,6 +17,7 @@
 #include <memory>
 #include "multimodal_input_plugin_manager.h"
 #include "i_input_event_handler.h"
+#include "input_event_handler.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
