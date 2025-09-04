@@ -458,10 +458,6 @@ int32_t LongPressSubscriberHandler::GetBundleName(std::string &bundleName, int32
     CALL_DEBUG_ENTER;
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     CHKPR(appMgrClient, ERROR_NULL_POINTER);
-    int32_t userid = WIN_MGR->GetCurrentUserId();
-    if (userid < 0) {
-        userid = DEFAULT_USER_ID;
-    }
     auto udsServer = InputHandler->GetUDSServer();
     CHKPR(udsServer, RET_ERR);
     auto sess = udsServer->GetSessionByPid(windowPid);

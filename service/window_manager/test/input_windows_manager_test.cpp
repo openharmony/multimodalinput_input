@@ -6591,12 +6591,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel,
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
- * @tc.name: InputWindowsManagerTest_GetPidByWindowId
- * @tc.desc: Test GetPidByWindowId
+ * @tc.name: InputWindowsManagerTest_GetPidByDisplayIdAndWindowId
+ * @tc.desc: Test GetPidByDisplayIdAndWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByWindowId, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByDisplayIdAndWindowId, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
@@ -6607,10 +6607,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByWindowId, Test
     auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(winInfo);
+        it->second.mainDisplayId = 0;
     }
-    EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), winInfo.pid);
+    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, id), winInfo.pid);
     id = 300;
-    EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), RET_ERR);
+    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, id), RET_ERR);
 }
 
 /**
