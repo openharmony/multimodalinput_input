@@ -36,9 +36,10 @@ const std::string CHANGED_TYPE = "change";
 std::shared_ptr<TaiheEvent> TaiheEvent::GetInstance()
 {
     static std::shared_ptr<TaiheEvent> instance = nullptr;
-    if (!instance) {
+    static std::once_flag flag;
+    std::call_once(flag, [] {
         instance = std::make_shared<TaiheEvent>();
-    }
+    });
     return instance;
 }
 
