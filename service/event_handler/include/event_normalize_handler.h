@@ -20,6 +20,7 @@
 #include "joystick_event_normalize.h"
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 #include "key_event_normalize.h"
+#include "plugin_stage.h"
 
 namespace OHOS {
 namespace MMI {
