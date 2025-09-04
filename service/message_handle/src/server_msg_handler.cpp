@@ -1124,7 +1124,7 @@ void ServerMsgHandler::ChangeToOld(size_t num, const std::vector<DisplayInfo>& d
 
 void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
 {
-    MMI_HILOGD("userScreenInfo-----------");
+    MMI_HILOGD("userScreenInfo:%{private}d", userScreenInfo.userId);
     size_t num = 0;
     for (const auto &item : userScreenInfo.screens) {
         MMI_HILOGD("screen%{public}zu, id:%{public}d, screenType:%{public}d, width:%{public}d, "
@@ -1161,6 +1161,10 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 MMI_HILOGD("%{public}f,", transform);
             }
             numDisplayInfo++;
+        }
+        for (const auto &itemWindow : item.windowsInfo) {
+            MMI_HILOGD("windows,id:%{public}d,pid:%{public}d,displayId:%{public}d,groupId:%{public}d",
+                itemWindow.id, itemWindow.pid, itemWindow.displayId, itemWindow.groupId);
         }
         num++;
     }

@@ -172,6 +172,7 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const UserScreenInfo &userScreenInfo
             windowGroupInfo_.windowsInfo.clear();
         }
     }
+    PrintDisplayInfo(userScreenInfo);
     int32_t ret = SendDisplayInfo(userScreenInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send user screen info, ret:%{public}d", ret);
