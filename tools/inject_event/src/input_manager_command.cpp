@@ -707,7 +707,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
-                            item.SetPressed(false);
+                            item.SetPressed(true);
                             item.SetPointerId(0);
                             pointerEvent->SetButtonPressed(0);
                             pointerEvent->AddPointerItem(item);
@@ -742,7 +742,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             simulateMouseEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
-                            item.SetPressed(true);
+                            item.SetPressed(false);
                             item.SetDisplayY(py2);
                             item.SetDisplayX(px2);
                             pointerEvent->UpdatePointerItem(0, item);
@@ -1533,6 +1533,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px1);
                             item.SetRawDisplayY(py1);
                             item.SetRawDisplayX(px1);
+                            item.SetPressed(true);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1566,6 +1567,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
                                 currentTimeMs = GetSysClockTime() / conversionRate;
                             }
+                            item.SetPressed(false);
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
                             item.SetRawDisplayX(px2);
