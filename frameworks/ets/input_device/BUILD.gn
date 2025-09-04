@@ -15,20 +15,22 @@ import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 copy_taihe_idl("input_device_taihe") {
   sources = [ "idl/ohos.multimodalInput.inputDevice.taihe" ]
+  deps = [ "${mmi_path}/frameworks/ets/key_code:key_code_taihe" ]
 }
 config("inputDevice_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "./include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/moudle_loader/include",
+    "${mmi_path}/frameworks/ets/common/include",
   ]
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path_inputDevice = "$taihe_file_path/out/$subsystem_name/$part_name/inputDevice"
+taihe_generated_file_path_inputDevice =
+    "$taihe_file_path/out/$subsystem_name/$part_name/inputDevice"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_inputDevice}"
   deps = [ ":input_device_taihe" ]
@@ -47,8 +49,11 @@ taihe_shared_library("InputDevice") {
     ":inputDevice_config",
   ]
   sources += [
+    "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
     "src/ani_constructor.cpp",
     "src/ohos.multimodalInput.inputDevice.impl.cpp",
+    "src/taihe_event.cpp",
+    "src/taihe_input_device_utils.cpp",
   ]
   deps = [
     ":run_taihe",
@@ -83,9 +88,10 @@ ohos_prebuilt_etc("input_device_etc") {
   subsystem_name = "$subsystem_name"
   deps = [ ":input_device" ]
 }
+
 group("ets_inputDevice_package") {
   deps = [
-    ":input_device_etc",
     ":InputDevice",
+    ":input_device_etc",
   ]
 }
