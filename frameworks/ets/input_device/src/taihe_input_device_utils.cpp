@@ -95,7 +95,7 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr
     std::vector<TaiheSType> vecSourceTypes;
     std::string sourceType = "";
     uint32_t types = static_cast<uint32_t>(device->GetType());
-    for (auto item : g_taiheDeviceType) {
+    for (const auto item : g_taiheDeviceType) {
         if (types &item.typeBit) {
             sourceType = item.sourceTypeName;
             vecSourceTypes.push_back(ConverterSourceType(ConverterSType(sourceType)));
@@ -104,11 +104,14 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr
     result.sources = taihe::array<TaiheSType>(vecSourceTypes);
     std::string axisType = "";
     std::vector<TaiheAxisRange> vecAxisRanges;
-    auto aixsArray = device->GetAxisInfo();
-    for (auto item : aixsArray) {
+    auto axisArray = device->GetAxisInfo();
+    for (auto item : axisArray) {
         auto iter = g_taiheAxisType.find(item.GetAxisType());
         if (iter != g_taiheAxisType.end()) {
             axisType = iter->second;
+        } else {
+            MMI_HILOGD("Find axisType failed");
+            continue;
         }
         TaiheAxisRange axisRange = ConverterAxisRange(item, sourceType, axisType);
         vecAxisRanges.push_back(axisRange);
