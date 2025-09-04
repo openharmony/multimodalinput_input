@@ -56,8 +56,6 @@ void TouchPadTransformProcessorTestEx::TearDown()
 {
 }
 
-
-
 /**
  * @tc.name: TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_001
  * @tc.desc: Test SmoothMultifingerSwipeData
@@ -93,7 +91,7 @@ HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_GetT
     vector<Coords> fingerCoords = {{1, 1}, {2, 2}, {3, 3}};
     vector<Coords> fingerCoordsZero = {{1, 1}, {0, 0}, {3, 3}};
     int32_t fingerCount = 3;
-    for(int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         processor.SmoothMultifingerSwipeData(fingerCoords, fingerCount);
     }
     EXPECT_EQ(processor.swipeHistory_[0].size, 3);
