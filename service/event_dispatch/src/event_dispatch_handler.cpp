@@ -23,6 +23,9 @@
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+#include "key_event_hook_manager.h"
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "pointer_device_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -43,6 +46,12 @@ constexpr int32_t THREE_FINGERS { 3 };
 void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    if (KEY_EVENT_HOOK_MGR.IsHooksExisted() && KEY_EVENT_HOOK_MGR.OnKeyEvent(keyEvent)) {
+        MMI_HILOGD("Keyevent is hooked");
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
     if (system::GetBoolParameter("const.multimodalinput.esc_to_back_support", false)) {

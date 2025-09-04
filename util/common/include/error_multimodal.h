@@ -29,6 +29,8 @@ inline constexpr int32_t ERROR_NOT_SYSAPI { 202 };
 inline constexpr int32_t ERROR_DEVICE_NOT_EXIST { 3900001 };
 inline constexpr int32_t ERROR_OPERATION_FREQUENT { -1001 };
 inline constexpr int32_t ERROR_DEVICE_NOT_SUPPORTED { -1002 };
+inline constexpr int32_t ERROR_REPEAT_INTERCEPTOR { -1003 };
+inline constexpr int32_t ERROR_INVALID_PARAMETER { -1004 };
 inline constexpr int32_t ERROR_APP_NOT_FOCUSED { 3900009 };
 inline constexpr int32_t ERROR_DEVICE_NO_POINTER { 3900010 };
 
