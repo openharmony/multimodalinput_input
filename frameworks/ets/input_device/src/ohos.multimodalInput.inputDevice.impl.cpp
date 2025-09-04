@@ -74,15 +74,18 @@ const std::string CHANGED_TYPE = "change";
         _device = device;
     };
     int32_t ret = InputManager_t::GetInstance()->GetDevice(deviceId, callback);
-    if (ret != OTHER_ERROR && ret != RET_OK) {
+    if (ret != RET_OK) {
+        TaiheInputDeviceData result {};
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
+            taihe::set_business_error(OTHER_ERROR, "Unknown error");
+            return result;
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get device info, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         std::shared_ptr<InputDevice> errDevice = nullptr;
-        return TaiheInputDeviceUtils::ConverterInputDevice(errDevice);
+        return result;
     }
     return TaiheInputDeviceUtils::ConverterInputDevice(_device);
 }

@@ -175,6 +175,7 @@ group("input_ets_group") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/ets/common/test:AniCommonTest",
     "frameworks/native/input:OHInputManagerEXTest",
     "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputDeviceImplTest",

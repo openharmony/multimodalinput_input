@@ -18,16 +18,6 @@
 
 #include <map>
 #include <string>
-#include <variant>
-
-#include "securec.h"
-
-#include "taihe/runtime.hpp"
-#include "taihe/callback.hpp"
-
-#include "key_event.h"
-#include "pointer_style.h"
-#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
