@@ -134,7 +134,6 @@ group("input_jsapi_group") {
     }
     if (input_feature_input_device) {
       deps += [
-        "frameworks/ani/input_device:ani_input_device_package",
         "frameworks/napi/input_device:inputdevice",
       ]
     }
@@ -176,6 +175,7 @@ group("input_ets_group") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/ets/common/test:AniCommonTest",
     "frameworks/native/input:OHInputManagerEXTest",
     "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputDeviceImplTest",
