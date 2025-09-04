@@ -769,15 +769,18 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         return RET_ERR;
     }
     if (!item.IsCanceled()) {
-        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            nextHandler_->HandlePointerEvent(pointerEvent);
-        } else {
-            std::shared_ptr<IPluginData> pData = std::make_shared<IPluginData>();
-            pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
-            int32_t result = InputPluginManager::GetInstance()->HandleEvent(pointerEvent, pData);
-            if (result == RET_NOTDO) {
-                nextHandler_->HandlePointerEvent(pointerEvent);
-            }
+        auto callback = [this](PluginEventType pluginEvent, int64_t frameTime) {
+            auto event = std::get_if<std::shared_ptr<PointerEvent>>(&pluginEvent);
+            if (!event) return;
+            this->nextHandler_->HandlePointerEvent(*event);
+        }
+        std::shared_ptr<IPluginData> pData = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(event);
+        pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
+        auto manager = InputPluginManager::GetInstance();
+        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_AFTER_NORMALIZED);
+        int32_t result = manager->HandleEvent(pointerEvent, pData);
+        if (result == RET_NOTDO) {
+            callback(pointerEvent, GetSysClockTime());
         }
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
