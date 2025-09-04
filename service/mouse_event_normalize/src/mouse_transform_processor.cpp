@@ -113,14 +113,19 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
 static Coordinate2D CalculateCursorPosFromOffset(Offset offset, const OLD::DisplayInfo &displayInfo)
 {
     auto direction = displayInfo.displayDirection;
-    auto width = displayInfo.width;
-    auto height = displayInfo.height;
+    auto width = displayInfo.validWidth;
+    auto height = displayInfo.validHeight;
     constexpr int evenNum = 2;
     if ((displayInfo.displayDirection - displayInfo.direction) % evenNum != 0) {
         std::swap(width, height);
     }
-    offset.dx -= displayInfo.offsetX;
-    offset.dy -= displayInfo.offsetY;
+    auto offsetX = displayInfo.offsetX;
+    auto offsetY = displayInfo.offsetY;
+    if (displayInfo.fixedDirection % evenNum != 0) {
+        std::swap(offsetX, offsetY);
+    }
+    offset.dx -= offsetX;
+    offset.dy -= offsetY;
     if (direction == DIRECTION90) {
         std::swap(offset.dx, offset.dy);
         offset.dx = width - offset.dx;
