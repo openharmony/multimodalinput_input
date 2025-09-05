@@ -735,14 +735,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_UI_EXTENSION_SIZE) {
-        MMI_HILOGE("Invalid num:%{public}u", num);
-        return RET_ERR;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_UI_EXTENSION_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo extensionInfo;
         pkt >> extensionInfo.id >> extensionInfo.pid >> extensionInfo.uid >> extensionInfo.area
@@ -752,11 +746,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
             >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowNameType;
+        CHKRWER(pkt, RET_ERR);
         info.uiExtentionWindowInfo.push_back(extensionInfo);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read extention window info failed");
-            return RET_ERR;
-        }
     }
     return RET_OK;
 }
@@ -799,19 +790,14 @@ int32_t ServerMsgHandler::ReadScreensInfo(NetPacket &pkt, UserScreenInfo &userSc
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_SCREEN_SIZE) {
-        MMI_HILOGE("Too many screens, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_SCREEN_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         ScreenInfo info;
         pkt >> info.id >> info.uniqueId >> info.screenType >> info.width >> info.height >> info.physicalWidth
             >> info.physicalHeight >> info.tpDirection >> info.dpi >> info.ppi >> info.rotation;
+        CHKRWER(pkt, RET_ERR);
         userScreenInfo.screens.push_back(info);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Read screens info error");
-        return RET_ERR;
     }
     return RET_OK;
 }
@@ -820,14 +806,13 @@ int32_t ServerMsgHandler::ReadDisplayGroupsInfo(NetPacket &pkt, UserScreenInfo &
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_DISPLAY_GROUP_SIZE) {
-        MMI_HILOGE("Too many display groups, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_DISPLAY_GROUP_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         DisplayGroupInfo info;
         OLD::DisplayGroupInfo oldInfo;
         pkt >> info.id >> info.name >> info.type >> info.mainDisplayId >> info.focusWindowId;
+        CHKRWER(pkt, RET_ERR);
         if (ReadDisplaysInfo(pkt, info) != RET_OK) {
             return RET_ERR;
         }
@@ -844,10 +829,8 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_DISPLAY_SIZE) {
-        MMI_HILOGE("Too many displays, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_DISPLAY_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
@@ -856,11 +839,8 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
             >> info.displaySourceMode >> info.oneHandX >> info.oneHandY >> info.screenArea >> info.rsId
             >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight
             >> info.deviceRotation >> info.rotationCorrection;
+        CHKRWER(pkt, RET_ERR);
         displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
     }
     return RET_OK;
 }
@@ -879,14 +859,8 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_WINDOW_GROUP_INFO_SIZE) {
-        MMI_HILOGE("Invalid windowGroup info size:%{public}u", num);
-        return RET_ERR;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read window group info failed");
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_WINDOW_GROUP_INFO_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
@@ -894,13 +868,11 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
             >> info.windowNameType;
+        CHKRWER(pkt, RET_ERR);
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
+        CHKRWER(pkt, RET_ERR);
         windowGroupInfo.windowsInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
     }
     WIN_MGR->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
@@ -933,18 +905,12 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     }
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_ENHANCE_CONFIG_SIZE) {
-        MMI_HILOGE("Invalid enhance data size:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_ENHANCE_CONFIG_SIZE, RET_ERR);
     uint8_t cfg[num];
     for (uint32_t i = 0; i < num; i++) {
         pkt >> cfg[i];
-    }
-
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read scinfo config failed");
-        return RET_ERR;
+        CHKRWER(pkt, RET_ERR);
     }
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::SetEnhanceCfg(cfg, num);
     if (result != 0) {
@@ -1044,10 +1010,8 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_WINDOWS_SIZE) {
-        MMI_HILOGE("Too many windows, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_WINDOWS_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
             WindowInfo info;
             int32_t byteCount = 0;
@@ -1056,15 +1020,12 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
                 >> info.windowInputType >> info.privacyMode >> info.windowType
                 >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
-
+            CHKRWER(pkt, RET_ERR);
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
+            CHKRWER(pkt, RET_ERR);
             displayGroupInfo.windowsInfo.push_back(info);
             oldDisplayGroupInfo.windowsInfo.push_back(info);
-            if (pkt.ChkRWError()) {
-                MMI_HILOGE("read window info failed");
-                return RET_ERR;
-            }
         }
     return RET_OK;
 }

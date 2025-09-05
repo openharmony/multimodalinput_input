@@ -37,6 +37,7 @@ declare_args() {
   input_feature_pointer_drawing = true
   input_feature_interceptor = true
   input_feature_monitor = true
+  input_feature_key_hook = true
   input_feature_keyboard = false
   input_feature_switch = true
   input_feature_mouse = true
@@ -342,6 +343,10 @@ if (input_feature_switch) {
 
 if (input_feature_monitor) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+}
+
+if (input_feature_key_hook) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_KEY_HOOK" ]
 }
 
 if (input_feature_touchscreen) {

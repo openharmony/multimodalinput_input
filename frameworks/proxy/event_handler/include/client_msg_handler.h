@@ -38,6 +38,9 @@ protected:
     int32_t OnKeyEvent(const UDSClient &client, NetPacket &pkt);
     int32_t OnKeyMonitor(const UDSClient &client, NetPacket &pkt);
     int32_t OnPreKeyEvent(const UDSClient &client, NetPacket &pkt);
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    int32_t OnHookKeyEvent(const UDSClient &client, NetPacket &pkt);
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnPointerEvent(const UDSClient &client, NetPacket &pkt);

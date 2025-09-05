@@ -167,12 +167,12 @@ void KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
 {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     CHKPV(device);
-    if (INPUT_DEV_MGR->IsKeyboardDevice(device) && libinput_has_event_led_type(device)) {
+    if (INPUT_DEV_MGR->IsKeyboardDevice(device) &&
+        INPUT_DEV_MGR->IsVirtualKeyboardDeviceEverConnected() && libinput_has_event_led_type(device)) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
         CHKPV(keyEvent_);
-        // plugin a physical kbd with led when a virtual kbd is already on.
         const std::vector<int32_t> funcKeys = {
             KeyEvent::NUM_LOCK_FUNCTION_KEY,
             KeyEvent::CAPS_LOCK_FUNCTION_KEY,
