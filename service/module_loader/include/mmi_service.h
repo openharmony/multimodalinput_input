@@ -314,7 +314,11 @@ protected:
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess);
     ErrCode GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub) override;
+    ErrCode AddKeyEventHook(int32_t &hookId) override;
+    ErrCode RemoveKeyEventHook(int32_t hookId) override;
+    ErrCode DispatchToNextHandler(int32_t eventId) override;
     ErrCode InitCustomConfig();
+
 private:
     MMIService();
     ~MMIService();

@@ -79,6 +79,7 @@ ohos_shared_library("oh_input_manager") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "access_token:libprivacy_sdk",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -138,6 +139,7 @@ ohos_unittest("OHInputManagerTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "access_token:libprivacy_sdk",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -188,6 +190,7 @@ ohos_unittest("OHInputManagerEXTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "access_token:libprivacy_sdk",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",

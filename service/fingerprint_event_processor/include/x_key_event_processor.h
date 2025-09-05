@@ -36,7 +36,7 @@ public:
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
     int32_t HandleQuickAccessMenu(int32_t xKeyEventType);
-    // 重置计数器
+    // reset count
     void ResetCount();
     void StartXKeyIfNeeded(int32_t xKeyEventType);
     bool IsRemoveDelaySingleClick();
@@ -44,9 +44,9 @@ private:
     void StartSingleClickTimer();
     void RemoveTimer();
 
-    int32_t singleClickTimerId_ { -1 };
-    int32_t longPressTimerId_ { -1 };
-    // 按压次数
+    std::atomic<int32_t> singleClickTimerId_ { -1 };
+    std::atomic<int32_t> longPressTimerId_ { -1 };
+    // press times
     std::atomic<int32_t> pressCount_ { 0 };
 
     const std::string X_KEY_SOURCE_KEY { "fkey" };

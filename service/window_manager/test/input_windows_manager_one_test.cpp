@@ -2897,18 +2897,19 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTargetTouc
     WindowInfo winInfo;
     int32_t pointerId = 1;
     PointerEvent::PointerItem pointerItem;
-    inputWindowsManager->targetTouchWinIds_[1] = {10, 20, 30};
-    inputWindowsManager->targetTouchWinIds_[2] = {10, 20, 30};
+
+    inputWindowsManager->targetTouchWinIds_[1][1] = {10, 20, 30};
+    inputWindowsManager->targetTouchWinIds_[1][2] = {10, 20, 30};
     pointerItem.SetDisplayXPos(0.0);
     pointerItem.SetDisplayYPos(0.0);
     winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
-    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1);
+    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
     winInfo.windowInputType = WindowInputType::TRANSMIT_EXCEPT_MOVE;
-    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1);
-    EXPECT_TRUE(!inputWindowsManager->targetTouchWinIds_[pointerId].empty());
-    inputWindowsManager->targetTouchWinIds_.clear();
-    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1);
-    EXPECT_TRUE(inputWindowsManager->targetTouchWinIds_[pointerId].empty());
+    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
+    EXPECT_TRUE(!inputWindowsManager->targetTouchWinIds_[1][pointerId].empty());
+    inputWindowsManager->targetTouchWinIds_[1].clear();
+    inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
+    EXPECT_TRUE(inputWindowsManager->targetTouchWinIds_[1][pointerId].empty());
 }
 
 /* *
@@ -2994,6 +2995,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchEnterLeaveE
 }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerOneTest_AdjustDisplayRotation_001
  * @tc.desc: Test the funcation AdjustDisplayRotation
@@ -3017,6 +3021,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AdjustDisplayRot
     it->second.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerOneTest_FoldScreenRotation_010

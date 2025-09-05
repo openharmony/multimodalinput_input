@@ -256,6 +256,9 @@ public:
     int32_t SubscribeInputActive(std::shared_ptr<IInputEventConsumer> inputEventConsumer, int64_t interval);
     void UnsubscribeInputActive(int32_t subscribeId);
     int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
+    int32_t AddKeyEventHook(std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t &hookId);
+    int32_t RemoveKeyEventHook(int32_t hookId);
+    int32_t DispatchToNextHandler(int32_t eventId);
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
 private:

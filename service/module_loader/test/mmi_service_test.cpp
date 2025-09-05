@@ -441,6 +441,8 @@ HWTEST_F(MMIServerTest, GetMousePrimaryButton_001, TestSize.Level1)
     EXPECT_NE(ret, RET_ERR);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: CheckPointerVisible_001
  * @tc.desc: Test the function CheckPointerVisible
@@ -455,6 +457,8 @@ HWTEST_F(MMIServerTest, CheckPointerVisible_001, TestSize.Level1)
     int32_t ret = mmiService.CheckPointerVisible(visible);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: MarkProcessed_001
@@ -472,6 +476,8 @@ HWTEST_F(MMIServerTest, MarkProcessed_001, TestSize.Level1)
     EXPECT_NE(ret, RET_ERR);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ReadPointerColor_001
  * @tc.desc: Test the function ReadPointerColor
@@ -486,6 +492,8 @@ HWTEST_F(MMIServerTest, ReadPointerColor_001, TestSize.Level1)
     int32_t ret = mmiService.ReadPointerColor(color);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: NotifyNapOnline_001

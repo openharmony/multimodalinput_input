@@ -229,7 +229,6 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     int32_t toolType = GetToolType(tabletEvent);
     int32_t twist = libinput_event_tablet_tool_get_twist(tabletEvent);
 
-    item.SetPressed(true);
     item.SetToolType(toolType);
     PhysicalCoordinate tCoord;
     if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord, item)) {
@@ -356,9 +355,20 @@ void TabletToolTransformProcessor::DrawTouchGraphicIdle()
 void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
 {
     CHKPV(pointerEvent_);
+    bool originalPressedStatus = false;
+    PointerEvent::PointerItem pointerItem;
+    bool isPointerItemExist = pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     auto pointerAction = pointerEvent_->GetPointerAction();
     switch (pointerAction) {
-        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            if (isPointerItemExist) {
+                originalPressedStatus = pointerItem.IsPressed();
+                pointerItem.SetPressed(true);
+                pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
+            }
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+            break;
+        }
         case PointerEvent::POINTER_ACTION_UP: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
             break;
@@ -384,6 +394,10 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
     }
     WIN_MGR->DrawTouchGraphic(pointerEvent_);
     pointerEvent_->SetPointerAction(pointerAction);
+    if (isPointerItemExist) {
+        pointerItem.SetPressed(originalPressedStatus);
+        pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

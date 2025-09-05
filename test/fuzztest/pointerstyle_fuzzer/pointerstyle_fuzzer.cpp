@@ -13,138 +13,103 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "pointerstyle_fuzzer.h"
 
 #include "ipc_skeleton.h"
-#include "securec.h"
-
 #include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {
-template <class T> size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+namespace {
+constexpr size_t MAX_STRING_LEN = 16;
+constexpr size_t MAX_HOTAREA_COUNT = 4;
 }
-
-size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSize)
-{
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
-void UpdateHotAreas(const uint8_t *data, size_t size, WindowInfo &windowInfo)
-{
-    size_t startPos = 0;
-    std::vector<Rect> defaultHotAreasInfo;
-    std::vector<Rect> pointerHotAreasInfo;
-    for (size_t j = 0; j < WindowInfo::MAX_HOTAREA_COUNT; ++j) {
-        Rect defaultRect;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.y);
-        defaultHotAreasInfo.push_back(defaultRect);
-        Rect pointerRect;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.height);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.y);
-        pointerHotAreasInfo.push_back(pointerRect);
-    }
-    windowInfo.defaultHotAreas = defaultHotAreasInfo;
-    windowInfo.pointerHotAreas = pointerHotAreasInfo;
-}
-
-void UpdateDisplayInfo(const uint8_t *data, size_t size, int32_t windowId)
+void UpdateDisplayInfo(FuzzedDataProvider &fdp, int32_t windowId)
 {
     DisplayGroupInfo displayGroupInfo;
-    size_t startPos = 0;
-    size_t stringSize = 4;
-    int32_t displayWidth = 0;
-    int32_t displayHeight = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayWidth);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayHeight);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
-    std::vector<WindowInfo> windowsInfo;
-    std::vector<DisplayInfo> displaysInfo;
+    displayGroupInfo.focusWindowId = fdp.ConsumeIntegral<int32_t>();
+
     WindowInfo windowInfo;
     windowInfo.id = windowId;
     windowInfo.pid = IPCSkeleton::GetCallingPid();
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.uid);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.x);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.y);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
-    UpdateHotAreas(data, size, windowInfo);
-    windowsInfo.push_back(windowInfo);
+    windowInfo.uid = fdp.ConsumeIntegral<int32_t>();
+    windowInfo.area.x = fdp.ConsumeIntegral<int32_t>();
+    windowInfo.area.y = fdp.ConsumeIntegral<int32_t>();
+    windowInfo.area.width = fdp.ConsumeIntegral<int32_t>();
+    windowInfo.area.height = fdp.ConsumeIntegral<int32_t>();
+
+    for (size_t i = 0; i < MAX_HOTAREA_COUNT; ++i) {
+        Rect r1 {fdp.ConsumeIntegral<int32_t>(), fdp.ConsumeIntegral<int32_t>(),
+                 fdp.ConsumeIntegral<int32_t>(), fdp.ConsumeIntegral<int32_t>()};
+        Rect r2 {fdp.ConsumeIntegral<int32_t>(), fdp.ConsumeIntegral<int32_t>(),
+                 fdp.ConsumeIntegral<int32_t>(), fdp.ConsumeIntegral<int32_t>()};
+        windowInfo.defaultHotAreas.push_back(r1);
+        windowInfo.pointerHotAreas.push_back(r2);
+    }
 
     DisplayInfo displayInfo;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.x);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.dpi);
-    char name[] = "name";
-    startPos += GetString(data + startPos, size - startPos, name, stringSize);
-    displayInfo.name = name;
-    char uniq[] = "uniq";
-    GetString(data + startPos, size - startPos, uniq, stringSize);
-    displaysInfo.push_back(displayInfo);
-    displayGroupInfo.windowsInfo = windowsInfo;
-    displayGroupInfo.displaysInfo = displaysInfo;
- 
+    displayInfo.id = fdp.ConsumeIntegral<int32_t>();
+    displayInfo.x = fdp.ConsumeIntegral<int32_t>();
+    displayInfo.y = fdp.ConsumeIntegral<int32_t>();
+    displayInfo.width = fdp.ConsumeIntegral<int32_t>();
+    displayInfo.height = fdp.ConsumeIntegral<int32_t>();
+    displayInfo.dpi = fdp.ConsumeIntegral<int32_t>();
+    displayInfo.name = fdp.ConsumeRandomLengthString(MAX_STRING_LEN);
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+
     UserScreenInfo userScreenInfo;
     ScreenInfo screenInfo;
-    screenInfo.screenType =(ScreenType)windowInfo.windowType;
+    screenInfo.screenType = static_cast<ScreenType>(windowInfo.windowType);
     screenInfo.dpi = displayInfo.dpi;
-    screenInfo.height =  windowInfo.area.height;
+    screenInfo.height = windowInfo.area.height;
     screenInfo.width = windowInfo.area.width;
-    screenInfo.physicalWidth = displayWidth;
-    screenInfo.physicalHeight = displayHeight;
+    screenInfo.physicalWidth = fdp.ConsumeIntegral<int32_t>();
+    screenInfo.physicalHeight = fdp.ConsumeIntegral<int32_t>();
     screenInfo.id = displayInfo.id;
     screenInfo.rotation = Rotation::ROTATION_0;
     screenInfo.tpDirection = Direction::DIRECTION0;
-    screenInfo.uniqueId = uniq;
-    userScreenInfo.screens.push_back(screenInfo);
+    screenInfo.uniqueId = fdp.ConsumeRandomLengthString(MAX_STRING_LEN);
 
+    userScreenInfo.screens.push_back(screenInfo);
     userScreenInfo.displayGroups.push_back(displayGroupInfo);
+
     InputManager::GetInstance()->UpdateDisplayInfo(userScreenInfo);
 }
 
-void PointerStyleFuzzTest(const uint8_t *data, size_t size)
+void PointerStyleFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t windowId;
-    size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowId);
-    UpdateDisplayInfo(data, size, windowId);
+    int32_t windowId = fdp.ConsumeIntegral<int32_t>();
+    UpdateDisplayInfo(fdp, windowId);
+
     PointerStyle pointerStyle;
-    GetObject<int32_t>(data + startPos, size - startPos, pointerStyle.id);
+    pointerStyle.id = fdp.ConsumeIntegral<int32_t>();
+    pointerStyle.size = fdp.ConsumeIntegral<int32_t>();
+    pointerStyle.color = fdp.ConsumeIntegral<int32_t>();
+    pointerStyle.options = fdp.ConsumeIntegral<int32_t>();
+
     InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
     InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    PointerStyleFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::PointerStyleFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

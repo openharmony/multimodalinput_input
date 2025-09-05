@@ -13,59 +13,46 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "supportkeys_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "SupportKeysFuzzTest"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t FUZZ_FST_DATA = 0;
 constexpr int32_t MAX_SUPPORT_KEY = 5;
-} // namespace
-
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
 }
-
-void SupportKeysFuzzTest(const uint8_t* data, size_t size)
+void SupportKeysFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t id = data[FUZZ_FST_DATA];
-    size_t startPos = 0;
+    int32_t id = fdp.ConsumeIntegral<int32_t>();
+
     std::vector<int32_t> keycodes;
     for (int32_t i = 0; i < MAX_SUPPORT_KEY; i++) {
-        int32_t preKey;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, preKey);
-        keycodes.push_back(preKey);
+        keycodes.push_back(fdp.ConsumeIntegral<int32_t>());
     }
-    auto fun = [](std::vector<bool> isSupport) {
-        MMI_HILOGD("Support key success");
-    };
-    InputManager::GetInstance()->SupportKeys(id, keycodes, fun);
+
+    auto callback = [](std::vector<bool>) {};
+    InputManager::GetInstance()->SupportKeys(id, keycodes, callback);
 }
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    SupportKeysFuzzTest(fdp);
+    return true;
+}
+
 } // namespace MMI
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::SupportKeysFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
