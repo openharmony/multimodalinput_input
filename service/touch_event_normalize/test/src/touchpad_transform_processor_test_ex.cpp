@@ -91,8 +91,8 @@ HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_Smoo
     int32_t deviceId = 1;
     TouchPadTransformProcessor processor(deviceId);
 
-    vector<Coords> fingerCoords = {{1, 1}, {2, 2}, {3, 3}};
-    vector<Coords> fingerCoordsZero = {{1, 1}, {0, 0}, {3, 3}};
+    std::vector<Coords> fingerCoords = {{1, 1}, {2, 2}, {3, 3}};
+    std::vector<Coords> fingerCoordsZero = {{1, 1}, {0, 0}, {3, 3}};
     int32_t fingerCount = 3;
     for (int i = 0; i < 3; ++i) {
         processor.SmoothMultifingerSwipeData(fingerCoords, fingerCount);
