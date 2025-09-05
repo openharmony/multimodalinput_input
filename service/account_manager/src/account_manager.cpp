@@ -456,7 +456,12 @@ void AccountManager::OnRemoveUser(const EventFwk::CommonEventData &data)
 void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
 {
     int32_t accountId = data.GetCode();
-    MMI_HILOGI("Switch to account(%d)", accountId);
+    std::string displayId = data.GetWant().GetStringParam("displayId");
+    if (!displayId.empty()) {
+        uint64_t currentDisplayId = static_cast<uint64_t>(std::stoull(displayId));
+        MMI_HILOGI("Switch to {%{public}" PRIu64 ":%d}", currentDisplayId, accountId);
+        displayIdCurrentUsers_[currentDisplayId] = accountId;
+    }
     if (currentAccountId_ != accountId) {
         if (auto iter = accounts_.find(accountId); iter == accounts_.end()) {
             accounts_.emplace(accountId, std::make_unique<AccountSetting>(accountId));
@@ -464,6 +469,32 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
         currentAccountId_ = accountId;
         MMI_HILOGI("Switched to account(%d)", currentAccountId_);
     }
+}
+
+bool AccountManager::GetAccountByDisplayId(uint64_t displayId, int32_t &currentUserId)
+{
+    std::lock_guard<std::mutex> guard { lock_ };
+    if (displayIdCurrentUsers_.find(displayId) != displayIdCurrentUsers_.end()) {
+        currentUserId = displayIdCurrentUsers_[displayId];
+        return true;
+    }
+    MMI_HILOGW("%{public}" PRIu64 "is not found", displayId);
+    return false;
+}
+
+void AccountManager::SetAccountByDisplayId(uint64_t displayId, int32_t currentUserId)
+{
+    std::lock_guard<std::mutex> guard { lock_ };
+    if (displayIdCurrentUsers_.find(displayId) == displayIdCurrentUsers_.end()) {
+        displayIdCurrentUsers_[displayId] = currentUserId;
+        MMI_HILOGI("set {%{public}" PRIu64 ":%d}", displayId, currentUserId);
+    }
+}
+
+int32_t AccountManager::GetCurrentAccountId()
+{
+    std::lock_guard<std::mutex> guard { lock_ };
+    return currentAccountId_;
 }
 } // namespace MMI
 } // namespace OHOS

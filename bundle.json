@@ -107,7 +107,8 @@
         "idl_tool",
         "runtime_core",
         "jsoncpp",
-        "libinput"
+        "libinput",
+        "os_account"
       ],
       "third_party": [
         "libuv",
