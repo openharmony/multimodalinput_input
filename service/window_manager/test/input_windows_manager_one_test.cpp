@@ -1387,12 +1387,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ParseJson_001, T
 }
 
 /* *
- * @tc.name: InputWindowsManagerOneTest_GetPidByWindowId_001
- * @tc.desc: Test the funcation GetPidByWindowId
+ * @tc.name: InputWindowsManagerOneTest_GetPidByDisplayIdAndWindowId_001
+ * @tc.desc: Test the funcation GetPidByDisplayIdAndWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByWindowId_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByDisplayIdAndWindowId_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
@@ -1406,11 +1406,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByWindowId
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
+        it->second.mainDisplayId = 0;
     }
-    EXPECT_EQ(inputWindowsManager->GetPidByWindowId(id), windowInfo.pid);
+    EXPECT_EQ(inputWindowsManager->GetPidByDisplayIdAndWindowId(0, id), windowInfo.pid);
 
     id = -1;
-    EXPECT_EQ(inputWindowsManager->GetPidByWindowId(id), RET_ERR);
+    EXPECT_EQ(inputWindowsManager->GetPidByDisplayIdAndWindowId(0, id), RET_ERR);
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
