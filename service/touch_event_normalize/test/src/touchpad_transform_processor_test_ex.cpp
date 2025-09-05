@@ -62,7 +62,7 @@ void TouchPadTransformProcessorTestEx::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_001, 
+HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_001,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -84,7 +84,7 @@ HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_Smoo
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_002, 
+HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_002,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
