@@ -62,7 +62,7 @@ void TouchPadTransformProcessorTestEx::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_GetTouchpadScrollRows_001, TestSize.Level1)
+HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
@@ -83,28 +83,29 @@ HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_GetT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_GetTouchpadScrollRows_002, TestSize.Level1)
+HWTEST_F(TouchPadTransformProcessorTestEx, TouchPadTransformProcessorTestEx_SmoothMultifingerSwipeData_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
     TouchPadTransformProcessor processor(deviceId);
+
     vector<Coords> fingerCoords = {{1, 1}, {2, 2}, {3, 3}};
     vector<Coords> fingerCoordsZero = {{1, 1}, {0, 0}, {3, 3}};
     int32_t fingerCount = 3;
     for (int i = 0; i < 3; ++i) {
         processor.SmoothMultifingerSwipeData(fingerCoords, fingerCount);
     }
-    EXPECT_EQ(processor.swipeHistory_[0].size, 3);
-    EXPECT_EQ(processor.swipeHistory_[1].size, 3);
-    EXPECT_EQ(processor.swipeHistory_[2].size, 3);
+    EXPECT_EQ(processor.swipeHistory_[0].size(), 3);
+    EXPECT_EQ(processor.swipeHistory_[1].size(), 3);
+    EXPECT_EQ(processor.swipeHistory_[2].size(), 3);
 
     processor.SmoothMultifingerSwipeData(fingerCoordsZero, fingerCount);
     EXPECT_EQ(fingerCoordsZero[0].x, 1);
-    EXPECT_EQ(fingerCoordsZero[0].x, 1);
+    EXPECT_EQ(fingerCoordsZero[0].y, 1);
     EXPECT_EQ(fingerCoordsZero[1].x, 2);
-    EXPECT_EQ(fingerCoordsZero[1].x, 2);
+    EXPECT_EQ(fingerCoordsZero[1].y, 2);
     EXPECT_EQ(fingerCoordsZero[2].x, 3);
-    EXPECT_EQ(fingerCoordsZero[2].x, 3);
+    EXPECT_EQ(fingerCoordsZero[2].y, 3);
 }
 } // namespace MMI
 } // namespace OHOS
