@@ -394,7 +394,7 @@ ohos_shared_library("libmmi-server") {
     sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
   }
 
-if (input_feature_key_hook) {
+  if (input_feature_key_hook) {
     sources += [
       "event_hook/src/key_event_hook_manager.cpp",
       "event_hook/src/event_loop_closure_checker.cpp",
