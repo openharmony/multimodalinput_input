@@ -21,6 +21,7 @@
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "fingersense_wrapper.h"
+#include "i_input_windows_manager.h"
 #include "input_event_handler.h"
 
 #undef MMI_LOG_DOMAIN

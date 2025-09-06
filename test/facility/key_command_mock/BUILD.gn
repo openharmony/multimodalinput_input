@@ -13,11 +13,11 @@
 
 import("../../../multimodalinput_mini.gni")
 
-config("event_handler_mock_public_config") {
+config("key_command_mock_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_source_set("event_handler_mock") {
+ohos_source_set("key_command_mock") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -29,29 +29,13 @@ ohos_source_set("event_handler_mock") {
 
   include_dirs = [ "include" ]
 
-  sources = [
-    "src/anr_manager.cpp",
-    "src/input_event_handler.cpp",
-    "src/key_event_value_transformation.cpp",
-  ]
+  sources = []
 
-  public_configs = [ ":event_handler_mock_public_config" ]
+  public_configs = [ ":key_command_mock_public_config" ]
 
-  deps = [
-    "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
-    "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
-    "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
-    "${mmi_path}/test/facility/key_command_mock:key_command_mock",
-    "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
-    "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
-    "${mmi_path}/util:libmmi-util",
-  ]
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-  ]
+  external_deps = [ "googletest:gmock_main" ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"

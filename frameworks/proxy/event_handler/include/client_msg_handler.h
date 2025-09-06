@@ -87,6 +87,10 @@ private:
         [](int32_t timerId) -> int32_t
         {
             return 0;
+        },
+        [](int32_t timerId) -> int32_t
+        {
+            return 0;
         }
     };
 };
