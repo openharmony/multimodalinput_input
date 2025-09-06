@@ -43,6 +43,19 @@ enum class InjectionType : int32_t {
     POINTEREVENT
 };
 
+struct InjectionTouch {
+    int32_t displayId_ { -1 };
+    int32_t pointerId_ { -1 };
+
+    bool operator<(const InjectionTouch &other) const
+    {
+        if (displayId_ != other.displayId_) {
+            return (displayId_ < other.displayId_);
+        }
+        return (pointerId_ < other.pointerId_);
+    }
+};
+
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
 class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
@@ -144,7 +157,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, bool isShell);
     int32_t FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
-        const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId = false,
+        const std::map<InjectionTouch, int32_t>& targetWindowIdMap, bool bNeedResetPointerId = false,
         int32_t diffPointerId = 0);
     bool UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t targetWindowId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -176,10 +189,10 @@ private:
     void Printf(const UserScreenInfo& userScreenInfo);
 private:
     UDSServer *udsServer_ { nullptr };
-    std::map<int32_t, int32_t> nativeTargetWindowIds_;
-    std::map<int32_t, int32_t> shellTargetWindowIds_;
-    std::map<int32_t, int32_t> accessTargetWindowIds_;
-    std::map<int32_t, int32_t> castTargetWindowIds_;
+    std::map<InjectionTouch, int32_t> nativeTargetWindowIds_;
+    std::map<InjectionTouch, int32_t> shellTargetWindowIds_;
+    std::map<InjectionTouch, int32_t> accessTargetWindowIds_;
+    std::map<InjectionTouch, int32_t> castTargetWindowIds_;
     std::map<int32_t, AuthorizationStatus> authorizationCollection_;
     int32_t CurrentPID_ { -1 };
     InjectionType InjectionType_ { InjectionType::UNKNOWN };
