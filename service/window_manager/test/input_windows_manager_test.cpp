@@ -9313,6 +9313,46 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
     inputWindowsManager->lastPointerEvent_->SetPointerId(pointerItem.pointerId_);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->NotifyPointerToWindow());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_NotifyPointerToWindow_003
+ * @tc.desc: Test NotifyPointerToWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    UDSServer udsServer;
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    inputWindowsManager.lastLogicX_ = 200;
+    inputWindowsManager.lastLogicY_ = 300;
+    WindowInfo windowInfo;
+    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.zOrder = 5.0f;
+    windowInfo.pointerHotAreas.push_back({ 100, 100, 300, 300 });
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    windowInfo.id = 10;
+    windowInfo.zOrder = 4.0f;
+    inputWindowsManager.lastWindowInfo_ = windowInfo;
+    inputWindowsManager.NotifyPointerToWindow();
+    EXPECT_TRUE(MMI_GNE(inputWindowsManager.lastWindowInfo_.zOrder, windowInfo.zOrder));
+
+    windowInfo.id = 20;
+    windowInfo.zOrder = 3.0f;
+    auto iter = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.clear();
+        iter->second.windowsInfo.push_back(windowInfo);
+    }
+    inputWindowsManager.NotifyPointerToWindow();
+    EXPECT_TRUE(MMI_EQ(inputWindowsManager.lastWindowInfo_.zOrder, windowInfo.zOrder));
+}
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
