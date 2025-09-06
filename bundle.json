@@ -106,7 +106,6 @@
         "sensor",
         "idl_tool",
         "runtime_core",
-        "jsoncpp",
         "libinput",
         "os_account"
       ],
