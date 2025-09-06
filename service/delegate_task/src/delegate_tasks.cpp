@@ -120,7 +120,6 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
         int32_t workerThreadId = static_cast<int32_t>(workerThreadId_);
         std::string stackTrace;
         HiviewDFX::GetBacktraceStringByTid(stackTrace, workerThreadId, SKIP_FRAME_NUM, false);
-        MMI_HILOGE("Task timeout");
         MMI_HILOGE("taskId:%{public}" PRId64 ", num of tasks:%{public}zu, stack of workerThread:%{public}s",
                     id_, tasks_.size(), stackTrace.c_str());
         return ETASKS_WAIT_TIMEOUT;
