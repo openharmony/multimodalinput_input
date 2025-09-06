@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "backtrace_local.h"
 #include "error_multimodal.h"
 
 #undef MMI_LOG_DOMAIN
@@ -29,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
     constexpr int32_t TIMED_WAIT_MS = 2;
+    constexpr size_t SKIP_FRAME_NUM = 0;
 } // namespace
 void DelegateTasks::Task::ProcessTask()
 {
@@ -115,7 +117,11 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     auto res = future.wait_for(span);
     task->SetWaited();
     if (res == std::future_status::timeout) {
-        MMI_HILOGE("Task timeout");
+        int32_t workerThreadId = static_cast<int32_t>(workerThreadId_);
+        std::string stackTrace;
+        HiviewDFX::GetBacktraceStringByTid(stackTrace, workerThreadId, SKIP_FRAME_NUM, false);
+        MMI_HILOGE("Task timeout, taskId:%{public}" PRId64 ", num of tasks:%{public}zu, stack of workerThread:%{public}s",
+                    id_, tasks_.size(), stackTrace.c_str());
         return ETASKS_WAIT_TIMEOUT;
     } else if (res == std::future_status::deferred) {
         MMI_HILOGE("Task deferred");
