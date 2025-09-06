@@ -640,7 +640,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d", pointerEvent->GetId(), pointerEvent->GetButtonId());
+            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d, PBS:%{public}zu", pointerEvent->GetId(),
+                pointerEvent->GetButtonId(), pointerEvent->GetPressedButtons().size());
         } else {
             MMI_HILOG_FREEZEI("recv");
         }

@@ -2604,6 +2604,8 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     currentPointerItem.SetPointerId(0);
 
     SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
+    currentPointerItem.SetPressed(lastPointerItem.IsPressed());
+    currentPointerItem.SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(0);
@@ -2679,6 +2681,12 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
         MMI_HILOGI("The mouse pointer does not leave the window:%{public}d", lastWindowInfo_.id);
         lastWindowInfo_ = *windowInfo;
         return;
+    }
+    if (MMI_GNE(lastWindowInfo_.zOrder, windowInfo->zOrder)) {
+        std::string windowPrint;
+        windowPrint += StringPrintf("highZorder");
+        PrintZorderInfo(*windowInfo, windowPrint);
+        MMI_HILOGD("%{public}s", windowPrint.c_str());
     }
     bool isFindLastWindow = false;
     auto &WindowsInfo = GetWindowInfoVector(groupId);
