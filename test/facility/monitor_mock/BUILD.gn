@@ -33,10 +33,7 @@ ohos_source_set("event_monitor_mock") {
 
   public_configs = [ ":event_monitor_mock_public_config" ]
 
-  public_deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-common",
-    "${mmi_path}/util:libmmi-util",
-  ]
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
   external_deps = [ "googletest:gmock_main" ]
 

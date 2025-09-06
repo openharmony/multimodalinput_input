@@ -21,7 +21,11 @@ config("mmi_custom_config_parser_cfg") {
     "${mmi_path}/service/product_property_config/include"
   ]
 }
- 
+
+config("mmi_custom_config_parser_public_configs") {
+  include_dirs = [ "${mmi_path}/service/custom_config_parser/include" ]
+}
+
 ohos_source_set("mmi_custom_config_parser") {
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -31,16 +35,19 @@ ohos_source_set("mmi_custom_config_parser") {
     cfi_cross_dso = true
     debug = false
   }
- 
+
   sources = [
     "${mmi_path}/service/custom_config_parser/src/bundle_name_parser.cpp",
     "${mmi_path}/service/custom_config_parser/src/product_type_parser.cpp",
     "${mmi_path}/service/custom_config_parser/src/special_input_device_parser.cpp",
     "${mmi_path}/service/custom_config_parser/src/misc_product_type_parser.cpp",
     "${mmi_path}/service/custom_config_parser/src/product_name_definition_parser.cpp"
-    ]
- 
+  ]
+
   configs = [ ":mmi_custom_config_parser_cfg" ]
+
+  public_configs = [ ":mmi_custom_config_parser_public_configs" ]
+
   deps = [
     "${mmi_path}/util:mmi_json_parser",
     "${mmi_path}/util:libmmi-util",
