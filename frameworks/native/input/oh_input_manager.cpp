@@ -3190,10 +3190,17 @@ Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
         return errCode;
     }
     g_keyEventHookId.store(hookId);
-    KEY_EVENT_HOOK_HANDLER.SetHookIdUpdater([](int32_t hookId) {
+    ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetHookIdUpdater([](int32_t hookId) {
         MMI_HILOGI("Update keyHookId:%{public}d", hookId);
         g_keyEventHookId.store(hookId);
     });
+    if (ret != RET_OK) {
+        auto errCode = NormalizeHookResult(ret);
+        MMI_HILOGE("SetHookIdUpdater failed, errCode:%{public}d", errCode);
+        g_keyEventHookId.store(INVALID_INTERCEPTOR_ID);
+        SetHookCallback(nullptr);
+        return errCode;
+    }
     MMI_HILOGI("OH_Input_AddKeyEventHook success, hookId:%{public}d", g_keyEventHookId.load());
     return INPUT_SUCCESS;
 }
