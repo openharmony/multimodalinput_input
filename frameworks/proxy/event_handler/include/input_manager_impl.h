@@ -259,7 +259,7 @@ public:
     int32_t AddKeyEventHook(std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t &hookId);
     int32_t RemoveKeyEventHook(int32_t hookId);
     int32_t DispatchToNextHandler(int32_t eventId);
-
+    int32_t SetHookIdUpdater(std::function<void(int32_t)> callback);
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
     int32_t PackDisplayGroupsInfo(NetPacket &pkt, const std::vector<DisplayGroupInfo> &displayGroups);

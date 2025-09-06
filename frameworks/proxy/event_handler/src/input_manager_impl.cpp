@@ -2981,5 +2981,16 @@ int32_t InputManagerImpl::DispatchToNextHandler(int32_t eventId)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
+
+int32_t InputManagerImpl::SetHookIdUpdater(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    KEY_EVENT_HOOK_HANDLER.SetHookIdUpdater(callback);
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
 } // namespace MMI
 } // namespace OHOS
