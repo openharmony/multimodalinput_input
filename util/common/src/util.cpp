@@ -689,6 +689,9 @@ void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const
 
 Aggregator::~Aggregator()
 {
+    if (removeTimer_) {
+        removeTimer_(timerId_);
+    }
     FlushRecords(MMI_LOG_HEADER);
 }
 } // namespace MMI
