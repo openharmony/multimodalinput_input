@@ -218,9 +218,11 @@ void PointerDrawingManager::InitPointerCallback()
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisysevent::ReportApiCallTimes(ApiDurationStatistics::Api::SET_ON_REMOTE_DIED_CALLBACK, durationMS);
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor() && (GetSurfaceNode() != nullptr)) {
+    if (GetSurfaceNode() != nullptr) {
         SetSurfaceNode(nullptr);
+    }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor()) {
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
