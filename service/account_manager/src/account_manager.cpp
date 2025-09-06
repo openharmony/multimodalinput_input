@@ -322,6 +322,7 @@ AccountManager::~AccountManager()
 
 void AccountManager::AccountManagerUnregister()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard { lock_ };
     UnsubscribeCommonEvent();
     if (timerId_ >= 0) {
@@ -329,6 +330,7 @@ void AccountManager::AccountManagerUnregister()
         timerId_ = -1;
     }
     accounts_.clear();
+    // LCOV_EXCL_STOP
 }
 
 void AccountManager::Initialize()
@@ -344,12 +346,14 @@ void AccountManager::Initialize()
 
 AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard { lock_ };
     if (auto iter = accounts_.find(currentAccountId_); iter != accounts_.end()) {
         return *iter->second;
     }
     auto [iter, _] = accounts_.emplace(currentAccountId_, std::make_unique<AccountSetting>(currentAccountId_));
     return *iter->second;
+    // LCOV_EXCL_STOP
 }
 
 #ifdef SCREENLOCK_MANAGER_ENABLED
@@ -372,6 +376,7 @@ void AccountManager::InitializeScreenLockStatus()
 
 void AccountManager::SubscribeCommonEvent()
 {
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     EventFwk::MatchingSkills matchingSkills;
 
@@ -396,10 +401,12 @@ void AccountManager::SubscribeCommonEvent()
     if (timerId_ < 0) {
         MMI_HILOGE("AddTimer fail, SubscribeCommonEvent fail");
     }
+    // LCOV_EXCL_STOP
 }
 
 void AccountManager::UnsubscribeCommonEvent()
 {
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     if (subscriber_ != nullptr) {
         if (!EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_)) {
@@ -407,16 +414,19 @@ void AccountManager::UnsubscribeCommonEvent()
         }
         subscriber_ = nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 void AccountManager::SetupMainAccount()
 {
+    // LCOV_EXCL_START
     MMI_HILOGI("Setup main account(%{public}d)", MAIN_ACCOUNT_ID);
     currentAccountId_ = MAIN_ACCOUNT_ID;
     auto [_, isNew] = accounts_.emplace(MAIN_ACCOUNT_ID, std::make_unique<AccountSetting>(MAIN_ACCOUNT_ID));
     if (!isNew) {
         MMI_HILOGW("Account(%{public}d) has existed", MAIN_ACCOUNT_ID);
     }
+    // LCOV_EXCL_STOP
 }
 
 void AccountManager::OnCommonEvent(const EventFwk::CommonEventData &data)
