@@ -17,10 +17,8 @@ group("test") {
   testonly = true
 
   deps = [
-    "accountmanager_fuzzer:fuzztest",
     "addgesturemonitor_fuzzer:fuzztest",
     "addinputeventfilter_fuzzer:fuzztest",
-    "addinterceptor_fuzzer:fuzztest",
     "addsample_fuzzer:fuzztest",
     "ancoonehanddata_fuzzer:fuzztest",
     "ancowindows_fuzzer:fuzztest",
