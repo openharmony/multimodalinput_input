@@ -1957,7 +1957,6 @@ ohos_unittest("SubscriberTest") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
@@ -2422,7 +2421,6 @@ ohos_unittest("KeyCommandTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
