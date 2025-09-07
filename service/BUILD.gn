@@ -394,7 +394,7 @@ ohos_shared_library("libmmi-server") {
     sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
   }
 
-if (input_feature_key_hook) {
+  if (input_feature_key_hook) {
     sources += [
       "event_hook/src/key_event_hook_manager.cpp",
       "event_hook/src/event_loop_closure_checker.cpp",
@@ -440,6 +440,7 @@ if (input_feature_key_hook) {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
+    "os_account:os_account_innerkits",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -1682,6 +1683,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "os_account:os_account_innerkits",
   ]
 }
 
@@ -1854,6 +1856,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
+    "os_account:os_account_innerkits",
   ]
 
   if (hitrace_enabled) {
@@ -1963,7 +1966,6 @@ ohos_unittest("SubscriberTest") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
@@ -2432,7 +2434,6 @@ ohos_unittest("KeyCommandTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",

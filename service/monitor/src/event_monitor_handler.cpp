@@ -636,11 +636,13 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     pointerEvent->GetPointerItem(pointerId, pointerItem);
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
+    int32_t displayId = pointerEvent->GetTargetDisplayId();
     std::unordered_set<int32_t> fingerFocusPidSet;
     for (const auto &monitor : monitors_) {
         CHKPC(monitor.session_);
         if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
-            monitor.session_->GetPid() == WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId())) {
+            monitor.session_->GetPid() == WIN_MGR->GetPidByDisplayIdAndWindowId(displayId,
+                WIN_MGR->GetFocusWindowId())) {
             fingerFocusPidSet.insert(monitor.session_->GetPid());
         }
     }
@@ -776,7 +778,7 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendFingerprintEvent(
         }
         MMI_HILOGD("fingerprint slide event not send monitor pid:%{public}d, focus pid:%{public}d",
             monitor.session_->GetPid(),
-            WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId()));
+            WIN_MGR->GetPidByDisplayIdAndWindowId(pointerEvent->GetTargetDisplayId(), WIN_MGR->GetFocusWindowId()));
         return false;
     }
     MMI_HILOGD("monitor eventType is not fingerprint pid:%{public}d", monitor.session_->GetPid());

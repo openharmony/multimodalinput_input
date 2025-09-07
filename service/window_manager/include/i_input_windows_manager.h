@@ -96,7 +96,6 @@ public:
     virtual std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info,
         double logicX, double logicY) const = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
-    virtual int32_t GetCurrentUserId() = 0;
     virtual void SetFoldState () = 0;
     virtual bool CheckAppFocused(int32_t pid) = 0;
     virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
@@ -168,7 +167,7 @@ public:
     virtual DisplayMode GetDisplayMode() const = 0;
     virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
     virtual int32_t GetWindowStateNotifyPid() = 0;
-    virtual int32_t GetPidByWindowId(int32_t pid) = 0;
+    virtual int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;

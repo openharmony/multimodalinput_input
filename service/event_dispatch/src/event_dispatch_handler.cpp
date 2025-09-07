@@ -87,13 +87,14 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     CHKPV(udsServer);
     auto pointerIdList = pointerEvent->GetPointerIds();
     if (pointerIdList.size() > 1) {
+        int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
                 MMI_HILOGW("Can't find this pointerItem");
                 continue;
             }
-            auto itemPid = WIN_MGR->GetWindowPid(pointeritem.GetTargetWindowId());
+            auto itemPid = WIN_MGR->GetPidByDisplayIdAndWindowId(targetDisplayId, pointeritem.GetTargetWindowId());
             if ((itemPid >= 0) && (itemPid != udsServer->GetClientPid(fd))) {
                 pointerEvent->RemovePointerItem(id);
                 MMI_HILOGD("pointerIdList size:%{public}zu", pointerEvent->GetPointerIds().size());
@@ -329,7 +330,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         ResetDisplayXY(point);
         return;
     }
-    auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
+    auto pid = WIN_MGR->GetPidByDisplayIdAndWindowId(point->GetTargetDisplayId(), point->GetTargetWindowId());
     int32_t fd = GetClientFd(pid, point);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {

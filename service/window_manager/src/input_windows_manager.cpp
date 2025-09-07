@@ -16,9 +16,11 @@
 #include "input_windows_manager.h"
 #include <linux/input.h>
 
+#include "account_manager.h"
 #include "display_manager_lite.h"
 #include "event_log_helper.h"
 #include "json_parser.h"
+#include "os_account_manager.h"
 #include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
@@ -816,9 +818,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     }
     int32_t groupId = FindDisplayGroupId(keyEvent->GetTargetDisplayId());
     const int32_t focusWindowId = GetFocusWindowId(groupId);
-    if (GetHardCursorEnabled()) {
-        UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
-    }
+    UpdateKeyEventDisplayId(keyEvent, focusWindowId, groupId);
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     bool isUIExtention = false;
@@ -926,7 +926,7 @@ void InputWindowsManager::UpdateDisplayIdAndName()
     CALL_DEBUG_ENTER;
     using IdNames = std::set<std::pair<uint64_t, std::string>>;
     IdNames newInfo;
-    auto &DisplaysInfo = GetDisplayInfoVector(MAIN_GROUPID);
+    auto &DisplaysInfo = GetAllUsersDisplays();
     for (const auto &item : DisplaysInfo) {
         newInfo.insert(std::make_pair(item.rsId, item.uniq));
     }
@@ -1851,7 +1851,8 @@ bool InputWindowsManager::JudgeCameraInFore()
 {
     CALL_DEBUG_ENTER;
     int32_t focWid = GetFocusWindowId(MAIN_GROUPID);
-    int32_t focPid = GetPidByWindowId(focWid);
+    int mainDisplayId = GetMainDisplayId(MAIN_GROUPID);
+    int32_t focPid = GetPidByDisplayIdAndWindowId(mainDisplayId, focWid);
     if (udsServer_ == nullptr) {
         MMI_HILOGW("The udsServer is nullptr");
         return false;
@@ -1908,8 +1909,19 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     }
     OLD::DisplayGroupInfo displayGroupInfoTemp;
     displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
+    int32_t currentUserId = -1;
+    ACCOUNT_MGR->GetAccountByDisplayId(displayGroupInfo.mainDisplayId, currentUserId);
+    if (currentUserId != displayGroupInfo.currentUserId) {
+        ErrCode errCode = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(
+            displayGroupInfo.mainDisplayId, currentUserId);
+        ACCOUNT_MGR->SetAccountByDisplayId(displayGroupInfo.mainDisplayId, currentUserId);
+        if (currentUserId != displayGroupInfo.currentUserId) {
+            MMI_HILOGW("{%{public}d,%{public}d,%{public}d,%{public}d}",
+                currentUserId, errCode, displayGroupInfo.mainDisplayId, displayGroupInfo.currentUserId);
+        }
+    }
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
-        && ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfo.currentUserId));
+        && ((currentUserId < 0) || (currentUserId == displayGroupInfo.currentUserId));
     if (bFlag) {
         if (GetHardCursorEnabled()) {
             bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
@@ -2590,6 +2602,8 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     currentPointerItem.SetPointerId(0);
 
     SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
+    currentPointerItem.SetPressed(lastPointerItem.IsPressed());
+    currentPointerItem.SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(0);
@@ -2665,6 +2679,12 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
         MMI_HILOGI("The mouse pointer does not leave the window:%{public}d", lastWindowInfo_.id);
         lastWindowInfo_ = *windowInfo;
         return;
+    }
+    if (MMI_GNE(lastWindowInfo_.zOrder, windowInfo->zOrder)) {
+        std::string windowPrint;
+        windowPrint += StringPrintf("highZorder");
+        PrintZorderInfo(*windowInfo, windowPrint);
+        MMI_HILOGD("%{public}s", windowPrint.c_str());
     }
     bool isFindLastWindow = false;
     auto &WindowsInfo = GetWindowInfoVector(groupId);
@@ -3205,6 +3225,16 @@ const std::vector<OLD::DisplayInfo>& InputWindowsManager::GetDisplayInfoVector(i
     return displayGroupInfo_.displaysInfo;
 }
 
+const std::vector<OLD::DisplayInfo> InputWindowsManager::GetAllUsersDisplays() const
+{
+    std::vector<OLD::DisplayInfo> displayInfos;
+    for (auto &groupInfo : displayGroupInfoMap_) {
+        displayInfos.insert(displayInfos.end(), groupInfo.second.displaysInfo.begin(),
+        groupInfo.second.displaysInfo.end());
+    }
+    return displayInfos;
+}
+
 const std::vector<WindowInfo>& InputWindowsManager::GetWindowInfoVector(int32_t groupId) const
 {
     const auto &groupInfo = displayGroupInfoMap_.find(groupId);
@@ -3229,6 +3259,15 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
     iter = displayGroupInfoMap_.find(MAIN_GROUPID);
     if (iter != displayGroupInfoMap_.end()) {
         return iter->second.focusWindowId;
+    }
+    return 0;
+}
+
+int32_t InputWindowsManager::GetMainDisplayId(int32_t groupId) const
+{
+    auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        return iter->second.mainDisplayId;
     }
     return 0;
 }
@@ -6920,8 +6959,6 @@ bool InputWindowsManager::IsTransparentWin(
 
 int32_t InputWindowsManager::SetCurrentUser(int32_t userId)
 {
-    CALL_DEBUG_ENTER;
-    currentUserId_ = userId;
     return RET_OK;
 }
 
@@ -7033,16 +7070,16 @@ int32_t InputWindowsManager::GetWindowStateNotifyPid()
     return windowStateNotifyPid_;
 }
 
-int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
+int32_t InputWindowsManager::GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId)
 {
-    int32_t groupId = FindDisplayGroupId(id);
+    int32_t groupId = FindDisplayGroupId(displayId);
     auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (auto &item : WindowsInfo) {
-        if (item.id == id) {
+        if (item.id == windowId) {
             return item.pid;
         }
         for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
-            if (uiExtentionWindow.id == id) {
+            if (uiExtentionWindow.id == windowId) {
                 return uiExtentionWindow.pid;
             }
         }
@@ -7203,11 +7240,6 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const OLD::Displa
 bool InputWindowsManager::GetHardCursorEnabled()
 {
     return CursorDrawingComponent::GetInstance().GetHardCursorEnabled();
-}
-
-int32_t InputWindowsManager::GetCurrentUserId()
-{
-    return currentUserId_;
 }
 
 void InputWindowsManager::SetFoldState()

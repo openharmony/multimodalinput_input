@@ -66,7 +66,6 @@ public:
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
     MOCK_METHOD(int32_t, ClearMouseHideFlag, (int32_t));
-    MOCK_METHOD(int32_t, GetCurrentUserId, ());
     MOCK_METHOD(void, SetFoldState, ());
     MOCK_METHOD(bool, CheckAppFocused, (int32_t));
 
@@ -126,7 +125,7 @@ public:
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
     void SetWindowStateNotifyPid(int32_t pid) override {}
     int32_t GetWindowStateNotifyPid() override { return 0; }
-    int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }

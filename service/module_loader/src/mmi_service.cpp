@@ -40,6 +40,7 @@
 #include "device_event_monitor.h"
 #include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
+#include "os_account_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
@@ -687,7 +688,7 @@ void MMIService::OnConnected(SessionPtr s)
     if (appMgrClient == nullptr) {
         return;
     }
-    int32_t userid = WIN_MGR->GetCurrentUserId();
+    int32_t userid = ACCOUNT_MGR->GetCurrentAccountId();
     if (userid < 0) {
         userid = DEFAULT_USER_ID;
     }
