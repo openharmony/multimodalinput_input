@@ -398,7 +398,8 @@ ohos_shared_library("libmmi-server") {
     sources += [
       "event_hook/src/key_event_hook_manager.cpp",
       "event_hook/src/event_loop_closure_checker.cpp",
-      "event_hook/src/event_dispatch_order_checker.cpp"
+      "event_hook/src/event_dispatch_order_checker.cpp",
+      "event_hook/src/event_expiration_checker.cpp"
     ]
   }
 
