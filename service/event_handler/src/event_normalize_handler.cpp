@@ -796,7 +796,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             auto event = std::get_if<std::shared_ptr<PointerEvent>>(&pluginEvent);
             if (!event) return;
             this->nextHandler_->HandlePointerEvent(*event);
-        }
+        };
         std::shared_ptr<IPluginData> pData = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(event);
         pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
         auto manager = InputPluginManager::GetInstance();

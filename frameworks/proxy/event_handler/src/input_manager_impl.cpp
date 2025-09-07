@@ -172,6 +172,7 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const UserScreenInfo &userScreenInfo
             windowGroupInfo_.windowsInfo.clear();
         }
     }
+    PrintDisplayInfo(userScreenInfo);
     int32_t ret = SendDisplayInfo(userScreenInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send user screen info, ret:%{public}d", ret);
@@ -639,7 +640,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d", pointerEvent->GetId(), pointerEvent->GetButtonId());
+            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d, PBS:%{public}zu", pointerEvent->GetId(),
+                pointerEvent->GetButtonId(), pointerEvent->GetPressedButtons().size());
         } else {
             MMI_HILOG_FREEZEI("recv");
         }
@@ -2975,6 +2977,17 @@ int32_t InputManagerImpl::DispatchToNextHandler(int32_t eventId)
         MMI_HILOGE("DispatchToNextHandler failed, ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+int32_t InputManagerImpl::SetHookIdUpdater(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    KEY_EVENT_HOOK_HANDLER.SetHookIdUpdater(callback);
     return RET_OK;
 #else
     return ERROR_UNSUPPORT;

@@ -88,7 +88,6 @@ public:
     const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
     std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info, double logicX, double logicY) const;
-    int32_t GetCurrentUserId();
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
     void SetFoldState ();
     bool CheckAppFocused(int32_t pid);
@@ -205,7 +204,7 @@ public:
     DisplayMode GetDisplayMode() const;
     void SetWindowStateNotifyPid(int32_t pid);
     int32_t GetWindowStateNotifyPid();
-    int32_t GetPidByWindowId(int32_t pid);
+    int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
@@ -310,8 +309,10 @@ private:
     void InitPointerStyle(int32_t groupId = DEFAULT_GROUP_ID);
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     const std::vector<OLD::DisplayInfo>& GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
+    const std::vector<OLD::DisplayInfo> GetAllUsersDisplays() const;
     const std::vector<WindowInfo>& GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
+    int32_t GetMainDisplayId(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetLogicalPositionX(int32_t id);
     int32_t GetLogicalPositionY(int32_t id);
     Direction GetLogicalPositionDirection(int32_t id);

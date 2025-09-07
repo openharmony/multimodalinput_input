@@ -58,6 +58,10 @@ private:
             [](int32_t timerId) -> int32_t
             {
                 return TimerMgr->ResetTimer(timerId);
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->RemoveTimer(timerId);
             }
     };
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
