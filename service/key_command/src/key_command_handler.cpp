@@ -1082,7 +1082,8 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     }
     auto callState = DEVICE_MONITOR->GetCallState();
     if (callState == StateType::CALL_STATUS_ACTIVE || callState == StateType::CALL_STATUS_HOLDING ||
-        callState == StateType::CALL_STATUS_INCOMING || callState == StateType::CALL_STATUS_ANSWERED) {
+        callState == StateType::CALL_STATUS_INCOMING || callState == StateType::CALL_STATUS_ANSWERED ||
+        callState == StateType::CALL_STATUS_ALERTING) {
         return true;
     }
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
