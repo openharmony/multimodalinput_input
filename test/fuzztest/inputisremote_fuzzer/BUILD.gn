@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("InputDeviceManagerFuzzTest") {
+ohos_fuzztest("InputIsRemoteFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/inputdevicemanager_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/inputisremote_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -51,7 +51,7 @@ ohos_fuzztest("InputDeviceManagerFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "inputdevicemanager_fuzzer.cpp" ]
+  sources = [ "inputisremote_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -84,7 +84,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":InputDeviceManagerFuzzTest",
+    ":InputIsRemoteFuzzTest",
   ]
 }
 ###############################################################################
