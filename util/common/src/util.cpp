@@ -344,6 +344,11 @@ static inline bool IsNum(const std::string &str)
     return (sin >> num) && sin.eof();
 }
 
+bool IsNumeric(const std::string &str)
+{
+    return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+}
+
 void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configKey)
 {

@@ -20,7 +20,6 @@
 #include "display_manager_lite.h"
 #include "event_log_helper.h"
 #include "json_parser.h"
-#include "os_account_manager.h"
 #include "pixel_map.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
@@ -1909,19 +1908,8 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     }
     OLD::DisplayGroupInfo displayGroupInfoTemp;
     displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
-    int32_t currentUserId = -1;
-    ACCOUNT_MGR->GetAccountByDisplayId(displayGroupInfo.mainDisplayId, currentUserId);
-    if (currentUserId != displayGroupInfo.currentUserId) {
-        ErrCode errCode = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(
-            displayGroupInfo.mainDisplayId, currentUserId);
-        ACCOUNT_MGR->SetAccountByDisplayId(displayGroupInfo.mainDisplayId, currentUserId);
-        if (currentUserId != displayGroupInfo.currentUserId) {
-            MMI_HILOGW("{%{public}d,%{public}d,%{public}d,%{public}d}",
-                currentUserId, errCode, displayGroupInfo.mainDisplayId, displayGroupInfo.currentUserId);
-        }
-    }
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
-        && ((currentUserId < 0) || (currentUserId == displayGroupInfo.currentUserId));
+        && (displayGroupInfo.userState == UserState::USER_ACTIVE);
     if (bFlag) {
         if (GetHardCursorEnabled()) {
             bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);

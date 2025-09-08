@@ -670,7 +670,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
-    pkt << userScreenInfo.userId;
+    pkt << userScreenInfo.userId << userScreenInfo.userState;
     if (PackScreensInfo(pkt, userScreenInfo.screens) != RET_OK) {
         MMI_HILOGE("Packet write screens info failed");
         return RET_ERR;
@@ -927,7 +927,7 @@ void InputManagerImpl::PrintDisplayInfo(const UserScreenInfo &userScreenInfo)
     if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
-    MMI_HILOGD("userId:%{private}d", userScreenInfo.userId);
+    MMI_HILOGD("userId:{%{private}d:%{public}d}", userScreenInfo.userId, userScreenInfo.userState);
     PrintScreens(userScreenInfo.screens);
     PrintDisplayGroups(userScreenInfo.displayGroups);
 }

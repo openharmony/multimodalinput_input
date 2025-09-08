@@ -40,7 +40,6 @@
 #include "device_event_monitor.h"
 #include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
-#include "os_account_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"

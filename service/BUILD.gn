@@ -441,7 +441,6 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
-    "os_account:os_account_innerkits",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -1678,7 +1677,6 @@ ohos_unittest("InputWindowsManagerTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
-    "os_account:os_account_innerkits",
   ]
 }
 
@@ -1849,7 +1847,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
-    "os_account:os_account_innerkits",
   ]
 
   if (hitrace_enabled) {
