@@ -194,7 +194,7 @@ public:
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId);
-    void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds,
+    void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::set<int32_t> &windowIds,
         int32_t deviceId);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId, int32_t deviceId);
     void ClearTargetDeviceWindowId(int32_t deviceId);
@@ -558,8 +558,8 @@ private:
         {}
     };
     std::map<int32_t, ActiveTouchWin> activeTouchWinTypes_;
-    std::map<int32_t, std::map<int32_t, std::vector<int32_t>>> targetTouchWinIds_;
-    std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
+    std::map<int32_t, std::map<int32_t, std::set<int32_t>>> targetTouchWinIds_;
+    std::map<int32_t, std::set<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
