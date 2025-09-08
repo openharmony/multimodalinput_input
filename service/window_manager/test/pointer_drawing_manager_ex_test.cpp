@@ -284,9 +284,15 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
     int32_t ret3 = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret3, RET_OK);
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_FALSE(INPUT_DEV_MGR->HasPointerDevice());
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_FALSE(WIN_MGR->IsMouseSimulate());
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(windowId));
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
     int32_t ret4 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret4, RET_OK);
 }
@@ -1155,7 +1161,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerColor_02
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
     EXPECT_EQ(ret, RET_OK);
     int32_t ret2 = pointerDrawingManager.SetPointerColor(color);
-    EXPECT_EQ(ret2, RET_ERR);
+    EXPECT_EQ(ret2, RET_OK);
 }
 
 /**

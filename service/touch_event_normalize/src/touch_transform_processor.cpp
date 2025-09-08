@@ -21,6 +21,7 @@
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "fingersense_wrapper.h"
+#include "i_input_windows_manager.h"
 #include "input_event_handler.h"
 
 #undef MMI_LOG_DOMAIN
@@ -355,6 +356,9 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     WIN_MGR->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;
 }
+
+void TouchTransformProcessor::OnDeviceRemoved()
+{}
 
 int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *data,
     struct libinput_device *device)

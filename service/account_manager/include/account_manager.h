@@ -77,6 +77,9 @@ public:
     void Initialize();
     AccountSetting GetCurrentAccountSetting();
     void AccountManagerUnregister();
+    bool GetAccountByDisplayId(uint64_t displayId, int32_t &currentUserId);
+    void SetAccountByDisplayId(uint64_t displayId, int32_t currentUserId);
+    int32_t GetCurrentAccountId();
 
 private:
 #ifdef SCREENLOCK_MANAGER_ENABLED
@@ -98,6 +101,7 @@ private:
     std::shared_ptr<CommonEventSubscriber> subscriber_;
     std::map<int32_t, std::unique_ptr<AccountSetting>> accounts_;
     std::map<std::string, std::function<void(const EventFwk::CommonEventData &)>> handlers_;
+    std::map<uint64_t, int32_t> displayIdCurrentUsers_;
 };
 
 inline int32_t AccountManager::AccountSetting::GetAccountId() const

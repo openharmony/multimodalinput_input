@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "setpointerlocation_fuzzer.h"
-
-#include "securec.h"
 
 #include "input_manager.h"
 #include "mmi_log.h"
@@ -25,38 +24,31 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void SetPointerLocationFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
+    int32_t pointerX = fdp.ConsumeIntegral<int32_t>();
+    int32_t pointerY = fdp.ConsumeIntegral<int32_t>();
 
-void SetPointerLocationFuzzTest(const uint8_t* data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t pointerX;
-    startPos += GetObject<int32_t>(pointerX, data + startPos, size - startPos);
-    int32_t pointerY;
-    startPos += GetObject<int32_t>(pointerY, data + startPos, size - startPos);
-    MMI_HILOGD("Call InputManager::SetPointerLocation");
+    MMI_HILOGD("Call InputManager::SetPointerLocation x:%{public}d y:%{public}d", pointerX, pointerY);
     InputManager::GetInstance()->SetPointerLocation(pointerX, pointerY);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    SetPointerLocationFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::SetPointerLocationFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

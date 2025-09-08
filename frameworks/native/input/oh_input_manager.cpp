@@ -15,11 +15,15 @@
 
 #include "oh_input_manager.h"
 
+#include <atomic>
+#include <vector>
+
 #include "securec.h"
 
 #include "event_log_helper.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
+#include "key_event_hook_handler.h"
 #include "oh_input_device_listener.h"
 #include "oh_input_interceptor.h"
 #include "oh_key_code.h"
@@ -40,8 +44,9 @@ struct Input_KeyState {
 };
 
 struct Input_KeyEvent {
-    int32_t action;
-    int32_t keyCode;
+    int32_t id { -1 };
+    int32_t action { -1 };
+    int32_t keyCode { -1 };
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
@@ -141,6 +146,7 @@ static std::set<Input_AxisEventCallback> g_axisMonitorAllCallbacks;
 static std::set<Input_DeviceListener*> g_ohDeviceListenerList;
 static std::map<InputEvent_AxisEventType, std::set<Input_AxisEventCallback>> g_axisMonitorCallbacks;
 static Input_KeyEventCallback g_keyInterceptorCallback = nullptr;
+static Input_KeyEventCallback g_keyEventHookCallback = nullptr;
 static struct Input_InterceptorEventCallback *g_pointerInterceptorCallback = nullptr;
 static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_pointerInterceptor =
     std::make_shared<OHOS::MMI::OHInputInterceptor>();
@@ -154,6 +160,7 @@ static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
 static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
 static int32_t g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
 static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
+static std::atomic_int32_t g_keyEventHookId = INVALID_INTERCEPTOR_ID;
 static int32_t UNKNOWN_MAX_TOUCH_POINTS { -1 };
 
 static const std::vector<int32_t> g_pressKeyCodes = {
@@ -1311,12 +1318,42 @@ static Input_Result NormalizeResult(int32_t result)
 {
     if (result < RET_OK) {
         if (result == OHOS::MMI::ERROR_NO_PERMISSION) {
-            MMI_HILOGE("Permisson denied");
+            MMI_HILOGE("permission denied");
             return INPUT_PERMISSION_DENIED;
         }
         return INPUT_SERVICE_EXCEPTION;
     }
     return INPUT_SUCCESS;
+}
+
+static Input_Result NormalizeHookResult(int32_t result)
+{
+    if (result == RET_OK) {
+        return INPUT_SUCCESS;
+    }
+    switch (result) {
+        case OHOS::MMI::ERROR_NO_PERMISSION: {
+            MMI_HILOGE("permission denied");
+            return INPUT_PERMISSION_DENIED;
+        }
+        case OHOS::MMI::ERROR_UNSUPPORT: {
+            MMI_HILOGE("Not supported");
+            return INPUT_DEVICE_NOT_SUPPORTED;
+        }
+        case OHOS::MMI::ERROR_REPEAT_INTERCEPTOR: {
+            MMI_HILOGE("Interceptor repeat");
+            return INPUT_REPEAT_INTERCEPTOR;
+        }
+        case OHOS::MMI::ERROR_INVALID_PARAMETER: {
+            MMI_HILOGE("Invalid parameter");
+            return INPUT_PARAMETER_ERROR;
+        }
+        default: {
+            break;
+        }
+    }
+    MMI_HILOGW("Unclear exception, treat as INPUT_SERVICE_EXCEPTION");
+    return INPUT_SERVICE_EXCEPTION;
 }
 
 static bool SetKeyEventAction(Input_KeyEvent* keyEvent, int32_t action)
@@ -1351,6 +1388,39 @@ static void KeyEventMonitorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_keyMonitorCallbacks) {
         callback(keyEvent);
+    }
+    OH_Input_DestroyKeyEvent(&keyEvent);
+}
+
+static Input_KeyEventCallback GetHookCallback()
+{
+    std::lock_guard guard(g_mutex);
+    return g_keyEventHookCallback;
+}
+
+static void SetHookCallback(Input_KeyEventCallback hookCallback)
+{
+    std::lock_guard guard(g_mutex);
+    g_keyEventHookCallback = hookCallback;
+}
+
+static void KeyEventHookCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
+{
+    CHKPV(event);
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    CHKPV(keyEvent);
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
+    keyEvent->id = event->GetId();
+    keyEvent->keyCode = event->GetKeyCode();
+    keyEvent->actionTime = event->GetActionTime();
+    keyEvent->windowId = event->GetTargetWindowId();
+    keyEvent->displayId = event->GetTargetDisplayId();
+    auto hookCallback = GetHookCallback();
+    if (hookCallback != nullptr) {
+        hookCallback(keyEvent);
     }
     OH_Input_DestroyKeyEvent(&keyEvent);
 }
@@ -3087,4 +3157,88 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input
     }
     pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
     return pointerEvent;
+}
+
+Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32_t* eventId)
+{
+    CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
+    *eventId = keyEvent->id;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback)
+{
+    CALL_INFO_TRACE;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (auto hookCallback = GetHookCallback(); callback == hookCallback) {
+        MMI_HILOGE("Repeatedly set the hook function.");
+        return INPUT_REPEAT_INTERCEPTOR;
+    }
+    if (g_keyEventHookId.load() != INVALID_INTERCEPTOR_ID) {
+        MMI_HILOGE("Repeatedly set the hook function. A process can only have one key hook function.");
+        return INPUT_REPEAT_INTERCEPTOR;
+    }
+    SetHookCallback(callback);
+    int32_t hookId { INVALID_INTERCEPTOR_ID };
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddKeyEventHook(
+        KeyEventHookCallback, hookId);
+    if (ret != RET_OK) {
+        auto errCode = NormalizeHookResult(ret);
+        MMI_HILOGE("AddKeyEventHook failed, errCode:%{public}d", errCode);
+        g_keyEventHookId.store(INVALID_INTERCEPTOR_ID);
+        SetHookCallback(nullptr);
+        return errCode;
+    }
+    g_keyEventHookId.store(hookId);
+    ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetHookIdUpdater([](int32_t hookId) {
+        MMI_HILOGI("Update keyHookId:%{public}d", hookId);
+        g_keyEventHookId.store(hookId);
+    });
+    if (ret != RET_OK) {
+        auto errCode = NormalizeHookResult(ret);
+        MMI_HILOGE("SetHookIdUpdater failed, errCode:%{public}d", errCode);
+        g_keyEventHookId.store(INVALID_INTERCEPTOR_ID);
+        SetHookCallback(nullptr);
+        return errCode;
+    }
+    MMI_HILOGI("OH_Input_AddKeyEventHook success, hookId:%{public}d", g_keyEventHookId.load());
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_RemoveKeyEventHook(Input_KeyEventCallback callback)
+{
+    CALL_INFO_TRACE;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (auto hookCallback = GetHookCallback(); hookCallback != callback) {
+        MMI_HILOGE("The callback has not been added before, return success");
+        return INPUT_SUCCESS;
+    }
+    if (int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveKeyEventHook(g_keyEventHookId);
+        ret != RET_OK) {
+        auto errCode = NormalizeHookResult(ret);
+        MMI_HILOGE("RemoveKeyEventHook failed, service exception, keyEventHookId:%{public}d", g_keyEventHookId.load());
+        return errCode;
+    }
+    MMI_HILOGI("OH_Input_RemoveKeyEventHook success, hookId:%{public}d", g_keyEventHookId.load());
+    g_keyEventHookId.store(INVALID_INTERCEPTOR_ID);
+    SetHookCallback(nullptr);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_DispatchToNextHandler(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    if (auto hookCallback = GetHookCallback(); hookCallback == nullptr ||
+        g_keyEventHookId.load() == INVALID_INTERCEPTOR_ID) {
+        MMI_HILOGE("No hook existed.");
+        return INPUT_PARAMETER_ERROR;
+    }
+    if (int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().DispatchToNextHandler(eventId);
+        ret != RET_OK) {
+        auto errCode = NormalizeHookResult(ret);
+        MMI_HILOGE("DispatchToNextHandler failed, eventId:%{public}d, errCode:%{public}d", eventId, errCode);
+        return errCode;
+    }
+    MMI_HILOGD("OH_Input_DispatchToNextHandler success, eventId:%{public}d", eventId);
+    return INPUT_SUCCESS;
 }

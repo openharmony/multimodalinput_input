@@ -17,6 +17,7 @@
 #include "cursor_drawing_component.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
+#include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
 #include "input_event_handler.h"
 #include "mouse_device_state.h"
@@ -102,6 +103,13 @@ MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
 {
     globalPointerSpeed_ = GetPointerSpeed();
+}
+
+MouseTransformProcessor::~MouseTransformProcessor()
+{
+    if (TimerMgr->IsExist(timerId_)) {
+        TimerMgr->RemoveTimer(timerId_);
+    }
 }
 
 std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
@@ -1592,6 +1600,9 @@ int32_t MouseTransformProcessor::SetMouseAccelerateMotionSwitch(bool enable)
     MMI_HILOGI("Set accelerate motion switch is %{public}d", enableMouseAleaccelerateBool_);
     return RET_OK;
 }
+
+void MouseTransformProcessor::OnDeviceRemoved()
+{}
 
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
 void MouseTransformProcessor::HandleFilterMouseEvent(Offset* offset)

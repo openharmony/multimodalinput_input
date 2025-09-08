@@ -56,7 +56,8 @@ public:
     MOCK_METHOD(const std::vector<WindowInfo>, GetWindowGroupInfoByDisplayIdCopy, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
     MOCK_METHOD((std::pair<double, double>), TransformDisplayXY, (const OLD::DisplayInfo&, double, double), (const));
-    void ClearTargetWindowId(int32_t pointerId) override {}
+    void ClearTargetDeviceWindowId(int32_t deviceId) override {}
+    void ClearTargetWindowId(int32_t pointerId, int32_t deviceId) override {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     MOCK_METHOD((std::vector<std::pair<int32_t, TargetInfo>>), UpdateTarget, (std::shared_ptr<KeyEvent>));
@@ -65,7 +66,6 @@ public:
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
     MOCK_METHOD(int32_t, ClearMouseHideFlag, (int32_t));
-    MOCK_METHOD(int32_t, GetCurrentUserId, ());
     MOCK_METHOD(void, SetFoldState, ());
     MOCK_METHOD(bool, CheckAppFocused, (int32_t));
 
@@ -90,8 +90,11 @@ public:
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
-    void UpdatePointerDrawingManagerWindowInfo() override {}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    void UpdatePointerDrawingManagerWindowInfo() override {}
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -122,13 +125,13 @@ public:
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
     void SetWindowStateNotifyPid(int32_t pid) override {}
     int32_t GetWindowStateNotifyPid() override { return 0; }
-    int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
     MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
-    void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
+    void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&, int32_t) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
 #ifdef OHOS_BUILD_ENABLE_ANCO

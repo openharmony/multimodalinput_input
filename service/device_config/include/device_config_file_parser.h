@@ -22,6 +22,7 @@ struct libinput_device;
 
 struct VendorConfig {
     int32_t pointerSpeed { -1 };
+    int32_t enableOutScreen { -1 };
 };
 
 namespace OHOS {
@@ -30,6 +31,7 @@ enum class ConfigFileItem {
     INVALID = -1,
     POINTER_BASE = 0,
     POINTER_SPEED,
+    POINTER_ENABLE_OUT_SCREEN,
 };
 class DeviceConfigManagement {
 public:

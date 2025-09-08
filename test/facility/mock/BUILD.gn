@@ -14,7 +14,10 @@
 import("../../../multimodalinput_mini.gni")
 
 config("mmi_mock_sources_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/service/window_manager/include",
+  ]
 }
 
 ohos_source_set("mmi_mock_sources") {

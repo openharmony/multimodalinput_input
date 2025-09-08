@@ -183,4 +183,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void SwitchScreenCapturePermission([in] unsigned int permissionType, [in] boolean enable);
     void ClearMouseHideFlag([in] int eventId);
     void QueryPointerRecord([in] int count, [out] sharedptr<PointerEvent> [] pointerList);
+    void AddKeyEventHook([out] int hookId);
+    void RemoveKeyEventHook([in] int hookId);
+    void DispatchToNextHandler([in] int eventId);
 }

@@ -13,47 +13,35 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "getintervalsincelastinput_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetIntervalSinceLastInputFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void GetIntervalSinceLastInputFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+    int64_t timeInterval = fdp.ConsumeIntegral<int64_t>();
+    InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
 }
 
-void GetIntervalSinceLastInputFuzzTest(const uint8_t* data, size_t size)
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    int64_t timeInterval = -1;
-    InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    GetIntervalSinceLastInputFuzzTest(fdp);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::GetIntervalSinceLastInputFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

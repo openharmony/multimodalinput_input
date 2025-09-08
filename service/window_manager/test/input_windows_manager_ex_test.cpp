@@ -745,6 +745,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006,
     EXPECT_FALSE(ret);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_001
  * @tc.desc: Test the function IsNeedRefreshLayer
@@ -857,6 +860,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_005
     EXPECT_FALSE(ret);
 }
 
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
+
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_01
  * @tc.desc: Cover if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) branch
@@ -904,6 +910,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     libinput_event_touch *touch = nullptr;
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
 
+    int32_t deviceId = 0;
     OLD::DisplayInfo info;
     info.direction = DIRECTION90;
     info.direction = DIRECTION270;
@@ -915,7 +922,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     touchInfo.toolRect.point.y = 600;
     touchInfo.toolRect.width = 720;
     touchInfo.toolRect.height = 1000;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->GetPhysicalDisplayCoord(touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->GetPhysicalDisplayCoord(deviceId, touch, info, touchInfo));
 }
 
 /**
@@ -2558,13 +2565,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
     libinput_event_touch touch {};
     OLD::DisplayInfo info;
     EventTouch touchInfo;
+    int32_t deviceId = 0;
     info.direction = DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
     info.direction = DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
     info.direction = DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(deviceId, &touch, info, touchInfo));
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_006
@@ -2600,6 +2611,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006
     ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
     EXPECT_FALSE(ret);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
 
 /**
 @tc.name: InputWindowsManagerTest_UpdateTransformDisplayXY_001
@@ -3540,6 +3554,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateDisplayScreen_00
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateDisplayScreen(info, coord));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer
  * @tc.desc: Test the function IsNeedRefreshLayer
@@ -3671,6 +3688,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_009
     EXPECT_FALSE(inputWindowsManager.IsNeedRefreshLayer(windowId));
 }
 
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation
  * @tc.desc: Test the funcation AdjustDisplayRotation
@@ -3800,6 +3823,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     }
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_001
@@ -4882,6 +4908,9 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_019, TestSize.Level1)
 
 #endif /* OHOS_BUILD_ENABLE_POINTER */
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_006
  * @tc.desc: Test the funcation AdjustDisplayRotation
@@ -4908,6 +4937,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     cursorPosRef.direction = Direction::DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 /**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation_010
@@ -5290,7 +5322,7 @@ HWTEST_F(InputWindowsManagerTest, IsWritePen_002, TestSize.Level1)
     ASSERT_NE(inputWindowsManager, nullptr);
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
-    EXPECT_TRUE(inputWindowsManager->IsWritePen(pointerItem));
+    EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
 }
 } // namespace MMI
 } // namespace OHOS

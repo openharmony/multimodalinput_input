@@ -56,7 +56,9 @@ XKeyEventProcessor::XKeyEventProcessor()
 {}
 
 XKeyEventProcessor::~XKeyEventProcessor()
-{}
+{
+    RemoveTimer();
+}
 
 bool XKeyEventProcessor::IsXKeyEvent(struct libinput_event* event)
 {
@@ -94,7 +96,7 @@ int32_t XKeyEventProcessor::AnalyseKeyEvent(struct libinput_event* event)
     auto keyCode = libinput_event_keyboard_get_key(keyEvent);
     int32_t keyState = libinput_event_keyboard_get_key_state(keyEvent);
     MMI_HILOGD("keyCode:%{private}d, keyState:%{private}d", keyCode, keyState);
-    int32_t keyAction = keyState == 0 ? KeyEvent::KEY_ACTION_UP : KeyEvent::KEY_ACTION_DOWN;
+    int32_t keyAction = keyState == LIBINPUT_KEY_STATE_PRESSED ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP;
     if (KeyEvent::KEY_ACTION_DOWN == keyAction) {
         InterceptXKeyDown();
     } else {

@@ -96,6 +96,9 @@ std::shared_ptr<PointerEvent> Remote_ControlTransformProcessor::OnEvent(struct l
     return pointerEvent_;
 }
 
+void Remote_ControlTransformProcessor::OnDeviceRemoved()
+{}
+
 bool Remote_ControlTransformProcessor::OnEventTouchMotion(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;

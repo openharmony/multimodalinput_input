@@ -1299,6 +1299,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandler_001, TestS
     EXPECT_EQ(ret, RET_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_001
  * @tc.desc: Test the function OnMoveMouse
@@ -1316,6 +1318,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_001, TestSize.Le
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnCancelInjection_001
@@ -2273,6 +2277,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSi
     EXPECT_EQ(result, ERR_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
  * @tc.desc: Test the function OnMoveMouse
@@ -2290,6 +2296,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Le
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnAuthorize_004
@@ -3459,8 +3467,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplaysInfo_002, TestSi
         << info.displayDirection << info.displayMode << info.transform << info.scalePercent << info.expandHeight
         << info.isCurrentOffScreenRendering << info.displaySourceMode << info.oneHandX << info.oneHandY
         << info.screenArea << info.rsId << info.offsetX << info.offsetY << info.pointerActiveWidth
-        << info.pointerActiveHeight;
-    ;
+        << info.pointerActiveHeight << info.deviceRotation << info.rotationCorrection;
     EXPECT_EQ(handler.ReadDisplaysInfo(pkt, displayGroupInfo), RET_OK);
 }
 
@@ -4429,6 +4436,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId02, TestSiz
     int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 
+    pointerEvent->SetPointerId(INT32_MAX - 1);
+    diffPointerId = 2;
+    result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
+    EXPECT_EQ(result, RET_ERR);
+
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     pointerEvent->AddPointerItem(item);
@@ -4472,7 +4484,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_08, TestSize.L
         << displayInfo.displayMode << displayInfo.transform << displayInfo.scalePercent << displayInfo.expandHeight
         << displayInfo.isCurrentOffScreenRendering << displayInfo.displaySourceMode << displayInfo.oneHandX
         << displayInfo.oneHandY << displayInfo.screenArea << displayInfo.rsId << displayInfo.offsetX
-        << displayInfo.offsetY << displayInfo.pointerActiveWidth << displayInfo.pointerActiveHeight;
+        << displayInfo.offsetY << displayInfo.pointerActiveWidth << displayInfo.pointerActiveHeight
+        << displayInfo.deviceRotation << displayInfo.rotationCorrection;
     uint32_t windowNum = 1;
     pkt << windowNum;
     WindowInfo windowInfo;
