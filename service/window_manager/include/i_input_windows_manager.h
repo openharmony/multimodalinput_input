@@ -161,7 +161,7 @@ public:
     virtual bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
-    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds,
+    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::set<int32_t> &windowIds,
         int32_t deviceId) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
