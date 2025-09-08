@@ -13,39 +13,35 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "removeinterceptor_fuzzer.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "RemoveInterceptorFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-void RemoveInterceptorFuzzTest(const uint8_t* data, size_t /* size */)
+void RemoveInterceptorFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr) {
-        return;
-    }
-    MMI_HILOGD("RemoveInterceptorFuzzTest");
-
-    int32_t interceptorId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t interceptorId = fdp.ConsumeIntegral<int32_t>();
     InputManager::GetInstance()->RemoveInterceptor(interceptorId);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    RemoveInterceptorFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
+    if (!data || size == 0) {
         return 0;
     }
-    if (size < sizeof(int32_t)) {
-        return 0;
-    }
-    OHOS::MMI::RemoveInterceptorFuzzTest(data, size);
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

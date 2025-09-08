@@ -13,39 +13,28 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "functionkeystate_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-template <class T> size_t GetObject(T &object, const uint8_t *data, size_t size)
+void FunctionKeyStateFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
+    int32_t funcKey = fdp.ConsumeIntegral<int32_t>();
+    bool enable = fdp.ConsumeBool();
 
-void FunctionkeyStateFuzzTest(const uint8_t *data, size_t size)
-{
-    int32_t funcKey;
-    size_t startPos = 0;
-    startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
-    int32_t random;
-    GetObject<int32_t>(random, data + startPos, size - startPos);
-    bool enable = (random % 2) ? false : true;
     InputManager::GetInstance()->SetFunctionKeyState(funcKey, enable);
+
     bool state = false;
     InputManager::GetInstance()->GetFunctionKeyState(funcKey, state);
+}
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    FunctionKeyStateFuzzTest(fdp);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
@@ -53,7 +42,11 @@ void FunctionkeyStateFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::FunctionkeyStateFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

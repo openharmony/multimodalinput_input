@@ -41,7 +41,8 @@ std::shared_ptr<TimerManager> TimerManager::GetInstance()
     return instance_;
 }
 
-int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount,
+    std::function<void()> callback, const std::string &name)
 {
     if (running_.load()) {
         return RET_ERR;
@@ -71,6 +72,11 @@ int32_t TimerManager::RemoveTimer(int32_t timerId)
 int32_t TimerManager::ResetTimer(int32_t timerId)
 {
     return RET_OK;
+}
+
+bool TimerManager::IsExist(int32_t timerId)
+{
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS
