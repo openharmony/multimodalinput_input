@@ -45,6 +45,7 @@ ohos_source_set("event_handler_mock") {
     "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
     "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
