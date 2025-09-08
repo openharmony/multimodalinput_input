@@ -16,6 +16,8 @@
 #ifndef LIBINPUT_ADAPTER_H
 #define LIBINPUT_ADAPTER_H
 
+#include <shared_mutex>
+
 #include "hotplug_detector.h"
 #include "libinput.h"
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -40,21 +42,9 @@ typedef std::function<int32_t(libinput_event_touch *touch, int32_t& delayMs,
                               std::vector<libinput_event*>& events)> GetLibinputEventForVKeyboard;
 typedef std::function<int32_t(libinput_event_touch *touch,
                               std::vector<libinput_event*>& events)> GetLibinputEventForVTrackpad;
-
+typedef std::function<void()> ResetVTrackpadState;
+typedef std::function<void()> StopVTrackpadTimer;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-enum VTPSwipeStateType {
-    SWIPE_BEGIN = 1,
-    SWIPE_UPDATE = 2,
-    SWIPE_END = 3,
-};
-enum VKeyboardMessageType {
-    VNoMessage = -1,
-    VKeyPressed = 0,
-    VCombinationKeyPressed = 1,
-    VStartLongPressControl = 16,
-    VStopLongPressControl = 17,
-    VSwitchLayout = 18,
-};
 enum VKeyboardEventType {
     NoKeyboardEvent = -1,
     NormalKeyboardEvent = 0,
@@ -68,37 +58,10 @@ enum VTrackpadEventType {
     NormalTrackpadEvent = 0,
     PinchBegin = 1,
     PinchUpdate = 2,
-    PinchEnd = 3
-};
-enum class VTPStateMachineMessageType : int32_t {
-    UNKNOWN = 0,
-    POINTER_MOVE = 1,
-    LEFT_CLICK_DOWN = 2,
-    LEFT_CLICK_UP = 3,
-    RIGHT_CLICK_DOWN = 4,
-    RIGHT_CLICK_UP = 5,
-    SCROLL_BEGIN = 6,
-    SCROLL_UPDATE = 7,
-    SCROLL_END = 8,
-    PINCH_BEGIN = 9,
-    PINCH_UPDATE = 10,
-    PINCH_END = 11,
-    PAN_BEGIN = 12,
-    PAN_UPDATE = 13,
-    PAN_END = 14,
-    ROT_BEGIN = 15,
-    ROT_UPDATE = 16,
-    ROT_END = 17,
-    LEFT_TOUCH_DOWN = 18,
-    LEFT_TOUCH_UP = 19,
-    TWO_FINGER_TAP = 20,
-    LEFT_TOUCH_UP_CANCEL = 21,
-    SWIPE_BEGIN = 22,
-    SWIPE_UPDATE = 23,
-    SWIPE_END = 24,
-    SWIPE_FOUR_BEGIN = 25,
-    SWIPE_FOUR_UPDATE = 26,
-    SWIPE_FOUR_END = 27,
+    PinchEnd = 3,
+    SingleTap = 4,
+    DoubleTap = 5,
+    RemoveTimer = 6,
 };
 
 enum class VKeyboardActivation : int32_t {
@@ -114,7 +77,7 @@ public:
     static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable);
     LibinputAdapter() = default;
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
-    ~LibinputAdapter() = default;
+    ~LibinputAdapter();
     bool Init(FunInputEvent funInputEvent);
     void EventDispatch(int32_t fd);
     void Stop();
@@ -135,8 +98,10 @@ public:
         GetKeyboardActivationState getKeyboardActivationState,
         IsFloatingKeyboard isFloatingKeyboard,
         IsVKeyboardShown isVKeyboardShown,
-		GetLibinputEventForVKeyboard getLibinputEventForVKeyboard,
-        GetLibinputEventForVTrackpad getLibinputEventForVTrackpad
+        GetLibinputEventForVKeyboard getLibinputEventForVKeyboard,
+        GetLibinputEventForVTrackpad getLibinputEventForVTrackpad,
+        ResetVTrackpadState resetVTrackpadState,
+        StopVTrackpadTimer stopVTrackpadTimer
         );
 
 private:
@@ -146,14 +111,14 @@ private:
     void OnDeviceAdded(std::string path);
     void OnDeviceRemoved(std::string path);
     void InitRightButtonAreaConfig();
-    void InjectKeyEvent(libinput_event_touch* touch, int32_t keyCode, libinput_key_state state, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
     void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> &keyboardEvents,
                                 int64_t frameTime);
     void HandleVTrackpadMessage(VTrackpadEventType eventType, std::vector<libinput_event*> &events,
-                                int64_t frameTime, libinput_event_touch *touch);
+                                int64_t frameTime, libinput_event_touch *touch,
+                                libinput_event *event, bool& delayvtpDestroy);
     bool IsVKeyboardActivationDropEvent(libinput_event_touch* touch, libinput_event_type eventType);
     void InjectEventForTwoFingerOnTouchpad(libinput_event_touch* touch,
         libinput_event_type eventType, int64_t frameTime);
@@ -161,22 +126,26 @@ private:
     bool IsCursorInCastWindow();
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void HandleHWKeyEventForVKeyboard(libinput_event* event);
-    void ShowMouseCursor();
     void HideMouseCursorTemporary();
     double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
-    bool SkipTouchMove(int touchId, int32_t eventType); // compress touch move events in consecutive two frame
     void DelayInjectKeyEventCallback();
-    bool CreateVKeyboardDelayTimer(libinput_event *event, int32_t delayMs, libinput_event *keyEvent);
+    bool CreateVKeyboardDelayTimer(int32_t delayMs, libinput_event *keyEvent);
     void StartVKeyboardDelayTimer(int32_t delayMs);
     bool GetIsCaptureMode();
-    void UpdateBootFlag();
-    VTPSwipeStateType vtpSwipeState_ = VTPSwipeStateType::SWIPE_END;
+    void SafeDestroyVKeyboardDelayedEvent();
+    libinput_event_touch* SafeGetVTrackPadTouchEvent();
+    void SafeDestroyVTrackPadDelayedEvent();
 
-    libinput_event *vkbDelayedEvent_ = nullptr;
+    void DelayInjectReleaseCallback();
+    void DelayInjectPressReleaseCallback();
+    void UpdateBootFlag();
+
     libinput_event *vkbDelayedKeyEvent_ = nullptr;
-    int32_t vkbDelayedKeyCode_ = 0;
-    std::chrono::system_clock::time_point vtpSingleTapDownTime;
-    const double vtpSingleTapThreshold = 0.18; // s
+    libinput_event *vtpDelayedEvent_ = nullptr;
+    std::mutex vtrDelayedMutex_;
+    int32_t vkbTimerId_ { -1 };
+    int32_t vtpTimerId_ { -1 };
+    
     // set as true once subscriber succeeded.
     std::atomic_bool hasInitSubscriber_ { false };
     static std::atomic_bool isBootCompleted_;
@@ -193,6 +162,8 @@ private:
     IsVKeyboardShown isVKeyboardShown_ { nullptr };
     GetLibinputEventForVKeyboard getLibinputEventForVKeyboard_ { nullptr };
     GetLibinputEventForVTrackpad getLibinputEventForVTrackpad_ { nullptr };
+    ResetVTrackpadState resetVTrackpadState_ { nullptr };
+    StopVTrackpadTimer stopVTrackpadTimer_ { nullptr };
     int32_t deviceId;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
