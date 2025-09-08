@@ -2003,7 +2003,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
             displayInfo->id, displayInfo->x, displayInfo->y, displayInfo->width, displayInfo->height,
             displayInfo->dpi, displayInfo->name.c_str(), displayInfo->uniq.c_str(), displayInfo->direction,
             displayInfo->displayDirection);
-        if (cursorPosCur.direction == displayInfo->direction) {
+        if (!GetHardCursorEnabled() && cursorPosCur.displayDirection != displayInfo->displayDirection) {
             ScreenRotateAdjustDisplayXY(*displayInfo, coord);
         }
 
