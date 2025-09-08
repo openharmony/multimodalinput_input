@@ -618,6 +618,8 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -629,13 +631,13 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
-            shellTargetWindowIds_[pointerId] = targetWindowId;
+            shellTargetWindowIds_[touch] = targetWindowId;
         } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
-            castTargetWindowIds_[pointerId] = targetWindowId;
+            castTargetWindowIds_[touch] = targetWindowId;
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-            accessTargetWindowIds_[pointerId] = targetWindowId;
+            accessTargetWindowIds_[touch] = targetWindowId;
         } else {
-            nativeTargetWindowIds_[pointerId] = targetWindowId;
+            nativeTargetWindowIds_[touch] = targetWindowId;
         }
     }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
@@ -643,13 +645,13 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
-            shellTargetWindowIds_.erase(pointerId);
+            shellTargetWindowIds_.erase(touch);
         } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
-            castTargetWindowIds_.erase(pointerId);
+            castTargetWindowIds_.erase(touch);
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-            accessTargetWindowIds_.erase(pointerId);
+            accessTargetWindowIds_.erase(touch);
         } else {
-            nativeTargetWindowIds_.erase(pointerId);
+            nativeTargetWindowIds_.erase(touch);
         }
     }
     return RET_OK;
@@ -663,10 +665,8 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     int32_t targetWindowId = -1;
     if (isShell) {
         targetWindowId = FixTargetWindowId(pointerEvent, shellTargetWindowIds_);
-    } else if ((IsCastInject(pointerEvent->GetDeviceId()))) {
-        targetWindowId = (pointerEvent->GetZOrder() > 0) ? // Gesture Window in Collaborative Scenarios
-        FixTargetWindowId(pointerEvent, castTargetWindowIds_, true, CAST_POINTER_ID) :
-        FixTargetWindowId(pointerEvent, nativeTargetWindowIds_, true, CAST_POINTER_ID);
+    } else if ((IsCastInject(pointerEvent->GetDeviceId())) && (pointerEvent->GetZOrder() > 0)) {
+        targetWindowId = FixTargetWindowId(pointerEvent, castTargetWindowIds_, true, CAST_POINTER_ID);
     } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         targetWindowId = FixTargetWindowId(pointerEvent, accessTargetWindowIds_);
     } else {
@@ -677,7 +677,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
 }
 
 int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
-    const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
+    const std::map<InjectionTouch, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
 {
     CHKPR(pointerEvent, RET_ERR);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
@@ -697,7 +697,9 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
             pointerEvent->SetPointerId(pointerEvent->GetPointerId() + diffPointerId);
         }
     }
-    auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    auto iter = targetWindowIdMap.find(touch);
     if (iter != targetWindowIdMap.end()) {
         return iter->second;
     }
