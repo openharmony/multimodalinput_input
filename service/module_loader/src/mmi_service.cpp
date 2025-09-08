@@ -163,8 +163,8 @@ const std::set<int32_t> g_keyCodeValueSet = {
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t DEFAULT_USER_ID { 100 };
 #endif // OHOS_BUILD_ENABLE_ANCO
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 // Define vkeyboard functions from vendor
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
 void* g_VKeyboardHandle = nullptr;
@@ -172,19 +172,6 @@ typedef int32_t (*HANDLE_TOUCHPOINT_TYPE)(
     double screenX, double screenY, int touchId, int32_t eventType, double touchPressure,
     int32_t longAxis, int32_t shortAxis);
 HANDLE_TOUCHPOINT_TYPE handleTouchPoint_ = nullptr;
-typedef int32_t (*STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE)(
-    int& delayMs, int& toggleCodeSecond, int& keyCode);
-STATEMACINEMESSAGQUEUE_GETLIBINPUTMESSAGE_TYPE statemachineMessageQueue_getLibinputMessage_ = nullptr;
-typedef void (*TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE)(
-    std::vector<std::vector<int32_t>>& retMsgList);
-TRACKPADENGINE_GETALLTOUCHMESSAGE_TYPE trackPadEngine_getAllTouchMessage_ = nullptr;
-typedef void (*TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE)();
-TRACKPADENGINE_CLEARTOUCHMESSAGE_TYPE trackPadEngine_clearTouchMessage_ = nullptr;
-typedef void (*TRACKPADENGINE_GETALLKEYMESSAGE_TYPE)(
-    std::vector<std::vector<int32_t>>& retMsgList);
-TRACKPADENGINE_GETALLKEYMESSAGE_TYPE trackPadEngine_getAllKeyMessage_ = nullptr;
-typedef void (*TRACKPADENGINE_CLEARKEYMESSAGE_TYPE)();
-TRACKPADENGINE_CLEARKEYMESSAGE_TYPE trackPadEngine_clearKeyMessage_ = nullptr;
 typedef int32_t (*VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE)(IRemoteObject* &vkeyboardDevice);
 VKEYBOARD_CREATEVKEYBOARDDEVICE_TYPE vkeyboard_createVKeyboardDevice_ = nullptr;
 typedef int32_t (*VKEYBOARD_ONFUNCKEYEVENT_TYPE)(std::shared_ptr<KeyEvent> funcKeyEvent);
@@ -203,6 +190,10 @@ GET_LIBINPUT_EVENT_FOR_VKEYBOARD_TYPE getLibinputEventForVKeyboard_ = nullptr;
 typedef int32_t (*GET_LIBINPUT_EVENT_FOR_VTRACKPAD_TYPE)(
     libinput_event_touch *touch, std::vector<libinput_event*>& events);
 GET_LIBINPUT_EVENT_FOR_VTRACKPAD_TYPE getLibinputEventForVTrackpad_ = nullptr;
+typedef void (*RESET_VTRACKPAD_STATE)();
+RESET_VTRACKPAD_STATE resetVTrackpadState_ = nullptr;
+typedef void (*STOP_VTRACKPAD_TIMER)();
+STOP_VTRACKPAD_TIMER stopVTrackpadTimer_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -4252,13 +4243,19 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "GetLibinputEventForVKeyboard");
             getLibinputEventForVTrackpad_ = (GET_LIBINPUT_EVENT_FOR_VTRACKPAD_TYPE)dlsym(
                 g_VKeyboardHandle, "GetLibinputEventForVTrackpad");
+            resetVTrackpadState_ = (RESET_VTRACKPAD_STATE)dlsym(
+                g_VKeyboardHandle, "ResetVTrackpadState");
+            stopVTrackpadTimer_ = (STOP_VTRACKPAD_TIMER)dlsym(
+                g_VKeyboardHandle, "StopVTrackpadTimer");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 vkeyboard_hardwareKeyEventDetected_,
                 vkeyboard_getKeyboardActivationState_,
                 gaussiankeyboard_isFloatingKeyboard_,
                 vkeyboard_isShown_,
                 getLibinputEventForVKeyboard_,
-                getLibinputEventForVTrackpad_);
+                getLibinputEventForVTrackpad_,
+                resetVTrackpadState_,
+                stopVTrackpadTimer_);
         }
     }
 }
