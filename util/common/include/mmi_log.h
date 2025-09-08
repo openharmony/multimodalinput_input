@@ -57,11 +57,13 @@ void ResetLogTrace();
 
 #define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
 #define MMI_FUNC_NOLINE_FMT "[%{public}s][%{public}s] "
+#define MMI_TRACE_LINE_FMT "[%{public}s|%{public}d]"
 #define INPUT_KEY_FLOW "InputKeyFlow"
 #define MMI_TRACE_ID (OHOS::MMI::FormatLogTrace()),
 #else
 #define MMI_FUNC_FMT "[%{public}s:%{public}d] "
 #define MMI_FUNC_NOLINE_FMT "[%{public}s] "
+#define MMI_TRACE_LINE_FMT "[%{public}d]"
 #define MMI_TRACE_ID
 #endif //MMI_DISABLE_LOG_TRACE
 
@@ -116,14 +118,14 @@ void ResetLogTrace();
 #endif
 
 #define MMI_HILOG_BASE(type, level, domain, tag, fmt, ...) do { \
-        HILOG_IMPL(type, level, domain, tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        HILOG_IMPL(type, level, domain, tag, MMI_TRACE_LINE_FMT fmt, MMI_TRACE_ID __LINE__, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HEADER(level, lh, fmt, ...) do { \
-        HILOG_IMPL(LOG_CORE, level, lh.domain, lh.tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID lh.func, lh.line, \
+        HILOG_IMPL(LOG_CORE, level, lh.domain, lh.tag, MMI_TRACE_LINE_FMT fmt, MMI_TRACE_ID lh.line, \
         ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HEADER_NO_RELEASE(level, lh, fmt, ...) do { \
-        HILOG_IMPL(LOG_ONLY_PRERELEASE, level, lh.domain, lh.tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID lh.func, lh.line, \
+        HILOG_IMPL(LOG_ONLY_PRERELEASE, level, lh.domain, lh.tag, MMI_TRACE_LINE_FMT fmt, MMI_TRACE_ID lh.line, \
         ##__VA_ARGS__); \
 } while (0)
 
