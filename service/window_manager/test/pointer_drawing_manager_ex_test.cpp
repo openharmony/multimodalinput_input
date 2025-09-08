@@ -359,7 +359,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPoint
     EXPECT_FALSE(windowId != GLOBAL_WINDOW_ID);
     pointerStyle.id = 2;
     style.id = 3;
-    EXPECT_TRUE(pointerStyle.id != style.id);
     int32_t ret2 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret2, RET_OK);
 

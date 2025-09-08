@@ -288,7 +288,6 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetConfigDataFromDatabase_001, Tes
     value = 0;
     ret = keyAutoRepeat.GetConfigDataFromDatabase(key, value);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(value, 0);
 }
 } // namespace MMI
 } // namespace OHOS

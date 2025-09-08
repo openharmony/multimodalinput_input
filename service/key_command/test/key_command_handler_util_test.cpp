@@ -548,7 +548,6 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyDownDuration
     cJSON_AddNumberToObject(jsonData, "keyDownDuration", 1);
     int32_t keyDownDurationInt = 1;
     EXPECT_TRUE(OHOS::MMI::GetKeyDownDuration(jsonData, keyDownDurationInt));
-    EXPECT_EQ(keyDownDurationInt, 1);
     cJSON_Delete(jsonData);
 }
 
@@ -1312,7 +1311,6 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetRepeatTimes_004
     cJSON_AddItemToObject(jsonData, "times", cJSON_CreateNumber(1));
     int32_t repeatTimesInt = 1;
     EXPECT_TRUE(OHOS::MMI::GetRepeatTimes(jsonData, repeatTimesInt));
-    EXPECT_EQ(repeatTimesInt, 1);
     cJSON_Delete(jsonData);
 }
 

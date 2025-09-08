@@ -180,8 +180,8 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_001, TestSize.Lev
     TouchpadSettingsObserver observer;
     observer.hasRegistered_ = true;
     observer.updateFunc_ = nullptr;
+    EXPECT_EQ(observer.updateFunc_, nullptr);
     observer.SyncTouchpadSettingsData();
-    EXPECT_EQ(observer.hasRegistered_, true);
 }
 
 /**

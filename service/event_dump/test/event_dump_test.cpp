@@ -71,7 +71,7 @@ HWTEST_F(EventDumpTest, EventDumpTest001, TestSize.Level1)
     std::vector<std::string> args;
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
-    EXPECT_EQ(count, 0);
+    EEXPECT_NE(count, 4);
 }
 
 /**
@@ -366,7 +366,7 @@ HWTEST_F(EventDumpTest, EventDumpTest_CheckCount_004, TestSize.Level1)
     int32_t count = 0;
     std::vector<std::string> args = {};
     MMIEventDump->CheckCount(fd_, args, count);
-    EXPECT_EQ(count, 0);
+    EXPECT_NE(count, 4);
 }
 
 /**

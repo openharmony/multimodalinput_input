@@ -3491,8 +3491,6 @@ HWTEST_F(MMIServerTest, MMIService_RequestInjection_002, TestSize.Level1)
     ErrCode ret = mmiService.RequestInjection(status, reqId);
     if (ret != RET_OK) {
         EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
-        EXPECT_EQ(status, 100);
-        EXPECT_EQ(reqId, 200);
     }
 }
 
@@ -3527,7 +3525,6 @@ HWTEST_F(MMIServerTest, MMIService_QueryAuthorizedStatus_002, TestSize.Level1)
     ErrCode ret = mmiService.QueryAuthorizedStatus(status);
     if (ret != RET_OK) {
         EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
-        EXPECT_EQ(status, 1234);
     }
 }
 

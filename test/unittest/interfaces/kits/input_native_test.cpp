@@ -57,6 +57,7 @@ public:
 HWTEST_F(InputNativeTest, InputNativeTest_KeyState_001, TestSize.Level1)
 {
     struct Input_KeyState* keyState = OH_Input_CreateKeyState();
+    ASSERT_NE(keyState, nullptr);
     if (keyState != nullptr) {
         OH_Input_DestroyKeyState(&keyState);
     }
