@@ -44,13 +44,6 @@ private:
         std::function<bool(std::shared_ptr<Hook>, std::shared_ptr<KeyEvent>)> handler;
     };
 
-    struct StashEvent {
-        int32_t pid { -1 };
-        int32_t timerId { -1 };
-        std::shared_ptr<KeyEvent> keyEvent;
-        std::shared_ptr<Hook> hook;
-    };
-
 public:
     bool OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t AddKeyEventHook(int32_t pid, SessionPtr sess, int32_t &hookId);
@@ -75,13 +68,7 @@ private:
     std::shared_ptr<KeyEventHookManager::Hook> GetNextHook(std::shared_ptr<Hook> hook);
     bool HookHandler(SessionPtr session, std::shared_ptr<Hook> hook, std::shared_ptr<KeyEvent> keyEvent);
     bool DispatchDirectly(std::shared_ptr<KeyEvent> keyEvent);
-    int32_t MakeStashEvent(SessionPtr session, std::shared_ptr<Hook> hook, std::shared_ptr<KeyEvent> keyEvent,
-        StashEvent &stashEvent);
-    void AddStashEvent(int32_t eventId, StashEvent stashEvent);
-    void RemoveStashEvent(int32_t eventId);
-    int32_t GetStashEvent(int32_t eventId, StashEvent &stashEvent);
-    void OnStashEventTimeout(int32_t eventId);
-    int32_t CheckAndUpdateEventLoopClosure(const StashEvent &stashEvent);
+    int32_t CheckAndUpdateEventLoopClosure(int32_t hookId, std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleEventLoopClosureKeyDown(int32_t hookId, int32_t keyCode);
     int32_t HandleEventLoopClosureKeyUpOrCancel(int32_t hookId, int32_t keyCode);
 
@@ -89,7 +76,6 @@ private:
     std::atomic_bool isInitialized_ { false };
     std::shared_mutex rwMutex_;
     std::deque<std::shared_ptr<Hook>> hooks_;
-    std::map<int32_t, StashEvent> stashEvents_; // eventId -> StashEvent
 };
 } // namespace MMI
 } // namespace OHOS

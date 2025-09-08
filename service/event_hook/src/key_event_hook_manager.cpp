@@ -17,6 +17,7 @@
 
 #include "error_multimodal.h"
 #include "event_dispatch_order_checker.h"
+#include "event_expiration_checker.h"
 #include "event_loop_closure_checker.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -30,9 +31,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t STASH_EVENT_TIMEOUT_MS { 3000 };
-} // namespace
 
 KeyEventHookManager &KeyEventHookManager::GetInstance()
 {
@@ -91,6 +89,9 @@ int32_t KeyEventHookManager::RemoveKeyEventHook(int32_t pid, int32_t hookId)
     if (EVENT_DISPATCH_ORDER_CHECKER.RemoveChecker(hookId) != RET_OK) {
         MMI_HILOGW("RemoveChecker of hook:%{public}d failed", hookId);
     }
+    if (EVENT_EXPIRATION_CHECKER.RemoveChecker(hookId) != RET_OK) {
+        MMI_HILOGW("RemoveChecker of hook:%{public}d failed", hookId);
+    }
     return RET_OK;
 }
 
@@ -101,29 +102,30 @@ int32_t KeyEventHookManager::DispatchToNextHandler(int32_t pid, int32_t eventId)
         MMI_HILOGW("No hook from pid:%{public}d", pid);
         return ERROR_INVALID_PARAMETER;
     }
-    static StashEvent stashEvent;
-    if (GetStashEvent(eventId, stashEvent) != RET_OK) {
-        MMI_HILOGW("GetStashEvent failed, eventId:%{public}d, caused by timeout or invalid eventId", eventId);
+    auto hook = GetHookByPid(pid);
+    CHKPR(hook, RET_ERR);
+    if (EVENT_EXPIRATION_CHECKER.CheckExpiration(hook->id, eventId) != RET_OK) {
+        MMI_HILOGW("CheckExpiration failed, eventId:%{public}d", eventId);
         return ERROR_INVALID_PARAMETER;
     }
-    CHKPR(stashEvent.hook, RET_ERR);
-    if (EVENT_DISPATCH_ORDER_CHECKER.CheckDispatchOrder(stashEvent.hook->id, eventId) != RET_OK) {
+    if (EVENT_DISPATCH_ORDER_CHECKER.CheckDispatchOrder(hook->id, eventId) != RET_OK) {
         MMI_HILOGW("CheckDispatchOrder failed, eventId:%{public}d", eventId);
         return ERROR_INVALID_PARAMETER;
     }
-    if (CheckAndUpdateEventLoopClosure(stashEvent) != RET_OK) {
+    auto keyEvent = EVENT_EXPIRATION_CHECKER.GetKeyEvent(hook->id, eventId);
+    CHKPR(keyEvent, ERROR_INVALID_PARAMETER);
+    if (CheckAndUpdateEventLoopClosure(hook->id, keyEvent) != RET_OK) {
         MMI_HILOGW("CheckAndUpdateEventLoopClosure failed, eventId:%{public}d", eventId);
         return RET_OK;
     }
-    RemoveStashEvent(eventId);
-    auto nextHook = GetNextHook(stashEvent.hook);
+    auto nextHook = GetNextHook(hook);
     bool ret { false };
     if (nextHook != nullptr && nextHook->handler != nullptr) {
-        ret = nextHook->handler(nextHook, stashEvent.keyEvent);
+        ret = nextHook->handler(nextHook, keyEvent);
     } else { // No hooks left, dispatch directly
-        ret = DispatchDirectly(stashEvent.keyEvent);
+        ret = DispatchDirectly(keyEvent);
     }
-    EVENT_DISPATCH_ORDER_CHECKER.UpdateLastDispatchedId(stashEvent.hook->id, eventId);
+    EVENT_DISPATCH_ORDER_CHECKER.UpdateLastDispatchedId(hook->id, eventId);
     return ret ? RET_OK : RET_ERR;
 }
 
@@ -161,6 +163,9 @@ void KeyEventHookManager::OnSessionLost(SessionPtr session)
         MMI_HILOGW("RemoveChecker of hook:%{public}d, pid:%{public}d failed", hook->id, pid);
     }
     if (EVENT_DISPATCH_ORDER_CHECKER.RemoveChecker(hook->id) != RET_OK) {
+        MMI_HILOGW("RemoveChecker of hook:%{public}d failed", hook->id);
+    }
+    if (EVENT_EXPIRATION_CHECKER.RemoveChecker(hook->id) != RET_OK) {
         MMI_HILOGW("RemoveChecker of hook:%{public}d failed", hook->id);
     }
     if (RemoveHookById(hook->id) != RET_OK) {
@@ -321,29 +326,8 @@ bool KeyEventHookManager::HookHandler(SessionPtr session, std::shared_ptr<Hook> 
         return false;
     }
     MMI_HILOGD("Send to hook:%{public}d success", session->GetPid());
-    StashEvent stashEvent;
-    if (MakeStashEvent(session, hook, keyEvent, stashEvent) != RET_OK) {
-        MMI_HILOGE("MakeStashEvent failed");
-        return false;
-    }
-    AddStashEvent(keyEvent->GetId(), stashEvent);
+    EVENT_EXPIRATION_CHECKER.UpdateStashEvent(hook->id, keyEvent);
     return true;
-}
-
-int32_t KeyEventHookManager::MakeStashEvent(SessionPtr session, std::shared_ptr<Hook> hook,
-    std::shared_ptr<KeyEvent> keyEvent, StashEvent &stashEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(session, RET_ERR);
-    CHKPR(hook, RET_ERR);
-    CHKPR(keyEvent, RET_ERR);
-    stashEvent.pid = session->GetPid();
-    auto eventId = keyEvent->GetId();
-    stashEvent.timerId = TimerMgr->AddTimer(STASH_EVENT_TIMEOUT_MS, 1, [this, eventId]() {
-        this->OnStashEventTimeout(eventId); }, "KeyEventHookManager::StashEvent");
-    stashEvent.keyEvent = KeyEvent::Clone(keyEvent);
-    stashEvent.hook = hook;
-    return RET_OK;
 }
 
 bool KeyEventHookManager::DispatchDirectly(std::shared_ptr<KeyEvent> keyEvent)
@@ -361,51 +345,11 @@ bool KeyEventHookManager::DispatchDirectly(std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-void KeyEventHookManager::AddStashEvent(int32_t eventId, StashEvent stashEvent)
+int32_t KeyEventHookManager::CheckAndUpdateEventLoopClosure(int32_t hookId, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
-    std::unique_lock<std::shared_mutex> lock(rwMutex_);
-    stashEvents_.insert({eventId, stashEvent});
-}
-
-void KeyEventHookManager::RemoveStashEvent(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    std::unique_lock<std::shared_mutex> lock(rwMutex_);
-    auto iter = stashEvents_.find(eventId);
-    if (iter == stashEvents_.end()) {
-        MMI_HILOGW("No event:%{public}d existed", eventId);
-        return;
-    }
-    TimerMgr->RemoveTimer(iter->second.timerId);
-    stashEvents_.erase(iter);
-}
-
-int32_t KeyEventHookManager::GetStashEvent(int32_t eventId, StashEvent &stashEvent)
-{
-    CALL_DEBUG_ENTER;
-    std::shared_lock<std::shared_mutex> lock(rwMutex_);
-    if (stashEvents_.find(eventId) == stashEvents_.end()) {
-        MMI_HILOGW("No event:%{public}d existed", eventId);
-        return RET_ERR;
-    }
-    stashEvent = stashEvents_[eventId];
-    return RET_OK;
-}
-
-void KeyEventHookManager::OnStashEventTimeout(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    RemoveStashEvent(eventId);
-}
-
-int32_t KeyEventHookManager::CheckAndUpdateEventLoopClosure(const StashEvent &stashEvent)
-{
-    CHKPR(stashEvent.keyEvent, RET_ERR);
-    CHKPR(stashEvent.hook, RET_ERR);
-    auto keyAction = stashEvent.keyEvent->GetKeyAction();
-    auto keyCode = stashEvent.keyEvent->GetKeyCode();
-    auto hookId = stashEvent.hook->id;
+    CHKPR(keyEvent, RET_ERR);
+    auto keyAction = keyEvent->GetKeyAction();
+    auto keyCode = keyEvent->GetKeyCode();
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         return HandleEventLoopClosureKeyDown(hookId, keyCode);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP || keyAction == KeyEvent::KEY_ACTION_CANCEL) {
