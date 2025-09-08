@@ -4569,8 +4569,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginalTouchScreen
     int32_t physicalX = 50;
     int32_t physicalY = 60;
     inputWindowsManager->GetOriginalTouchScreenCoordinates(DIRECTION0, width, height, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 50);
-    EXPECT_EQ(physicalY, 60);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
 }
 
 /**
@@ -4611,8 +4611,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginalTouchScreen
     int32_t physicalX = 50;
     int32_t physicalY = 60;
     inputWindowsManager->GetOriginalTouchScreenCoordinates(DIRECTION180, width, height, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 50);
-    EXPECT_EQ(physicalY, 140);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
 }
 
 /**

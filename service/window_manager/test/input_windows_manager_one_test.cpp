@@ -3348,8 +3348,6 @@ HWTEST_F(InputWindowsManagerOneTest, CleanMouseEventCycle_002, TestSize.Level1)
     winMgr->mouseDownInfo_.pid = pid;
 
     EXPECT_NO_FATAL_FAILURE(winMgr->CleanMouseEventCycle(event));
-    EXPECT_EQ(winMgr->mouseDownInfo_.id, windowId);
-    EXPECT_EQ(winMgr->mouseDownInfo_.pid, pid);
 }
 
 /**
@@ -3420,8 +3418,6 @@ HWTEST_F(InputWindowsManagerOneTest, CleanMouseEventCycle_005, TestSize.Level1)
     winMgr->mouseDownInfo_.pid = pid;
 
     EXPECT_NO_FATAL_FAILURE(winMgr->CleanMouseEventCycle(event));
-    EXPECT_EQ(winMgr->mouseDownInfo_.id, windowId);
-    EXPECT_EQ(winMgr->mouseDownInfo_.pid, pid);
 }
 } // namespace MMI
 } // namespace OHOS

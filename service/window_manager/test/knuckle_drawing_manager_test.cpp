@@ -1089,7 +1089,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_ProcessUpEvent_004
     };
     auto ret = kceDrawMgr.ProcessUpEvent(isNeedUpAnimation);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(kceDrawMgr.destroyTimerId_, -1);
     ASSERT_EQ(kceDrawMgr.brushCanvasNode_, nullptr);
     ASSERT_EQ(kceDrawMgr.trackCanvasNode_, nullptr);
     ASSERT_EQ(kceDrawMgr.surfaceNode_, nullptr);

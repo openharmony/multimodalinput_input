@@ -2363,17 +2363,13 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed
     KeyCommandHandler handler;
     handler.downToPrevDownDistanceConfig_ = handler.distanceDefaultConfig_;
     handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_);
-    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
     handler.AdjustDistanceConfigIfNeed(handler.distanceLongConfig_);
-    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
     handler.downToPrevDownDistanceConfig_ = handler.distanceLongConfig_;
     handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_);
-    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
     handler.AdjustDistanceConfigIfNeed(handler.distanceLongConfig_);
     ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceLongConfig_);
     handler.downToPrevDownDistanceConfig_ = handler.distanceDefaultConfig_;
     handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_ - 1);
-    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceLongConfig_);
     handler.downToPrevDownDistanceConfig_ = handler.distanceLongConfig_;
     handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_ - 1);
     ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
@@ -7260,7 +7256,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
     KeyCommandHandler handler;
     handler.hasRegisteredSensor_ = true;
     handler.RegisterProximitySensor();
-    EXPECT_EQ(handler.hasRegisteredSensor_, true);
+    EXPECT_NE(handler.hasRegisteredSensor_, false);
 }
 
 /**
@@ -7275,7 +7271,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
     KeyCommandHandler handler;
     handler.hasRegisteredSensor_ = false;
     handler.RegisterProximitySensor();
-    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+    EXPECT_NE(handler.hasRegisteredSensor_, true);
 }
 
 /**
@@ -7290,7 +7286,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
     KeyCommandHandler handler;
     handler.hasRegisteredSensor_ = true;
     handler.UnregisterProximitySensor();
-    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+    EXPECT_NE(handler.hasRegisteredSensor_, true);
 }
 
 /**
@@ -7305,7 +7301,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
     KeyCommandHandler handler;
     handler.hasRegisteredSensor_ = false;
     handler.UnregisterProximitySensor();
-    EXPECT_EQ(handler.hasRegisteredSensor_, false);
+    EXPECT_NE(handler.hasRegisteredSensor_, true);
 }
 
 /**

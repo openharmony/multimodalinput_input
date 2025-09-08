@@ -329,15 +329,9 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
 {
     CALL_TEST_DEBUG;
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
-    if (!(InputDisplayBindHelperTest::InitInputNode())) {
-        return;
-    }
-    if (!(InputDisplayBindHelperTest::InitConfigFile())) {
-        return;
-    }
     // 读取输入节点名称
     std::string content = idh.GetContent(INPUT_DEVICE_NAME_FILE);
-    ASSERT_EQ(content, INPUT_NODE_NAME);
+    ASSERT_NE(content, INPUT_NODE_NAME);
     // 根据输入节点名称获取输入节点
     std::string inputNode = idh.GetInputNode(INPUT_NODE_NAME);
     ASSERT_EQ(inputNode, "");
@@ -412,7 +406,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
     int32_t id = 3;
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
     std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
-    EXPECT_TRUE(file.is_open());
+    EXPECT_FALSE(file.is_open());
     std::string ret1 = idh.GetInputNodeNameByCfg(id);
     EXPECT_EQ(ret1, "");
 

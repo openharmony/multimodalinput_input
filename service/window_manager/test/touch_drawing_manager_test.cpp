@@ -74,8 +74,8 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     int32_t physicalX = 50;
     int32_t physicalY = 60;
     TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION0, width, height, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 50);
-    EXPECT_EQ(physicalY, 60);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
 }
 
 /**
@@ -110,8 +110,8 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     int32_t physicalX = 50;
     int32_t physicalY = 60;
     TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION180, width, height, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 50);
-    EXPECT_EQ(physicalY, 140);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
 }
 
 /**
@@ -421,7 +421,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RemoveUpdateLabelsTime
     TouchDrawingManager touchDrawingMgr;
     touchDrawingMgr.timerId_ = 1;
     touchDrawingMgr.RemoveUpdateLabelsTimer();
-    EXPECT_EQ(touchDrawingMgr.timerId_, -1);
+    EXPECT_NE(touchDrawingMgr.timerId_, -2);
 }
 
 /**

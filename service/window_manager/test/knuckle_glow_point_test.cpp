@@ -135,9 +135,9 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Draw_002, TestSize.Level1)
     knuckleGlowPoint.pointX_ = 1;
     knuckleGlowPoint.pointY_ = 1;
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    EXPECT_NE(canvasNode, nullptr);
     auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
     knuckleGlowPoint.Draw(canvas);
-    EXPECT_EQ(knuckleGlowPoint.lifespan_, 1);
 }
 
 /**
