@@ -119,6 +119,7 @@ group("test") {
     "notifynaponline_fuzzer:fuzztest",
     "parseproductnamemap_fuzzer:fuzztest",
     "notifyremovedevicelisteners_fuzzer:fuzztest",
+    "oncommonevent_fuzzer:fuzztest",
     "pointeritem_fuzzer:fuzztest",
     "pointerevent_fuzzer:fuzztest",
     "pointerlocation_fuzzer:fuzztest",
