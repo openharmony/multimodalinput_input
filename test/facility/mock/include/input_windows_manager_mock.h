@@ -131,7 +131,7 @@ public:
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
     MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
-    void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&, int32_t) override {}
+    void GetTargetWindowIds(int32_t, int32_t, std::set<int32_t>&, int32_t) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
 #ifdef OHOS_BUILD_ENABLE_ANCO

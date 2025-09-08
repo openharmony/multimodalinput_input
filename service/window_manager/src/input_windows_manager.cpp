@@ -5370,7 +5370,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOG_DISPATCHD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        std::vector<int32_t> windowIds;
+        std::set<int32_t> windowIds;
         GetTargetWindowIds(pointerId, pointerEvent->GetSourceType(), windowIds, pointerEvent->GetDeviceId());
         if (windowIds.size() <= 1) {
             pointerEvent->SetAncoDeal(true);
@@ -5607,7 +5607,7 @@ void InputWindowsManager::UpdateTargetTouchWinIds(const WindowInfo &item, Pointe
             targetTouchWinIds_[deviceId][pointerId], deviceId);
         if (!targetTouchWinIds_[deviceId][pointerId].empty()) {
             ClearMismatchTypeWinIds(pointerId, displayId, deviceId);
-            targetTouchWinIds_[deviceId][pointerId].push_back(item.id);
+            targetTouchWinIds_[deviceId][pointerId].insert(item.id);
         }
     }
 }
@@ -6803,7 +6803,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t w
 }
 
 void InputWindowsManager::GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType,
-    std::vector<int32_t> &windowIds, int32_t deviceId)
+    std::set<int32_t> &windowIds, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     if (sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
@@ -6827,10 +6827,10 @@ void InputWindowsManager::AddTargetWindowIds(int32_t pointerItemId, int32_t sour
     CALL_DEBUG_ENTER;
     if (sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (targetMouseWinIds_.find(pointerItemId) != targetMouseWinIds_.end()) {
-            targetMouseWinIds_[pointerItemId].push_back(windowId);
+            targetMouseWinIds_[pointerItemId].insert(windowId);
         } else {
-            std::vector<int32_t> windowIds;
-            windowIds.push_back(windowId);
+            std::set<int32_t> windowIds;
+            windowIds.insert(windowId);
             targetMouseWinIds_.emplace(pointerItemId, windowIds);
         }
         return;
@@ -6840,10 +6840,10 @@ void InputWindowsManager::AddTargetWindowIds(int32_t pointerItemId, int32_t sour
             targetTouchWinIds_[deviceId] = {};
         }
         if (targetTouchWinIds_[deviceId].find(pointerItemId) != targetTouchWinIds_[deviceId].end()) {
-            targetTouchWinIds_[deviceId][pointerItemId].push_back(windowId);
+            targetTouchWinIds_[deviceId][pointerItemId].insert(windowId);
         } else {
-            std::vector<int32_t> windowIds;
-            windowIds.push_back(windowId);
+            std::set<int32_t> windowIds;
+            windowIds.insert(windowId);
             targetTouchWinIds_[deviceId].emplace(pointerItemId, windowIds);
         }
     }
