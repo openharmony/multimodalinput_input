@@ -327,9 +327,14 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 void LibinputAdapter::DelayInjectKeyEventCallback()
 {
+    if (funInputEvent_ == nullptr) {
+        MMI_HILOGW("inject function funInputEvent_ is null");
+        SafeDestroyVKeyboardDelayedEvent();
+        return;
+    }
     int64_t frameTime = GetSysClockTime();
     std::lock_guard<std::mutex> guard(vtrDelayedMutex_);
-    if (vkbDelayedKeyEvent_ != nullptr && funInputEvent_ != nullptr) {
+    if (vkbDelayedKeyEvent_ != nullptr) {
         funInputEvent_(vkbDelayedKeyEvent_, frameTime);
         free(vkbDelayedKeyEvent_);
         vkbDelayedKeyEvent_ = nullptr;
@@ -362,7 +367,6 @@ void LibinputAdapter::SafeDestroyVTrackPadDelayedEvent()
     libinput_event_destroy(vtpDelayedEvent_);
     vtpDelayedEvent_ = nullptr;
 }
-
 
 // return true if timer has started successfully.
 bool LibinputAdapter::CreateVKeyboardDelayTimer(int32_t delayMs, libinput_event *keyEvent)
