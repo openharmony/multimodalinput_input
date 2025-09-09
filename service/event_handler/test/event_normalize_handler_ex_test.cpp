@@ -204,5 +204,53 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchPad
     handler.HandleTouchPadAction(&event);
     EXPECT_EQ(event.device->vendor, 1);
 }
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandlePointerEvent_001
+ * @tc.desc: Test the function TerminateAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    handler.nextHandler_ = std::make_shared<EventTestHandler>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    handler.HandlePointerEvent(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerId(), 0);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandlePointerEvent_002
+ * @tc.desc: Test the function TerminateAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    handler.nextHandler_ = std::make_shared<EventTestHandler>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    handler.HandlePointerEvent(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerId(), 0);
+}
 } // namespace MMI
 } // namespace OHOS
