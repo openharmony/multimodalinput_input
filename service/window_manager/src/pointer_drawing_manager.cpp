@@ -879,8 +879,6 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
             CHKPV(ptr);
             ptr->SetRotation(ROTATION_ANGLE);
         });
-
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 std::shared_ptr<Rosen::Drawing::ColorSpace> PointerDrawingManager::ConvertToColorSpace(
@@ -1261,7 +1259,6 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
                 protocol,
                 Rosen::RSAnimationTimingCurve::LINEAR,
                 [this]() { canvasNode_->SetRotation(0); });
-            Rosen::RSTransaction::FlushImplicitTransaction();
             canvasNode_->SetVisible(false);
         }
         MMI_HILOGE("current pointer is not running");
@@ -1389,7 +1386,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
     }
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY += height;
+            physicalX -= height;
             break;
         }
         case ANGLE_CENTER: {
@@ -1398,7 +1395,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX -= width * MOUSE_ICON_BIAS_RATIO;
+            physicalY -= width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -1467,7 +1464,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
     }
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY -= height;
+            physicalX += height;
             break;
         }
         case ANGLE_CENTER: {
@@ -1476,7 +1473,7 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
             break;
         }
         case ANGLE_NW_RIGHT: {
-            physicalX += width * MOUSE_ICON_BIAS_RATIO;
+            physicalY -= width * MOUSE_ICON_BIAS_RATIO;
             [[fallthrough]];
         }
         case ANGLE_NW: {
@@ -3869,6 +3866,10 @@ OLD::DisplayInfo PointerDrawingManager::GetCurrentDisplayInfo()
 void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle,
     int32_t &physicalX, int32_t &physicalY)
 {
+    if (pointerStyle == MOUSE_ICON::LOADING) {
+        direction = DIRECTION0;
+    }
+
     if (pointerStyle == MOUSE_ICON::DEFAULT) {
         if (mouseIcons_[pointerStyle].iconPath == CursorIconPath) {
             AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
