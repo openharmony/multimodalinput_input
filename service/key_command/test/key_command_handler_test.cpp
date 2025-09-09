@@ -968,6 +968,9 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_006, TestS
     inputEvent->bitwise_ = 0x00000000;
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
+    handler.lastMatchedKeys_ = {};
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -2418,6 +2421,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_01, TestSize
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
     shortcutKey.keyDownDuration = 0;
+    shortcutKey.ability.bundleName = "com.example.test";
     ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
 }
 
@@ -2432,8 +2436,45 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_02, TestSize
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 1000;
+    shortcutKey.ability.bundleName = "com.example.test";
+    shortcutKey.timerId = -1;
+    ASSERT_FALSE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_03
+ * @tc.desc: test HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 0;
+    shortcutKey.ability.bundleName = "com.example.test";
     shortcutKey.timerId = -1;
     ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_04
+ * @tc.desc: test HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 1000;
+    shortcutKey.ability.bundleName = "com.example.test";
+    shortcutKey.finalkey = 17;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    ASSERT_FALSE(handler.HandleKeyDown(shortcutKey));
 }
 
 /**
