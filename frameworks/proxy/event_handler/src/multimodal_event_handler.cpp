@@ -22,6 +22,9 @@
 
 #include "event_log_helper.h"
 #include "input_manager_impl.h"
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+#include "key_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "mmi_client.h"
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
@@ -64,6 +67,9 @@ void OnConnected(const IfMMIClient& client)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     INPUT_ACTIVE_SUBSCRIBE_MGR.OnConnected();
     DEVICE_CONSUMER.OnConnected();
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    KEY_EVENT_HOOK_HANDLER.OnConnected();
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
 
 void OnDisconnected(const IfMMIClient &client)

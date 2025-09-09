@@ -46,7 +46,8 @@
       "input_feature_touch_drawing",
       "input_feature_watch_cfg_source",
       "input_feature_upgrade_skia",
-      "input_feature_mistouch_prevention"
+      "input_feature_mistouch_prevention",
+      "input_feature_key_hook"
     ],
     "adapted_system_type": [
       "standard"
@@ -105,8 +106,8 @@
         "sensor",
         "idl_tool",
         "runtime_core",
-        "jsoncpp",
-        "libinput"
+        "libinput",
+        "os_account"
       ],
       "third_party": [
         "libuv",

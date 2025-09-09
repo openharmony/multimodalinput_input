@@ -28,7 +28,9 @@
 #include "mmi_log.h"
 #include "parameters.h"
 #include "pixel_map.h"
+#define private public
 #include "pointer_drawing_manager.h"
+#undef private
 #include "pointer_event.h"
 
 #undef MMI_LOG_TAG
@@ -2174,6 +2176,45 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerCallback());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InitPointerCallback_002
+ * @tc.desc: Test InitPointerCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.SetSurfaceNode(nullptr);
+    pointerDrawingManager.initEventhandlerFlag_.store(true);
+    pointerDrawingManager.InitPointerCallback();
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InitPointerCallback_003
+ * @tc.desc: Test InitPointerCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::CURSOR_NODE;
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode =
+        Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(surfaceNode, nullptr);
+    pointerDrawingManager.SetSurfaceNode(surfaceNode);
+
+    pointerDrawingManager.initEventhandlerFlag_.store(true);
+    pointerDrawingManager.InitPointerCallback();
+    ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
 }
 
 /**

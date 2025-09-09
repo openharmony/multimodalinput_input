@@ -84,7 +84,7 @@ public:
 public:
     DISALLOW_COPY_AND_MOVE(MouseTransformProcessor);
     explicit MouseTransformProcessor(int32_t deviceId);
-    ~MouseTransformProcessor() = default;
+    ~MouseTransformProcessor();
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
@@ -199,6 +199,10 @@ private:
             [](int32_t timerId) -> int32_t
             {
                 return TimerMgr->ResetTimer(timerId);
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->RemoveTimer(timerId);
             }
     };
     bool enableMouseAleaccelerateBool_ { true };

@@ -1227,5 +1227,26 @@ int32_t MultimodalInputConnectManager::QueryPointerRecord(
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->QueryPointerRecord(count, pointerList);
 }
+
+int32_t MultimodalInputConnectManager::AddKeyEventHook(int32_t &hookId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddKeyEventHook(hookId);
+}
+
+int32_t MultimodalInputConnectManager::RemoveKeyEventHook(int32_t hookId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemoveKeyEventHook(hookId);
+}
+
+int32_t MultimodalInputConnectManager::DispatchToNextHandler(int32_t eventId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->DispatchToNextHandler(eventId);
+}
 } // namespace MMI
 } // namespace OHOS

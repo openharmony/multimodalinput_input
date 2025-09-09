@@ -16,6 +16,74 @@ import("../../../multimodalinput_mini.gni")
 
 module_output_path = "input/input"
 
+ohos_unittest("MouseEventNormalizeTestWithMock") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+  ]
+
+  sources = [
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_event_normalize.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
+    "src/mouse_event_normalize_test_with_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
+    "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
+    "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
+    "${mmi_path}/test/facility/event_handler_mock:event_handler_mock",
+    "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
+    "${mmi_path}/test/facility/key_command_mock:key_command_mock",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
+    "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
+    "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "preferences:native_preferences",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("MouseEventNormalizeTest") {
   module_out_path = module_output_path
 
@@ -301,5 +369,13 @@ ohos_unittest("MouseTransformProcessorEXTest") {
     "window_manager:libwm",
     "init:libbegetutil",
     "graphic_2d:librender_service_client",
+  ]
+}
+
+group("MouseEventNormalizeTests") {
+  testonly = true
+
+  deps = [
+    ":MouseEventNormalizeTestWithMock"
   ]
 }

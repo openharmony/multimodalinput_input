@@ -28,6 +28,12 @@ namespace MMI {
 namespace {
 constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
 constexpr size_t PRE_KEYS_NUM { 4 };
+enum SubcriberType : int32_t {
+    ACTION_UNKNOWN = 0,
+    ACTION_CANCEL = 1,
+    ACTION_ONLY_DOWN = 2,
+    ACTION_DOWN_AND_UP = 3
+};
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
@@ -54,11 +60,30 @@ std::string KeyEventInputSubscribeManager::MonitorIdentity::Dump() const
 bool KeyEventInputSubscribeManager::MonitorIdentity::Want(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPF(keyEvent);
-    return ((key_ == keyEvent->GetKeyCode()) &&
-            (action_ == keyEvent->GetKeyAction()) &&
-            (isRepeat_ ||
-             (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) ||
-             !keyEvent->IsRepeatKey()));
+    int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t keyAction = keyEvent->GetKeyAction();
+    bool isKeyRepeat = keyEvent->IsRepeatKey();
+    MMI_HILOGD("[key_:%{public}d, KC:%{private}d],[action_:%{public}d, KA:%{public}d]"
+        "[isRepeat_:%{public}d, isKeyRpeat:%{public}d]",
+        key_, keyCode, action_, keyAction, isRepeat_, isKeyRepeat);
+    if (key_ != keyCode) {
+        MMI_HILOGW("Invalid subscription key:%{private}d", keyCode);
+        return false;
+    }
+
+    bool isRepeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (!isKeyRepeat) : isKeyRepeat;
+    bool flag = false;
+    if (action_ == SubcriberType::ACTION_ONLY_DOWN) {
+        flag = (keyAction == KeyEvent::KEY_ACTION_DOWN) &&
+            (isRepeat_ || !isKeyRepeat);
+    } else if (action_ == SubcriberType::ACTION_DOWN_AND_UP) {
+        flag = ((keyAction == KeyEvent::KEY_ACTION_DOWN) ||
+            (keyAction == KeyEvent::KEY_ACTION_UP)) && (isRepeat_ || isRepeatValue);
+    }  else  {
+        MMI_HILOGW("Invalid SubcriberType");
+        flag = false;
+    }
+    return flag;
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 

@@ -38,6 +38,8 @@ const std::string EVENT { "event" };
 const char* NAME { "name" };
 const int32_t DISPLAY_ID_MAIN { 0 };
 const int32_t DISPLAY_ID_SUB { 5 };
+const int32_t DISPLAY_ID_CAR_CO_PILOT { 1 };
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 }
 
 namespace fs = std::filesystem;
@@ -386,9 +388,8 @@ std::set<std::pair<uint64_t, std::string>> InputDisplayBindHelper::GetDisplayIdN
 void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
     auto inputDeviceName = configFileInfos_->GetInputDeviceByDisplayName(name);
-    if (IsDualDisplayFoldDevice()) {
+    if (IsDualDisplayFoldDevice() || PRODUCT_TYPE == "car") {
         std::string deviceName = GetInputDeviceById(id);
         if (!deviceName.empty()) {
             inputDeviceName = deviceName;
@@ -439,10 +440,10 @@ void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name
 std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
 {
     CALL_DEBUG_ENTER;
-    if (id != DISPLAY_ID_MAIN && id != DISPLAY_ID_SUB) {
+    if (id != DISPLAY_ID_MAIN && id != DISPLAY_ID_SUB &&
+        id != DISPLAY_ID_CAR_CO_PILOT) {
         return "";
     }
-
     std::string inputNodeName = GetInputNodeNameByCfg(id);
     if (inputNodeName.empty()) {
         return "";

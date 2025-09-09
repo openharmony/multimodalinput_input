@@ -81,6 +81,7 @@ public:
     void DrawScreenCenterPointer(const PointerStyle &pointerStyle);
     void SubscribeScreenModeChange();
     void RegisterDisplayStatusReceiver();
+    void InitDefaultMouseIconPath();
     int32_t UpdateMouseLayer(
         const PointerStyle &pointerStyle, uint64_t displayId, int32_t physicalX, int32_t physicalY);
     int32_t DrawNewDpiPointer();

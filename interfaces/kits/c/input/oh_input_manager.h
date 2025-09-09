@@ -624,6 +624,75 @@ void OH_Input_SetKeyEventDisplayId(struct Input_KeyEvent* keyEvent, int32_t disp
 int32_t OH_Input_GetKeyEventDisplayId(const struct Input_KeyEvent* keyEvent);
 
 /**
+ * @brief Get the eventId of the keyEvent.
+ *
+ * @param keyEvent - Key event object.
+ * @param eventId - Get the keyEvent eventId.
+ * @return OH_Input_GetKeyEventId function result code.
+ *         {@link INPUT_SUCCESS} Get the eventId of the keyEvent success.\n
+ *         {@link INPUT_PARAMETER_ERROR} Parameter check failed.\n
+ * @since 21
+ */
+
+Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32_t* eventId);
+
+/**
+ * @brief Add a keyEvent interception hook function. Before using this interface,
+ *        the user needs to authorize it in the settings.
+ *
+ * @permission ohos.permission.HOOK_KEY_EVENT
+ * @param callback - Hook function, keyEvent will be sent to the hook function for priority processing.
+ * @return OH_Input_AddKeyEventHook function result code.
+ *         {@link INPUT_SUCCESS} Added hook function successfully.\n
+ *         {@link INPUT_PARAMETER_ERROR}  Failed to add the hook function. Reason: Parameter check failed.\n
+ *         {@link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.\n
+ *         {@link INPUT_PERMISSION_DENIED} Failed to add the hook function. Reason: Permission check failed.\n
+ *         {@link INPUT_REPEAT_INTERCEPTOR} Failed to add the hook function.\n
+ *                 Reason: Repeatedly set the hook function. A process can only have one key hook function.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the hook function.\n
+ *                 Reason: Input service exception, please try again.\n
+ * @since 21
+ */
+Input_Result OH_Input_AddKeyEventHook(Input_KeyEventCallback callback);
+
+/**
+ * @brief Remove keyEvent interception hook function.
+ *
+ * @param callback - Hook function, Same as the parameters when calling OH_Input_AddKeyEventHook.
+ * @return OH_Input_RemoveKeyEventHook function result code.
+ *         {@link INPUT_SUCCESS} Hook function removed successfully.\n
+ *               Even if the hook function has not been added before, it will return success when removed.\n
+ *         {@link INPUT_PARAMETER_ERROR} Failed to remove the hook function. Reason: Parameter check failed.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to remove the hook function.\n
+ *                 Reason: Input service exception, please try again.\n
+ * @since 21
+ */
+Input_Result OH_Input_RemoveKeyEventHook(Input_KeyEventCallback callback);
+
+/**
+ * @brief Redispatches keyEvent.
+ *        Only keyEvent intercepted by hook functions can be redispatched,
+ *        and the event order must be maintained during redispatching.
+ *        The hook function intercepts the input event and then redistributes it for 3 seconds.
+ *        If this time is exceeded, calling this function will return INPUT_PARAMETER_ERROR.
+ * 	      Re-dispatching requires event pairing, usually starting with one or more KEY_ACTION_DOWN and
+ *        ending with KEY_ACTION_UP or KEY_ACTION_CANCEL.
+ * 	      Only KEY_ACTION_UP or KEY_ACTION_CANCEL is redispatched, the function call succeeds,
+ *        but no actual dispatch is made.
+ *        If an event is dispatched that is not intercepted by the hook function,
+ *        the function call succeeds, but no actual dispatch action is taken.
+ *
+ * @param eventId - keyEvent eventId.
+ * @return OH_Input_DispatchToNextHandler function result code.
+ *         {@link INPUT_SUCCESS} Redistribution successful.\n
+ *         {@link INPUT_PARAMETER_ERROR} Redistribution failed. Reason: KeyEvent does not exist.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Redistribution failed.\n
+ *                 Reason: Input service exception, it's recommended to reset the pending distribution status.\n
+ * @since 21
+ */
+Input_Result OH_Input_DispatchToNextHandler(int32_t eventId);
+
+/**
  * @brief Inject mouse event.
  *
  * @param mouseEvent - the mouse event to be injected.

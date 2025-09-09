@@ -67,6 +67,8 @@ public:
     MOCK_METHOD(struct libinput_event_touch *, GetTouchpadEvent, (struct libinput_event *));
     MOCK_METHOD(int32_t, TouchpadGetTool, (struct libinput_event_touch *));
     MOCK_METHOD(int,  DeviceGetSize, (struct libinput_device *, double *, double *));
+    MOCK_METHOD(enum libinput_config_status, DeviceConfigSetDragEnabled,
+        (struct libinput_device *, enum libinput_config_drag_state));
     MOCK_METHOD(char*, DeviceGetName, (struct libinput_device *));
     MOCK_METHOD(struct libinput_event_keyboard*, LibinputEventGetKeyboardEvent, (struct libinput_event *));
     MOCK_METHOD(uint32_t, LibinputEventKeyboardGetKey, (struct libinput_event_keyboard *));

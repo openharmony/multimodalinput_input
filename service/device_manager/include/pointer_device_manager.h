@@ -36,6 +36,7 @@ public:
     std::atomic<bool> isFirstAddRenderService { true };
     std::atomic<bool> isFirstAddDisplayManagerService { true };
     std::atomic<bool> isFirstAdddistributedKVDataService { true };
+    std::atomic<bool> isInitDefaultMouseIconPath { false };
 
 private:
     PointerDeviceManager() = default;

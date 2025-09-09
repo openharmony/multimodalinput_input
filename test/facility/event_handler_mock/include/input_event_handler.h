@@ -15,10 +15,12 @@
 
 #ifndef MMI_INPUT_EVENT_HANDLER_MOCK_H
 #define MMI_INPUT_EVENT_HANDLER_MOCK_H
+#include "event_dispatch_handler.h"
 #include "event_filter_handler.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
 #include "event_normalize_handler.h"
+#include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "switch_subscriber_handler.h"
 
@@ -33,8 +35,10 @@ public:
     virtual std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const = 0;
     virtual std::shared_ptr<KeySubscriberHandler> GetSubscriberHandler() const = 0;
     virtual std::shared_ptr<SwitchSubscriberHandler> GetSwitchSubscriberHandler() const = 0;
+    virtual std::shared_ptr<KeyCommandHandler> GetKeyCommandHandler() const = 0;
     virtual std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const = 0;
     virtual std::shared_ptr<EventFilterHandler> GetFilterHandler() const = 0;
+    virtual std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const = 0;
 };
 
 class InputEventHandlerManager final : public IInputEventHandlerManager {
@@ -46,8 +50,10 @@ public:
     MOCK_METHOD(std::shared_ptr<EventInterceptorHandler>, GetInterceptorHandler, (), (const));
     MOCK_METHOD(std::shared_ptr<KeySubscriberHandler>, GetSubscriberHandler, (), (const));
     MOCK_METHOD(std::shared_ptr<SwitchSubscriberHandler>, GetSwitchSubscriberHandler, (), (const));
+    MOCK_METHOD(std::shared_ptr<KeyCommandHandler>, GetKeyCommandHandler, (), (const));
     MOCK_METHOD(std::shared_ptr<EventMonitorHandler>, GetMonitorHandler, (), (const));
     MOCK_METHOD(std::shared_ptr<EventFilterHandler>, GetFilterHandler, (), (const));
+    MOCK_METHOD(std::shared_ptr<EventDispatchHandler>, GetEventDispatchHandler, (), (const));
 
     static std::shared_ptr<InputEventHandlerManager> GetInstance();
     static void ReleaseInstance();
