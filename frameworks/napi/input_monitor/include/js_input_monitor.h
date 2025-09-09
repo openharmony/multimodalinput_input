@@ -17,6 +17,7 @@
 #define JS_INPUT_MONITOR_H
 
 #include <map>
+#include <mutex>
 #include <queue>
 #include <uv.h>
 
