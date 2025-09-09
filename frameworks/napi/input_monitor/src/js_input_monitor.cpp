@@ -258,13 +258,13 @@ void InputMonitor::SetTypeName(const std::string &typeName)
 
 void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
+    std::lock_guard<std::mutex> guard(callbackMutex_);
     callback_ = callback;
 }
 
 void InputMonitor::SetKeyCallback(std::function<void(std::shared_ptr<KeyEvent>)> keyCallback)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
+    std::lock_guard<std::mutex> guard(keyCallbackMutex_);
     keyCallback_ = keyCallback;
 }
 
@@ -287,7 +287,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
-        std::lock_guard<std::mutex> guard(mutex_);
+        std::lock_guard<std::mutex> guard(callbackMutex_);
         auto typeName = JS_INPUT_MONITOR_MGR.GetMonitorTypeName(id_, fingers_);
         if (typeName == INVALID_TYPE_NAME) {
             MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
@@ -389,7 +389,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     CHKPV(keyEvent);
     std::function<void(std::shared_ptr<KeyEvent>)> callback;
     {
-        std::lock_guard<std::mutex> guard(mutex_);
+        std::lock_guard<std::mutex> guard(keyCallbackMutex_);
         auto typeName = JS_INPUT_MONITOR_MGR.GetPreMonitorTypeName(id_);
         if (typeName == INVALID_TYPE_NAME || typeName != "keyPressed") {
             MMI_HILOGE("Failed to process key event, id:%{public}d", id_);
