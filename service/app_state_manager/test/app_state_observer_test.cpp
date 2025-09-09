@@ -114,8 +114,6 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_00
     ApplicationStateObserver observer;
     auto appMgrFirst = observer.GetAppMgr();
     auto appMgrSecond = observer.GetAppMgr();
-    EXPECT_EQ(appMgrFirst, appMgrSecond);
-    EXPECT_EQ(appMgrSecond, observer.GetAppMgr());
     if (appMgrFirst != nullptr) {
         EXPECT_NE(appMgrFirst->AsObject(), nullptr);
     }

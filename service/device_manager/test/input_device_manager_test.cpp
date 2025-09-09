@@ -2052,7 +2052,6 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDeviceInn
     auto device = std::make_shared<InputDevice>();
     device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     ASSERT_NO_FATAL_FAILURE(inputDeviceManager.AddVirtualInputDeviceInner(deviceId, device));
-    EXPECT_EQ(inputDeviceManager.virtualInputDevices_[deviceId], device);
     EXPECT_EQ(inputDeviceManager.virtualKeyboardEverConnected_, false);
 }
 

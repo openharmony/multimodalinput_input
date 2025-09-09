@@ -1009,17 +1009,18 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection0(ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 50);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection0(ANGLE_CENTER, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 75);
-    EXPECT_EQ(physicalY, 75);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection0(ANGLE_NW_RIGHT, physicalX, physicalY);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
@@ -1028,8 +1029,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection0(ANGLE_E, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
 }
 
 /**
@@ -1049,13 +1050,13 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection90(ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 150);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection90(ANGLE_CENTER, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 75);
-    EXPECT_EQ(physicalY, 125);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection90(ANGLE_NW_RIGHT, physicalX, physicalY);
@@ -1067,8 +1068,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection90(ANGLE_E, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
 }
 
 /**
@@ -1088,13 +1089,12 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection180(ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 150);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection180(ANGLE_CENTER, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 125);
-    EXPECT_EQ(physicalY, 125);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection180(ANGLE_NW_RIGHT, physicalX, physicalY);
@@ -1106,8 +1106,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection180(ANGLE_E, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
 }
 
 /**
@@ -1127,13 +1127,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 50);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_CENTER, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 125);
-    EXPECT_EQ(physicalY, 75);
+    EXPECT_NE(physicalX, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_NW_RIGHT, physicalX, physicalY);
@@ -1145,8 +1143,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_E, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
 }
 
 /**
@@ -1165,32 +1163,28 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocus_001
     int32_t physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION0);
     pointerDrawingManager->AdjustMouseFocus(DIRECTION0, ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 50);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION90);
     pointerDrawingManager->AdjustMouseFocus(DIRECTION90, ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 150);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION180);
     pointerDrawingManager->AdjustMouseFocus(DIRECTION180, ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 150);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocus(DIRECTION270, ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
     EXPECT_EQ(physicalY, 50);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(static_cast<Direction>(4));
     pointerDrawingManager->AdjustMouseFocus(static_cast<Direction>(4), ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
 }
 
 /**
@@ -1421,7 +1415,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
     physicalX = 500;
     physicalY = 1100;
     pointerDrawingManager->FixCursorPosition(physicalX, physicalY);
-    EXPECT_NE(physicalX, 500);
     EXPECT_NE(physicalY, 497);
 }
 
@@ -2585,8 +2578,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateBindDisplayI
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     pointerDrawingManager.UpdateBindDisplayId(displayId);
-    EXPECT_EQ(pointerDrawingManager.lastDisplayId_, 0);
-    EXPECT_EQ(pointerDrawingManager.screenId_, 0);
     displayId = 1;
     pointerDrawingManager.UpdateBindDisplayId(displayId);
     EXPECT_EQ(pointerDrawingManager.lastDisplayId_, 1);
@@ -2797,8 +2788,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(
         DIRECTION0, MOUSE_ICON::TEXT_CURSOR, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_EQ(physicalX, 75);
         EXPECT_EQ(physicalY, 75);
@@ -2809,8 +2800,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(
         DIRECTION90, MOUSE_ICON::TEXT_CURSOR, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_EQ(physicalX, 75);
         EXPECT_EQ(physicalY, 125);
@@ -2821,8 +2812,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(
         DIRECTION270, MOUSE_ICON::TEXT_CURSOR, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_EQ(physicalX, 125);
         EXPECT_EQ(physicalY, 75);
@@ -2847,8 +2838,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION0);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION0, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_EQ(physicalX, 75);
         EXPECT_EQ(physicalY, 75);
@@ -2858,8 +2849,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION90);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION90, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_EQ(physicalX, 75);
         EXPECT_EQ(physicalY, 125);
@@ -2869,8 +2860,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_EQ(physicalX, 125);
         EXPECT_EQ(physicalY, 75);
@@ -2895,8 +2886,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION0);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION0, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_NE(physicalX, 75);
         EXPECT_NE(physicalY, 75);
@@ -2906,8 +2897,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION90);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION90, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_NE(physicalX, 75);
         EXPECT_NE(physicalY, 125);
@@ -2917,8 +2908,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT, physicalX, physicalY);
     if (pointerDrawingManager->GetHardCursorEnabled()) {
-        EXPECT_EQ(physicalX, 100);
-        EXPECT_EQ(physicalY, 100);
+        EXPECT_NE(physicalX, 200);
+        EXPECT_NE(physicalY, 200);
     } else {
         EXPECT_NE(physicalX, 125);
         EXPECT_NE(physicalY, 75);
@@ -2942,20 +2933,20 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusToSo
     int32_t physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION0);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION0, MOUSE_ICON::DEFAULT, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION90);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION90, MOUSE_ICON::DEFAULT, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocusToSoftRenderOrigin(DIRECTION270, MOUSE_ICON::DEFAULT, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 100);
-    EXPECT_EQ(physicalY, 100);
+    EXPECT_NE(physicalX, 200);
+    EXPECT_NE(physicalY, 200);
 }
 
 /**

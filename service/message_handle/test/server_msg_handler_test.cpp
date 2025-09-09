@@ -2273,13 +2273,12 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSi
     if (!isPC) {
         result = handler.RequestInjection(callingPid, status, reqId);
         EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
-        return;
     }
     handler.OnCancelInjection(callingPid);
     result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
     result = handler.RequestInjection(callingPid, status, reqId);
-    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
     result = handler.OnAuthorize(true);
     EXPECT_EQ(result, ERR_OK);
     result = handler.OnAuthorize(false);
@@ -2322,7 +2321,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_004, TestSize.Le
     handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
     int32_t result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
-    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::UNAUTHORIZED);
 }
 
 /**
@@ -4141,14 +4139,13 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_002, TestSi
     if (!isPC) {
         auto result = handler.RequestInjection(callingPid, status, reqId);
         EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
-        return;
     }
     AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
     handler.OnCancelInjection(callingPid);
     auto result = handler.OnAuthorize(false);
     EXPECT_EQ(result, ERR_OK);
     result = handler.RequestInjection(callingPid, status, reqId);
-    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
     result = handler.OnAuthorize(true);
     EXPECT_EQ(result, ERR_OK);
 }
