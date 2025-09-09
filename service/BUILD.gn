@@ -136,6 +136,10 @@ config("libmmi_server_config") {
   if (input_feature_joystick) {
     include_dirs += [ "${mmi_service_path}/joystick/include" ]
   }
+
+  if (input_feature_key_hook) {
+    include_dirs += [ "${mmi_service_path}/event_hook/include" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {
@@ -390,6 +394,15 @@ ohos_shared_library("libmmi-server") {
     sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
   }
 
+  if (input_feature_key_hook) {
+    sources += [
+      "event_hook/src/key_event_hook_manager.cpp",
+      "event_hook/src/event_loop_closure_checker.cpp",
+      "event_hook/src/event_dispatch_order_checker.cpp",
+      "event_hook/src/event_expiration_checker.cpp"
+    ]
+  }
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -428,6 +441,7 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
+    "os_account:os_account_innerkits",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -475,6 +489,7 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "access_token:libtokenid_sdk",
+    "access_token:libprivacy_sdk",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
     "faultloggerd:libbacktrace_local",
@@ -1409,11 +1424,14 @@ ohos_unittest("TouchDrawingManagerTest") {
     "${mmi_path}/util/json_parser/include"
   ]
 
-  sources = [
-    "window_manager/test/pointer_renderer_test.cpp",
-    "window_manager/test/screen_pointer_test.cpp",
-    "window_manager/test/touch_drawing_manager_test.cpp",
-  ]
+  sources = [ "window_manager/test/touch_drawing_manager_test.cpp" ]
+
+  if (input_feature_pointer_drawing) {
+    sources += [
+      "window_manager/test/pointer_renderer_test.cpp",
+      "window_manager/test/screen_pointer_test.cpp",
+    ]
+  }
 
   deps = [
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
@@ -1660,6 +1678,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "os_account:os_account_innerkits",
   ]
 }
 
@@ -1830,6 +1849,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
+    "os_account:os_account_innerkits",
   ]
 
   if (hitrace_enabled) {
@@ -1938,7 +1958,6 @@ ohos_unittest("SubscriberTest") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
@@ -2041,6 +2060,7 @@ ohos_unittest("NapProcessTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -2193,6 +2213,12 @@ ohos_unittest("KeyEventNormalizeTest") {
 ohos_unittest("KeyEventNormalizeWithMockTest") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  
   include_dirs = [
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
@@ -2396,7 +2422,6 @@ ohos_unittest("KeyCommandTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
@@ -2894,19 +2919,20 @@ ohos_unittest("EventHandlerEXTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "event_handler/test/event_normalize_handler_ex_test.cpp" ]
+  sources = [
+    "event_handler/src/event_normalize_handler.cpp",
+    "event_handler/test/event_normalize_handler_ex_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -2918,8 +2944,12 @@ ohos_unittest("EventHandlerEXTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
 }
 
 ohos_unittest("EventDispatchTest") {
@@ -2938,7 +2968,29 @@ ohos_unittest("EventDispatchTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "event_dispatch/test/event_dispatch_test.cpp" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/device_manager/include",
+    "dfx/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/events/include",
+    "${mmi_path}/util/common/include",
+  ]
+
+  sources = [
+    "event_dispatch/test/event_dispatch_test.cpp",
+    "event_dispatch/src/event_dispatch_handler.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -2948,6 +3000,7 @@ ohos_unittest("EventDispatchTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
@@ -2955,6 +3008,8 @@ ohos_unittest("EventDispatchTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_core",
@@ -3080,6 +3135,7 @@ ohos_unittest("PermissionHelperTest") {
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
   ]
 
@@ -3470,6 +3526,7 @@ ohos_unittest("DeviceEventMonitorTest") {
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]

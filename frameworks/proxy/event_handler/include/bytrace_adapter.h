@@ -33,7 +33,8 @@ public:
         KEY_SUBSCRIBE_EVENT = 3,
         KEY_DISPATCH_EVENT = 4,
         POINT_INTERCEPT_EVENT = 5,
-        POINT_DISPATCH_EVENT = 6
+        POINT_DISPATCH_EVENT = 6,
+        KEY_HOOK_EVENT = 7
     };
     enum EventType {
         START_EVENT = 1,

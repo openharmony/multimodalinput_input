@@ -13,45 +13,33 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "appendextradata_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-template <class T> size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+namespace {
+constexpr size_t MAX_BUFFER_SIZE = 512;
 }
-
-void AppendExtraDataFuzzTest(const uint8_t *data, size_t size)
+void AppendExtraDataFuzzTest(FuzzedDataProvider &fdp)
 {
     ExtraData extraData;
-    size_t startPos = 0;
-    int32_t random;
-    GetObject<int32_t>(random, data + startPos, size - startPos);
-    bool appended = (random % 2) ? false : true;
-    extraData.appended = appended;
-    int32_t sourceType;
-    GetObject<int32_t>(sourceType, data + startPos, size - startPos);
-    extraData.sourceType = sourceType;
-    int32_t pointerId;
-    GetObject<int32_t>(pointerId, data + startPos, size - startPos);
-    extraData.pointerId = pointerId;
-    std::vector<uint8_t> dataBuffer(512, 1);
-    extraData.buffer = dataBuffer;
+    extraData.appended = fdp.ConsumeBool();
+    extraData.sourceType = fdp.ConsumeIntegral<int32_t>();
+    extraData.pointerId = fdp.ConsumeIntegral<int32_t>();
+
+    size_t len = fdp.ConsumeIntegralInRange<size_t>(0, MAX_BUFFER_SIZE);
+    extraData.buffer = fdp.ConsumeBytes<uint8_t>(len);
+
     InputManager::GetInstance()->AppendExtraData(extraData);
+}
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    AppendExtraDataFuzzTest(fdp);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
@@ -59,7 +47,11 @@ void AppendExtraDataFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::AppendExtraDataFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

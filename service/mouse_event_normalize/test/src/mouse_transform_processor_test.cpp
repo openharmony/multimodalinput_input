@@ -216,6 +216,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Dump_002, Test
     ASSERT_EQ(args, idNames);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: MouseTransformProcessorTest_NormalizeMoveMouse_003
  * @tc.desc: Test NormalizeMoveMouse
@@ -245,6 +247,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_0
     MouseTransformProcessor processor(deviceId);
     ASSERT_EQ(processor.GetDisplayId(), idNames);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_005
@@ -813,6 +817,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeRotat
     ASSERT_NE(ret, RET_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: MouseTransformProcessorTest_HandleMotionMoveMouse_001
  * @tc.desc: Handle motion move mouse verify
@@ -842,6 +848,10 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionMo
     int32_t offsetY = 500;
     ASSERT_NO_FATAL_FAILURE(processor.HandleMotionMoveMouse(offsetX, offsetY));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: MouseTransformProcessorTest_OnDisplayLost_001
@@ -884,6 +894,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandlePostMove
     PointerEvent::PointerItem pointerItem;
     ASSERT_NO_FATAL_FAILURE(processor.HandlePostMoveMouse(pointerItem));
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: MouseTransformProcessorTest_DumpInner_001

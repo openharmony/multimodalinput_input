@@ -27,6 +27,9 @@
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+#include "key_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "long_press_event_subscribe_manager.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -169,6 +172,7 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const UserScreenInfo &userScreenInfo
             windowGroupInfo_.windowsInfo.clear();
         }
     }
+    PrintDisplayInfo(userScreenInfo);
     int32_t ret = SendDisplayInfo(userScreenInfo);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to send user screen info, ret:%{public}d", ret);
@@ -442,6 +446,8 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
         return -CAPABILITY_NOT_SUPPORTED;
     }
     CHKPR(callback, RET_ERR);
+    MMI_HILOGI("key:%{public}d, action:%{public}d, isRepeat:%{public}d",
+        keyOption.GetKey(), keyOption.GetAction(), keyOption.IsRepeat());
     return KeyEventInputSubscribeMgr.SubscribeKeyMonitor(keyOption, callback);
 #else
     MMI_HILOGW("Does not support subscription of key monitor");
@@ -634,7 +640,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d", pointerEvent->GetId(), pointerEvent->GetButtonId());
+            MMI_HILOG_FREEZEI("id:%{public}d recv, BI:%{public}d, PBS:%{public}zu", pointerEvent->GetId(),
+                pointerEvent->GetButtonId(), pointerEvent->GetPressedButtons().size());
         } else {
             MMI_HILOG_FREEZEI("recv");
         }
@@ -2932,6 +2939,59 @@ int32_t InputManagerImpl::ClearMouseHideFlag(int32_t eventId)
 int32_t InputManagerImpl::QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->QueryPointerRecord(count, pointerList);
+}
+
+int32_t InputManagerImpl::AddKeyEventHook(std::function<void(std::shared_ptr<KeyEvent>)> callback, int32_t &hookId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    if (int32_t ret = KEY_EVENT_HOOK_HANDLER.AddKeyEventHook(callback, hookId); ret != RET_OK) {
+        MMI_HILOGE("AddKeyEventHook failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+int32_t InputManagerImpl::RemoveKeyEventHook(int32_t keyEventHookId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    if (int32_t ret = KEY_EVENT_HOOK_HANDLER.RemoveKeyEventHook(keyEventHookId); ret != RET_OK) {
+        MMI_HILOGE("RemoveKeyEventHook failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+int32_t InputManagerImpl::DispatchToNextHandler(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    if (int32_t ret = KEY_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId); ret != RET_OK) {
+        MMI_HILOGE("DispatchToNextHandler failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+int32_t InputManagerImpl::SetHookIdUpdater(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+    KEY_EVENT_HOOK_HANDLER.SetHookIdUpdater(callback);
+    return RET_OK;
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
 } // namespace MMI
 } // namespace OHOS

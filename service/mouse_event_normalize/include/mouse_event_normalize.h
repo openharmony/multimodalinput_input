@@ -46,6 +46,8 @@ public:
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
+    void OnDisplayLost(int32_t displayId);
+    int32_t GetDisplayId() const;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows() const;
@@ -53,8 +55,6 @@ public:
     int32_t GetMousePrimaryButton() const;
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed() const;
-    void OnDisplayLost(int32_t displayId);
-    int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t dispiayId);
     int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
     int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const;

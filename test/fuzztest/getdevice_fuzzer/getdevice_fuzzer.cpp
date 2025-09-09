@@ -13,37 +13,37 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "getdevice_fuzzer.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetDeviceFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-void GetDeviceFuzzTest(const uint8_t* data, size_t /* size */)
+void GetDeviceFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t deviceId = *(reinterpret_cast<const int32_t*>(data));
-    auto callback = [](std::shared_ptr<InputDevice> inputDevice) {
-        MMI_HILOGD("Get device success");
-    };
+    int32_t deviceId = fdp.ConsumeIntegral<int32_t>();
+    auto callback = [](std::shared_ptr<InputDevice>) {};
     InputManager::GetInstance()->GetDevice(deviceId, callback);
 }
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    GetDeviceFuzzTest(fdp);
+    return true;
+}
+
 } // namespace MMI
 } // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if (!data || size == 0) {
         return 0;
     }
-    if (size < sizeof(int32_t)) {
-        return 0;
-    }
-    OHOS::MMI::GetDeviceFuzzTest(data, size);
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

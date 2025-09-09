@@ -22,6 +22,9 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+#include "key_event_hook_handler.h"
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -50,6 +53,10 @@ void ClientMsgHandler::Init()
             return this->OnSubscribeKeyMonitor(client, pkt); }},
         { MmiMessageId::ON_PRE_KEY_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnPreKeyEvent(client, pkt); }},
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+        { MmiMessageId::ON_HOOK_KEY_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnHookKeyEvent(client, pkt); }},
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
         { MmiMessageId::ON_SUBSCRIBE_SWITCH, [this] (const UDSClient &client, NetPacket &pkt) {
@@ -177,6 +184,22 @@ int32_t ClientMsgHandler::OnPreKeyEvent(const UDSClient& client, NetPacket& pkt)
     PRE_MONITOR_MGR.OnPreKeyEvent(keyEvent, handlerId);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+int32_t ClientMsgHandler::OnHookKeyEvent(const UDSClient& client, NetPacket& pkt)
+{
+    auto keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
+    if (ret != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read netPacket failed");
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
+    KEY_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& pkt)
@@ -210,7 +233,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+    if (false && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
         aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),

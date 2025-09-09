@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,51 +13,40 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "getpointerlocation_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetPointerLocationFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void GetPointerLocationFuzzTest(FuzzedDataProvider &fdp)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
+    int32_t displayId = fdp.ConsumeIntegral<int32_t>();
 
-void GetPointerLocationFuzzTest(const uint8_t* data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t displayId = 0;
-    double displayX = 0.0;
-    startPos += GetObject<double>(displayX, data + startPos, size - startPos);
-    double displayY = 0.0;
-    startPos += GetObject<double>(displayY, data + startPos, size - startPos);
-    MMI_HILOGD("Call InputManager::GetPointerLocation");
+    double displayX = fdp.ConsumeFloatingPoint<double>();
+    double displayY = fdp.ConsumeFloatingPoint<double>();
+
     InputManager::GetInstance()->GetPointerLocation(displayId, displayX, displayY);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    GetPointerLocationFuzzTest(fdp);
+    return true;
+}
+
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::GetPointerLocationFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }
-

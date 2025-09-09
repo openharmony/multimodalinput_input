@@ -16,29 +16,32 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include "getintervalsincelastinput_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "GetIntervalSinceLastInputFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-void GetIntervalSinceLastInputFuzzTest(const uint8_t* data, size_t size)
+void GetIntervalSinceLastInputFuzzTest(FuzzedDataProvider &fdp)
 {
-    FuzzedDataProvider fdp(data, size);
     int64_t timeInterval = fdp.ConsumeIntegral<int64_t>();
     InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+}
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    GetIntervalSinceLastInputFuzzTest(fdp);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::GetIntervalSinceLastInputFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

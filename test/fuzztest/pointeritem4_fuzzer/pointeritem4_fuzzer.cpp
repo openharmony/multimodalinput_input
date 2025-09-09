@@ -1,0 +1,59 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "fuzzer/FuzzedDataProvider.h"
+#include "mmi_log.h"
+#include "pointer_event.h"
+#include "pointeritem4_fuzzer.h"
+#include "securec.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerItem4FuzzTest"
+
+namespace OHOS {
+namespace MMI {
+
+void PointerItem4FuzzTest(const uint8_t *data, size_t size)
+{
+    FuzzedDataProvider provider(data, size);
+    PointerEvent::PointerItem item;
+
+    int32_t width = provider.ConsumeIntegral<int32_t>();
+    item.SetWidth(width);
+
+    int32_t height = provider.ConsumeIntegral<int32_t>();
+    item.SetHeight(height);
+
+    double titleX = provider.ConsumeFloatingPoint<double>();
+    item.SetTiltX(titleX);
+
+    double titleY = provider.ConsumeFloatingPoint<double>();
+    item.SetTiltY(titleY);
+    MMI_HILOGD("PointerItem4FuzzTest");
+}
+} // MMI
+} // OHOS
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
+    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+
+    OHOS::MMI::PointerItem4FuzzTest(data, size);
+    return 0;
+}
