@@ -106,8 +106,7 @@
         "sensor",
         "idl_tool",
         "runtime_core",
-        "libinput",
-        "os_account"
+        "libinput"
       ],
       "third_party": [
         "libuv",
