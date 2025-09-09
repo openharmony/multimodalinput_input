@@ -17,7 +17,6 @@
 #define JS_INPUT_MONITOR_H
 
 #include <map>
-#include <mutex>
 #include <queue>
 #include <uv.h>
 
@@ -69,8 +68,8 @@ private:
     uint32_t rectTotal_ { 0 };
     mutable bool consumed_ { false };
     mutable std::mutex mutex_;
-    std::mutex callbackMutex_;
-    std::mutex keyCallbackMutex_;
+    mutable std::mutex callbackMutex_;
+    mutable std::mutex keyCallbackMutex_;
     mutable int32_t flowCtrl_ { 0 };
     std::string typeName_;
     std::vector<int32_t> keys_;
