@@ -79,6 +79,40 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_Unsu
 }
 
 /**
+ * @tc.name: InputActiveSubscriberHandlerTest_UnsubscribeInputActive_002
+ * @tc.desc: Verify UnsubscribeInputActive remove timer success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_UnsubscribeInputActive_002, TestSize.Level1)
+{
+    InputActiveSubscriberHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    ASSERT_NE(pointerEvent, nullptr);
+    handler.HandlePointerEvent(pointerEvent);
+    handler.HandleTouchEvent(pointerEvent);
+    auto session = std::make_shared<UDSSession>("test_program", 1, 123, 1000, 2000);
+    ASSERT_NE(session, nullptr);
+    std::shared_ptr<InputActiveSubscriberHandler::Subscriber> subscriber =
+        std::make_shared<InputActiveSubscriberHandler::Subscriber>(1, session, 500);
+    ASSERT_NE(subscriber, nullptr);
+    subscriber->sendEventLastTime_ = 401;
+    subscriber->lastEventType_ = InputActiveSubscriberHandler::EVENTTYPE_POINTER;
+    subscriber->pointerEvent_ = pointerEvent;
+    subscriber->timerId_ = 1;
+    subscriber->id_ = 1;
+    handler.InsertSubscriber(subscriber);
+    int64_t currTime = 880;
+    int32_t subscribeId = 1;
+    auto ret = handler.SubscribeInputActive(session, subscribeId, 500);
+    EXPECT_EQ(ret, RET_OK);
+    ret = handler.UnsubscribeInputActive(session, subscribeId);
+    handler.CleanSubscribeInfo(subscriber, currTime);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: InputActiveSubscriberHandlerTest_OnSubscribeInputActive_001
  * @tc.desc: Verify OnSubscribeInputActive
  * @tc.type: FUNC

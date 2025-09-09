@@ -51,6 +51,10 @@ private:
             [](int32_t timerId) -> int32_t
             {
                 return TimerMgr->ResetTimer(timerId);
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->RemoveTimer(timerId);
             }
     };
 };

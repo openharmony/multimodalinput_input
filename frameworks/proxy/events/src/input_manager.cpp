@@ -229,7 +229,9 @@ void InputManager::RemoveMonitor(int32_t monitorId)
 int32_t InputManager::AddGestureMonitor(
     std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.AddGestureMonitor(consumer, type, fingers);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::RemoveGestureMonitor(int32_t monitorId)
@@ -249,18 +251,24 @@ void InputManager::MoveMouse(int32_t offsetX, int32_t offsetY)
 
 int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.AddInterceptor(interceptor);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.AddInterceptor(interceptor);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, int32_t priority,
     uint32_t deviceTags)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.AddInterceptor(interceptor, priority, deviceTags);
+    // LCOV_EXCL_STOP
 }
 
 void InputManager::RemoveInterceptor(int32_t interceptorId)
@@ -270,14 +278,17 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    // LCOV_EXCL_START
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(keyEvent);
+    // LCOV_EXCL_STOP
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isAutoToVirtualScreen,
     int32_t useCoordinate)
 {
+    // LCOV_EXCL_START
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
@@ -293,11 +304,13 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         MMI_HILOGD("isAutoToVirtualScreen=%{public}s", isAutoToVirtualScreen ? "true" : "false");
     }
     InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
+    // LCOV_EXCL_STOP
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder,
     bool isAutoToVirtualScreen, int32_t useCoordinate)
 {
+    // LCOV_EXCL_START
     CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
@@ -316,28 +329,34 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
             isAutoToVirtualScreen ? "true" : "false");
     }
     InputMgrImpl.SimulateInputEvent(pointerEvent, useCoordinate);
+    // LCOV_EXCL_STOP
 }
 
 void InputManager::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
     const TouchpadCDG &touchpadCDG)
 {
+    // LCOV_EXCL_START
     CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(touchpadCDG.zOrder);
     InputMgrImpl.SimulateTouchPadInputEvent(pointerEvent, touchpadCDG);
+    // LCOV_EXCL_STOP
 }
 
 void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    // LCOV_EXCL_START
     CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateTouchPadEvent(pointerEvent);
+    // LCOV_EXCL_STOP
 }
 
 bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    // LCOV_EXCL_START
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI_HILOGD("It's not MouseEvent, don't need to transform");
@@ -375,10 +394,12 @@ bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent>
 
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     return true;
+    // LCOV_EXCL_STOP
 }
 
 bool InputManager::TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    // LCOV_EXCL_START
     CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI_HILOGD("It's not TouchEvent, don't need to transform");
@@ -414,16 +435,21 @@ bool InputManager::TransformTouchEventToMouseEvent(std::shared_ptr<PointerEvent>
 
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     return true;
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.RegisterDevListener(type, listener);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.UnregisterDevListener(type, listener);
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback)

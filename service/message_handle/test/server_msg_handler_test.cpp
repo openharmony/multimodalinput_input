@@ -1187,12 +1187,15 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_006, TestS
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     bool result = handler.FixTargetWindowId(pointerEvent, action, true);
     ASSERT_FALSE(result);
-    handler.shellTargetWindowIds_[0] = 0;
+    handler.shellTargetWindowIds_[touch] = 0;
     result = handler.FixTargetWindowId(pointerEvent, action, true);
     ASSERT_FALSE(result);
-    handler.shellTargetWindowIds_[0] = 1;
+    handler.shellTargetWindowIds_[touch] = 1;
     result = handler.FixTargetWindowId(pointerEvent, action, true);
     ASSERT_FALSE(result);
     pointerEvent->pointers_.clear();
@@ -1220,7 +1223,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_007, TestS
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(-1);
-    handler.shellTargetWindowIds_[0] = -1;
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    handler.shellTargetWindowIds_[touch] = -1;
     int32_t result = handler.FixTargetWindowId(pointerEvent, action, true);
     ASSERT_TRUE(result);
 }
@@ -1299,6 +1305,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandler_001, TestS
     EXPECT_EQ(ret, RET_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_001
  * @tc.desc: Test the function OnMoveMouse
@@ -1316,6 +1324,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_001, TestSize.Le
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnCancelInjection_001
@@ -1459,7 +1469,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    msgHandler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
     EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -2273,6 +2286,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSi
     EXPECT_EQ(result, ERR_OK);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 /**
  * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
  * @tc.desc: Test the function OnMoveMouse
@@ -2290,6 +2305,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Le
     int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
     EXPECT_EQ(ret, RET_OK);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnAuthorize_004
@@ -2890,7 +2907,10 @@ HWTEST_F(ServerMsgHandlerTest, DealGesturePointers001, TestSize.Level1)
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    handler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    handler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
     auto touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
     PointerEvent::PointerItem item;
@@ -3248,7 +3268,10 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, 
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    msgHandler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
     ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -3290,19 +3313,22 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_008, TestS
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(-1);
-    handler.shellTargetWindowIds_[0] = -1;
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    handler.shellTargetWindowIds_[touch] = -1;
     pointerEvent->SetZOrder(1);
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
-    handler.castTargetWindowIds_[0] = -1;
+    handler.castTargetWindowIds_[touch] = -1;
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
     pointerEvent->SetZOrder(-1);
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
-    handler.accessTargetWindowIds_[0] = -1;
+    handler.accessTargetWindowIds_[touch] = -1;
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
-    handler.nativeTargetWindowIds_[0] = -1;
+    handler.nativeTargetWindowIds_[touch] = -1;
     ASSERT_NO_FATAL_FAILURE(handler.FixTargetWindowId(pointerEvent, action, true));
 }
 
@@ -3459,8 +3485,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplaysInfo_002, TestSi
         << info.displayDirection << info.displayMode << info.transform << info.scalePercent << info.expandHeight
         << info.isCurrentOffScreenRendering << info.displaySourceMode << info.oneHandX << info.oneHandY
         << info.screenArea << info.rsId << info.offsetX << info.offsetY << info.pointerActiveWidth
-        << info.pointerActiveHeight;
-    ;
+        << info.pointerActiveHeight << info.deviceRotation << info.rotationCorrection;
     EXPECT_EQ(handler.ReadDisplaysInfo(pkt, displayGroupInfo), RET_OK);
 }
 
@@ -4334,15 +4359,18 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_009, TestS
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(111);
     pointerEvent->SetZOrder(1);
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
     ASSERT_FALSE(result);
-    handler.shellTargetWindowIds_[0] = 0;
+    handler.shellTargetWindowIds_[touch] = 0;
     action = PointerEvent::POINTER_ACTION_UNKNOWN;
     pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
     pointerEvent->SetZOrder(-1);
     result = handler.FixTargetWindowId(pointerEvent, action, false);
     ASSERT_FALSE(result);
-    handler.shellTargetWindowIds_[0] = 1;
+    handler.shellTargetWindowIds_[touch] = 1;
     action = PointerEvent::POINTER_ACTION_CANCEL;
     pointerEvent->SetZOrder(0);
     result = handler.FixTargetWindowId(pointerEvent, action, false);
@@ -4370,7 +4398,10 @@ HWTEST_F(ServerMsgHandlerTest, DealGesturePointers003, TestSize.Level1)
     pointerEvent->eventType_ = 1;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    handler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
+    pointerEvent->SetTargetDisplayId(0);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    handler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
     std::list<PointerEvent::PointerItem> pointers_;
     PointerEvent::PointerItem item1;
     item1.SetPointerId(1);
@@ -4397,10 +4428,17 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId01, TestSiz
     ServerMsgHandler handler;
     handler.shellTargetWindowIds_.clear();
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
-    std::map<int32_t, int32_t> targetWindowIdMap = {
-        {PointerEvent::SOURCE_TYPE_MOUSE, PointerEvent::SOURCE_TYPE_TOUCHSCREEN},
-        {PointerEvent::POINTER_ACTION_BUTTON_DOWN, PointerEvent::POINTER_ACTION_DOWN},
-        {PointerEvent::MOUSE_BUTTON_LEFT, PointerEvent::POINTER_INITIAL_VALUE}
+    InjectionTouch mouse{
+        .displayId_ = PointerEvent::SOURCE_TYPE_MOUSE, .pointerId_ = PointerEvent::SOURCE_TYPE_MOUSE};
+    InjectionTouch button{
+        .displayId_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN,
+        .pointerId_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN};
+    InjectionTouch left{
+        .displayId_ = PointerEvent::MOUSE_BUTTON_LEFT, .pointerId_ = PointerEvent::MOUSE_BUTTON_LEFT};
+    std::map<InjectionTouch, int32_t> targetWindowIdMap = {
+        {mouse, PointerEvent::SOURCE_TYPE_TOUCHSCREEN},
+        {button, PointerEvent::POINTER_ACTION_DOWN},
+        {left, PointerEvent::POINTER_INITIAL_VALUE}
     };
     bool bNeedResetPointerId = false;
     int32_t diffPointerId = 0;
@@ -4423,10 +4461,16 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId02, TestSiz
     ASSERT_NE(pointerEvent, nullptr);
 
     pointerEvent->SetPointerId(999);
-    std::map<int32_t, int32_t> targetWindowIdMap;
+    pointerEvent->SetTargetDisplayId(0);
+    std::map<InjectionTouch, int32_t> targetWindowIdMap;
     bool bNeedResetPointerId = true;
     int32_t diffPointerId = 0;
     int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
+    EXPECT_EQ(result, RET_ERR);
+
+    pointerEvent->SetPointerId(INT32_MAX - 1);
+    diffPointerId = 2;
+    result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 
     PointerEvent::PointerItem item;
@@ -4472,7 +4516,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_08, TestSize.L
         << displayInfo.displayMode << displayInfo.transform << displayInfo.scalePercent << displayInfo.expandHeight
         << displayInfo.isCurrentOffScreenRendering << displayInfo.displaySourceMode << displayInfo.oneHandX
         << displayInfo.oneHandY << displayInfo.screenArea << displayInfo.rsId << displayInfo.offsetX
-        << displayInfo.offsetY << displayInfo.pointerActiveWidth << displayInfo.pointerActiveHeight;
+        << displayInfo.offsetY << displayInfo.pointerActiveWidth << displayInfo.pointerActiveHeight
+        << displayInfo.deviceRotation << displayInfo.rotationCorrection;
     uint32_t windowNum = 1;
     pkt << windowNum;
     WindowInfo windowInfo;

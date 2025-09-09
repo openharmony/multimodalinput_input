@@ -83,6 +83,7 @@ enum libinput_event_type {
     LIBINPUT_EVENT_TOUCHPAD_DOWN = 550,
     LIBINPUT_EVENT_TOUCHPAD_UP,
     LIBINPUT_EVENT_TOUCHPAD_MOTION,
+    LIBINPUT_EVENT_TOUCHPAD_ACTIVE = 580,
 
     LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN = 800,
     LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
@@ -165,6 +166,17 @@ enum libinput_tablet_tool_proximity_state {
     LIBINPUT_TABLET_TOOL_PROXIMITY_STATE_IN = 1,
 };
 
+enum libinput_config_drag_state {
+    LIBINPUT_CONFIG_DRAG_DISABLED,
+    LIBINPUT_CONFIG_DRAG_ENABLED,
+};
+
+enum libinput_config_status {
+    LIBINPUT_CONFIG_STATUS_SUCCESS = 0, /**< Config applied successfully */
+    LIBINPUT_CONFIG_STATUS_UNSUPPORTED, /**< Configuration not available on this device */
+    LIBINPUT_CONFIG_STATUS_INVALID,     /**< Invalid parameter range */
+};
+
 struct udev_device;
 struct libinput_device;
 struct libinput_event;
@@ -195,6 +207,9 @@ double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *
 uint64_t libinput_event_tablet_tool_get_time_usec(struct libinput_event_tablet_tool *event);
 
 double libinput_event_tablet_tool_get_pressure(struct libinput_event_tablet_tool *event);
+
+enum libinput_tablet_tool_proximity_state libinput_event_tablet_tool_get_proximity_state(
+    struct libinput_event_tablet_tool *event);
 
 int32_t libinput_event_tablet_tool_get_twist(struct libinput_event_tablet_tool *event);
 
@@ -335,6 +350,9 @@ int32_t libinput_device_get_axis_flat(struct libinput_device* device, int32_t co
 int32_t libinput_device_get_axis_resolution(struct libinput_device* device, int32_t code);
 
 int libinput_device_get_size(struct libinput_device *device, double *width, double *height);
+
+enum libinput_config_status libinput_device_config_tap_set_drag_enabled(
+    struct libinput_device *device, enum libinput_config_drag_state enable);
 
 int libinput_get_funckey_state(struct libinput_device *device, unsigned int code);
 

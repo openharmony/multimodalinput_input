@@ -132,6 +132,8 @@ private:
     int32_t OnEventTouchPadDown(struct libinput_event *event);
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
+    int32_t OnEventTouchPadAction(struct libinput_event *event);
+    void SetActionPointerItem(int64_t time);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
     int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
     void SmoothMultifingerSwipeData(std::vector<Coords>& fingerCoords, const int32_t fingerCount);
@@ -157,7 +159,6 @@ private:
     double rotateAngle_ { 0.0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::deque<Coords>> swipeHistory_;
-    std::mutex swipeHistoryMutex_;
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
@@ -167,6 +168,10 @@ private:
             [](int32_t timerId) -> int32_t
             {
                 return TimerMgr->ResetTimer(timerId);
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->RemoveTimer(timerId);
             }
     };
 };

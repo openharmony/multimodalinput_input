@@ -36,11 +36,16 @@ ohos_source_set("device_manager_mock") {
 
   public_configs = [ ":device_manager_mock_public_config" ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
-  public_deps = [ "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources" ]
-
-  external_deps = [ "googletest:gmock_main" ]
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"

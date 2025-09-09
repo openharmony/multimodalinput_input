@@ -618,6 +618,8 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -629,13 +631,13 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
-            shellTargetWindowIds_[pointerId] = targetWindowId;
+            shellTargetWindowIds_[touch] = targetWindowId;
         } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
-            castTargetWindowIds_[pointerId] = targetWindowId;
+            castTargetWindowIds_[touch] = targetWindowId;
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-            accessTargetWindowIds_[pointerId] = targetWindowId;
+            accessTargetWindowIds_[touch] = targetWindowId;
         } else {
-            nativeTargetWindowIds_[pointerId] = targetWindowId;
+            nativeTargetWindowIds_[touch] = targetWindowId;
         }
     }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
@@ -643,13 +645,13 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
         int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
-            shellTargetWindowIds_.erase(pointerId);
+            shellTargetWindowIds_.erase(touch);
         } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
-            castTargetWindowIds_.erase(pointerId);
+            castTargetWindowIds_.erase(touch);
         } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-            accessTargetWindowIds_.erase(pointerId);
+            accessTargetWindowIds_.erase(touch);
         } else {
-            nativeTargetWindowIds_.erase(pointerId);
+            nativeTargetWindowIds_.erase(touch);
         }
     }
     return RET_OK;
@@ -663,10 +665,8 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     int32_t targetWindowId = -1;
     if (isShell) {
         targetWindowId = FixTargetWindowId(pointerEvent, shellTargetWindowIds_);
-    } else if ((IsCastInject(pointerEvent->GetDeviceId()))) {
-        targetWindowId = (pointerEvent->GetZOrder() > 0) ? // Gesture Window in Collaborative Scenarios
-        FixTargetWindowId(pointerEvent, castTargetWindowIds_, true, CAST_POINTER_ID) :
-        FixTargetWindowId(pointerEvent, nativeTargetWindowIds_, true, CAST_POINTER_ID);
+    } else if ((IsCastInject(pointerEvent->GetDeviceId())) && (pointerEvent->GetZOrder() > 0)) {
+        targetWindowId = FixTargetWindowId(pointerEvent, castTargetWindowIds_, true, CAST_POINTER_ID);
     } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         targetWindowId = FixTargetWindowId(pointerEvent, accessTargetWindowIds_);
     } else {
@@ -677,7 +677,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
 }
 
 int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
-    const std::map<int32_t, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
+    const std::map<InjectionTouch, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
 {
     CHKPR(pointerEvent, RET_ERR);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
@@ -697,7 +697,9 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
             pointerEvent->SetPointerId(pointerEvent->GetPointerId() + diffPointerId);
         }
     }
-    auto iter = targetWindowIdMap.find(pointerEvent->GetPointerId());
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    auto iter = targetWindowIdMap.find(touch);
     if (iter != targetWindowIdMap.end()) {
         return iter->second;
     }
@@ -735,14 +737,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_UI_EXTENSION_SIZE) {
-        MMI_HILOGE("Invalid num:%{public}u", num);
-        return RET_ERR;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_UI_EXTENSION_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo extensionInfo;
         pkt >> extensionInfo.id >> extensionInfo.pid >> extensionInfo.uid >> extensionInfo.area
@@ -752,11 +748,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
             >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowNameType;
+        CHKRWER(pkt, RET_ERR);
         info.uiExtentionWindowInfo.push_back(extensionInfo);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read extention window info failed");
-            return RET_ERR;
-        }
     }
     return RET_OK;
 }
@@ -799,19 +792,14 @@ int32_t ServerMsgHandler::ReadScreensInfo(NetPacket &pkt, UserScreenInfo &userSc
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_SCREEN_SIZE) {
-        MMI_HILOGE("Too many screens, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_SCREEN_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         ScreenInfo info;
         pkt >> info.id >> info.uniqueId >> info.screenType >> info.width >> info.height >> info.physicalWidth
             >> info.physicalHeight >> info.tpDirection >> info.dpi >> info.ppi >> info.rotation;
+        CHKRWER(pkt, RET_ERR);
         userScreenInfo.screens.push_back(info);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Read screens info error");
-        return RET_ERR;
     }
     return RET_OK;
 }
@@ -820,14 +808,13 @@ int32_t ServerMsgHandler::ReadDisplayGroupsInfo(NetPacket &pkt, UserScreenInfo &
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_DISPLAY_GROUP_SIZE) {
-        MMI_HILOGE("Too many display groups, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_DISPLAY_GROUP_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         DisplayGroupInfo info;
         OLD::DisplayGroupInfo oldInfo;
         pkt >> info.id >> info.name >> info.type >> info.mainDisplayId >> info.focusWindowId;
+        CHKRWER(pkt, RET_ERR);
         if (ReadDisplaysInfo(pkt, info) != RET_OK) {
             return RET_ERR;
         }
@@ -844,10 +831,8 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_DISPLAY_SIZE) {
-        MMI_HILOGE("Too many displays, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_DISPLAY_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
@@ -856,11 +841,8 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
             >> info.displaySourceMode >> info.oneHandX >> info.oneHandY >> info.screenArea >> info.rsId
             >> info.offsetX >> info.offsetY >> info.pointerActiveWidth >> info.pointerActiveHeight
             >> info.deviceRotation >> info.rotationCorrection;
+        CHKRWER(pkt, RET_ERR);
         displayGroupInfo.displaysInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
     }
     return RET_OK;
 }
@@ -879,14 +861,8 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_WINDOW_GROUP_INFO_SIZE) {
-        MMI_HILOGE("Invalid windowGroup info size:%{public}u", num);
-        return RET_ERR;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read window group info failed");
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_WINDOW_GROUP_INFO_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
@@ -894,13 +870,11 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
             >> info.windowNameType;
+        CHKRWER(pkt, RET_ERR);
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
+        CHKRWER(pkt, RET_ERR);
         windowGroupInfo.windowsInfo.push_back(info);
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read display info failed");
-            return RET_ERR;
-        }
     }
     WIN_MGR->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
@@ -933,18 +907,12 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     }
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_ENHANCE_CONFIG_SIZE) {
-        MMI_HILOGE("Invalid enhance data size:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_ENHANCE_CONFIG_SIZE, RET_ERR);
     uint8_t cfg[num];
     for (uint32_t i = 0; i < num; i++) {
         pkt >> cfg[i];
-    }
-
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read scinfo config failed");
-        return RET_ERR;
+        CHKRWER(pkt, RET_ERR);
     }
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::SetEnhanceCfg(cfg, num);
     if (result != 0) {
@@ -1044,10 +1012,8 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
 {
     uint32_t num = 0;
     pkt >> num;
-    if (num > MAX_WINDOWS_SIZE) {
-        MMI_HILOGE("Too many windows, num:%{public}u", num);
-        return RET_ERR;
-    }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(num, MAX_WINDOWS_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
             WindowInfo info;
             int32_t byteCount = 0;
@@ -1056,15 +1022,12 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
                 >> info.windowInputType >> info.privacyMode >> info.windowType
                 >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
-
+            CHKRWER(pkt, RET_ERR);
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
+            CHKRWER(pkt, RET_ERR);
             displayGroupInfo.windowsInfo.push_back(info);
             oldDisplayGroupInfo.windowsInfo.push_back(info);
-            if (pkt.ChkRWError()) {
-                MMI_HILOGE("read window info failed");
-                return RET_ERR;
-            }
         }
     return RET_OK;
 }
@@ -1163,7 +1126,7 @@ void ServerMsgHandler::ChangeToOld(size_t num, const std::vector<DisplayInfo>& d
 
 void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
 {
-    MMI_HILOGD("userScreenInfo-----------");
+    MMI_HILOGD("userScreenInfo:%{private}d", userScreenInfo.userId);
     size_t num = 0;
     for (const auto &item : userScreenInfo.screens) {
         MMI_HILOGD("screen%{public}zu, id:%{public}d, screenType:%{public}d, width:%{public}d, "
@@ -1200,6 +1163,10 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 MMI_HILOGD("%{public}f,", transform);
             }
             numDisplayInfo++;
+        }
+        for (const auto &itemWindow : item.windowsInfo) {
+            MMI_HILOGD("windows,id:%{public}d,pid:%{public}d,displayId:%{public}d,groupId:%{public}d",
+                itemWindow.id, itemWindow.pid, itemWindow.displayId, itemWindow.groupId);
         }
         num++;
     }

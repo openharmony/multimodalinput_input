@@ -171,7 +171,7 @@ private:
     void UpdatePointerVisible();
     int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
     void CheckMouseIconPath();
-    void InitDefaultMouseIconPath();
+    void InitDefaultMouseIconPath() override;
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);

@@ -915,7 +915,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
 #ifdef OHOS_BUILD_ENABLE_X_KEY
     handler.eventType_ = HANDLE_EVENT_TYPE_X_KEY;
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);

@@ -113,6 +113,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
     AddTimerCallbackFunc addTimerFunc_;
     int32_t destroyTimerId_ { -1 };
+    uint64_t windowScreenId_ {0};
+    uint64_t displayNodeScreenId_ {0};
 };
 } // namespace MMI
 } // namespace OHOS

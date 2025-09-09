@@ -91,11 +91,11 @@ public:
     virtual ExtraData GetExtraData() const = 0;
     virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
-    virtual void ClearTargetWindowId(int32_t pointerId) = 0;
+    virtual void ClearTargetDeviceWindowId(int32_t deviceId) = 0;
+    virtual void ClearTargetWindowId(int32_t pointerId, int32_t deviceId) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info,
         double logicX, double logicY) const = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
-    virtual int32_t GetCurrentUserId() = 0;
     virtual void SetFoldState () = 0;
     virtual bool CheckAppFocused(int32_t pid) = 0;
     virtual bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) = 0;
@@ -127,8 +127,12 @@ public:
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
     virtual bool IsMouseSimulate() = 0;
     virtual bool HasMouseHideFlag() = 0;
-    virtual void UpdatePointerDrawingManagerWindowInfo() = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    virtual void UpdatePointerDrawingManagerWindowInfo() = 0;
+#endif // defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual bool IsNeedRefreshLayer(int32_t windowId) = 0;
@@ -157,12 +161,13 @@ public:
     virtual bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
-    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds) = 0;
+    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::set<int32_t> &windowIds,
+        int32_t deviceId) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
     virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
     virtual int32_t GetWindowStateNotifyPid() = 0;
-    virtual int32_t GetPidByWindowId(int32_t pid) = 0;
+    virtual int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
