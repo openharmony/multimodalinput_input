@@ -787,6 +787,27 @@ struct DisplayGroupInfo {
 };
 
 /**
+ * user state
+ *
+ * @since 21
+ */
+enum UserState {
+    /**
+    * user active
+    *
+    * @since 21
+    */
+    USER_ACTIVE = 0,
+
+    /**
+    * user inactive.
+    *
+    * @since 21
+    */
+    USER_INACTIVE = 1,
+};
+
+/**
  * user's screen information
  *
  * @since 20
@@ -798,6 +819,13 @@ struct UserScreenInfo {
      * @since 20
      */
     int32_t userId;
+
+    /**
+     * user state.
+     *
+     * @since 21
+     */
+    UserState userState { USER_ACTIVE};
 
     /**
      * Physical screen information.

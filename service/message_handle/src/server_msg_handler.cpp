@@ -771,7 +771,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     UserScreenInfo userScreenInfo;
     oldDisplayGroupInfos_.clear();
-    pkt >> userScreenInfo.userId;
+    pkt >> userScreenInfo.userId >> userScreenInfo.userState;
     if (ReadScreensInfo(pkt, userScreenInfo) != RET_OK) {
         return RET_ERR;
     }
@@ -1050,6 +1050,7 @@ bool ServerMsgHandler::ChangeToOld(const UserScreenInfo& userScreenInfo)
         oldDisplayGroupInfos_[num].mainDisplayId = displayGroupInfo.mainDisplayId;
         oldDisplayGroupInfos_[num].focusWindowId = displayGroupInfo.focusWindowId;
         oldDisplayGroupInfos_[num].currentUserId = userScreenInfo.userId;
+        oldDisplayGroupInfos_[num].userState = userScreenInfo.userState;
         ChangeToOld(num, displayGroupInfo.displaysInfo, userScreenInfo.screens);
         num++;
     }
@@ -1126,7 +1127,7 @@ void ServerMsgHandler::ChangeToOld(size_t num, const std::vector<DisplayInfo>& d
 
 void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
 {
-    MMI_HILOGD("userScreenInfo:%{private}d", userScreenInfo.userId);
+    MMI_HILOGD("userScreenInfo:{%{private}d:%{public}d}", userScreenInfo.userId, userScreenInfo.userState);
     size_t num = 0;
     for (const auto &item : userScreenInfo.screens) {
         MMI_HILOGD("screen%{public}zu, id:%{public}d, screenType:%{public}d, width:%{public}d, "

@@ -243,6 +243,13 @@ struct DisplayGroupInfo {
     int32_t currentUserId { -1 };
 
     /**
+     * user state.
+     *
+     * @since 21
+     */
+    UserState userState { USER_ACTIVE};
+
+    /**
      * List of window information of the logical display arranged in Z order, with the top window at the top
      *
      * @since 9
