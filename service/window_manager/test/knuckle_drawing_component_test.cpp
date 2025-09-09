@@ -124,6 +124,8 @@ HWTEST_F(KnuckleDrawingComponentTest, KnuckleDrawingComponentTest_SetMultiWindow
     uint64_t screenId = 0;
     uint64_t displayNodeScreenId = 0;
     KnuckleDrawingComponent::GetInstance().SetMultiWindowScreenId(screenId, displayNodeScreenId);
+    ASSERT_EQ(KnuckleDrawingComponent::GetInstance().windowScreenId_, 0);
+    ASSERT_EQ(KnuckleDrawingComponent::GetInstance().displayNodeScreenId_, 0);
     KnuckleDrawingComponent::GetInstance().impl_ = nullptr;
     delete knuckleDrawing;
     knuckleDrawing = nullptr;

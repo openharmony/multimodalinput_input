@@ -13,61 +13,40 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "setkeydownduration_fuzzer.h"
 
-#include "securec.h"
-
 #include "input_manager.h"
-#include "mmi_log.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "SetKeyDownDurationFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template <class T> size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+namespace {
+constexpr size_t MAX_BUSINESS_ID_LEN = 32;
 }
-
-size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSize)
+void SetKeyDownDurationFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
+    std::string businessId = fdp.ConsumeRandomLengthString(MAX_BUSINESS_ID_LEN);
+    int32_t delay = fdp.ConsumeIntegral<int32_t>();
 
-void SetKeyDownDurationFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    size_t stringSize = 4;
-    char businessId[] = "businessId";
-    startPos += GetString(data + startPos, size - startPos, businessId, stringSize);
-    int32_t delay;
-    MMI_HILOGD("SetKeyDownDurationFuzzTest start");
-    startPos += GetObject<int32_t>(delay, data + startPos, size - startPos);
     InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
 }
-} // MMI
-} // OHOS
+
+bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)
+{
+    SetKeyDownDurationFuzzTest(fdp);
+    return true;
+}
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::MMI::SetKeyDownDurationFuzzTest(data, size);
+    if (!data || size == 0) {
+        return 0;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    OHOS::MMI::MmiServiceFuzzTest(fdp);
     return 0;
 }

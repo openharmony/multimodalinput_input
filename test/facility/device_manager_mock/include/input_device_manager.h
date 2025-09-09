@@ -18,8 +18,11 @@
 #include <memory>
 #include <vector>
 #include <gmock/gmock.h>
+
 #include "device_observer.h"
+#include "input_device.h"
 #include "libinput.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,11 +31,15 @@ public:
     IInputDeviceManager() = default;
     virtual ~IInputDeviceManager() = default;
 
+    virtual std::vector<int32_t> GetInputDeviceIds() const = 0;
+    virtual std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId) const = 0;
     virtual bool IsRemoteInputDevice(int32_t deviceId) const = 0;
     virtual int32_t FindInputDeviceId(struct libinput_device* inputDevice) = 0;
     virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice) = 0;
+    virtual bool HasPointerDevice() = 0;
+    virtual std::vector<libinput_device*> GetTouchPadDeviceOrigins() = 0;
 };
 
 class InputDeviceManagerMock final : public IInputDeviceManager {
@@ -40,11 +47,15 @@ public:
     InputDeviceManagerMock() = default;
     ~InputDeviceManagerMock() override = default;
 
+    MOCK_METHOD(std::vector<int32_t>, GetInputDeviceIds, (), (const));
+    MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t), (const));
     MOCK_METHOD(bool, IsRemoteInputDevice, (int32_t), (const));
     MOCK_METHOD(int32_t, FindInputDeviceId, (struct libinput_device*));
     MOCK_METHOD(void, Attach, (std::shared_ptr<IDeviceObserver>));
     MOCK_METHOD(void, Detach, (std::shared_ptr<IDeviceObserver>));
     MOCK_METHOD(void, GetMultiKeyboardDevice, (std::vector<struct libinput_device*>&));
+    MOCK_METHOD(bool, HasPointerDevice, ());
+    MOCK_METHOD(std::vector<libinput_device*>, GetTouchPadDeviceOrigins, ());
 
     static std::shared_ptr<InputDeviceManagerMock> GetInstance();
     static void ReleaseInstance();

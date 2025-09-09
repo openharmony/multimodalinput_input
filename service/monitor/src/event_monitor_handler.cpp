@@ -636,11 +636,13 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     pointerEvent->GetPointerItem(pointerId, pointerItem);
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
+    int32_t displayId = pointerEvent->GetTargetDisplayId();
     std::unordered_set<int32_t> fingerFocusPidSet;
     for (const auto &monitor : monitors_) {
         CHKPC(monitor.session_);
         if ((monitor.eventType_ & HANDLE_EVENT_TYPE_FINGERPRINT) == HANDLE_EVENT_TYPE_FINGERPRINT &&
-            monitor.session_->GetPid() == WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId())) {
+            monitor.session_->GetPid() == WIN_MGR->GetPidByDisplayIdAndWindowId(displayId,
+                WIN_MGR->GetFocusWindowId())) {
             fingerFocusPidSet.insert(monitor.session_->GetPid());
         }
     }
@@ -776,7 +778,7 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendFingerprintEvent(
         }
         MMI_HILOGD("fingerprint slide event not send monitor pid:%{public}d, focus pid:%{public}d",
             monitor.session_->GetPid(),
-            WIN_MGR->GetPidByWindowId(WIN_MGR->GetFocusWindowId()));
+            WIN_MGR->GetPidByDisplayIdAndWindowId(pointerEvent->GetTargetDisplayId(), WIN_MGR->GetFocusWindowId()));
         return false;
     }
     MMI_HILOGD("monitor eventType is not fingerprint pid:%{public}d", monitor.session_->GetPid());
@@ -794,6 +796,15 @@ bool EventMonitorHandler::MonitorCollection::IsXKey(std::shared_ptr<PointerEvent
     MMI_HILOGD("not X-key event");
     return false;
 }
+
+bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendXkeyEvent(SessionHandler &monitor,
+    std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_X_KEY) == HANDLE_EVENT_TYPE_X_KEY && IsXKey(pointerEvent)) {
+        return true;
+    }
+    return false;
+}
 #endif // OHOS_BUILD_ENABLE_X_KEY
 
 bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
@@ -806,7 +817,7 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_X_KEY
-    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_X_KEY) == HANDLE_EVENT_TYPE_X_KEY && IsXKey(pointerEvent)) {
+    if (CheckIfNeedSendXkeyEvent(monitor, pointerEvent)) {
         return true;
     }
 #endif // OHOS_BUILD_ENABLE_X_KEY

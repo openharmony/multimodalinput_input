@@ -139,6 +139,8 @@ public:
     virtual struct libinput_event_touch* GetTouchpadEvent(struct libinput_event *event) = 0;
     virtual int32_t TouchpadGetTool(struct libinput_event_touch *event) = 0;
     virtual int DeviceGetSize(struct libinput_device *device, double *width, double *height) = 0;
+    virtual enum libinput_config_status DeviceConfigSetDragEnabled(
+        struct libinput_device *device, enum libinput_config_drag_state enable) = 0;
     virtual char* DeviceGetName(struct libinput_device *device) = 0;
     virtual struct libinput_event_keyboard* LibinputEventGetKeyboardEvent (struct libinput_event *event) = 0;
     virtual uint32_t LibinputEventKeyboardGetKey (struct libinput_event_keyboard *event) = 0;

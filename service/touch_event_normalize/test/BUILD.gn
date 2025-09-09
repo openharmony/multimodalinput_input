@@ -16,6 +16,86 @@ import("../../../multimodalinput_mini.gni")
 
 module_output_path = "input/input"
 
+ohos_unittest("TouchEventNormalizeTestWithMock") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+  ]
+
+  sources = [
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
+    "${mmi_path}/service/fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/gesture_transform_processor.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/remote_control_transform_processor.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_event_normalize.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_transform_processor.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
+    "src/touch_event_normalize_test_with_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
+    "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
+    "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
+    "${mmi_path}/test/facility/event_handler_mock:event_handler_mock",
+    "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
+    "${mmi_path}/test/facility/key_command_mock:key_command_mock",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
+    "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
+    "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "preferences:native_preferences",
+  ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
+}
+
 ohos_unittest("TouchEventNormalizeTest") {
   module_out_path = module_output_path
 
@@ -37,6 +117,7 @@ ohos_unittest("TouchEventNormalizeTest") {
     "src/touch_gesture_detector_test.cpp",
     "src/touch_transform_processor_test.cpp",
     "src/touchpad_transform_processor_test.cpp",
+    "src/touchpad_transform_processor_test_ex.cpp",
   ]
 
   deps = [
@@ -677,6 +758,7 @@ ohos_unittest("TouchpadGestureTest") {
 
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/custom_config_parser/src/product_name_definition_parser.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
     "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
     "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
@@ -728,6 +810,7 @@ ohos_unittest("TouchpadGestureTest") {
   deps = [
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -1179,12 +1262,58 @@ ohos_unittest("TouchGestureManagerTestWithMock") {
   }
 }
 
+ohos_unittest("TouchpadTransformProcessorEXTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "src/touchpad_transform_processor_ex_test.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+  ]
+}
+
 group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
     ":InputDeviceConsumerHandlerTest",
     ":TouchEventNormalizeTest",
+    ":TouchpadTransformProcessorEXTest",
+    ":TouchEventNormalizeTestWithMock",
     ":TransformPointTest",
     ":TouchGestureManagerTestWithMock",
   ]

@@ -1237,6 +1237,8 @@ HWTEST_F(InputDeviceManagerTest, RemoveDevListener_Test_001, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(inputDevice.RemoveDevListener(session));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 /**
  * @tc.name: HasPointerDevice_Test_001
  * @tc.desc: Test the function HasPointerDevice
@@ -1252,6 +1254,8 @@ HWTEST_F(InputDeviceManagerTest, HasPointerDevice_Test_001, TestSize.Level1)
     ret = inputDevice.HasTouchDevice();
     EXPECT_FALSE(ret);
 }
+
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
  * @tc.name: NotifyDevCallback_Test_001
@@ -2030,5 +2034,77 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
     EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
     EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
 }
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDeviceInner_NoVkb_001
+ * @tc.desc: Test the function AddVirtualInputDeviceInner without virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDeviceInner_NoVkb_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    inputDeviceManager.virtualKeyboardEverConnected_ = false;
+    inputDeviceManager.virtualInputDevices_.clear();
+
+    int32_t deviceId = 1;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.AddVirtualInputDeviceInner(deviceId, device));
+    EXPECT_EQ(inputDeviceManager.virtualInputDevices_[deviceId], device);
+    EXPECT_EQ(inputDeviceManager.virtualKeyboardEverConnected_, false);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDeviceInner_Vkb_002
+ * @tc.desc: Test the function AddVirtualInputDeviceInner with virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDeviceInner_Vkb_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    inputDeviceManager.virtualKeyboardEverConnected_ = false;
+    inputDeviceManager.virtualInputDevices_.clear();
+
+    int32_t deviceId = 1;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.AddVirtualInputDeviceInner(deviceId, device));
+    EXPECT_EQ(inputDeviceManager.virtualInputDevices_[deviceId], device);
+    EXPECT_EQ(inputDeviceManager.virtualKeyboardEverConnected_, true);
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: InputDeviceManagerTest_IsVirtualKeyboardDeviceEverConnected_NoVkb_001
+ * @tc.desc: Test the function IsVirtualKeyboardDeviceEverConnected without virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsVirtualKeyboardDeviceEverConnected_NoVkb_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    inputDeviceManager.virtualKeyboardEverConnected_ = false;
+    EXPECT_EQ(inputDeviceManager.IsVirtualKeyboardDeviceEverConnected(), false);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsVirtualKeyboardDeviceEverConnected_Vkb_002
+ * @tc.desc: Test the function IsVirtualKeyboardDeviceEverConnected with virtual keyboard
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsVirtualKeyboardDeviceEverConnected_Vkb_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    inputDeviceManager.virtualKeyboardEverConnected_ = true;
+    EXPECT_EQ(inputDeviceManager.IsVirtualKeyboardDeviceEverConnected(), true);
+}
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 } // namespace MMI
 } // namespace OHOS
