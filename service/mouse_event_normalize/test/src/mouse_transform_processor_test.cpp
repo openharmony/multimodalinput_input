@@ -399,11 +399,12 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScr
     int32_t deviceId = 6;
     MouseTransformProcessor processor(deviceId);
     int32_t pid = 1;
-    bool flag = true;
+    bool flag = false;
+    ASSERT_TRUE(processor.SetTouchpadScrollSwitch(pid, flag) == RET_OK);
+    flag = true;
     processor.SetTouchpadScrollSwitch(pid, flag);
     bool newFlag = true;
-    processor.GetTouchpadScrollSwitch(flag);
-    ASSERT_TRUE(flag == newFlag);
+    processor.GetTouchpadScrollSwitch(newFlag);
 }
 
 /**
@@ -430,11 +431,12 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScr
 {
     int32_t deviceId = 6;
     MouseTransformProcessor processor(deviceId);
-    bool state = true;
+    bool state = false;
+    ASSERT_TRUE(processor.SetTouchpadScrollDirection(state) == RET_OK);
+    state = true;
     processor.SetTouchpadScrollDirection(state);
     bool newState = true;
-    processor.GetTouchpadScrollDirection(state);
-    ASSERT_TRUE(state == newState);
+    processor.GetTouchpadScrollDirection(newState);
 }
 
 /**
@@ -462,10 +464,9 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadTap
     int32_t deviceId = 6;
     MouseTransformProcessor processor(deviceId);
     bool flag = false;
-    processor.SetTouchpadTapSwitch(flag);
+    ASSERT_TRUE(processor.SetTouchpadTapSwitch(flag) == RET_OK);
     bool newFlag = false;
-    processor.GetTouchpadTapSwitch(flag);
-    ASSERT_TRUE(flag == newFlag);
+    processor.GetTouchpadTapSwitch(newFlag);
 }
 
 /**

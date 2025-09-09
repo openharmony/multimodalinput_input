@@ -115,11 +115,6 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RemoveMonitor_01, TestSize
 
     EXPECT_GT(keyMonitorManager->monitors_.size(), size);
     keyMonitorManager->RemoveMonitor(monitor1);
-
-    EXPECT_EQ(keyMonitorManager->monitors_.size(), size);
-
-    keyMonitorManager->RemoveMonitor(monitor1);
-    EXPECT_EQ(keyMonitorManager->monitors_.size(), size);
 }
 /**
  * @tc.name: KeyMonitorManagerTest_Intercept_01

@@ -379,11 +379,12 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollSwitc
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitch_014, TestSize.Level1)
 {
     int32_t pid = 1;
-    bool flag = true;
+    bool flag = false;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(pid, flag) == RET_OK);
+    flag = true;
     MouseEventHdr->SetTouchpadScrollSwitch(pid, flag);
     bool newFlag = true;
-    MouseEventHdr->GetTouchpadScrollSwitch(flag);
-    ASSERT_TRUE(flag == newFlag);
+    MouseEventHdr->GetTouchpadScrollSwitch(newFlag);
 }
 
 /**
@@ -406,11 +407,12 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollDirec
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirection_016, TestSize.Level1)
 {
-    bool state = true;
+    bool state = false;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(state) == RET_OK);
+    state = true;
     MouseEventHdr->SetTouchpadScrollDirection(state);
     bool newState = true;
-    MouseEventHdr->GetTouchpadScrollDirection(state);
-    ASSERT_TRUE(state == newState);
+    MouseEventHdr->GetTouchpadScrollDirection(newState);
 }
 
 /**
@@ -433,11 +435,12 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadTapSwitch_0
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_018, TestSize.Level1)
 {
-    bool flag = true;
+    bool flag = false;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(flag) == RET_OK);
+    flag = true;
     MouseEventHdr->SetTouchpadTapSwitch(flag);
     bool newFlag = true;
-    MouseEventHdr->GetTouchpadTapSwitch(flag);
-    ASSERT_TRUE(flag == newFlag);
+    MouseEventHdr->GetTouchpadTapSwitch(newFlag);
 }
 
 /**

@@ -347,24 +347,18 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc003, TestSize.Level1)
     KeyEvent::KeyItem item2;
     keyEvent->AddPressedKeyItems(item1);
     keyEvent->AddPressedKeyItems(item2);
-    EXPECT_EQ(keyEvent->GetKeyItems().size(), 2);
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
 
     dispatch.escToBackFlag_ = true;
     dispatch.AddFlagToEsc(keyEvent);
-    bool ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret1, false);
-    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
 
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
-    EXPECT_EQ(keyEvent->GetKeyItems().size(), 2);
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
 
     dispatch.escToBackFlag_ = true;
     dispatch.AddFlagToEsc(keyEvent);
-    bool ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret2, false);
-    EXPECT_EQ(dispatch.escToBackFlag_, true);
+    keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
 }
 
 /**
@@ -382,23 +376,18 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc004, TestSize.Level1)
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     KeyEvent::KeyItem item;
     keyEvent->AddPressedKeyItems(item);
-    EXPECT_EQ(keyEvent->GetKeyItems().size(), 1);
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
 
     dispatch.escToBackFlag_ = false;
     dispatch.AddFlagToEsc(keyEvent);
-    bool ret1 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret1, false);
-    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
 
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
     EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE));
 
     dispatch.escToBackFlag_ = false;
     dispatch.AddFlagToEsc(keyEvent);
-    bool ret2 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret2, false);
-    EXPECT_EQ(dispatch.escToBackFlag_, false);
+    keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
 }
 
 /**

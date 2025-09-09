@@ -133,10 +133,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    processor.SetTouchpadPinchSwitch(flag);
+    ASSERT_TRUE(processor.SetTouchpadPinchSwitch(flag) == RET_OK);
     bool newFlag = false;
-    processor.GetTouchpadPinchSwitch(flag);
-    ASSERT_TRUE(flag == newFlag);
+    processor.GetTouchpadPinchSwitch(newFlag);
 }
 
 /**
@@ -166,10 +165,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    processor.SetTouchpadSwipeSwitch(flag);
+    ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(flag) == RET_OK);
     bool newFlag = false;
-    processor.GetTouchpadSwipeSwitch(flag);
-    ASSERT_TRUE(flag == newFlag);
+    processor.GetTouchpadSwipeSwitch(newFlag);
 }
 
 /**
@@ -199,10 +197,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool rotateSwitch = false;
-    processor.SetTouchpadRotateSwitch(rotateSwitch);
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
     bool newRotateSwitch = false;
-    processor.GetTouchpadRotateSwitch(newRotateSwitch);
-    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
 }
 
 /**

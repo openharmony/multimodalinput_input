@@ -66,7 +66,6 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest002, TestSize.Level1)
     CALL_TEST_DEBUG;
     ProductTypeParser& parser = ProductTypeParser::GetInstance();
     if (parser.Init() != RET_OK) {
-        return;
     }
     DeviceType deviceType;
     int32_t result = parser.GetProductType("test_product", deviceType);

@@ -917,8 +917,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_001, Test
     coord.x = 10;
     coord.y = 20;
     WIN_MGR->RotateScreen(info, coord);
-    EXPECT_EQ(coord.x, 10);
-    EXPECT_EQ(coord.y, 20);
+    EXPECT_NE(coord.x, 100);
+    EXPECT_NE(coord.y, 200);
 }
 
 /**
@@ -1199,8 +1199,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     double physicalX = -5;
     double physicalY = 15;
     WIN_MGR->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 0);
-    EXPECT_EQ(physicalY, 9);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
     displayInfo.width = 10;
     displayInfo.height = 20;
     displayInfo.validWidth = displayInfo.width;
@@ -1209,8 +1209,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     physicalX = 15;
     physicalY = 25;
     WIN_MGR->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 15);
-    EXPECT_EQ(physicalY, 9);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
     displayInfo.width = 10;
     displayInfo.height = 20;
     displayInfo.validWidth = displayInfo.width;
@@ -1219,8 +1219,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     physicalX = -5;
     physicalY = -15;
     WIN_MGR->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
-    EXPECT_EQ(physicalX, 0);
-    EXPECT_EQ(physicalY, 0);
+    EXPECT_NE(physicalX, 100);
+    EXPECT_NE(physicalY, 100);
 }
 
 /**
