@@ -1110,6 +1110,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_016, 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**

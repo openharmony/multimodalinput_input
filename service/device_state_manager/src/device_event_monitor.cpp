@@ -137,7 +137,8 @@ void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &event
     }
     voipCallState_ = voipCallState;
     MMI_HILOGI("The voipCallState:%{public}d, hasHandleRingMute_:%{public}d", voipCallState, hasHandleRingMute_);
-    if (voipCallState_ == StateType::CALL_STATUS_DISCONNECTED || voipCallState_ == StateType::CALL_STATUS_DISCONNECTED) {
+    if (voipCallState_ == StateType::CALL_STATUS_DISCONNECTED ||
+        voipCallState_ == StateType::CALL_STATUS_DISCONNECTED) {
         auto subscriberHandler = InputHandler->GetSubscriberHandler();
         CHKPV(subscriberHandler);
         subscriberHandler->ResetSkipPowerKeyUpFlag();
