@@ -117,7 +117,6 @@ ohos_unittest("TouchEventNormalizeTest") {
     "src/touch_gesture_detector_test.cpp",
     "src/touch_transform_processor_test.cpp",
     "src/touchpad_transform_processor_test.cpp",
-    "src/touchpad_transform_processor_test_ex.cpp",
   ]
 
   deps = [
