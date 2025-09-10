@@ -123,6 +123,7 @@ group("test") {
     "moduleloader_touchpad_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "notifyadddevicelisteners_fuzzer:fuzztest",
+    "notifyaddpointerdevice_fuzzer:fuzztest",
     "notifydeviceadded_fuzzer:fuzztest",
     "notifydeviceremoved_fuzzer:fuzztest",
     "notifyinputdevicemessage_fuzzer:fuzztest",
