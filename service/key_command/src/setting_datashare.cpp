@@ -82,6 +82,7 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value, c
 
 ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, const std::string &strUri)
 {
+    MMI_HILOGI("HGC 888 GetBoolValue enter----> value: %{public}d", value);
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
     if (ret != ERR_OK) {
@@ -93,6 +94,7 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
         return ERR_INVALID_VALUE;
     }
     value = ((valueStr == "true") || (valueStr == "1"));
+    MMI_HILOGI("HGC 888 GetBoolValue end----> value: %{public}d", value);
     return ERR_OK;
 }
 

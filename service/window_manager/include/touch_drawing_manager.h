@@ -62,6 +62,8 @@ private:
     ITouchDrawingHandler* LoadTouchDrawingHandler();
     ITouchDrawingHandler* GetTouchDrawingHandler() const;
     void UnloadTouchDrawingHandler();
+    // hgc 999 
+    int32_t UpdatePointerMode();
 
 private:
     OLD::DisplayInfo displayInfo_ {};
@@ -75,6 +77,8 @@ private:
     std::unique_ptr<ITouchDrawingHandler, ComponentManager::Component<ITouchDrawingHandler>> touchDrawingHandler_ {
         nullptr, ComponentManager::Component<ITouchDrawingHandler>(nullptr, nullptr) };
     int32_t timerId_ { -1 };
+    // hgc 999 定义锁保护数据
+    std::mutex pointerModeMutex_;
 };
 
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
