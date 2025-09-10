@@ -378,7 +378,8 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
                 item.GetMoveFlag(), item.GetDeviceId());
         }
     }
-    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
         WIN_MGR->UpdateTargetPointer(pointerEvent);
     }
     if (IsAccessibilityEventWithZOrder(pointerEvent)) {

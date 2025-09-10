@@ -597,8 +597,9 @@ void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
-        (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE)) {
+    if ((!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
+        (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE)) &&
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE)) {
         return;
     }
     PointerEvent::PointerItem pointerItem {};
