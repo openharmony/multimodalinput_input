@@ -873,12 +873,37 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdatePointerEvent_003, Test
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
     int32_t pointerId = 1;
     PointerEvent::PointerItem item;
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
     ASSERT_NO_FATAL_FAILURE(handler.UpdatePointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdatePointerEvent_004
+ * @tc.desc: Test the function UpdatePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdatePointerEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    handler.UpdatePointerEvent(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerId(), 0);
 }
 
 /**
