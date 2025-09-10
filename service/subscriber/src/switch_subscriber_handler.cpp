@@ -113,6 +113,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
 
     bool handled = false;
     for (const auto &subscriber : subscribers_) {
+        MMI_HILOGI("The switchType:%{public}d", subscriber->switchType_);
         if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
             (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
                 switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID)) {
