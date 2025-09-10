@@ -324,7 +324,9 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
 
 void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libinput_event *event)
 {
+    CHKPV(event);
     struct libinput_device *dev = libinput_event_get_device(event);
+    CHKPV(dev);
     const std::string mouseName = libinput_device_get_name(dev);
     const int32_t devType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));
     MMI_HILOGI("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
