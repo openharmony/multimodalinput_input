@@ -15,6 +15,7 @@
 
 #include "axis_event.h"
 #include "axisevent_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #include "securec.h"
@@ -24,20 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 bool AxisEventFuzzTest(const uint8_t *data, size_t size)
 {
     AxisEvent::from(nullptr);
@@ -46,23 +33,18 @@ bool AxisEventFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    axisEvent->SetAxisAction(rowsBefore);
+    FuzzedDataProvider provider(data, size);
+    int32_t axisAction = provider.ConsumeIntegral<int32_t>();
+    axisEvent->SetAxisAction(axisAction);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    axisEvent->SetAxisType(rowsBefore);
+    int32_t axisType = provider.ConsumeIntegral<int32_t>();
+    axisEvent->SetAxisType(axisType);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    axisEvent->SetAxisValue(rowsBefore);
+    int32_t axisValue = provider.ConsumeIntegral<int32_t>();
+    axisEvent->SetAxisValue(axisValue);
 
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    axisEvent->ActionToShortStr(rowsBefore);
-
-    axisEvent->GetAxisAction();
-    axisEvent->GetAxisType();
-    axisEvent->GetAxisValue();
+    int32_t action = provider.ConsumeIntegral<int32_t>();
+    axisEvent->ActionToShortStr(action);
     MMI_HILOGD("AxisEventFuzzTest");
     return true;
 }

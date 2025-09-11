@@ -13,32 +13,32 @@
  * limitations under the License.
  */
 
-#include "key_event.h"
-#include "keyitem_fuzzer.h"
 #include "fuzzer/FuzzedDataProvider.h"
+#include "key_event.h"
+#include "keyitemparcel_fuzzer.h"
 #include "mmi_log.h"
 
 #include "securec.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "KeyItemFuzzTest"
+#define MMI_LOG_TAG "KeyItemParcelFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-bool KeyItemFuzzTest(const uint8_t *data, size_t size)
+void KeyItemParcelFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
     KeyEvent::KeyItem keyItem;
-    int32_t keyCode = provider.ConsumeIntegral<int32_t>();
-    keyItem.SetKeyCode(keyCode);
+    bool pressed = provider.ConsumeBool();
+    keyItem.SetPressed(pressed);
 
-    int64_t downTime = provider.ConsumeIntegral<int64_t>();
-    keyItem.SetDownTime(downTime);
+    uint32_t unicode = provider.ConsumeIntegral<uint32_t>();
+    keyItem.SetUnicode(unicode);
 
-    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
-    keyItem.SetDeviceId(deviceId);
-    MMI_HILOGD("KeyItemFuzzTest");
-    return true;
+    Parcel parcel;
+    keyItem.WriteToParcel(parcel);
+    keyItem.ReadFromParcel(parcel);
+    MMI_HILOGD("KeyItemParcelFuzzTest");
 }
 } // MMI
 } // OHOS
@@ -51,6 +51,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::MMI::KeyItemFuzzTest(data, size);
+    OHOS::MMI::KeyItemParcelFuzzTest(data, size);
     return 0;
 }
