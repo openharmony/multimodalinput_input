@@ -18,7 +18,7 @@ import { Callback, AsyncCallback } from '@ohos.base';
 import { BusinessError } from "@ohos.base"
 
 export namespace inputDevice {
-    loadLibrary("ani_input_device");
+    loadLibraryWithPermissionCheck("ani_input_device", "@ohos.multimodalInput.inputDevice");
 
     export native function getDeviceListInner(): Array<number>;
     export native function getDeviceInfoInner(deviceId: number): InputDeviceData;

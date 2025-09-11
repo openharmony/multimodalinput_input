@@ -18,7 +18,7 @@ import { AsyncCallback } from "@ohos.base"
 import { BusinessError } from "@ohos.base"
 
 export namespace pointer {
-  loadLibrary("ani_pointer");
+  loadLibraryWithPermissionCheck("ani_pointer", "@ohos.multimodalInput.pointer");
 
   export native function setPointerStyleInner(windowId: number, pointerStyle: PointerStyle): int;
 
