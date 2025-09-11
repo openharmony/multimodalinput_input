@@ -179,6 +179,7 @@ public:
     bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void SendOneHandData(const OLD::DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
     bool IsAncoGameActive();
+    bool IsShouldSendToAnco(std::shared_ptr<PointerEvent> pointerEvent, bool isFirstSpecialWindow);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
