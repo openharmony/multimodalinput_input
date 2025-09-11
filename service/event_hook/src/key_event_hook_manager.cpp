@@ -125,6 +125,7 @@ int32_t KeyEventHookManager::DispatchToNextHandler(int32_t pid, int32_t eventId)
     } else { // No hooks left, dispatch directly
         ret = DispatchDirectly(keyEvent);
     }
+    MMI_HILOGD("DispatchToNextHandler res:%{public}s", ret ? "success" : "failed");
     EVENT_DISPATCH_ORDER_CHECKER.UpdateLastDispatchedId(hook->id, eventId);
     return ret ? RET_OK : RET_ERR;
 }

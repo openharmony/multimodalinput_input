@@ -62,7 +62,7 @@ int32_t EventExpirationChecker::UpdateStashEvent(int32_t hookId, std::shared_ptr
     EventExpirationChecker::StashEvent stashEvent {
         .timeStampRcvd = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now().time_since_epoch()).count(),
-        .keyEvent = keyEvent
+        .keyEvent = KeyEvent::Clone(keyEvent)
     };
     stashEvents_[hookId].push_back(stashEvent);
     return RET_OK;
