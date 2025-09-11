@@ -289,11 +289,13 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
     }
     MMI_HILOGE("HGC 008 end<---");
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
-    MMI_HILOGE("HGC 009 enter--->");
-    if (strUri.empty()) {
-        ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
-    } else {
-        ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
+    MMI_HILOGE("HGC 009 enter isDataShareReady_:%{public}d--->", isDataShareReady_);
+    if (isDataShareReady_) {
+        if (strUri.empty()) {
+            ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
+        } else {
+            ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
+        }
     }
     MMI_HILOGE("HGC 009 end<---");
     BytraceAdapter::StopDataShare();
