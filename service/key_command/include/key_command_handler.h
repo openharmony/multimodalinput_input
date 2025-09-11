@@ -71,6 +71,7 @@ struct ShortcutKey {
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
     Ability ability;
     void Print() const;
+    std::string key;
 };
 
 struct SequenceKey {
@@ -270,13 +271,6 @@ private:
     void CreateStatusConfigObserver(T& item);
     template <class T>
     void CreateKnuckleConfigObserver(T& item);
-    void ResetLastMatchedKey()
-    {
-        lastMatchedKey_.preKeys.clear();
-        lastMatchedKey_.finalKey = -1;
-        lastMatchedKey_.timerId = -1;
-        lastMatchedKey_.keyDownDuration = 0;
-    }
     void ResetCurrentLaunchAbilityKey()
     {
         currentLaunchAbilityKey_.preKeys.clear();
@@ -352,7 +346,7 @@ private:
 
 private:
     Sequence matchedSequence_;
-    ShortcutKey lastMatchedKey_;
+    std::set<std::string> lastMatchedKeys_;
     ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::set<std::string> appWhiteList_;

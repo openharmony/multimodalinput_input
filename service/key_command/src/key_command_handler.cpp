@@ -1962,9 +1962,15 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGD("No shortkeys configuration data");
         return false;
     }
-    if (IsKeyMatch(lastMatchedKey_, keyEvent)) {
-        MMI_HILOGD("The same key is waiting timeout, skip");
-        return true;
+    if (!lastMatchedKeys_.empty()) {
+        auto it = shortcutKeys_.find(*lastMatchedKeys_.begin());
+        if (it != shortcutKeys_.end()) {
+            MMI_HILOGD("it:%{public}s", it->first.c_str());
+            if (IsKeyMatch(it->second, keyEvent)) {
+                MMI_HILOGD("The same key is waiting timeout, skip");
+                return true;
+            }
+        }
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VCR2 && WIN_MGR->JudgeCameraInFore()) {
         MMI_HILOGD("The camera has been activated");
@@ -1979,12 +1985,19 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         return true;
     }
     DfxHisysevent::GetComboStartTime();
-    if (lastMatchedKey_.timerId >= 0) {
-        MMI_HILOGD("Remove timer:%{public}d", lastMatchedKey_.timerId);
-        TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
-        lastMatchedKey_.timerId = -1;
+    for (const auto &lastkey : lastMatchedKeys_) {
+        auto it = shortcutKeys_.find(lastkey);
+        if (it == shortcutKeys_.end()) {
+            continue;
+        }
+        auto matchKey = it->second;
+        if (matchKey.timerId >= 0) {
+            MMI_HILOGD("Remove timer:%{public}d", matchKey.timerId);
+            TimerMgr->RemoveTimer(matchKey.timerId);
+            matchKey.timerId = -1;
+        }
     }
-    ResetLastMatchedKey();
+    lastMatchedKeys_.clear();
     if (MatchShortcutKeys(keyEvent)) {
         return true;
     }
@@ -2418,7 +2431,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         return false;
     }
     MMI_HILOGI("Add timer success");
-    lastMatchedKey_ = shortcutKey;
+    lastMatchedKeys_.insert(shortcutKey.key);
     auto handler = InputHandler->GetSubscriberHandler();
     CHKPF(handler);
     if (handler->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
@@ -2592,8 +2605,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 {
     CALL_INFO_TRACE;
-    LaunchAbility(key.ability, lastMatchedKey_.keyDownDuration);
-    ResetLastMatchedKey();
+    LaunchAbility(key.ability, key.keyDownDuration);
 }
 
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
