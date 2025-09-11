@@ -269,13 +269,8 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
         }
     }
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
-    if (instance_ == nullptr) {
-        MMI_HILOGE("instance_ is null");
-        BytraceAdapter::StopDataShare();
-        return nullptr;
-    }
-    MMI_HILOGI("DataShare is ready [%{public}d]", instance_->isDataShareReady_);
-    if (instance_->isDataShareReady_) {
+    if (instance_ != nullptr && instance_->isDataShareReady_) {
+        MMI_HILOGI("DataShare is ready [%{public}d]", instance_->isDataShareReady_);
         if (strUri.empty()) {
             ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
         } else {
