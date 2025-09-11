@@ -1453,7 +1453,7 @@ void InputWindowsManager::ResetPointerPositionIfOutValidDisplay(const OLD::Displ
 }
 
 bool InputWindowsManager::IsPositionOutValidDisplay(
-    Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos)
+    Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos, bool isPointerDowned)
 {
     double posX = position.x;
     double posY = position.y;
@@ -1501,6 +1501,14 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     }
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
                  (rotateY < offsetY) || (rotateY > offsetY + validH);
+#ifdef OHOS_BUILD_PC_EXTERNAL_SCREEN
+    if (isOut && isPointerDowned) {
+        if (rotateX < offsetX) { rotateX = offsetX; }
+        if (rotateX > offsetX + validW) { rotateX = offsetX + validW; }
+        if (rotateY < offsetY) { rotateY = offsetY; }
+        if (rotateY > offsetY + validH) { rotateY = offsetY + validH; }
+    }
+#endif // OHOS_BUILD_PC_EXTERNAL_SCREEN
     PrintDisplayInfo(currentDisplay);
     MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}f %{private}f}"
                "->{%{private}f %{private}f} RealValidWH={w:%{private}f h:%{private}f}",
@@ -3018,7 +3026,7 @@ void InputWindowsManager::RotateDisplayScreen(const OLD::DisplayInfo& info, Phys
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
-    const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear)
+    const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear, bool isPointerDowned)
 {
     PrintDisplayInfo(info);
     auto width = info.width;
@@ -3037,7 +3045,7 @@ bool InputWindowsManager::GetPhysicalDisplayCoord(int32_t deviceId, struct libin
     MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, coord.x, coord.y);
     Coordinate2D pos = { .x = coord.x, .y = coord.y };
-    if (IsPositionOutValidDisplay(pos, info, true)) {
+    if (IsPositionOutValidDisplay(pos, info, true, isPointerDowned)) {
         if (INPUT_DEV_MGR->GetVendorConfig(deviceId).enableOutScreen != ENABLE_OUT_SCREEN_TOUCH) {
             MMI_HILOGW("Position out valid display width:%{private}d, height:%{private}d, "
                 "physicalX:%{private}f, physicalY:%{private}f", width, height, pos.x, pos.y);
@@ -3125,7 +3133,7 @@ void InputWindowsManager::SetAntiMisTakeStatus(bool state)
 }
 
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& physicalDisplayId, bool isNeedClear)
+    EventTouch& touchInfo, int32_t& physicalDisplayId, bool isNeedClear, bool isPointerDowned)
 {
     CHKPF(touch);
     std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
@@ -3139,7 +3147,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
         MMI_HILOGE("Get OLD::DisplayInfo is error");
         return false;
     }
-    return GetPhysicalDisplayCoord(deviceId, touch, *info, touchInfo, isNeedClear);
+    return GetPhysicalDisplayCoord(deviceId, touch, *info, touchInfo, isNeedClear, isPointerDowned);
 }
 
 bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,

@@ -223,8 +223,8 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
     dalta_time = filterInsertionPoint_.filterDeltaTime;
     HandleFilterMouseEvent(&offset);
-    CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+    CalculateOffset(displayInfo, offset);
     if (!enableMouseAleaccelerateBool_) {
         abs_x += offset.dx;
         abs_y += offset.dy;
