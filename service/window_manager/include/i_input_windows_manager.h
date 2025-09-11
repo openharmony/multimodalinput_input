@@ -151,6 +151,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    virtual bool UpdateDisplayId(int32_t& displayId) = 0;
     virtual void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual const OLD::DisplayInfo *GetPhysicalDisplay(int32_t id) const = 0;
