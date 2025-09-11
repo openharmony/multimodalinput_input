@@ -479,6 +479,10 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
+  if (input_feature_touch_drawing) {
+    external_deps += [ "graphic_2d:librender_service_client" ]
+  }
+
   if (input_feature_combination_key) {
     external_deps += [ "sensor:sensor_interface_native" ]
   }
