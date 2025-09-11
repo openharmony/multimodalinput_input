@@ -200,15 +200,17 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
     ced.SetWant(want);
     deviceEventMonitor.hasHandleRingMute_ = true;
     deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, -1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
+ 
+    want.SetParam("state", 5);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+    
     want.SetParam("state", 4);
     ced.SetWant(want);
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.SetVoipCallState(ced, 1));
-    want.SetParam("state", 6);
-    ced.SetWant(want);
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.SetVoipCallState(ced, 1));
-    deviceEventMonitor.hasHandleRingMute_ = false;
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.SetVoipCallState(ced, 1));
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
 }
  
 /**
