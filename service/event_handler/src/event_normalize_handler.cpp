@@ -19,7 +19,6 @@
 #include "crown_transform_processor.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
-#include "input_device_consumer_handler.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -54,6 +53,7 @@
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 #include "x_key_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_X_KEY
+#include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -793,15 +793,18 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         return RET_ERR;
     }
     if (!item.IsCanceled()) {
-        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            nextHandler_->HandlePointerEvent(pointerEvent);
-        } else {
-            auto toolType = GetToolType(event);
-            if (toolType == PointerEvent::TOOL_TYPE_THP_FEATURE) {
-                HandleDeviceConsumerEvent(toolType, event, item, pointerEvent);
-            } else {
-                nextHandler_->HandleTouchEvent(pointerEvent);
-            }
+        auto callback = [this](PluginEventType pluginEvent, int64_t frameTime) {
+            auto event = std::get_if<std::shared_ptr<PointerEvent>>(&pluginEvent);
+            if (!event) return;
+            this->nextHandler_->HandlePointerEvent(*event);
+        };
+        std::shared_ptr<IPluginData> pData = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(event);
+        pData->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
+        auto manager = InputPluginManager::GetInstance();
+        manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_AFTER_NORMALIZED);
+        int32_t result = manager->HandleEvent(pointerEvent, pData);
+        if (result == RET_NOTDO) {
+            callback(pointerEvent, GetSysClockTime());
         }
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1298,22 +1301,6 @@ int32_t EventNormalizeHandler::GetToolType(libinput_event* event)
         return RET_ERR;
     }
     return libinput_event_touch_get_tool_type(touch);
-}
-
-void EventNormalizeHandler::HandleDeviceConsumerEvent(int32_t toolType, libinput_event* event,
-    PointerEvent::PointerItem &item, std::shared_ptr<PointerEvent> pointerEvent)
-{
-    auto touch = libinput_event_get_touch_event(event);
-    CHKPV(touch);
-    auto orientation = libinput_event_touch_get_orientation(touch);
-    item.SetOrientation(orientation);
-    item.SetToolType(toolType);
-    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
-    CHKPV(event);
-    auto device = libinput_event_get_device(event);
-    CHKPV(device);
-    std::string name = libinput_device_get_name(device);
-    DEVICEHANDLER->HandleDeviceConsumerEvent(name, pointerEvent);
 }
 
 bool EventNormalizeHandler::IsAccessibilityEventWithZOrder(std::shared_ptr<PointerEvent> pointerEvent)

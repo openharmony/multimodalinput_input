@@ -33,8 +33,6 @@ void ConsumerFuzzTest(FuzzedDataProvider &fdp)
         size_t len = fdp.ConsumeIntegralInRange<size_t>(0, MAX_BUNDLE_NAME_LEN);
         names.emplace_back(fdp.ConsumeRandomLengthString(len));
     }
-    MMIService::GetInstance()->SetInputDeviceConsumer(names);
-    MMIService::GetInstance()->ClearInputDeviceConsumer(names);
 
     int32_t subId = fdp.ConsumeIntegral<int32_t>();
     int64_t interval = fdp.ConsumeIntegral<int64_t>();

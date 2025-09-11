@@ -657,6 +657,7 @@ ohos_unittest("event_resample_test") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -698,6 +699,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -936,6 +938,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/util:mmi_json_parser",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -1438,6 +1441,7 @@ ohos_unittest("TouchDrawingManagerTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -1496,6 +1500,7 @@ ohos_unittest("CursorDrawingComponentTest") {
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -1650,6 +1655,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/util:mmi_json_parser",
   ]
 
@@ -1731,6 +1737,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -1801,6 +1808,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
@@ -1941,6 +1949,7 @@ ohos_unittest("SubscriberTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -2143,6 +2152,7 @@ ohos_unittest("ModuleLoaderTest") {
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
   ]
 
   external_deps = [
@@ -2151,6 +2161,7 @@ ohos_unittest("ModuleLoaderTest") {
     "c_utils:utils",
     "data_share:datashare_consumer",
     "googletest:gtest_main",
+    "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
@@ -2321,6 +2332,7 @@ ohos_unittest("KeyUnicodeTransformationTest") {
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -2398,6 +2410,7 @@ ohos_unittest("KeyCommandTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/util:mmi_json_parser",
   ]
 
@@ -2924,6 +2937,7 @@ ohos_unittest("EventHandlerEXTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -3075,6 +3089,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

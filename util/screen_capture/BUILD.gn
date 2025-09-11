@@ -46,6 +46,7 @@ ohos_shared_library("libmmi-screen_capture") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
   external_deps = [
     "c_utils:utils",

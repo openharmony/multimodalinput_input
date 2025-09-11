@@ -425,40 +425,20 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPoi
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
- * @tc.name: MultimodalInputConnectProxyTest_SetInputDeviceConsumer
- * @tc.desc: Test the function SetInputDeviceConsumer
+ * @tc.name: MultimodalInputConnectProxyTest_GetExternalObject
+ * @tc.desc: Test the function GetExternalObject
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_SetInputDeviceConsumer, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetExternalObject, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
     sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
     MultimodalInputConnectProxy proxy(remote);
-    std::vector<std::string> deviceNames;
-    deviceNames.push_back("test1");
-    deviceNames.push_back("test2");
-    auto ret = proxy.SetInputDeviceConsumer(deviceNames);
-    EXPECT_NE(ret, RET_OK);
-}
-
-/**
- * @tc.name: MultimodalInputConnectProxyTest_ClearInputDeviceConsumer
- * @tc.desc: Test the function ClearInputDeviceConsumer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_ClearInputDeviceConsumer, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
-    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
-    MultimodalInputConnectProxy proxy(remote);
-    std::vector<std::string> deviceNames;
-    deviceNames.push_back("test1");
-    deviceNames.push_back("test2");
-    auto ret = proxy.ClearInputDeviceConsumer(deviceNames);
+    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    auto ret = proxy.GetExternalObject(pluginName, inputDevicePluginStub);
     EXPECT_NE(ret, RET_OK);
 }
 

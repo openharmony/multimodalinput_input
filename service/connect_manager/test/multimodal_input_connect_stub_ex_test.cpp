@@ -393,15 +393,10 @@ public:
 
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum) override { return RET_OK; }
 
-    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames) override
+    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub) override
     {
         return RET_OK;
-    };
- 
-    int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames) override
-    {
-        return RET_OK;
-    };
+    }
 
     int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override
     {

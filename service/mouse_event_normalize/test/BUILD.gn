@@ -68,6 +68,7 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
     "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/util:mmi_json_parser",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -221,6 +222,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
@@ -354,6 +356,7 @@ ohos_unittest("MouseTransformProcessorEXTest") {
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [
