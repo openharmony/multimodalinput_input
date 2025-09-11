@@ -16,7 +16,7 @@
 import { Callback } from '@ohos.base';
 
 export namespace inputConsumer {
-    loadLibrary("input_consumer")
+    loadLibraryWithPermissionCheck("input_consumer", "@ohos.multimodalInput.inputConsumer")
 
     export interface KeyOptions {
         finalKey: number;
