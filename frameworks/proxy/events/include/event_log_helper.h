@@ -276,9 +276,9 @@ private:
                     item.GetFixedDisplayXPos(), item.GetFixedDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
                     item.IsPressed(), item.GetPressure(), item.GetMoveFlag(), item.GetLongAxis(), item.GetShortAxis(),
                     isSimulate.c_str());
-                MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}d|%{public}d|%{public}d|%{public}d|%{public}" PRId64,
-                    item.GetPointerId(), item.GetTargetWindowId(), item.GetOriginPointerId(),
-                    item.GetTwist(), item.GetDownTime());
+                MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}d|%{public}d|%{public}d|%{public}d|%{public}d“
+                    ”|%{public}" PRId64, item.GetPointerId(), item.GetTargetWindowId(), item.GetOriginPointerId(),
+                    event->GetTargetDisplayId(), item.GetTwist(), item.GetDownTime());
             }
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
