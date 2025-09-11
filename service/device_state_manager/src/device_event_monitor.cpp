@@ -65,7 +65,7 @@ public:
             }
         } else if (action == VOIP_CALL_CHANGE_EVENTS) {
             int32_t voipCallState = 0;
-            MMI_HILOGI("voipCallState_:%{public}d", voipCallState);
+            DEVICE_MONITOR->SetVoipCallState(eventData, voipCallState);
         } else {
             MMI_HILOGW("Device changed receiver event: unknown");
             return;
