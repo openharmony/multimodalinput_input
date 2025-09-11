@@ -21,6 +21,9 @@
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
 #include "timer_manager.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#include "transaction/rs_transaction.h"
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
 
 #define MMI_LOG_TAG "CursorDrawingComponent"
 #define CHK_IS_LOADV(isLoaded, pointerInstance)                                                      \
@@ -88,7 +91,7 @@ void CursorDrawingComponent::Load()
     timerId_ = TimerMgr->AddLongTimer(CHECK_INTERVAL_MS, CHECK_COUNT, [this] {
         auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - lastCallTime_).count();
-        if ((idleTime >= UNLOAD_TIME_MS) && !POINTER_DEV_MGR.isInit) {
+        if ((idleTime >= UNLOAD_TIME_MS) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
             CursorDrawingComponent::GetInstance().UnLoad();
         }
     }, "libcursor_drawing_adapter-Unload");
@@ -158,6 +161,10 @@ void CursorDrawingComponent::UnLoad()
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
     pointerInstance_ = nullptr;
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+    // When SO unload, surface node destruction needs submit to the render service
+    Rosen::RSTransaction::FlushImplicitTransaction();
+#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     MMI_HILOGI("UnLoad %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
