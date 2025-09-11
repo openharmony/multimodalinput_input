@@ -3552,11 +3552,9 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
             }
             if (isDirectionChanged) {
 #ifdef OHOS_BUILD_PC_EXTERNAL_SCREEN
-                if (mirrorScreen->IsMirror() || mirrorScreen->IsMain()) {
-                    mainWidth = mirrorScreen->GetMirrorWidth() == 0 ? mainWidth : mirrorScreen->GetMirrorWidth();
-                    mainHeight = mirrorScreen->GetMirrorHeight() == 0 ? mainHeight : mirrorScreen->GetMirrorHeight();
-                    mirrorScreen->UpdatePadding(mainWidth, mainHeight);
-                }
+                mainWidth = mirrorScreen->GetMirrorWidth() == 0 ? mainWidth : mirrorScreen->GetMirrorWidth();
+                mainHeight = mirrorScreen->GetMirrorHeight() == 0 ? mainHeight : mirrorScreen->GetMirrorHeight();
+                mirrorScreen->UpdatePadding(mainWidth, mainHeight);
 #else
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
 #endif // OHOS_BUILD_PC_EXTERNAL_SCREEN
