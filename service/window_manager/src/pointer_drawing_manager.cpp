@@ -38,6 +38,7 @@
 #include "i_preference_manager.h"
 #include "parameters.h"
 #include "pipeline/rs_recording_canvas.h"
+#include "pointer_device_manager.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
@@ -2566,6 +2567,7 @@ void PointerDrawingManager::UpdatePointerVisible()
     CHKPV(surfaceNodePtr);
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNodePtr->SetVisible(true);
+        POINTER_DEV_MGR.isPointerVisible = true;
         if (GetHardCursorEnabled()) {
             if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
                 MMI_HILOGE("Init Layer failed");
@@ -2586,6 +2588,7 @@ void PointerDrawingManager::UpdatePointerVisible()
             HideHardwareCursors();
         }
         surfaceNodePtr->SetVisible(false);
+        POINTER_DEV_MGR.isPointerVisible = false;
         MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}" PRIu64,
             mouseDisplayState_ ? "true" : "false", displayId_);
     }
