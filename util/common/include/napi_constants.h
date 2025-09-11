@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
+inline constexpr std::string_view OPEN_HANDLE_SCOPE = "napi_open_handle_scope";
 inline constexpr std::string_view CALL_FUNCTION = "napi_call_function";
 inline constexpr std::string_view CREATE_OBJECT = "napi_create_object";
 inline constexpr std::string_view CREATE_INT32 = "napi_create_int32";
