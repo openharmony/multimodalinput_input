@@ -187,8 +187,6 @@ public:
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     int32_t LaunchAiScreenAbility();
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
-    int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceNames);
-    int32_t ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames);
     int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval);
     int32_t UnsubscribeInputActive(int32_t subscribeId);
     int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
@@ -198,6 +196,7 @@ public:
     int32_t AddKeyEventHook(int32_t &hookId);
     int32_t RemoveKeyEventHook(int32_t hookId);
     int32_t DispatchToNextHandler(int32_t eventId);
+    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
 private:
     MultimodalInputConnectManager() = default;

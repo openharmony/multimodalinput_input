@@ -39,6 +39,7 @@ ohos_source_set("device_manager_mock") {
   deps = [
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

@@ -175,8 +175,6 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void SetKnuckleSwitch([in] boolean isKnuckleSwitch);
     void LaunchAiScreenAbility();
     void GetMaxMultiTouchPointNum([out] int pointNum);
-    void SetInputDeviceConsumer([in] String[] deviceNames);
-    void ClearInputDeviceConsumer([in] String[] deviceNames);
     void SubscribeInputActive([in] int subscribeId, [in] long interval);
     void UnsubscribeInputActive([in] int subscribeId);
     void SetMouseAccelerateMotionSwitch([in] int deviceId, [in] boolean enable);
@@ -186,4 +184,5 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void AddKeyEventHook([out] int hookId);
     void RemoveKeyEventHook([in] int hookId);
     void DispatchToNextHandler([in] int eventId);
+    void GetExternalObject([in] String pluginName, [out] IRemoteObject pluginRemoteStub);
 }

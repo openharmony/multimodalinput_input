@@ -41,6 +41,7 @@ ohos_shared_library("inputconsumer") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

@@ -20,6 +20,7 @@
 #include "joystick_event_normalize.h"
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 #include "key_event_normalize.h"
+#include "plugin_stage.h"
 
 namespace OHOS {
 namespace MMI {
@@ -83,8 +84,6 @@ private:
     bool TouchPadKnuckleDoubleClickHandle(libinput_event* event);
     bool HandleTouchPadEdgeSwipe(libinput_event* event);
     int32_t GetToolType(libinput_event* event);
-    void HandleDeviceConsumerEvent(int32_t toolType, libinput_event* event, PointerEvent::PointerItem &pointerItem,
-        std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t timerId_ { -1 };

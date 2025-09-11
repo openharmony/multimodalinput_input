@@ -390,20 +390,6 @@ int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerT
     return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority, deviceTags, actionsType);
 }
 
-int32_t MultimodalInputConnectManager::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetInputDeviceConsumer(deviceNames);
-}
-
-int32_t MultimodalInputConnectManager::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->ClearInputDeviceConsumer(deviceNames);
-}
-
 int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
@@ -1247,6 +1233,14 @@ int32_t MultimodalInputConnectManager::DispatchToNextHandler(int32_t eventId)
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->DispatchToNextHandler(eventId);
+}
+
+int32_t MultimodalInputConnectManager::GetExternalObject(
+    const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetExternalObject(pluginName, pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS

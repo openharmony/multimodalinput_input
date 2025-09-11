@@ -33,7 +33,10 @@ ohos_source_set("subscriber_mock") {
 
   public_configs = [ ":subscriber_mock_public_config" ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
 
   external_deps = [
     "c_utils:utils",

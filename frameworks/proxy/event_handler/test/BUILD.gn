@@ -70,6 +70,7 @@ ohos_unittest("MultimodalEventHandlerTest") {
     "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_active_subscribe_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_device_consumer.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/input_device_consumer_proxy.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/input_manager_impl.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/key_event_input_subscribe_manager.cpp",
     "${mmi_path}/frameworks/proxy/event_handler/src/long_press_event_subscribe_manager.cpp",
@@ -103,6 +104,7 @@ ohos_unittest("MultimodalEventHandlerTest") {
     "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
   external_deps = [

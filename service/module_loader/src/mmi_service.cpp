@@ -405,7 +405,7 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
-    InputPluginManager::GetInstance()->Init();
+    InputPluginManager::GetInstance()->Init(*this);
     MMI_HILOGI("PointerDrawingManager Init");
     mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
@@ -5134,65 +5134,6 @@ bool MMIService::ParseDeviceConsumerConfig()
     return true;
 }
 
-ErrCode MMIService::SetInputDeviceConsumer(const std::vector<std::string>& deviceNames)
-{
-    CALL_INFO_TRACE;
-    if (deviceNames.size() < 0 || deviceNames.size() > MAX_DEVICE_NUM) {
-        MMI_HILOGE("Invalid size:%{public}d", static_cast<int32_t>(deviceNames.size()));
-        return RET_ERR;
-    }
-    bool flag = ParseDeviceConsumerConfig();
-    if (!flag) {
-        return ERROR_NO_PERMISSION;
-    }
-    auto nameVec = FilterConsumers(deviceNames);
-    if (nameVec.empty()) {
-        return ERROR_NO_PERMISSION;
-    }
-    int32_t pid = GetCallingPid();
-    auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &nameVec, &sess] {
-            return DEVICEHANDLER->SetDeviceConsumerHandler(nameVec, sess);
-        }
-    );
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetDeviceConsumerHandler failed, return:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
-ErrCode MMIService::ClearInputDeviceConsumer(const std::vector<std::string>& deviceNames)
-{
-    CALL_INFO_TRACE;
-    if (deviceNames.size() < 0 || deviceNames.size() > MAX_DEVICE_NUM) {
-        MMI_HILOGE("Invalid size:%{public}d", static_cast<int32_t>(deviceNames.size()));
-        return RET_ERR;
-    }
-    bool flag = ParseDeviceConsumerConfig();
-    if (!flag) {
-        return ERROR_NO_PERMISSION;
-    }
-    auto nameVec = FilterConsumers(deviceNames);
-    if (nameVec.empty()) {
-        return ERROR_NO_PERMISSION;
-    }
-    int32_t pid = GetCallingPid();
-    auto sess = GetSessionByPid(pid);
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &nameVec, &sess] {
-            return DEVICEHANDLER->ClearDeviceConsumerHandler(nameVec, sess);
-        }
-    );
-    if (ret != RET_OK) {
-        MMI_HILOGE("ClearInputDeviceConsumer failed, return:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
 ErrCode MMIService::InitCustomConfig()
 {
     CALL_INFO_TRACE;
@@ -5443,6 +5384,12 @@ ErrCode MMIService::DispatchToNextHandler(int32_t eventId)
 #else
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+}
+
+ErrCode MMIService::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+{
+    CALL_INFO_TRACE;
+    return InputPluginManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS

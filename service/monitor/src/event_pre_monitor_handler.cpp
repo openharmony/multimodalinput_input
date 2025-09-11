@@ -33,18 +33,23 @@ void EventPreMonitorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyE
     CHKPV(keyEvent);
     OnHandleEvent(keyEvent);
     CHKPV(nextHandler_);
-    auto callback = [this](std::shared_ptr<KeyEvent> keyEvent) {
-        this->nextHandler_->HandleKeyEvent(keyEvent);
+    auto callback = [this](PluginEventType pluginEvent, int64_t frameTime) {
+        auto keyEvent = std::get_if<std::shared_ptr<KeyEvent>>(&pluginEvent);
+        if (!keyEvent) return;
+        this->nextHandler_->HandleKeyEvent(*keyEvent);
     };
     auto manager = InputPluginManager::GetInstance();
     if (manager != nullptr) {
+        std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+        data->frameTime = keyEvent->GetActionTime();
+        data->stage = InputPluginStage::INPUT_BEFORE_KEYCOMMAND;
         manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
-        int32_t result = manager->HandleEvent(keyEvent, InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+        int32_t result = manager->HandleEvent(keyEvent, data);
         if (result != 0) {
             return;
         }
     }
-    callback(keyEvent);
+    callback(keyEvent, keyEvent->GetActionTime());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

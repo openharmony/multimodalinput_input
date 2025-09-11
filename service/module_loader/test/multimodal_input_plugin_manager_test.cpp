@@ -15,17 +15,23 @@
  
 #include <cstdio>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include "general_mouse.h"
-#include "libinput_interface.h"
-#include "libinput_wrapper.h"
 #include "multimodal_input_plugin_manager.h"
+#include "general_mouse.h"
+#include "general_touchpad.h"
+#include "input_event_handler.h"
+#include "libinput_interface.h"
+#include "libinput_mock.h"
+#include "libinput_wrapper.h"
+#include "net_packet.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputPluginManagerTest"
 namespace OHOS {
 namespace MMI {
 namespace {
+using namespace testing;
 using namespace testing::ext;
 } // namespace
 
@@ -35,136 +41,76 @@ class MultimodalInputPluginManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
-    static void SetupMouse();
-    static void CloseMouse();
-
-    void SetUp();
-private:
-    std::shared_ptr<InputPluginManager> manager;
-    static LibinputWrapper libinput_;
-    static GeneralMouse vMouse_;
 };
 
-GeneralMouse MultimodalInputPluginManagerTest::vMouse_;
-LibinputWrapper MultimodalInputPluginManagerTest::libinput_;
-
-
 void MultimodalInputPluginManagerTest::SetUpTestCase(void)
-{
-    ASSERT_TRUE(libinput_.Init());
-    SetupMouse();
-}
+{}
 
 void MultimodalInputPluginManagerTest::TearDownTestCase(void)
-{
-    CloseMouse();
-}
+{}
 
-void MultimodalInputPluginManagerTest::SetupMouse()
-{
-    ASSERT_TRUE(vMouse_.SetUp());
-    std::cout << "device node name: " << vMouse_.GetDevPath() << std::endl;
-    ASSERT_TRUE(libinput_.AddPath(vMouse_.GetDevPath()));
+class MockInputPluginContext : public IPluginContext {
+public:
+    virtual ~MockInputPluginContext() = default;
+    MOCK_METHOD(std::string, GetName, (), (override));
+    MOCK_METHOD(int32_t, GetPriority, (), (override));
+    MOCK_METHOD(std::shared_ptr<IInputPlugin>, GetPlugin, (), (override));
+    MOCK_METHOD(void, SetCallback, (std::function<void(PluginEventType, int64_t)>& callback), (override));
+    MOCK_METHOD(int32_t, AddTimer, (std::function<void()> func, int32_t intervalMs, int32_t repeatCount), (override));
+    MOCK_METHOD(int32_t, RemoveTimer, (int32_t id), (override));
+    MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, int64_t frameTime), (override));
+    MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, InputDispatchStage stage), (override));
+    MOCK_METHOD(void, DispatchEvent, (NetPacket& pkt, int32_t pid), (override));
+    MOCK_METHOD(PluginResult, HandleEvent,
+                (libinput_event * event, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent,
+                (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent,
+                (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<AxisEvent> axisEvent,
+                std::shared_ptr<IPluginData> data), (override));
+};
 
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
-}
+class MockInputPlugin : public IInputPlugin {
+public:
+    virtual ~MockInputPlugin() = default;
+    MOCK_METHOD(int32_t, GetPriority, (), (override, const));
+    MOCK_METHOD(const std::string, GetVersion, (), (override, const));
+    MOCK_METHOD(const std::string, GetName, (), (override, const));
+    MOCK_METHOD(InputPluginStage, GetStage, (), (override, const));
+    MOCK_METHOD(void, DeviceWillAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
+    MOCK_METHOD(void, DeviceDidAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
+    MOCK_METHOD(void, DeviceWillRemoved, (std::shared_ptr<InputDevice> inputDevice), (override));
+    MOCK_METHOD(void, DeviceDidRemoved, (std::shared_ptr<InputDevice> inputDevice), (override));
+    MOCK_METHOD(sptr<IRemoteObject>, GetExternalObject, (), (override));
+    MOCK_METHOD(
+        PluginResult, HandleEvent, (libinput_event * event, std::shared_ptr<IPluginData> data), (override, const));
+    MOCK_METHOD(PluginResult, HandleEvent,
+        (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override, const));
+    MOCK_METHOD(PluginResult, HandleEvent,
+        (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override, const));
+    MOCK_METHOD(PluginResult, HandleEvent,
+        (std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data), (override, const));
+};
 
-void MultimodalInputPluginManagerTest::CloseMouse()
-{
-    libinput_.RemovePath(vMouse_.GetDevPath());
-    vMouse_.Close();
-}
+class MockUDSSession : public UDSSession {
+public:
+    MOCK_METHOD(bool, SendMsg, (NetPacket& pkt));
+    MockUDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
+        const int32_t pid) : UDSSession(programName, moduleType, fd, uid, pid) {}
+};
 
-void MultimodalInputPluginManagerTest::SetUp()
-{
-    manager = std::make_shared<InputPluginManager>(PATH);
-}
+class RemoteObjectTest : public IRemoteObject {
+public:
+    explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
+    ~RemoteObjectTest() {}
 
-/**
- * @tc.name  : MultimodalInputPluginManagerTest_Init_001
- * @tc.number: Init_001
- * @tc.desc  : 测试初始化是否成功
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Init_001, TestSize.Level0) {
-    int32_t valV1 = manager->Init();
-    EXPECT_EQ(valV1, RET_OK);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_HandleEvent_02
- * @tc.desc: Test_HandleEvent_02
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleEvent_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    vMouse_.SendEvent(EV_REL, REL_X, 5);
-    vMouse_.SendEvent(EV_REL, REL_Y, -10);
-    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-    int32_t result = manager->HandleEvent(event, GetSysClockTime(),
-                     InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT);
-    EXPECT_GE(result, RET_OK);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_03
- * @tc.desc: Test_IntermediateEndEvent_03
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IntermediateEndEvent_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    vMouse_.SendEvent(EV_REL, REL_X, 5);
-    vMouse_.SendEvent(EV_REL, REL_Y, -10);
-    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-
-    EXPECT_TRUE(manager->IntermediateEndEvent(event));
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_GetInstance_001
- * @tc.desc: GetInstance will return not nullptr when instance_=nullptr
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetInstance_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::string dir = "/system/lib64/multimodalinput/autorun/libpointer_predict_insertion.z.so";
-    InputPluginManager::instance_ = nullptr;
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance(dir);
-    ASSERT_NE(ptr, nullptr);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_GetInstance_002
- * @tc.desc: GetInstance will return not nullptr when instance_!=nullptr
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetInstance_002,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-}
+    int32_t GetObjectRefCount() { return 0; }
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { return 0; }
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    int Dump(int fd, const std::vector<std::u16string> &args) { return 0; }
+};
 
 /**
  * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_001
@@ -175,474 +121,467 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    int32_t result = InputPluginManager::GetInstance()->Init(udsServer);
+    EXPECT_EQ(result, RET_OK);
+}
 
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_HandleEvent_001
+ * @tc.desc: Test_HandleEvent_001
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_HandleEvent_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_AFTER_FILTER;
+    int32_t result = InputPluginManager::GetInstance()->HandleEvent(&event, data);
+    EXPECT_GE(result, RET_NOTDO);
 
-    int32_t ret = ptr->Init();
+    data->stage = InputPluginStage::INPUT_BEFORE_LIBINPUT_ADAPTER_ON_EVENT;
+    EXPECT_GE(result, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_001
+ * @tc.desc: Test_IntermediateEndEvent_001
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_MOTION));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    libinput_event_keyboard keyboardEvent;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_KEYBOARD_KEY));
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    libinput_event_pointer pointerEvent;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointerEvent));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY));
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_001
+ * @tc.desc: Test_GetExternalObject_001
+ * @tc.require: test GetExternalObject
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string pluginName = "yunshuiqiao";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    int32_t result = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_002
+ * @tc.desc: Test_GetExternalObject_002
+ * @tc.require: test GetExternalObject
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
+    EXPECT_CALL(*mockInputPlugin, GetExternalObject()).WillOnce(Return(remote));
+    EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
+    std::list<std::shared_ptr<IPluginContext>> pluginLists;
+    pluginLists.push_back(mockInputPluginContext);
+    InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
+
+    int32_t ret = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
     EXPECT_EQ(ret, RET_OK);
+    InputPluginManager::GetInstance()->plugins_.clear();
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_002
- * @tc.desc: Init will return RET_OK when directory_ is invalid path
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_003
+ * @tc.desc: Test_GetExternalObject_003
+ * @tc.require: test GetExternalObject
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_002,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_003,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
+    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
 
-    std::string dir = "/test/test/test/test/";
-    InputPluginManager::instance_ = nullptr;
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance(dir);
-    ASSERT_NE(ptr, nullptr);
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
+    EXPECT_CALL(*mockInputPlugin, GetExternalObject()).WillOnce(Return(nullptr));
+    EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
+    std::list<std::shared_ptr<IPluginContext>> pluginLists;
+    pluginLists.push_back(mockInputPluginContext);
+    InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
 
-    int32_t ret = ptr->Init();
-    EXPECT_EQ(ret, RET_OK);
+    int32_t ret = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    InputPluginManager::GetInstance()->plugins_.clear();
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_003
- * @tc.desc: Init will return RET_OK when directory_ is invalid path
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_001
+ * @tc.desc: Test_GetPluginDataFromLibInput_001
+ * @tc.require: test GetPluginDataFromLibInput
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_003,
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_device touchpadDevice;
+    libinput_event_touch touchEvent;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
+    EXPECT_CALL(libinputMock, TouchEventGetToolType).WillOnce(Return(11));
+    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
+    char deviceName[] = "yunshuiqiao";
+    EXPECT_CALL(libinputMock, DeviceGetName).WillOnce(Return(deviceName));
+
+    libinput_event event;
+    IPluginData* data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
+    EXPECT_EQ(data->libInputEventData.toolType, 11);
+    EXPECT_EQ(data->libInputEventData.deviceName, deviceName);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_002
+ * @tc.desc: Test_GetPluginDataFromLibInput_002
+ * @tc.require: test GetPluginDataFromLibInput
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    libinput_event_touch touchEvent;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
+    IPluginData* data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
+    EXPECT_EQ(data->libInputEventData.toolType, 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003
+ * @tc.desc: Test_GetPluginDataFromLibInput_003
+ * @tc.require: test GetPluginDataFromLibInput
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003, TestSize.Level1) {
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    IPluginData *data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
+    EXPECT_EQ(data->libInputEventData.toolType, 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_ProcessEvent_001
+ * @tc.desc: Test_ProcessEvent_001
+ * @tc.require: test ProcessEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_ProcessEvent_001,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
 
-    std::string dir = "/";
-    InputPluginManager::instance_ = nullptr;
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance(dir);
-    ASSERT_NE(ptr, nullptr);
+    libinput_event *event = nullptr;
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(event, data)).WillOnce(Return(PluginResult::NotUse));
+    PluginResult result = InputPluginManager::GetInstance()->ProcessEvent(event, mockInputPluginContext, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
 
-    int32_t ret = ptr->Init();
-    EXPECT_EQ(ret, RET_OK);
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(pointerEvent, data)).WillOnce(Return(PluginResult::NotUse));
+    result = InputPluginManager::GetInstance()->ProcessEvent(pointerEvent, mockInputPluginContext, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
+
+    std::shared_ptr<AxisEvent> axisEvent =
+        std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(axisEvent, data)).WillOnce(Return(PluginResult::NotUse));
+    result = InputPluginManager::GetInstance()->ProcessEvent(axisEvent, mockInputPluginContext, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
+
+    std::shared_ptr<KeyEvent> keyEvent =
+        std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(keyEvent, data)).WillOnce(Return(PluginResult::NotUse));
+    result = InputPluginManager::GetInstance()->ProcessEvent(keyEvent, mockInputPluginContext, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_004
- * @tc.desc: Init will return RET_OK when directory_ is invalid path
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_DoHandleEvent_001
+ * @tc.desc: Test_DoHandleEvent_001
+ * @tc.require: test DoHandleEvent
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_004,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_DoHandleEvent_001,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::string dir = "/system/lib64/multimodalinput/autorun/test.c";
-    InputPluginManager::instance_ = nullptr;
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance(dir);
-    ASSERT_NE(ptr, nullptr);
-
-    int32_t ret = ptr->Init();
-    EXPECT_EQ(ret, RET_OK);
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_GLOBAL_INIT;
+    libinput_event* event = nullptr;
+    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(event, data, nullptr);
+    EXPECT_EQ(result, RET_NOTDO);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_005
- * @tc.desc: Init will return RET_OK when directory_ is invalid path
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_DoHandleEvent_002
+ * @tc.desc: Test_DoHandleEvent_002
+ * @tc.require: test DoHandleEvent
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_005,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_DoHandleEvent_002,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::string dir = "/system/lib64/multimodalinput/autorun/test.so";
-    InputPluginManager::instance_ = nullptr;
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance(dir);
-    ASSERT_NE(ptr, nullptr);
-
-    int32_t ret = ptr->Init();
-    EXPECT_EQ(ret, RET_OK);
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_AFTER_NORMALIZED;
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    int32_t result = InputPluginManager::GetInstance()->DoHandleEvent(keyEvent, data, nullptr);
+    EXPECT_EQ(result, RET_NOTDO);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_001
- * @tc.desc: LoadPlugin will return true when LoadPlugin get valid path
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetUdsServer_001
+ * @tc.desc: Test_GetUdsServer_001
+ * @tc.require: test GetUdsServer
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    std::string dir = "/system/lib64/multimodalinput/autorun/libpointer_predict_insertion.z.so";
-    bool ret = ptr->LoadPlugin(dir);
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_002
- * @tc.desc: LoadPlugin will return true when LoadPlugin get valid path
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    std::string dir = "/system/lib64/multimodalinput/autorun/test.so";
-    bool ret = ptr->LoadPlugin(dir);
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_PrintPlugins_001
- * @tc.desc: PrintPlugins will print plugin info when plugins_!=nullptr
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_PrintPlugins_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::string path = "/system/lib64/multimodalinput/autorun/libpointer_predict_insertion.z.so";
-    void *handle = dlopen(path.c_str(), RTLD_LAZY);
-    ASSERT_NE(handle, nullptr);
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
-    ptr->plugins_.insert({stage, {nullptr}});
-
-    ASSERT_NO_FATAL_FAILURE(ptr->PrintPlugins());
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_PluginAssignmentCallBack_001
- * @tc.desc: Nothing will happenned when callback=nullptr
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_PluginAssignmentCallBack_001,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetUdsServer_001,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::function<void(libinput_event *, int64_t)> callback = nullptr;
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    ASSERT_NO_FATAL_FAILURE(ptr->PluginAssignmentCallBack(callback, stage));
-}
-
-static void DispatchEvent(libinput_event *event, int64_t frameTime)
-{
-    (void)event;
-    (void)frameTime;
+    auto instance = InputPluginManager::GetInstance();
+    UDSServer* result = instance->GetUdsServer();
+    EXPECT_EQ(result, InputPluginManager::GetInstance()->udsServer_);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_PluginAssignmentCallBack_002
- * @tc.desc: Nothing will happenned when callback!=nullptr
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_001
+ * @tc.desc: Test_DispatchEvent_001
+ * @tc.require: test DispatchEvent
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_PluginAssignmentCallBack_002,
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_001,
     TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    libinput_event* event = nullptr;
+    int64_t frameTime = 100;
+    inputPluginContext->DispatchEvent(event, frameTime);
+    EXPECT_EQ(frameTime, 100);
+}
 
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_002
+ * @tc.desc: Test_DispatchEvent_002
+ * @tc.require: test DispatchEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    int32_t pid = 1;
+    UDSServer udsServer;
+    InputPluginManager::GetInstance()->udsServer_ = &udsServer;
+    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
+    inputPluginContext->DispatchEvent(pkt, pid);
+    EXPECT_EQ(pid, 1);
+}
 
-    InputPlugin inputPlugin;
-    std::function<void(libinput_event *, int64_t)> callback = DispatchEvent;
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_003
+ * @tc.desc: Test_DispatchEvent_003
+ * @tc.require: test DispatchEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<UDSServer> udsServer = std::make_shared<UDSServer>();
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> session = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    InputPluginManager::GetInstance()->udsServer_ = udsServer.get();
+    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
+    inputPluginContext->DispatchEvent(pkt, pid);
+    EXPECT_EQ(pid, 4);
+}
 
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_004
+ * @tc.desc: Test_DispatchEvent_004
+ * @tc.require: test DispatchEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_DispatchEvent_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDispatchStage filterStage = InputDispatchStage::Filter;
+    InputDispatchStage interceptStage = InputDispatchStage::Intercept;
+    InputDispatchStage keyCommandStage = InputDispatchStage::KeyCommand;
+    InputDispatchStage monitorStage = InputDispatchStage::Monitor;
 
-    ASSERT_NO_FATAL_FAILURE(ptr->PluginAssignmentCallBack(callback, stage));
+    libinput_event* event = nullptr;
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
+    std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, filterStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, interceptStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, keyCommandStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, monitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(pointerEvent, monitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(axisEvent, monitorStage));
+    EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(keyEvent, monitorStage));
 }
 
 /**
  * @tc.name: MultimodalInputPluginManagerTest_HandleEvent_001
- * @tc.desc: HandleEvent will return RET_NOTDO when event=nullptr
- * @tc.require:
+ * @tc.desc: Test_HandleEvent_001
+ * @tc.require: test HandleEvent
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleEvent_001, TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_HandleEvent_001,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    libinput_event* event = nullptr;
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    PluginResult result = inputPluginContext->HandleEvent(event, data);
+    EXPECT_EQ(result, PluginResult::NotUse);
 
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillOnce(Return(201));
+    EXPECT_CALL(*mockInputPlugin, GetStage()).WillOnce(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
+    inputPluginContext->Init(mockInputPlugin);
 
-    int64_t frameTime = 0;
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(event, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    result = inputPluginContext->HandleEvent(event, data);
+    EXPECT_EQ(result, PluginResult::UseNeedReissue);
 
-    int32_t ret = ptr->HandleEvent(nullptr, frameTime, stage);
-    EXPECT_EQ(ret, RET_NOTDO);
+    std::shared_ptr<PointerEvent> pointerEvent =
+        std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(pointerEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    result = inputPluginContext->HandleEvent(pointerEvent, data);
+    EXPECT_EQ(result, PluginResult::UseNeedReissue);
+
+    std::shared_ptr<AxisEvent> axisEvent =
+        std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(axisEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    result = inputPluginContext->HandleEvent(axisEvent, data);
+    EXPECT_EQ(result, PluginResult::UseNeedReissue);
+
+    std::shared_ptr<KeyEvent> keyEvent =
+        std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(keyEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    result = inputPluginContext->HandleEvent(keyEvent, data);
+    EXPECT_EQ(result, PluginResult::UseNeedReissue);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_001
- * @tc.desc: DoHandleEvent will return RET_NOTDO when event=nullptr
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_GetName_001
+ * @tc.desc: Test_GetName_001
+ * @tc.require: test GetName
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_001, TestSize.Level1)
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetName_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    int64_t frameTime = 0;
-    InputPlugin iplugin;
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
-
-    int32_t ret = ptr->DoHandleEvent(nullptr, frameTime, &iplugin, stage);
-    EXPECT_EQ(ret, RET_NOTDO);
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    inputPluginContext->name_ = "yunshuiqiao";
+    std::string pluginName = inputPluginContext->GetName();
+    EXPECT_EQ(pluginName, "yunshuiqiao");
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_002
- * @tc.desc: DoHandleEvent will return RET_NOTDO when event=nullptr
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_GetPriority_001
+ * @tc.desc: Test_GetPriority_001
+ * @tc.require: test GetPriority
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_002, TestSize.Level1)
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPriority_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    int64_t frameTime = 0;
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
-
-    int32_t ret = ptr->DoHandleEvent(nullptr, frameTime, nullptr, stage);
-    EXPECT_EQ(ret, RET_NOTDO);
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    inputPluginContext->prio_ = 300;
+    int32_t priority = inputPluginContext->GetPriority();
+    EXPECT_EQ(priority, 300);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_003
- * @tc.desc: DoHandleEvent will return RET_NOTDO when event=nullptr
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_SetCallback_001
+ * @tc.desc: Test_SetCallback_001
+ * @tc.require: test SetCallback
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_003, TestSize.Level1)
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_SetCallback_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-
-    int64_t frameTime = 0;
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
-
-    int32_t ret = ptr->DoHandleEvent(event, frameTime, nullptr, stage);
-    EXPECT_EQ(ret, RET_NOTDO);
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
+    inputPluginContext->SetCallback(callback);
+    EXPECT_NE(inputPluginContext->callback_, nullptr);
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_DoHandleEvent_004
- * @tc.desc: DoHandleEvent will return RET_NOTDO when event=nullptr
- * @tc.require:
+ * @tc.name: MultimodalInputPluginManagerTest_GetPlugin_001
+ * @tc.desc: Test_GetPlugin_001
+ * @tc.require: test GetPlugin
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DoHandleEvent_004, TestSize.Level1)
+HWTEST_F(
+    MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_GetPlugin_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-
-    int64_t frameTime = 0;
-    InputPlugin iplugin;
-    std::shared_ptr<IInputPlugin> iPin;
-    InputPluginStage stage = iPin->GetStage();
-
-    int32_t ret = ptr->DoHandleEvent(event, frameTime, &iplugin, stage);
-    EXPECT_EQ(ret, RET_NOTDO);
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillOnce(Return(201));
+    EXPECT_CALL(*mockInputPlugin, GetStage()).WillOnce(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
+    inputPluginContext->Init(mockInputPlugin);
+    std::shared_ptr<IInputPlugin> inputPlugin = inputPluginContext->GetPlugin();
+    EXPECT_NE(inputPlugin, nullptr);
 }
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_001
- * @tc.desc: IntermediateEndEvent will true when libinput_event_type before LIBINPUT_EVENT_GESTURE_HOLD_END
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IntermediateEndEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    libinput_event event;
-    event.type = LIBINPUT_EVENT_TABLET_TOOL_TIP;
-
-    bool ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_POINTER_MOTION;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_POINTER_AXIS;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_002
- * @tc.desc: IntermediateEndEvent will true when libinput_event_type before LIBINPUT_EVENT_GESTURE_HOLD_END
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IntermediateEndEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    libinput_event event;
-    event.type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
-
-    bool ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TOUCH_UP;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TOUCH_UP;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TOUCH_MOTION;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TOUCH_CANCEL;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TOUCHPAD_UP;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_TOUCHPAD_MOTION;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_003
- * @tc.desc: IntermediateEndEvent will true when libinput_event_type before LIBINPUT_EVENT_GESTURE_HOLD_END
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IntermediateEndEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    libinput_event event;
-    event.type = LIBINPUT_EVENT_TABLET_TOOL_AXIS;
-
-    bool ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_GESTURE_SWIPE_END;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_KEYBOARD_KEY;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_GESTURE_SWIPE_END;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-
-    event.type = LIBINPUT_EVENT_GESTURE_PINCH_END;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_IntermediateEndEvent_004
- * @tc.desc: IntermediateEndEvent will true when libinput_event_type before LIBINPUT_EVENT_GESTURE_HOLD_END
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IntermediateEndEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    std::shared_ptr<InputPluginManager> ptr = InputPluginManager::GetInstance();
-    ASSERT_NE(ptr, nullptr);
-
-    libinput_event event;
-    event.type = LIBINPUT_EVENT_KEYBOARD_KEY;
-
-    bool ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-
-    event.type = LIBINPUT_EVENT_POINTER_BUTTON;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-
-    event.type = LIBINPUT_EVENT_POINTER_TAP;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-
-    event.type = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-
-    event.type = LIBINPUT_EVENT_POINTER_TAP;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-
-    event.type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-
-    event.type = LIBINPUT_EVENT_TABLET_TOOL_TIP;
-    ret = ptr->IntermediateEndEvent(&event);
-    EXPECT_EQ(ret, false);
-}
-
 } // namespace MMI
 } // namespace OHOS

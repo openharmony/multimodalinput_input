@@ -2993,5 +2993,10 @@ int32_t InputManagerImpl::SetHookIdUpdater(std::function<void(int32_t)> callback
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
+
+int32_t InputManagerImpl::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, pluginRemoteStub);
+}
 } // namespace MMI
 } // namespace OHOS
