@@ -123,6 +123,7 @@ group("test") {
     "moduleloader_shield_ir_fuzzer:fuzztest",
     "moduleloader_touchpad_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
+    "onremoterequest_fuzzer:fuzztest",
     "notifyadddevicelisteners_fuzzer:fuzztest",
     "notifyaddpointerdevice_fuzzer:fuzztest",
     "notifydeviceadded_fuzzer:fuzztest",

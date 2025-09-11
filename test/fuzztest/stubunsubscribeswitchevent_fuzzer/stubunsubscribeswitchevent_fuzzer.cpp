@@ -25,9 +25,9 @@
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
+const std::u16string FORMMGR_INTERFACE_TOKEN = IMultimodalInputConnect::GetDescriptor();
 bool StubUnsubscribeSwitchEventFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -43,7 +43,6 @@ bool StubUnsubscribeSwitchEventFuzzTest(const uint8_t* data, size_t size)
 
 bool StubQuerySwitchStatusFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -59,7 +58,6 @@ bool StubQuerySwitchStatusFuzzTest(const uint8_t* data, size_t size)
 
 bool StubSetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -76,7 +74,6 @@ bool StubSetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
 
 bool StubGetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -93,7 +90,6 @@ bool StubGetTouchpadRotateSwitchFuzzTest(const uint8_t* data, size_t size)
 
 bool StubGetKeyStateFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -109,7 +105,6 @@ bool StubGetKeyStateFuzzTest(const uint8_t* data, size_t size)
 
 bool StubAuthorizeFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -125,7 +120,6 @@ bool StubAuthorizeFuzzTest(const uint8_t* data, size_t size)
 
 bool StubCancelInjectionFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -141,7 +135,6 @@ bool StubCancelInjectionFuzzTest(const uint8_t* data, size_t size)
 
 bool StubHasIrEmitterFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -157,7 +150,6 @@ bool StubHasIrEmitterFuzzTest(const uint8_t* data, size_t size)
 
 bool StubGetInfraredFrequenciesFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -173,7 +165,6 @@ bool StubGetInfraredFrequenciesFuzzTest(const uint8_t* data, size_t size)
 
 bool StubTransmitInfraredFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -189,7 +180,6 @@ bool StubTransmitInfraredFuzzTest(const uint8_t* data, size_t size)
 
 bool StubSetPixelMapDataFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -205,7 +195,6 @@ bool StubSetPixelMapDataFuzzTest(const uint8_t* data, size_t size)
 
 bool StubSetCurrentUserFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -221,7 +210,6 @@ bool StubSetCurrentUserFuzzTest(const uint8_t* data, size_t size)
 
 bool StubEnableHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -238,7 +226,6 @@ bool StubEnableHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
 
 bool StubGetHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -254,7 +241,6 @@ bool StubGetHardwareCursorStatsFuzzTest(const uint8_t* data, size_t size)
 
 bool StubAddVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -270,7 +256,6 @@ bool StubAddVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
 
 bool StubRemoveVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -287,7 +272,6 @@ bool StubRemoveVirtualInputDeviceFuzzTest(const uint8_t* data, size_t size)
 
 bool StubTransferBinderClientServiceFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -305,7 +289,6 @@ bool StubTransferBinderClientServiceFuzzTest(const uint8_t* data, size_t size)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 bool StubGetPointerSnapshotFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -322,7 +305,6 @@ bool StubGetPointerSnapshotFuzzTest(const uint8_t* data, size_t size)
 
 bool StubSkipPointerLayerFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -338,7 +320,6 @@ bool StubSkipPointerLayerFuzzTest(const uint8_t* data, size_t size)
 
 bool StubMarkEventConsumedFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -354,7 +335,6 @@ bool StubMarkEventConsumedFuzzTest(const uint8_t* data, size_t size)
 
 bool StubGetDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -370,7 +350,6 @@ bool StubGetDeviceFuzzTest(const uint8_t* data, size_t size)
 
 bool StubSetTouchpadThreeFingersTapSwitchFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -387,7 +366,6 @@ bool StubSetTouchpadThreeFingersTapSwitchFuzzTest(const uint8_t* data, size_t si
 
 bool StubGetTouchpadThreeFingersTapSwitchFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -405,7 +383,6 @@ bool StubGetTouchpadThreeFingersTapSwitchFuzzTest(const uint8_t* data, size_t si
 #ifdef OHOS_BUILD_ENABLE_ANCO
 bool StubAncoAddChannelFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -421,7 +398,6 @@ bool StubAncoAddChannelFuzzTest(const uint8_t* data, size_t size)
 
 bool StubAncoRemoveChannelFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
@@ -438,7 +414,6 @@ bool StubAncoRemoveChannelFuzzTest(const uint8_t* data, size_t size)
 
 bool switchDefaultFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
