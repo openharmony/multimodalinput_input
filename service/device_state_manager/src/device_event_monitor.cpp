@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 const char* SOS_PAGE_CHANGE_EVENTS = "emergencycommunication.event.SOS_EMERGENCY_CALL_ABILITY_PAGE_CHANGE";
-const char *VOIP_CALL_CHANGE_EVENTS = "usual.event.VOIP_CALL_STATE_CHANGED";
+const char* VOIP_CALL_CHANGE_EVENTS = "usual.event.VOIP_CALL_STATE_CHANGED";
 DeviceEventMonitor::DeviceEventMonitor() {}
 DeviceEventMonitor::~DeviceEventMonitor() {}
 
@@ -65,7 +65,6 @@ public:
             }
         } else if (action == VOIP_CALL_CHANGE_EVENTS) {
             int32_t voipCallState = 0;
-            DEVICE_MONITOR->SetVoipCallState(eventData, voipCallState);
             MMI_HILOGI("voipCallState_:%{public}d", voipCallState);
         } else {
             MMI_HILOGW("Device changed receiver event: unknown");
