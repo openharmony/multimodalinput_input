@@ -5372,21 +5372,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         }
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-        // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
-        bool isCompensatePointer = (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
-            !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) ||
-            (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
-            !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GENERATE_FROM_REAL));
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOG_DISPATCHI("In Anco, WI:%{public}d, SI:%{public}d SW:%{public}d",
-                touchWindow->id, isCompensatePointer, isFirstSpecialWindow);
-        }
-        if (isCompensatePointer || isFirstSpecialWindow) {
-            if (!(IsAncoGameActive() && MMI_GE(pointerEvent->GetZOrder(), 0.0f))) {
-                SimulatePointerExt(pointerEvent);
-            } else {
-                MMI_HILOG_DISPATCHD("In the anco game scene, events from gestureNav are not allowed");
-            }
+        if (IsShouldSendToAnco(pointerEvent, isFirstSpecialWindow)) {
+            SimulatePointerExt(pointerEvent);
             isFirstSpecialWindow = false;
         } else {
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
