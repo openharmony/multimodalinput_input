@@ -1050,8 +1050,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection90(ANGLE_SW, physicalX, physicalY);
-    EXPECT_NE(physicalX, 200);
-    EXPECT_NE(physicalY, 200);
+    EXPECT_EQ(physicalX, 50);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection90(ANGLE_CENTER, physicalX, physicalY);
@@ -1127,7 +1126,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalY, 50);
+    EXPECT_EQ(physicalX, 150);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_CENTER, physicalX, physicalY);
@@ -1135,6 +1134,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->AdjustMouseFocusByDirection270(ANGLE_NW_RIGHT, physicalX, physicalY);
+    EXPECT_EQ(physicalY, 92);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
@@ -1168,7 +1168,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocus_001
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION90);
     pointerDrawingManager->AdjustMouseFocus(DIRECTION90, ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalY, 150);
+    EXPECT_EQ(physicalX, 50);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION180);
@@ -1178,7 +1178,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocus_001
     physicalY = 100;
     pointerDrawingManager->RotateDegree(DIRECTION270);
     pointerDrawingManager->AdjustMouseFocus(DIRECTION270, ANGLE_SW, physicalX, physicalY);
-    EXPECT_EQ(physicalY, 50);
+    EXPECT_EQ(physicalX, 150);
     physicalX = 100;
     physicalY = 100;
     pointerDrawingManager->RotateDegree(static_cast<Direction>(4));
