@@ -28,7 +28,7 @@ namespace OHOS {
 namespace MMI {
 
 namespace {
-const std::u16string kInterfaceToken{u"ohos.multimodalinput.IConnectManager"};
+const std::u16string kInterfaceToken = IMultimodalInputConnect::GetDescriptor();
 constexpr int32_t kMinSubscribeId = std::numeric_limits<int32_t>::min();
 constexpr int32_t kMaxSubscribeId = std::numeric_limits<int32_t>::max();
 constexpr int32_t kMinFingerCount = 1;

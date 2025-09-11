@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace MMI {
 namespace OHOS {
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+const std::u16string FORMMGR_INTERFACE_TOKEN = IMultimodalInputConnect::GetDescriptor();
 
 bool GetKeyBoardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
 {
