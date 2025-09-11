@@ -14,37 +14,35 @@
  */
 
 #include "pointer_event.h"
-#include "pointerevent_fuzzer.h"
 #include "fuzzer/FuzzedDataProvider.h"
 #include "mmi_log.h"
 
 #include "securec.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "PointerEventFuzzTest"
+#define MMI_LOG_TAG "PointerEvent2FuzzTest"
 
 namespace OHOS {
 namespace MMI {
-bool PointerEventFuzzTest(const uint8_t *data, size_t size)
+void PointerEvent2FuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
     int32_t eventType = provider.ConsumeIntegral<int32_t>();
     PointerEvent pointEvent(eventType);
 
-    double throwAngle = provider.ConsumeFloatingPoint<double>();
-    pointEvent.SetThrowAngle(throwAngle);
+    int32_t handOption = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetHandOption(handOption);
 
-    double throwSpeed = provider.ConsumeFloatingPoint<double>();
-    pointEvent.SetThrowSpeed(throwSpeed);
+    int32_t pointerId = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetPointerId(pointerId);
 
-    int32_t pointerAction = provider.ConsumeIntegral<int32_t>();
-    pointEvent.SetPointerAction(pointerAction);
+    int32_t fingerCount = provider.ConsumeIntegral<int32_t>();
+    pointEvent.SetFingerCount(fingerCount);
 
-    int32_t originPointerAction = provider.ConsumeIntegral<int32_t>();
-    pointEvent.SetOriginPointerAction(originPointerAction);
+    float zOrder = provider.ConsumeFloatingPoint<float>();
+    pointEvent.SetZOrder(zOrder);
 
-    MMI_HILOGD("PointerEventFuzzTest");
-    return true;
+    MMI_HILOGD("PointerEvent2FuzzTest");
 }
 } // MMI
 } // OHOS
@@ -57,6 +55,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::MMI::PointerEventFuzzTest(data, size);
+    OHOS::MMI::PointerEvent2FuzzTest(data, size);
     return 0;
 }
