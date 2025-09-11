@@ -82,7 +82,6 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value, c
 
 ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, const std::string &strUri)
 {
-    MMI_HILOGI("HGC 888 GetBoolValue enter----> value: %{public}d", value);
     std::string valueStr;
     ErrCode ret = GetStringValue(key, valueStr, strUri);
     if (ret != ERR_OK) {
@@ -94,7 +93,6 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
         return ERR_INVALID_VALUE;
     }
     value = ((valueStr == "true") || (valueStr == "1"));
-    MMI_HILOGI("HGC 888 GetBoolValue end----> value: %{public}d", value);
     return ERR_OK;
 }
 
@@ -189,40 +187,27 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
 ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value, const std::string &strUri)
 {
     BytraceAdapter::StartDataShare(key);
-    MMI_HILOGE("HGC 001 enter--->");
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    MMI_HILOGE("HGC 001 end<---");
-    MMI_HILOGE("HGC 002 enter--->");
     auto helper = CreateDataShareHelper(strUri);
-    MMI_HILOGE("HGC 002 end<---");
     if (helper == nullptr) {
-        MMI_HILOGE("HGC 002 helper is null");
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_NO_INIT;
     }
     std::vector<std::string> columns = {SETTING_COLUMN_VALUE};
-    MMI_HILOGE("HGC 003 enter--->");
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    MMI_HILOGE("HGC 003 end<---");
-    MMI_HILOGE("HGC 004 enter--->");
     Uri uri(AssembleUri(key, strUri));
     auto resultSet = helper->Query(uri, predicates, columns);
-    MMI_HILOGE("HGC 004 end<---");
-    MMI_HILOGE("HGC 005 enter--->");
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
-        MMI_HILOGE("HGC 005 resultSet is null");
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_INVALID_OPERATION;
     }
-    MMI_HILOGE("HGC 005 end<---");
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
-        MMI_HILOGE("HGC 006 count is 0");
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_NAME_NOT_FOUND;
@@ -231,15 +216,12 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     resultSet->GoToRow(tmpRow);
     int32_t ret = resultSet->GetString(tmpRow, value);
     if (ret != RET_OK) {
-        MMI_HILOGE("HGC 006 ret is err");
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         BytraceAdapter::StopDataShare();
         return ERR_INVALID_VALUE;
     }
     resultSet->Close();
-    MMI_HILOGE("HGC 007 enter--->");
     IPCSkeleton::SetCallingIdentity(callingIdentity);
-    MMI_HILOGE("HGC 007 end<---");
     BytraceAdapter::StopDataShare();
     return ERR_OK;
 }
@@ -277,7 +259,6 @@ ErrCode SettingDataShare::PutStringValue(
 
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper(const std::string &strUri)
 {
-    MMI_HILOGE("HGC 008 enter--->");
     BytraceAdapter::StartDataShare(strUri);
     if (remoteObj_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -287,10 +268,9 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
             remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
         }
     }
-    MMI_HILOGE("HGC 008 end<---");
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     CHKPP(instance_);
-    MMI_HILOGE("HGC 009 enter isDataShareReady_:%{public}d--->", instance_->isDataShareReady_);
+    MMI_HILOGI("DataShare is ready [%{public}d]", instance_->isDataShareReady_);
     if (instance_->isDataShareReady_) {
         if (strUri.empty()) {
             ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
@@ -298,7 +278,6 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
             ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
         }
     }
-    MMI_HILOGE("HGC 009 end<---");
     BytraceAdapter::StopDataShare();
     return ret.second;
 }
