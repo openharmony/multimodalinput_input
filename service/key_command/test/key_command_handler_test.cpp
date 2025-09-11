@@ -968,7 +968,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_006, TestS
     inputEvent->bitwise_ = 0x00000000;
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
-    handler.lastMatchedKey_.timerId = -5;
+    handler.lastMatchedKeys_ = {};
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
 }
@@ -2417,6 +2417,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_01, TestSize
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
     shortcutKey.keyDownDuration = 0;
+    shortcutKey.ability.bundleName = "com.example.test";
     ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
 }
 
@@ -2431,8 +2432,45 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_02, TestSize
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 1000;
+    shortcutKey.ability.bundleName = "com.example.test";
+    shortcutKey.timerId = -1;
+    ASSERT_FALSE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_03
+ * @tc.desc: test HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 0;
+    shortcutKey.ability.bundleName = "com.example.test";
     shortcutKey.timerId = -1;
     ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_04
+ * @tc.desc: test HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 1000;
+    shortcutKey.ability.bundleName = "com.example.test";
+    shortcutKey.finalkey = 17;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    ASSERT_FALSE(handler.HandleKeyDown(shortcutKey));
 }
 
 /**
@@ -3489,12 +3527,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_001, TestS
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
-    handler.lastMatchedKey_.timerId = 1;
-    ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_FALSE(ret);
-    handler.lastMatchedKey_.timerId = -1;
-    ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_FALSE(ret);
     std::string businessId = "power";
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
@@ -3527,9 +3559,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_002, TestS
     key.ability = ability_temp;
     handler.shortcutKeys_.insert(std::make_pair("key2", key));
     bool ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_FALSE(ret);
-    handler.lastMatchedKey_.timerId = -1;
-    ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
     std::string businessId = "power";
     ret = handler.HandleShortKeys(keyEvent);
@@ -3564,9 +3593,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_003, TestS
     handler.shortcutKeys_.insert(std::make_pair("key3", key));
     bool ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
-    handler.lastMatchedKey_.timerId = -1;
-    ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_FALSE(ret);
     std::string businessId = "power";
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
@@ -3599,9 +3625,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_04, TestSi
     key.ability = ability_temp;
     handler.shortcutKeys_.insert(std::make_pair("key2", key));
     bool ret = handler.HandleShortKeys(keyEvent);
-    EXPECT_FALSE(ret);
-    handler.lastMatchedKey_.timerId = -1;
-    ret = handler.HandleShortKeys(keyEvent);
     EXPECT_FALSE(ret);
 
     key.businessId = "power";
@@ -4047,12 +4070,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_004, TestS
     key.keyDownDuration = 5;
     key.triggerType = KeyEvent::KEY_ACTION_DOWN;
     key.timerId = 6;
-    handler.lastMatchedKey_.finalKey = 1;
-    handler.lastMatchedKey_.triggerType = 2;
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(2);
-    bool result = handler.IsKeyMatch(handler.lastMatchedKey_, keyEvent);
-    ASSERT_FALSE(result);
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     bool ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
@@ -5403,9 +5422,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_01, TestSi
     shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
     shortcutKey.timerId = 10;
     handler.shortcutKeys_.insert(std::make_pair("key", shortcutKey));
-    handler.lastMatchedKey_.finalKey = 1;
-    handler.lastMatchedKey_.triggerType = KeyEvent::KEY_ACTION_UP;
-    handler.lastMatchedKey_.preKeys = {3};
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     KeyEvent::KeyItem item1;
@@ -5420,7 +5436,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_01, TestSi
     keyEvent->AddKeyItem(item2);
     bool ret = handler.HandleShortKeys(keyEvent);
     ASSERT_TRUE(ret);
-    handler.lastMatchedKey_.preKeys = {4, 5, 6};
     handler.currentLaunchAbilityKey_.timerId = 5;
     handler.currentLaunchAbilityKey_.finalKey = 1;
     handler.currentLaunchAbilityKey_.triggerType = KeyEvent::KEY_ACTION_UP;

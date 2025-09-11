@@ -662,6 +662,7 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
         }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::string key = GenerateKey(shortcutKey);
+        shortcutKey.key = key;
         if (shortcutKeyMap.find(key) == shortcutKeyMap.end()) {
             if (!shortcutKeyMap.emplace(key, shortcutKey).second) {
                 MMI_HILOGW("Duplicate shortcutKey:%s", key.c_str());
