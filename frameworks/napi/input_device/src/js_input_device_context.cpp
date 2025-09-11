@@ -120,7 +120,8 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 
     napi_value object = nullptr;
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
+    CHKRP(napi_open_handle_scope(env, &scope), OPEN_HANDLE_SCOPE);
+    CHKPP(scope);
     CHKRP(napi_get_named_property(env, global, "multimodal_input_device", &object), GET_NAMED_PROPERTY);
     CHKPP(object);
 
