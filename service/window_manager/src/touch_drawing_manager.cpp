@@ -224,29 +224,10 @@ void TouchDrawingManager::CreateObserver()
         MMI_HILOGI("Setup observer of show-touch-position");
         pointerMode_.SwitchName = POINTER_POSITION_SWITCH_NAME;
         CreatePointerObserver(pointerMode_);
-        // hgc 999 调度阻塞形的，抛到其他线程上
-        CHKPV(delegateProxy_);
-        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdatePointerMode, this));
-        // SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
-        //     GetBoolValue(POINTER_POSITION_SWITCH_NAME, pointerMode_.isShow);
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).
+            GetBoolValue(POINTER_POSITION_SWITCH_NAME, pointerMode_.isShow);
     }
     MMI_HILOGD("The bubbleMode_:%{public}d, pointerMode_:%{public}d", bubbleMode_.isShow, pointerMode_.isShow);
-}
-
-int32_t TouchDrawingManager::UpdatePointerMode()
-{
-    bool isShow = false;
-    auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .GetBoolValue(POINTER_POSITION_SWITCH_NAME, isShow);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get value from setting data fail");
-        return ret;
-    }
-    // 使用互斥锁保护对 pointerMode_.isShow 的访问
-    std::lock_guard<std::mutex> lock(pointerModeMutex_);
-    pointerMode_.isShow = isShow;
-    MMI_HILOGI("HGC 999 Pointer mode isShow: %{public}d", pointerMode_.isShow);
-    return RET_OK;
 }
 
 template <class T>
@@ -262,7 +243,7 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
         }
         CHKPV(delegateProxy_);
         delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
-        MMI_HILOGI("HMY 001 The key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
+        MMI_HILOGI("The key:%{public}s, statusValue:%{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.SwitchName, updateFunc);
