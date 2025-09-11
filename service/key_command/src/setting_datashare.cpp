@@ -270,7 +270,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
     }
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret;
     if (instance_ != nullptr && instance_->isDataShareReady_) {
-        MMI_HILOGI("DataShare is ready [%{public}d]", instance_->isDataShareReady_);
+        MMI_HILOGI("DataShare is ready");
         if (strUri.empty()) {
             ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
         } else {
