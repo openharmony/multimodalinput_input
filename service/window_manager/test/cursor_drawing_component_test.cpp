@@ -420,17 +420,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_Dump_001, TestSi
 }
 
 /**
- * @tc.name: CursorDrawingComponentTest_InitPointerCallback_001
- * @tc.desc: Test DrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallback_001, TestSize.Level1)
-{
-    EXPECT_NO_FATAL_FAILURE(instance_->InitPointerCallback());
-}
-
-/**
  * @tc.name: CursorDrawingComponentTest_InitScreenInfo_001
  * @tc.desc: Test DrawPointer
  * @tc.type: FUNC
@@ -714,5 +703,16 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_NotifyPointerEve
     EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt));
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
+
+/**
+ * @tc.name: CursorDrawingComponentTest_InitPointerCallback_001
+ * @tc.desc: Test DrawPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallback_001, TestSize.Level1)
+{
+    EXPECT_NO_FATAL_FAILURE(instance_->InitPointerCallback());
+}
 } // namespace MMI
 } // namespace OHOS
