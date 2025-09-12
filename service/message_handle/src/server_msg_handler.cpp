@@ -624,12 +624,6 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
-        int32_t pointerId = pointerEvent->GetPointerId();
-        PointerEvent::PointerItem pointerItem;
-        if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-            return RET_ERR;
-        }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         if (isShell) {
             shellTargetWindowIds_[touch] = targetWindowId;
@@ -640,11 +634,12 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         } else {
             nativeTargetWindowIds_[touch] = targetWindowId;
         }
+        MMI_HILOGD("Update displayId:%{public}d, pointerId:%{public}d, targetWindowId:%{public}d",
+            touch.displayId_, touch.pointerId_, targetWindowId);
     }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
-        int32_t pointerId = pointerEvent->GetPointerId();
         if (isShell) {
             shellTargetWindowIds_.erase(touch);
         } else if (IsCastInject(pointerEvent->GetDeviceId()) && (pointerEvent->GetZOrder() > 0)) {
@@ -654,6 +649,8 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         } else {
             nativeTargetWindowIds_.erase(touch);
         }
+        MMI_HILOGD("Erase displayId:%{public}d, pointerId:%{public}d",
+            touch.displayId_, touch.pointerId_);
     }
     return RET_OK;
 }
@@ -698,8 +695,13 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
             pointerEvent->SetPointerId(pointerEvent->GetPointerId() + diffPointerId);
         }
     }
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    if (displayId < 0 && !WIN_MGR->UpdateDisplayId(displayId)) {
+        MMI_HILOG_DISPATCHE("This display is not existent");
+        return RET_ERR;
+    }
     InjectionTouch touch{
-        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+        .displayId_ = displayId, .pointerId_ = pointerEvent->GetPointerId()};
     auto iter = targetWindowIdMap.find(touch);
     if (iter != targetWindowIdMap.end()) {
         return iter->second;

@@ -113,6 +113,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    MOCK_METHOD(bool, UpdateDisplayId, (int32_t&));
     void DrawTouchGraphic(std::shared_ptr<PointerEvent>) override {}
     MOCK_METHOD(int32_t, UpdateTargetPointer, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(const OLD::DisplayInfo *, GetPhysicalDisplay, (int32_t), (const));
