@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "mmi_log.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "input_event.h"
 #include "inputevent_fuzzer.h"
+#include "mmi_log.h"
 
 #include "securec.h"
 
@@ -24,122 +25,26 @@
 
 namespace OHOS {
 namespace MMI {
-namespace OHOS {
-#define ODDEVENFLAG 2
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+void InputEventFuzzTest(const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+    FuzzedDataProvider provider(data, size);
+
+    int32_t eventType = provider.ConsumeIntegral<int32_t>();
+    InputEvent inputEvent(eventType);
+
+    eventType = provider.ConsumeIntegral<int32_t>();
+    inputEvent.EventTypeToString(eventType);
+
+    int32_t id = provider.ConsumeIntegral<int32_t>();
+    inputEvent.SetId(id);
+
+    int64_t actionTime = provider.ConsumeIntegral<int64_t>();
+    inputEvent.SetActionTime(actionTime);
+
+    uint64_t sensorTime = provider.ConsumeIntegral<uint64_t>();
+    inputEvent.SetSensorInputTime(sensorTime);
 }
-
-void InputEventGetFuncFuzzTest(InputEvent &inputEvent)
-{
-    Parcel parcel;
-    inputEvent.Marshalling(parcel);
-    inputEvent.ReadFromParcel(parcel);
-    inputEvent.Unmarshalling(parcel);
-
-    inputEvent.GetId();
-    inputEvent.UpdateId();
-    inputEvent.GetActionTime();
-    inputEvent.GetSensorInputTime();
-    inputEvent.GetAction();
-    inputEvent.GetActionStartTime();
-    inputEvent.GetDeviceId();
-    inputEvent.GetSourceType();
-    inputEvent.GetTargetDisplayId();
-    inputEvent.GetAgentWindowId();
-    inputEvent.GetTargetWindowId();
-    inputEvent.GetEventType();
-    inputEvent.GetFlag();
-    inputEvent.IsMarkEnabled();
-    inputEvent.MarkProcessed();
-    inputEvent.ToString();
-
-    InputEvent::Create();
-    InputEvent inputEvent2 = InputEvent(inputEvent);
-    inputEvent2.ToString();
-}
-
-bool InputEventFuzzTest(const uint8_t *data, size_t size)
-{
-    size_t startPos = 0;
-    int32_t rowsBefore;
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-
-    InputEvent inputEvent(rowsBefore);
-    inputEvent.Reset();
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.EventTypeToString(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetId(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetActionTime(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetSensorInputTime(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetAction(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetActionStartTime(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetDeviceId(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetSourceType(rowsBefore);
-
-    inputEvent.DumpSourceType();
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetTargetDisplayId(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetAgentWindowId(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetTargetWindowId(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.HasFlag(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.IsFlag(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.AddFlag(rowsBefore);
-    inputEvent.ClearFlag();
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.ClearFlag(rowsBefore);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.SetMarkEnabled(rowsBefore);
-
-    std::function<void(int32_t, int64_t)> callback = [](int32_t, int64_t) {};
-    inputEvent.SetProcessedCallback(callback);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-
-    startPos += GetObject<int32_t>(rowsBefore, data + startPos, size - startPos);
-    inputEvent.ActionToShortStr(rowsBefore);
-    InputEventGetFuncFuzzTest(inputEvent);
-    
-    return true;
-}
+} // namespace MMI
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
@@ -149,8 +54,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::InputEventFuzzTest(data, size);
+    OHOS::MMI::InputEventFuzzTest(data, size);
     return 0;
 }
-} // namespace MMI
-} // namespace OHOS
