@@ -197,16 +197,17 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     uint64_t time = libinput_event_touch_get_time_usec(touch);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    PointerEvent::PointerItem item;
-    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
-    if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
-#ifdef OHOS_BUILD_EXTERNAL_SCREEN
-        CHKFR(OnEventTouchDown(event), nullptr, "Get OnEventTouchDown failed");
-        return true;
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
-    }
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
+    PointerEvent::PointerItem item;
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    if (!pointerEvent_->GetPointerItem(seatSlot, item) &&
+        WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true, false)) {
+        CHKFR(OnEventTouchDown(event), nullptr, "Get OnEventTouchDown failed");
+        return true;
+    }
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true, true)) {
         processedCount_++;
         if (processedCount_ == PRINT_INTERVAL_COUNT) {
@@ -216,7 +217,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
         return false;
     }
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
-        MMI_HILOGD("Get pointer parameter failed");
+        MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
     int32_t blobId = libinput_event_touch_get_blob_id(touch);
