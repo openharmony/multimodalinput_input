@@ -696,7 +696,7 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
         }
     }
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (displayId < 0 && !UpdateDisplayId(displayId)) {
+    if (displayId < 0 && !WIN_MGR->UpdateDisplayId(displayId)) {
         MMI_HILOG_DISPATCHE("This display is not existent");
         return RET_ERR;
     }
