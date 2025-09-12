@@ -43,11 +43,14 @@ public:
 
     void InitCommonEventSubscriber();
     void SetCallState(const EventFwk::CommonEventData &eventData, int32_t callState);
+    void SetVoipCallState(const EventFwk::CommonEventData &eventData, int32_t voipCallState);
     int32_t GetCallState();
     void SetHasHandleRingMute(bool hasHandleRingMute);
     bool GetHasHandleRingMute();
+    int32_t GetVoipCallState();
 private:
     bool hasInit_ { false };
+    int32_t voipCallState_ { -1 };
     int32_t callState_ { -1 };
     bool hasHandleRingMute_ { false };
     std::mutex stateMutex_;

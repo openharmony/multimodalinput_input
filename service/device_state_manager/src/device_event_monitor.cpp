@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace MMI {
 const char* SOS_PAGE_CHANGE_EVENTS = "emergencycommunication.event.SOS_EMERGENCY_CALL_ABILITY_PAGE_CHANGE";
+const char* VOIP_CALL_CHANGE_EVENTS = "usual.event.VOIP_CALL_STATE_CHANGED";
 DeviceEventMonitor::DeviceEventMonitor() {}
 DeviceEventMonitor::~DeviceEventMonitor() {}
 
@@ -62,6 +63,9 @@ public:
                 MMI_HILOGE("SetIsFreezePowerKey is failed in key command:%{public}d", ret);
                 return;
             }
+        } else if (action == VOIP_CALL_CHANGE_EVENTS) {
+            int32_t voipCallState = 0;
+            DEVICE_MONITOR->SetVoipCallState(eventData, voipCallState);
         } else {
             MMI_HILOGW("Device changed receiver event: unknown");
             return;
@@ -80,6 +84,7 @@ void DeviceEventMonitor::InitCommonEventSubscriber()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     matchingSkills.AddEvent(SOS_PAGE_CHANGE_EVENTS);
+    matchingSkills.AddEvent(VOIP_CALL_CHANGE_EVENTS);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     commonEventSubscribeInfo.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
@@ -112,12 +117,47 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
     }
 }
 
+void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &eventData, int32_t voipCallState)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(stateMutex_);
+    if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
+        int32_t state = eventData.GetWant().GetIntParam("state", -1);
+        if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
+            hasHandleRingMute_ = false;
+        }
+        MMI_HILOGI("The state:%{public}d, hasHandleRingMute_:%{public}d", state, hasHandleRingMute_);
+        return;
+    }
+    voipCallState = eventData.GetWant().GetIntParam("state", -1);
+    if (hasHandleRingMute_ && (voipCallState_  == CALL_STATUS_INCOMING || voipCallState_  == CALL_STATUS_WAITING)) {
+        MMI_HILOGI("Voip Mute reply success");
+        hasHandleRingMute_ = false;
+    }
+    voipCallState_ = voipCallState;
+    MMI_HILOGI("The voipCallState:%{public}d, hasHandleRingMute_:%{public}d", voipCallState, hasHandleRingMute_);
+    if (voipCallState_ == StateType::CALL_STATUS_DISCONNECTED ||
+        voipCallState_ == StateType::CALL_STATUS_DISCONNECTED) {
+        auto subscriberHandler = InputHandler->GetSubscriberHandler();
+        CHKPV(subscriberHandler);
+        subscriberHandler->ResetSkipPowerKeyUpFlag();
+    }
+}
+
 int32_t DeviceEventMonitor::GetCallState()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
     MMI_HILOGI("The callState:%{public}d", callState_);
     return callState_;
+}
+
+int32_t DeviceEventMonitor::GetVoipCallState()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(stateMutex_);
+    MMI_HILOGI("The voipCallState_:%{public}d", voipCallState_);
+    return voipCallState_;
 }
 
 void DeviceEventMonitor::SetHasHandleRingMute(bool hasHandleRingMute)

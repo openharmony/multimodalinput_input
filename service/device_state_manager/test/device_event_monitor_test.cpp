@@ -183,5 +183,124 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_003, TestSize.Level1)
     ASSERT_EQ(deviceEventMonitor.callState_, -1);
 }
 
+/**
+ * @tc.name: SetVoipCallState_001
+ * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DeviceEventMonitor deviceEventMonitor;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    want.SetParam("slotId", 1);
+    want.SetParam("state", 1);
+    ced.SetWant(want);
+    deviceEventMonitor.hasHandleRingMute_ = true;
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
+ 
+    want.SetParam("state", 5);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+    
+    want.SetParam("state", 4);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
+}
+ 
+/**
+ * @tc.name: SetVoipCallState_002
+ * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DeviceEventMonitor deviceEventMonitor;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    deviceEventMonitor.hasHandleRingMute_ = true;
+    want.SetParam("state", 1);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
+ 
+    want.SetParam("state", 5);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+    
+    want.SetParam("state", 4);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
+}
+/**
+ * @tc.name: SetVoipCallState_005
+ * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DeviceEventMonitor deviceEventMonitor;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    deviceEventMonitor.hasHandleRingMute_ = false;
+    want.SetParam("state", 4);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
+    want.SetParam("state", 5);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+}
+ 
+/**
+ * @tc.name: SetVoipCallState_006
+ * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DeviceEventMonitor deviceEventMonitor;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    deviceEventMonitor.hasHandleRingMute_ = true;
+    want.SetParam("state", 1);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
+    deviceEventMonitor.hasHandleRingMute_ = false;
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+}
+/**
+ * @tc.name: SetVoipCallState_003
+ * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DeviceEventMonitor deviceEventMonitor;
+    deviceEventMonitor.hasHandleRingMute_ = true;
+    EventFwk::CommonEventData ced;
+    EventFwk::Want want;
+    want.SetParam("slotId", 1);
+    ced.SetWant(want);
+    deviceEventMonitor.SetVoipCallState(ced, 1);
+    ASSERT_EQ(deviceEventMonitor.voipCallState_, -1);
+}
 } // namespace MMI
 } // namespace OHOS

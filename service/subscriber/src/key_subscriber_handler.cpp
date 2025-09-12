@@ -598,7 +598,9 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     int32_t ret = -1;
     PublishKeyPressCommonEvent(keyEvent);
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING ||
-        DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_WAITING) {
+        DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_WAITING ||
+        DEVICE_MONITOR->GetVoipCallState() == StateType::CALL_STATUS_INCOMING ||
+        DEVICE_MONITOR->GetVoipCallState() == StateType::CALL_STATUS_WAITING) {
         if (callManagerClientPtr == nullptr) {
             callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
             if (callManagerClientPtr == nullptr) {
