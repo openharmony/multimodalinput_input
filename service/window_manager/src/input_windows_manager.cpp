@@ -1501,14 +1501,15 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     }
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
                  (rotateY < offsetY) || (rotateY > offsetY + validH);
-#ifdef OHOS_BUILD_PC_EXTERNAL_SCREEN
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
     if (isOut && isPointerDowned) {
         if (rotateX < offsetX) { rotateX = offsetX; }
         if (rotateX > offsetX + validW) { rotateX = offsetX + validW; }
         if (rotateY < offsetY) { rotateY = offsetY; }
         if (rotateY > offsetY + validH) { rotateY = offsetY + validH; }
+        isOut = false;
     }
-#endif // OHOS_BUILD_PC_EXTERNAL_SCREEN
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     PrintDisplayInfo(currentDisplay);
     MMI_HILOGD("isOut=%{public}d,isPhysicalPos=%{public}d Position={%{private}f %{private}f}"
                "->{%{private}f %{private}f} RealValidWH={w:%{private}f h:%{private}f}",
