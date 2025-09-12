@@ -3357,13 +3357,13 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
                 sp.second->SetRotation(mainRotation);
                 sp.second->UpdatePadding(mainWidth, mainHeight);
             }
-#ifdef OHOS_BUILD_PC_EXTERNAL_SCREEN
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
             if (sp.second->IsMirror() || sp.second->IsMain()) {
                 mainWidth = si->GetMirrorWidth() == 0 ? mainWidth : si->GetMirrorWidth();
                 mainHeight = si->GetMirrorHeight() == 0 ? mainHeight : si->GetMirrorHeight();
                 sp.second->UpdatePadding(mainWidth, mainHeight);
             }
-#endif // OHOS_BUILD_PC_EXTERNAL_SCREEN
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
         }
     }
     UpdateDisplayInfo(displayInfo_);
@@ -3551,13 +3551,13 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
                 isDirectionChanged = true;
             }
             if (isDirectionChanged) {
-#ifdef OHOS_BUILD_PC_EXTERNAL_SCREEN
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
                 mainWidth = mirrorScreen->GetMirrorWidth() == 0 ? mainWidth : mirrorScreen->GetMirrorWidth();
                 mainHeight = mirrorScreen->GetMirrorHeight() == 0 ? mainHeight : mirrorScreen->GetMirrorHeight();
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
 #else
                 mirrorScreen->UpdatePadding(mainWidth, mainHeight);
-#endif // OHOS_BUILD_PC_EXTERNAL_SCREEN
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
             }
             MMI_HILOGD("update mirror screen dpi, mainScreen dpi: %{public}f, original mirrorScreen dpi: %{public}f",
                 sp->GetDPI(), mirrorScreen->GetDPI());
