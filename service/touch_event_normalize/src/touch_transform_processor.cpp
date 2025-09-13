@@ -38,6 +38,7 @@ constexpr int32_t DRIVER_NUMBER { 8 };
 constexpr int32_t MT_TOOL_THP_FEATURE {11};
 constexpr uint32_t TOUCH_CANCEL_MASK { 1U << 29U };
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
+constexpr int32_t MAX_N_POINTER_ITEMS { 10 };
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -60,6 +61,9 @@ bool TouchTransformProcessor::OnEventTouchCancel(struct libinput_event *event)
 
     PointerEvent::PointerItem item;
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    RemoveInvalidAreaDownedEvent(seatSlot);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -86,10 +90,17 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     CHKPF(device);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+        AddInvalidAreaDownedEvent(seatSlot);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
         return false;
     }
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    RemoveInvalidAreaDownedEvent(seatSlot);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     auto pointIds = pointerEvent_->GetPointerIds();
     uint64_t time = libinput_event_touch_get_time_usec(touch);
     if (pointIds.empty()) {
@@ -102,7 +113,6 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     int32_t blobId = libinput_event_touch_get_blob_id(touch);
     item.SetBlobId(blobId);
     double pressure = libinput_event_touch_get_pressure(touch);
-    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     // we clean up pointerItem's cancel mark at down stage to ensure newer event
     // always starts with a clean and inital state
     if (pointerItemCancelMarks_.find(seatSlot) != pointerItemCancelMarks_.end()) {
@@ -199,12 +209,12 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    PointerEvent::PointerItem item;
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    if (!pointerEvent_->GetPointerItem(seatSlot, item) &&
+    if (isInvalidAreaDownedEvent(seatSlot) &&
         WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true, false)) {
         CHKFR(OnEventTouchDown(event), false, "Get OnEventTouchDown failed");
+        RemoveInvalidAreaDownedEvent(seatSlot);
         return true;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
@@ -216,6 +226,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
         }
         return false;
     }
+    PointerEvent::PointerItem item;
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -249,6 +260,9 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     uint64_t time = libinput_event_touch_get_time_usec(touch);
     pointerEvent_->SetActionTime(time);
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    RemoveInvalidAreaDownedEvent(seatSlot);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     if (pointerItemCancelMarks_.find(seatSlot) != pointerItemCancelMarks_.end()) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         pointerItemCancelMarks_.erase(seatSlot);
@@ -413,5 +427,38 @@ void TouchTransformProcessor::InitToolTypes()
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_MOUSE, PointerEvent::TOOL_TYPE_MOUSE));
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_LENS, PointerEvent::TOOL_TYPE_LENS));
 }
+
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+bool TouchTransformProcessor::isInvalidAreaDownedEvent(int32_t seatSlot) {
+    for (auto& item : InvalidAreaDownedEvents_) {
+        if (item == seatSlot) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void TouchTransformProcessor::AddInvalidAreaDownedEvent(int32_t seatSlot) {
+    if (InvalidAreaDownedEvents_.size() >= MAX_N_POINTER_ITEMS) {
+        InvalidAreaDownedEvents_.erase(InvalidAreaDownedEvents_.begin());
+        return;
+    }
+    for (auto& item : InvalidAreaDownedEvents_) {
+        if (item == seatSlot) {
+            return;
+        }
+    }
+    InvalidAreaDownedEvents_.push_back(seatSlot);
+}
+
+void TouchTransformProcessor::RemoveInvalidAreaDownedEvent(int32_t seatSlot) {
+    for (auto it = InvalidAreaDownedEvents_.begin(); it != InvalidAreaDownedEvents_.end(); ++it) {
+        if (*it == seatSlot) {
+            InvalidAreaDownedEvents_.erase(it);
+            break;
+        }
+    }
+}
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
 } // namespace MMI
 } // namespace OHOS
