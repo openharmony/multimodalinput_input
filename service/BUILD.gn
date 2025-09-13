@@ -478,8 +478,8 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_touch_drawing) {
     external_deps += [
-      "graphic_2d:librender_service_base",
       "graphic_2d:librender_service_client",
+      "graphic_2d:window_animation",
     ]
   }
 

@@ -21,9 +21,6 @@
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
 #include "timer_manager.h"
-#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
-#include "transaction/rs_transaction.h"
-#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
 
 #define MMI_LOG_TAG "CursorDrawingComponent"
 #define CHK_IS_LOADV(isLoaded, pointerInstance)                                                      \
@@ -161,10 +158,6 @@ void CursorDrawingComponent::UnLoad()
     soHandle_ = nullptr;
     getPointerInstance_ = nullptr;
     pointerInstance_ = nullptr;
-#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
-    // When SO unload, surface node destruction needs submit to the render service
-    Rosen::RSTransaction::FlushImplicitTransaction();
-#endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     MMI_HILOGI("UnLoad %{public}s is succeeded", MULTIMODAL_PATH_NAME);
 }
 
@@ -504,11 +497,11 @@ void CursorDrawingComponent::NotifyPointerEventToRS(int32_t pointAction, int32_t
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->NotifyPointerEventToRS(pointAction, pointCnt);
 }
+#endif // OHOS_BUILD_ENABLE_WATCH
 
 void CursorDrawingComponent::InitDefaultMouseIconPath()
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->InitDefaultMouseIconPath();
 }
-#endif // OHOS_BUILD_ENABLE_WATCH
 } // namespace OHOS

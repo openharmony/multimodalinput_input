@@ -98,6 +98,16 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
+ScreenPointer::~ScreenPointer()
+{
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+}
+
 bool ScreenPointer::Init(PointerRenderer &render)
 {
     if (!InitSurface()) {
