@@ -339,6 +339,14 @@ PointerDrawingManager::~PointerDrawingManager()
             }
             screenModeChangeListener_ = nullptr;
         }
+    } else {
+        auto surfaceNodePtr = GetSurfaceNode();
+        if (surfaceNodePtr != nullptr) {
+            surfaceNodePtr->DetachToDisplay(screenId_);
+            SetSurfaceNode(nullptr);
+            MMI_HILOGI("Detach screenId:%{public}" PRIu64, screenId_);
+            Rosen::RSTransaction::FlushImplicitTransaction();
+        }
     }
     INPUT_DEV_MGR->Detach(self_);
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
