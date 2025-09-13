@@ -38,7 +38,9 @@ constexpr int32_t DRIVER_NUMBER { 8 };
 constexpr int32_t MT_TOOL_THP_FEATURE {11};
 constexpr uint32_t TOUCH_CANCEL_MASK { 1U << 29U };
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
 constexpr int32_t MAX_N_POINTER_ITEMS { 10 };
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -429,7 +431,8 @@ void TouchTransformProcessor::InitToolTypes()
 }
 
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-bool TouchTransformProcessor::isInvalidAreaDownedEvent(int32_t seatSlot) {
+bool TouchTransformProcessor::isInvalidAreaDownedEvent(int32_t seatSlot)
+{
     for (auto& item : InvalidAreaDownedEvents_) {
         if (item == seatSlot) {
             return true;
@@ -438,7 +441,8 @@ bool TouchTransformProcessor::isInvalidAreaDownedEvent(int32_t seatSlot) {
     return false;
 }
 
-void TouchTransformProcessor::AddInvalidAreaDownedEvent(int32_t seatSlot) {
+void TouchTransformProcessor::AddInvalidAreaDownedEvent(int32_t seatSlot)
+{
     if (InvalidAreaDownedEvents_.size() >= MAX_N_POINTER_ITEMS) {
         InvalidAreaDownedEvents_.erase(InvalidAreaDownedEvents_.begin());
         return;
@@ -451,7 +455,8 @@ void TouchTransformProcessor::AddInvalidAreaDownedEvent(int32_t seatSlot) {
     InvalidAreaDownedEvents_.push_back(seatSlot);
 }
 
-void TouchTransformProcessor::RemoveInvalidAreaDownedEvent(int32_t seatSlot) {
+void TouchTransformProcessor::RemoveInvalidAreaDownedEvent(int32_t seatSlot)
+{
     for (auto it = InvalidAreaDownedEvents_.begin(); it != InvalidAreaDownedEvents_.end(); ++it) {
         if (*it == seatSlot) {
             InvalidAreaDownedEvents_.erase(it);
