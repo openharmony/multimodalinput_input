@@ -14,10 +14,10 @@
  */
 
 #include <fuzzer/FuzzedDataProvider.h>
-
+#include "mmi_log.h"
 #include "input_device_manager.h"
 #include "inputpointerdevice_fuzzer.h"
-#include "mmi_log.h"
+
 #include "securec.h"
 
 #undef MMI_LOG_TAG

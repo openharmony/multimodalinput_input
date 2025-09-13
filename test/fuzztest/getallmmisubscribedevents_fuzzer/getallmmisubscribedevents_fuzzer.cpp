@@ -14,7 +14,7 @@
  */
 
 #include <fuzzer/FuzzedDataProvider.h>
-#include "setkeyboardrepeatdelay_fuzzer.h"
+#include "getallmmisubscribedevents_fuzzer.h"
 
 #include "securec.h"
 
@@ -26,12 +26,19 @@
 
 namespace OHOS {
 namespace MMI {
-void SetKeyboardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
+void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
-    int32_t delayTime = provider.ConsumeIntegral<int32_t>();
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> map = {
+        {{provider.ConsumeIntegral<int32_t>(), provider.ConsumeIntegral<int32_t>(), provider.ConsumeBytesAsString(10)},
+            provider.ConsumeIntegral<int32_t>()},
+        {{provider.ConsumeIntegral<int32_t>(), provider.ConsumeIntegral<int32_t>(), provider.ConsumeBytesAsString(10)},
+            provider.ConsumeIntegral<int32_t>()},
+        {{provider.ConsumeIntegral<int32_t>(), provider.ConsumeIntegral<int32_t>(), provider.ConsumeBytesAsString(10)},
+            provider.ConsumeIntegral<int32_t>()}
+    };
 
-    InputManager::GetInstance()->SetKeyboardRepeatDelay(delayTime);
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(map);
 }
 } // MMI
 } // OHOS
@@ -44,8 +51,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     /* Run your code on data */
-    OHOS::MMI::SetKeyboardRepeatDelayFuzzTest(data, size);
-
+    OHOS::MMI::GetAllMmiSubscribedEventsFuzzTest(data, size);
     return 0;
 }
 

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "sethoverscrollstate_fuzzer.h"
 
 #include "securec.h"
@@ -20,29 +21,18 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SetMouseScrollRowsFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 {
-    bool state;
-    size_t startPos = 0;
-    startPos += GetObject<bool>(state, data + startPos, size - startPos);
+    FuzzedDataProvider provider(data, size);
+    bool state = provider.ConsumeBool();
+
     InputManager::GetInstance()->SetHoverScrollState(state);
+    InputManager::GetInstance()->GetHoverScrollState(state);
 }
 } // MMI
 } // OHOS
@@ -50,7 +40,12 @@ void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    if (data == nullptr || size < 0) {
+        return 0;
+    }
     /* Run your code on data */
     OHOS::MMI::SetHoverScrollStateFuzzTest(data, size);
+
     return 0;
 }
+
