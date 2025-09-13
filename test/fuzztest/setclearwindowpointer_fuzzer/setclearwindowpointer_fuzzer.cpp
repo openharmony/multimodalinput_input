@@ -14,7 +14,7 @@
  */
 
 #include <fuzzer/FuzzedDataProvider.h>
-#include "setkeyboardrepeatdelay_fuzzer.h"
+#include "setclearwindowpointer_fuzzer.h"
 
 #include "securec.h"
 
@@ -26,12 +26,12 @@
 
 namespace OHOS {
 namespace MMI {
-void SetKeyboardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
+void SetClearWindowPointerFuzzTest(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
-    int32_t delayTime = provider.ConsumeIntegral<int32_t>();
-
-    InputManager::GetInstance()->SetKeyboardRepeatDelay(delayTime);
+    int32_t pid = provider.ConsumeIntegral<int32_t>();
+    int32_t uid = provider.ConsumeIntegral<int32_t>();
+    InputManager::GetInstance()->ClearWindowPointerStyle(pid, uid);
 }
 } // MMI
 } // OHOS
@@ -44,7 +44,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     /* Run your code on data */
-    OHOS::MMI::SetKeyboardRepeatDelayFuzzTest(data, size);
+    OHOS::MMI::SetClearWindowPointerFuzzTest(data, size);
 
     return 0;
 }
