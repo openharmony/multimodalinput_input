@@ -38,7 +38,7 @@ public:
     DISALLOW_COPY_AND_MOVE(ScreenPointer);
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, const OLD::DisplayInfo &di);
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, screen_info_ptr_t si);
-    ~ScreenPointer() = default;
+    ~ScreenPointer();
 
     bool Init(PointerRenderer &render);
     bool InitSurface();
