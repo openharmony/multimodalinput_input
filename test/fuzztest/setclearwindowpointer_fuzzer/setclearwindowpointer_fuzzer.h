@@ -16,6 +16,6 @@
 #ifndef SETMOUSESCROLLROWS_FUZZER_H
 #define SETMOUSESCROLLROWS_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "sethoverscrollstate_fuzzer"
+#define FUZZ_PROJECT_NAME "setclearwindowpointer_fuzzer"
 
 #endif // SETMOUSESCROLLROWS_FUZZER_H

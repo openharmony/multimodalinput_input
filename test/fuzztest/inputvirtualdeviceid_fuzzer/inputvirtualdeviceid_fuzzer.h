@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef SETMOUSESCROLLROWS_FUZZER_H
-#define SETMOUSESCROLLROWS_FUZZER_H
+#ifndef INPUTDEVICEMANAGER_FUZZER
+#define INPUTDEVICEMANAGER_FUZZER
 
-#define FUZZ_PROJECT_NAME "sethoverscrollstate_fuzzer"
+#define FUZZ_PROJECT_NAME "inputvirtualdeviceid_fuzzer"
 
-#endif // SETMOUSESCROLLROWS_FUZZER_H
+#endif // INPUTDEVICEMANAGER_FUZZER

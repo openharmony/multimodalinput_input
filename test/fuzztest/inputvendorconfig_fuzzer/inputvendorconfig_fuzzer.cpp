@@ -16,7 +16,7 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include "mmi_log.h"
 #include "input_device_manager.h"
-#include "inputisremote_fuzzer.h"
+#include "inputvendorconfig_fuzzer.h"
 
 #include "securec.h"
 
@@ -27,12 +27,12 @@ namespace OHOS {
 namespace MMI {
 namespace OHOS {
 
-bool InputIsRemoteFuzzTest(const uint8_t *data, size_t size)
+bool InputVendorConfigFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
-    int32_t id = provider.ConsumeIntegral<int32_t>();
+    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
 
-    INPUT_DEV_MGR->IsRemote(id);
+    INPUT_DEV_MGR->GetVendorConfig(deviceId);
 
     return true;
 }
@@ -45,7 +45,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
-    OHOS::InputIsRemoteFuzzTest(data, size);
+    OHOS::InputVendorConfigFuzzTest(data, size);
     return 0;
 }
 } // namespace MMI
