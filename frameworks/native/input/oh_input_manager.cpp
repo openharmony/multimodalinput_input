@@ -3162,6 +3162,7 @@ std::shared_ptr<OHOS::MMI::PointerEvent> OH_Input_TouchEventToPointerEvent(Input
 Input_Result OH_Input_GetKeyEventId(const struct Input_KeyEvent* keyEvent, int32_t* eventId)
 {
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(eventId, INPUT_PARAMETER_ERROR);
     *eventId = keyEvent->id;
     return INPUT_SUCCESS;
 }
