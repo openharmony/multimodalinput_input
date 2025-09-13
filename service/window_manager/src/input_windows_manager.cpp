@@ -1503,10 +1503,10 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
                  (rotateY < offsetY) || (rotateY > offsetY + validH);
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     if (isOut && isPointerDowned) {
-        if (rotateX < offsetX) { rotateX = offsetX; }
-        if (rotateX > offsetX + validW) { rotateX = offsetX + validW; }
-        if (rotateY < offsetY) { rotateY = offsetY; }
-        if (rotateY > offsetY + validH) { rotateY = offsetY + validH; }
+        rotateX = std::max(rotateX, offsetX);
+        rotateX = std::min(rotateX, offsetX + validW);
+        rotateY = std::max(rotateY, offsetY);
+        rotateY = std::min(rotateY, offsetY + validH);
         isOut = false;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
