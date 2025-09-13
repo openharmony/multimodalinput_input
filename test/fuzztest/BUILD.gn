@@ -222,7 +222,7 @@ group("test") {
     "stubsethoverscrollstate_fuzzer:fuzztest",
     "stubsetkeyboardrepeatdelay_fuzzer:fuzztest",
     "stubsetkeyboardrepeatrate_fuzzer:fuzztest",
-    "stubsetkeydownduration_fuzzer:fuzztest",
+    "stubhandledownduration_fuzzer:fuzztest",
     "stubsetmousecapturemode_fuzzer:fuzztest",
     "stubsetmousehotspot_fuzzer:fuzztest",
     "stubsetmouseicon_fuzzer:fuzztest",
