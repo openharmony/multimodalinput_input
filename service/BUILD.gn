@@ -3100,6 +3100,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
+    "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
