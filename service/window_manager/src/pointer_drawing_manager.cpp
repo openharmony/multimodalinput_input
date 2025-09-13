@@ -3359,8 +3359,8 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             }
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
             if (sp.second->IsMirror() || sp.second->IsMain()) {
-                mainWidth = si->GetMirrorWidth() == 0 ? mainWidth : si->GetMirrorWidth();
-                mainHeight = si->GetMirrorHeight() == 0 ? mainHeight : si->GetMirrorHeight();
+                mainWidth = sp.second->GetMirrorWidth() == 0 ? mainWidth : sp.second->GetMirrorWidth();
+                mainHeight = sp.second->GetMirrorHeight() == 0 ? mainHeight : sp.second->GetMirrorHeight();
                 sp.second->UpdatePadding(mainWidth, mainHeight);
             }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
