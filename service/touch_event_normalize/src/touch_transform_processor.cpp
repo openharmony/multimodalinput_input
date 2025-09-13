@@ -204,7 +204,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     if (!pointerEvent_->GetPointerItem(seatSlot, item) &&
         WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true, false)) {
-        CHKFR(OnEventTouchDown(event), nullptr, "Get OnEventTouchDown failed");
+        CHKFR(OnEventTouchDown(event), false, "Get OnEventTouchDown failed");
         return true;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
