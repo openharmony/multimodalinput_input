@@ -193,6 +193,8 @@ typedef void (*RESET_VTRACKPAD_STATE)();
 RESET_VTRACKPAD_STATE resetVTrackpadState_ = nullptr;
 typedef void (*STOP_VTRACKPAD_TIMER)();
 STOP_VTRACKPAD_TIMER stopVTrackpadTimer_ = nullptr;
+typedef bool (*VKEYBOARD_ISINSIDEFULLKBD_TYPE)(double x, double y);
+VKEYBOARD_ISINSIDEFULLKBD_TYPE vkeyboard_isInsideFullKbd_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -4246,6 +4248,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "ResetVTrackpadState");
             stopVTrackpadTimer_ = (STOP_VTRACKPAD_TIMER)dlsym(
                 g_VKeyboardHandle, "StopVTrackpadTimer");
+            vkeyboard_isInsideFullKbd_ = (VKEYBOARD_ISINSIDEFULLKBD_TYPE)dlsym(
+                g_VKeyboardHandle, "IsInsideFullKeyboard");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 vkeyboard_hardwareKeyEventDetected_,
                 vkeyboard_getKeyboardActivationState_,
@@ -4254,7 +4258,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 getLibinputEventForVKeyboard_,
                 getLibinputEventForVTrackpad_,
                 resetVTrackpadState_,
-                stopVTrackpadTimer_);
+                stopVTrackpadTimer_,
+                vkeyboard_isInsideFullKbd_);
         }
     }
 }
