@@ -610,14 +610,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
-                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " < "
-                                    << pressTimeMs << " < " << maxPressTimeMs << " ms" << std::endl;
+                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
+                                    << pressTimeMs << " <= " << maxPressTimeMs << " ms" << std::endl;
                                 return RET_ERR;
                             }
                             if ((clickIntervalTimeMs < minClickIntervalTimeMs) ||
                                 (clickIntervalTimeMs > maxClickIntervalTimeMs)) {
                                 std::cout << "click interval time is out of range:" << minClickIntervalTimeMs << " ms"
-                                    " < " << clickIntervalTimeMs << " < " << maxClickIntervalTimeMs << " ms"
+                                    " <= " << clickIntervalTimeMs << " <= " << maxClickIntervalTimeMs << " ms"
                                     << std::endl;
                                 return RET_ERR;
                             }
@@ -762,7 +762,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > tookTime) || (maxTaktTimeMs < tookTime)) {
                                 std::cout << "tookTime is out of range" << std::endl;
-                                std::cout << minTaktTimeMs << " < tookTime < " << maxTaktTimeMs;
+                                std::cout << minTaktTimeMs << " <= tookTime <= " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -1023,7 +1023,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
                                 std::cout << "taktTime is error" << std::endl;
-                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << minTaktTimeMs << " <= taktTime <= " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -1415,7 +1415,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 const int64_t maxIntervalTimeMs = 450;
                                 if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
                                     std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
-                                    std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+                                    std::cout << " <= interval time <= " << maxIntervalTimeMs << "ms" << std::endl;
                                     return RET_ERR;
                                 }
                             } else {
@@ -1464,7 +1464,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t maxTakeTimeMs = 15000;
                             if ((minTakeTimeMs > takeTime) || (maxTakeTimeMs < takeTime)) {
                                 std::cout << "takeTime is out of range. ";
-                                std::cout << minTakeTimeMs << " < takeTime < " << maxTakeTimeMs;
+                                std::cout << minTakeTimeMs << " <= takeTime <= " << maxTakeTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
@@ -1972,7 +1972,7 @@ int32_t InputManagerCommand::SingleKnuckleGestureProcesser(int32_t argc, char *a
         const int64_t maxIntervalTimeMs = 250;
         if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
             std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
-            std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+            std::cout << " <= interval time <= " << maxIntervalTimeMs << "ms" << std::endl;
             return RET_ERR;
         }
     } else {
@@ -2022,7 +2022,7 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
         const int64_t maxIntervalTimeMs = 250;
         if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
             std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
-            std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+            std::cout << " <= interval time <= " << maxIntervalTimeMs << "ms" << std::endl;
             return RET_ERR;
         }
     } else {
@@ -2183,7 +2183,7 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
             return RET_ERR;
         }
         if ((rotateValue >= conversionValue) || (rotateValue <= -(conversionValue))) {
-            std::cout << "Rotate value must be within (-360,360)" << std::endl;
+            std::cout << "Rotate value must be within [-359,359]" << std::endl;
             return RET_ERR;
         }
         std::cout << "Input rotate value:"<<rotateValue << std::endl;
@@ -2212,10 +2212,10 @@ int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
     int32_t centerY = 0;
     int32_t scalePercentNumerator = 0;
     std::string tips = "uinput -P -p dx, dy, scalePercent; dx, dy, scalePercent are all number.";
-    std::string extralTips = " dx is bigger than 0 and dy is bigger than 0. 0 < scalePercent <= 500;";
+    std::string g_extralTips = " dx is bigger than 0 and dy is bigger than 0. 1 <= scalePercent <= 500;";
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
-        std::cout << tips << extralTips << std::endl;
+        std::cout << tips << g_extralTips << std::endl;
         return RET_ERR;
     }
     int32_t startPos = optind - MOVE_POS_ONE;
@@ -2223,21 +2223,21 @@ int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
         if ((!StrToInt(argv[startPos], centerX)) ||
             (!StrToInt(argv[startPos + MOVE_POS_ONE], centerY)) ||
             (!StrToInt(argv[startPos + MOVE_POS_TWO], scalePercentNumerator))) {
-            std::cout << tips << extralTips << std::endl;
+            std::cout << tips << g_extralTips << std::endl;
             return RET_ERR;
         }
     } else {
-        std::cout << tips << extralTips << std::endl;
+        std::cout << tips << g_extralTips << std::endl;
         return RET_ERR;
     }
     if ((scalePercentNumerator <= minScaleNumerator) || (scalePercentNumerator > maxScaleNumerator)) {
         std::cout << "Invalid scalePercent:" << scalePercentNumerator << std::endl;
-        std::cout << tips << extralTips << std::endl;
+        std::cout << tips << g_extralTips << std::endl;
         return RET_ERR;
     }
     bool check = (centerX > 0) && (centerY > 0);
     if (!check) {
-        std::cout << tips << extralTips << std::endl;
+        std::cout << tips << g_extralTips << std::endl;
         return RET_ERR;
     }
 
@@ -2517,12 +2517,12 @@ void InputManagerCommand::PrintKnuckleUsage()
 void InputManagerCommand::PrintTouchPadUsage()
 {
     std::cout << "-p <dx> <dy> <scalePercent>  --dx, dy, scalePercent are all number."                    << std::endl;
-    std::cout << "   dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;"           << std::endl;
+    std::cout << "   dx is bigger than 0 and dy is bigger than 200. 1 <= scalePercent <= 500;"           << std::endl;
     std::cout << "   While simulate this, make sure that a picture is on the top of the desktop."      << std::endl;
     std::cout << "-s <startX> <startY> <endX> <endY>  --startX, startY, endX, endY are all greater than 0";
     std::cout << std::endl;
     std::cout << "   While simulate this, make sure that your actual action is available"              << std::endl;
-    std::cout << "-r <rotateValue> --rotateValue must be within (-360,360)"                         << std::endl;
+    std::cout << "-r <rotateValue> --rotateValue must be within [-359,359]"                         << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()
@@ -2554,7 +2554,6 @@ void InputManagerCommand::ShowUsage()
     PrintTouchUsage();
     std::cout << std::endl;
 
-    std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }
 } // namespace MMI
