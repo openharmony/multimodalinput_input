@@ -65,6 +65,7 @@ enum class VKeyboardTouchEventType : int32_t {
 constexpr int32_t WAIT_TIME_MS_STAP { 180 };  // milliseconds touch up delay for Single TAP
 constexpr int32_t WAIT_TIME_MS_DTAP { 60 };  // milliseconds touch up delay for Double TAP
 constexpr int32_t EXPIRED_TIMER_ID { -1 };
+const std::string TOUCHSCREEN_DEVICE_NAME { "input_mt_wrapper" };
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t KEY_CAPSLOCK { 58 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -313,7 +314,8 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     GetLibinputEventForVKeyboard getLibinputEventForVKeyboard,
     GetLibinputEventForVTrackpad getLibinputEventForVTrackpad,
     ResetVTrackpadState resetVTrackpadState,
-    StopVTrackpadTimer stopVTrackpadTimer)
+    StopVTrackpadTimer stopVTrackpadTimer,
+    IsInsideFullKbd isInsideFullKbd)
 {
     handleTouchPoint_ = handleTouchPoint;
     hardwareKeyEventDetected_ = hardwareKeyEventDetected;
@@ -324,8 +326,9 @@ void LibinputAdapter::InitVKeyboard(HandleTouchPoint handleTouchPoint,
     getLibinputEventForVTrackpad_ = getLibinputEventForVTrackpad;
     resetVTrackpadState_ = resetVTrackpadState;
     stopVTrackpadTimer_ = stopVTrackpadTimer;
+    isInsideFullKbd_ = isInsideFullKbd;
     // init touch device Id.
-    deviceId = -1;
+    deviceId_ = -1;
 }
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -838,6 +841,94 @@ void LibinputAdapter::UpdateBootFlag()
         }
     }
 }
+
+void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
+    libinput_event *event, libinput_event_type eventType, int64_t frameTime)
+{
+    CHKPV(event);
+    libinput_event_touch* touch = libinput_event_get_touch_event(event);
+    CHKPV(touch);
+    bool isInsideSpecialWindow = false;
+    int32_t touchId = 0;
+    double touchPressure = 0.0;
+    double accumulatedPressure = 0.0;
+    if (eventType != LIBINPUT_EVENT_TOUCH_FRAME) {
+        touchId = libinput_event_touch_get_slot(touch);
+        touchPressure = libinput_event_touch_get_pressure(touch);
+        accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
+    }
+    if (deviceId_ == -1) {
+        // initialize touch device ID.
+        libinput_device* device = libinput_event_get_device(event);
+        deviceId_ = INPUT_DEV_MGR->FindInputDeviceId(device);
+    }
+    double x = 0.0;
+    double y = 0.0;
+    int32_t touchEventType = ConvertToTouchEventType(eventType);
+    // touch up event has no coordinates information, skip coordinate calculation.
+    if (eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
+        MapTouchToVKeyboardCoordinates(touch, x, y, isInsideSpecialWindow);
+    } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
+        auto pos = touchPoints_.find(touchId);
+        if (pos != touchPoints_.end()) {
+            x = (pos->second).first;
+            y = (pos->second).second;
+            touchPoints_.erase(pos);
+        }
+    }
+
+    // check for non-touchscreen generated events.
+    if (IsNonTouchScreenEventOnFullKbd(event, x, y)) {
+        MMI_HILOGI("Discard when non-touchscreen event on full kbd, type=%{public}d",
+            static_cast<int32_t>(eventType));
+        libinput_event_destroy(event);
+        return;
+    }
+    
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
+    if (!isInsideSpecialWindow && handleTouchPoint_ != nullptr &&
+        handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure, longAxis, shortAxis) == 0) {
+        MMI_HILOGD("Inside vkeyboard area");
+        HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
+    } else {
+        bool bDropEventFlag = IsVKeyboardActivationDropEvent(touch, eventType);
+        if (!bDropEventFlag) {
+            funInputEvent_(event, frameTime);
+        }
+        libinput_event_destroy(event);
+    }
+}
+
+void LibinputAdapter::MapTouchToVKeyboardCoordinates(
+    libinput_event_touch* touch, double &x, double &y, bool &isInsideSpecialWindow)
+{
+    CHKPV(touch);
+    EventTouch touchInfo;
+    int32_t logicalDisplayId = -1;
+    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
+        MMI_HILOGE("Map touch point to display point failed");
+    } else {
+        x = touchInfo.point.x;
+        y = touchInfo.point.y;
+
+        touchPoints_[touchId] = std::pair<double, double>(x, y);
+
+        InputWindowsManager *inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
+        isInsideSpecialWindow = inputWindowsManager->IsPointInsideSpecialWindow(x, y);
+    }
+}
+
+bool LibinputAdapter::IsNonTouchScreenEventOnFullKbd(libinput_event *event, double x, double y)
+{
+    CHKPF(event);
+    libinput_device* device = libinput_event_get_device(event);
+    CHKPF(device);
+    std::string devName = libinput_device_get_name(device);
+    CHKPF(isInsideFullKbd_);
+    // return true if non-touchscreen AND inside full kbd on C side.
+    return devName != TOUCHSCREEN_DEVICE_NAME && isInsideFullKbd_(x, y);
+}
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 void LibinputAdapter::MultiKeyboardSetLedState(bool newCapsLockState)
@@ -879,10 +970,6 @@ void LibinputAdapter::OnEventHandler()
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         foldingAreaToast_.FoldingAreaProcess(event);
         libinput_event_type eventType = libinput_event_get_type(event);
-        int32_t touchId = 0;
-        libinput_event_touch* touch = nullptr;
-        static int32_t downCount = 0;
-        bool isInsideWindow = false;
 
         // confirm boot completed msg in case of mmi restart.
         UpdateBootFlag();
@@ -894,72 +981,7 @@ void LibinputAdapter::OnEventHandler()
             || eventType == LIBINPUT_EVENT_TOUCH_MOTION
             || eventType == LIBINPUT_EVENT_TOUCH_CANCEL
             || eventType == LIBINPUT_EVENT_TOUCH_FRAME) && isBootCompleted_) {
-            touch = libinput_event_get_touch_event(event);
-            double touchPressure = 0.0;
-            double accumulatedPressure = 0.0;
-            if (eventType != LIBINPUT_EVENT_TOUCH_FRAME) {
-                touchId = libinput_event_touch_get_slot(touch);
-                touchPressure = libinput_event_touch_get_pressure(touch);
-                accumulatedPressure = GetAccumulatedPressure(touchId, eventType, touchPressure);
-            }
-
-            if (deviceId == -1) {
-                // initialize touch device ID.
-                libinput_device* device = libinput_event_get_device(event);
-                deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
-            }
-
-            EventTouch touchInfo;
-            int32_t logicalDisplayId = -1;
-            double x = 0.0;
-            double y = 0.0;
-            int32_t touchEventType = ConvertToTouchEventType(eventType);
-            // touch up event has no coordinates information, skip coordinate calculation.
-            if (eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
-                if (!WIN_MGR->TouchPointToDisplayPoint(deviceId, touch, touchInfo, logicalDisplayId)) {
-                    MMI_HILOGE("Map touch point to display point failed");
-                } else {
-                    x = touchInfo.point.x;
-                    y = touchInfo.point.y;
-
-                    touchPoints_[touchId] = std::pair<double, double>(x, y);
-
-                    InputWindowsManager* inputWindowsManager = static_cast<InputWindowsManager *>(WIN_MGR.get());
-                    isInsideWindow = inputWindowsManager->IsPointInsideSpecialWindow(x, y);
-                }
-            } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
-                auto pos = touchPoints_.find(touchId);
-                if (pos != touchPoints_.end()) {
-                    x = (pos->second).first;
-                    y = (pos->second).second;
-                    touchPoints_.erase(pos);
-                }
-            }
-
-            int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
-            int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
-            MMI_HILOGD("touch event. deviceId:%{private}d, touchId:%{private}d, x:%{private}d, y:%{private}d, \
-type:%{private}d, accPressure:%{private}f, longAxis:%{private}d, shortAxis:%{private}d",
-                deviceId,
-                touchId,
-                static_cast<int32_t>(x),
-                static_cast<int32_t>(y),
-                static_cast<int32_t>(eventType),
-                accumulatedPressure,
-                longAxis,
-                shortAxis);
-
-            if (!isInsideWindow && handleTouchPoint_ != nullptr &&
-                handleTouchPoint_(x, y, touchId, touchEventType, accumulatedPressure, longAxis, shortAxis) == 0) {
-                MMI_HILOGD("Inside vkeyboard area");
-                HandleVFullKeyboardMessages(event, frameTime, eventType, touch);
-            } else {
-                bool bDropEventFlag = IsVKeyboardActivationDropEvent(touch, eventType);
-                if (!bDropEventFlag) {
-                    funInputEvent_(event, frameTime);
-                }
-                libinput_event_destroy(event);
-            }
+            ProcessTouchEventAsVKeyboardEvent(event, eventType, frameTime);
         } else if (eventType == LIBINPUT_EVENT_KEYBOARD_KEY) {
             struct libinput_event_keyboard* keyboardEvent = libinput_event_get_keyboard_event(event);
             std::shared_ptr<KeyEvent> keyEvent = KeyEventHdr->GetKeyEvent();
