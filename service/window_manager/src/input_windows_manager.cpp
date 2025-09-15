@@ -1907,7 +1907,9 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
     }
     OLD::DisplayGroupInfo displayGroupInfoTemp;
-    displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
+    if (displayGroupInfo.userState == UserState::USER_ACTIVE) {
+        displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
+    }
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
         && (displayGroupInfo.userState == UserState::USER_ACTIVE);
     if (bFlag) {
