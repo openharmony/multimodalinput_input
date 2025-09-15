@@ -758,7 +758,7 @@ void LibinputAdapter::HideMouseCursorTemporary()
     }
 }
 
-double LibinputAdapter::GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure)
+double LibinputAdapter::GetAccumulatedPressure(int32_t touchId, int32_t eventType, double touchPressure)
 {
     auto pos = touchPointPressureCache_.find(touchId);
     double accumulatedPressure = 0.0;
@@ -867,7 +867,7 @@ void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
     int32_t touchEventType = ConvertToTouchEventType(eventType);
     // touch up event has no coordinates information, skip coordinate calculation.
     if (eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_MOTION) {
-        MapTouchToVKeyboardCoordinates(touch, x, y, isInsideSpecialWindow);
+        MapTouchToVKeyboardCoordinates(touch, touchId, x, y, isInsideSpecialWindow);
     } else if (eventType == LIBINPUT_EVENT_TOUCH_UP) {
         auto pos = touchPoints_.find(touchId);
         if (pos != touchPoints_.end()) {
@@ -901,7 +901,7 @@ void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
 }
 
 void LibinputAdapter::MapTouchToVKeyboardCoordinates(
-    libinput_event_touch* touch, double &x, double &y, bool &isInsideSpecialWindow)
+    libinput_event_touch* touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow)
 {
     CHKPV(touch);
     EventTouch touchInfo;

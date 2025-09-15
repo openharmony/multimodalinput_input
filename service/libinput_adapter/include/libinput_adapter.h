@@ -115,7 +115,8 @@ private:
     void InitRightButtonAreaConfig();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void ProcessTouchEventAsVKeyboardEvent(libinput_event *event, libinput_event_type eventType, int64_t frameTime);
-    void MapTouchToVKeyboardCoordinates(libinput_event_touch* touch, double &x, double &y, bool &isInsideSpecialWindow);
+    void MapTouchToVKeyboardCoordinates(
+        libinput_event_touch* touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow);
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
     void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> &keyboardEvents,
@@ -131,7 +132,7 @@ private:
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void HandleHWKeyEventForVKeyboard(libinput_event* event);
     void HideMouseCursorTemporary();
-    double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
+    double GetAccumulatedPressure(int32_t touchId, int32_t eventType, double touchPressure);
     void DelayInjectKeyEventCallback();
     bool CreateVKeyboardDelayTimer(int32_t delayMs, libinput_event *keyEvent);
     void StartVKeyboardDelayTimer(int32_t delayMs);
