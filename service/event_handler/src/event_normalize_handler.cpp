@@ -1141,7 +1141,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         }
         // get touchpad physic size
         if (libinput_device_get_size(touchPadDevice, &g_touchPadDeviceWidth, &g_touchPadDeviceHeight)) {
-            MMI_HILOGD("judgeIfSwipeInward, get touchPad physic size error");
+            MMI_HILOGD("JudgeIfSwipeInward, get touchPad physic size error");
         }
         // get touchpad max axis size
         g_touchPadDeviceAxisX = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_X);
@@ -1168,7 +1168,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
             g_isSwipeInward = true;
             type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
-            pointerEvent->SetPointerAction(pointerEvent::POINTER_ACTION_DOWN);
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
         }
     }
     // judge
