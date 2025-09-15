@@ -141,7 +141,8 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false, bool isPointerDowned = false) = 0;
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false,
+        bool hasValidAreaDowned = false) = 0;
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem) = 0;
     virtual const OLD::DisplayInfo *GetDefaultDisplayInfo() const = 0;
