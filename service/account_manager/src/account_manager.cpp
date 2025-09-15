@@ -44,6 +44,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAIN_ACCOUNT_ID { 100 };
+constexpr int32_t MAIN_DISPLAY_ID { 0 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t REPEAT_COOLING_TIME { 1000 };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
@@ -469,11 +470,12 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
 {
     int32_t accountId = data.GetCode();
     std::string displayId = data.GetWant().GetStringParam("displayId");
+    uint64_t currentDisplayId = MAIN_DISPLAY_ID;
     if (displayId.size() <= MAX_DISPLAYID_SIZE && IsNumeric(displayId)) {
-        uint64_t currentDisplayId = static_cast<uint64_t>(std::stoull(displayId));
+        currentDisplayId = static_cast<uint64_t>(std::stoull(displayId));
         MMI_HILOGI("Switch to {%{public}" PRIu64 ":%d}", currentDisplayId, accountId);
     }
-    if (currentAccountId_ != accountId) {
+    if (currentDisplayId == MAIN_DISPLAY_ID && currentAccountId_ != accountId) {
         if (auto iter = accounts_.find(accountId); iter == accounts_.end()) {
             accounts_.emplace(accountId, std::make_unique<AccountSetting>(accountId));
         }
