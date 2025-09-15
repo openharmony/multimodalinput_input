@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INJECTEVENT_FUZZER_H
-#define INJECTEVENT_FUZZER_H
+#ifndef STUBHANDLEALLOCSOCAETFD_FUZZER_H
+#define STUBHANDLEALLOCSOCAETFD_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "injectevent_fuzzer"
+#define FUZZ_PROJECT_NAME "stubhandletapswitch_fuzzer"
 
-#endif // INJECTEVENT_FUZZER_H
+#endif // STUBHANDLEALLOCSOCAETFD_FUZZER_H

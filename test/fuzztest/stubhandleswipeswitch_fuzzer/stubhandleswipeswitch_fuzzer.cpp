@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,39 +14,41 @@
  */
 
 #include <fuzzer/FuzzedDataProvider.h>
-#include "injecteventsetpointer_fuzzer.h"
-#include "input_manager.h"
-#include "define_multimodal.h"
+#include "stubhandleswipeswitch_fuzzer.h"
+
 #include "mmi_service.h"
-#include "mmi_log.h"
+#include "multimodal_input_connect_stub.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "StubHandleAllocSocketFdFuzzTest"
+
+class UDSSession;
+using SessionPtr = std::shared_ptr<UDSSession>;
 
 namespace OHOS {
 namespace MMI {
 
-bool InjecteventSetPointerFuzzTest(const uint8_t *data, size_t size)
+void StubHandleSwipeSwitchFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
-    int32_t pointerAction = provider.ConsumeIntegral<int32_t>();
-    int32_t sourceType = provider.ConsumeIntegral<int32_t>();
 
-    auto injectDownEvent = KeyEvent::Create();
-    CHKPF(injectDownEvent);
-    injectDownEvent->SetPointerAction(pointerAction);
-    injectDownEvent->SetSourceType(sourceType);
+    bool switchFlag = provider.ConsumeBool();
 
-    return true;
+    MMIService::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
+    MMIService::GetInstance()->ReadTouchpadSwipeSwitch(switchFlag);
+    MMIService::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
 }
 } // MMI
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    if (data == nullptr || size < 0) {
+    /* Run your code on data */
+    if (data == nullptr) {
         return 0;
     }
-    /* Run your code on data */
 
-    OHOS::MMI::InjecteventSetPointerFuzzTest(data, size);
+    OHOS::MMI::StubHandleSwipeSwitchFuzzTest(data, size);
     return 0;
 }

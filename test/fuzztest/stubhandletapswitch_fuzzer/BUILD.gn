@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("InputDeviceManagerOneFuzzTest") {
+ohos_fuzztest("StubHandleTapSwitchFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/inputdevicemanagerone_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/stubhandletapswitch_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -31,6 +31,7 @@ ohos_fuzztest("InputDeviceManagerOneFuzzTest") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/joystick/include",
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
@@ -40,8 +41,9 @@ ohos_fuzztest("InputDeviceManagerOneFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
-    "${mmi_path}/service/device_manager/include",
-    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/common/anco/comm/include",
   ]
   cflags = [
     "-g",
@@ -51,10 +53,18 @@ ohos_fuzztest("InputDeviceManagerOneFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "inputdevicemanagerone_fuzzer.cpp" ]
+
+  configs = [
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  sources = [ "stubhandletapswitch_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -65,16 +75,24 @@ ohos_fuzztest("InputDeviceManagerOneFuzzTest") {
     "c_utils:utils",
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
   }
 }
 
@@ -84,7 +102,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":InputDeviceManagerOneFuzzTest",
+    ":StubHandleTapSwitchFuzzTest",
   ]
 }
 ###############################################################################
