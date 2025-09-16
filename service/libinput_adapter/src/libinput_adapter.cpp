@@ -65,7 +65,6 @@ enum class VKeyboardTouchEventType : int32_t {
 constexpr int32_t WAIT_TIME_MS_STAP { 180 };  // milliseconds touch up delay for Single TAP
 constexpr int32_t WAIT_TIME_MS_DTAP { 60 };  // milliseconds touch up delay for Double TAP
 constexpr int32_t EXPIRED_TIMER_ID { -1 };
-const std::string TOUCHSCREEN_DEVICE_NAME { "input_mt_wrapper" };
 #else // OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t KEY_CAPSLOCK { 58 };
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -388,7 +387,7 @@ bool LibinputAdapter::CreateVKeyboardDelayTimer(int32_t delayMs, libinput_event 
     }
     vkbDelayedKeyEvent_ = keyEvent;
     StartVKeyboardDelayTimer(delayMs);
-    MMI_HILOGI("Create the delayed event, Delay=%{public}d, timer Id=%{public}d", vkbTimerId_, delayMs);
+    MMI_HILOGI("Create the delayed event, Delay=%{public}d, timer Id=%{public}d", delayMs, vkbTimerId_);
     return true;
 }
 
@@ -877,9 +876,9 @@ void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
         }
     }
 
-    // check for non-touchscreen generated events.
-    if (IsNonTouchScreenEventOnFullKbd(event, x, y)) {
-        MMI_HILOGI("Discard when non-touchscreen event on full kbd, type=%{public}d",
+    // check for phone-touch generated events.
+    if (IsPhoneTouchThpEventOnFullKbd(touch, eventType, x, y)) {
+        MMI_HILOGI("Discard when phone touch event on full kbd, type=%{public}d",
             static_cast<int32_t>(eventType));
         libinput_event_destroy(event);
         return;
@@ -919,15 +918,19 @@ void LibinputAdapter::MapTouchToVKeyboardCoordinates(
     }
 }
 
-bool LibinputAdapter::IsNonTouchScreenEventOnFullKbd(libinput_event *event, double x, double y)
+bool LibinputAdapter::IsPhoneTouchThpEventOnFullKbd(
+    libinput_event_touch *event, libinput_event_type eventType, double x, double y)
 {
+    if (!(eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_UP ||
+        eventType == LIBINPUT_EVENT_TOUCH_MOTION)) {
+        // reject invalid types.
+        return false;
+    }
     CHKPF(event);
-    libinput_device* device = libinput_event_get_device(event);
-    CHKPF(device);
-    std::string devName = libinput_device_get_name(device);
+    int32_t toolType = libinput_event_touch_get_tool_type(event);
     CHKPF(isInsideFullKbd_);
     // return true if non-touchscreen AND inside full kbd on C side.
-    return devName != TOUCHSCREEN_DEVICE_NAME && isInsideFullKbd_(x, y);
+    return toolType == PointerEvent::TOOL_TYPE_THP_FEATURE && isInsideFullKbd_(x, y);
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
