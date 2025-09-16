@@ -1151,7 +1151,8 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         if (curPosX >SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
             return g_isSwipeInward;
         }
-        lastDirection = (curPosX <= SWIPE_INWARD_EDGE_X_THRE) ? 1 : -1; // -1:direction from right to lest, 1 left to right
+        // -1:direction from right to lest, 1 left to right
+        lastDirection = (curPosX <= SWIPE_INWARD_EDGE_X_THRE) ? 1 : -1;
         // update start down x postion
         currentPointDownPosX_ = curPosX;
         currentPointDownTime_ = GetSysClockTime();
@@ -1159,29 +1160,38 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     }
 
     if (g_isSwipeInward == false && type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
-        int64_t curTime = GetSysClockTime();
-        double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
-        if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE) {
-            return g_isSwipeInward;
-        }
-        double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
-        if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
-            g_isSwipeInward = true;
-            type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-        }
+        SwipeInwardSpeedJudge(pointerEvent);
     }
     // judge
     if (g_isSwipeInward == true) {
+        type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
         SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
-        if (g_buttonPressed) {
-            MMI_HILOGD("Button pressed, response button, cancel swipeInward");
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            nextHandler_->HandlePointerEvent(pointerEvent);
-            g_isSwipeInward = false;
-        }
+        SwipeInwardButtonJudge(pointerEvent);
     }
     return g_isSwipeInward;
+}
+
+void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent) {
+    if (g_buttonPressed) {
+        MMI_HILOGD("Button pressed, response button, cancel swipeInward");
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        g_isSwipeInward = false;
+    }
+}
+
+void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent) {
+    int64_t curTime = GetSysClockTime();
+    double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
+    if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE) {
+        return g_isSwipeInward;
+    }
+    double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
+    if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
+        g_isSwipeInward = true;
+        
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    }
 }
 
 void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent,
