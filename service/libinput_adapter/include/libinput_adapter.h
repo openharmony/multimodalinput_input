@@ -116,7 +116,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     void ProcessTouchEventAsVKeyboardEvent(libinput_event *event, libinput_event_type eventType, int64_t frameTime);
     void MapTouchToVKeyboardCoordinates(
-        libinput_event_touch* touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow);
+        libinput_event_touch *touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow);
+    bool IsPhoneTouchThpEventOnFullKbd(libinput_event_touch *touch, libinput_event_type eventType, double x, double y);
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
     void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> &keyboardEvents,
@@ -143,7 +144,6 @@ private:
     void DelayInjectReleaseCallback();
     void DelayInjectPressReleaseCallback();
     void UpdateBootFlag();
-    bool IsPhoneTouchThpEventOnFullKbd(libinput_event_touch *event, libinput_event_type eventType, double x, double y);
 
     libinput_event *vkbDelayedKeyEvent_ = nullptr;
     libinput_event *vtpDelayedEvent_ = nullptr;
