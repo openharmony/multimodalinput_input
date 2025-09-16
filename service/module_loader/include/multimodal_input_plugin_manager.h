@@ -55,7 +55,7 @@ public:
     std::string GetName() override;
     int32_t GetPriority() override;
     std::shared_ptr<IInputPlugin> GetPlugin() override;
-    void SetCallback(std::function<void(PluginEventType, int64_t)>& callback) override;
+    void SetCallback(std::function<void(PluginEventType, int64_t)> callback) override;
     PluginResult HandleEvent(libinput_event *event, std::shared_ptr<IPluginData> data) override;
     PluginResult HandleEvent(std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) override;
     PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) override;
