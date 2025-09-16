@@ -1171,7 +1171,8 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     return g_isSwipeInward;
 }
 
-void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent) {
+void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent)
+{
     if (g_buttonPressed) {
         MMI_HILOGD("Button pressed, response button, cancel swipeInward");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -1180,7 +1181,8 @@ void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent>
     }
 }
 
-void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent) {
+void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent)
+{
     int64_t curTime = GetSysClockTime();
     double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
     if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE) {
