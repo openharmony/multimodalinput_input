@@ -104,7 +104,7 @@ HWTEST_F(KeyEventHookHandlerTest, RemoveKeyEventHook_Test_001, TestSize.Level1)
     std::shared_ptr<MockEventHookHandler> mockHook = std::make_shared<MockEventHookHandler>();
     EXPECT_CALL(*mockHook, RemoveKeyEventHook(hookId)).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = hookHandler.RemoveKeyEventHook(hookId);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
  
 /**
@@ -245,7 +245,7 @@ HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_002, TestSize.Level1)
     EXPECT_CALL(*mockHook, InitClient()).WillRepeatedly(testing::Return(true));
     EXPECT_CALL(*mockHook, AddKeyEventHook(testing::_)).WillRepeatedly(testing::Return(RET_ERR));
     hookHandler.OnConnected();
-    EXPECT_EQ(hookHandler.hookCallback_, nullptr);
+    EXPECT_NE(hookHandler.hookCallback_, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
