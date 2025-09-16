@@ -44,6 +44,11 @@ private:
     void UpdatePointerItemByTouchInfo(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
     bool DumpInner();
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    void AddInvalidAreaDownedEvent(int32_t seatSlot);
+    void RemoveInvalidAreaDownedEvent(int32_t seatSlot);
+    bool isInvalidAreaDownedEvent(int32_t seatSlot);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
 private:
     const int32_t deviceId_ { -1 };
     int32_t processedCount_ { 0 };
@@ -67,6 +72,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     TouchType rawTouch_;
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    std::list<int32_t> InvalidAreaDownedEvents_;
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
 };
 } // namespace MMI
 } // namespace OHOS
