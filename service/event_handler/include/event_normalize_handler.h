@@ -92,7 +92,7 @@ private:
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
     int32_t currentHandleKeyCode_ { -1 };
-    double currentPointDownPosX_ { 0 };
+    double currentPointDownPosX_ { 0.0 };
     int64_t currentPointDownTime_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     bool moveEventFilterFlag_ { false };

@@ -1148,7 +1148,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         g_touchPadDeviceAxisY = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_Y);
         double curPosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
         // start postion in edge
-        if (curPosX >SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
+        if (curPosX > SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
             return g_isSwipeInward;
         }
         // -1:direction from right to lest, 1 left to right
@@ -1185,7 +1185,7 @@ void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> 
 {
     int64_t curTime = GetSysClockTime();
     double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
-    if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE) {
+    if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE || curTime - currentPointDownTime_ == 0) {
         return;
     }
     double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
