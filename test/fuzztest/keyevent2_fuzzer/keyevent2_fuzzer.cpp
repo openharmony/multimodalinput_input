@@ -39,7 +39,7 @@ void KeyEvent2FuzzTest(const uint8_t *data, size_t size)
     keyEvent.SetKeyAction(keyAction);
 
     KeyEvent::KeyItem item;
-    keyCode = provider.ConsumeIntegral<int32_t>();
+    int32_t keyCode = provider.ConsumeIntegral<int32_t>();
     item.SetKeyCode(keyCode);
     keyEvent.AddKeyItem(item);
 
