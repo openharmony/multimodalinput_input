@@ -4042,5 +4042,18 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_0
     EXPECT_EQ(ret, INPUT_SUCCESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(HOOK_WAIT_TIME_MS));
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_003
+ * @tc.desc: Test OH_Input_DispatchToNextHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_DispatchToNextHandler(1);
+    EXPECT_NE(ret, INPUT_SUCCESS);
+}
 } // namespace MMI
 } // namespace OHOS
