@@ -3366,8 +3366,14 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
             }
         }
     }
-    UpdateDisplayInfo(displayInfo_);
-    UpdatePointerVisible();
+    std::shared_ptr<DelegateInterface> delegateProxy =
+        IPointerDrawingManager::GetInstance()->GetDelegateProxy();
+    CHKPV(delegateProxy);
+    delegateProxy->OnPostSyncTask([this] {
+        this->UpdateDisplayInfo(displayInfo_);
+        this->UpdatePointerVisible();
+        return RET_OK;
+    });
 }
 
 Direction PointerDrawingManager::CalculateRenderDirection(const bool isHard, const bool isWindowRotation)
