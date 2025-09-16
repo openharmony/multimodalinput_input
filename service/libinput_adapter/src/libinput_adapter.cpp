@@ -900,7 +900,7 @@ void LibinputAdapter::ProcessTouchEventAsVKeyboardEvent(
 }
 
 void LibinputAdapter::MapTouchToVKeyboardCoordinates(
-    libinput_event_touch* touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow)
+    libinput_event_touch *touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow)
 {
     CHKPV(touch);
     EventTouch touchInfo;
@@ -919,15 +919,15 @@ void LibinputAdapter::MapTouchToVKeyboardCoordinates(
 }
 
 bool LibinputAdapter::IsPhoneTouchThpEventOnFullKbd(
-    libinput_event_touch *event, libinput_event_type eventType, double x, double y)
+    libinput_event_touch *touch, libinput_event_type eventType, double x, double y)
 {
     if (!(eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_UP ||
         eventType == LIBINPUT_EVENT_TOUCH_MOTION)) {
         // reject invalid types.
         return false;
     }
-    CHKPF(event);
-    int32_t toolType = libinput_event_touch_get_tool_type(event);
+    CHKPF(touch);
+    int32_t toolType = libinput_event_touch_get_tool_type(touch);
     CHKPF(isInsideFullKbd_);
     // return true if non-touchscreen AND inside full kbd on C side.
     return toolType == PointerEvent::TOOL_TYPE_THP_FEATURE && isInsideFullKbd_(x, y);
