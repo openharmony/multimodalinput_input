@@ -929,7 +929,6 @@ bool LibinputAdapter::IsPhoneTouchThpEventOnFullKbd(
     CHKPF(touch);
     int32_t toolType = libinput_event_touch_get_tool_type(touch);
     CHKPF(isInsideFullKbd_);
-    // return true if non-touchscreen AND inside full kbd on C side.
     return toolType == PointerEvent::TOOL_TYPE_THP_FEATURE && isInsideFullKbd_(x, y);
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
