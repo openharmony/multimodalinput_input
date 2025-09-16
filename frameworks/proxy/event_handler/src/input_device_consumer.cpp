@@ -42,7 +42,7 @@ int32_t InputDeviceConsumer::SetInputDeviceConsumer(
     }
 
     sptr<IInputDeviceConsumerProxy> inputDevicePluginProxy =
-        sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDeviceConsumerPluginStub_);
+        sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDeviceConsumerPluginStub);
     if (!inputDevicePluginProxy) {
         MMI_HILOGE("Transfer input device plugin stub to proxy failed");
         return ERROR_UNSUPPORT;
