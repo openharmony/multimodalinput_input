@@ -1186,7 +1186,7 @@ void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> 
     int64_t curTime = GetSysClockTime();
     double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
     if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE) {
-        return g_isSwipeInward;
+        return;
     }
     double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
     if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
