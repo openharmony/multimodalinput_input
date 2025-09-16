@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef INPUTDEVICEMANAGERONE_FUZZER
-#define INPUTDEVICEMANAGERONE_FUZZER
+#ifndef STUBHANDLEALLOCSOCAETFD_FUZZER_H
+#define STUBHANDLEALLOCSOCAETFD_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "inputdevicemanagerone_fuzzer"
+#define FUZZ_PROJECT_NAME "stubhandleswitchevent_fuzzer"
 
-#endif // INPUTDEVICEMANAGERONE_FUZZER
+#endif // STUBHANDLEALLOCSOCAETFD_FUZZER_H
