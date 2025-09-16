@@ -141,7 +141,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const OLD::DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false);
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false, bool hasValidAreaDowned = false);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void ReverseRotateScreen(const OLD::DisplayInfo& info, const double x, const double y,
@@ -394,7 +394,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
-        const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
+        const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false,
+        bool hasValidAreaDowned = false);
     void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
@@ -432,7 +433,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void ResetPointerPositionIfOutValidDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
     void CancelMouseEvent();
     bool IsPositionOutValidDisplay(
-        Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos = false);
+        Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos = false,
+        bool hasValidAreaDowned = false);
     void CancelTouchScreenEventIfValidDisplayChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsValidDisplayChange(const OLD::DisplayInfo &displayInfo);
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);

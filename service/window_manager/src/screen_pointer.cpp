@@ -81,6 +81,10 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
         std::swap(width_, height_);
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    mirrorWidth_ = di.validWidth;
+    mirrorHeight_ = di.validHeight;
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -94,6 +98,10 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    mirrorWidth_ = si->GetMirrorWidth() == 0 ? GetScreenInfoWidth(si) : si->GetMirrorWidth();
+    mirrorHeight_ = si->GetMirrorHeight() == 0 ? GetScreenInfoHeight(si) : si->GetMirrorHeight();
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -319,6 +327,10 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mode_ = si->GetSourceMode();
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    mirrorWidth_ = si->GetMirrorWidth() == 0 ? GetScreenInfoWidth(si) : si->GetMirrorWidth();
+    mirrorHeight_ = si->GetMirrorHeight() == 0 ? GetScreenInfoHeight(si) : si->GetMirrorHeight();
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     surfaceNode_->AttachToDisplay(screenId_);
     Rosen::RSTransaction::FlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
@@ -354,6 +366,7 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotat
 
 bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
 {
+#ifndef OHOS_BUILD_EXTERNAL_SCREEN
     if (!IsMirror()) {
         MMI_HILOGI("UpdatePadidng, reset padding, screenId=%{public}" PRIu64 ", scale=%{public}f, "
             "paddingTop_=%{public}u, paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
@@ -362,11 +375,12 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
         paddingLeft_ = 0;
         return false;
     }
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     if (mainWidth == 0 || mainHeight == 0) {
         MMI_HILOGE("Invalid parameters, mainWidth=%{public}u, mainHeight=%{public}u", mainWidth, mainHeight);
         return false;
     }
-    if (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270) {
+    if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270) && IsMirror()) {
         std::swap(mainWidth, mainHeight);
     }
 
@@ -374,6 +388,11 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
     scale_ = fmin(float(width_) / mainWidth, float(height_) / mainHeight);
     paddingTop_ = (height_ - mainHeight * scale_) / NUM_TWO;
     paddingLeft_ = (width_ - mainWidth * scale_) / NUM_TWO;
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    if (IsMain()) {
+        scale_ = 1.0;
+    }
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("UpdatePadding, screenId=%{public}" PRIu64 ", scale=%{public}f, paddingTop_=%{public}u,"
                " paddingLeft_=%{public}u", screenId_, scale_, paddingTop_, paddingLeft_);
     return true;
@@ -428,6 +447,14 @@ void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
     y += paddingTop_;
 }
 
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+void ScreenPointer::CalculateHwcPositionForMain(int32_t& x, int32_t& y)
+{
+    x += paddingLeft_;
+    y += paddingTop_;
+}
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
+
 void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
 {
     x = x * offRenderScale_;
@@ -443,6 +470,11 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     CHKPF(hwcMgr_);
     int32_t px = 0;
     int32_t py = 0;
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    if (IsMain()) {
+        CalculateHwcPositionForMain(x, y);
+    }
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     if (IsMirror()) {
         CalculateHwcPositionForMirror(x, y);
     } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
