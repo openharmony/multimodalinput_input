@@ -33,15 +33,25 @@ void KeyEvent4FuzzTest(const uint8_t *data, size_t size)
     KeyEvent::Clone(nullptr);
 
     FuzzedDataProvider provider(data, size);
+    int32_t eventType = provider.ConsumeIntegral<int32_t>();
+    KeyEvent keyEvent(eventType);
 
-    funcKey = provider.ConsumeIntegral<int32_t>();
+    int32_t funcKey = provider.ConsumeIntegral<int32_t>();
     int32_t value = provider.ConsumeIntegral<int32_t>();
     keyEvent.SetFunctionKey(funcKey, value);
 
     int32_t keyIntention = provider.ConsumeIntegral<int32_t>();
     keyEvent.SetKeyIntention(keyIntention);
 
-    KeyEventFuzzTest_Add(provider, keyEvent);
+    KeyEvent::KeyItem item;
+    int32_t keyCode = provider.ConsumeIntegral<int32_t>();
+    item.SetKeyCode(keyCode);
+    keyEvent.AddKeyItem(item);
+    std::vector<KeyEvent::KeyItem> items;
+    items.push_back(item);
+    keyEvent.SetKeyItem(items);
+
+    keyEvent.AddPressedKeyItems(item);
     keyEvent.RemoveReleasedKeyItems(item);
     MMI_HILOGD("KeyEvent4FuzzTest");
 }
