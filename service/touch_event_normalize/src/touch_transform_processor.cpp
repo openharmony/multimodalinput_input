@@ -433,7 +433,7 @@ void TouchTransformProcessor::InitToolTypes()
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
 bool TouchTransformProcessor::isInvalidAreaDownedEvent(int32_t seatSlot)
 {
-    for (auto& item : InvalidAreaDownedEvents_) {
+    for (const tuto& item : InvalidAreaDownedEvents_) {
         if (item == seatSlot) {
             return true;
         }
@@ -447,7 +447,7 @@ void TouchTransformProcessor::AddInvalidAreaDownedEvent(int32_t seatSlot)
         InvalidAreaDownedEvents_.erase(InvalidAreaDownedEvents_.begin());
         return;
     }
-    for (auto& item : InvalidAreaDownedEvents_) {
+    for (const auto& item : InvalidAreaDownedEvents_) {
         if (item == seatSlot) {
             return;
         }
