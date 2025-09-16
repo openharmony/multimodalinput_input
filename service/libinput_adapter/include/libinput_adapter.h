@@ -143,7 +143,7 @@ private:
     void DelayInjectReleaseCallback();
     void DelayInjectPressReleaseCallback();
     void UpdateBootFlag();
-    bool IsNonTouchScreenEventOnFullKbd(libinput_event *event, double x, double y);
+    bool IsPhoneTouchThpEventOnFullKbd(libinput_event_touch *event, libinput_event_type eventType, double x, double y);
 
     libinput_event *vkbDelayedKeyEvent_ = nullptr;
     libinput_event *vtpDelayedEvent_ = nullptr;
