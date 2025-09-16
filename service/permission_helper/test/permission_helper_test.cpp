@@ -353,7 +353,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckKeyEventHook, TestSize.
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_AddPermissionUsedRecord001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    unsigned int token= 3;
+    unsigned int token = 3;
     std::string permissionName = "access";
     int32_t successCount = 1;
     int32_t failCount = 1;
