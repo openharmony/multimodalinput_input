@@ -979,7 +979,9 @@ int32_t InputManager::SetKnuckleSwitch(bool knuckleSwitch)
 
 int32_t InputManager::LaunchAiScreenAbility()
 {
+    // LCOV_EXCL_START
     return InputMgrImpl.LaunchAiScreenAbility();
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
