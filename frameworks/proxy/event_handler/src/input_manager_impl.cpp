@@ -446,6 +446,10 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
         return -CAPABILITY_NOT_SUPPORTED;
     }
     CHKPR(callback, RET_ERR);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     MMI_HILOGI("key:%{public}d, action:%{public}d, isRepeat:%{public}d",
         keyOption.GetKey(), keyOption.GetAction(), keyOption.IsRepeat());
     return KeyEventInputSubscribeMgr.SubscribeKeyMonitor(keyOption, callback);

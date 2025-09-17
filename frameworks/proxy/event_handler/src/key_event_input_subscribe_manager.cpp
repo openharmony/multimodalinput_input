@@ -392,9 +392,12 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-int32_t KeyEventInputSubscribeManager::OnSubscribeKeyMonitor(std::shared_ptr<KeyEvent> event)
+int32_t KeyEventInputSubscribeManager::OnSubscribeKeyMonitor(std::shared_ptr<KeyEvent> event, bool status)
 {
     CHKPR(event, RET_ERR);
+    isMeeTime_ = status;
+    MMI_HILOGD("KC:%{private}d, KA:%{public}d, isMeeTime_:%{public}d",
+        event->GetKeyCode(), event->GetKeyAction(), isMeeTime_);
     auto callbacks = CheckKeyMonitors(event);
     std::for_each(callbacks.cbegin(), callbacks.cend(), [event](auto callback) {
         if (callback) {
@@ -459,7 +462,7 @@ std::vector<std::function<void(std::shared_ptr<KeyEvent>)>> KeyEventInputSubscri
     std::lock_guard<std::mutex> guard(mtx_);
 
     for (const auto &[monitorId, monitors] : monitors_) {
-        if (!monitorId.Want(event)) {
+        if (!monitorId.Want(event) && !CheckMeeTimeSubscriber(event)) {
             continue;
         }
         std::for_each(monitors.cbegin(), monitors.cend(), [&](const auto &item) {
@@ -467,6 +470,22 @@ std::vector<std::function<void(std::shared_ptr<KeyEvent>)>> KeyEventInputSubscri
         });
     }
     return keyMonitors;
+}
+
+bool KeyEventInputSubscribeManager::CheckMeeTimeSubscriber(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_UP) {
+        return false;
+    }
+    bool flag = keyEvent->HasFlag(InputEvent::EVENT_MEETIME);
+    MMI_HILOGI("Subscriber flag:%{public}d, isMeeTimeSubcriber_:%{public}d",
+        flag, static_cast<bool>(isMeeTime_));
+    if (flag && isMeeTime_) {
+        return true;
+    }
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 } // namespace MMI

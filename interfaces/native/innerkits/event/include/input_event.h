@@ -110,6 +110,7 @@ public:
     static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
     static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
     static constexpr uint32_t EVENT_FLAG_ACCESSIBILITY = 0x00000100;
+    static constexpr uint32_t EVENT_MEETIME = 0x00000200;
 
     /**
      * The multimodal input event from navigation window.
