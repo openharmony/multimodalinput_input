@@ -70,10 +70,7 @@ public:
         return descript_;
     }
 
-    const std::string GetProgramName() const
-    {
-        return programName_;
-    }
+    const std::string GetProgramName();
 
     void SetAnrStatus(int32_t type, bool status)
     {
@@ -88,6 +85,16 @@ public:
     void SetTokenType(int32_t type)
     {
         tokenType_ = type;
+    }
+
+    void SetTokenId(uint32_t tokenId)
+    {
+        tokenId_ = tokenId;
+    }
+
+    void SetIsRealProcessName(bool isRealProcessName)
+    {
+        isRealProcessName_ = isRealProcessName;
     }
 
     int32_t GetTokenType() const
@@ -112,7 +119,7 @@ protected:
     std::map<int32_t, std::vector<EventTime>> events_;
     std::map<int32_t, bool> isAnrProcess_;
     std::string descript_;
-    const std::string programName_;
+    std::string programName_;
     const int32_t moduleType_ { -1 };
     int32_t fd_ { -1 };
     const int32_t uid_ { -1 };
@@ -121,6 +128,8 @@ protected:
     mutable bool invalidSocket_ { false };
     int64_t lastReportTime_ = 0;
     int32_t lastReportedPid_ = 0;
+    uint32_t tokenId_ = 0;
+    bool isRealProcessName_ = true;
 };
 } // namespace MMI
 } // namespace OHOS
