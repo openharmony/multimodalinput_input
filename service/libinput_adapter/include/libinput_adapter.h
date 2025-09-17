@@ -44,6 +44,7 @@ typedef std::function<int32_t(libinput_event_touch *touch,
                               std::vector<libinput_event*>& events)> GetLibinputEventForVTrackpad;
 typedef std::function<void()> ResetVTrackpadState;
 typedef std::function<void()> StopVTrackpadTimer;
+typedef std::function<bool(double x, double y)> IsInsideFullKbd;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 enum VKeyboardEventType {
     NoKeyboardEvent = -1,
@@ -101,7 +102,8 @@ public:
         GetLibinputEventForVKeyboard getLibinputEventForVKeyboard,
         GetLibinputEventForVTrackpad getLibinputEventForVTrackpad,
         ResetVTrackpadState resetVTrackpadState,
-        StopVTrackpadTimer stopVTrackpadTimer
+        StopVTrackpadTimer stopVTrackpadTimer,
+        IsInsideFullKbd isInsideFullKbd
         );
 
 private:
@@ -112,6 +114,10 @@ private:
     void OnDeviceRemoved(std::string path);
     void InitRightButtonAreaConfig();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void ProcessTouchEventAsVKeyboardEvent(libinput_event *event, libinput_event_type eventType, int64_t frameTime);
+    void MapTouchToVKeyboardCoordinates(
+        libinput_event_touch *touch, int32_t touchId, double &x, double &y, bool &isInsideSpecialWindow);
+    bool IsPhoneTouchThpEventOnFullKbd(libinput_event_touch *touch, libinput_event_type eventType, double x, double y);
     void HandleVFullKeyboardMessages(
         libinput_event *event, int64_t frameTime, libinput_event_type eventType, libinput_event_touch *touch);
     void HandleVKeyboardMessage(VKeyboardEventType eventType, std::vector<libinput_event*> &keyboardEvents,
@@ -127,7 +133,7 @@ private:
     int32_t ConvertToTouchEventType(libinput_event_type eventType);
     void HandleHWKeyEventForVKeyboard(libinput_event* event);
     void HideMouseCursorTemporary();
-    double GetAccumulatedPressure(int touchId, int32_t eventType, double touchPressure);
+    double GetAccumulatedPressure(int32_t touchId, int32_t eventType, double touchPressure);
     void DelayInjectKeyEventCallback();
     bool CreateVKeyboardDelayTimer(int32_t delayMs, libinput_event *keyEvent);
     void StartVKeyboardDelayTimer(int32_t delayMs);
@@ -135,7 +141,6 @@ private:
     void SafeDestroyVKeyboardDelayedEvent();
     libinput_event_touch* SafeGetVTrackPadTouchEvent();
     void SafeDestroyVTrackPadDelayedEvent();
-
     void DelayInjectReleaseCallback();
     void DelayInjectPressReleaseCallback();
     void UpdateBootFlag();
@@ -164,7 +169,8 @@ private:
     GetLibinputEventForVTrackpad getLibinputEventForVTrackpad_ { nullptr };
     ResetVTrackpadState resetVTrackpadState_ { nullptr };
     StopVTrackpadTimer stopVTrackpadTimer_ { nullptr };
-    int32_t deviceId;
+    IsInsideFullKbd isInsideFullKbd_ { nullptr };
+    int32_t deviceId_;
     std::unordered_map<int32_t, std::pair<double, double>> touchPoints_;
     static std::unordered_map<std::string, int32_t> keyCodes_;
     std::unordered_map<int32_t, double> touchPointPressureCache_;
