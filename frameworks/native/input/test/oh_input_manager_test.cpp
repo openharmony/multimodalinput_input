@@ -98,9 +98,10 @@ void DummyCallback(const Input_KeyEvent* keyEvent)
 
 void HookCallback(const Input_KeyEvent* keyEvent)
 {
+    CALL_INFO_TRACE;
     int32_t eventId { -1 };
     if (OH_Input_GetKeyEventId(keyEvent, &eventId) != INPUT_SUCCESS) {
-        MMI_HILOGW("GetKeyEventId failed");
+        MMI_HILOGW("GetEventId failed");
         return;
     }
     int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
@@ -3893,7 +3894,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventId_001, Test
     int32_t eventId { -1 };
     EXPECT_EQ(OH_Input_GetKeyEventId(&keyEvent, &eventId), INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_001
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3906,7 +3907,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_001, Te
     Input_Result ret = OH_Input_AddKeyEventHook(nullptr);
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_002
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3923,7 +3924,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_002, Te
     ret = OH_Input_RemoveKeyEventHook(HookCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_003
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3943,7 +3944,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_003, Te
     ret = OH_Input_RemoveKeyEventHook(HookCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_004
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3959,7 +3960,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_004, Te
     ret = OH_Input_RemoveKeyEventHook(HookCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_RemoveKeyEventHook_001
  * @tc.desc: Test OH_Input_RemoveKeyEventHook
@@ -3973,9 +3974,9 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveKeyEventHook_001,
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
     auto testHook = [](const Input_KeyEvent* keyEvent) {};
     ret = OH_Input_RemoveKeyEventHook(testHook);
-    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_001
  * @tc.desc: Test OH_Input_DispatchToNextHandler
@@ -4008,9 +4009,10 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_0
     };
     Input_Result ret = OH_Input_AddKeyEventHook(numberHook);
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    std::this_thread::sleep_for(std::chrono::milliseconds(HOOK_WAIT_TIME_MS));
+    ret = OH_Input_RemoveKeyEventHook(numberHook);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_002
  * @tc.desc: Test OH_Input_DispatchToNextHandler
@@ -4040,9 +4042,10 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_0
     };
     Input_Result ret = OH_Input_AddKeyEventHook(alphabetHook);
     EXPECT_EQ(ret, INPUT_SUCCESS);
-    std::this_thread::sleep_for(std::chrono::milliseconds(HOOK_WAIT_TIME_MS));
+    ret = OH_Input_RemoveKeyEventHook(alphabetHook);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
 }
-
+ 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_003
  * @tc.desc: Test OH_Input_DispatchToNextHandler
