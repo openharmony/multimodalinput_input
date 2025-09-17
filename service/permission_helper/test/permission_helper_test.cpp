@@ -330,5 +330,34 @@ HWTEST_F(PermissionHelperTest, CheckInjectPermissionTest1, TestSize.Level1)
     CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(PER_HELPER->CheckInjectPermission());
 }
+
+/**
+ * @tc.name: PermissionHelperTest_CheckKeyEventHook
+ * @tc.desc: Test CheckKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckKeyEventHook, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool ret = PER_HELPER->CheckKeyEventHook();
+    EXPECT_TRUE(ret);
+}
+ 
+/**
+ * @tc.name: PermissionHelperTest_AddPermissionUsedRecord001
+ * @tc.desc: Test AddPermissionUsedRecord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_AddPermissionUsedRecord001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    unsigned int token = 3;
+    std::string permissionName = "access";
+    int32_t successCount = 1;
+    int32_t failCount = 1;
+    EXPECT_FALSE(PER_HELPER->AddPermissionUsedRecord(token, permissionName, successCount, failCount));
+}
 } // namespace MMI
 } // namespace OHOS

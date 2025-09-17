@@ -22,6 +22,7 @@
 #include "event_dispatch_handler.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
+#include "key_event_hook_manager.h"
 #include "parameters.h"
 
 #undef protected
@@ -50,6 +51,10 @@ static constexpr char PROGRAM_NAME[] { "uds_sesion_test" };
 int32_t g_moduleType { 3 };
 int32_t g_pid { 0 };
 int32_t g_writeFd { -1 };
+constexpr int32_t MODULE_TYPE = 1;
+constexpr int32_t UDS_FD = -1;
+constexpr int32_t UDS_UID = 456;
+constexpr int32_t UDS_PID = 123;
 } // namespace
 
 class EventDispatchTest : public testing::Test {
@@ -2351,6 +2356,30 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_009,
     eventdispatchhandler.cancelEventList_[1].push_back(windowInfo1);
     auto windowInfo = eventdispatchhandler.SearchCancelList(pointerId, windowId);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleKeyEvent_004
+ * @tc.desc: Test HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_004, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+        [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+        }
+    );
+    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(-1);
+    KeyEventHookManager::GetInstance().OnKeyEvent(keyEvent);
+    bool result = KeyEventHookManager::GetInstance().IsValidKeyEvent(keyEvent);
+    eventdispatchhandler.HandleKeyEvent(keyEvent);
+    EXPECT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS
