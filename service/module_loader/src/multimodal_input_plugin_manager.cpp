@@ -407,12 +407,14 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
         }
     }
 
-    std::visit(overloaded{
+    if (eventHandler) {
+        std::visit(overloaded{
         [&eventHandler](std::shared_ptr<KeyEvent> evt) { return eventHandler->HandleKeyEvent(evt); },
         [&eventHandler](std::shared_ptr<PointerEvent> evt) { return eventHandler->HandlePointerEvent(evt); },
         [](libinput_event* evt) { return; },
         [](std::shared_ptr<AxisEvent> evt) { return; }
-    }, pluginEvent);
+        }, pluginEvent);
+    }
 }
 
 void InputPlugin::DispatchEvent(NetPacket& pkt, int32_t pid)
@@ -482,7 +484,7 @@ int32_t InputPlugin::GetPriority()
     return prio_;
 }
 
-void InputPlugin::SetCallback(std::function<void(PluginEventType, int64_t)>& callback)
+void InputPlugin::SetCallback(std::function<void(PluginEventType, int64_t)> callback)
 {
     callback_ = callback;
 }
