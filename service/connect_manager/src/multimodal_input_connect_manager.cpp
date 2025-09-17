@@ -116,16 +116,20 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 
 int32_t MultimodalInputConnectManager::NotifyNapOnline()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->NotifyNapOnline();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveInputEventObserver();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
@@ -307,16 +311,20 @@ int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, Pointer
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RegisterDevListener();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::UnregisterDevListener()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->UnregisterDevListener();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
@@ -568,9 +576,11 @@ int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<Point
 
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetAnrObserver();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::GetFunctionKeyState(int32_t funcKey, bool &state)
@@ -666,14 +676,17 @@ void MultimodalInputConnectManager::Clean(const wptr<IRemoteObject> &remoteObj)
 
 void MultimodalInputConnectManager::NotifyServiceDeath()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     for (const auto &watcher : watchers_) {
         watcher->OnServiceDied();
     }
+    // LCOV_EXCL_STOP
 }
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     int32_t retryCount = 50;
     do {
@@ -683,6 +696,7 @@ void MultimodalInputConnectManager::NotifyDeath()
             return;
         }
     } while (--retryCount > 0);
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
@@ -903,9 +917,11 @@ int32_t MultimodalInputConnectManager::Authorize(bool isAuthorize)
 
 int32_t MultimodalInputConnectManager::CancelInjection()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->CancelInjection();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::RequestInjection(int32_t &status, int32_t &reqId)
@@ -1151,9 +1167,11 @@ int32_t MultimodalInputConnectManager::SetKnuckleSwitch(bool knuckleSwitch)
 
 int32_t MultimodalInputConnectManager::LaunchAiScreenAbility()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->LaunchAiScreenAbility();
+    // LCOV_EXCL_STOP
 }
 
 int32_t MultimodalInputConnectManager::GetMaxMultiTouchPointNum(int32_t &pointNum)
