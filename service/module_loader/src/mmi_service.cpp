@@ -2563,6 +2563,7 @@ ErrCode MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
     }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
     std::string bundleName = sess->GetProgramName();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, keyOption, bundleName] {
@@ -2582,6 +2583,7 @@ ErrCode MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
     }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
     std::string bundleName = sess->GetProgramName();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, keyOption, bundleName] {

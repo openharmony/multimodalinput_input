@@ -344,7 +344,7 @@ UDSServer* InputPluginManager::GetUdsServer()
     return udsServer_;
 }
 
-void InputPluginManager::HandleMonitorStatus(bool monitorStatus, std::string monitorType)
+void InputPluginManager::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
 {
     CALL_INFO_TRACE;
     MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
@@ -519,7 +519,7 @@ InputPlugin::~InputPlugin()
     MMI_HILOGI("~InputPlugin");
 }
 
-void InputPlugin::HandleMonitorStatus(bool monitorStatus, std::string monitorType)
+void InputPlugin::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
 {
     CHKPV(plugin_);
     MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",

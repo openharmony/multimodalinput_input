@@ -1251,7 +1251,7 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
-    const KeyMonitorOption &keyOption, const std::string bundleName)
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
@@ -1267,7 +1267,7 @@ int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
 }
 
 int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session,
-    const KeyMonitorOption &keyOption, const std::string bundleName)
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());

@@ -343,7 +343,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyMonitor(const UDSClient &client, NetPack
         MMI_HILOGE("Read net packet failed");
         return RET_ERR;
     }
-    MMI_HILOGD("Key monitor(No:%{public}d, KC:%{public}d, KA:%{public}d)",
+    MMI_HILOGD("Key monitor(No:%{public}d, KC:%{private}d, KA:%{public}d)",
         keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
