@@ -587,34 +587,40 @@ void MMIService::RemoveAppDebugListener()
     // LCOV_EXCL_STOP
 }
 
-ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
-    int32_t &tokenType)
+ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    int32_t &toReturnClientFd, int32_t &tokenType)
 {
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
         return MMISERVICE_NOT_RUNNING;
     }
-    if (programName.empty()) {
-        MMI_HILOGE("Invalid programName");
-        return RET_ERR;
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    bool isRealProcessName = true;
+    std::string processName = GetProcessName(tokenId, pid);
+    if (processName.empty()) {
+        MMI_HILOGW("GetProcessName is empty");
+        processName = programName;
+        isRealProcessName = false;
     }
     tokenType = PER_HELPER->GetTokenType();
     toReturnClientFd = MMIService::INVALID_SOCKET_FD;
     int32_t serverFd = MMIService::INVALID_SOCKET_FD;
     int32_t uid = GetCallingUid();
-    MMI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d, pid:%{public}d",
-        programName.c_str(), moduleType, pid);
+    MMI_HILOGI("Enter, programName:{%{public}s:%{public}d}, moduleType:%{public}d, pid:%{public}d",
+        processName.c_str(), isRealProcessName, moduleType, pid);
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
-            return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+        [this, processName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType,
+            tokenId, isRealProcessName] {
+            return this->AddSocketPairInfo(processName, moduleType, uid, pid, serverFd, toReturnClientFd,
+                tokenType, tokenId, isRealProcessName);
         }
         );
     DfxHisysevent::ClientConnectData data = {
         .pid = pid,
         .uid = uid,
         .moduleType = moduleType,
-        .programName = programName,
+        .programName = processName,
         .serverFd = serverFd
     };
     if (ret != RET_OK) {
@@ -625,7 +631,7 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         }
         return ret;
     }
-    MMI_HILOGIK("Leave, programName:%{public}s, moduleType:%{public}d, alloc success", programName.c_str(),
+    MMI_HILOGIK("Leave, programName:%{public}s, moduleType:%{public}d, alloc success", processName.c_str(),
                 moduleType);
     DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;

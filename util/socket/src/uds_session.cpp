@@ -257,5 +257,19 @@ std::vector<UDSSession::EventTime> UDSSession::GetEventsByType(int32_t type) con
     auto iter = events_.find(type);
     return (iter != events_.end()) ? iter->second : std::vector<EventTime>();
 }
+
+const std::string UDSSession::GetProgramName()
+{
+    if (!isRealProcessName_) {
+        programName_ = GetProcessName(tokenId_, pid_);
+        if (programName_.empty()) {
+            MMI_HILOGW("programName_ empty:{%{public}d,%{public}d}", tokenId_, pid_);
+        } else {
+            isRealProcessName_ = true;
+        }
+    }
+
+    return programName_;
+}
 } // namespace MMI
 } // namespace OHOS

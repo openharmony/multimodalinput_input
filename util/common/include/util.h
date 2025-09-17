@@ -83,6 +83,8 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
 
 std::string StringPrintf(const char *format, ...);
 
+std::string GetProcessName(uint32_t tokenId, int32_t pid);
+
 inline void RemoveSpace(std::string &str)
 {
     str.erase(remove_if(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c);}), str.end());
