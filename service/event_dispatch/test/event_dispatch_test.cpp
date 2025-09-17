@@ -17,12 +17,18 @@
 
 #include <gtest/gtest.h>
 
+#include "account_manager.h"
 #include "anr_manager.h"
 #include "define_multimodal.h"
 #include "event_dispatch_handler.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
 #include "parameters.h"
+#include "key_event_hook_manager.h"
+#include "parameters.h"
+#include "mmi_service.h"
+#include "old_display_info.h"
+#include "property_reader.h"
 
 #undef protected
 #undef private
@@ -52,10 +58,26 @@ int32_t g_pid { 0 };
 int32_t g_writeFd { -1 };
 } // namespace
 
+#define NUM_100 100
+#define NUM_200 200
+#define NUM_1 1
+#define NUM_2 2
+
 class EventDispatchTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    static OLD::DisplayGroupInfo CreateDisplayGroupInfo(int groupId, int displayId)
+    {
+        OLD::DisplayGroupInfo displayGroupInfo;
+        displayGroupInfo.groupId = groupId;
+        displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+        std::vector<OLD::DisplayInfo> displaysInfo;
+        OLD::DisplayInfo display = { .id = displayId };
+        displaysInfo.emplace_back(display);
+        displayGroupInfo.displaysInfo = displaysInfo;
+        return displayGroupInfo;
+    }
 };
 
 /**
@@ -241,6 +263,51 @@ HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_01, TestSize.Level1)
     auto itemPid = WIN_MGR->GetWindowPid(pointeritem.targetWindowId_);
     EXPECT_FALSE(itemPid >= 0);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: FilterInvalidPointerItem_02
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_02, TestSize.Level1)
+{
+    MMIService* mmiService = MMIService::GetInstance();
+    mmiService->Init();
+    auto udsItem = std::make_shared<UDSSession>("temp", 0, NUM_100, NUM_100, NUM_100);
+    mmiService->AddSession(udsItem);
+
+    EventDispatchHandler eventdispatchhandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(NUM_1);
+
+    OHOS::MMI::WindowInfo win1 = {.id = NUM_1, .pid = NUM_100};
+    OHOS::MMI::WindowInfo win2 = {.id = NUM_2, .pid = NUM_200};
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo1 = { win1, win2 };
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo2 = { win2 };
+    OLD::DisplayGroupInfo group1 = EventDispatchTest::CreateDisplayGroupInfo(NUM_1, NUM_1);
+    group1.windowsInfo = windowsInfo1;
+    OLD::DisplayGroupInfo group2 = EventDispatchTest::CreateDisplayGroupInfo(NUM_2, NUM_2);
+    group2.windowsInfo = windowsInfo2;
+    WIN_MGR->UpdateDisplayInfo(group1);
+    WIN_MGR->UpdateDisplayInfo(group2);
+
+    PointerEvent::PointerItem pointeritem1;
+    pointeritem1.SetPointerId(NUM_1);
+    pointeritem1.SetTargetWindowId(NUM_1);
+    PointerEvent::PointerItem pointeritem2;
+    pointeritem2.SetPointerId(NUM_2);
+    pointeritem2.SetTargetWindowId(NUM_2);
+
+    pointerEvent->AddPointerItem(pointeritem1);
+    pointerEvent->AddPointerItem(pointeritem2);
+
+    eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, NUM_100);
+    EXPECT_EQ(NUM_2, pointerEvent->GetAllPointerItems().size());
+
+    AccountManager::GetInstance()->AccountManagerUnregister();
 }
 
 /**
