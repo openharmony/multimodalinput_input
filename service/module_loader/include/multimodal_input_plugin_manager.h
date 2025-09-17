@@ -66,7 +66,7 @@ public:
     void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) override;
     void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) override;
     void DispatchEvent(NetPacket &pkt, int32_t pid) override;
-    void HandleMonitorStatus(bool monitorStatus, std::string monitorType);
+    void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) override;
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
@@ -96,7 +96,7 @@ public:
     int32_t DoHandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data, IPluginContext *iplugin);
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
     UDSServer *GetUdsServer();
-    void HandleMonitorStatus(bool monitorStatus, std::string monitorType);
+    void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType);
 
 private:
     explicit InputPluginManager(const std::string& directory) : directory_(directory) {};

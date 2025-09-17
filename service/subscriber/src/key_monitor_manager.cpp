@@ -33,7 +33,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t REPEAT_ONCE { 1 };
-const std::string MEETIME_NAME { MEETIME_DTOD_NAME };
+const std::string MEETIME_NAME { "MEETIME_DTOD_NAME" };
 }
 
 const std::set<int32_t> KeyMonitorManager::allowedKeys_ {
@@ -97,8 +97,8 @@ bool KeyMonitorManager::Monitor::Want(std::shared_ptr<KeyEvent> keyEvent) const
         return false;
     }
 
-    bool repeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ?
-        (keyCode != repeatCode) : (keyCode == repeatCode);
+    bool repeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (keyCode != repeatCode) :
+        ((keyCode == repeatCode) || keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
     bool flag = false;
     if (action_ == MonitorType::MONITOR_ACTION_ONLY_DOWN) {
         flag = (keyAction == KeyEvent::KEY_ACTION_DOWN) &&
@@ -124,7 +124,7 @@ KeyMonitorManager::KeyMonitorManager()
     }
 }
 
-int32_t KeyMonitorManager::AddMonitor(const Monitor &monitor, const std::string bundleName)
+int32_t KeyMonitorManager::AddMonitor(const Monitor &monitor, const std::string &bundleName)
 {
     MMI_HILOGI("Add key monitor(%{public}s)", monitor.Dump().c_str());
     if (!CheckMonitor(monitor)) {
@@ -145,7 +145,7 @@ int32_t KeyMonitorManager::AddMonitor(const Monitor &monitor, const std::string 
     return RET_OK;
 }
 
-void KeyMonitorManager::RemoveMonitor(const Monitor &monitor, const std::string bundleName)
+void KeyMonitorManager::RemoveMonitor(const Monitor &monitor, const std::string &bundleName)
 {
     MMI_HILOGI("Remove key monitor(%{public}s)", monitor.Dump().c_str());
     auto iter = monitors_.find(monitor);
@@ -187,12 +187,17 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
     std::set<int32_t> sessions;
     auto nTriggered = std::count_if(monitors_.cbegin(), monitors_.cend(),
         [this, keyEvent, &sessions](const auto &monitor) {
-            if (monitor.Want(keyEvent) &&
-                monitor.IsFocused() &&
-                (sessions.find(monitor.session_) == sessions.cend())) {
-                sessions.emplace(monitor.session_);
-                NotifyKeyMonitor(keyEvent, monitor.session_, isMeeTimeSubcriber_);
-                return true;
+            if (monitor.Want(keyEvent)) {
+                if (CheckMeeTimeMonitor(keyEvent)) {
+                    NotifyMeeTimeMonitor(keyEvent);
+                    return true;
+                }
+                if (monitor.IsFocused() &&
+                    (sessions.find(monitor.session_) == sessions.cend())) {
+                    sessions.emplace(monitor.session_);
+                    NotifyKeyMonitor(keyEvent, monitor.session_, isMeeTimeSubcriber_);
+                    return true;
+                }
             }
             return false;
         });
@@ -202,10 +207,6 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t delay)
 {
     CHKPF(keyEvent);
-    if (CheckMeeTimeMonitor(keyEvent)) {
-        NotifyMeeTimeMonitor(keyEvent);
-        return true;
-    }
     if ((keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) || (delay <= 0)) {
         return false;
     }
@@ -214,6 +215,10 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t de
         [this, keyEvent, delay, &sessions](const auto &monitor) {
             if (!monitor.Want(keyEvent)) {
                 return false;
+            }
+            if (CheckMeeTimeMonitor(keyEvent)) {
+                NotifyMeeTimeMonitor(keyEvent);
+                return true;
             }
             if (!monitor.IsFocused()) {
                 return false;

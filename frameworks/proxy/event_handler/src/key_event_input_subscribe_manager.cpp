@@ -71,7 +71,8 @@ bool KeyEventInputSubscribeManager::MonitorIdentity::Want(std::shared_ptr<KeyEve
         return false;
     }
 
-    bool isRepeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (!isKeyRepeat) : isKeyRepeat;
+    bool isRepeatValue = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (!isKeyRepeat) :
+        (isKeyRepeat || keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
     bool flag = false;
     if (action_ == SubcriberType::ACTION_ONLY_DOWN) {
         flag = (keyAction == KeyEvent::KEY_ACTION_DOWN) &&

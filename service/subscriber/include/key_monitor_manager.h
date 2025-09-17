@@ -54,8 +54,8 @@ public:
     ~KeyMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(KeyMonitorManager);
 
-    int32_t AddMonitor(const Monitor &monitor, const std::string bundleName);
-    void RemoveMonitor(const Monitor &monitor, const std::string bundleName);
+    int32_t AddMonitor(const Monitor &monitor, const std::string &bundleName);
+    void RemoveMonitor(const Monitor &monitor, const std::string &bundleName);
     bool Intercept(std::shared_ptr<KeyEvent> keyEvent);
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent, int32_t delay);
     void NotifyPendingMonitors();
