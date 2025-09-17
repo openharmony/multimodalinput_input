@@ -248,6 +248,11 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
         KEY_MONITOR_MGR->NotifyPendingMonitors();
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         Reset();
+        if ((keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP) &&
+            (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) &&
+            KeyMonitorIntercept(keyEvent)) {
+            return true;
+        }
         RunPendingHandlers();
     }
     return false;

@@ -2562,9 +2562,11 @@ ErrCode MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    std::string bundleName = sess->GetProgramName();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, keyOption] {
-            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption);
+        [this, pid, keyOption, bundleName] {
+            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption, bundleName);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::SubscribeKeyMonitor fail, error:%{public}d", ret);
@@ -2579,9 +2581,11 @@ ErrCode MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    std::string bundleName = sess->GetProgramName();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, keyOption] {
-            return sMsgHandler_.UnsubscribeKeyMonitor(pid, keyOption);
+        [this, pid, keyOption, bundleName] {
+            return sMsgHandler_.UnsubscribeKeyMonitor(pid, keyOption, bundleName);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::UnsubscribeKeyMonitor fail, error:%{public}d", ret);
