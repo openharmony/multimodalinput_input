@@ -4581,5 +4581,51 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandler_002, Te
     ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_001
+ * @tc.desc: Test the function SaveTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetWindowId(10);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    int32_t windowId = -1;
+    auto iter = handler.nativeTargetWindowIds_.find(touch);
+    if (iter != handler.nativeTargetWindowIds_.end()) {
+        windowId = iter->second;
+    }
+    EXPECT_EQ(windowId, pointerEvent->GetTargetWindowId());
+
+    pointerEvent->SetTargetDisplayId(1);
+    InjectionTouch temp{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    windowId = -1;
+    auto it = handler.nativeTargetWindowIds_.find(temp);
+    if (it != handler.nativeTargetWindowIds_.end()) {
+        windowId = it->second;
+    }
+    EXPECT_NE(windowId, pointerEvent->GetTargetWindowId());
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetTargetDisplayId(0);
+    ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(handler.nativeTargetWindowIds_.empty(), true);
+}
 } // namespace MMI
 } // namespace OHOS
