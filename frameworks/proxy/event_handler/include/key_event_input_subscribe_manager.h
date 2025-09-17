@@ -106,7 +106,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t GenerateId();
     std::vector<std::function<void(std::shared_ptr<KeyEvent>)>> CheckKeyMonitors(std::shared_ptr<KeyEvent> event);
-    // 010 校验D2D
     bool CheckMeeTimeSubscriber(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
