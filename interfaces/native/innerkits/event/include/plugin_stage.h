@@ -108,7 +108,7 @@ struct IPluginContext {
     virtual std::string GetName() = 0;
     virtual int32_t GetPriority() = 0;
     virtual std::shared_ptr<IInputPlugin> GetPlugin() = 0;
-    virtual void SetCallback(std::function<void(PluginEventType, int64_t)>& callback) = 0;
+    virtual void SetCallback(std::function<void(PluginEventType, int64_t)> callback) = 0;
     virtual int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) = 0;
     virtual int32_t RemoveTimer(int32_t id) = 0;
     virtual void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) = 0;
