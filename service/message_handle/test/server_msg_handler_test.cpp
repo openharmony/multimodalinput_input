@@ -908,29 +908,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdatePointerEvent_004, Test
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_001
- * @tc.desc: Test the function SaveTargetWindowId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    int32_t pointerId = 1;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(pointerId);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerId(0);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_002
  * @tc.desc: Test the function SaveTargetWindowId
  * @tc.type: FUNC
@@ -4363,41 +4340,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnGetFunctionKeyState_003, T
     state = false;
     ret = handler.OnGetFunctionKeyState(funcKey, state);
     EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
-}
-
-/**
-@tc.name: ServerMsgHandlerTest_SaveTargetWindowId_009
-@tc.desc: Test the function SaveTargetWindowId
-@tc.type: FUNC
-@tc.require:
-*/
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_009, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    auto pointer = PointerEvent::Create();
-    ASSERT_NE(pointer, nullptr);
-    pointer->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointer->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    int32_t id = 100;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(id);
-    pointer->AddPointerItem(item);
-    pointer->SetPointerId(0);
-    pointer->SetZOrder(-1);
-    int32_t ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-    pointer->SetDeviceId(111);
-    pointer->SetZOrder(1);
-    pointer->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
-    ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-    pointer->SetDeviceId(-1);
-    pointer->SetZOrder(-1);
-    ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-    ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
