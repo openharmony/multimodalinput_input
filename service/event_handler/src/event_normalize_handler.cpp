@@ -67,8 +67,10 @@ constexpr int32_t FINGER_NUM { 2 };
 constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
 constexpr int32_t USELIB_ABS_MT_POSITION_X { 0x35 };
 constexpr int32_t USELIB_ABS_MT_POSITION_Y { 0x36 };
-constexpr int32_t SWIPE_INWARD_EDGE_X_THRE { 8 };
+constexpr double SWIPE_INWARD_EDGE_X_THRE { 8.0 };
 constexpr int32_t SWIPE_INWARD_ANGLE_TOLERANCE { 8 };
+constexpr double SWIPE_INWARD_SPEED_THRE { 0.00004 };
+constexpr int32_t SWIPE_INWARD_TIME_THRE { 60000 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
@@ -202,8 +204,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
             if (g_isSwipeInward &&
-                type != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD &&
-                type != LIBINPUT_EVENT_POINTER_AXIS) {
+                type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
                 break;
             }
             HandleMouseEvent(event);
@@ -1140,32 +1141,59 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         }
         // get touchpad physic size
         if (libinput_device_get_size(touchPadDevice, &g_touchPadDeviceWidth, &g_touchPadDeviceHeight)) {
-            MMI_HILOGD("judgeIfSwipeInward, get touchPad physic size error");
+            MMI_HILOGD("JudgeIfSwipeInward, get touchPad physic size error");
         }
         // get touchpad max axis size
         g_touchPadDeviceAxisX = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_X);
         g_touchPadDeviceAxisY = libinput_device_get_axis_max(touchPadDevice, USELIB_ABS_MT_POSITION_Y);
-        // if down position on edge, start deliver data
-        if (pointerEvent->GetAllPointerItems().begin()->GetDisplayX() >=
-            g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
-            lastDirection = -1; // -1 means direction from right to left
-            g_isSwipeInward = true;
-        } else if (pointerEvent->GetAllPointerItems().begin()->GetDisplayX() <= SWIPE_INWARD_EDGE_X_THRE) {
-            lastDirection = 1; // 1 means direction from left to right
-            g_isSwipeInward = true;
+        double curPosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
+        // start postion in edge
+        if (curPosX > SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
+            return g_isSwipeInward;
         }
+        // -1:direction from right to lest, 1 left to right
+        lastDirection = (curPosX <= SWIPE_INWARD_EDGE_X_THRE) ? 1 : -1;
+        // update start down x postion
+        currentPointDownPosX_ = curPosX;
+        currentPointDownTime_ = GetSysClockTime();
+        return g_isSwipeInward;
+    }
+
+    if (g_isSwipeInward == false && type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
+        SwipeInwardSpeedJudge(pointerEvent);
     }
     // judge
     if (g_isSwipeInward == true) {
+        type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
         SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
-        if (g_buttonPressed) {
-            MMI_HILOGD("Button pressed, response button, cancel swipeInward");
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            nextHandler_->HandlePointerEvent(pointerEvent);
-            g_isSwipeInward = false;
-        }
+        SwipeInwardButtonJudge(pointerEvent);
     }
     return g_isSwipeInward;
+}
+
+void EventNormalizeHandler::SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (g_buttonPressed) {
+        MMI_HILOGD("Button pressed, response button, cancel swipeInward");
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        g_isSwipeInward = false;
+    }
+}
+
+void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int64_t curTime = GetSysClockTime();
+    double curMovePosX = pointerEvent->GetAllPointerItems().begin()->GetDisplayXPos();
+    if (curTime - currentPointDownTime_ > SWIPE_INWARD_TIME_THRE || curTime - currentPointDownTime_ == 0) {
+        return;
+    }
+    double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
+    if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
+        g_isSwipeInward = true;
+        
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    }
 }
 
 void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent,
