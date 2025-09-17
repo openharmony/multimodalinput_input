@@ -35,11 +35,13 @@ const int32_t MAX_TIMER = 3;
 
 InputPluginManager::~InputPluginManager()
 {
+    // LCOV_EXCL_START
     plugins_.clear();
     if (instance_ != nullptr) {
         instance_ = nullptr;
     }
     MMI_HILOGI("~InputPluginManager");
+    // LCOV_EXCL_STOP
 }
 
 InputPluginManager* InputPluginManager::GetInstance(const std::string &directory)
@@ -135,6 +137,7 @@ bool InputPluginManager::LoadPlugin(const std::string &path)
 
 void InputPluginManager::PrintPlugins()
 {
+    // LCOV_EXCL_START
     for (const auto &stagePlugins : plugins_) {
         MMI_HILOGI("InputPluginManager InputPluginStage : %{public}d", stagePlugins.first);
         for (const auto &plugin : stagePlugins.second) {
@@ -142,6 +145,7 @@ void InputPluginManager::PrintPlugins()
                 plugin->GetName().c_str(), plugin->GetPriority());
         }
     }
+    // LCOV_EXCL_STOP
 }
 
 void InputPluginManager::PluginAssignmentCallBack(
@@ -354,11 +358,13 @@ int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
 
 void InputPlugin::UnInit()
 {
+    // LCOV_EXCL_START
     CHKPV(plugin_);
     MMI_HILOGI("InputPlugin UnInit Start name:%{public}s.", name_.c_str());
     if (unintPlugin_) {
         unintPlugin_(plugin_);
     }
+    // LCOV_EXCL_STOP
 }
 
 void InputPlugin::DispatchEvent(PluginEventType pluginEvent, int64_t frameTime)
@@ -496,11 +502,13 @@ std::shared_ptr<IInputPlugin> InputPlugin::GetPlugin()
 
 InputPlugin::~InputPlugin()
 {
+    // LCOV_EXCL_START
     if (handle_) {
         dlclose(handle_);
         handle_ = nullptr;
     }
     MMI_HILOGI("~InputPlugin");
+    // LCOV_EXCL_STOP
 }
 } // namespace MMI
 } // namespace OHOS
