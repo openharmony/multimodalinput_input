@@ -527,7 +527,7 @@ void StateMachine::AddSessionObserver(Context &context, const EnableCooperateEve
     RegisterApplicationStateObserver(context.Sender(), event);
 }
 
-std::string StateMachine::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
+std::string StateMachine::GetPackageName(OHOS::Security::AccessToken::AccessTokenID tokenId)
 {
     CALL_INFO_TRACE;
     std::string bundleName {"Default"};
