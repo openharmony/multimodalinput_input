@@ -20,6 +20,7 @@
 
 #include "backtrace_local.h"
 #include "error_multimodal.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -89,7 +90,11 @@ void DelegateTasks::ProcessTasks()
         return;
     }
     for (const auto &it : tasks) {
+        std::string msg = "DelegateTasks::ProcessTasks, taskId is: "
+            + std::to_string(static_cast<uint32_t>(it->GetId()));
+        BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
         it->ProcessTask();
+        BytraceAdapter::MMIServiceTraceStop();
     }
     std::vector<DelegateTasks::TaskData> datas = {};
     datas.resize(count);
