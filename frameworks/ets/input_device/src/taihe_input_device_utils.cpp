@@ -125,5 +125,72 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr
     result.uniq = std::string_view(device->GetUniq());
     return result;
 }
+
+ani_object TaiheInputDeviceUtils::WrapBusinessError(ani_env* env, const std::string& msg)
+{
+    ani_class cls {};
+    ani_method method {};
+    ani_object obj = nullptr;
+    ani_status status = ANI_ERROR;
+    if (env == nullptr) {
+        return nullptr;
+    }
+
+    ani_string aniMsg = nullptr;
+    if ((status = env->String_NewUTF8(msg.c_str(), msg.size(), &aniMsg)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+
+    ani_ref undefRef;
+    if ((status = env->GetUndefined(&undefRef)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+
+    if ((status = env->FindClass("Lescompat/Error;", &cls)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;Lescompat/ErrorOptions;:V", &method)) !=
+        ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+
+    if ((status = env->Object_New(cls, method, &obj, aniMsg, undefRef)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+    return obj;
+}
+
+ani_ref TaiheInputDeviceUtils::CreateBusinessError(ani_env* env, ani_int code, const std::string& msg)
+{
+    ani_class cls;
+    ani_status status = ANI_OK;
+    if ((status = env->FindClass("L@ohos/base/BusinessError;", &cls)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+    ani_method ctor;
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "DLescompat/Error;:V", &ctor)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+    ani_object error = TaiheInputDeviceUtils::WrapBusinessError(env, msg);
+    if (error == nullptr) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+    ani_object obj = nullptr;
+    ani_double dCode(code);
+    if ((status = env->Object_New(cls, ctor, &obj, dCode, error)) != ANI_OK) {
+        MMI_HILOGE("The ani function call failed, status:%{public}d", status);
+        return nullptr;
+    }
+    return reinterpret_cast<ani_ref>(obj);
+}
+
 } // namespace MMI
 } // namespace OHOS

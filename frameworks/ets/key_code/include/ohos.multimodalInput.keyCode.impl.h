@@ -378,8 +378,12 @@ enum KeyCodeEts {
     KEYCODE_DAGGER_DOUBLE_CLICK_ETS = 3212,
     KEYCODE_DAGGER_LONG_PRESS_ETS = 3213
 };
-
-KeyCode ConvertEtsKeyCode(int32_t keyCode);
+extern const std::map<int32_t, KeyCode> KEY_CODE_TRANSFORMATION;
+class TaiheKeyCodeConverter {
+public:
+    static KeyCode ConvertEtsKeyCode(int32_t keyCode);
+    static KeyCodeEts GetKeyCodeByValue(const std::map<int32_t, KeyCode>& map, KeyCode code);
+};
 
 } // namespace MMI
 } // namespace OHOS

@@ -14,7 +14,9 @@ import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 copy_taihe_idl("short_key_taihe") {
-  sources = [ "idl/ohos.multimodalInput.shortKey.taihe" ]
+  sources = [ "idl/ohos.multimodalInput.shortKey.taihe",
+              "idl/ohos.multimodalInput.shortKeyFunc.taihe" ]
+  deps = ["${mmi_path}/frameworks/ets/key_code:key_code_taihe"]
 }
 config("shortKey_config") {
   visibility = [ ":*" ]
@@ -22,6 +24,7 @@ config("shortKey_config") {
   include_dirs = [
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/frameworks/ets/common/include"
   ]
 }
 subsystem_name = "multimodalinput"
@@ -33,6 +36,8 @@ ohos_taihe("run_taihe") {
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.shortKey.ani.cpp",
     "$taihe_generated_file_path/src/ohos.multimodalInput.shortKey.abi.c",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.shortKeyFunc.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.multimodalInput.shortKeyFunc.abi.c",
   ]
 }
 taihe_shared_library("ShortKey") {
@@ -47,11 +52,12 @@ taihe_shared_library("ShortKey") {
   sources += [
     "src/ani_constructor.cpp",
     "src/ohos.multimodalInput.shortKey.impl.cpp",
+    "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
   ]
   deps = [
     ":run_taihe",
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:libmmi-util"
   ]
   external_deps = [
     "c_utils:utils",
@@ -67,6 +73,7 @@ taihe_shared_library("ShortKey") {
     debug = false
   }
 }
+
 generate_static_abc("short_key") {
   base_url = "${taihe_generated_file_path_shortKey}"
   files = [ "${taihe_generated_file_path_shortKey}/@ohos.multimodalInput.shortKey.ets" ]
@@ -74,6 +81,7 @@ generate_static_abc("short_key") {
   device_dst_file = "/system/framework/short_key.abc"
   dependencies = [ ":run_taihe" ]
 }
+
 ohos_prebuilt_etc("short_key_etc") {
   source = "$target_out_dir/short_key.abc"
   module_install_dir = "framework"
@@ -81,6 +89,14 @@ ohos_prebuilt_etc("short_key_etc") {
   subsystem_name = "$subsystem_name"
   deps = [ ":short_key" ]
 }
+
+generate_static_abc("input_short_key_test") {
+  base_url = "${mmi_path}/frameworks/ets/short_key"
+  files = [ "$base_url/test/test_main.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/short_key.abc"
+}
+
 group("ets_shortKey_package") {
   deps = [
     ":short_key_etc",

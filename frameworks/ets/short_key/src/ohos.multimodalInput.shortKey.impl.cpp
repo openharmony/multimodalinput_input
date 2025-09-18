@@ -15,15 +15,50 @@
 
 #include "ohos.multimodalInput.shortKey.proj.hpp"
 #include "ohos.multimodalInput.shortKey.impl.hpp"
+#include "ohos.multimodalInput.shortKeyFunc.proj.hpp"
+#include "ohos.multimodalInput.shortKeyFunc.impl.hpp"
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
+#include "ani_common.h"
+#include "define_multimodal.h"
+#include "input_manager.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TaiHeShortKeyImpl"
+
 using namespace taihe;
+using namespace OHOS::MMI;
 using namespace ohos::multimodalInput::shortKey;
 
 namespace {
-} // namespace
+constexpr int32_t MAX_DELAY { 4000 };
+constexpr int32_t MIN_DELAY { 0 };
+
+void SetKeyDownDurationAsync(::taihe::string_view businessKey, int32_t delay)
+{
+    if (businessKey.empty()) {
+        MMI_HILOGE("Invalid businessId");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "businessId is invalid");
+    }
+    if (delay < MIN_DELAY || delay > MAX_DELAY) {
+        MMI_HILOGE("Invalid delay");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Delay is invalid");
+    }
+    int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(std::string(businessKey), delay);
+    if (ret == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return;
+    } else if (ret == COMMON_PARAMETER_ERROR) {
+        MMI_HILOGE("Invalid param");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "param is invalid");
+        return;
+    }
+}
+}  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
+TH_EXPORT_CPP_API_SetKeyDownDurationAsync(SetKeyDownDurationAsync);
 // NOLINTEND
