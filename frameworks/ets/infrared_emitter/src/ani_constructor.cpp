@@ -13,8 +13,7 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.shortKey.ani.hpp"
-#include "ohos.multimodalInput.shortKeyFunc.ani.hpp"
+#include "ohos.multimodalInput.infraredEmitter.ani.hpp"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
@@ -22,14 +21,11 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         return ANI_ERROR;
     }
-    if (ANI_OK != ohos::multimodalInput::shortKey::ANIRegister(env)) {
-        std::cerr << "Error from ohos::multimodalInput::shortKey::ANIRegister" << std::endl;
-        return ANI_ERROR;
-    }
-    if (ANI_OK != ohos::multimodalInput::shortKeyFunc::ANIRegister(env)) {
-        std::cerr << "Error from ohos::multimodalInput::shortKeyFunc::ANIRegister" << std::endl;
-        return ANI_ERROR;
+    ani_status status = ANI_OK;
+    if (ANI_OK != ohos::multimodalInput::infraredEmitter::ANIRegister(env)) {
+        std::cerr << "Error from ohos::multimodalInput::infraredEmitter::ANIRegister" << std::endl;
+        status = ANI_ERROR;
     }
     *result = ANI_VERSION_1;
-    return ANI_OK;
+    return status;
 }

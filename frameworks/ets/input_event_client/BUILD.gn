@@ -15,7 +15,10 @@ import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 copy_taihe_idl("input_event_client_taihe") {
   sources = [ "idl/ohos.multimodalInput.inputEventClient.taihe" ]
-  deps = [ "${mmi_path}/frameworks/ets/touch_event:touch_event_taihe" ]
+  deps = [
+    "${mmi_path}/frameworks/ets/touch_event:touch_event_taihe",
+    "${mmi_path}/frameworks/ets/mouse_event:mouse_event_taihe",
+  ]
 }
 config("inputEventClient_config") {
   visibility = [ ":*" ]
@@ -25,6 +28,7 @@ config("inputEventClient_config") {
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/frameworks/ets/input_event_client/include",
   ]
 }
 subsystem_name = "multimodalinput"
@@ -53,6 +57,7 @@ taihe_shared_library("InputEventClient") {
   ]
   deps = [
     ":run_taihe",
+    "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -84,6 +89,14 @@ ohos_prebuilt_etc("input_event_client_etc") {
   subsystem_name = "$subsystem_name"
   deps = [ ":input_event_client" ]
 }
+
+generate_static_abc("input_input_event_client_taihe_test") {
+  base_url = "${mmi_path}/frameworks/ets/input_event_client"
+  files = [ "$base_url/test/test_main.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/input_event_client_test.abc"
+}
+
 group("ets_inputEventClient_package") {
   deps = [
     ":input_event_client_etc",

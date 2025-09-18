@@ -23,7 +23,6 @@
 
 #include "define_multimodal.h"
 #include "input_manager.h"
-#include "ohos.multimodalInput.keyCode.impl.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,7 +39,6 @@ const std::set<int32_t> allowedKeys_ {
     KeyEvent::KEYCODE_VOLUME_UP,
 };
 
-int32_t EtsKeyActionToKeyAction(int32_t action);
 EtsKeyAction KeyActionEtsKeyAction(int32_t action);
 ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem);
 ohos::multimodalInput::keyEvent::Action ConverKeyAction(EtsKeyAction action);

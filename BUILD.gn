@@ -170,6 +170,7 @@ group("input_ets_group") {
   if (input_feature_short_key) {
     deps += [ "frameworks/ets/short_key:ets_shortKey_package" ]
   }
+  deps += ["frameworks/ets/infrared_emitter:ets_infraredEmitter_package"]
 }
 
 group("mmi_tests") {

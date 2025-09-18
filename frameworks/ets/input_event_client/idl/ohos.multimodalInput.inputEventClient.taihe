@@ -15,10 +15,41 @@
 
 @!namespace("@ohos.multimodalInput.inputEventClient", "inputEventClient")
 from ohos.multimodalInput.touchEvent use TouchEvent;
+from ohos.multimodalInput.mouseEvent use MouseEvent;
 @!sts_inject("""
 static { loadLibrary("InputEventClient.z") }
 """)
 
+struct KeyEvent {
+    isPressed: bool;
+    keyCode: i32;
+    keyDownDuration: i32;
+    isIntercepted: bool;
+}
+
 struct TouchEventData {
     touchEvent: TouchEvent;
 }
+
+struct MouseEventData {
+    mouseEvent: MouseEvent;
+}
+
+struct KeyEventData {
+    keyEvent: KeyEvent;
+}
+
+struct KeyEventInfo {
+    KeyEvent: KeyEvent;
+}
+
+@rename("injectKeyEvent")
+function InjectKeyEventSync(keyEvent: KeyEventData): void;
+@rename("injectEvent")
+function InjectEventSync(keyEvent: KeyEventInfo): void;
+@rename("injectMouseEvent")
+function InjectMouseEventSync(mouseEvent: MouseEventData): void;
+@rename("injectTouchEvent")
+function InjectTouchEventSync(touchEvent: TouchEventData): void;
+@rename("permitInjection")
+function PermitInjectionSync(result: bool): void;

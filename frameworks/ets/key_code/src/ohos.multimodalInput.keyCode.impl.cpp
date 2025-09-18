@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.keyCode.impl.h"
 
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "ohos.multimodalInput.keyCode.impl"
+#include "ohos.multimodalInput.keyCode.proj.hpp"
+#include "ohos.multimodalInput.keyCode.impl.hpp"
+#include "ohos.multimodalInput.keyCode.impl.h"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
 namespace OHOS {
 namespace MMI {
-
-const static std::map<int32_t, KeyCode> KEY_CODE_TRANSFORMATION = {
+const std::map<int32_t, KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_FN_ETS,                        KeyCode::key_t::KEYCODE_FN },
     { KEYCODE_UNKNOWN_ETS,                   KeyCode::key_t::KEYCODE_UNKNOWN },
     { KEYCODE_HOME_ETS,                      KeyCode::key_t::KEYCODE_HOME },
@@ -370,14 +371,23 @@ const static std::map<int32_t, KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_DAGGER_LONG_PRESS_ETS,         KeyCode::key_t::KEYCODE_DAGGER_LONG_PRESS }
 };
 
-KeyCode ConvertEtsKeyCode(int32_t keyCode)
+KeyCode TaiheKeyCodeConverter::ConvertEtsKeyCode(int32_t keyCode)
 {
     auto iter = KEY_CODE_TRANSFORMATION.find(keyCode);
     if (iter == KEY_CODE_TRANSFORMATION.end()) {
-        MMI_HILOGE("Find failed, keyCode:%{public}d", keyCode);
         return KeyCode::key_t::KEYCODE_UNKNOWN;
     }
     return iter->second;
+}
+
+KeyCodeEts TaiheKeyCodeConverter::GetKeyCodeByValue(const std::map<int32_t, KeyCode>& map, KeyCode code)
+{
+    for (const auto& [key, val] : map) {
+        if (val == code) {
+            return static_cast<KeyCodeEts>(key);
+        }
+    }
+    return KEYCODE_UNKNOWN_ETS;
 }
 
 } // namespace MMI
