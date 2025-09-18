@@ -15,11 +15,13 @@ import("//build/ohos/taihe_idl/taihe.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 copy_taihe_idl("pointer_taihe") {
   sources = [ "idl/ohos.multimodalInput.pointer.taihe" ]
+  deps = [ "${mmi_path}/frameworks/ets/key_code:key_code_taihe" ]
 }
 config("pointer_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "${mmi_path}/frameworks/ets/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -49,10 +51,14 @@ taihe_shared_library("Pointer") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image_taihe",
+    "image_framework:image_native",
   ]
   sources += [
     "src/ani_constructor.cpp",
     "src/ohos.multimodalInput.pointer.impl.cpp",
+    "src/taihe_pointer_utils.cpp",
+    "${mmi_path}/frameworks/ets/common/src/ani_common.cpp"
   ]
   deps = [
     ":run_taihe",
@@ -83,6 +89,15 @@ ohos_prebuilt_etc("pointer_etc") {
   subsystem_name = "$subsystem_name"
   deps = [ ":pointer" ]
 }
+
+generate_static_abc("input_pointer_taihe_test") {
+  base_url = "${mmi_path}/frameworks/ets/pointer"
+  files = [ "$base_url/test/test_main.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/pointer_test.abc"
+}
+
+
 group("ets_pointer_package") {
   deps = [
     ":pointer_etc",
