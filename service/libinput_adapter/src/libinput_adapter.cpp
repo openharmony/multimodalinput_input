@@ -22,6 +22,7 @@
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "key_event_normalize.h"
+#include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 #include "key_event_value_transformation.h"
 #include "timer_manager.h"
@@ -969,9 +970,11 @@ void LibinputAdapter::OnEventHandler()
     libinput_event *event = nullptr;
     int64_t frameTime = GetSysClockTime();
     while ((event = libinput_get_event(input_))) {
+        libinput_event_type eventType = libinput_event_get_type(event);
+        std::string msg = "OnEventHandler, eventType is: " + std::to_string(eventType);
+        BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         foldingAreaToast_.FoldingAreaProcess(event);
-        libinput_event_type eventType = libinput_event_get_type(event);
 
         // confirm boot completed msg in case of mmi restart.
         UpdateBootFlag();
@@ -1011,6 +1014,7 @@ void LibinputAdapter::OnEventHandler()
         funInputEvent_(event, frameTime);
         libinput_event_destroy(event);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+        BytraceAdapter::MMIServiceTraceStop();
     }
     if (event == nullptr) {
         funInputEvent_(nullptr, 0);

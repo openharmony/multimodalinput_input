@@ -14,6 +14,7 @@
  */
 
 #include "timer_manager.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TimerManager"
@@ -212,20 +213,25 @@ void TimerManager::ProcessTimersInternal()
             break;
         }
         auto curTimer = std::move(*it);
+        std::string msg = "StartTimer, Name is: " + curTimer->name;
+        BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
         CrashObjDumper dumper((curTimer->name).c_str());
         timers_.erase(it);
         ++curTimer->callbackCount;
         if ((curTimer->repeatCount >= 1) && (curTimer->callbackCount >= curTimer->repeatCount)) {
             curTimer->callback();
+            BytraceAdapter::MMIServiceTraceStop();
             continue;
         }
         if (!AddInt64(curTimer->nextCallTime, curTimer->intervalMs, curTimer->nextCallTime)) {
             MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+            BytraceAdapter::MMIServiceTraceStop();
             return;
         }
         auto callback = curTimer->callback;
         InsertTimerInternal(curTimer);
         callback();
+        BytraceAdapter::MMIServiceTraceStop();
     }
 }
 } // namespace MMI

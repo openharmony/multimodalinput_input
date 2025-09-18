@@ -30,6 +30,7 @@
 #include "special_input_device_parser.h"
 #include "product_name_definition_parser.h"
 #include "json_parser.h"
+#include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
@@ -4694,12 +4695,16 @@ ErrCode MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
+
+    std::string msg = "Epoll_event_input, event type is: " + flag;
+    BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, THREAD_BLOCK_TIMER_SPAN_S,
         getpid(), gettid());
     int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, THREAD_BLOCK_TIMER_SPAN_S, printLog, nullptr,
         HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    BytraceAdapter::MMIServiceTraceStop();
 }
 
 void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid)
