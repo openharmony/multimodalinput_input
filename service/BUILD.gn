@@ -4064,6 +4064,48 @@ ohos_unittest("EventLoopClosureCheckerTest") {
   ]
 }
 
+ohos_unittest("EventExpirationCheckerTest") {
+  module_out_path = module_output_path
+ 
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+  ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [ "-Wno-string-conversion" ]
+ 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+ 
+  include_dirs = [
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/test/facility/mock/include",
+    "${mmi_path}/util/common/include",
+  ]
+ 
+  sources = [ "event_hook/test/event_expiration_checker_test.cpp" ]
+ 
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+ 
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "hilog:libhilog"
+  ]
+}
+
 group("mmi-service-tests") {
   testonly = true
   deps = [ "libinput_adapter/test" ]
