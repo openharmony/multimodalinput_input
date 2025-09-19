@@ -22,6 +22,7 @@
 #include "ohos.multimodalInput.pointer.impl.hpp"
 #include "stdexcept"
 #include "taihe/runtime.hpp"
+#include "ani_common.h"
 
 #include <map>
 
@@ -71,20 +72,5 @@ enum PointerStyleCode {
     LOADING_IMPL,
     RUNNING_IMPL,
     MIDDLE_BTN_EAST_WEST_IMPL
-};
-
-enum EtsErrorCode : int32_t {
-    OTHER_ERROR = -1,
-    COMMON_PERMISSION_CHECK_ERROR = 201,
-    COMMON_PARAMETER_ERROR = 401,
-    COMMON_USE_SYSAPI_ERROR = 202,
-    INPUT_DEVICE_NOT_SUPPORTED = 801,
-    INPUT_OCCUPIED_BY_SYSTEM = 4200002,
-    INPUT_OCCUPIED_BY_OTHER = 4200003,
-    PRE_KEY_NOT_SUPPORTED = 4100001,
-    COMMON_DEVICE_NOT_EXIST = 3900001,
-    COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
-    COMMON_NON_INPUT_APPLICATION = 3900003,
-    ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
 };
 #endif // OHOS_MULTIMODALINPUT_POINTER_IMPL_H
