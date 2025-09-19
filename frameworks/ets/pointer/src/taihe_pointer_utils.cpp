@@ -27,14 +27,16 @@ CustomCursor TaihePointerUtils::ConverterToCustomCursor(const ohos::multimodalIn
 {
     CustomCursor cursor;
     ani_env *env = taihe::get_env();
-    CHKPR(env, cursor);
+    if (env == nullptr) {
+        MMI_HILOGE("env is null");
+        return cursor;
+    }
     ani_object obj = reinterpret_cast<ani_object>(value.pixelMap);
     ani_ref pixelMapAni;
     if (ANI_OK != env->GlobalReference_Create(obj, &pixelMapAni)) {
         MMI_HILOGE("get pixelMap failed.");
         return cursor;
     }
-
     auto pixelMap = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(env,
         reinterpret_cast<ani_object>(pixelMapAni));
     if (pixelMap == nullptr) {
