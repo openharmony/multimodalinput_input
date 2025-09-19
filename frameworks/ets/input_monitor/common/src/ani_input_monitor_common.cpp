@@ -573,9 +573,10 @@ int32_t TaiheMonitorConverter::TaiheKeyEventKeyToTaihe(const KeyEvent::KeyItem &
     return ret;
 }
 
-int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent>& pointerEvent,
+int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent> pointerEvent,
     const PointerEvent::PointerItem& item, TaiheMouseEvent &mouseEvent)
 {
+    CHKPR(pointerEvent, RET_ERR);
     int32_t ret = RET_OK;
     int32_t buttonId = pointerEvent->GetButtonId();
     if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
@@ -604,6 +605,7 @@ int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent>& p
 
 int32_t TaiheMonitorConverter::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, TaiheAxisValue& value)
 {
+    CHKPR(pointerEvent, RET_ERR);
     double axisValue = -1.0;
     int32_t axis = -1;
     if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
@@ -618,16 +620,15 @@ int32_t TaiheMonitorConverter::GetAxesValue(const std::shared_ptr<PointerEvent> 
         axisValue = pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH);
         axis = AXIS_TYPE_PINCH;
     }
-
     value.axis = TaiheAxis::key_t(axis) ;
     value.value = axisValue;
-
     return RET_OK;
 }
 
 int32_t TaiheMonitorConverter::GetMousePointerItem(
     std::shared_ptr<PointerEvent> pointerEvent, TaiheMouseEvent &mouseEvent)
 {
+    CHKPR(pointerEvent, RET_ERR);
     int32_t ret = RET_OK;
     int32_t currentPointerId = pointerEvent->GetPointerId();
     std::vector<TaiheAxisValue> axisValueVec;
@@ -723,6 +724,7 @@ int32_t TaiheMonitorConverter::MouseActionToTaihe(int32_t action, TaiheMouseActi
 
 int32_t TaiheMonitorConverter::MouseEventToTaihe(std::shared_ptr<PointerEvent> pointerEvent, TaiheMouseEvent &out)
 {
+    CHKPR(pointerEvent, RET_ERR);
     int32_t ret = MouseActionToTaihe(pointerEvent->GetPointerAction(), out.action);
     if (ret != RET_OK) {
         return ret;
@@ -764,6 +766,8 @@ int32_t TaiheMonitorConverter::MouseEventToTaihe(std::shared_ptr<PointerEvent> p
 bool TaiheMonitorConverter::GetIntObject(ani_env* env, const char* propertyName,
     ani_object object, int32_t& result)
 {
+    CHKPR(env, false);
+    CHKPR(propertyName, false);
     ani_long value;
     ani_status ret = env->Object_GetPropertyByName_Long(object, propertyName, &value);
     if (ret != ANI_OK) {
