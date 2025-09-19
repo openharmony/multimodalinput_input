@@ -32,11 +32,13 @@ void KeyEvent3FuzzTest(const uint8_t *data, size_t size)
     KeyEvent::Clone(nullptr);
 
     FuzzedDataProvider provider(data, size);
+    int32_t eventType = provider.ConsumeIntegral<int32_t>();
+    KeyEvent keyEvent(eventType);
 
     int32_t action = provider.ConsumeIntegral<int32_t>();
     keyEvent.ActionToString(action);
 
-    keyCode = provider.ConsumeIntegral<int32_t>();
+    int32_t keyCode = provider.ConsumeIntegral<int32_t>();
     keyEvent.KeyCodeToString(keyCode);
 
     bool fourceMonitorFlag = provider.ConsumeBool();
