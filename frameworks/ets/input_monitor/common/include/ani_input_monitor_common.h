@@ -134,7 +134,7 @@ public:
     static bool ParseRects(ani_object aniRects, std::vector<Rect> &rects, int32_t maxNum);
 private:
     static int32_t GetMousePointerItem(std::shared_ptr<PointerEvent> pointerEvent, TaiheMouseEvent &mouseEvent);
-    static int32_t SetMouseProperty(std::shared_ptr<PointerEvent>& pointerEvent,
+    static int32_t SetMouseProperty(std::shared_ptr<PointerEvent> pointerEvent,
         const PointerEvent::PointerItem& item, TaiheMouseEvent &mouseEvent);
     static int32_t GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, TaiheAxisValue& value);
     static int32_t GetPressedKey(const std::vector<int32_t>& pressedKeys, TaiheMouseEvent &mouseEvent);

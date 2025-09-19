@@ -18,6 +18,10 @@
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     ani_env *env;
+    if (vm == nullptr) {
+        std::cerr << "vm is nullptr" << std::endl;
+        return ANI_ERROR;
+    }
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         return ANI_ERROR;
     }
@@ -25,6 +29,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     if (ANI_OK != ohos::multimodalInput::infraredEmitter::ANIRegister(env)) {
         std::cerr << "Error from ohos::multimodalInput::infraredEmitter::ANIRegister" << std::endl;
         status = ANI_ERROR;
+    }
+    if (result == nullptr) {
+        std::cerr << "result is nullptr" << std::endl;
+        return ANI_ERROR;
     }
     *result = ANI_VERSION_1;
     return status;

@@ -52,12 +52,12 @@ static TaiheInfraredFrequency InfraredFrequencyToAni(OHOS::MMI::InfraredFrequenc
 void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
-    int32_t size = static_cast<int32_t>(pattern.size());
+    size_t size = pattern.size();
     std::vector<int64_t> vecPattern(pattern.begin(), pattern.end());
 
     std::string context = "infraredFrequency:" +
         std::to_string(infraredFrequency) + "\n;" + "; size=" + std::to_string(size) + ";";
-    for (int32_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
     }
     MMI_HILOGD("ohos.multimodalInput.infraredEmitter.TransmitInfrared para size:%{public}s", context.c_str());
