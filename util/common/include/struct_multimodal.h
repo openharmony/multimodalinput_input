@@ -38,11 +38,6 @@ enum KNUCKLE_DOUBLE_CLICK_EVENT_TYPE {
     KNUCKLE_2F_DOUBLE_CLICK,
 };
 
-enum SENIOR_DEVICE_TYPE {
-    INPUT_DEVICE_AISENSOR = 31,
-    INPUT_DEVICE_KNUCKLE = 41
-};
-
 enum DEVICE_TYPE {
     DEVICE_TYPE_UNKNOWN = -1,
     DEVICE_TYPE_TOUCH_PANEL = 0,
@@ -224,11 +219,6 @@ struct TagPackHead {
     int32_t sizeEvent[1];
 };
 #pragma pack()
-
-struct SeniorDeviceInfo {
-    char physical[MAX_DEVICENAME];
-    enum SENIOR_DEVICE_TYPE seniorDeviceType;
-};
 
 struct EventJoyStickAxisAbsInfo {
     int32_t code;

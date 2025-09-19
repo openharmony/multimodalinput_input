@@ -32,6 +32,7 @@ enum KeyShortcutError : int32_t {
 
 class KeyShortcutManager final {
 public:
+    static inline constexpr uint32_t SHORTCUT_MODIFIER_NONE { 0U };
     static inline constexpr uint32_t SHORTCUT_MODIFIER_ALT { 0x1 };
     static inline constexpr uint32_t SHORTCUT_MODIFIER_SHIFT { SHORTCUT_MODIFIER_ALT << 1U };
     static inline constexpr uint32_t SHORTCUT_MODIFIER_CTRL { SHORTCUT_MODIFIER_ALT << 2U };
@@ -85,6 +86,7 @@ public:
 
     static std::shared_ptr<KeyShortcutManager> GetInstance();
     static bool IsModifier(int32_t keyCode);
+    static uint32_t Key2Modifier(int32_t keyCode);
 
 private:
     struct SystemKey {
