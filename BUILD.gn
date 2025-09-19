@@ -171,6 +171,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerStyleTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "frameworks/proxy/event_handler/test:InputActiveSubscribeManagerTest",
+    "frameworks/proxy/events/test:FrameworkEventTests",
     "libudev:test",
     "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",
@@ -261,10 +262,6 @@ group("mmi_tests") {
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
-  }
-
-  if (input_ext_feature_anco) {
-    deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
 
   if (input_feature_touch_drawing) {
