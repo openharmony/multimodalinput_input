@@ -3468,6 +3468,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_002, T
     DisplayGroupInfo info;
     uint32_t num = 1;
     pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
+    uint32_t groupNum = 0;
+    uint32_t windowsNum = 0;
+    pkt << groupNum << windowsNum;
     EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_OK);
 }
 
@@ -3488,7 +3491,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_003, T
     uint32_t num = 1;
     pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_OK);
+    EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_ERR);
 }
 
 /**
@@ -3600,12 +3603,13 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_003, TestSiz
     NetPacket pkt(idMsg);
     WindowInfo info;
     uint32_t num = 1;
+    uint32_t windowsNum = 0;
     int32_t byteCount = 0;
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
-    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount
+        << windowsNum << info.rectChangeBySystem;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_OK);
 }
 
