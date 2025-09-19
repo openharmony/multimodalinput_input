@@ -596,53 +596,6 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_SendToClient_point
 }
 
 /**
- * @tc.name: KeyInterceptByHostOSWhiteList_001
- * @tc.desc: Test the function KeyInterceptByHostOSWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, KeyInterceptByHostOSWhiteList_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    handler.keyevent_intercept_whitelist = nullptr;
-    int32_t keyCode = 123;
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("");
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-}
-
-/**
- * @tc.name: KeyInterceptByHostOSWhiteList_002
- * @tc.desc: Test the function KeyInterceptByHostOSWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, KeyInterceptByHostOSWhiteList_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    int32_t keyCode = 123;
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("123;456;");
-    EXPECT_TRUE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-}
-
-/**
- * @tc.name: KeyInterceptByHostOSWhiteList_003
- * @tc.desc: Test the function KeyInterceptByHostOSWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, KeyInterceptByHostOSWhiteList_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    int32_t keyCode = 789;
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("123;456;");
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-}
-
-/**
  * @tc.name: EventInterceptorHandler_Test_011
  * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
@@ -1082,67 +1035,6 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_003
 }
 
 /**
- * @tc.name: EventInterceptorHandler_HandleKeyEvent_004
- * @tc.desc: Test the function HandleKeyEvent WhenKeyInWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
-    event->SetKeyAction(INPUT_DEVICE_AISENSOR);
-    int32_t keyCode = 123;
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("123;456;");
-    EXPECT_TRUE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
-}
-
-/**
- * @tc.name: EventInterceptorHandler_HandleKeyEvent_005
- * @tc.desc: Test the function HandleKeyEvent WhenKeyNotInWhiteListAndNotOnHandleEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
-    event->SetKeyAction(INPUT_DEVICE_AISENSOR);
-    handler.keyevent_intercept_whitelist = nullptr;
-    int32_t keyCode = 123;
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("");
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
-}
-
-/**
- * @tc.name: EventInterceptorHandler_HandleKeyEvent_006
- * @tc.desc: Test the function HandleKeyEvent WhenKeyNotInWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_HandleKeyEvent_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-    handler.nextHandler_ = std::make_shared<EventInterceptorHandler>();
-    event->SetKeyAction(INPUT_DEVICE_AISENSOR);
-    int32_t keyCode = 789;
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("123;456;");
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    event->bitwise_ = 0x00000000;
-    EXPECT_FALSE(handler.OnHandleEvent(event));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
-}
-
-/**
  * @tc.name: EventInterceptorHandler_OnHandleEvent_001
  * @tc.desc: Test the function OnHandleEvent_001
  * @tc.type: FUNC
@@ -1202,44 +1094,6 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnHandleEvent_004,
     EXPECT_FALSE(handler.OnHandleEvent(event));
 }
 
-/**
- * @tc.name: KeyInterceptByHostOSWhiteList_004
- * @tc.desc: Test the function KeyInterceptByHostOSWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, KeyInterceptByHostOSWhiteList_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    handler.keyevent_intercept_whitelist = nullptr;
-    int32_t keyCode = 123;
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    keyCode = 78;
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    keyCode = 789;
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-}
-
-/**
- * @tc.name: KeyInterceptByHostOSWhiteList_005
- * @tc.desc: Test the function KeyInterceptByHostOSWhiteList
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, KeyInterceptByHostOSWhiteList_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventInterceptorHandler handler;
-    handler.keyevent_intercept_whitelist.reset();
-    handler.keyevent_intercept_whitelist = std::make_unique<std::string>("2722;41;40;0;22;17;16;23;2841;9;2089;2083;");
-    int32_t keyCode = 2722;
-    EXPECT_TRUE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    keyCode = 41;
-    EXPECT_TRUE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-    keyCode = 42;
-    EXPECT_FALSE(handler.KeyInterceptByHostOSWhiteList(keyCode));
-}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 /**

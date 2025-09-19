@@ -388,6 +388,9 @@ ohos_shared_library("libmmi-server") {
   }
   if (input_feature_interceptor) {
     sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
+    if (input_feature_keyboard) {
+      sources += [ "interceptor/src/local_hotkey_handler.cpp" ]
+    }
   }
 
   if (input_feature_touch_drawing) {
