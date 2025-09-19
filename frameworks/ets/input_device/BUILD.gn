@@ -25,6 +25,7 @@ config("inputDevice_config") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/ets/common/include",
+    "${mmi_path}/frameworks/ets/key_code/include"
   ]
 }
 subsystem_name = "multimodalinput"
@@ -49,6 +50,7 @@ taihe_shared_library("InputDevice") {
     ":inputDevice_config",
   ]
   sources += [
+    "${mmi_path}/frameworks/ets/key_code/src/ohos.multimodalInput.keyCode.impl.cpp",
     "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
     "src/ani_constructor.cpp",
     "src/ohos.multimodalInput.inputDevice.impl.cpp",
@@ -88,6 +90,14 @@ ohos_prebuilt_etc("input_device_etc") {
   subsystem_name = "$subsystem_name"
   deps = [ ":input_device" ]
 }
+
+generate_static_abc("input_device_taihe_test") {
+  base_url = "${mmi_path}/frameworks/ets/input_device"
+  files = [ "$base_url/test/test_main.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/input_device_test.abc"
+}
+
 
 group("ets_inputDevice_package") {
   deps = [

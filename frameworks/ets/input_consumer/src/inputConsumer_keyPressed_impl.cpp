@@ -13,56 +13,25 @@
  * limitations under the License.
  */
 
+#include "ani_common.h"
 #include "inputConsumer_keyPressed_impl.h"
+#include "ohos.multimodalInput.keyCode.impl.h"
+
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "inputConsumer_keyPressed_impl"
+#define MMI_LOG_TAG "AniConsumerkeyPressed"
 
 namespace OHOS {
 namespace MMI {
 using namespace ohos::multimodalInput::keyCode;
+using KeyEventAction_t = ::ohos::multimodalInput::keyEvent::Action;
+using KeyCode_t = ohos::multimodalInput::keyCode::KeyCode;
 
 ohos::multimodalInput::keyEvent::KeyEvent TaiheInvalidKeyPressed()
 {
-    return {
-        {
-            0,
-            0,
-            0,
-            0,
-            0
-        },
-        ohos::multimodalInput::keyEvent::Action::key_t::CANCEL,
-        {
-            ohos::multimodalInput::keyCode::KeyCode::key_t::KEYCODE_UNKNOWN,
-            0,
-            0
-        },
-        0,
-        ::taihe::array<ohos::multimodalInput::keyEvent::Key>(nullptr, 0),
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-    };
-}
-
-int32_t EtsKeyActionToKeyAction(int32_t action)
-{
-    static const std::map<int32_t, int32_t> keyActionMap {
-        { EtsKeyAction::ETS_KEY_ACTION_CANCEL, KeyEvent::KEY_ACTION_CANCEL },
-        { EtsKeyAction::ETS_KEY_ACTION_DOWN, KeyEvent::KEY_ACTION_DOWN },
-        { EtsKeyAction::ETS_KEY_ACTION_UP, KeyEvent::KEY_ACTION_UP },
-    };
-    if (auto iter = keyActionMap.find(action); iter != keyActionMap.cend()) {
-        return iter->second;
-    } else {
-        return KeyEvent::KEY_ACTION_UNKNOWN;
-    }
+    return {.action = KeyEventAction_t::key_t::CANCEL,
+            .key = {.code = KeyCode_t::key_t::KEYCODE_UNKNOWN }
+        };
 }
 
 EtsKeyAction KeyActionEtsKeyAction(int32_t action)
@@ -94,7 +63,7 @@ ohos::multimodalInput::keyEvent::Action ConverKeyAction(EtsKeyAction action)
 ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem)
 {
     return {
-        ConvertEtsKeyCode(keyItem.GetKeyCode()),
+        TaiheKeyCodeConverter::ConvertEtsKeyCode(keyItem.GetKeyCode()),
         keyItem.GetDownTime(),
         keyItem.GetDeviceId()
     };
