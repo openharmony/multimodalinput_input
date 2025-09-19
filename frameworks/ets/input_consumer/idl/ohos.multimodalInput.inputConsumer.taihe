@@ -46,6 +46,10 @@ struct InfraredFrequency {
     min: i32;
 }
 
+enum ShieldMode: i32 {
+    FACTORY_MODE = 0
+}
+
 @!sts_inject("""
     function on(type: 'key', keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
         return onKey(keyOptions, callback, callback);
@@ -78,3 +82,9 @@ function onHotkeyChange(hotkeyOptions: HotkeyOptions, f: (info: HotkeyOptions) =
 function offHotkeyChange(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
 function onKeyPressed(options: KeyPressedConfig, f: (info: KeyEvent) => void, opq: Opaque);
 function offKeyPressed(opq: Optional<Opaque>);
+
+function SetShieldStatus(shieldMode: ShieldMode, isShield: bool): void;
+function GetShieldStatus(shieldMode: ShieldMode): bool;
+
+@gen_promise("getAllSystemHotkeys")
+function GetAllSystemHotkeysSync(): Array<HotkeyOptions>;

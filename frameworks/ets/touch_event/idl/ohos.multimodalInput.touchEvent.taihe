@@ -78,4 +78,5 @@ struct TouchEvent {
   touches: Array<Touch>;
   sourceType: SourceType;
   fixedMode: Optional<FixedMode>;
+  isInject: Optional<bool>;
 }
