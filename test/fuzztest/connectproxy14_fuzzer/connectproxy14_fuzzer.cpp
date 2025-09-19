@@ -30,28 +30,6 @@ void GetMaxMultiTouchPointNumFuzz(FuzzedDataProvider &fdp)
     MULTIMODAL_INPUT_CONNECT_MGR->GetMaxMultiTouchPointNum(pointNum);
 }
 
-void SetInputDeviceConsumerFuzz(FuzzedDataProvider &fdp)
-{
-    std::vector<std::string> deviceNames = {
-        fdp.ConsumeRandomLengthString(),
-        fdp.ConsumeRandomLengthString(),
-        fdp.ConsumeRandomLengthString(),
-        fdp.ConsumeRandomLengthString()
-    };
-    MULTIMODAL_INPUT_CONNECT_MGR->SetInputDeviceConsumer(deviceNames);
-}
-
-void ClearInputDeviceConsumerFuzz(FuzzedDataProvider &fdp)
-{
-    std::vector<std::string> deviceNames = {
-        fdp.ConsumeRandomLengthString(),
-        fdp.ConsumeRandomLengthString(),
-        fdp.ConsumeRandomLengthString(),
-        fdp.ConsumeRandomLengthString()
-    };
-    MULTIMODAL_INPUT_CONNECT_MGR->ClearInputDeviceConsumer(deviceNames);
-}
-
 void SubscribeInputActiveFuzz(FuzzedDataProvider &fdp)
 {
     int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
@@ -69,8 +47,6 @@ void ConnectProxy14FuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);
     GetMaxMultiTouchPointNumFuzz(fdp);
-    SetInputDeviceConsumerFuzz(fdp);
-    ClearInputDeviceConsumerFuzz(fdp);
     SubscribeInputActiveFuzz(fdp);
     UnsubscribeInputActiveFuzz(fdp);
 }
