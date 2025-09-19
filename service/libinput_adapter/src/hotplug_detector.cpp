@@ -19,6 +19,7 @@
 #include <sys/inotify.h>
 
 #include "dfx_hisysevent_device.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -116,7 +117,9 @@ void HotplugDetector::OnEvent() const
         return;
     }
     std::byte event_buf[MAX_EVENT_BUF_SIZE];
+    BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, "HotplugDetector::OnEvent read");
     int32_t res = read(inotifyFd_, event_buf, sizeof(event_buf));
+    BytraceAdapter::MMIServiceTraceStop();
     if (res < EVSIZE) {
         auto err = SystemError();
         auto errMsg = err.message();
@@ -133,12 +136,16 @@ void HotplugDetector::OnEvent() const
     for (int32_t pos = 0; res > EVSIZE;) {
         std::copy_n(event_buf + pos, sizeof(event), reinterpret_cast<std::byte*>(&event));
         if (event.len != 0) {
+            std::string msg = "HotplugDetector: "
+                + (event.mask & IN_CREATE ? std::string("add") : std::string("remove"));
+            BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
             auto path = INPUT_DEVICES_PATH + std::string{reinterpret_cast<char*>(event_buf + pos + sizeof(event))};
             if (event.mask & IN_CREATE) {
                 addFunc_(path);
             } else {
                 removeFunc_(path);
             }
+            BytraceAdapter::MMIServiceTraceStop();
         }
         int32_t consumed = EVSIZE + event.len;
         pos += consumed;
