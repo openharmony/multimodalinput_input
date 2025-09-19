@@ -42,6 +42,14 @@ public:
         STOP_EVENT = 3
     };
 
+    enum MMIThreadLoopDepth {
+        MMI_THREAD_LOOP_DEPTH_ZERO = 0,
+        MMI_THREAD_LOOP_DEPTH_ONE = 1,
+        MMI_THREAD_LOOP_DEPTH_TWO = 2,
+        MMI_THREAD_LOOP_DEPTH_THREE = 3,
+        MMI_THREAD_LOOP_DEPTH_FOUR = 4
+    };
+
     static void StartBytrace(std::shared_ptr<KeyEvent> keyEvent);
     static void StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType);
     static void StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn);
@@ -113,6 +121,9 @@ public:
 
     static void StartHardPointerMove(uint32_t width, uint32_t height, uint32_t bufferId, uint32_t screenId);
     static void StopHardPointerMove();
+
+    static void MMIServiceTraceStart(int32_t type, const std::string& msg);
+    static void MMIServiceTraceStop();
 
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
