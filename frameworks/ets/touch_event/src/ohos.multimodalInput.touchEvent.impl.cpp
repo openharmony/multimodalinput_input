@@ -1,10 +1,10 @@
- /*
+/*
  * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,20 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef ANI_MULTI_MODAL_INPUT_POINTER_H
-#define ANI_MULTI_MODAL_INPUT_POINTER_H
+#include "ohos.multimodalInput.touchEvent.proj.hpp"
+#include "ohos.multimodalInput.touchEvent.impl.hpp"
+#include "taihe/runtime.hpp"
+#include "stdexcept"
 
-#include <ani.h>
-#include <array>
-#include <list>
-#include <map>
-#include <set>
-#include <string>
+using namespace taihe;
+using namespace ohos::multimodalInput::touchEvent;
 
-#define SUCCESS_CODE 0
-#define ERROR_CODE (-1)
-#define UNREGISTERED_CODE (-2)
-#define PRE_KEY_MAX_COUNT 4
+namespace {
+} // namespace
 
-
-#endif // ANI_MULTI_MODAL_INPUT_POINTER_H
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+// NOLINTEND

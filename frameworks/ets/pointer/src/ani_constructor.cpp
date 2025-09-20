@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,26 +13,18 @@
  * limitations under the License.
  */
 
-#include "ani_input_device_manager.h"
+#include "ohos.multimodalInput.pointer.ani.hpp"
 
-#include "input_device_impl.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "AniInputDeviceManager"
-
-namespace OHOS {
-namespace MMI {
-
-void AniInputDeviceManager::RegisterDevListener(ani_env *env, const std::string &type, ani_object handle)
+ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
-    CALL_DEBUG_ENTER;
-    AddListener(env, type, handle);
+    ani_env *env;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        return ANI_ERROR;
+    }
+    if (ANI_OK != ohos::multimodalInput::pointer::ANIRegister(env)) {
+        std::cerr << "Error from ohos::multimodalInput::pointer::ANIRegister" << std::endl;
+        return ANI_ERROR;
+    }
+    *result = ANI_VERSION_1;
+    return ANI_OK;
 }
-
-void AniInputDeviceManager::ResetEnv()
-{
-    CALL_DEBUG_ENTER;
-    AniEventTarget::ResetEnv();
-}
-} // namespace MMI
-} // namespace OHOS
