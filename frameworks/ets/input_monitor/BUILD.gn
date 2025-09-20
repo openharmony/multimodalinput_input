@@ -18,15 +18,24 @@ copy_taihe_idl("input_monitor_taihe") {
   deps = [
     "${mmi_path}/frameworks/ets/mouse_event:mouse_event_taihe",
     "${mmi_path}/frameworks/ets/touch_event:touch_event_taihe",
+    "${mmi_path}/frameworks/ets/short_key:short_key_taihe",
+    "${mmi_path}/frameworks/ets/key_code:key_code_taihe",
+    "${mmi_path}/frameworks/ets/input_event:input_event_taihe",
+    "${mmi_path}/frameworks/ets/gesture_event:gesture_event_taihe",
+    "${mmi_path}/frameworks/ets/key_event:key_event_taihe",
   ]
 }
 config("inputMonitor_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/service/permission_helper/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/frameworks/ets/common/include",
+    "${mmi_path}/frameworks/ets/input_monitor/include",
+    "${mmi_path}/frameworks/ets/key_code/include"
   ]
 }
 subsystem_name = "multimodalinput"
@@ -49,18 +58,25 @@ taihe_shared_library("InputMonitor") {
     "${mmi_path}:coverage_flags",
     ":inputMonitor_config",
   ]
+
   sources += [
+    "${mmi_path}/frameworks/ets/key_code/src/ohos.multimodalInput.keyCode.impl.cpp",
+    "common/src/ani_input_monitor_common.cpp",
+    "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
     "src/ani_constructor.cpp",
+    "src/ani_input_monitor_consumer.cpp",
+    "src/ani_input_monitor_manager.cpp",
     "src/ohos.multimodalInput.inputMonitor.impl.cpp",
   ]
   deps = [
     ":run_taihe",
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:libmmi-util"
   ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "libuv:uv",
   ]
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -86,6 +102,17 @@ ohos_prebuilt_etc("input_monitor_etc") {
   subsystem_name = "$subsystem_name"
   deps = [ ":input_monitor" ]
 }
+
+
+generate_static_abc("input_monitor_taihe_test") {
+  base_url = "${mmi_path}/frameworks/ets/input_monitor"
+  files = [ "$base_url/test/test_main.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/input_monitor_test.abc"
+}
+
+
+
 group("ets_inputMonitor_package") {
   deps = [
     ":input_monitor_etc",

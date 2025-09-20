@@ -103,7 +103,8 @@
         "ipc",
         "sensor",
         "idl_tool",
-        "runtime_core"
+        "runtime_core",
+        "libuv"
       ],
       "third_party": [
         "libuv",
