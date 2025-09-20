@@ -99,7 +99,7 @@ std::map<std::string, int32_t> TO_HANDLE_PRE_EVENT_TYPE = {
 }
 
 struct MonitorInfo {
-    int32_t monitorId_ { -1 };
+    int32_t monitorId { -1 };
 };
 
 void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
