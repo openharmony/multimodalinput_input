@@ -16,6 +16,29 @@
 @!namespace("@ohos.multimodalInput.inputMonitor", "inputMonitor")
 from ohos.multimodalInput.touchEvent use TouchEvent;
 from ohos.multimodalInput.mouseEvent use MouseEvent;
+from ohos.multimodalInput.gestureEvent use Rotate, Pinch, ThreeFingersSwipe, FourFingersSwipe, SwipeInward;
+from ohos.multimodalInput.gestureEvent use ThreeFingersTap, TouchGestureEvent;
+from ohos.multimodalInput.shortKey use FingerprintEvent;
+from ohos.multimodalInput.keyEvent use KeyEvent;
+from ohos.multimodalInput.keyCode use KeyCode;
+
+@!sts_inject_into_module("
+    import { TouchEvent } from './@ohos.multimodalInput.touchEvent';
+    import { MouseEvent } from './@ohos.multimodalInput.mouseEvent';
+    import { Rotate } from './@ohos.multimodalInput.gestureEvent';
+    import { Pinch } from './@ohos.multimodalInput.gestureEvent';
+    import { ThreeFingersSwipe } from './@ohos.multimodalInput.gestureEvent';
+    import { FourFingersSwipe } from './@ohos.multimodalInput.gestureEvent';
+    import { SwipeInward } from './@ohos.multimodalInput.gestureEvent';
+    import { ThreeFingersTap } from './@ohos.multimodalInput.gestureEvent';
+    import { TouchGestureEvent } from './@ohos.multimodalInput.gestureEvent';
+    import { ThreeFingersTap  } from './@ohos.multimodalInput.gestureEvent';
+    import { KeyEvent } from './@ohos.multimodalInput.keyEvent';
+    import { KeyCode } from './@ohos.multimodalInput.keyCode';
+    import  { FingerprintEvent } from './@ohos.multimodalInput.shortKey';
+    import display from '@ohos.display';
+")
+
 @!sts_inject("""
 static { loadLibrary("InputMonitor.z") }
 """)
@@ -23,3 +46,136 @@ static { loadLibrary("InputMonitor.z") }
 struct TouchEventReceiver {
     filter: (touchEvent: TouchEvent) => bool;
 }
+
+
+@gen_promise("queryTouchEvents")
+function QueryTouchEventsSync(count: i32) : Array<TouchEvent>;
+
+@!sts_inject("""
+    /*function on(type: 'touch', receiver: TouchEventReceiver): void {
+        return  onTouch(receiver.filter, receiver.filter);
+    }*/
+    type HandleVoid = (arg_0: Object) => void;
+    type HandleBool = (arg_0: Object) => boolean;
+    type HandleAll = HandleVoid | HandleBool;
+    function on(type: string, receiver: HandleAll): void {
+        switch(type) {
+            case 'touch': return onTouch(receiver as (info: TouchEvent) => boolean, receiver);
+            case 'mouse': return onMouse(receiver as (info: MouseEvent) => void, receiver);
+            case 'pinch': return onPinch(receiver as (info: Pinch) => void, receiver);
+            case 'threeFingersSwipe': return onThreeFingersSwipe(receiver as (info: ThreeFingersSwipe) => void , receiver);
+            case 'fourFingersSwipe': return onFourFingersSwipe(receiver as (info: FourFingersSwipe) => void, receiver);
+            case 'threeFingersTap': return onThreeFingersTap(receiver as (info: ThreeFingersTap) => void, receiver);
+            case 'fingerprint': return onFingerprint(receiver as (info: FingerprintEvent) => void, receiver);
+            case 'swipeInward': return onSwipeInward(receiver as (info: SwipeInward) => void, receiver);
+            default: throw new Error(`Unknown type: ${type}`);
+        }
+    }
+
+    function on(type: string, fingers: int, receiver: (arg_0: Object) => void): void {
+        switch(type) {
+            case 'pinch' : return onPinchByNumber(fingers, receiver as (info: Pinch) => void, receiver);
+            case 'rotate':  return onRotateByNumber(fingers, receiver as (info: Rotate) => void, receiver);
+            case 'touchscreenSwipe': return onTouchscreenSwipeByNumber(fingers, receiver as (info: TouchGestureEvent) => void, receiver);
+            case 'touchscreenPinch': return onTouchscreenPinch(fingers, receiver as (info: TouchGestureEvent) => void, receiver);
+            default: throw new Error(`Unknown type: ${type}`);
+        }
+    }
+
+    function on(type: string, arr: Array<KeyCode>|Array<display.Rect>, receiver: (arg_0: Object) => void):void {
+        switch(type) {
+           case 'mouse' : return onMouseForDisplayRect(arr as Array<display.Rect>, receiver as (arg_0: MouseEvent) => void, receiver);
+           case 'keyPressed':  return onKeyPressed(arr as Array<KeyCode>, receiver as (arg_0: KeyEvent) => void, receiver);
+           default: throw new Error(`Unknown type: ${type}`);
+        }
+    }
+    /*
+    function off(type: 'touch', receiver?: TouchEventReceiver): void {
+        if (receiver) {
+            offTouch(receiver.filter);
+        } else {
+            offTouch(undefined);
+        }
+    }*/
+
+    function off(type: string, receiver?: HandleAll): void {
+        switch(type) {
+            case 'touch': offTouch(receiver as (((info: TouchEvent) => boolean) | undefined));
+            case 'mouse': offMouse(receiver as (((info: MouseEvent) => void) | undefined));
+            case 'pinch': return offPinch(receiver as (((info: Pinch) => void) | undefined));
+            case 'threeFingersSwipe': return offThreeFingersSwipe(receiver as (((info: ThreeFingersSwipe) => void) | undefined));
+            case 'fourFingersSwipe': return offFourFingersSwipe(receiver as (((info: FourFingersSwipe) => void) | undefined));
+            case 'threeFingersTap': return offThreeFingersTap(receiver as (((info: ThreeFingersTap) => void) | undefined));
+            case 'fingerprint': return offFingerprint(receiver as (((info: FingerprintEvent) => void) | undefined));
+            case 'swipeInward': return offSwipeInward(receiver as (((info: SwipeInward) => void) | undefined));
+            case 'keyPressed': return offKeyPressed(receiver as (((info: KeyEvent) => void) | undefined));
+            default: throw new Error(`Unknown type: ${type}`);
+        }
+    }
+
+    function off(type: string, fingers: int, receiver?: (arg_0: Object) => void): void {
+        switch(type) {
+            case 'pinch' : return offPinchByNumber(fingers, receiver as (((info: Pinch) => void) | undefined));
+            case 'rotate':  return offRotateByNumber(fingers, receiver as (((info: Rotate) => void) | undefined));
+            case 'touchscreenSwipe': return offTouchscreenSwipe(fingers, receiver as (((info: TouchGestureEvent) => void) | undefined));
+            case 'touchscreenPinch': return offTouchscreenPinch(fingers, receiver as (((info: TouchGestureEvent) => void) | undefined));
+            default: throw new Error(`Unknown type: ${type}`);
+        }
+    }
+""")
+
+function onTouch(receiver: (touchEvent: TouchEvent) => bool, opq: Opaque): void;
+
+function onMouse(receiver: (info: MouseEvent) => void, opq: Opaque): void;
+
+function onMouseForDisplayRect(rect: @sts_type("Array<display.Rect>") Opaque, receiver: (info: MouseEvent) => void, opq: Opaque): void;
+
+function onPinch(receiver: (info: Pinch) => void, opq: Opaque): void;
+
+function onPinchByNumber(fingers: i32, receiver: (info: Pinch) => void, opq: Opaque): void;
+
+function onRotateByNumber(fingers: i32, receiver: (info: Rotate) => void, opq: Opaque): void;
+
+function onThreeFingersSwipe(receiver: (info: ThreeFingersSwipe) => void, opq: Opaque): void;
+
+function onFourFingersSwipe(receiver: (info: FourFingersSwipe) => void, opq: Opaque): void;
+
+function onThreeFingersTap(receiver: (info: ThreeFingersTap) => void, opq: Opaque): void;
+
+function onFingerprint(receiver: (info: FingerprintEvent) => void, opq: Opaque): void;
+
+function onSwipeInward(receiver: (info: SwipeInward) => void, opq: Opaque): void;
+
+function onTouchscreenSwipeByNumber(fingers: i32, receiver: (info: TouchGestureEvent) => void, opq: Opaque): void;
+
+function onTouchscreenPinch(fingers: i32, receiver: (info: TouchGestureEvent) => void, opq: Opaque): void;
+
+function onKeyPressed(keys: Array<KeyCode>, receiver: (info: KeyEvent) => void, opq: Opaque): void;
+
+
+function offTouch(receiver: Optional<Opaque>): void;
+
+function offMouse(receiver: Optional<Opaque>): void;
+
+function offPinch(receiver: Optional<Opaque>): void;
+
+function offPinchByNumber(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offRotateByNumber(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offThreeFingersSwipe(receiver: Optional<Opaque>): void;
+
+function offFourFingersSwipe(receiver: Optional<Opaque>): void;
+
+function offThreeFingersTap(receiver: Optional<Opaque>): void;
+
+function offFingerprint(receiver: Optional<Opaque>): void;
+
+function offSwipeInward(receiver: Optional<Opaque>): void;
+
+function offTouchscreenSwipe(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offTouchscreenPinch(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offKeyPressed(receiver: Optional<Opaque>): void;
+
