@@ -144,7 +144,7 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_RemoveKeyEventHook002,
     KeyEventHookManager::GetInstance().hooks_.push_front(hook);
     EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(hookId);
     result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
-    EXPECT_EQ(result, RET_OK);  
+    EXPECT_EQ(result, RET_OK);
 
     KeyEventHookManager::GetInstance().hooks_.push_front(hook);
     result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
