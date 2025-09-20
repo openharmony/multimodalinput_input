@@ -751,7 +751,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.zOrder >> extensionInfo.pointerChangeAreas >> extensionInfo.transform
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
-            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowNameType;
+            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen
+            >> extensionInfo.windowNameType >> extensionInfo.agentPid;
         CHKRWER(pkt, RET_ERR);
         info.uiExtentionWindowInfo.push_back(extensionInfo);
     }
@@ -873,7 +874,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
-            >> info.windowNameType;
+            >> info.windowNameType >> info.agentPid;
         CHKRWER(pkt, RET_ERR);
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
@@ -1025,7 +1026,7 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
                 >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
                 >> info.windowInputType >> info.privacyMode >> info.windowType
-                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
+                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> info.agentPid >> byteCount;
             CHKRWER(pkt, RET_ERR);
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
@@ -1170,8 +1171,9 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
             numDisplayInfo++;
         }
         for (const auto &itemWindow : item.windowsInfo) {
-            MMI_HILOGD("windows,id:%{public}d,pid:%{public}d,displayId:%{public}d,groupId:%{public}d",
-                itemWindow.id, itemWindow.pid, itemWindow.displayId, itemWindow.groupId);
+            MMI_HILOGD(
+                "windows,id:%{public}d,pid:%{public}d,agentPid:%{public}d,displayId:%{public}d,groupId:%{public}d",
+                itemWindow.id, itemWindow.pid, itemWindow.agentPid, itemWindow.displayId, itemWindow.groupId);
         }
         num++;
     }
