@@ -17,7 +17,6 @@
 #define OHOS_MULTIMODALINPUT_KEY_CODE_IMPL_H
 
 #include "define_multimodal.h"
-#include "input_manager.h"
 #include "ohos.multimodalInput.keyCode.proj.hpp"
 #include "ohos.multimodalInput.keyCode.impl.hpp"
 #include "taihe/runtime.hpp"
