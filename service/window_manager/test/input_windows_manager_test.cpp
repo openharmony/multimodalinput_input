@@ -6615,6 +6615,30 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByDisplayIdAndWi
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_GetAgentPidByDisplayIdAndWindowId
+ * @tc.desc: Test GetAgentPidByDisplayIdAndWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetAgentPidByDisplayIdAndWindowId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t id = 100;
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.agentPid = 150;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(winInfo);
+        it->second.mainDisplayId = 0;
+    }
+    EXPECT_EQ(inputWindowsMgr.GetAgentPidByDisplayIdAndWindowId(0, id), winInfo.agentPid);
+    id = 300;
+    EXPECT_EQ(inputWindowsMgr.GetAgentPidByDisplayIdAndWindowId(0, id), RET_ERR);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SetPixelMapData
  * @tc.desc: Test SetPixelMapData
  * @tc.type: FUNC
@@ -7885,6 +7909,28 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_004, Test
     }
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowAgentPid
+ * @tc.desc: Test if (item.id == windowId)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowAgentPid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t errorWindowId = 105;
+    WindowInfo windowInfo;
+    windowInfo.id = 2;
+    windowInfo.agentPid = 15;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    EXPECT_EQ(inputWindowsManager.GetWindowAgentPid(windowInfo.id), windowInfo.agentPid);
+    EXPECT_EQ(inputWindowsManager.GetWindowAgentPid(errorWindowId), -1);
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

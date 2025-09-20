@@ -1414,6 +1414,34 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByDisplayI
     EXPECT_EQ(inputWindowsManager->GetPidByDisplayIdAndWindowId(0, id), RET_ERR);
 }
 
+/* *
+ * @tc.name: InputWindowsManagerOneTest_GetAgentPidByDisplayIdAndWindowId_001
+ * @tc.desc: Test the funcation GetAgentPidByDisplayIdAndWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetAgentPidByDisplayIdAndWindowId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t id = 0;
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
+    WindowInfo winInfo;
+    winInfo.id = id;
+    windowInfo.uiExtentionWindowInfo.push_back(winInfo);
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.mainDisplayId = 0;
+    }
+    EXPECT_EQ(inputWindowsManager->GetAgentPidByDisplayIdAndWindowId(0, id), windowInfo.agentPid);
+
+    id = -1;
+    EXPECT_EQ(inputWindowsManager->GetAgentPidByDisplayIdAndWindowId(0, id), RET_ERR);
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /* *
  * @tc.name: InputWindowsManagerOneTest_CancelTouch_001
