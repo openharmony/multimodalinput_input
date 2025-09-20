@@ -62,6 +62,7 @@ taihe_shared_library("InputDevice") {
   ]
   external_deps = [
     "c_utils:utils",
+    "ipc:ipc_single",
     "hilog:libhilog",
   ]
   branch_protector_ret = "pac_ret"
