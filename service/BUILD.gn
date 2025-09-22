@@ -2979,6 +2979,8 @@ ohos_unittest("EventDispatchTest") {
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
     "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -2994,15 +2996,30 @@ ohos_unittest("EventDispatchTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_state_manager/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/display_state_manager/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/gesturesense_wrapper/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/service/window_manager/include",
-    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/util/json_parser/include",
     "dfx/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/events/include",
     "${mmi_path}/util/common/include",
+    "${target_gen_dir}",
+    "${target_gen_dir}/connect_manager",
   ]
 
   sources = [
@@ -3017,10 +3034,12 @@ ohos_unittest("EventDispatchTest") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
@@ -3033,9 +3052,14 @@ ohos_unittest("EventDispatchTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
 }
 
 ohos_unittest("LibinputAdapterTest") {
