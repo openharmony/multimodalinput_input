@@ -4468,6 +4468,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
+            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
         pointerStyle = CursorDrawingComponent::GetInstance().GetLastMouseStyle();
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
