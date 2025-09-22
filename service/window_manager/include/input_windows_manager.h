@@ -467,6 +467,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void AddActiveWindow(int32_t windowId, int32_t pointerId);
     void RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void ClearActiveWindow();
+    void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
 private:
     OLD::DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
     int32_t FindDisplayGroupId(int32_t displayId) const;
