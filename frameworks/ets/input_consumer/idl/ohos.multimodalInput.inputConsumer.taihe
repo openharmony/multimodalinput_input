@@ -51,27 +51,27 @@ enum ShieldMode: i32 {
 }
 
 @!sts_inject("""
-    function on(type: 'key', keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
+    function onKey(keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
         return onKey(keyOptions, callback, callback);
     }
-    function off(type: 'key', keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
+    function offKey(keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
         return offKey(keyOptions, callback);
     }
 """)
 @!sts_inject("""
-    function on(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
+    function onHotkeyChange(hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
         return onHotkeyChange(hotkeyOptions, callback, callback);
     }
-    function off(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
+    function offHotkeyChange(hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
         return offHotkeyChange(hotkeyOptions, callback);
     }
 """)
 @!sts_inject("""
-    function on(type: 'keyPressed', options: KeyPressedConfig,
+    function onKeyPressed(options: KeyPressedConfig,
         callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
         return onKeyPressed(options, callback, callback);
     }
-    function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+    function offKeyPressed(callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
         return offKeyPressed(callback);
     }
 """)
