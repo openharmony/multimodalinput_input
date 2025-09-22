@@ -250,6 +250,7 @@ group("mmi_tests") {
     "util:UdsClientTest",
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
+    "util/common:InputEventDataTransformationTest",
   ]
 
   if (input_feature_pointer_drawing) {
