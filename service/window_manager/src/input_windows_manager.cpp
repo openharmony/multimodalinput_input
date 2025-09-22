@@ -701,6 +701,7 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
             if (item.privacyMode == SecureFlag::PRIVACY_MODE) {
                 keyEvent->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
             }
+            UpdateWindowInfoFlag(item.flags, keyEvent);
             return;
         }
     }
@@ -1260,7 +1261,7 @@ void InputWindowsManager::SendBackCenterPointerEevent(const CursorPosition &curs
     pointerBackCenterEvent->UpdatePointerItem(pointerId, item);
     pointerBackCenterEvent->SetTargetWindowId(touchWindow->id);
     pointerBackCenterEvent->SetAgentWindowId(touchWindow->id);
-
+    UpdateWindowInfoFlag(touchWindow->flags, pointerBackCenterEvent);
     if (lastPointerAction == PointerEvent::POINTER_ACTION_MOVE) {
         pointerBackCenterEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     } else if (lastPointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
@@ -2481,6 +2482,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
     pointerEvent->UpdateId();
+    UpdateWindowInfoFlag(lastWindowInfo_.flags, pointerEvent);
     LogTracer lt1(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
@@ -2613,6 +2615,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
     pointerEvent->SetDeviceId(lastPointerEventCopy->GetDeviceId());
+    UpdateWindowInfoFlag(lastWindowInfo_.flags, pointerEvent);
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
         pointerEvent->SetPullId(extraData_.pullId);
@@ -4584,6 +4587,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    UpdateWindowInfoFlag(touchWindow->flags, pointerEvent);
     DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
     double windowX = logicalX - touchWindow->area.x;
     double windowY = logicalY - touchWindow->area.y;
@@ -5358,6 +5362,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     winMap.clear();
+    UpdateWindowInfoFlag(touchWindow->flags, pointerEvent);
     ProcessTouchTracking(pointerEvent, *touchWindow);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         lockWindowInfo_ = *touchWindow;
@@ -5762,6 +5767,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
     pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
+    UpdateWindowInfoFlag(lastTouchWindowInfo_.flags, pointerEvent);
     if (lastTouchEvent_->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     }
@@ -7726,6 +7732,17 @@ void InputWindowsManager::ClearActiveWindow()
 {
     activeTouchWinTypes_.clear();
     MMI_HILOGD("ClearActiveWindow success");
+}
+
+void InputWindowsManager::UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event)
+{
+    CHKPV(event);
+    if ((flag & WindowInfo::FLAG_BIT_DISABLE_USER_ACTION)
+        == WindowInfo::FLAG_BIT_DISABLE_USER_ACTION) {
+        event->AddFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION);
+    } else {
+        event->ClearFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
