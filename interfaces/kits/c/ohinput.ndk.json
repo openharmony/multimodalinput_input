@@ -574,5 +574,49 @@
     {
         "first_introduced": "20",
         "name": "OH_Input_InjectTouchEventGlobal"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_SetPointerVisible"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_GetPointerStyle"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_SetPointerStyle"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CustomCursor_Create"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CustomCursor_Destroy"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CustomCursor_GetPixelMap"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CustomCursor_GetAnchor"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CursorConfig_Create"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CursorConfig_Destroy"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_CursorConfig_IsFollowSystem"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_SetCustomCursor"
     }
 ]
