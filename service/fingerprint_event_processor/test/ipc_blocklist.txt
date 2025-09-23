@@ -14,3 +14,4 @@
 [cfi]
 src:*third_party/googletest/googletest/include/*
 src:*fingerprint_event_processor_test.cpp
+src:*x_key_event_processor_test.cpp
