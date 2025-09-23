@@ -23,6 +23,7 @@
 #include "oh_key_code.h"
 #include "input_manager.h"
 #include "pointer_event.h"
+#include "image/pixelmap_native.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -4057,6 +4058,137 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_0
     CALL_TEST_DEBUG;
     Input_Result ret = OH_Input_DispatchToNextHandler(1);
     EXPECT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPointerVisible_001
+ * @tc.desc: Test OH_Input_SetPointerVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerVisible_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool visible = true;
+    Input_Result res = OH_Input_SetPointerVisible(visible);
+    EXPECT_EQ(res, INPUT_SUCCESS);
+    visible = false;
+    res = OH_Input_SetPointerVisible(visible);
+    EXPECT_EQ(res, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetPointerStyle_001
+ * @tc.desc: Test OH_Input_GetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = OHOS::MMI::GLOBAL_WINDOW_ID;
+    int32_t pointerStyle = -1;
+    Input_Result res = OH_Input_GetPointerStyle(windowId, &pointerStyle);
+    EXPECT_EQ(res, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetPointerStyle_002
+ * @tc.desc: Test OH_Input_GetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = -2;
+    int32_t pointerStyle = -1;
+    Input_Result res = OH_Input_GetPointerStyle(windowId, &pointerStyle);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
+    windowId = OHOS::MMI::GLOBAL_WINDOW_ID;
+    res = OH_Input_GetPointerStyle(windowId, nullptr);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPointerStyle_001
+ * @tc.desc: Test OH_Input_SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = OHOS::MMI::GLOBAL_WINDOW_ID;
+    int32_t pointerStyle = EAST;
+    Input_Result res = OH_Input_SetPointerStyle(windowId, pointerStyle);
+    EXPECT_EQ(res, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPointerStyle_002
+ * @tc.desc: Test OH_Input_SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = OHOS::MMI::GLOBAL_WINDOW_ID;
+    int32_t pointerStyle = -1;
+    Input_Result res = OH_Input_SetPointerStyle(windowId, pointerStyle);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
+    windowId = -2;
+    pointerStyle = EAST;
+    res = OH_Input_SetPointerStyle(windowId, pointerStyle);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_Create_001
+ * @tc.desc: Test OH_Input_CustomCursor_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Create_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative* pixelmap1 = nullptr;
+    OH_Pixelmap_InitializationOptions *options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap1);
+    OH_PixelmapNative* pixelmap2 = nullptr;
+    int32_t anchorX = 0;
+    int32_t anchorY = 0;
+    int32_t testX = -1;
+    int32_t testY = -1;
+    Input_CustomCursor* customCursor = OH_Input_CustomCursor_Create(pixelmap1, anchorX, anchorY);
+    EXPECT_NE(customCursor, nullptr);
+    OH_Input_CustomCursor_GetPixelMap(customCursor, pixelmap2);
+    EXPECT_EQ(pixelmap1, pixelmap2);
+    OH_Input_CustomCursor_GetAnchor(customCursor, &testX, &testY);
+    EXPECT_EQ(anchorX, testX);
+    EXPECT_EQ(anchorY, testY);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    OH_PixelmapNative_Release(pixelmap1);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorConfig_Create_001
+ * @tc.desc: Test OH_Input_CursorConfig_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorConfig_Create_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool followSystem = true;
+    Input_CursorConfig* cursorConfig = OH_Input_CursorConfig_Create(followSystem);
+    EXPECT_NE(cursorConfig, nullptr);
+    bool isfollowSystem = false;
+    OH_Input_CursorConfig_IsFollowSystem(cursorConfig, &isfollowSystem);
+    EXPECT_EQ(followSystem, isfollowSystem);
+    OH_Input_CursorConfig_Destroy(&cursorConfig);
 }
 } // namespace MMI
 } // namespace OHOS

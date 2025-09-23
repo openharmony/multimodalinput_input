@@ -84,6 +84,8 @@ ohos_shared_library("oh_input_manager") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
   ]
 
   if (enable_player_framework) {
@@ -147,6 +149,9 @@ ohos_unittest("OHInputManagerTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
+    "napi:ace_napi",
   ]
 
   if (enable_player_framework) {
@@ -198,6 +203,9 @@ ohos_unittest("OHInputManagerEXTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
+    "napi:ace_napi",
   ]
 
   if (enable_player_framework) {
