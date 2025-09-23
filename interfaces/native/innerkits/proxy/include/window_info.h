@@ -354,6 +354,13 @@ struct WindowInfo {
     bool isSkipSelfWhenShowOnVirtualScreen { false };
 	
     int32_t windowNameType;
+
+    /**
+     * ID of the agent process where the window is located
+     *
+     * @since 21
+     */
+    int32_t agentPid { -1 };
 };
 
 /**

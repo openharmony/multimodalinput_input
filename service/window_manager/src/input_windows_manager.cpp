@@ -509,45 +509,45 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
         FoldScreenRotation(pointerEvent);
-        MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
-        return udsServer_->GetClientFd(windowInfo->pid);
+        MMI_HILOG_DISPATCHD("get agentPid:%{public}d from idxPidMap", windowInfo->agentPid);
+        return udsServer_->GetClientFd(windowInfo->agentPid);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
         MMI_HILOG_DISPATCHD("window info is null, so pointerEvent is dropped! return -1");
         return udsServer_->GetClientFd(-1);
     }
-    int32_t pid = -1;
+    int32_t agentPid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (iter != touchItemDownInfos_.end()) {
-            MMI_HILOG_DISPATCHI("Cant not find pid");
-            pid = iter->second.window.pid;
+            MMI_HILOG_DISPATCHI("Cant not find agentPid");
+            agentPid = iter->second.window.agentPid;
             iter->second.flag = false;
-            MMI_HILOG_DISPATCHD("touchscreen occurs, new pid:%{public}d", pid);
+            MMI_HILOG_DISPATCHD("touchscreen occurs, new agentPid:%{public}d", agentPid);
         }
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) ||
         (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_CROWN)) {
-        if (mouseDownInfo_.pid != -1) {
-            pid = GetWindowPid(mouseDownInfo_.agentWindowId);
-            if (pid < 0) {
-                pid = mouseDownInfo_.pid;
+        if (mouseDownInfo_.agentPid != -1) {
+            agentPid = GetWindowAgentPid(mouseDownInfo_.agentWindowId);
+            if (agentPid < 0) {
+                agentPid = mouseDownInfo_.agentPid;
             }
-            MMI_HILOGD("mouseevent occurs, update the pid:%{public}d", pid);
+            MMI_HILOGD("mouseevent occurs, update the agentPid:%{public}d", agentPid);
             InitMouseDownInfo();
-        } else if (axisBeginWindowInfo_ && axisBeginWindowInfo_->pid != -1) {
-            pid = GetWindowPid(axisBeginWindowInfo_->agentWindowId);
-            if (pid < 0) {
-                pid = axisBeginWindowInfo_->pid;
+        } else if (axisBeginWindowInfo_ && axisBeginWindowInfo_->agentPid != -1) {
+            agentPid = GetWindowAgentPid(axisBeginWindowInfo_->agentWindowId);
+            if (agentPid < 0) {
+                agentPid = axisBeginWindowInfo_->agentPid;
             }
-            MMI_HILOGD("The axisBeginEvent occurs, update the pid:%{public}d", pid);
+            MMI_HILOGD("The axisBeginEvent occurs, update the agentPid:%{public}d", agentPid);
             axisBeginWindowInfo_ = std::nullopt;
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    MMI_HILOGD("Get clientFd by %{public}d", pid);
-    return udsServer_->GetClientFd(pid);
+    MMI_HILOGD("Get clientFd by %{public}d", agentPid);
+    return udsServer_->GetClientFd(agentPid);
 }
 
 void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent)
@@ -671,15 +671,15 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::UpdateTarget(st
     auto secSubWindows = GetPidAndUpdateTarget(keyEvent);
     for (const auto &item : secSubWindows) {
         int32_t fd = INVALID_FD;
-        int32_t pid = item.first;
-        if (pid <= 0) {
-            MMI_HILOG_DISPATCHE("Invalid pid:%{public}d", pid);
+        int32_t agentPid = item.first;
+        if (agentPid <= 0) {
+            MMI_HILOG_DISPATCHE("Invalid agentPid:%{public}d", agentPid);
             continue;
         }
         CHKPC(udsServer_);
-        fd = udsServer_->GetClientFd(pid);
+        fd = udsServer_->GetClientFd(agentPid);
         if (fd < 0) {
-            MMI_HILOG_DISPATCHE("The windowPid:%{public}d matching fd:%{public}d is invalid", pid, fd);
+            MMI_HILOG_DISPATCHE("The windowAgentPid:%{public}d matching fd:%{public}d is invalid", agentPid, fd);
             continue;
         }
         secSubWindowTargets.emplace_back(std::make_pair(fd, item.second));
@@ -726,7 +726,7 @@ void InputWindowsManager::ReissueEvent(std::shared_ptr<KeyEvent> keyEvent, int32
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         auto udServer = InputHandler->GetUDSServer();
         CHKPV(udServer);
-        auto fd = udServer->GetClientFd(GetWindowPid(focusWindowId_));
+        auto fd = udServer->GetClientFd(GetWindowAgentPid(focusWindowId_));
         MMI_HILOG_DISPATCHI("Out focus window:%{public}d is replaced by window:%{public}d",
             focusWindowId_, focusWindowId);
         if (eventDispatchHandler != nullptr && udServer != nullptr) {
@@ -800,8 +800,8 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         return INVALID_FD;
     }
-    MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
-    return udsServer_->GetClientFd(windowInfo->pid);
+    MMI_HILOGD("Get agentPid:%{public}d from idxPidMap", windowInfo->agentPid);
+    return udsServer_->GetClientFd(windowInfo->agentPid);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -842,15 +842,15 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     TargetInfo targetInfo = { windowInfo->privacyMode, windowInfo->id, windowInfo->agentWindowId };
-    secSubWindows.emplace_back(std::make_pair(windowInfo->pid, targetInfo));
+    secSubWindows.emplace_back(std::make_pair(windowInfo->agentPid, targetInfo));
     if (isUIExtention) {
         for (const auto &item : iter->uiExtentionWindowInfo) {
             if (item.privacyUIFlag) {
-                MMI_HILOG_DISPATCHD("security sub windowId:%{public}d,pid:%{public}d", item.id, item.pid);
+                MMI_HILOG_DISPATCHD("security sub windowId:%{public}d,agentPid:%{public}d", item.id, item.agentPid);
                 targetInfo.privacyMode = item.privacyMode;
                 targetInfo.id = item.id;
                 targetInfo.agentWindowId = item.agentWindowId;
-                secSubWindows.emplace_back(std::make_pair(item.pid, targetInfo));
+                secSubWindows.emplace_back(std::make_pair(item.agentPid, targetInfo));
             }
         }
     }
@@ -870,6 +870,24 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
             for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
                 CHKCC(uiExtentionWindow.id == windowId);
                 return uiExtentionWindow.pid;
+            }
+        }
+    }
+    return INVALID_PID;
+}
+
+int32_t InputWindowsManager::GetWindowAgentPid(int32_t windowId) const
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &groupItem : displayGroupInfoMap_) {
+        for (const auto &item : groupItem.second.windowsInfo) {
+            MMI_HILOGD("Get windowId:%{public}d", item.id);
+            if (item.id == windowId) {
+                return item.agentPid;
+            }
+            for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+                CHKCC(uiExtentionWindow.id == windowId);
+                return uiExtentionWindow.agentPid;
             }
         }
     }
@@ -2695,7 +2713,7 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
         }
     }
     if (!isFindLastWindow) {
-        if (udsServer_ != nullptr && udsServer_->GetClientFd(lastWindowInfo_.pid) != INVALID_FD) {
+        if (udsServer_ != nullptr && udsServer_->GetClientFd(lastWindowInfo_.agentPid) != INVALID_FD) {
             DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         }
     }
@@ -2760,12 +2778,12 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
     std::string window;
     window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
-        MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, uid:%{public}d, "
+        MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, agentPid:%{public}d, uid:%{public}d, "
             "area.x:%d, area.y:%d, area.width:%{public}d, area.height:%{public}d, "
             "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu, "
             "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d, "
             "zOrder:%{public}f, privacyMode:%{public}d, privacyProtect:%{public}d, windowType:%{public}d",
-            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.id, item.pid, item.agentPid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder, item.privacyMode,
             item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
@@ -5038,7 +5056,7 @@ void InputWindowsManager::SendUIExtentionPointerEvent(double logicalX, double lo
     pointerItem.SetTargetWindowId(windowInfo.id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPV(udsServer_);
-    auto fd = udsServer_->GetClientFd(windowInfo.pid);
+    auto fd = udsServer_->GetClientFd(windowInfo.agentPid);
     auto sess = udsServer_->GetSession(fd);
     CHKPRV(sess, "The window has disappeared");
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
@@ -7067,6 +7085,23 @@ int32_t InputWindowsManager::GetPidByDisplayIdAndWindowId(int32_t displayId, int
         for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
             if (uiExtentionWindow.id == windowId) {
                 return uiExtentionWindow.pid;
+            }
+        }
+    }
+    return RET_ERR;
+}
+
+int32_t InputWindowsManager::GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId)
+{
+    int32_t groupId = FindDisplayGroupId(displayId);
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
+    for (auto &item : WindowsInfo) {
+        if (item.id == windowId) {
+            return item.agentPid;
+        }
+        for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+            if (uiExtentionWindow.id == windowId) {
+                return uiExtentionWindow.agentPid;
             }
         }
     }
