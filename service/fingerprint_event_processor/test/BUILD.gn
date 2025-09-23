@@ -130,6 +130,13 @@ ohos_unittest("XKeyEventProcessorTest") {
     "-Dprotected=public",
   ]
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   include_dirs = [
     "${mmi_path}/service/fingerprint_event_processor/include",
     "${mmi_path}/service/event_handler/include",
