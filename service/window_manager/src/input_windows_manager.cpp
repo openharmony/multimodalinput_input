@@ -4516,7 +4516,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif
     GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-    if (isUiExtension_) {
+    if (isUiExtension_ && uiExtensionWindowId_ == touchWindow->id) {
         MMI_HILOGD("updatemouse target in uiextension");
         GetPointerStyle(uiExtensionPid_, uiExtensionWindowId_, pointerStyle, isUiExtension_);
         dragPointerStyle_ = pointerStyle;
