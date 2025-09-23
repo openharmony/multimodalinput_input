@@ -131,65 +131,6 @@ function QueryTouchEventsSync(count: i32) : Array<TouchEvent>;
     function offKeyPressed(receiver?:(info: KeyEvent) => void): void {
         return offKeyPressed(receiver);
     }
- /*
-    type HandleVoid = (arg_0: Object) => void;
-    type HandleBool = (arg_0: Object) => boolean;
-    type HandleAll = HandleVoid | HandleBool;
-    function on(type: string, receiver: HandleAll): void {
-        switch(type) {
-            case 'touch': return onTouch(receiver as (info: TouchEvent) => boolean, receiver);
-            case 'mouse': return onMouse(receiver as (info: MouseEvent) => void, receiver);
-            case 'pinch': return onPinch(receiver as (info: Pinch) => void, receiver);
-            case 'threeFingersSwipe': return onThreeFingersSwipe(receiver as (info: ThreeFingersSwipe) => void , receiver);
-            case 'fourFingersSwipe': return onFourFingersSwipe(receiver as (info: FourFingersSwipe) => void, receiver);
-            case 'threeFingersTap': return onThreeFingersTap(receiver as (info: ThreeFingersTap) => void, receiver);
-            case 'fingerprint': return onFingerprint(receiver as (info: FingerprintEvent) => void, receiver);
-            case 'swipeInward': return onSwipeInward(receiver as (info: SwipeInward) => void, receiver);
-            default: throw new Error(`Unknown type: ${type}`);
-        }
-    }
-
-    function on(type: string, fingers: int, receiver: (arg_0: Object) => void): void {
-        switch(type) {
-            case 'pinch' : return onPinchByNumber(fingers, receiver as (info: Pinch) => void, receiver);
-            case 'rotate':  return onRotateByNumber(fingers, receiver as (info: Rotate) => void, receiver);
-            case 'touchscreenSwipe': return onTouchscreenSwipeByNumber(fingers, receiver as (info: TouchGestureEvent) => void, receiver);
-            case 'touchscreenPinch': return onTouchscreenPinch(fingers, receiver as (info: TouchGestureEvent) => void, receiver);
-            default: throw new Error(`Unknown type: ${type}`);
-        }
-    }
-
-    function on(type: string, arr: Array<KeyCode>|Array<display.Rect>, receiver: (arg_0: Object) => void):void {
-        switch(type) {
-           case 'mouse' : return onMouseForDisplayRect(arr as Array<display.Rect>, receiver as (arg_0: MouseEvent) => void, receiver);
-           case 'keyPressed':  return onKeyPressed(arr as Array<KeyCode>, receiver as (arg_0: KeyEvent) => void, receiver);
-           default: throw new Error(`Unknown type: ${type}`);
-        }
-    }
-    function off(type: string, receiver?: HandleAll): void {
-        switch(type) {
-            case 'touch': offTouch(receiver as (((info: TouchEvent) => boolean) | undefined));
-            case 'mouse': offMouse(receiver as (((info: MouseEvent) => void) | undefined));
-            case 'pinch': return offPinch(receiver as (((info: Pinch) => void) | undefined));
-            case 'threeFingersSwipe': return offThreeFingersSwipe(receiver as (((info: ThreeFingersSwipe) => void) | undefined));
-            case 'fourFingersSwipe': return offFourFingersSwipe(receiver as (((info: FourFingersSwipe) => void) | undefined));
-            case 'threeFingersTap': return offThreeFingersTap(receiver as (((info: ThreeFingersTap) => void) | undefined));
-            case 'fingerprint': return offFingerprint(receiver as (((info: FingerprintEvent) => void) | undefined));
-            case 'swipeInward': return offSwipeInward(receiver as (((info: SwipeInward) => void) | undefined));
-            case 'keyPressed': return offKeyPressed(receiver as (((info: KeyEvent) => void) | undefined));
-            default: throw new Error(`Unknown type: ${type}`);
-        }
-    }
-
-    function off(type: string, fingers: int, receiver?: (arg_0: Object) => void): void {
-        switch(type) {
-            case 'pinch' : return offPinchByNumber(fingers, receiver as (((info: Pinch) => void) | undefined));
-            case 'rotate':  return offRotateByNumber(fingers, receiver as (((info: Rotate) => void) | undefined));
-            case 'touchscreenSwipe': return offTouchscreenSwipe(fingers, receiver as (((info: TouchGestureEvent) => void) | undefined));
-            case 'touchscreenPinch': return offTouchscreenPinch(fingers, receiver as (((info: TouchGestureEvent) => void) | undefined));
-            default: throw new Error(`Unknown type: ${type}`);
-        }
-    }*/
 """)
 
 function onTouch(receiver: (touchEvent: TouchEvent) => bool, opq: Opaque): void;
