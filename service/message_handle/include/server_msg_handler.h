@@ -54,6 +54,11 @@ struct InjectionTouch {
         }
         return (pointerId_ < other.pointerId_);
     }
+
+    bool operator==(const InjectionTouch &other) const
+    {
+        return (displayId_ == other.displayId_ && pointerId_ == other.pointerId_);
+    }
 };
 
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;

@@ -51,3 +51,50 @@ ohos_unittest("UtilCommonTest") {
     "hilog:libhilog",
   ]
 }
+
+ohos_unittest("InputEventDataTransformationTest") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  defines = input_default_defines
+
+  include_dirs = [ "${mmi_path}/util/common/include" ]
+
+  sources = [
+    "${mmi_path}/util/common/src/input_event_data_transformation.cpp",
+    "${mmi_path}/util/common/test/input_event_data_transformation_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+   ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ffrt:libffrt",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "preferences:native_preferences",
+  ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+}

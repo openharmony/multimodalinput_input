@@ -20,6 +20,7 @@
 #include "account_manager.h"
 #include "key_event.h"
 #include "mmi_log.h"
+#include "want.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AccountManagerTest"
@@ -33,6 +34,7 @@ constexpr int32_t TEST_ACCOUNT_ID_002 { 2 };
 constexpr int32_t MAIN_ACCOUNT_ID { 100 };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
 const std::string SECURE_SETTING_URI_PROXY {""};
+const std::string TEST_STR_DISPLAY_ID { "0" };
 } // namespace
 
 class AccountManagerTest : public testing::Test {
@@ -647,5 +649,32 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_SetupMainAccount, TestSize.Level
     EXPECT_FALSE(ret.second);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->SetupMainAccount());
 }
+
+/**
+ * @tc.name: AccountManagerTest_GetCurrentAccountId_01
+ * @tc.desc: Test the funcation GetCurrentAccountId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountId_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::CommonEventData data;
+    data.SetCode(MAIN_ACCOUNT_ID);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+    EXPECT_EQ(MAIN_ACCOUNT_ID, ACCOUNT_MGR->GetCurrentAccountId());
+ 
+    data.SetCode(TEST_ACCOUNT_ID_001);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+    EXPECT_EQ(TEST_ACCOUNT_ID_001, ACCOUNT_MGR->GetCurrentAccountId());
+ 
+    data.SetCode(MAIN_ACCOUNT_ID);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
+    EXPECT_EQ(MAIN_ACCOUNT_ID, ACCOUNT_MGR->GetCurrentAccountId());
+ 
+    data.SetCode(TEST_ACCOUNT_ID_001);
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
+}
+
 } // namespace MMI
 } // namespace OHOS

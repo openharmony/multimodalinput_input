@@ -3468,6 +3468,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_002, T
     DisplayGroupInfo info;
     uint32_t num = 1;
     pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
+    uint32_t groupNum = 0;
+    uint32_t windowsNum = 0;
+    pkt << groupNum << windowsNum;
     EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_OK);
 }
 
@@ -3488,7 +3491,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_003, T
     uint32_t num = 1;
     pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_OK);
+    EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_ERR);
 }
 
 /**
@@ -3577,7 +3580,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_002, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_ERR);
 }
 
@@ -3600,12 +3603,13 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_003, TestSiz
     NetPacket pkt(idMsg);
     WindowInfo info;
     uint32_t num = 1;
+    uint32_t windowsNum = 0;
     int32_t byteCount = 0;
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
-    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount
+        << windowsNum << info.rectChangeBySystem;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_OK);
 }
 
@@ -4580,6 +4584,52 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandler_002, Te
     EXPECT_EQ(ret, RET_OK);
     ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_001
+ * @tc.desc: Test the function SaveTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetWindowId(10);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    int32_t windowId = -1;
+    auto iter = handler.nativeTargetWindowIds_.find(touch);
+    if (iter != handler.nativeTargetWindowIds_.end()) {
+        windowId = iter->second;
+    }
+    EXPECT_EQ(windowId, pointerEvent->GetTargetWindowId());
+
+    pointerEvent->SetTargetDisplayId(1);
+    InjectionTouch temp{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    windowId = -1;
+    auto it = handler.nativeTargetWindowIds_.find(temp);
+    if (it != handler.nativeTargetWindowIds_.end()) {
+        windowId = it->second;
+    }
+    EXPECT_NE(windowId, pointerEvent->GetTargetWindowId());
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetTargetDisplayId(0);
+    ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(handler.nativeTargetWindowIds_.empty(), true);
 }
 } // namespace MMI
 } // namespace OHOS
