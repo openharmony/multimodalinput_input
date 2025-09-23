@@ -1042,6 +1042,9 @@ ohos_unittest("PointerEventNdkTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
+    "napi:ace_napi",
   ]
 
   if (enable_player_framework) {
