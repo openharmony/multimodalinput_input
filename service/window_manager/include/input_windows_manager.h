@@ -75,6 +75,7 @@ public:
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
+    int32_t GetWindowAgentPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
     void DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
@@ -206,6 +207,7 @@ public:
     void SetWindowStateNotifyPid(int32_t pid);
     int32_t GetWindowStateNotifyPid();
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
+    int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
