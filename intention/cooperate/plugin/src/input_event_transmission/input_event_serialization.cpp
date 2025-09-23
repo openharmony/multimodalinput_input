@@ -31,8 +31,8 @@ namespace DeviceStatus {
 namespace Cooperate {
 namespace {
 constexpr int32_t MAX_KEY_SIZE { 395 };
-constexpr size_t MAX_N_PRESSED_KEYS { 10 };
-constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
+constexpr size_t MAX_PRESSED_KEYS { 10 };
+constexpr size_t MAX_PRESSED_BUTTONS { 10 };
 } // namespace
 
 int32_t InputEventSerialization::KeyEventToNetPacket(const std::shared_ptr<MMI::KeyEvent> key, NetPacket &pkt)
@@ -297,12 +297,12 @@ int32_t InputEventSerialization::SerializePressedButtons(std::shared_ptr<MMI::Po
 
 int32_t InputEventSerialization::DeserializePressedButtons(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event)
 {
-    std::set<int32_t>::size_type nPressed;
+    std::set<int32_t>::size_type nPressed = 0;
     int32_t btnId {};
 
     pkt >> nPressed;
     CHKRWER(pkt, RET_ERR);
-    CHKUPPER(nPressed, MAX_N_PRESSED_BUTTONS, RET_ERR);
+    CHKUPPER(nPressed, MAX_PRESSED_BUTTONS, RET_ERR);
 
     for (; nPressed > 0; --nPressed) {
         pkt >> btnId;
@@ -399,10 +399,10 @@ int32_t InputEventSerialization::SerializePressedKeys(std::shared_ptr<MMI::Point
 
 int32_t InputEventSerialization::DeserializePressedKeys(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event)
 {
-    std::vector<int32_t>::size_type nPressed {};
+    std::vector<int32_t>::size_type nPressed = 0;
     pkt >> nPressed;
     CHKRWER(pkt, RET_ERR);
-    CHKUPPER(nPressed, MAX_N_PRESSED_KEYS, RET_ERR);
+    CHKUPPER(nPressed, MAX_PRESSED_KEYS, RET_ERR);
 
     std::vector<int32_t> pressedKeys;
     int32_t keyCode {};
@@ -439,19 +439,18 @@ int32_t InputEventSerialization::SerializeBuffer(std::shared_ptr<MMI::PointerEve
 
 int32_t InputEventSerialization::DeserializeBuffer(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event)
 {
-    std::vector<uint8_t>::size_type bufSize {};
+    std::vector<uint8_t>::size_type bufSize = 0;
     pkt >> bufSize;
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(bufSize, MMI::ExtraData::MAX_BUFFER_SIZE, RET_ERR);
 
     std::vector<uint8_t> buffer;
     uint8_t item {};
 
     for (; bufSize > 0; --bufSize) {
         pkt >> item;
+        CHKRWER(pkt, RET_ERR);
         buffer.push_back(item);
-    }
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Failed to deserialize buffer");
-        return RET_ERR;
     }
     event->SetBuffer(buffer);
     return RET_OK;
@@ -577,10 +576,10 @@ int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::Poi
 
 int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event)
 {
-    uint32_t enHanceDataLen;
+    uint32_t enHanceDataLen = 0;
     pkt >> enHanceDataLen;
     CHKRWER(pkt, RET_ERR);
-    CHKUPPER(enHanceDataLen, MAX_ENHANCE_DATA_LEN, RET_ERR);
+    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     if (enHanceDataLen == 0) {
         return RET_OK;
     }
@@ -632,9 +631,11 @@ int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::Key
 
 int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<MMI::KeyEvent> event)
 {
-    uint32_t enHanceDataLen;
+    uint32_t enHanceDataLen = 0;
     pkt >> enHanceDataLen;
-    if (enHanceDataLen == 0 || enHanceDataLen > MAX_HMAC_SIZE) {
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
+    if (enHanceDataLen == 0) {
         return RET_OK;
     }
     uint8_t enhanceDataBuf[enHanceDataLen];

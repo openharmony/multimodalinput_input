@@ -418,6 +418,14 @@ bool KeyShortcutManager::IsModifier(int32_t keyCode)
     return (modifiers_.find(keyCode) != modifiers_.cend());
 }
 
+uint32_t KeyShortcutManager::Key2Modifier(int32_t keyCode)
+{
+    if (auto iter = modifiers_.find(keyCode); iter != modifiers_.cend()) {
+        return iter->second;
+    }
+    return SHORTCUT_MODIFIER_NONE;
+}
+
 bool KeyShortcutManager::IsValid(const ShortcutTriggerType triggerType) const
 {
     return ((triggerType == SHORTCUT_TRIGGER_TYPE_DOWN) ||

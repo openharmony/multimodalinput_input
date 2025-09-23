@@ -864,6 +864,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     }
     WindowGroupInfo windowGroupInfo;
     pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
+    CHKRWER(pkt, RET_ERR);
     uint32_t num = 0;
     pkt >> num;
     CHKRWER(pkt, RET_ERR);
