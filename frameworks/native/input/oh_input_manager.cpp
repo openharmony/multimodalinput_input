@@ -3288,7 +3288,7 @@ Input_Result OH_Input_GetPointerStyle(int32_t windowId, int32_t *pointerStyle)
 Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
+    if (windowId < 0) {
         MMI_HILOGE("Invalid windowid");
         return INPUT_PARAMETER_ERROR;
     }
