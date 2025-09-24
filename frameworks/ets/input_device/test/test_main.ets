@@ -221,7 +221,7 @@ function test_getKeyboardType_sync() {
      console.log(Tag, `${fun_name} end`);
 }
 
-// 默认值500ms，调节范围[300ms，1000ms]。
+// The default value is 500ms, and the adjustment range is [300ms, 1000ms].
 function test_setKeyboardRepeatDelay_promise() {
     let delay: int = 350;
     let fun_name: string = `test_setKeyboardRepeatDelay_promise ${delay}`;
@@ -317,7 +317,7 @@ function test_getKeyboardRepeatRate_callback() {
     }
      console.log(Tag, `${fun_name} end`);
 }
-// 键盘按键重复速率，默认值50ms/次，调节范围[36ms/次，100ms/次]。
+// Keyboard key repetition rate, default value 50ms/time, adjustable range [36ms/time, 100ms/time].
 function test_setKeyboardRepeatRate_promise() {
     let rate: int = 50;
     let fun_name: string = `test_setKeyboardRepeatRate_promise ${rate}`;
