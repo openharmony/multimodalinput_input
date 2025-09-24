@@ -20,14 +20,14 @@ import { AsyncCallback, BusinessError } from '@ohos.base';
 
 const Tag:String = "pointer"
 const WAIT_OPER: long = 2000;
-const WINDOW_ID: int = 17; //可以使用 hdc shell hidumper -s WindowManagerService -a '-a' 查看窗口id
+// You can use the command `hdc shell hidumper -s WindowManagerService -a '-a'` to view window IDs
+const WINDOW_ID: int = 17;
 function wait(delay: long) {
     let start = new Date().getTime();
     while (new Date().getTime() - start < delay) {
     }
 }
 
-////////////////////test pointerSpeed beign/////////////////////////////////////
 function test_setPointerSpeed_callback() {
     let fun_name = 'test_setPointerSpeed_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -110,9 +110,7 @@ function test_getPointerSpeed_sync() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-////////////////////test pointerSpeed end/////////////////////////////////////
 
-/////////////////////tet pointerStyle begin//////////////////////////////////////////
 function test_setPointerStyle_callback() {
     let fun_name = 'test_setPointerStyle_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -195,9 +193,7 @@ function test_getPointerStyle_sync() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-/////////////////////test pointerStyle end//////////////////////////////////////////
 
-/////////////////////test pointerVisible begin//////////////////////////////////////////
 function test_setPointerVisible_callback() {
     let fun_name = 'test_setPointerVisible_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -280,9 +276,7 @@ function test_isPointerVisible_sync() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-/////////////////////test pointerVisible end//////////////////////////////////////////
 
-/////////////////////test pointerColor begin//////////////////////////////////////////
 function test_setPointerColor_callback() {
     let fun_name = 'test_setPointerColor_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -365,9 +359,7 @@ function test_getPointerColor_sync() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-/////////////////////test pointerColor end//////////////////////////////////////////
 
-/////////////////////test pointerSize begin//////////////////////////////////////////
 function test_setPointerSize_callback() {
     let fun_name = 'test_setPointerSize_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -450,9 +442,7 @@ function test_getPointerSize_sync() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-/////////////////////test pointerSize end//////////////////////////////////////////
 
-/////////////////////test MousePrimaryButton begin//////////////////////////////////////////
 function test_setMousePrimaryButton_callback() {
     let fun_name = 'test_setMousePrimaryButton_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -512,9 +502,7 @@ function test_getMousePrimaryButton_promise() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-/////////////////////test MousePrimaryButton end//////////////////////////////////////////
 
-/////////////////////test HoverScrollState begin//////////////////////////////////////////
 function test_setHoverScrollState_callback() {
     let fun_name = 'test_setHoverScrollState_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -574,9 +562,7 @@ function test_getHoverScrollState_promise() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-/////////////////////test HoverScrollState end//////////////////////////////////////////
 
-/////////////////////test MouseScrollRows begin//////////////////////////////////////////
 function test_setMouseScrollRows_callback() {
     let fun_name = 'test_setMouseScrollRows_callback';
     console.log(Tag, `into func ${fun_name}`);
@@ -606,635 +592,6 @@ function test_setMouseScrollRows_promise() {
     }
     console.log(Tag, `out func ${fun_name}`);
 }
-
-function test_getMouseScrollRows_callback() {
-    let fun_name = 'test_getMouseScrollRows_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: int|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getMouseScrollRows(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getMouseScrollRows_promise() {
-    let fun_name = 'test_getMouseScrollRows_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: int) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getMouseScrollRows().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test MouseScrollRows end//////////////////////////////////////////
-
-/////////////////////test TouchpadScrollSwitch begin//////////////////////////////////////////
-function test_setTouchpadScrollSwitch_callback() {
-    let fun_name = 'test_setTouchpadScrollSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadScrollSwitch(true, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadScrollSwitch_promise() {
-    let fun_name = 'test_setTouchpadScrollSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadScrollSwitch(true).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadScrollSwitch_callback() {
-    let fun_name = 'test_getTouchpadScrollSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: boolean|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadScrollSwitch(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadScrollSwitch_promise() {
-    let fun_name = 'test_getTouchpadScrollSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: boolean) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadScrollSwitch().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadScrollSwitch end//////////////////////////////////////////
-
-/////////////////////test TouchpadScrollDirection begin//////////////////////////////////////////
-function test_setTouchpadScrollDirection_callback() {
-    let fun_name = 'test_setTouchpadScrollDirection_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadScrollDirection(true, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadScrollDirection_promise() {
-    let fun_name = 'test_setTouchpadScrollDirection_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadScrollDirection(true).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadScrollDirection_callback() {
-    let fun_name = 'test_getTouchpadScrollDirection_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: boolean|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadScrollDirection(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadScrollDirection_promise() {
-    let fun_name = 'test_getTouchpadScrollDirection_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: boolean) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadScrollDirection().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadScrollDirection end//////////////////////////////////////////
-
-/////////////////////test TouchpadTapSwitch begin//////////////////////////////////////////
-function test_setTouchpadTapSwitch_callback() {
-    let fun_name = 'test_setTouchpadTapSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadTapSwitch(true, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadTapSwitch_promise() {
-    let fun_name = 'test_setTouchpadTapSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadTapSwitch(true).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadTapSwitch_callback() {
-    let fun_name = 'test_getTouchpadTapSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: boolean|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadTapSwitch(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadTapSwitch_promise() {
-    let fun_name = 'test_getTouchpadTapSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: boolean) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadTapSwitch().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadTapSwitch end//////////////////////////////////////////
-
-/////////////////////test TouchpadPointerSpeed begin//////////////////////////////////////////
-function test_setTouchpadPointerSpeed_callback() {
-    let fun_name = 'test_setTouchpadPointerSpeed_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadPointerSpeed(1, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadPointerSpeed_promise() {
-    let fun_name = 'test_setTouchpadPointerSpeed_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadPointerSpeed(10).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadPointerSpeed_callback() {
-    let fun_name = 'test_getTouchpadPointerSpeed_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: int|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadPointerSpeed(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadPointerSpeed_promise() {
-    let fun_name = 'test_getTouchpadPointerSpeed_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: int) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadPointerSpeed().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadPointerSpeed end//////////////////////////////////////////
-
-/////////////////////test TouchpadPinchSwitch begin//////////////////////////////////////////
-function test_setTouchpadPinchSwitch_callback() {
-    let fun_name = 'test_setTouchpadPinchSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadPinchSwitch(true, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadPinchSwitch_promise() {
-    let fun_name = 'test_setTouchpadPinchSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadPinchSwitch(true).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadPinchSwitch_callback() {
-    let fun_name = 'test_getTouchpadPinchSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: boolean|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadPinchSwitch(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadPinchSwitch_promise() {
-    let fun_name = 'test_getTouchpadPinchSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: boolean) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadPinchSwitch().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadPinchSwitch end//////////////////////////////////////////
-
-/////////////////////test TouchpadSwipeSwitch begin//////////////////////////////////////////
-function test_setTouchpadSwipeSwitch_callback() {
-    let fun_name = 'test_setTouchpadSwipeSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadSwipeSwitch(true, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadSwipeSwitch_promise() {
-    let fun_name = 'test_setTouchpadSwipeSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadSwipeSwitch(true).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadSwipeSwitch_callback() {
-    let fun_name = 'test_getTouchpadSwipeSwitch_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: boolean|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadSwipeSwitch(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadSwipeSwitch_promise() {
-    let fun_name = 'test_getTouchpadSwipeSwitch_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: boolean) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadSwipeSwitch().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadSwipeSwitch end//////////////////////////////////////////
-
-/////////////////////test TouchpadRightClickType begin//////////////////////////////////////////
-function test_setTouchpadRightClickType_callback() {
-    let fun_name = 'test_setTouchpadRightClickType_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadRightClickType(pointer.RightClickType.TOUCHPAD_RIGHT_BUTTON, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadRightClickType_promise() {
-    let fun_name = 'test_setTouchpadRightClickType_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadRightClickType(pointer.RightClickType.TOUCHPAD_RIGHT_BUTTON).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadRightClickType_callback() {
-    let fun_name = 'test_getTouchpadRightClickType_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: pointer.RightClickType|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadRightClickType(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadRightClickType_promise() {
-    let fun_name = 'test_getTouchpadRightClickType_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: pointer.RightClickType) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadRightClickType().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadRightClickType end//////////////////////////////////////////
-
-
-/////////////////////test CustomCursor begin//////////////////////////////////////////
-function test_setCustomCursor_promise() {
-    let fun_name = 'test_setCustomCursor_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    let width: int = 64;
-    let height: int = 64;
-    const buffer = new ArrayBuffer(width * height * 4); // RGBA_8888
-    const pixelView = new Uint8Array(buffer);
-    for (let i = 0; i < pixelView.length; i += 4) {
-        // 设置RGBA通道值
-        pixelView[i] = 0xFF;
-        pixelView[i+1] = 0x00;
-        pixelView[i+2] = 0x00;
-        pixelView[i+3] = 0xFF; // 不透明
-    }
-    const opts: image.InitializationOptions = {
-        editable: true,
-        pixelFormat: image.PixelMapFormat.RGBA_8888,
-        size: { width: width, height: height }
-    };
-    let img = image.createPixelMapSync(buffer, opts);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setCustomCursor(WINDOW_ID, img, 25, 25).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    img.release();
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setCustomCursor_sync() {
-    let fun_name = 'test_setCustomCursor_sync';
-    console.log(Tag, `into func ${fun_name}`);
-    let width: int = 64;
-    let height: int = 64;
-    const buffer = new ArrayBuffer(width * height * 4); // RGBA_8888
-    const pixelView = new Uint8Array(buffer);
-    for (let i = 0; i < pixelView.length; i += 4) {
-        // 设置RGBA通道值
-        pixelView[i] = (i % 12 < 4) ? 0xFF : 0x00;   // 红色条纹
-        pixelView[i+1] = (i % 12 >= 4 && i % 12 < 8) ? 0xFF : 0x00; // 绿色条纹
-        pixelView[i+2] = (i % 12 >= 8) ? 0xFF : 0x00; // 蓝色条纹
-        pixelView[i+3] = 0xFF; // 不透明
-    }
-    const opts: image.InitializationOptions = {
-        editable: true,
-        pixelFormat: image.PixelMapFormat.RGBA_8888,
-        size: { width: width, height: height }
-    };
-    let img = image.createPixelMapSync(buffer, opts);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setCustomCursorSync(WINDOW_ID, img, 25, 25);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    img.release();
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setCustomCursor_CursorConfig_promise() {
-    let fun_name = 'test_setCustomCursor_CursorConfig_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    let width: int = 64;
-    let height: int = 64;
-    const buffer = new ArrayBuffer(width * height * 4); // RGBA_8888
-    const pixelView = new Uint8Array(buffer);
-    for (let i = 0; i < pixelView.length; i += 4) {
-       // 设置RGBA通道值
-        pixelView[i] =  0x00;   // 红色条纹
-        pixelView[i+1] = 0xFF; // 绿色条纹
-        pixelView[i+2] = 0xFF; // 蓝色条纹
-        pixelView[i+3] = 0xFF; // 不透明
-    }
-    const opts: image.InitializationOptions = {
-        editable: true,
-        pixelFormat: image.PixelMapFormat.RGBA_8888,
-        size: { width: width, height: height }
-    };
-    let cursor: pointer.CustomCursor =  {pixelMap: image.createPixelMapSync(buffer, opts), focusX: 25, focusY: 25};
-    let config :pointer.CursorConfig =  {followSystem: false};
-    try {
-        pointer.setCustomCursor(WINDOW_ID, cursor, config);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    cursor.pixelMap.release();
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-/////////////////////test CustomCursor end//////////////////////////////////////////
-
-
-/////////////////////test TouchpadDoubleTapAndDragState begin//////////////////////////////////////////
-function test_setTouchpadDoubleTapAndDragState_callback() {
-    let fun_name = 'test_setTouchpadDoubleTapAndDragState_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err}`);
-        };
-        pointer.setTouchpadDoubleTapAndDragState(true, fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_setTouchpadDoubleTapAndDragState_promise() {
-    let fun_name = 'test_setTouchpadDoubleTapAndDragState_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = () => {
-            console.log(Tag, `func ${fun_name} callback`);
-        };
-        pointer.setTouchpadDoubleTapAndDragState(true).then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadDoubleTapAndDragState_callback() {
-    let fun_name = 'test_getTouchpadDoubleTapAndDragState_callback';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (err: BusinessError<void>|null, info: boolean|undefined) => {
-            console.log(Tag, `func ${fun_name} callback,err:${err},info:${info}`);
-        };
-        pointer.getTouchpadDoubleTapAndDragState(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-
-function test_getTouchpadDoubleTapAndDragState_promise() {
-    let fun_name = 'test_getTouchpadDoubleTapAndDragState_promise';
-    console.log(Tag, `into func ${fun_name}`);
-    try {
-        let fnCallBack = (info: boolean) => {
-            console.log(Tag, `func ${fun_name} callback info:${info}`);
-        };
-        pointer.getTouchpadDoubleTapAndDragState().then(fnCallBack);
-        wait(WAIT_OPER);
-    } catch (error) {
-        console.error(Tag, `${fun_name} failed, error: ${error}`);
-    }
-    console.log(Tag, `out func ${fun_name}`);
-}
-/////////////////////test TouchpadDoubleTapAndDragState end//////////////////////////////////////////
 
 function main() {
     console.println(Tag + ` into main`);
