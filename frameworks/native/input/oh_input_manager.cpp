@@ -3319,7 +3319,7 @@ Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, in
     return customCursor;
 }
 
-void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor) 
+void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor)
 {
     CALL_DEBUG_ENTER;
     CHKPV(customCursor);
@@ -3444,7 +3444,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
         MMI_HILOGE("pixelMap is invalid");
         return INPUT_PARAMETER_ERROR;
     }
-    auto tmpPixelmapPtr = OHOS::Media::PixelMap::Create(reinterpret_cast<uint32_t*>(pixelBuffer), 
+    auto tmpPixelmapPtr = OHOS::Media::PixelMap::Create(reinterpret_cast<uint32_t*>(pixelBuffer),
                                                         static_cast<uint32_t>(pixelBufferSize), options);
     delete[] pixelBuffer;
     CHKPR(tmpPixelmapPtr, INPUT_PARAMETER_ERROR);
