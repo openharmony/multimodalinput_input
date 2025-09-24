@@ -2181,6 +2181,7 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
  * @param visible Whether the mouse pointer is visible. The value true indicates that the pointer
  * @return OH_Input_SetPointerVisible function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_DEVICE_NOT_SUPPORTED} if the device is not supported.
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
  * @since 21
  */
@@ -2207,6 +2208,7 @@ Input_Result OH_Input_GetPointerStyle(int32_t windowId, int32_t *pointerStyle);
  * @return OH_Input_SetPointerVisible function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if window ID is invalid or pointerStyle is invalid;
+ *         {@link INPUT_NOT_SYSTEM_APPLICATION } if application is not system application;
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
  * @since 21
  */
