@@ -45,11 +45,13 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     std::vector<Rect> hotRectArea, int32_t rectTotal, napi_value callback, const int32_t fingers)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    for (const auto &item : monitors_) {
-        if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
-            MMI_HILOGW("Add js monitor failed");
-            return;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (const auto &item : monitors_) {
+            if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
+                MMI_HILOGW("Add js monitor failed");
+                return;
+            }
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, hotRectArea,
@@ -60,6 +62,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
         ThrowError(jsEnv, ret);
         return;
     }
+    std::lock_guard<std::mutex> guard(mutex_);
     monitors_.push_back(monitor);
 }
 
@@ -67,11 +70,13 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     napi_value callback, const int32_t fingers)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    for (const auto &item : monitors_) {
-        if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
-            MMI_HILOGW("Add js monitor failed");
-            return;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (const auto &item : monitors_) {
+            if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
+                MMI_HILOGW("Add js monitor failed");
+                return;
+            }
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, fingers);
@@ -81,6 +86,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
         ThrowError(jsEnv, ret);
         return;
     }
+    std::lock_guard<std::mutex> guard(mutex_);
     monitors_.push_back(monitor);
 }
 
@@ -88,11 +94,13 @@ void JsInputMonitorManager::AddPreMonitor(napi_env jsEnv, const std::string &typ
     napi_value callback, std::vector<int32_t> keys)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    for (const auto &item : monitors_) {
-        if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
-            MMI_HILOGW("Add js monitor failed");
-            return;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (const auto &item : monitors_) {
+            if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
+                MMI_HILOGW("Add js monitor failed");
+                return;
+            }
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, keys);
@@ -102,6 +110,7 @@ void JsInputMonitorManager::AddPreMonitor(napi_env jsEnv, const std::string &typ
         ThrowError(jsEnv, ret);
         return;
     }
+    std::lock_guard<std::mutex> guard(mutex_);
     monitors_.push_back(monitor);
 }
 
