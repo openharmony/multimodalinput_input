@@ -46,50 +46,50 @@ extern "C" {
  */
 
 typedef enum Input_PointerStyle {
-    /** 
-    * Default 
+    /**
+    * Default
     * @since 21
     */
     DEFAULT = 0,
 
     /**
-    * East arrow 
+    * East arrow
     * @since 21
     */
     EAST = 1,
 
     /**
-    * West arrow 
+    * West arrow
     * @since 21
     */
     WEST = 2,
 
     /**
-    * South arrow 
+    * South arrow
     * @since 21
     */
     SOUTH = 3,
 
     /**
-    * North arrow 
+    * North arrow
     * @since 21
     */
     NORTH = 4,
 
     /**
-    * East-west arrow 
+    * East-west arrow
     * @since 21
     */
     WEST_EAST = 5,
 
     /**
-    * North-south arrow 
+    * North-south arrow
     * @since 21
     */
     NORTH_SOUTH = 6,
 
     /**
-    * North-east arrow 
+    * North-east arrow
     * @since 21
     */
     NORTH_EAST = 7,

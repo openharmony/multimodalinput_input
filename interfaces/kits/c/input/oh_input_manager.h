@@ -2189,7 +2189,7 @@ Input_Result OH_Input_SetPointerVisible(bool visible);
 /**
  * @brief Obtains the mouse pointer style.
  *
- * @param windowid Window ID. The value is an integer greater than or equal to -1.
+ * @param windowId Window ID. The value is an integer greater than or equal to -1.
  * @param pointerStyle Pointer to the pointerStyle.
  * @return OH_Input_SetPointerVisible function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
@@ -2300,7 +2300,8 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig *cursorConf
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
  * @since 21
  */
-Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* customCursor, Input_CursorConfig* cursorConfig);
+Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* customCursor, 
+                                      Input_CursorConfig* cursorConfig);
 #ifdef __cplusplus
 }
 #endif
