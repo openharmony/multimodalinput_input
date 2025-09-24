@@ -2300,7 +2300,7 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig *cursorConf
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
  * @since 21
  */
-Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* customCursor, 
+Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* customCursor,
                                       Input_CursorConfig* cursorConfig);
 #ifdef __cplusplus
 }
