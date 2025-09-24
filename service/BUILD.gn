@@ -328,6 +328,8 @@ ohos_shared_library("libmmi-server") {
       if (input_shortcut_key_rules_enabled) {
         defines += [ "SHORTCUT_KEY_RULES_ENABLED" ]
       }
+    } else {
+      sources += [ "subscriber/src/key_shortcut_manager_variant.cpp" ]
     }
     if (input_feature_key_pressed_handler) {
       sources += [ "subscriber/src/key_monitor_manager.cpp" ]
