@@ -3437,7 +3437,6 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     Image_ErrorCode imageResult = OH_PixelmapNative_GetByteCount(customCursor->pixelMap, &byteCount);
     if (imageResult != IMAGE_SUCCESS) {
         MMI_HILOGE("pixelMap is invalid");
-        delete[] pixelBuffer;
         return INPUT_PARAMETER_ERROR;
     }
     size_t pixelBufferSize = static_cast<size_t>(byteCount);
