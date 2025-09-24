@@ -3452,7 +3452,6 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     delete[] pixelBuffer;
     CHKPR(tmpPixelmapPtr, INPUT_PARAMETER_ERROR);
     std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr = std::move(tmpPixelmapPtr);
-    CHKPR(pixelMapPtr, INPUT_SERVICE_EXCEPTION);
     OHOS::MMI::CustomCursor cursor;
     cursor.focusX = customCursor->anchorX;
     cursor.focusY = customCursor->anchorY;
