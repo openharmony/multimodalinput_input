@@ -3302,7 +3302,7 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
     if (ret != RET_OK) {
         MMI_HILOGE("SetPointerStyle fail, windowId: %{public}d, error: %{public}d", windowId, ret);
-        return ret == INPUT_NOT_SYSTEM_APPLICATION ? INPUT_NOT_SYSTEM_APPLICATION : INPUT_SERVICE_EXCEPTION;
+        return INPUT_SERVICE_EXCEPTION;
     }
     return INPUT_SUCCESS;
 }
