@@ -20,7 +20,7 @@ module_output_path = "input/input"
 ##############################fuzztest##########################################
 ohos_fuzztest("EventSetMouseHotSpotFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/enableinputdevice_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/eventsetmousehotspot_fuzzer"
   include_dirs = [ "${mmi_path}/interfaces/util/common/include" ]
   cflags = [
     "-g",
