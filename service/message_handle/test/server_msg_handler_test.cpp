@@ -2774,7 +2774,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor_001, Tes
     ServerMsgHandler serverMsgHandler;
     int32_t session = 1;
     KeyMonitorOption keyOption;
-    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.SubscribeKeyMonitor(session, keyOption));
+    std::string name = "test.name";
+    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.SubscribeKeyMonitor(session, keyOption, name));
 }
 
 /**
@@ -2789,7 +2790,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor_001, T
     ServerMsgHandler serverMsgHandler;
     int32_t session = 1;
     KeyMonitorOption keyOption;
-    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.UnsubscribeKeyMonitor(session, keyOption));
+    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.UnsubscribeKeyMonitor(session, keyOption, ""));
 }
 
 /**
@@ -3227,7 +3228,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor002, Test
     ServerMsgHandler handler;
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session {-1};
-    int32_t ret = handler.SubscribeKeyMonitor(session, keyOption);
+    std::string name = "test.name";
+    int32_t ret = handler.SubscribeKeyMonitor(session, keyOption, name);
     EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
 }
 
@@ -3243,7 +3245,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor002, Te
     ServerMsgHandler handler;
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session {-1};
-    int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption);
+    std::string name = "test.name";
+    int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption, name);
     EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
 }
 

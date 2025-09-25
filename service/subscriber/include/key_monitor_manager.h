@@ -54,23 +54,28 @@ public:
     ~KeyMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(KeyMonitorManager);
 
-    int32_t AddMonitor(const Monitor &monitor);
-    void RemoveMonitor(const Monitor &monitor);
+    int32_t AddMonitor(const Monitor &monitor, const std::string &bundleName);
+    void RemoveMonitor(const Monitor &monitor, const std::string &bundleName);
     bool Intercept(std::shared_ptr<KeyEvent> keyEvent);
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent, int32_t delay);
     void NotifyPendingMonitors();
     void ResetAll(int32_t keyCode);
+    void SetMeeTimeSubcriber(bool status, std::string monitorType);
 
     static std::shared_ptr<KeyMonitorManager> GetInstance();
 
 private:
     void OnSessionLost(int32_t session);
     bool CheckMonitor(const Monitor &monitor);
-    void NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session);
+    void NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session, int32_t status);
+    bool CheckMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent);
+    void NotifyMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent);
 
     std::set<Monitor> monitors_;
     std::map<Monitor, PendingMonitor> pending_;
     static const std::set<int32_t> allowedKeys_;
+    std::atomic_bool isMeeTimeSubcriber_ { false };
+    std::map<std::string, int32_t> meeTimeMonitor_;
 };
 
 #define KEY_MONITOR_MGR KeyMonitorManager::GetInstance()

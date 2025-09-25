@@ -92,8 +92,10 @@ public:
     int32_t OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    int32_t SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption);
-    int32_t UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption);
+    int32_t SubscribeKeyMonitor(int32_t session,
+        const KeyMonitorOption &keyOption, const std::string &bundleName);
+    int32_t UnsubscribeKeyMonitor(int32_t session,
+        const KeyMonitorOption &keyOption, const std::string &bundleName);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
