@@ -11782,5 +11782,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessInjectEventGlob
     EXPECT_EQ(mockPointerItem.GetGlobalX(), 200.0);
     EXPECT_NO_FATAL_FAILURE(manager.ProcessInjectEventGlobalXY(mockPointerEvent, PointerEvent::GLOBAL_COORDINATE));
 }
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfoFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    uint32_t flag = WindowInfo::FLAG_BIT_DISABLE_USER_ACTION;
+    std::shared_ptr<InputEvent> event = InputEvent::Create();
+    ASSERT_NE(event, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
+    flag = WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
+}
 } // namespace MMI
 } // namespace OHOS
