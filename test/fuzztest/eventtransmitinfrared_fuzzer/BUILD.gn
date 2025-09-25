@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("EventSetMouseHotSpotFuzzTest") {
+ohos_fuzztest("EventTransmitInfraredFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/eventsetmousehotspot_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/eventtransmitinfrared_fuzzer"
   include_dirs = [ "${mmi_path}/interfaces/util/common/include" ]
   cflags = [
     "-g",
@@ -28,7 +28,7 @@ ohos_fuzztest("EventSetMouseHotSpotFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "eventsetmousehotspot_fuzzer.cpp" ]
+  sources = [ "eventtransmitinfrared_fuzzer.cpp" ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
@@ -47,7 +47,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":EventSetMouseHotSpotFuzzTest",
+    ":EventTransmitInfraredFuzzTest",
   ]
 }
 ###############################################################################
