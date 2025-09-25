@@ -151,10 +151,10 @@ function GetDeviceInfoSync(deviceId: i32): InputDeviceData;
 
 
 @!sts_inject("""
-    function on(type: 'change', callback: (info: DeviceListener) => void) {
+    function onChange(callback: (info: DeviceListener) => void) {
         return onKey(callback, callback);
     }
-    function off(type: 'change', callback?: (info: DeviceListener) => void) {
+    function offChange(callback?: (info: DeviceListener) => void) {
         return offKey(callback);
     }
 """)
