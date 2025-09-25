@@ -2183,7 +2183,7 @@ Input_Result OH_Input_SetPointerVisible(bool visible);
 /**
  * @brief Obtains the mouse pointer style.
  *
- * @param windowId Window ID. The value is an integer greater than or equal to 0.
+ * @param windowId Window ID. The value is an integer greater than or equal to -1.
  * @param pointerStyle Pointer to the pointerStyle.
  * @return OH_Input_SetPointerVisible function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
