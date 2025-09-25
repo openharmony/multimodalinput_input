@@ -447,6 +447,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         lastPressedKey = pressedKeys.back();
         MMI_HILOGD("The last repeat button, keyCode:%{private}d", lastPressedKey);
     }
+    WIN_MGR->HandleKeyEventWindowId(keyEvent);
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG

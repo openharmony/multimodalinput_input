@@ -304,7 +304,6 @@ void LocalHotKeySteward::LoadLocalHotKeys()
         ReadLocalHotKeys(ifs, localHotKeys_);
         PickSystemHotKeys(localHotKeys_, systemHotKeys_);
     }
-    ifs.close();
 }
 
 static bool ReadSystemLocalHotKeys(const std::string &paramName, std::string &paramValue)

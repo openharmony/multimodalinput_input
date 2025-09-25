@@ -189,8 +189,11 @@ void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<
             CleanSubscribeInfo(subscriber, currentTime);
             NotifySubscriber(keyEvent, subscriber);
         } else {
-            subscriber->keyEvent_ = keyEvent;
             subscriber->lastEventType_ = EVENTTYPE_KEY;
+            if (keyEventCopy_ == nullptr) {
+                keyEventCopy_ = std::make_shared<KeyEvent>(*keyEvent);
+            }
+            subscriber->keyEvent_ = keyEventCopy_;
             StartIntervalTimer(subscriber, currentTime);
         }
     }
@@ -212,8 +215,11 @@ void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<
             CleanSubscribeInfo(subscriber, currentTime);
             NotifySubscriber(pointerEvent, subscriber);
         } else {
-            subscriber->pointerEvent_ = pointerEvent;
             subscriber->lastEventType_ = EVENTTYPE_POINTER;
+            if (pointerEventCopy_ == nullptr) {
+                pointerEventCopy_ = std::make_shared<PointerEvent>(*pointerEvent);
+            }
+            subscriber->pointerEvent_ = pointerEventCopy_;
             StartIntervalTimer(subscriber, currentTime);
         }
     }
