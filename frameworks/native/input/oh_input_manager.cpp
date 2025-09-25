@@ -3419,7 +3419,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     CALL_DEBUG_ENTER;
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
-    if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
+    if (windowId < 0) {
         MMI_HILOGE("Invalid windowId");
         return INPUT_PARAMETER_ERROR;
     }
