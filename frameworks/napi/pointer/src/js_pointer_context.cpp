@@ -83,7 +83,7 @@ napi_value JsPointerContext::CreateInstance(napi_env env)
 
     uint32_t refCount = 0;
     if (napi_reference_ref(env, jsContext->contextRef_, &refCount) != napi_ok) {
-        CHKRP(napi_delete_reference(env, jsContext->contextRef_), DELETE_REFERENCE);        
+        CHKRP(napi_delete_reference(env, jsContext->contextRef_), DELETE_REFERENCE);
         return nullptr;
     }
     return jsInstance;
