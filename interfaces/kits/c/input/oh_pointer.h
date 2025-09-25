@@ -29,7 +29,7 @@
  *
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @library libohinput.so
- * @since 21
+ * @since 22
  */
 
 #ifndef OH_POINTER_H
