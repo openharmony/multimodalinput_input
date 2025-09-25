@@ -18,6 +18,7 @@
 #include "multimodal_input_plugin_manager.h"
 #include "i_input_event_handler.h"
 #include "input_event_handler.h"
+#include "key_monitor_manager.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -347,6 +348,23 @@ UDSServer* InputPluginManager::GetUdsServer()
     return udsServer_;
 }
 
+void InputPluginManager::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
+{
+    CALL_INFO_TRACE;
+    MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
+        monitorStatus, monitorType.c_str());
+    auto it = plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    if (it == plugins_.end()) {
+        MMI_HILOGE("plugins_ not stage:%{public}d", InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+        return;
+    }
+    for (auto &plugin : it->second) {
+        if (plugin != nullptr) {
+            plugin->HandleMonitorStatus(monitorStatus, monitorType);
+        }
+    }
+}
+
 int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
 {
     name_ = pin->GetName();
@@ -509,6 +527,14 @@ InputPlugin::~InputPlugin()
     }
     MMI_HILOGI("~InputPlugin");
     // LCOV_EXCL_STOP
+}
+
+void InputPlugin::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
+{
+    CHKPV(plugin_);
+    MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
+        monitorStatus, monitorType.c_str());
+    return plugin_->HandleMonitorStatus(monitorStatus, monitorType);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -1254,7 +1254,8 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
@@ -1266,10 +1267,11 @@ int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorO
         .action_ = keyOption.GetAction(),
         .isRepeat_ = keyOption.IsRepeat(),
     };
-    return KEY_MONITOR_MGR->AddMonitor(monitor);
+    return KEY_MONITOR_MGR->AddMonitor(monitor, bundleName);
 }
 
-int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session,
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
@@ -1281,7 +1283,7 @@ int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonito
         .action_ = keyOption.GetAction(),
         .isRepeat_ = keyOption.IsRepeat(),
     };
-    KEY_MONITOR_MGR->RemoveMonitor(monitor);
+    KEY_MONITOR_MGR->RemoveMonitor(monitor, bundleName);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
