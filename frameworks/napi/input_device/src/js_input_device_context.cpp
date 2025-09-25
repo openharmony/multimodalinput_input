@@ -86,7 +86,6 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
     CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
     uint32_t refCount = 0;
-    CHKRP(napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
     if (napi_reference_ref(env, jsContext->contextRef_, &refCount) != napi_ok) {
         CHKRP(napi_delete_reference(env, jsContext->contextRef_), DELETE_REFERENCE);        
         return nullptr;
