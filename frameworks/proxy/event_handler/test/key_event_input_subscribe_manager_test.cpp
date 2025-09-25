@@ -460,7 +460,7 @@ HWTEST_F(KeyEventInputSubscribeManagerTest, KeyEventInputSubscribeManagerTest_On
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent->SetRepeatKey(true);
-    auto ret = manager.OnSubscribeKeyMonitor(keyEvent);
+    auto ret = manager.OnSubscribeKeyMonitor(keyEvent, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -492,7 +492,7 @@ HWTEST_F(KeyEventInputSubscribeManagerTest, KeyEventInputSubscribeManagerTest_On
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent->SetRepeatKey(true);
-    auto ret = manager.OnSubscribeKeyMonitor(keyEvent);
+    auto ret = manager.OnSubscribeKeyMonitor(keyEvent, false);
     EXPECT_EQ(ret, RET_OK);
 }
 

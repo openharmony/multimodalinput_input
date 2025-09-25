@@ -82,17 +82,18 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_AddMonitor_01, TestSize.Le
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::string name = "test.name";
     KeyMonitorManager::Monitor monitor1{
         .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_UP, .isRepeat_ = true};
-    int32_t ret = keyMonitorManager->AddMonitor(monitor1);
+    int32_t ret = keyMonitorManager->AddMonitor(monitor1, name);
     EXPECT_EQ(ret, -PARAM_INPUT_INVALID);
 
     KeyMonitorManager::Monitor monitor2{
         .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_DOWN, .isRepeat_ = true};
-    ret = keyMonitorManager->AddMonitor(monitor2);
+    ret = keyMonitorManager->AddMonitor(monitor2, name);
     EXPECT_EQ(ret, RET_OK);
 
-    ret = keyMonitorManager->AddMonitor(monitor2);
+    ret = keyMonitorManager->AddMonitor(monitor2, name);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -107,14 +108,15 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RemoveMonitor_01, TestSize
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
     size_t size = keyMonitorManager->monitors_.size();
+    std::string name = "test.name";
 
     KeyMonitorManager::Monitor monitor1{
         .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_DOWN, .isRepeat_ = true};
-    int32_t ret = keyMonitorManager->AddMonitor(monitor1);
+    int32_t ret = keyMonitorManager->AddMonitor(monitor1, name);
     EXPECT_EQ(ret, RET_OK);
 
     EXPECT_GT(keyMonitorManager->monitors_.size(), size);
-    keyMonitorManager->RemoveMonitor(monitor1);
+    keyMonitorManager->RemoveMonitor(monitor1, name);
 }
 /**
  * @tc.name: KeyMonitorManagerTest_Intercept_01

@@ -101,6 +101,7 @@ struct IInputPlugin {
     virtual PluginResult HandleEvent(
         std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual sptr<IRemoteObject> GetExternalObject() { return nullptr;}
+    virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) const = 0;
 };
 
 struct IPluginContext {
@@ -119,6 +120,7 @@ struct IPluginContext {
         std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
+    virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)
