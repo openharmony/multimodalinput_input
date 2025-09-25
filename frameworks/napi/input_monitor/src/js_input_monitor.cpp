@@ -1531,10 +1531,9 @@ JsInputMonitor::~JsInputMonitor()
             monitor_->Stop();
         }
     }
-    uint32_t refCount = 0;
-    auto status = napi_reference_unref(jsEnv_, receiver_, &refCount);
+    auto status = napi_delete_reference(jsEnv_, receiver_);
     if (status != napi_ok) {
-        THROWERR(jsEnv_, "napi_reference_unref is failed");
+        MMI_HILOGE("napi_delete_reference is failed, status:%{public}d", status);
         return;
     }
 }

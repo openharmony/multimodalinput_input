@@ -36,6 +36,8 @@ constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 } // namespace
 
+napi_env JsInputDeviceContext::env_ = nullptr;
+
 JsInputDeviceContext::JsInputDeviceContext()
 {
     mgr_ = std::make_shared<JsInputDeviceManager>();
@@ -48,6 +50,13 @@ JsInputDeviceContext::~JsInputDeviceContext()
     mgr_.reset();
     if (jsInputDeviceMgr) {
         jsInputDeviceMgr->ResetEnv();
+    }
+    if (env_ != nullptr) {
+        auto status = napi_delete_reference(env_, contextRef_);
+        if (status != napi_ok) {
+            MMI_HILOGE("napi_delete_reference is failed, status:%{public}d", status);
+            return;
+        }
     }
 }
 
@@ -78,6 +87,10 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 
     uint32_t refCount = 0;
     CHKRP(napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
+    if (napi_reference_ref(env, jsContext->contextRef_, &refCount) != napi_ok) {
+        CHKRP(napi_delete_reference(env, jsContext->contextRef_), DELETE_REFERENCE);        
+        return nullptr;
+    }
     return jsInstance;
 }
 
@@ -831,6 +844,7 @@ napi_value JsInputDeviceContext::CreateEnumFunctionKey(napi_env env, napi_value 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
+    env_ = env;
     CHKPP(CreateInstance(env));
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
