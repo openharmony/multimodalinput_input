@@ -89,7 +89,7 @@ void CursorDrawingComponent::Load()
         auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - lastCallTime_).count();
         if ((idleTime >= UNLOAD_TIME_MS) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
-            CursorDrawingComponent::GetInstance().UnLoad();
+            this->UnLoad();
         }
     }, "libcursor_drawing_adapter-Unload");
     if (timerId_ < 0) {
