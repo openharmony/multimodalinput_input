@@ -3440,7 +3440,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
         return INPUT_PARAMETER_ERROR;
     }
     size_t pixelBufferSize = static_cast<size_t>(byteCount);
-    uint8_t *pixelBuffer = new uint8_t[static_cast<size_t>(byteCount)]();
+    uint8_t *pixelBuffer = new uint8_t[pixelBufferSize]();
     imageResult = OH_PixelmapNative_ReadPixels(customCursor->pixelMap, pixelBuffer, &pixelBufferSize);
     if (imageResult != IMAGE_SUCCESS) {
         MMI_HILOGE("pixelMap is invalid");
@@ -3448,7 +3448,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
         return INPUT_PARAMETER_ERROR;
     }
     auto tmpPixelmapPtr = OHOS::Media::PixelMap::Create(reinterpret_cast<uint32_t*>(pixelBuffer),
-                                                        static_cast<uint32_t>(pixelBufferSize), options);
+                                                        byteCount, options);
     delete[] pixelBuffer;
     CHKPR(tmpPixelmapPtr, INPUT_PARAMETER_ERROR);
     std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr = std::move(tmpPixelmapPtr);
