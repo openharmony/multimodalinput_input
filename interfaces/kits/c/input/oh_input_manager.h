@@ -2264,7 +2264,7 @@ Input_CursorConfig* OH_Input_CursorConfig_Create(bool followSystem);
 /**
  * @brief Destroys a CursorConfig object.
  *
- * @param cursorConfig Pointer to a pointer to an {@link Input_CursorOptions} object.
+ * @param cursorConfig Pointer to a pointer to an {@link cursorConfig} object.
  * @since 22
  */
 void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig);
@@ -2286,9 +2286,9 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig *cursorConf
  *
  * @param windowId Window ID. The value is an integer greater than or equal to 0.
  * @param customCursor Pointer to an {@link Input_CustomCursor} object.
- * @param cursorConfig Pointer to an {@link Input_CursorOptions} object.
+ * @param cursorConfig Pointer to an {@link cursorConfig} object.
  * @return OH_Input_SetCustomCursor function result code.
- *         {@link INPUT_SUCCESS} if window ID is invalid or customCursor is invalid or cursorOptions is invalid;
+ *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if window ID is invalid or customCursor is invalid;
  *         {@link INPUT_DEVICE_NOT_SUPPORTED} Capability not supported.
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
