@@ -26,7 +26,7 @@
  * @file oh_pointer.h
  *
  * @brief Defines the pointer structure and related enumeration values.
- *
+ * @kit InputKit
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @library libohinput.so
  * @since 22
