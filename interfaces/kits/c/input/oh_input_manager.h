@@ -2185,7 +2185,7 @@ Input_Result OH_Input_SetPointerVisible(bool visible);
  *
  * @param windowId Window ID. The value is an integer greater than or equal to -1.
  * @param pointerStyle Pointer to the pointerStyle.
- * @return OH_Input_SetPointerVisible function api result code
+ * @return OH_Input_GetPointerStyle function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if parameter is a null pointer or window ID is invalid;
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
@@ -2198,7 +2198,7 @@ Input_Result OH_Input_GetPointerStyle(int32_t windowId, int32_t *pointerStyle);
  *
  * @param windowId Window ID. The value is an integer greater than or equal to 0.
  * @param pointerStyle Pointer style.The value should be a member of the {@link Input_PointerStyle} enumeration.
- * @return OH_Input_SetPointerVisible function api result code
+ * @return OH_Input_SetPointerStyle function api result code
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if window ID is invalid or pointerStyle is invalid;
  *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
