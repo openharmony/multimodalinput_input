@@ -2231,7 +2231,7 @@ void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor);
  *
  * @param customCursor Pointer to an {@link Input_CustomCursor} object.
  * @param pixelMap Pointer to a {@link OH_PixelmapNative}  object.
- * @return OH_Input_SetCustomCursorPixelMap function result code.
+ * @return OH_Input_CustomCursor_GetPixelMap function result code.
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} The customCursor is NULL.
  * @since 22
@@ -2244,7 +2244,7 @@ Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor,
  * @param customCursor Pointer to an {@link Input_CustomCursor} object.
  * @param anchorX Pointer to horizontal coordinate of the cursor focus.
  * @param anchorY Pointer to vertical coordinate of the cursor focus.
- * @return OH_Input_SetCustomCursorFocusX function result code.
+ * @return OH_Input_CustomCursor_GetAnchor function result code.
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} The customCursor is NULL.
  * @since 22
@@ -2274,7 +2274,7 @@ void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig);
  *
  * @param cursorConfig Pointer to an {@link Input_CursorConfig} object.
  * @param followSystem Pointer of the config whether to adjust the cursor size based on system settings
- * @return OH_Input_GetCursorOptionsFollowSystem function result code.
+ * @return OH_Input_CursorConfig_IsFollowSystem function result code.
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} The cursorOptions or followSystem the is NULL.
  * @since 22
