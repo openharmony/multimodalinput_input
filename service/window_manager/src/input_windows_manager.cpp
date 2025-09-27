@@ -460,6 +460,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         if (item.id == pointerEvent->GetTargetWindowId()) {
             MMI_HILOG_DISPATCHD("find windowinfo by window id %{public}d", item.id);
             windowInfo = &item;
+            UpdateWindowInfoFlag(item.flags, pointerEvent);
             break;
         }
     }
@@ -491,6 +492,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             if (item.id == pointerEvent->GetTargetWindowId()) {
                 MMI_HILOG_DISPATCHD("find windowinfo by window id %{public}d", item.id);
                 windowInfo = &item;
+                UpdateWindowInfoFlag(item.flags, pointerEvent);
                 break;
             }
         }
@@ -7773,6 +7775,7 @@ void InputWindowsManager::ClearActiveWindow()
 void InputWindowsManager::UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event)
 {
     CHKPV(event);
+    MMI_HILOGD("UpdateWindowInfoFlag :flag %{public}d", flag);
     if ((flag & WindowInfo::FLAG_BIT_DISABLE_USER_ACTION)
         == WindowInfo::FLAG_BIT_DISABLE_USER_ACTION) {
         event->AddFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION);
