@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.multimodalInput.pointer", "pointer")
 @!sts_inject("""
-static { loadLibrary("Pointer.z") }
+static { loadLibraryWithPermissionCheck("Pointer.z", "@ohos.multimodalInput.pointer") }
 """)
 
 enum PointerStyle : i32 {
