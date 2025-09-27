@@ -136,6 +136,7 @@ void InputActiveSubscriberHandler::StartIntervalTimer(std::shared_ptr<Subscriber
         if (subscriber->lastEventType_ == EVENTTYPE_KEY) {
             if (subscriber->keyEvent_) {
                 NotifySubscriber(subscriber->keyEvent_, subscriber);
+                subscriber->keyEvent_ = nullptr;
             } else {
                 currentTime = 0;
                 MMI_HILOGE("lastKeyEvent is null");
@@ -143,6 +144,7 @@ void InputActiveSubscriberHandler::StartIntervalTimer(std::shared_ptr<Subscriber
         } else if (subscriber->lastEventType_ == EVENTTYPE_POINTER) {
             if (subscriber->pointerEvent_) {
                 NotifySubscriber(subscriber->pointerEvent_, subscriber);
+                subscriber->pointerEvent_ = nullptr;
             } else {
                 currentTime = 0;
                 MMI_HILOGE("lastPointerEvent is null");
@@ -176,7 +178,9 @@ void InputActiveSubscriberHandler::CleanSubscribeInfo(std::shared_ptr<Subscriber
 void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    MMI_HILOGD("The Subscribe InputActive keycode: %{private}d", keyEvent->GetKeyCode());
+    MMI_HILOGD("The Subscribe InputActive keycode: %{private}d, is expandInputFlag: %{public}d",
+        keyEvent->GetKeyCode(), keyEvent->HasFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION));
+    std::shared_ptr<KeyEvent> keyEventCopy = nullptr;
     for (const auto &subscriber : subscribers_) {
         if (!subscriber) {
             MMI_HILOGE("subscriber is null");
@@ -190,10 +194,10 @@ void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<
             NotifySubscriber(keyEvent, subscriber);
         } else {
             subscriber->lastEventType_ = EVENTTYPE_KEY;
-            if (keyEventCopy_ == nullptr) {
-                keyEventCopy_ = std::make_shared<KeyEvent>(*keyEvent);
+            if (keyEventCopy == nullptr) {
+                keyEventCopy = std::make_shared<KeyEvent>(*keyEvent);
             }
-            subscriber->keyEvent_ = keyEventCopy_;
+            subscriber->keyEvent_ = keyEventCopy;
             StartIntervalTimer(subscriber, currentTime);
         }
     }
@@ -202,7 +206,9 @@ void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<
 void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    MMI_HILOGD("The Subscribe InputActive pointerId: %{private}d", pointerEvent->GetPointerId());
+    MMI_HILOGD("The Subscribe InputActive pointerId: %{private}d, is expandInputFlag: %{public}d",
+        pointerEvent->GetPointerId(), pointerEvent->HasFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION));
+    std::shared_ptr<PointerEvent> pointerEventCopy = nullptr;
     for (const auto &subscriber : subscribers_) {
         if (!subscriber) {
             MMI_HILOGE("subscriber is null");
@@ -216,10 +222,10 @@ void InputActiveSubscriberHandler::OnSubscribeInputActive(const std::shared_ptr<
             NotifySubscriber(pointerEvent, subscriber);
         } else {
             subscriber->lastEventType_ = EVENTTYPE_POINTER;
-            if (pointerEventCopy_ == nullptr) {
-                pointerEventCopy_ = std::make_shared<PointerEvent>(*pointerEvent);
+            if (pointerEventCopy == nullptr) {
+                pointerEventCopy = std::make_shared<PointerEvent>(*pointerEvent);
             }
-            subscriber->pointerEvent_ = pointerEventCopy_;
+            subscriber->pointerEvent_ = pointerEventCopy;
             StartIntervalTimer(subscriber, currentTime);
         }
     }
