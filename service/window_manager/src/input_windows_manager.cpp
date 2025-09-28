@@ -5628,7 +5628,7 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
     }
     if (targetTouchWinIds_[deviceId].find(pointerId) == targetTouchWinIds_[deviceId].end()) {
         return;
-    }   
+    }
     for (int32_t windowId : targetTouchWinIds_[deviceId][pointerId]) {
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
         CHKCC(windowInfo);
