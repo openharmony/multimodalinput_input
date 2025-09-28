@@ -81,10 +81,6 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, const O
         std::swap(width_, height_);
     }
     dpi_ = float(di.dpi) / BASELINE_DENSITY;
-#ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    mirrorWidth_ = di.validWidth;
-    mirrorHeight_ = di.validHeight;
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("Construct with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
@@ -99,8 +95,8 @@ ScreenPointer::ScreenPointer(hwcmgr_ptr_t hwcMgr, handler_ptr_t handler, screen_
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    mirrorWidth_ = si->GetMirrorWidth() == 0 ? GetScreenInfoWidth(si) : si->GetMirrorWidth();
-    mirrorHeight_ = si->GetMirrorHeight() == 0 ? GetScreenInfoHeight(si) : si->GetMirrorHeight();
+    mirrorWidth_ = si->GetMirrorWidth();
+    mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     MMI_HILOGI("Construct with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
@@ -328,8 +324,8 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     rotation_ = si->GetRotation();
     dpi_ = si->GetVirtualPixelRatio();
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    mirrorWidth_ = si->GetMirrorWidth() == 0 ? GetScreenInfoWidth(si) : si->GetMirrorWidth();
-    mirrorHeight_ = si->GetMirrorHeight() == 0 ? GetScreenInfoHeight(si) : si->GetMirrorHeight();
+    mirrorWidth_ = si->GetMirrorWidth();
+    mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     surfaceNode_->AttachToDisplay(screenId_);
     Rosen::RSTransaction::FlushImplicitTransaction();
