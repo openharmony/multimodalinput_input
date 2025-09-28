@@ -213,14 +213,16 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    if (isInvalidAreaDownedEvent(seatSlot) &&
+    if (IsInvalidAreaDownedEvent(seatSlot) &&
         WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true, false)) {
         CHKFR(OnEventTouchDown(event), false, "Get OnEventTouchDown failed");
         RemoveInvalidAreaDownedEvent(seatSlot);
         return true;
     }
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
     if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true, true)) {
+#else
+    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId, true)) {
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
         processedCount_++;
         if (processedCount_ == PRINT_INTERVAL_COUNT) {
             MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
@@ -431,7 +433,7 @@ void TouchTransformProcessor::InitToolTypes()
 }
 
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-bool TouchTransformProcessor::isInvalidAreaDownedEvent(int32_t seatSlot)
+bool TouchTransformProcessor::IsInvalidAreaDownedEvent(int32_t seatSlot)
 {
     for (const auto& item : InvalidAreaDownedEvents_) {
         if (item == seatSlot) {
@@ -445,7 +447,6 @@ void TouchTransformProcessor::AddInvalidAreaDownedEvent(int32_t seatSlot)
 {
     if (InvalidAreaDownedEvents_.size() >= MAX_N_POINTER_ITEMS) {
         InvalidAreaDownedEvents_.erase(InvalidAreaDownedEvents_.begin());
-        return;
     }
     for (const auto& item : InvalidAreaDownedEvents_) {
         if (item == seatSlot) {
