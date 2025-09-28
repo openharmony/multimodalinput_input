@@ -16,7 +16,7 @@
 @!namespace("@ohos.multimodalInput.inputEventClient", "inputEventClient")
 from ohos.multimodalInput.touchEvent use TouchEvent;
 @!sts_inject("""
-static { loadLibrary("InputEventClient.z") }
+static { loadLibraryWithPermissionCheck("InputEventClient.z", "@ohos.multimodalInput.inputEventClient") }
 """)
 
 struct TouchEventData {

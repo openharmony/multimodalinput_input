@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.multimodalInput.keyCode")
 @!sts_inject("""
-  loadLibrary("KeyCode.z")
+  { loadLibraryWithPermissionCheck("KeyCode.z", "@ohos.multimodalInput.keyCode") }
 """)
 
 enum KeyCode : i32 {

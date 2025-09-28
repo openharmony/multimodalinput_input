@@ -16,7 +16,7 @@
 @!namespace("@ohos.multimodalInput.touchEvent")
 from ohos.multimodalInput.inputEvent use InputEvent;
 @!sts_inject("""
-  loadLibrary("TouchEvent.z")
+  { loadLibraryWithPermissionCheck("TouchEvent.z", "@ohos.multimodalInput.touchEvent") }
 """)
 
 enum Action : i32 {
