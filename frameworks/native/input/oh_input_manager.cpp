@@ -3328,12 +3328,12 @@ void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor)
     *customCursor = nullptr;
 }
 
-Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative* pixelMap)
+Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative** pixelMap)
 {
     CALL_DEBUG_ENTER;
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
-    pixelMap = customCursor->pixelMap;
+    *pixelMap = customCursor->pixelMap;
     return INPUT_SUCCESS;
 }
 
