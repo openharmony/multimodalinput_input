@@ -17,7 +17,7 @@
 from ohos.multimodalInput.inputEvent use InputEvent;
 from ohos.multimodalInput.keyCode use KeyCode;
 @!sts_inject("""
-  loadLibrary("MouseEvent.z")
+  { loadLibraryWithPermissionCheck("MouseEvent.z", "@ohos.multimodalInput.mouseEvent") }
 """)
 
 enum Action : i32 {

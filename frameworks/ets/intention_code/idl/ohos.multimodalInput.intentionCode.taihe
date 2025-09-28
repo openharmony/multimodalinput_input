@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.multimodalInput.intentionCode")
 @!sts_inject("""
-  loadLibrary("IntentionCode.z")
+  { loadLibraryWithPermissionCheck("IntentionCode.z", "@ohos.multimodalInput.intentionCode") }
 """)
 
 enum IntentionCode : i32 {

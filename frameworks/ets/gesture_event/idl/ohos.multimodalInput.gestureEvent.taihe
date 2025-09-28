@@ -16,7 +16,7 @@
 @!namespace("@ohos.multimodalInput.gestureEvent")
 from ohos.multimodalInput.touchEvent use Touch;
 @!sts_inject("""
-  loadLibrary("GestureEvent.z")
+  { loadLibraryWithPermissionCheck("GestureEvent.z", "@ohos.multimodalInput.gestureEvent") }
 """)
 
 struct Pinch {

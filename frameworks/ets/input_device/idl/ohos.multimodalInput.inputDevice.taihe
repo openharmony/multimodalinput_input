@@ -15,7 +15,7 @@
 
 @!namespace("@ohos.multimodalInput.inputDevice", "inputDevice")
 @!sts_inject("""
-static { loadLibrary("InputDevice.z") }
+static { loadLibraryWithPermissionCheck("InputDevice.z", "@ohos.multimodalInput.inputDevice") }
 """)
 
 from ohos.multimodalInput.keyCode use KeyCode;

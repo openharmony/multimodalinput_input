@@ -17,7 +17,7 @@
 from ohos.multimodalInput.touchEvent use TouchEvent;
 from ohos.multimodalInput.mouseEvent use MouseEvent;
 @!sts_inject("""
-static { loadLibrary("InputMonitor.z") }
+static { loadLibraryWithPermissionCheck("InputMonitor.z", "@ohos.multimodalInput.inputMonitor") }
 """)
 
 struct TouchEventReceiver {
