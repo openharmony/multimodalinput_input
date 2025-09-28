@@ -5626,6 +5626,9 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
     if (targetTouchWinIds_.find(deviceId) == targetTouchWinIds_.end()) {
         return;
     }
+    if (targetTouchWinIds_[deviceId].find(pointerId) == targetTouchWinIds_[deviceId].end()) {
+        return;
+    }   
     for (int32_t windowId : targetTouchWinIds_[deviceId][pointerId]) {
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
         CHKCC(windowInfo);
@@ -5633,7 +5636,7 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
             auto it = std::find(targetTouchWinIds_[deviceId][pointerId].begin(),
                 targetTouchWinIds_[deviceId][pointerId].end(), windowId);
             if (it != targetTouchWinIds_[deviceId][pointerId].end()) {
-                targetTouchWinIds_[deviceId][pointerId].erase(it);
+                it = targetTouchWinIds_[deviceId][pointerId].erase(it);
             }
         }
     }
