@@ -1521,11 +1521,7 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     bool isOut = (rotateX < offsetX) || (rotateX > offsetX + validW) ||
                  (rotateY < offsetY) || (rotateY > offsetY + validH);
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    if (isOut && hasValidAreaDowned) {
-        rotateX = std::max(rotateX, offsetX);
-        rotateX = std::min(rotateX, offsetX + validW);
-        rotateY = std::max(rotateY, offsetY);
-        rotateY = std::min(rotateY, offsetY + validH);
+    if (hasValidAreaDowned) {
         isOut = false;
     }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
