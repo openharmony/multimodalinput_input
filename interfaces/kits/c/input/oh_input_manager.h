@@ -45,6 +45,11 @@ extern "C" {
 #endif
 
 struct OH_PixelmapNative;
+/**
+ * @brief Pixelmap struct
+ *
+ * @since 22
+ */
 typedef struct OH_PixelmapNative OH_PixelmapNative;
 
 /**
