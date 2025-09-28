@@ -195,5 +195,139 @@ HWTEST_F(TouchTransformProcessorTestWithMock, TouchTransformProcessorTest_GetDis
         }
     }
 }
+
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_AddInvalidAreaDownedEventTest_001
+ * @tc.desc  : 测试当列表未满时,添加元素到列表中
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, AddInvalidAreaDownedEventTest_001, TestSize.Level1) {
+    int32_t seatSlot = 5;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), 1);
+    ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.begin()), seatSlot);
+}
+
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_AddInvalidAreaDownedEventTest_002
+ * @tc.desc  : 测试当seatSlot已经存在于列表中时,不会重复添加
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, AddInvalidAreaDownedEventTest_002, TestSize.Level1) {
+    int32_t seatSlot = 5;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), 1);
+    ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.begin()), seatSlot);
+}
+
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_AddInvalidAreaDownedEventTest_003
+ * @tc.desc  : 测试当列表满时,添加元素会删除列表中的第一个元素
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, AddInvalidAreaDownedEventTest_003, TestSize.Level1) {
+    int32_t seatSlot = 11;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+
+    for (int i = 0; i < MAX_N_POINTER_ITEMS; ++i) {
+        processor.AddInvalidAreaDownedEvent(i);
+    }
+
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), MAX_N_POINTER_ITEMS);
+    ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.end()), seatSlot);
+}
+
+
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_IsInvalidAreaDownedEvent_001
+ * @tc.desc  : 测试当seatSlot已经存在于列表中, 判断存列表中的元素时返回true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, IsInvalidAreaDownedEvent_001, TestSize.Level1) {
+    int32_t seatSlot = 5;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+
+    ASSERT_TRUE(processor.isInvalidAreaDownedEvent(seatSlot));
+}
+
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_IsInvalidAreaDownedEvent_002
+ * @tc.desc  : 测试当seatSlot已经存在于列表中, 判断不存列表中的元素时返回false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, IsInvalidAreaDownedEvent_002, TestSize.Level1) {
+    int32_t seatSlot = 5;
+    int32_t otherSeatSlot = 6;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+
+    ASSERT_FALSE(processor.isInvalidAreaDownedEvent(otherSeatSlot));
+}
+
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_RemoveInvalidAreaDownedEventTest_001
+ * @tc.desc  : 测试当seatSlot已经存在于列表中时,可以删除
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, RemoveInvalidAreaDownedEventTest_001, TestSize.Level1) {
+    int32_t seatSlot = 5;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+    processor.RemoveInvalidAreaDownedEvent(seatSlot);
+
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), 0);
+}
+
+/**
+ * @tc.name  : TouchTransformProcessorTestWithMock_RemoveInvalidAreaDownedEventTest_002
+ * @tc.desc  : 测试当seatSlot不存在于列表中时,无法删除
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, RemoveInvalidAreaDownedEventTest_002, TestSize.Level1) {
+    int32_t seatSlot = 5;
+    int32_t otherSeatSlot = 6;
+    int32_t deviceId = 6;
+    TouchTransformProcessor processor(deviceId);
+    processor.InvalidAreaDownedEvents_.clear();
+
+    processor.AddInvalidAreaDownedEvent(seatSlot);
+    processor.RemoveInvalidAreaDownedEvent(otherSeatSlot);
+
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), 1);
+    ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.begin()), seatSlot);
+}
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
 } // namespace MMI
 } // namespace OHOS
