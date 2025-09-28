@@ -53,6 +53,7 @@ namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
+constexpr int32_t ACCESS_TOKEN_SERVICE_ID = 3020;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
 [[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
@@ -907,7 +908,7 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userId = sess->GetUid();
-    if (userId != SECURITY_COMPONENT_SERVICE_ID) {
+    if ((userId != SECURITY_COMPONENT_SERVICE_ID) && (userId != ACCESS_TOKEN_SERVICE_ID)) {
         MMI_HILOGE("Session is not security component service");
         return RET_ERR;
     }
