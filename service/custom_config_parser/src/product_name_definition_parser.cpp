@@ -80,6 +80,10 @@ std::string ProductNameDefinitionParser::GetProductName(const std::string &key)
 
 int32_t ProductNameDefinitionParser::ParseProductNameMap(const JsonParser &jsonParser)
 {
+    if (!cJSON_IsObject(jsonParser.Get())) {
+        MMI_HILOGE("The jsonParser is not object");
+        return RET_ERR;
+    }
     cJSON *productNameMapJson = cJSON_GetObjectItemCaseSensitive(jsonParser.Get(), "product_name_definition");
 
     if (!cJSON_IsArray(productNameMapJson)) {

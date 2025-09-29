@@ -5175,6 +5175,10 @@ std::vector<std::string> MMIService::FilterConsumers(const std::vector<std::stri
 void MMIService::UpdateConsumers(const cJSON* consumer)
 {
     DeviceConsumer deviceConsumer;
+    if (!cJSON_IsObject(consumer)) {
+        MMI_HILOGE("The parser is not object");
+        return;
+    }
     cJSON* name = cJSON_GetObjectItemCaseSensitive(consumer, "name");
     if (name != nullptr && cJSON_IsString(name)) {
         char *nameString = cJSON_Print(name);
