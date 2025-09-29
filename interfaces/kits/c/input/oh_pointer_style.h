@@ -176,7 +176,7 @@ typedef enum Input_PointerStyle {
     * Move
     * @since 22
     */
-    MOVE = 21,
+    CURSOR_MOVE = 21,
 
     /**
     * Left and right resizing
