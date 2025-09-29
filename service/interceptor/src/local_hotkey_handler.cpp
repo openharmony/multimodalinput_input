@@ -60,6 +60,10 @@ bool LocalHotKey::operator<(const LocalHotKey &other) const
 
 static bool ReadHotKeyCode(int32_t index, cJSON *jsonHotKey, int32_t &keyCode)
 {
+    if (!cJSON_IsObject(jsonHotKey)) {
+        MMI_HILOGE("The jsonHotKey is not object");
+        return false;
+    }
     cJSON *jsonKeyCode = cJSON_GetObjectItemCaseSensitive(jsonHotKey, "KEYCODE");
     if (jsonKeyCode == nullptr) {
         MMI_HILOGE("The 'LOCAL_HOT_KEYS[%{public}d].KEYCODE' is missing", index);
@@ -107,6 +111,10 @@ static bool ReadModifiers(int32_t index, cJSON *jsonHotKey, const std::map<std::
         { "NONE", ModifierKeyAction::NONE },
     };
     for (const auto &[name, modifierBit] : names) {
+        if (!cJSON_IsObject(jsonModifiers)) {
+            MMI_HILOGE("The jsonModifiers is not object");
+            return false;
+        }
         cJSON *jsonModifier = cJSON_GetObjectItemCaseSensitive(jsonModifiers, name.c_str());
         if (jsonModifier == nullptr) {
             MMI_HILOGW("The 'LOCAL_HOT_KEYS[%{public}d].MODIFIERS.%{public}s' is missing", index, name.c_str());
@@ -167,6 +175,10 @@ static bool ReadHotKeyModifiers(int32_t index, cJSON *jsonHotKey, std::set<uint3
 
 static bool ReadHotKeyAction(int32_t index, cJSON *jsonHotKey, LocalHotKeyAction &hotKeyAction)
 {
+    if (!cJSON_IsObject(jsonHotKey)) {
+        MMI_HILOGE("The jsonHotKey is not object");
+        return false;
+    }
     cJSON *jsonAction = cJSON_GetObjectItemCaseSensitive(jsonHotKey, "ACTION");
     if (jsonAction == nullptr) {
         MMI_HILOGE("The 'LOCAL_HOT_KEYS[%{public}d].ACTION' is missing", index);
