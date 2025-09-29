@@ -86,7 +86,7 @@ typedef enum {
     KEYCODE_MEDIA_PREVIOUS = 13,
     /**
      * Rewind key
-     * @since 22.
+     * @since 22
      */
     KEYCODE_MEDIA_REWIND = 14,
     /**
@@ -1276,7 +1276,7 @@ typedef enum {
      * @since 22
      */
     KEYCODE_ALTERASE = 2839,
-    /** 
+    /**
      * Switch Video Mode key (monitor, LCD, and TV, etc)
      * @since 22
      */

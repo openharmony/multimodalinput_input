@@ -4230,5 +4230,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_001, Te
     int32_t windowId = 0;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
     EXPECT_EQ(res, INPUT_SUCCESS);
+}
 } // namespace MMI
 } // namespace OHOS
