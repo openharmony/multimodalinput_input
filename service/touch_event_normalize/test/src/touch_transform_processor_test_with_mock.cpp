@@ -243,16 +243,17 @@ HWTEST_F(TouchTransformProcessorTestWithMock, AddInvalidAreaDownedEventTest_002,
 HWTEST_F(TouchTransformProcessorTestWithMock, AddInvalidAreaDownedEventTest_003, TestSize.Level1) {
     int32_t seatSlot = 11;
     int32_t deviceId = 6;
+    int32_t maxPointerItems = 10;
     TouchTransformProcessor processor(deviceId);
     processor.InvalidAreaDownedEvents_.clear();
 
-    for (int i = 0; i < MAX_N_POINTER_ITEMS; ++i) {
+    for (int i = 0; i < maxPointerItems; ++i) {
         processor.AddInvalidAreaDownedEvent(i);
     }
 
     processor.AddInvalidAreaDownedEvent(seatSlot);
 
-    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), MAX_N_POINTER_ITEMS);
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), maxPointerItems);
     ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.end()), seatSlot);
 }
 
