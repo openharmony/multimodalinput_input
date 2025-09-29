@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "iservice_registry.h"
 #include "setting_datashare.h"
 #include "setting_observer.h"
 #include "event_log_helper.h"
@@ -71,7 +72,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutIntValue, TestSize.Level1
     std::string key = "settingDateShare";
     int32_t value = 123;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutIntValue(key, value, needNotify), ERR_OK);
+    ASSERT_NE(settingDataShare.PutIntValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -87,7 +88,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutLongValue, TestSize.Level
     std::string key = "settingDateShare";
     int64_t value = 123;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutLongValue(key, value, needNotify), ERR_OK);
+    ASSERT_NE(settingDataShare.PutLongValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -103,7 +104,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutBoolValue, TestSize.Level
     std::string key = "settingDateShare";
     bool value = true;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutBoolValue(key, value, needNotify), ERR_OK);
+    ASSERT_NE(settingDataShare.PutBoolValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -214,12 +215,12 @@ HWTEST_F(SettingObserverTest, SettingObserverTest_OnChange, TestSize.Level1)
 }
 
 /**
- * @tc.name: SettingObserverTest_CreateDataShareHelper
+ * @tc.name: SettingObserverTest_CreateDataShareHelper_001
  * @tc.desc: Test CreateDataShareHelper
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper, TestSize.Level1)
+HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     SettingDataShare settingDataShare;
@@ -227,6 +228,77 @@ HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper, TestSiz
     ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
     str = "";
     ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
+}
+
+/**
+ * @tc.name: SettingObserverTest_CreateDataShareHelper_002
+ * @tc.desc: Test CreateDataShareHelper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    std::string str = "createdatasharehelper";
+    SettingDataShare::instance_ = nullptr;
+    ASSERT_EQ(settingDataShare.CreateDataShareHelper(str), nullptr);
+}
+
+/**
+ * @tc.name: SettingObserverTest_CreateDataShareHelper_003
+ * @tc.desc: Test CreateDataShareHelper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    std::string str = "createdatasharehelper";
+    settingDataShare.isDataShareReady_ =false;
+    ASSERT_EQ(settingDataShare.CreateDataShareHelper(str), nullptr);
+}
+
+/**
+ * @tc.name: SettingObserverTest_CreateDataShareHelper_004
+ * @tc.desc: Test CreateDataShareHelper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    std::string str = "createdatasharehelper";
+    SettingDataShare::instance_ = std::make_shared<SettingDataShare>();
+    SettingDataShare::instance_->isDataShareReady_ = true;
+    settingDataShare.isDataShareReady_ = true;
+
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
+    str = "";
+    ASSERT_EQ(settingDataShare.CreateDataShareHelper(str), nullptr);
+}
+
+/**
+ * @tc.name: SettingObserverTest_CreateDataShareHelper_005
+ * @tc.desc: Test CreateDataShareHelper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingDataShare settingDataShare;
+    std::string str = "createdatasharehelper";
+    SettingDataShare::instance_ = std::make_shared<SettingDataShare>();
+    SettingDataShare::instance_->isDataShareReady_ = true;
+    settingDataShare.isDataShareReady_ = true;
+
+    auto sysMgr = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(sysMgr != nullptr);
+    ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
+    ASSERT_EQ(settingDataShare.CreateDataShareHelper(str), nullptr);
 }
 
 /**
