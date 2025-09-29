@@ -501,7 +501,7 @@ typedef enum {
      * @since 22
      */
     KEYCODE_HANJA = 2614,
-    /** 
+    /**
      * Yen key
      * @since 22
      */

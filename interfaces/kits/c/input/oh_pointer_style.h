@@ -315,12 +315,53 @@ typedef enum Input_PointerStyle {
     * @since 22
     */
     MIDDLE_BTN_EAST_WEST = 44;
-    
+
+    /*
+    * Left part of running state with dynamic cursor
+    * @since 22
+    */
+    RUNNING_LEFT = 45,
+    /*
+    * Right part of running state with dynamic cursor
+    * @since 22
+    */
+    RUNNING_RIGHT = 46,
+
+    /*
+    * Circular cursor
+    * @since 22
+    */
+    AECH_DEVELOPER_DEFINED_ICON = 47,
+
     /**
     * Screen Recording
     * @since 22
     */
-    SCREENRECORDER_CURSOR = 48;
+    SCREENRECORDER_CURSOR = 48,
+
+    /*
+    * Laser
+    * @since 22
+    */
+    LASER_CURSOR = 49,
+
+    /*
+    * Dot laser
+    * @since 22
+    */
+    LASER_CURSOR_DOT = 50,
+
+    /*
+    * Red dot laser
+    * @since 22
+    */
+    LASER_CURSOR_DOT_RED = 51,
+
+    /*
+    * User defined
+    * @since 22
+    */
+    DEVELOPER_DEFINED_ICON = -100
 } Input_PointerStyle;
 
 #ifdef __cplusplus
