@@ -79,6 +79,10 @@ std::string BundleNameParser::GetBundleName(const std::string &key)
 
 int32_t BundleNameParser::ParseBundleNameMap(const JsonParser &jsonParser)
 {
+    if (!cJSON_IsObject(jsonParser.Get())) {
+        MMI_HILOGE("The jsonParser is not object");
+        return RET_ERR;
+    }
     cJSON *bundleNameMapJson = cJSON_GetObjectItemCaseSensitive(jsonParser.Get(), "bundle_name_map");
     if (!cJSON_IsArray(bundleNameMapJson)) {
         MMI_HILOGE("bundleNameMapJson is not array");
