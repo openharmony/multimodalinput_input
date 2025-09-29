@@ -314,7 +314,7 @@ typedef enum Input_PointerStyle {
     * Scrolling east and west
     * @since 22
     */
-    MIDDLE_BTN_EAST_WEST = 44;
+    MIDDLE_BTN_EAST_WEST = 44,
 
     /*
     * Left part of running state with dynamic cursor
