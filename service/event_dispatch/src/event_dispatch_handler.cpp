@@ -168,11 +168,11 @@ void EventDispatchHandler::AddFlagToEsc(const std::shared_ptr<KeyEvent> keyEvent
 {
     CHKPV(keyEvent);
     MMI_HILOGD("add Flag to ESC in");
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE)) {
+        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
+    }
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_ESCAPE) {
         return;
-    }
-    if (!escToBackFlag_ && keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE)) {
-        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
     }
 
     if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
