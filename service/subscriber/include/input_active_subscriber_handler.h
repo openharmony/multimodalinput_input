@@ -75,8 +75,6 @@ private:
     std::list<std::shared_ptr<Subscriber>> subscribers_;
     std::atomic_bool callbackInitialized_ { false };
     static constexpr int32_t INVALID_TIMERID = -1;
-    std::shared_ptr<KeyEvent> keyEventCopy_ { nullptr };
-    std::shared_ptr<PointerEvent> pointerEventCopy_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
