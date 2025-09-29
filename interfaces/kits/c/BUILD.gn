@@ -21,7 +21,7 @@ ohos_ndk_headers("ohinput_header") {
     "./input/oh_axis_type.h",
     "./input/oh_input_manager.h",
     "./input/oh_key_code.h",
-    "./input/oh_pointer.h",
+    "./input/oh_pointer_style.h",
   ]
 }
 
@@ -34,6 +34,6 @@ ohos_ndk_library("libohinput_ndk") {
     "multimodalinput/oh_axis_type.h",
     "multimodalinput/oh_input_manager.h",
     "multimodalinput/oh_key_code.h",
-    "./input/oh_pointer.h",
+    "multimodalinput/input/oh_pointer_style.h",
   ]
 }

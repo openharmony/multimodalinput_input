@@ -23,7 +23,7 @@
  */
 
 /**
- * @file oh_pointer.h
+ * @file oh_pointer_style.h
  *
  * @brief Defines the pointer structure and related enumeration values.
  * @kit InputKit
@@ -32,8 +32,8 @@
  * @since 22
  */
 
-#ifndef OH_POINTER_H
-#define OH_POINTER_H
+#ifndef OH_POINTER_STYLE_H
+#define OH_POINTER_STYLE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -176,7 +176,7 @@ typedef enum Input_PointerStyle {
     * Move
     * @since 22
     */
-    MOVE = 21,
+    CURSOR_MOVE = 21,
 
     /**
     * Left and right resizing
@@ -314,13 +314,55 @@ typedef enum Input_PointerStyle {
     * Scrolling east and west
     * @since 22
     */
-    MIDDLE_BTN_EAST_WEST = 44;
-    
+    MIDDLE_BTN_EAST_WEST = 44,
+
+    /**
+    * Left part of running state with dynamic cursor
+    * @since 22
+    */
+    RUNNING_LEFT = 45,
+
+    /**
+    * Right part of running state with dynamic cursor
+    * @since 22
+    */
+    RUNNING_RIGHT = 46,
+
+    /**
+    * Circular cursor
+    * @since 22
+    */
+    AECH_DEVELOPER_DEFINED_ICON = 47,
+
     /**
     * Screen Recording
     * @since 22
     */
-    SCREENRECORDER_CURSOR = 48;
+    SCREENRECORDER_CURSOR = 48,
+
+    /**
+    * Laser
+    * @since 22
+    */
+    LASER_CURSOR = 49,
+
+    /**
+    * Dot laser
+    * @since 22
+    */
+    LASER_CURSOR_DOT = 50,
+
+    /**
+    * Red dot laser
+    * @since 22
+    */
+    LASER_CURSOR_DOT_RED = 51,
+
+    /**
+    * User defined
+    * @since 22
+    */
+    DEVELOPER_DEFINED_ICON = -100
 } Input_PointerStyle;
 
 #ifdef __cplusplus
@@ -328,4 +370,4 @@ typedef enum Input_PointerStyle {
 #endif
 /** @} */
 
-#endif /* OH_POINTER_H */
+#endif /* OH_POINTER_STYLE_H */

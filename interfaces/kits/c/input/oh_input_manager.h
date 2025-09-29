@@ -45,6 +45,11 @@ extern "C" {
 #endif
 
 struct OH_PixelmapNative;
+/**
+ * @brief Pixelmap struct
+ *
+ * @since 22
+ */
 typedef struct OH_PixelmapNative OH_PixelmapNative;
 
 /**
@@ -2236,7 +2241,7 @@ void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor);
  *         {@link INPUT_PARAMETER_ERROR} The customCursor is NULL.
  * @since 22
  */
-Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative* pixelMap);
+Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative** pixelMap);
  
 /**
  * @brief Obtains the anchor of the CustomCursor.

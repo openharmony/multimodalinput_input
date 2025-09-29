@@ -3297,7 +3297,7 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
         return INPUT_PARAMETER_ERROR;
     }
     if ((pointerStyle < OHOS::MMI::DEFAULT && pointerStyle != OHOS::MMI::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle > OHOS::MMI::SCREENRECORDER_CURSOR) {
+        pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         return INPUT_PARAMETER_ERROR;
     }
@@ -3332,12 +3332,12 @@ void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor)
     *customCursor = nullptr;
 }
 
-Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative* pixelMap)
+Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative** pixelMap)
 {
     CALL_DEBUG_ENTER;
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
-    pixelMap = customCursor->pixelMap;
+    *pixelMap = customCursor->pixelMap;
     return INPUT_SUCCESS;
 }
 
