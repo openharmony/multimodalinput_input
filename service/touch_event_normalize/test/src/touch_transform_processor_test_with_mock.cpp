@@ -270,7 +270,7 @@ HWTEST_F(TouchTransformProcessorTestWithMock, IsInvalidAreaDownedEvent_001, Test
     processor.InvalidAreaDownedEvents_.clear();
     processor.AddInvalidAreaDownedEvent(seatSlot);
 
-    ASSERT_TRUE(processor.isInvalidAreaDownedEvent(seatSlot));
+    ASSERT_TRUE(processor.IsInvalidAreaDownedEvent(seatSlot));
 }
 
 /**
@@ -288,7 +288,7 @@ HWTEST_F(TouchTransformProcessorTestWithMock, IsInvalidAreaDownedEvent_002, Test
 
     processor.AddInvalidAreaDownedEvent(seatSlot);
 
-    ASSERT_FALSE(processor.isInvalidAreaDownedEvent(otherSeatSlot));
+    ASSERT_FALSE(processor.IsInvalidAreaDownedEvent(otherSeatSlot));
 }
 
 /**
