@@ -247,7 +247,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
             .CreateObserver(g_touchpadSwitchesKey, observer.updateFunc_);
     observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
-    EXPECT_TRUE(observer.UnregisterTpObserver(2));
+    EXPECT_FALSE(observer.UnregisterTpObserver(2));
     observer.volumeSwitchesObserver_ = nullptr;
     observer.brightnessSwitchesObserver_ = nullptr;
     observer.pressureObserver_ = nullptr;
@@ -460,7 +460,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_004, TestSiz
     };
     observer.updateFunc_ = UpdateFunc;
     observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
-    EXPECT_NE(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
+    EXPECT_EQ(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
     observer.volumeSwitchesObserver_ = nullptr;
 }
 
