@@ -19,7 +19,7 @@
  *
  * @brief Provides the C interface in the multi-modal input domain.
  *
- * @since 12
+ * @since 22
  */
 
 /**
