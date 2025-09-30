@@ -72,7 +72,7 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
     bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
-    MMI_HILOGI("PublishCommonEvent: %{public}s %{public}d return %{public}d", 
+    MMI_HILOGI("PublishCommonEvent: %{public}s %{public}d return %{public}d",
         "SWITCH_TABLET", switchEvent->GetSwitchValue(), ret);
     return ret;
 }
@@ -85,7 +85,7 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
         if (PublishTabletEvent(switchEvent)) {
             MMI_HILOGI("The tablet commonEvent publish success");
-        }else {
+        } else {
             MMI_HILOGI("The tablet commonEvent publish failed");
         }
     }
