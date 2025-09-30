@@ -5627,15 +5627,15 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
     if (targetTouchWinIds_[deviceId].find(pointerId) == targetTouchWinIds_[deviceId].end()) {
         return;
     }
-    for (int32_t windowId : targetTouchWinIds_[deviceId][pointerId]) {
+    std::set<int32_t>& windowIds = targetTouchWinIds_[deviceId][pointerId];
+    for (auto iter = windowIds.begin(); iter != windowIds.end();) {
+        int32_t windowId = *iter;
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
         CHKCC(windowInfo);
         if (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL) {
-            auto it = std::find(targetTouchWinIds_[deviceId][pointerId].begin(),
-                targetTouchWinIds_[deviceId][pointerId].end(), windowId);
-            if (it != targetTouchWinIds_[deviceId][pointerId].end()) {
-                it = targetTouchWinIds_[deviceId][pointerId].erase(it);
-            }
+            iter = windowIds.erase(iter);
+        } else {
+            ++iter;
         }
     }
 }
