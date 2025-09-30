@@ -4141,7 +4141,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerStyle_002, Te
     int32_t pointerStyle = -1;
     Input_Result res = OH_Input_SetPointerStyle(windowId, pointerStyle);
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
-    pointerStyle = 49;
+    pointerStyle = 52;
     res = OH_Input_SetPointerStyle(windowId, pointerStyle);
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     windowId = -2;
