@@ -17,6 +17,10 @@
 
 #include <parameters.h>
 
+#include "common_event_data.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "want.h"
 #include "dfx_hisysevent.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -55,11 +59,36 @@ void SwitchSubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEvent> switchEvent)
+{
+    CHKPF(switchEvent);
+    OHOS::AAFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TABLET_MODE_CHANGED);
+    want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_TABLET);
+    want.SetParam("eventState", switchEvent->GetSwitchValue());
+        
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetSticky(true);
+    bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
+    MMI_HILOGI("PublishCommonEvent: %{public}s %{public}d return %{public}d", 
+        "SWITCH_TABLET", switchEvent->GetSwitchValue(), ret);
+    return ret;
+}
+
 #ifdef OHOS_BUILD_ENABLE_SWITCH
 void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
     CHKPV(switchEvent);
     UpdateSwitchState(switchEvent);
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
+        if (PublishTabletEvent(switchEvent)) {
+            MMI_HILOGI("The tablet commonEvent publish success");
+        }else {
+            MMI_HILOGI("The tablet commonEvent publish failed");
+        }
+    }
     if (OnSubscribeSwitchEvent(switchEvent)) {
         MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
         return;
