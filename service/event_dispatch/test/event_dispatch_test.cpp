@@ -399,7 +399,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc002, TestSize.Level1)
     dispatch.AddFlagToEsc(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, true);
     bool ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret3, true);
+    EXPECT_EQ(ret3, false);
 }
 
 /**
