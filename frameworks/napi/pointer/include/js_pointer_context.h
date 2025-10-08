@@ -27,7 +27,7 @@ using GetTouchpadFunc = std::function<napi_value (napi_env env, napi_value handl
 public:
     JsPointerContext();
     DISALLOW_COPY_AND_MOVE(JsPointerContext);
-    ~JsPointerContext() = default;
+    ~JsPointerContext();
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
     static napi_value SetPointerVisibleSync(napi_env env, napi_callback_info info);
@@ -112,6 +112,7 @@ private:
     std::shared_ptr<JsPointerManager> mgr_ { nullptr };
     static bool isCustomCursorEx_;
     napi_ref contextRef_ { nullptr };
+    static napi_env env_;
 };
 } // namespace MMI
 } // namespace OHOS

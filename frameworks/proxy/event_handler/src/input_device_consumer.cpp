@@ -34,14 +34,15 @@ int32_t InputDeviceConsumer::SetInputDeviceConsumer(
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set input device consumer start");
     const std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
-    MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, inputDeviceConsumerPluginStub_);
-    if (!inputDeviceConsumerPluginStub_) {
+    sptr<IRemoteObject> inputDeviceConsumerPluginStub = nullptr;
+    MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, inputDeviceConsumerPluginStub);
+    if (!inputDeviceConsumerPluginStub) {
         MMI_HILOGE("Get input device stub from plugin failed");
         return ERROR_UNSUPPORT;
     }
 
     sptr<IInputDeviceConsumerProxy> inputDevicePluginProxy =
-        sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDeviceConsumerPluginStub_);
+        sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDeviceConsumerPluginStub);
     if (!inputDevicePluginProxy) {
         MMI_HILOGE("Transfer input device plugin stub to proxy failed");
         return ERROR_UNSUPPORT;
@@ -70,8 +71,16 @@ void InputDeviceConsumer::OnConnected()
         return;
     }
 
+    const std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
+    sptr<IRemoteObject> inputDeviceConsumerPluginStub = nullptr;
+    MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, inputDeviceConsumerPluginStub);
+    if (!inputDeviceConsumerPluginStub) {
+        MMI_HILOGE("Get input device stub from plugin failed");
+        return;
+    }
+
     sptr<IInputDeviceConsumerProxy> inputDevicePluginProxy =
-        sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDeviceConsumerPluginStub_);
+        sptr<IInputDeviceConsumerProxy>::MakeSptr(inputDeviceConsumerPluginStub);
     if (!inputDevicePluginProxy) {
         MMI_HILOGE("Transfer input device plugin stub to proxy failed");
         return;

@@ -908,29 +908,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdatePointerEvent_004, Test
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_001
- * @tc.desc: Test the function SaveTargetWindowId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    int32_t pointerId = 1;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(pointerId);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerId(0);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_002
  * @tc.desc: Test the function SaveTargetWindowId
  * @tc.type: FUNC
@@ -2797,7 +2774,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor_001, Tes
     ServerMsgHandler serverMsgHandler;
     int32_t session = 1;
     KeyMonitorOption keyOption;
-    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.SubscribeKeyMonitor(session, keyOption));
+    std::string name = "test.name";
+    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.SubscribeKeyMonitor(session, keyOption, name));
 }
 
 /**
@@ -2812,7 +2790,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor_001, T
     ServerMsgHandler serverMsgHandler;
     int32_t session = 1;
     KeyMonitorOption keyOption;
-    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.UnsubscribeKeyMonitor(session, keyOption));
+    ASSERT_NO_FATAL_FAILURE(serverMsgHandler.UnsubscribeKeyMonitor(session, keyOption, ""));
 }
 
 /**
@@ -3250,7 +3228,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor002, Test
     ServerMsgHandler handler;
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session {-1};
-    int32_t ret = handler.SubscribeKeyMonitor(session, keyOption);
+    std::string name = "test.name";
+    int32_t ret = handler.SubscribeKeyMonitor(session, keyOption, name);
     EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
 }
 
@@ -3266,7 +3245,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor002, Te
     ServerMsgHandler handler;
     OHOS::MMI::KeyMonitorOption keyOption;
     int32_t session {-1};
-    int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption);
+    std::string name = "test.name";
+    int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption, name);
     EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
 }
 
@@ -3491,6 +3471,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_002, T
     DisplayGroupInfo info;
     uint32_t num = 1;
     pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
+    uint32_t groupNum = 0;
+    uint32_t windowsNum = 0;
+    pkt << groupNum << windowsNum;
     EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_OK);
 }
 
@@ -3511,7 +3494,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_003, T
     uint32_t num = 1;
     pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_OK);
+    EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_ERR);
 }
 
 /**
@@ -3600,7 +3583,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_002, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_ERR);
 }
 
@@ -3623,12 +3606,13 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_003, TestSiz
     NetPacket pkt(idMsg);
     WindowInfo info;
     uint32_t num = 1;
+    uint32_t windowsNum = 0;
     int32_t byteCount = 0;
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
-    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount
+        << windowsNum << info.rectChangeBySystem;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_OK);
 }
 
@@ -4366,41 +4350,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnGetFunctionKeyState_003, T
 }
 
 /**
-@tc.name: ServerMsgHandlerTest_SaveTargetWindowId_009
-@tc.desc: Test the function SaveTargetWindowId
-@tc.type: FUNC
-@tc.require:
-*/
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_009, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    auto pointer = PointerEvent::Create();
-    ASSERT_NE(pointer, nullptr);
-    pointer->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointer->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    int32_t id = 100;
-    PointerEvent::PointerItem item;
-    item.SetPointerId(id);
-    pointer->AddPointerItem(item);
-    pointer->SetPointerId(0);
-    pointer->SetZOrder(-1);
-    int32_t ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-    pointer->SetDeviceId(111);
-    pointer->SetZOrder(1);
-    pointer->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_ENTER);
-    ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-    pointer->SetDeviceId(-1);
-    pointer->SetZOrder(-1);
-    ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-    ret = handler.SaveTargetWindowId(pointer, false);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
 @tc.name: ServerMsgHandlerTest_FixTargetWindowId_009
 @tc.desc: Test FixTargetWindowId
 @tc.type: FUNC
@@ -4638,6 +4587,52 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandler_002, Te
     EXPECT_EQ(ret, RET_OK);
     ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_001
+ * @tc.desc: Test the function SaveTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetWindowId(10);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+
+    InjectionTouch touch{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    int32_t windowId = -1;
+    auto iter = handler.nativeTargetWindowIds_.find(touch);
+    if (iter != handler.nativeTargetWindowIds_.end()) {
+        windowId = iter->second;
+    }
+    EXPECT_EQ(windowId, pointerEvent->GetTargetWindowId());
+
+    pointerEvent->SetTargetDisplayId(1);
+    InjectionTouch temp{
+        .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
+    windowId = -1;
+    auto it = handler.nativeTargetWindowIds_.find(temp);
+    if (it != handler.nativeTargetWindowIds_.end()) {
+        windowId = it->second;
+    }
+    EXPECT_NE(windowId, pointerEvent->GetTargetWindowId());
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetTargetDisplayId(0);
+    ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(handler.nativeTargetWindowIds_.empty(), true);
 }
 } // namespace MMI
 } // namespace OHOS

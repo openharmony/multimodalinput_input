@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr size_t MAX_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_POINTER_COUNT { 10 };
-constexpr size_t MAX_PRESSED_KEY_NUM { 10 };
+constexpr size_t MAX_PRESSED_KEYS { 10 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr uint32_t MAX_ENHANCE_DATA_LEN { 1000 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -442,7 +442,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     int32_t tField;
     pkt >> pressedKeySize;
     CHKRWER(pkt, RET_ERR);
-    CHKUPPER(pressedKeySize, MAX_PRESSED_KEY_NUM, RET_ERR);
+    CHKUPPER(pressedKeySize, MAX_PRESSED_KEYS, RET_ERR);
     while (pressedKeySize-- > 0) {
         pkt >> tField;
         CHKRWER(pkt, RET_ERR);

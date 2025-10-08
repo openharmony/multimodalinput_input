@@ -228,6 +228,14 @@ bool KeyGestureManager::LongPressSingleKey::ShouldIntercept(std::shared_ptr<KeyO
 bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 {
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
+        static const std::string DEVICE_TYPE_TV = system::GetParameter("const.product.devicetype", "unknown");
+        const std::string PRODUCT_TYPE_TV = "tv";
+        if (DEVICE_TYPE_TV == PRODUCT_TYPE_TV) {
+            if (!KeyMonitorIntercept(keyEvent)) {
+                NotifyHandlers(keyEvent);
+            }
+            return true;
+        }
         if (IsActive()) {
             int64_t now = GetSysClockTime();
             if ((now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) &&
@@ -248,6 +256,11 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
         KEY_MONITOR_MGR->NotifyPendingMonitors();
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         Reset();
+        if ((keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP) &&
+            (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) &&
+            KeyMonitorIntercept(keyEvent)) {
+            return true;
+        }
         RunPendingHandlers();
     }
     return false;

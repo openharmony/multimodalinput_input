@@ -479,7 +479,7 @@ void LongPressSubscriberHandler::NotifySubscriber(std::shared_ptr<Subscriber> su
         return;
     }
     CHKPV(touchEvent_);
-    int32_t windowPid = WIN_MGR->GetWindowPid(touchEvent_->GetTargetWindowId());
+    int32_t windowPid = WIN_MGR->GetWindowAgentPid(touchEvent_->GetTargetWindowId());
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
         return;

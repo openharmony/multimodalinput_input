@@ -17,6 +17,7 @@
 #include <fstream>
 #include <gmock/gmock.h>
 
+#include "account_manager.h"
 #include "cursor_drawing_component.h"
 #include "event_filter_handler.h"
 #include "fingersense_wrapper.h"
@@ -66,13 +67,34 @@ constexpr uint32_t TEST_WINDOW_END {100000};
 #undef WIN_MGR
 #endif
 #define WIN_MGR g_instance
+#define NUM_100 100
+#define NUM_200 200
+#define NUM_1 1
+#define NUM_2 2
+#define NA_GROUP_ID 1000
 
 class InputWindowsManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void) {};
+    static OLD::DisplayGroupInfo CreateDisplayGroupInfo(int groupId, int displayId, int displayId2 = 0)
+    {
+        OLD::DisplayGroupInfo displayGroupInfo;
+        displayGroupInfo.groupId = groupId;
+        displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+        std::vector<OLD::DisplayInfo> displaysInfo;
+        OLD::DisplayInfo display = { .id = displayId };
+        displaysInfo.emplace_back(display);
+        if (displayId2 != 0) {
+            OLD::DisplayInfo display2 = { .id = displayId2 };
+            displaysInfo.emplace_back(display2);
+        }
+        displayGroupInfo.displaysInfo = displaysInfo;
+        return displayGroupInfo;
+    }
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
     static SessionPtr CreateSessionPtr();
+    static SessionPtr CreateCameraSessionPtr();
     void SetUp(void)
     {
         // 创建displayGroupInfo_
@@ -112,6 +134,7 @@ public:
 
     void TearDown(void)
     {
+        AccountManager::GetInstance()->AccountManagerUnregister();
         WIN_MGR->SetHoverScrollState(preHoverScrollState_);
     }
 
@@ -163,6 +186,17 @@ SessionPtr InputWindowsManagerTest::CreateSessionPtr()
     std::string programName = "uds_sesion_test";
     int32_t moduleType = 3;
     int32_t fd = -1;
+    int32_t uidRoot = 0;
+    int32_t pid = 9;
+    return std::make_shared<UDSSession>(programName, moduleType, fd, uidRoot, pid);
+}
+
+SessionPtr InputWindowsManagerTest::CreateCameraSessionPtr()
+{
+    CALL_DEBUG_ENTER;
+    std::string programName = "uds_sesion_test.camera";
+    int32_t moduleType = 3;
+        int32_t fd = -1;
     int32_t uidRoot = 0;
     int32_t pid = 9;
     return std::make_shared<UDSSession>(programName, moduleType, fd, uidRoot, pid);
@@ -610,6 +644,31 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     assert(WIN_MGR->IsDisplayAdd(1, "A"));
     assert(WIN_MGR->IsDisplayAdd(3, "C"));
     assert(!WIN_MGR->IsDisplayAdd(2, "B"));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetAllUsersDisplays_001
+ * @tc.desc: Test GetAllUsersDisplays
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetAllUsersDisplays_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::WindowInfo win1 = {.id = NUM_1, .pid = NUM_100};
+    OHOS::MMI::WindowInfo win2 = {.id = NUM_2, .pid = NUM_200};
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo1 = { win1, win2 };
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo2 = { win2 };
+    OLD::DisplayGroupInfo group1 = InputWindowsManagerTest::CreateDisplayGroupInfo(NUM_100, NUM_100, NUM_100 + NUM_1);
+    group1.windowsInfo = windowsInfo1;
+    OLD::DisplayGroupInfo group2 = InputWindowsManagerTest::CreateDisplayGroupInfo(NUM_200, NUM_200);
+    group2.windowsInfo = windowsInfo2;
+
+    WIN_MGR->UpdateDisplayInfo(group1);
+    WIN_MGR->UpdateDisplayInfo(group2);
+
+    std::vector<OLD::DisplayInfo> displays = WIN_MGR->GetAllUsersDisplays();
+    EXPECT_EQ(displays.size(), NUM_1 + NUM_2);
 }
 
 /**
@@ -6604,14 +6663,67 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByDisplayIdAndWi
     WindowInfo winInfo;
     winInfo.id = 100;
     winInfo.pid = 150;
+    WindowInfo extWinInfo;
+    extWinInfo.id = 1000;
+    extWinInfo.pid = 1500;
+    WindowInfo exiWin = {.id = 400, .pid = 450};
+    extWinInfo.uiExtentionWindowInfo.push_back(exiWin);
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(winInfo);
+        it->second.windowsInfo.push_back(extWinInfo);
+        it->second.mainDisplayId = 0;
+    }
+    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, id), winInfo.pid);
+    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, 400), 450);
+    id = 300;
+    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, id), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetAgentPidByDisplayIdAndWindowId
+ * @tc.desc: Test GetAgentPidByDisplayIdAndWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetAgentPidByDisplayIdAndWindowId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t id = 100;
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.agentPid = 150;
     auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(winInfo);
         it->second.mainDisplayId = 0;
     }
-    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, id), winInfo.pid);
+    EXPECT_EQ(inputWindowsMgr.GetAgentPidByDisplayIdAndWindowId(0, id), winInfo.agentPid);
     id = 300;
-    EXPECT_EQ(inputWindowsMgr.GetPidByDisplayIdAndWindowId(0, id), RET_ERR);
+    EXPECT_EQ(inputWindowsMgr.GetAgentPidByDisplayIdAndWindowId(0, id), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetMainDisplayId
+ * @tc.desc: Test GetMainDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMainDisplayId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.pid = 150;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(winInfo);
+        it->second.mainDisplayId = 100;
+    }
+    EXPECT_EQ(inputWindowsMgr.GetMainDisplayId(DEFAULT_GROUP_ID), 100);
+    EXPECT_EQ(inputWindowsMgr.GetMainDisplayId(NA_GROUP_ID), 0);
 }
 
 /**
@@ -6790,6 +6902,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_005,
     CALL_TEST_DEBUG;
     OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_error_userid
+ * @tc.desc: Test updating window & display information for each display diff userid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_diff_userid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.currentUserId = 11;
 
     ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
 }
@@ -7494,6 +7622,37 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCameraInFore_001,
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_JudgeCameraInFore_002
+ * @tc.desc: JudgeCameraInFore
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgeCameraInFore_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+
+    int32_t udsPid = 20;
+    int32_t udsFd = 15;
+    udsServer.idxPidMap_.insert(std::make_pair(udsPid, udsFd));
+    SessionPtr session = CreateCameraSessionPtr();
+    udsServer.sessionsMap_.insert(std::make_pair(udsFd, session));
+
+    WindowInfo windowInfo;
+    windowInfo.id = 20;
+    windowInfo.pid = udsPid;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 20;
+    }
+    EXPECT_EQ(inputWindowsManager.JudgeCameraInFore(), true);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SelectPointerChangeArea_003
  * @tc.desc: Test SelectPointerChangeArea
  * @tc.type: FUNC
@@ -7885,6 +8044,28 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_004, Test
     }
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetWindowPid(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowAgentPid
+ * @tc.desc: Test if (item.id == windowId)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowAgentPid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t errorWindowId = 105;
+    WindowInfo windowInfo;
+    windowInfo.id = 2;
+    windowInfo.agentPid = 15;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    EXPECT_EQ(inputWindowsManager.GetWindowAgentPid(windowInfo.id), windowInfo.agentPid);
+    EXPECT_EQ(inputWindowsManager.GetWindowAgentPid(errorWindowId), -1);
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -11600,6 +11781,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessInjectEventGlob
     EXPECT_EQ(mockPointerItem.GetGlobalY(), 200.0);
     EXPECT_EQ(mockPointerItem.GetGlobalX(), 200.0);
     EXPECT_NO_FATAL_FAILURE(manager.ProcessInjectEventGlobalXY(mockPointerEvent, PointerEvent::GLOBAL_COORDINATE));
+}
+
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfoFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    uint32_t flag = WindowInfo::FLAG_BIT_DISABLE_USER_ACTION;
+    std::shared_ptr<InputEvent> event = InputEvent::Create();
+    ASSERT_NE(event, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
+    flag = WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
 }
 } // namespace MMI
 } // namespace OHOS

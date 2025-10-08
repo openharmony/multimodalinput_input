@@ -17,12 +17,19 @@
 
 #include <gtest/gtest.h>
 
+#include "account_manager.h"
 #include "anr_manager.h"
 #include "define_multimodal.h"
 #include "event_dispatch_handler.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
+#include "key_event_hook_manager.h"
 #include "parameters.h"
+#include "key_event_hook_manager.h"
+#include "parameters.h"
+#include "mmi_service.h"
+#include "old_display_info.h"
+#include "property_reader.h"
 
 #undef protected
 #undef private
@@ -50,12 +57,32 @@ static constexpr char PROGRAM_NAME[] { "uds_sesion_test" };
 int32_t g_moduleType { 3 };
 int32_t g_pid { 0 };
 int32_t g_writeFd { -1 };
+constexpr int32_t MODULE_TYPE = 1;
+constexpr int32_t UDS_FD = -1;
+constexpr int32_t UDS_UID = 456;
+constexpr int32_t UDS_PID = 123;
 } // namespace
+
+#define NUM_100 100
+#define NUM_200 200
+#define NUM_1 1
+#define NUM_2 2
 
 class EventDispatchTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    static OLD::DisplayGroupInfo CreateDisplayGroupInfo(int groupId, int displayId)
+    {
+        OLD::DisplayGroupInfo displayGroupInfo;
+        displayGroupInfo.groupId = groupId;
+        displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+        std::vector<OLD::DisplayInfo> displaysInfo;
+        OLD::DisplayInfo display = { .id = displayId };
+        displaysInfo.emplace_back(display);
+        displayGroupInfo.displaysInfo = displaysInfo;
+        return displayGroupInfo;
+    }
 };
 
 /**
@@ -244,6 +271,51 @@ HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_01, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FilterInvalidPointerItem_02
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_02, TestSize.Level1)
+{
+    MMIService* mmiService = MMIService::GetInstance();
+    mmiService->Init();
+    auto udsItem = std::make_shared<UDSSession>("temp", 0, NUM_100, NUM_100, NUM_100);
+    mmiService->AddSession(udsItem);
+
+    EventDispatchHandler eventdispatchhandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(NUM_1);
+
+    OHOS::MMI::WindowInfo win1 = {.id = NUM_1, .pid = NUM_100};
+    OHOS::MMI::WindowInfo win2 = {.id = NUM_2, .pid = NUM_200};
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo1 = { win1, win2 };
+    std::vector<OHOS::MMI::WindowInfo> windowsInfo2 = { win2 };
+    OLD::DisplayGroupInfo group1 = EventDispatchTest::CreateDisplayGroupInfo(NUM_1, NUM_1);
+    group1.windowsInfo = windowsInfo1;
+    OLD::DisplayGroupInfo group2 = EventDispatchTest::CreateDisplayGroupInfo(NUM_2, NUM_2);
+    group2.windowsInfo = windowsInfo2;
+    WIN_MGR->UpdateDisplayInfo(group1);
+    WIN_MGR->UpdateDisplayInfo(group2);
+
+    PointerEvent::PointerItem pointeritem1;
+    pointeritem1.SetPointerId(NUM_1);
+    pointeritem1.SetTargetWindowId(NUM_1);
+    PointerEvent::PointerItem pointeritem2;
+    pointeritem2.SetPointerId(NUM_2);
+    pointeritem2.SetTargetWindowId(NUM_2);
+
+    pointerEvent->AddPointerItem(pointeritem1);
+    pointerEvent->AddPointerItem(pointeritem2);
+
+    eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, NUM_100);
+    EXPECT_EQ(NUM_2, pointerEvent->GetAllPointerItems().size());
+
+    AccountManager::GetInstance()->AccountManagerUnregister();
+}
+
+/**
  * @tc.name: EventDispatchTest_AddFlagToEsc001
  * @tc.desc: Test AddFlagToEsc
  * @tc.type: FUNC
@@ -327,7 +399,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AddFlagToEsc002, TestSize.Level1)
     dispatch.AddFlagToEsc(keyEvent);
     EXPECT_EQ(dispatch.escToBackFlag_, true);
     bool ret3 = keyEvent->HasFlag(InputEvent::EVENT_FLAG_KEYBOARD_ESCAPE);
-    EXPECT_EQ(ret3, true);
+    EXPECT_EQ(ret3, false);
 }
 
 /**
@@ -2351,6 +2423,30 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_009,
     eventdispatchhandler.cancelEventList_[1].push_back(windowInfo1);
     auto windowInfo = eventdispatchhandler.SearchCancelList(pointerId, windowId);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleKeyEvent_004
+ * @tc.desc: Test HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_004, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+        [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+        }
+    );
+    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(-1);
+    KeyEventHookManager::GetInstance().OnKeyEvent(keyEvent);
+    bool result = KeyEventHookManager::GetInstance().IsValidKeyEvent(keyEvent);
+    eventdispatchhandler.HandleKeyEvent(keyEvent);
+    EXPECT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS

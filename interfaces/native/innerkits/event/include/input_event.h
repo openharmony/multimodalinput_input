@@ -145,6 +145,14 @@ public:
 
     static constexpr uint32_t EVENT_FLAG_DISABLE_PULL_THROW = 0x00020000;
 
+    static constexpr uint32_t EVENT_FLAG_DISABLE_USER_ACTION = 0x00040000;
+    /**
+     * The multimodal input event for the device to enable the intercom mode flag.
+     *
+     * @since 21
+     */
+    static constexpr uint32_t EVENT_MEETIME = 0x00090000;
+
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
      *

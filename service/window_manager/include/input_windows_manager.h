@@ -75,6 +75,7 @@ public:
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
+    int32_t GetWindowAgentPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
     void DeviceStatusChanged(int32_t deviceId, const std::string &name, const std::string &sysUid,
@@ -141,7 +142,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustDisplayCoordinate(const OLD::DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false);
+        EventTouch& touchInfo, int32_t& targetDisplayId, bool isNeedClear = false, bool hasValidAreaDowned = false);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void ReverseRotateScreen(const OLD::DisplayInfo& info, const double x, const double y,
@@ -206,6 +207,7 @@ public:
     void SetWindowStateNotifyPid(int32_t pid);
     int32_t GetWindowStateNotifyPid();
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
+    int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
@@ -394,7 +396,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
-        const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false);
+        const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false,
+        bool hasValidAreaDowned = false);
     void TriggerTouchUpOnInvalidAreaEntry(int32_t pointerId);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
@@ -432,7 +435,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void ResetPointerPositionIfOutValidDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
     void CancelMouseEvent();
     bool IsPositionOutValidDisplay(
-        Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos = false);
+        Coordinate2D &position, const OLD::DisplayInfo &currentDisplay, bool isPhysicalPos = false,
+        bool hasValidAreaDowned = false);
     void CancelTouchScreenEventIfValidDisplayChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsValidDisplayChange(const OLD::DisplayInfo &displayInfo);
     void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId, int32_t groupId = DEFAULT_GROUP_ID);
@@ -465,6 +469,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void AddActiveWindow(int32_t windowId, int32_t pointerId);
     void RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void ClearActiveWindow();
+    void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
 private:
     OLD::DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
     int32_t FindDisplayGroupId(int32_t displayId) const;

@@ -1,0 +1,86 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.multimodalInput.mouseEvent")
+from ohos.multimodalInput.inputEvent use InputEvent;
+from ohos.multimodalInput.keyCode use KeyCode;
+@!sts_inject("""
+  { loadLibraryWithPermissionCheck("MouseEvent.z", "@ohos.multimodalInput.mouseEvent") }
+""")
+
+enum Action : i32 {
+  CANCEL = 0,
+  MOVE = 1,
+  BUTTON_DOWN = 2,
+  BUTTON_UP = 3,
+  AXIS_BEGIN = 4,
+  AXIS_UPDATE = 5,
+  AXIS_END = 6,
+  ACTION_DOWN = 7,
+  ACTION_UP = 8,
+}
+
+enum Button : i32 {
+  LEFT = 0,
+  MIDDLE = 1,
+  RIGHT = 2,
+  SIDE = 3,
+  EXTRA = 4,
+  FORWARD = 5,
+  BACK = 6,
+  TASK = 7
+}
+
+enum Axis : i32 {
+  SCROLL_VERTICAL = 0,
+  SCROLL_HORIZONTAL = 1,
+  PINCH = 2
+}
+
+struct AxisValue {
+  axis: Axis;
+  value: i32;
+}
+
+enum ToolType : i32 {
+  UNKNOWN = 0,
+  MOUSE = 1,
+  JOYSTICK = 2,
+  TOUCHPAD = 3,
+}
+
+struct MouseEvent {
+  @extends base:InputEvent;
+  action: Action;
+  screenX: i32;
+  screenY: i32;
+  windowX: i32;
+  windowY: i32;
+  rawDeltaX: i32;
+  rawDeltaY: i32;
+  button: Button;
+  pressedButtons: Array<Button>;
+  axes: Array<AxisValue>;
+  pressedKeys: Array<KeyCode>;
+  ctrlKey: bool;
+  altKey: bool;
+  shiftKey: bool;
+  logoKey: bool;
+  fnKey: bool;
+  capsLock: bool;
+  numLock: bool;
+  scrollLock: bool;
+  toolType: ToolType;
+}

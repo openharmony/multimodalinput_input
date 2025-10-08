@@ -101,6 +101,7 @@ struct IInputPlugin {
     virtual PluginResult HandleEvent(
         std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual sptr<IRemoteObject> GetExternalObject() { return nullptr;}
+    virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) const = 0;
 };
 
 struct IPluginContext {
@@ -108,7 +109,7 @@ struct IPluginContext {
     virtual std::string GetName() = 0;
     virtual int32_t GetPriority() = 0;
     virtual std::shared_ptr<IInputPlugin> GetPlugin() = 0;
-    virtual void SetCallback(std::function<void(PluginEventType, int64_t)>& callback) = 0;
+    virtual void SetCallback(std::function<void(PluginEventType, int64_t)> callback) = 0;
     virtual int32_t AddTimer(std::function<void()> func, int32_t intervalMs, int32_t repeatCount) = 0;
     virtual int32_t RemoveTimer(int32_t id) = 0;
     virtual void DispatchEvent(PluginEventType pluginEvent, int64_t frameTime) = 0;
@@ -119,6 +120,7 @@ struct IPluginContext {
         std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
+    virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

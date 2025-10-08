@@ -229,6 +229,13 @@ struct WindowInfo {
     static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
 
     /**
+     * Disable user action window
+     *
+     * @since 21
+     */
+    static constexpr uint32_t FLAG_BIT_DISABLE_USER_ACTION = 4;
+
+    /**
      * Globally unique identifier of the window
      *
      * @since 9
@@ -354,6 +361,13 @@ struct WindowInfo {
     bool isSkipSelfWhenShowOnVirtualScreen { false };
 	
     int32_t windowNameType;
+
+    /**
+     * ID of the agent process where the window is located
+     *
+     * @since 21
+     */
+    int32_t agentPid { -1 };
 };
 
 /**

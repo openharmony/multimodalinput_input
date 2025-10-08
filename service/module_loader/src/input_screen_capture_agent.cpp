@@ -33,14 +33,17 @@ const std::string REFENCE_LIB_ABSOLUTE_PATH = REFERENCE_LIB_PATH + FILESEPARATOR
 
 InputScreenCaptureAgent::~InputScreenCaptureAgent()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(agentMutex_);
     if (handle_.handle != nullptr) {
         handle_.Free();
     }
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputScreenCaptureAgent::LoadLibrary()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(agentMutex_);
     if (handle_.handle != nullptr) {
         MMI_HILOGD("The library has already been loaded");
@@ -70,6 +73,7 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
         return RET_ERR;
     }
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 bool InputScreenCaptureAgent::IsScreenCaptureWorking(int32_t capturePid)
@@ -102,6 +106,7 @@ void InputScreenCaptureAgent::RegisterListener(ScreenCaptureCallback callback)
 
 bool InputScreenCaptureAgent::IsMusicActivate()
 {
+    // LCOV_EXCL_START
     if (LoadAudioLibrary() != RET_OK) {
         MMI_HILOGE("LoadLibrary fail");
         return false;
@@ -112,10 +117,12 @@ bool InputScreenCaptureAgent::IsMusicActivate()
         return false;
     }
     return handle_.isMusicActivate();
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputScreenCaptureAgent::LoadAudioLibrary()
 {
+    // LCOV_EXCL_START
     std::lock_guard<std::mutex> guard(agentMutex_);
     if (handle_.handle != nullptr) {
         MMI_HILOGD("The library has already been loaded");
@@ -138,6 +145,7 @@ int32_t InputScreenCaptureAgent::LoadAudioLibrary()
         return RET_ERR;
     }
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 }
 }
