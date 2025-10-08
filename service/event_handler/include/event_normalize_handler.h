@@ -72,6 +72,8 @@ private:
         enum libinput_event_type type, libinput_event* event);
     void SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent,
         enum libinput_event_type type, libinput_event* event, int32_t* angleTolerance, int32_t lastDirection);
+    void SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent);
+    void SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -90,6 +92,8 @@ private:
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
     int32_t currentHandleKeyCode_ { -1 };
+    double currentPointDownPosX_ { 0.0 };
+    int64_t currentPointDownTime_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     bool moveEventFilterFlag_ { false };
     std::list<PointerEvent::PointerItem> lastTouchDownItems_;

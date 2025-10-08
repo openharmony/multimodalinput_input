@@ -446,6 +446,10 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
         return -CAPABILITY_NOT_SUPPORTED;
     }
     CHKPR(callback, RET_ERR);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     MMI_HILOGI("key:%{public}d, action:%{public}d, isRepeat:%{public}d",
         keyOption.GetKey(), keyOption.GetAction(), keyOption.IsRepeat());
     return KeyEventInputSubscribeMgr.SubscribeKeyMonitor(keyOption, callback);
@@ -702,7 +706,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
-            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType;
+            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
         MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
@@ -746,7 +750,7 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.privacyUIFlag << item.rectChangeBySystem
-            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType;
+            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -825,7 +829,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas << item.transform
             << item.windowInputType << item.privacyMode << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen
-            << item.windowNameType;
+            << item.windowNameType << item.agentPid;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
@@ -887,12 +891,12 @@ void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInf
         return;
     }
     for (const auto &item : windowsInfo) {
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,agentPid:%{public}d,uid:%{public}d,"
             "area.x:%{private}d,area.y:%{private}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
             "groupId:%{public}d,zOrder:%{public}f,privacyMode:%{public}d",
-            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.id, item.pid, item.agentPid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder, item.privacyMode);
         for (const auto &win : item.defaultHotAreas) {

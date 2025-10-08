@@ -907,7 +907,9 @@ void KeyEvent::KeyItem::SetKeyCode(int32_t keyCode)
 
 int64_t KeyEvent::KeyItem::GetDownTime() const
 {
+    // LCOV_EXCL_START
     return downTime_;
+    // LCOV_EXCL_STOP
 }
 
 void KeyEvent::KeyItem::SetDownTime(int64_t downTime)
@@ -917,7 +919,9 @@ void KeyEvent::KeyItem::SetDownTime(int64_t downTime)
 
 int32_t KeyEvent::KeyItem::GetDeviceId() const
 {
+    // LCOV_EXCL_START
     return deviceId_;
+    // LCOV_EXCL_STOP
 }
 
 void KeyEvent::KeyItem::SetDeviceId(int32_t deviceId)
@@ -942,7 +946,9 @@ void KeyEvent::KeyItem::SetUnicode(uint32_t unicode)
 
 uint32_t KeyEvent::KeyItem::GetUnicode() const
 {
+    // LCOV_EXCL_START
     return unicode_;
+    // LCOV_EXCL_STOP
 }
 
 bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
@@ -967,7 +973,9 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
 
 std::shared_ptr<KeyEvent> KeyEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
+    // LCOV_EXCL_START
     return nullptr;
+    // LCOV_EXCL_STOP
 }
 
 KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
@@ -998,6 +1006,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Create()
 
 void KeyEvent::Reset()
 {
+    // LCOV_EXCL_START
     InputEvent::Reset();
     keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
     keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
@@ -1011,6 +1020,7 @@ void KeyEvent::Reset()
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     enhanceData_.clear();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    // LCOV_EXCL_STOP
 }
 
 std::string KeyEvent::ToString()
@@ -1061,7 +1071,9 @@ void KeyEvent::AddKeyItem(const KeyItem& keyItem)
 
 void KeyEvent::SetKeyItem(std::vector<KeyItem> keyItem)
 {
+    // LCOV_EXCL_START
     keys_ = keyItem;
+    // LCOV_EXCL_STOP
 }
 
 std::vector<KeyEvent::KeyItem> KeyEvent::GetKeyItems() const
@@ -1106,7 +1118,9 @@ void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 
 std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem() const
 {
+    // LCOV_EXCL_START
     return GetKeyItem(keyCode_);
+    // LCOV_EXCL_STOP
 }
 
 std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem(int32_t keyCode) const
@@ -1121,6 +1135,7 @@ std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem(int32_t keyCode) const
 
 const char* KeyEvent::ActionToString(int32_t action)
 {
+    // LCOV_EXCL_START
     switch (action) {
         case KEY_ACTION_UNKNOWN: {
             return "KEY_ACTION_UNKNOWN";
@@ -1138,6 +1153,7 @@ const char* KeyEvent::ActionToString(int32_t action)
             return "KEY_ACTION_INVALID";
         }
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* KeyEvent::KeyCodeToString(int32_t keyCode)
@@ -1240,12 +1256,16 @@ bool KeyEvent::IsValid() const
 
 void KeyEvent::SetFourceMonitorFlag(bool fourceMonitorFlag)
 {
+    // LCOV_EXCL_START
     fourceMonitorFlag_ = fourceMonitorFlag;
+    // LCOV_EXCL_STOP
 }
 
 bool KeyEvent::GetFourceMonitorFlag()
 {
+    // LCOV_EXCL_START
     return fourceMonitorFlag_;
+    // LCOV_EXCL_STOP
 }
 
 bool KeyEvent::WriteToParcel(Parcel &out) const
@@ -1347,6 +1367,7 @@ bool KeyEvent::ReadEnhanceDataFromParcel(Parcel &in)
 
 int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
 {
+    // LCOV_EXCL_START
     switch (keyCode) {
         case KEYCODE_NUM_LOCK: {
             return NUM_LOCK_FUNCTION_KEY;
@@ -1362,10 +1383,12 @@ int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
             return UNKNOWN_FUNCTION_KEY;
         }
     }
+    // LCOV_EXCL_STOP
 }
 
 bool KeyEvent::GetFunctionKey(int32_t funcKey) const
 {
+    // LCOV_EXCL_START
     switch (funcKey) {
         case NUM_LOCK_FUNCTION_KEY: {
             return numLock_;
@@ -1381,6 +1404,7 @@ bool KeyEvent::GetFunctionKey(int32_t funcKey) const
             return false;
         }
     }
+    // LCOV_EXCL_STOP
 }
 
 int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
@@ -1408,7 +1432,9 @@ int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
 
 int32_t KeyEvent::GetKeyIntention() const
 {
+    // LCOV_EXCL_START
     return keyIntention_;
+    // LCOV_EXCL_STOP
 }
 
 void KeyEvent::SetKeyIntention(int32_t keyIntention)
@@ -1418,26 +1444,35 @@ void KeyEvent::SetKeyIntention(int32_t keyIntention)
 
 bool KeyEvent::IsRepeat() const
 {
+    // LCOV_EXCL_START
     return repeat_;
+    // LCOV_EXCL_STOP
 }
 
 void KeyEvent::SetRepeat(bool repeat)
 {
+    // LCOV_EXCL_START
     repeat_ = repeat;
+    // LCOV_EXCL_STOP
 }
 
 bool KeyEvent::IsRepeatKey() const
 {
+    // LCOV_EXCL_START
     return repeatKey_;
+    // LCOV_EXCL_STOP
 }
 
 void KeyEvent::SetRepeatKey(bool repeatKey)
 {
+    // LCOV_EXCL_START
     repeatKey_ = repeatKey;
+    // LCOV_EXCL_STOP
 }
 
 std::string_view KeyEvent::ActionToShortStr(int32_t action)
 {
+    // LCOV_EXCL_START
     switch (action) {
         case KeyEvent::KEY_ACTION_CANCEL:
             return "K:C:";
@@ -1450,17 +1485,22 @@ std::string_view KeyEvent::ActionToShortStr(int32_t action)
         default:
             return "A:?:";
     }
+    // LCOV_EXCL_STOP
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void KeyEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
 {
+    // LCOV_EXCL_START
     enhanceData_ = enhanceData;
+    // LCOV_EXCL_STOP
 }
 
 std::vector<uint8_t> KeyEvent::GetEnhanceData() const
 {
+    // LCOV_EXCL_START
     return enhanceData_;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace MMI

@@ -124,20 +124,17 @@ group("input_jsapi_group") {
     }
     if (input_feature_mouse) {
       deps += [
-        "frameworks/ani/pointer:ani_pointer_package",
         "frameworks/napi/pointer:pointer",
       ]
     }
     if (input_feature_keyboard) {
       deps += [
-        "frameworks/ani/input_consumer:input_consumer_package",
         "frameworks/napi/input_consumer:inputconsumer",
         "frameworks/napi/input_event_client:inputeventclient",
       ]
     }
     if (input_feature_input_device) {
       deps += [
-        "frameworks/ani/input_device:ani_input_device_package",
         "frameworks/napi/input_device:inputdevice",
       ]
     }
@@ -148,9 +145,38 @@ group("input_jsapi_group") {
   }
 }
 
+group("input_ets_group") {
+  deps = [
+    "frameworks/ets/input_event:ets_inputEvent_package",
+    "frameworks/ets/intention_code:ets_intentionCode_package",
+    "frameworks/ets/input_monitor:ets_inputMonitor_package",
+    "frameworks/ets/key_code:ets_keyCode_package",
+    "frameworks/ets/key_event:ets_keyEvent_package",
+    "frameworks/ets/mouse_event:ets_mouseEvent_package",
+    "frameworks/ets/touch_event:ets_touchEvent_package",
+    "frameworks/ets/gesture_event:ets_gestureEvent_package"
+  ]
+  if (input_feature_keyboard) {
+    deps += [
+      "frameworks/ets/input_consumer:ets_inputConsumer_package",
+      "frameworks/ets/input_event_client:ets_inputEventClient_package"
+    ]
+  }
+  if (input_feature_input_device) {
+    deps += [ "frameworks/ets/input_device:ets_inputDevice_package" ]
+  }
+  if (input_feature_mouse) {
+    deps += [ "frameworks/ets/pointer:ets_pointer_package" ]
+    }
+  if (input_feature_short_key) {
+    deps += [ "frameworks/ets/short_key:ets_shortKey_package" ]
+  }
+}
+
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/ets/common/test:AniCommonTest",
     "frameworks/native/input:OHInputManagerEXTest",
     "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputDeviceImplTest",
@@ -161,6 +187,7 @@ group("mmi_tests") {
     "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:InputManagerTest",
     "frameworks/proxy:InputMonitorManagerTest",
+    "frameworks/proxy:KeyEventHookHandlerTest",
     "frameworks/proxy:KeyEventInputSubscribeManagerTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:LongPressEventSubscribeManagerTest",
@@ -170,6 +197,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerStyleTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "frameworks/proxy/event_handler/test:InputActiveSubscribeManagerTest",
+    "frameworks/proxy/events/test:FrameworkEventTests",
     "libudev:test",
     "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",
@@ -182,12 +210,15 @@ group("mmi_tests") {
     "service:DeviceManagerTest",
     "service:DfxHisysEventTest",
     "service:DisplayStateManagerTest",
+    "service:EventDispatchOrderCheckerTest",
     "service:EventDispatchTest",
     "service:EventDumpTest",
+    "service:EventExpirationCheckerTest",
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
     "service:EventHandlerEXTest",
     "service:EventHandlerTest",
+    "service:EventLoopClosureCheckerTest",
     "service:EventNormalizeHandlerTest",
     "service:InfraredEmitterTest",
     "service:InputDisplayBindHelperTest",
@@ -198,6 +229,7 @@ group("mmi_tests") {
     "service:JoystickTest",
     "service:KeyAutoRepeatExTest",
     "service:KeyCommandTest",
+    "service:KeyEventHookManagerTest",
     "service:KeyEventNormalizeTest",
     "service:KeyEventNormalizeWithMockTest",
     "service:KeyEventValueTransformationTest",
@@ -244,6 +276,7 @@ group("mmi_tests") {
     "util:UdsClientTest",
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
+    "util/common:InputEventDataTransformationTest",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -257,10 +290,6 @@ group("mmi_tests") {
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
-  }
-
-  if (input_ext_feature_anco) {
-    deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
 
   if (input_feature_touch_drawing) {

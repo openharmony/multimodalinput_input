@@ -56,6 +56,7 @@ private:
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
     std::mutex mtx_;
+    static napi_env env_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -55,7 +55,7 @@ public:
     MOCK_METHOD(std::string, GetName, (), (override));
     MOCK_METHOD(int32_t, GetPriority, (), (override));
     MOCK_METHOD(std::shared_ptr<IInputPlugin>, GetPlugin, (), (override));
-    MOCK_METHOD(void, SetCallback, (std::function<void(PluginEventType, int64_t)>& callback), (override));
+    MOCK_METHOD(void, SetCallback, (std::function<void(PluginEventType, int64_t)> callback), (override));
     MOCK_METHOD(int32_t, AddTimer, (std::function<void()> func, int32_t intervalMs, int32_t repeatCount), (override));
     MOCK_METHOD(int32_t, RemoveTimer, (int32_t id), (override));
     MOCK_METHOD(void, DispatchEvent, (PluginEventType pluginEvent, int64_t frameTime), (override));
@@ -69,6 +69,7 @@ public:
                 (std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data), (override));
     MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<AxisEvent> axisEvent,
                 std::shared_ptr<IPluginData> data), (override));
+    MOCK_METHOD(void, HandleMonitorStatus, (bool monitorStatus, const std::string &monitorType), (override));
 };
 
 class MockInputPlugin : public IInputPlugin {
@@ -91,6 +92,7 @@ public:
         (std::shared_ptr<PointerEvent> pointerEvent, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(PluginResult, HandleEvent,
         (std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data), (override, const));
+    MOCK_METHOD(void, HandleMonitorStatus, (bool monitorStatus, const std::string &monitorType), (override, const));
 };
 
 class MockUDSSession : public UDSSession {
@@ -465,6 +467,11 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
         std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
     std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
     std::shared_ptr<KeyEvent> keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+
+    InputHandler->eventFilterHandler_ = std::make_shared<EventFilterHandler>();
+    InputHandler->eventInterceptorHandler_ = std::make_shared<EventInterceptorHandler>();
+    InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
+    InputHandler->eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
 
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     EXPECT_NO_FATAL_FAILURE(inputPluginContext->DispatchEvent(event, filterStage));

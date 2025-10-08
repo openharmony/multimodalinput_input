@@ -394,6 +394,18 @@ void BytraceAdapter::StopLaunchAbility()
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT);
 }
 
+void BytraceAdapter::MMIServiceTraceStart(int32_t type, const std::string& msg)
+{
+    std::string traceInfo = "trace type:" + std::to_string(type) + ", msg:" + msg;
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, traceInfo.c_str(), "");
+}
+
+void BytraceAdapter::MMIServiceTraceStop()
+{
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT);
+}
+
+
 void BytraceAdapter::StartMarkedTracker(int32_t eventId)
 {
     std::string traceInfo = "markProcessed eventId:" + std::to_string(eventId);

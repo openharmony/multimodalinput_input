@@ -32,6 +32,8 @@
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "screen_capture_monitor.h"
 #include "ipc_skeleton.h"
+#include "pixel_map.h"
+#include "image/pixelmap_native.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
 
 #undef MMI_LOG_TAG
@@ -114,6 +116,16 @@ struct Input_DeviceInfo {
     int32_t vendor { -1 };
     int32_t version { -1 };
     char phys[SIZE_ARRAY] {};
+};
+
+struct Input_CustomCursor {
+    OH_PixelmapNative* pixelMap { nullptr };
+    int32_t anchorX { 0 };
+    int32_t anchorY { 0 };
+};
+
+struct Input_CursorConfig {
+    bool followSystem { false };
 };
 
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
@@ -562,7 +574,8 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
         return result;
     }
     g_mouseEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_mouseEvent,
+    auto event = std::make_shared<PointerEvent>(*g_mouseEvent);
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
         true, PointerEvent::DISPLAY_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
@@ -600,7 +613,8 @@ int32_t OH_Input_InjectMouseEventGlobal(const struct Input_MouseEvent* mouseEven
         return INPUT_PARAMETER_ERROR;
     }
     g_mouseEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_mouseEvent,
+    auto event = std::make_shared<PointerEvent>(*g_mouseEvent);
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
         true, PointerEvent::GLOBAL_COORDINATE);
     if ((result == INPUT_PERMISSION_DENIED) || (result == INPUT_OCCUPIED_BY_OTHER)) {
         MMI_HILOGE("Permission denied or occupied by other");
@@ -893,7 +907,8 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent)
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
+    auto event = std::make_shared<PointerEvent>(*g_touchEvent);
+    OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event, true,
         PointerEvent::DISPLAY_COORDINATE);
     if (touchEvent->action == TOUCH_ACTION_UP) {
         g_touchEvent->RemovePointerItem(g_touchEvent->GetPointerId());
@@ -925,7 +940,8 @@ int32_t OH_Input_InjectTouchEventGlobal(const struct Input_TouchEvent* touchEven
         return INPUT_PARAMETER_ERROR;
     }
     g_touchEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_SIMULATE);
-    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(g_touchEvent, true,
+    auto event = std::make_shared<PointerEvent>(*g_touchEvent);
+    result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event, true,
         PointerEvent::GLOBAL_COORDINATE);
     if (touchEvent->action == TOUCH_ACTION_UP) {
         g_touchEvent->RemovePointerItem(g_touchEvent->GetPointerId());
@@ -3241,5 +3257,215 @@ Input_Result OH_Input_DispatchToNextHandler(int32_t eventId)
         return errCode;
     }
     MMI_HILOGD("OH_Input_DispatchToNextHandler success, eventId:%{public}d", eventId);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetPointerVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(visible);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetPointerVisible fail, error: %{public}d", ret);
+        return ret == INPUT_DEVICE_NOT_SUPPORTED ? INPUT_DEVICE_NOT_SUPPORTED : INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetPointerStyle(int32_t windowId, int32_t *pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerStyle, INPUT_PARAMETER_ERROR);
+    if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
+        MMI_HILOGE("Invalid windowId");
+        return INPUT_PARAMETER_ERROR;
+    }
+    OHOS::MMI::PointerStyle style;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetPointerStyle(windowId, style);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetPointerStyle fail, windowid: %{public}d, error: %{public}d", windowId, ret);
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    *pointerStyle = style.id;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (windowId < 0) {
+        MMI_HILOGE("Invalid windowid");
+        return INPUT_PARAMETER_ERROR;
+    }
+    if ((pointerStyle < OHOS::MMI::DEFAULT && pointerStyle != OHOS::MMI::DEVELOPER_DEFINED_ICON) ||
+        pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
+        MMI_HILOGE("Undefined pointer style");
+        return INPUT_PARAMETER_ERROR;
+    }
+    OHOS::MMI::PointerStyle style;
+    style.id = pointerStyle;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetPointerStyle fail, windowId: %{public}d, error: %{public}d", windowId, ret);
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, int32_t anchorX, int32_t anchorY)
+{
+    CALL_DEBUG_ENTER;
+    CHKPP(pixelMap);
+    Input_CustomCursor* customCursor = new (std::nothrow) Input_CustomCursor();
+    CHKPP(customCursor);
+    customCursor->pixelMap = pixelMap;
+    customCursor->anchorX = anchorX;
+    customCursor->anchorY = anchorY;
+    return customCursor;
+}
+
+void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(customCursor);
+    CHKPV(*customCursor);
+    delete *customCursor;
+    *customCursor = nullptr;
+}
+
+Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative** pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(customCursor, INPUT_PARAMETER_ERROR);
+    CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
+    *pixelMap = customCursor->pixelMap;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_CustomCursor_GetAnchor(Input_CustomCursor* customCursor, int32_t* anchorX, int32_t* anchorY)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(customCursor, INPUT_PARAMETER_ERROR);
+    CHKPR(anchorX, INPUT_PARAMETER_ERROR);
+    CHKPR(anchorY, INPUT_PARAMETER_ERROR);
+    *anchorX = customCursor->anchorX;
+    *anchorY = customCursor->anchorY;
+    return INPUT_SUCCESS;
+}
+
+Input_CursorConfig* OH_Input_CursorConfig_Create(bool followSystem)
+{
+    CALL_DEBUG_ENTER;
+    Input_CursorConfig* cursorConfig = new (std::nothrow) Input_CursorConfig();
+    CHKPP(cursorConfig);
+    cursorConfig->followSystem = followSystem;
+    return cursorConfig;
+}
+
+void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cursorConfig);
+    CHKPV(*cursorConfig);
+    delete *cursorConfig;
+    *cursorConfig = nullptr;
+}
+
+Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig* cursorConfig, bool* followSystem)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
+    CHKPR(followSystem, INPUT_PARAMETER_ERROR);
+    *followSystem = cursorConfig->followSystem;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Media::InitializationOptions* options)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
+    CHKPR(options, INPUT_PARAMETER_ERROR);
+    OH_Pixelmap_ImageInfo* imageInfo = nullptr;
+    Image_ErrorCode imageResult = OH_PixelmapImageInfo_Create(&imageInfo);
+    if (imageResult != IMAGE_SUCCESS) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    imageResult = OH_PixelmapNative_GetImageInfo(pixelMap, imageInfo);
+    if (imageResult != IMAGE_SUCCESS) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    bool ret = true;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    int32_t alphaType = 0;
+    uint32_t rowStride = 0;
+    int32_t pixelFormat = 0;
+    ret &= OH_PixelmapImageInfo_GetWidth(imageInfo, &width) == IMAGE_SUCCESS;
+    ret &= OH_PixelmapImageInfo_GetHeight(imageInfo, &height) == IMAGE_SUCCESS;
+    ret &= OH_PixelmapImageInfo_GetAlphaType(imageInfo, &alphaType) == IMAGE_SUCCESS;
+    ret &= OH_PixelmapImageInfo_GetRowStride(imageInfo, &rowStride) == IMAGE_SUCCESS;
+    ret &= OH_PixelmapImageInfo_GetPixelFormat(imageInfo, &pixelFormat) == IMAGE_SUCCESS;
+    OH_PixelmapImageInfo_Release(imageInfo);
+    if (!ret) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    options->alphaType = static_cast<OHOS::Media::AlphaType>(alphaType);
+    options->srcPixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
+    options->pixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
+    options->srcRowStride = rowStride;
+    options->size.height = static_cast<int32_t>(height);
+    options->size.width = static_cast<int32_t>(width);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* customCursor,
+                                      Input_CursorConfig* cursorConfig)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(customCursor, INPUT_PARAMETER_ERROR);
+    CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
+    if (windowId < 0) {
+        MMI_HILOGE("Invalid windowId");
+        return INPUT_PARAMETER_ERROR;
+    }
+    if (customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
+        MMI_HILOGE("customCursor is invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
+    OHOS::Media::InitializationOptions options;
+    Input_Result inputResult = OH_Input_GetPixelMapOptions(customCursor->pixelMap, &options);
+    if (inputResult != INPUT_SUCCESS) {
+        MMI_HILOGE("pixelMap is invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
+    uint32_t byteCount = 0;
+    Image_ErrorCode imageResult = OH_PixelmapNative_GetByteCount(customCursor->pixelMap, &byteCount);
+    if (imageResult != IMAGE_SUCCESS) {
+        MMI_HILOGE("pixelMap is invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
+    size_t pixelBufferSize = static_cast<size_t>(byteCount);
+    uint8_t *pixelBuffer = new uint8_t[pixelBufferSize]();
+    imageResult = OH_PixelmapNative_ReadPixels(customCursor->pixelMap, pixelBuffer, &pixelBufferSize);
+    if (imageResult != IMAGE_SUCCESS) {
+        MMI_HILOGE("pixelMap is invalid");
+        delete[] pixelBuffer;
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto tmpPixelmapPtr = OHOS::Media::PixelMap::Create(reinterpret_cast<uint32_t*>(pixelBuffer),
+                                                        byteCount, options);
+    delete[] pixelBuffer;
+    CHKPR(tmpPixelmapPtr, INPUT_PARAMETER_ERROR);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr = std::move(tmpPixelmapPtr);
+    OHOS::MMI::CustomCursor cursor;
+    cursor.focusX = customCursor->anchorX;
+    cursor.focusY = customCursor->anchorY;
+    cursor.pixelMap = (void *)pixelMapPtr.get();
+    OHOS::MMI::CursorOptions cursorOptions;
+    cursorOptions.followSystem = cursorConfig->followSystem;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetCustomCursor(windowId, cursor, cursorOptions);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetCustomCursor fail, error:%{public}d", ret);
+        return ret == OHOS::MMI::ERROR_UNSUPPORT ? INPUT_DEVICE_NOT_SUPPORTED : INPUT_SERVICE_EXCEPTION;
+    }
     return INPUT_SUCCESS;
 }

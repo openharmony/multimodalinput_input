@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.multimodalInput.keyEvent")
+from ohos.multimodalInput.inputEvent use InputEvent;
+from ohos.multimodalInput.keyCode use KeyCode;
+@!sts_inject("""
+  { loadLibraryWithPermissionCheck("KeyEvent.z", "@ohos.multimodalInput.keyEvent") }
+""")
+
+enum Action : i32 {
+  CANCEL = 0,
+  DOWN = 1,
+  UP = 2
+}
+
+struct Key {
+  code: KeyCode;
+  pressedTime: i64;
+  deviceId: i32;
+}
+
+struct KeyEvent {
+  @extends base: InputEvent;
+  action: Action;
+  key: Key;
+  unicodeChar: i32;
+  keys: Array<Key>;
+  ctrlKey: bool;
+  altKey: bool;
+  shiftKey: bool;
+  logoKey: bool;
+  fnKey: bool;
+  capsLock: bool;
+  numLock: bool;
+  scrollLock: bool;
+}

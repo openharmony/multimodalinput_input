@@ -96,7 +96,7 @@ public:
 
     int32_t OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    int32_t OnSubscribeKeyMonitor(std::shared_ptr<KeyEvent> event);
+    int32_t OnSubscribeKeyMonitor(std::shared_ptr<KeyEvent> event, bool status);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
     void OnConnected();
@@ -106,11 +106,13 @@ private:
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     int32_t GenerateId();
     std::vector<std::function<void(std::shared_ptr<KeyEvent>)>> CheckKeyMonitors(std::shared_ptr<KeyEvent> event);
+    bool CheckMeeTimeSubscriber(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
 
 private:
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     std::map<MonitorIdentity, std::map<int32_t, Monitor>> monitors_;
+    bool isMeeTime_ { false };
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     std::set<SubscribeKeyEventInfo> subscribeInfos_;
     static int32_t subscribeIdManager_;

@@ -132,6 +132,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    keyEvent->UpdateId();
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
         int32_t checkReturn = NativeInjectCheck(pid);
@@ -750,7 +751,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.zOrder >> extensionInfo.pointerChangeAreas >> extensionInfo.transform
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
-            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowNameType;
+            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen
+            >> extensionInfo.windowNameType >> extensionInfo.agentPid;
         CHKRWER(pkt, RET_ERR);
         info.uiExtentionWindowInfo.push_back(extensionInfo);
     }
@@ -862,6 +864,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     }
     WindowGroupInfo windowGroupInfo;
     pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
+    CHKRWER(pkt, RET_ERR);
     uint32_t num = 0;
     pkt >> num;
     CHKRWER(pkt, RET_ERR);
@@ -872,7 +875,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
-            >> info.windowNameType;
+            >> info.windowNameType >> info.agentPid;
         CHKRWER(pkt, RET_ERR);
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
@@ -1024,7 +1027,7 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
                 >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
                 >> info.windowInputType >> info.privacyMode >> info.windowType
-                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
+                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> info.agentPid >> byteCount;
             CHKRWER(pkt, RET_ERR);
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
@@ -1169,8 +1172,9 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
             numDisplayInfo++;
         }
         for (const auto &itemWindow : item.windowsInfo) {
-            MMI_HILOGD("windows,id:%{public}d,pid:%{public}d,displayId:%{public}d,groupId:%{public}d",
-                itemWindow.id, itemWindow.pid, itemWindow.displayId, itemWindow.groupId);
+            MMI_HILOGD(
+                "windows,id:%{public}d,pid:%{public}d,agentPid:%{public}d,displayId:%{public}d,groupId:%{public}d",
+                itemWindow.id, itemWindow.pid, itemWindow.agentPid, itemWindow.displayId, itemWindow.groupId);
         }
         num++;
     }
@@ -1250,7 +1254,8 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
@@ -1262,10 +1267,11 @@ int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session, const KeyMonitorO
         .action_ = keyOption.GetAction(),
         .isRepeat_ = keyOption.IsRepeat(),
     };
-    return KEY_MONITOR_MGR->AddMonitor(monitor);
+    return KEY_MONITOR_MGR->AddMonitor(monitor, bundleName);
 }
 
-int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonitorOption &keyOption)
+int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session,
+    const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
     if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
         MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
@@ -1277,7 +1283,7 @@ int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session, const KeyMonito
         .action_ = keyOption.GetAction(),
         .isRepeat_ = keyOption.IsRepeat(),
     };
-    KEY_MONITOR_MGR->RemoveMonitor(monitor);
+    KEY_MONITOR_MGR->RemoveMonitor(monitor, bundleName);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER

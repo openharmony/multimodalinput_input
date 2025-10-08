@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.multimodalInput.inputDevice", "inputDevice")
+@!sts_inject("""
+static { loadLibraryWithPermissionCheck("InputDevice.z", "@ohos.multimodalInput.inputDevice") }
+""")
+
+from ohos.multimodalInput.keyCode use KeyCode;
+
+enum changedType: String {
+    ADD = "add",
+    REMOVE = "remove"
+}
+union ChangedType {
+    type : changedType;
+}
+
+enum sourceType : String {
+    KEYBOARD = "keyboard",
+    MOUSE = "mouse",
+    TOUCHPAD = "touchpad",
+    TOUCHSCREEN = "touchscreen",
+    JOYSTICK = "joystick",
+    TRACKBALL = "trackball"
+}
+union SourceType {
+    type : sourceType;
+}
+
+enum axisType: String {
+    TOUCHMAJOR = "touchmajor",
+    TOUCHMINOR = "touchminor",
+    ORIENTATION = "orientation",
+    X = "x",
+    Y = "y",
+    PRESSURE = "pressure",
+    TOOLMINOR = "toolminor",
+    TOOLMAJOR = "toolmajor",
+    AXIS_NULL = "null"
+}
+union AxisType {
+    type : axisType;
+}
+
+enum KeyboardType : i32 {
+    NONE = 0,
+    UNKNOWN = 1,
+    ALPHABETIC_KEYBOARD = 2,
+    DIGITAL_KEYBOARD = 3,
+    HANDWRITING_PEN = 4,
+    REMOTE_CONTROL = 5,
+    MAX = 6
+}
+
+enum FunctionKey : i32 {
+    CAPS_LOCK = 1
+}
+
+struct DeviceListener {
+    type: ChangedType;
+    deviceId: i32;
+}
+
+struct AxisRange {
+    source: SourceType;
+    axis: AxisType;
+    max: i32;
+    min: i32;
+    fuzz: i32;
+    flat: i32;
+    resolution: i32;
+}
+
+struct InputDeviceData {
+    id: i32;
+    name: String;
+    sources: Array<SourceType>;
+    axisRanges: Array<AxisRange>;
+    bus: i32;
+    product: i32;
+    vendor: i32;
+    version: i32;
+    phys: String;
+    uniq: String;
+}
+@gen_async("getDeviceList")
+@gen_promise("getDeviceList")
+function GetDeviceIdsAsync(): Array<i32>;
+@gen_async("getDeviceInfo")
+@gen_promise("getDeviceInfo")
+function GetDeviceInfoAsync(deviceId: i32): InputDeviceData;
+
+@!sts_inject("""
+    function on(type: 'change', callback: (info: DeviceListener) => void) {
+        return onKey(callback, callback);
+    }
+    function off(type: 'change', callback?: (info: DeviceListener) => void) {
+        return offKey(callback);
+    }
+""")
+function onKey(f: (info: DeviceListener) => void, opq: Opaque);
+function offKey(opq: Optional<Opaque>);

@@ -30,6 +30,7 @@
 #include "special_input_device_parser.h"
 #include "product_name_definition_parser.h"
 #include "json_parser.h"
+#include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
@@ -193,6 +194,8 @@ typedef void (*RESET_VTRACKPAD_STATE)();
 RESET_VTRACKPAD_STATE resetVTrackpadState_ = nullptr;
 typedef void (*STOP_VTRACKPAD_TIMER)();
 STOP_VTRACKPAD_TIMER stopVTrackpadTimer_ = nullptr;
+typedef bool (*VKEYBOARD_ISINSIDEFULLKBD_TYPE)(double x, double y);
+VKEYBOARD_ISINSIDEFULLKBD_TYPE vkeyboard_isInsideFullKbd_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
@@ -216,6 +219,7 @@ template <class... Ts> void CheckDefineOutput(const char *fmt, Ts... args)
 
 static void CheckDefine()
 {
+    // LCOV_EXCL_START
     CheckDefineOutput("ChkDefs:");
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER_DRAWING");
@@ -235,16 +239,19 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_MONITOR");
 #endif // OHOS_BUILD_ENABLE_MONITOR
+    // LCOV_EXCL_STOP
 }
 
 MMIService::MMIService() : SystemAbility(MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
 MMIService::~MMIService()
 {
+    // LCOV_EXCL_START
     if (g_MMIService != nullptr) {
         g_MMIService = nullptr;
     }
     MMI_HILOGI("~MMIService");
+    // LCOV_EXCL_STOP
 }
 
 MMIService* MMIService::GetInstance()
@@ -325,6 +332,7 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
+    // LCOV_EXCL_START
     if (!(libinputAdapter_.Init([](void *event, int64_t frameTime) { InputHandler->OnEvent(event, frameTime); }))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
@@ -340,10 +348,12 @@ bool MMIService::InitLibinputService()
         MMI_HILOGD("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
     }
     return true;
+    // LCOV_EXCL_STOP
 }
 
 bool MMIService::InitService()
 {
+    // LCOV_EXCL_START
     MMI_HILOGD("Server msg handler Init");
     sMsgHandler_.Init(*this);
     if (state_ != ServiceRunningState::STATE_NOT_START) {
@@ -369,10 +379,12 @@ bool MMIService::InitService()
     }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
     return true;
+    // LCOV_EXCL_STOP
 }
 
 bool MMIService::InitDelegateTasks()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     if (!delegateTasks_.Init()) {
         MMI_HILOGE("The delegate task init failed");
@@ -394,10 +406,12 @@ bool MMIService::InitDelegateTasks()
     delegateInterface_->Init();
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
+    // LCOV_EXCL_STOP
 }
 __attribute__((no_sanitize("cfi")))
 int32_t MMIService::Init()
 {
+    // LCOV_EXCL_START
     CheckDefine();
     MMI_HILOGD("WindowsManager Init");
     WIN_MGR->Init(*this);
@@ -433,10 +447,12 @@ int32_t MMIService::Init()
     }
     MMI_HILOGI("Set para input.pointer.device false");
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 void MMIService::OnStart()
 {
+    // LCOV_EXCL_START
     CHK_PID_AND_TID();
     int32_t ret = Init();
     CHKNOKRV(ret, "Init mmi_service failed");
@@ -509,6 +525,7 @@ void MMIService::OnStart()
     };
     MMI_HILOGI("Run periodical task success");
     InitPrintClientInfo();
+    // LCOV_EXCL_STOP
 }
 
 void MMIService::OnStop()
@@ -553,6 +570,7 @@ void MMIService::AddAppDebugListener()
 
 void MMIService::RemoveAppDebugListener()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     CHKPV(appDebugListener_);
     auto begin = std::chrono::high_resolution_clock::now();
@@ -565,9 +583,43 @@ void MMIService::RemoveAppDebugListener()
     if (errCode != RET_OK) {
         MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode:%{public}d", errCode);
     }
+    // LCOV_EXCL_STOP
 }
 
-ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
+static std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId)
+{
+    CALL_INFO_TRACE;
+    std::string bundleName = "";
+    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
+            Security::AccessToken::HapTokenInfo hapInfo;
+            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != RET_OK) {
+                MMI_HILOGE("Get hap token info failed");
+            } else {
+                bundleName = hapInfo.bundleName;
+            }
+            break;
+        }
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE:
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
+            Security::AccessToken::NativeTokenInfo tokenInfo;
+            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != RET_OK) {
+                MMI_HILOGE("Get native token info failed");
+            } else {
+                bundleName = tokenInfo.processName;
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGW("token type not match");
+            break;
+        }
+    }
+    return bundleName;
+}
+
+ErrCode MMIService::AllocSocketFd(const int32_t moduleType, int32_t &toReturnClientFd,
     int32_t &tokenType)
 {
     int32_t pid = GetCallingPid();
@@ -575,6 +627,7 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         MMI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
         return MMISERVICE_NOT_RUNNING;
     }
+    std::string programName = GetPackageName(IPCSkeleton::GetCallingTokenID());
     if (programName.empty()) {
         MMI_HILOGE("Invalid programName");
         return RET_ERR;
@@ -953,8 +1006,10 @@ ErrCode MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerSize(int32_t &size)
 {
+    // LCOV_EXCL_START
     size = CursorDrawingComponent::GetInstance().GetPointerSize();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -1033,8 +1088,10 @@ ErrCode MMIService::SetMousePrimaryButton(int32_t primaryButton)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadMousePrimaryButton(int32_t &primaryButton)
 {
+    // LCOV_EXCL_START
     primaryButton = MouseEventHdr->GetMousePrimaryButton();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -1226,8 +1283,10 @@ ErrCode MMIService::SetPointerSpeed(int32_t speed)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 {
+    // LCOV_EXCL_START
     speed = MouseEventHdr->GetPointerSpeed();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -1262,6 +1321,7 @@ ErrCode MMIService::NotifyNapOnline()
 
 ErrCode MMIService::RemoveInputEventObserver()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
@@ -1269,6 +1329,7 @@ ErrCode MMIService::RemoveInputEventObserver()
     }
     NapProcess::GetInstance()->RemoveInputEventObserver();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension)
@@ -1378,8 +1439,10 @@ ErrCode MMIService::SetHoverScrollState(bool state)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadHoverScrollState(bool &state)
 {
+    // LCOV_EXCL_START
     state = WIN_MGR->GetHoverScrollState();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -1521,6 +1584,7 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
 
 ErrCode MMIService::RegisterDevListener()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1533,6 +1597,7 @@ ErrCode MMIService::RegisterDevListener()
         return ret;
     }
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 int32_t MMIService::OnUnregisterDevListener(int32_t pid)
@@ -1544,6 +1609,7 @@ int32_t MMIService::OnUnregisterDevListener(int32_t pid)
 
 ErrCode MMIService::UnregisterDevListener()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1556,6 +1622,7 @@ ErrCode MMIService::UnregisterDevListener()
         return ret;
     }
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
@@ -2375,11 +2442,13 @@ void MMIService::ScreenCaptureCallback(int32_t pid, bool isStart)
 
 void MMIService::RegisterScreenCaptureCallback()
 {
+    // LCOV_EXCL_START
     if (hasRegisterListener_) {
         return;
     }
     InputScreenCaptureAgent::GetInstance().RegisterListener(ScreenCaptureCallback);
     hasRegisterListener_ = true;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 
@@ -2560,9 +2629,12 @@ ErrCode MMIService::SubscribeKeyMonitor(const KeyMonitorOption &keyOption)
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    std::string bundleName = sess->GetProgramName();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, keyOption] {
-            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption);
+        [this, pid, keyOption, bundleName] {
+            return sMsgHandler_.SubscribeKeyMonitor(pid, keyOption, bundleName);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::SubscribeKeyMonitor fail, error:%{public}d", ret);
@@ -2577,9 +2649,12 @@ ErrCode MMIService::UnsubscribeKeyMonitor(const KeyMonitorOption &keyOption)
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t pid = GetCallingPid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    std::string bundleName = sess->GetProgramName();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, keyOption] {
-            return sMsgHandler_.UnsubscribeKeyMonitor(pid, keyOption);
+        [this, pid, keyOption, bundleName] {
+            return sMsgHandler_.UnsubscribeKeyMonitor(pid, keyOption, bundleName);
         });
     if (ret != RET_OK) {
         MMI_HILOGE("ServerMsgHandler::UnsubscribeKeyMonitor fail, error:%{public}d", ret);
@@ -2985,6 +3060,7 @@ void MMIService::OnDelegateTask(epoll_event &ev)
 
 void MMIService::OnThread()
 {
+    // LCOV_EXCL_START
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
@@ -3035,6 +3111,7 @@ void MMIService::OnThread()
         }
     }
     MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+    // LCOV_EXCL_STOP
 }
 
 #ifdef OHOS_BUILD_PC_PRIORITY
@@ -3053,6 +3130,7 @@ void MMIService::SetMmiServicePriority(int32_t tid)
 
 void MMIService::PreEventLoop()
 {
+    // LCOV_EXCL_START
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     SetupTouchGestureHandler();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -3060,10 +3138,12 @@ void MMIService::PreEventLoop()
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->Initialize();
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
+    // LCOV_EXCL_STOP
 }
 
 bool MMIService::InitSignalHandler()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     sigset_t mask = { 0 };
     int32_t retCode = sigfillset(&mask);
@@ -3091,6 +3171,7 @@ bool MMIService::InitSignalHandler()
         return false;
     }
     return true;
+    // LCOV_EXCL_STOP
 }
 
 void MMIService::OnSignalEvent(int32_t signalFd)
@@ -3125,6 +3206,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 
 void MMIService::AddReloadDeviceTimer()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     TimerMgr->AddTimer(RELOAD_DEVICE_TIME, REPEAT_COUNT, [this]() {
         auto deviceIds = INPUT_DEV_MGR->GetInputDeviceIds();
@@ -3132,6 +3214,7 @@ void MMIService::AddReloadDeviceTimer()
             libinputAdapter_.ReloadDevice();
         }
     }, "MMIService-AddReloadDeviceTimer");
+    // LCOV_EXCL_STOP
 }
 
 int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
@@ -4246,6 +4329,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 g_VKeyboardHandle, "ResetVTrackpadState");
             stopVTrackpadTimer_ = (STOP_VTRACKPAD_TIMER)dlsym(
                 g_VKeyboardHandle, "StopVTrackpadTimer");
+            vkeyboard_isInsideFullKbd_ = (VKEYBOARD_ISINSIDEFULLKBD_TYPE)dlsym(
+                g_VKeyboardHandle, "IsInsideFullKeyboard");
             libinputAdapter_.InitVKeyboard(handleTouchPoint_,
                 vkeyboard_hardwareKeyEventDetected_,
                 vkeyboard_getKeyboardActivationState_,
@@ -4254,7 +4339,8 @@ void MMIService::InitVKeyboardFuncHandler()
                 getLibinputEventForVKeyboard_,
                 getLibinputEventForVTrackpad_,
                 resetVTrackpadState_,
-                stopVTrackpadTimer_);
+                stopVTrackpadTimer_,
+                vkeyboard_isInsideFullKbd_);
         }
     }
 }
@@ -4262,8 +4348,10 @@ void MMIService::InitVKeyboardFuncHandler()
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {
+    // LCOV_EXCL_START
     hasIrEmitter = false;
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap)
@@ -4559,8 +4647,10 @@ ErrCode MMIService::SetTouchpadScrollRows(int32_t rows)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
 {
+    // LCOV_EXCL_START
     rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -4645,12 +4735,16 @@ ErrCode MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
+
+    std::string msg = "Epoll_event_input, event type is: " + flag;
+    BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, THREAD_BLOCK_TIMER_SPAN_S,
         getpid(), gettid());
     int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, THREAD_BLOCK_TIMER_SPAN_S, printLog, nullptr,
         HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    BytraceAdapter::MMIServiceTraceStop();
 }
 
 void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid)
@@ -4733,6 +4827,7 @@ ErrCode MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
 
 void MMIService::InitPrintClientInfo()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
         ffrt::submit([this] {
@@ -4757,6 +4852,7 @@ void MMIService::InitPrintClientInfo()
         return this->OnSessionDelete(sess);
     };
     AddSessionDeletedCallback(callback);
+    // LCOV_EXCL_STOP
 }
 
 ErrCode MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
@@ -4805,8 +4901,10 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 void MMIService::SetupTouchGestureHandler()
 {
+    // LCOV_EXCL_START
     touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
     WIN_MGR->AttachTouchGestureMgr(touchGestureMgr_);
+    // LCOV_EXCL_STOP
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 
@@ -5019,6 +5117,7 @@ ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
 
 ErrCode MMIService::LaunchAiScreenAbility()
 {
+    // LCOV_EXCL_START
     int32_t pid = GetCallingPid();
     int ret = delegateTasks_.PostSyncTask(
         [pid] {
@@ -5032,6 +5131,7 @@ ErrCode MMIService::LaunchAiScreenAbility()
         MMI_HILOGE("LaunchAiScreenAbility failed, return:%{public}d", ret);
     }
     return ret;
+    // LCOV_EXCL_STOP
 }
 
 ErrCode MMIService::GetMaxMultiTouchPointNum(int32_t &pointNum)
@@ -5075,6 +5175,10 @@ std::vector<std::string> MMIService::FilterConsumers(const std::vector<std::stri
 void MMIService::UpdateConsumers(const cJSON* consumer)
 {
     DeviceConsumer deviceConsumer;
+    if (!cJSON_IsObject(consumer)) {
+        MMI_HILOGE("The parser is not object");
+        return;
+    }
     cJSON* name = cJSON_GetObjectItemCaseSensitive(consumer, "name");
     if (name != nullptr && cJSON_IsString(name)) {
         char *nameString = cJSON_Print(name);
@@ -5099,6 +5203,7 @@ void MMIService::UpdateConsumers(const cJSON* consumer)
 
 bool MMIService::ParseDeviceConsumerConfig()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     consumersData_.consumers.clear();
     const char configName[] { "/etc/multimodalinput/input_device_consumers.json" };
@@ -5132,6 +5237,7 @@ bool MMIService::ParseDeviceConsumerConfig()
         }
     }
     return true;
+    // LCOV_EXCL_STOP
 }
 
 ErrCode MMIService::InitCustomConfig()

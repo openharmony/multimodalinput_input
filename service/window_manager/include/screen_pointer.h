@@ -205,6 +205,9 @@ private:
     void Rotate(rotation_t rotation, int32_t& x, int32_t& y);
     void CalculateHwcPositionForMirror(int32_t& x, int32_t& y);
     void CalculateHwcPositionForExtend(int32_t& x, int32_t& y);
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    void CalculateHwcPositionForMain(int32_t& x, int32_t& y);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
     bool InitDefaultBuffer(const OHOS::BufferRequestConfig &bufferCfg, PointerRenderer &render);
     bool InitTransparentBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     bool InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg);

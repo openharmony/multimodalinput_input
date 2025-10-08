@@ -36,18 +36,9 @@ const char* SUFFIX { "0000:0000" };
 const std::string INPUT { "input" };
 const std::string EVENT { "event" };
 const char* NAME { "name" };
-const int32_t DISPLAY_ID_MAIN { 0 };
-const int32_t DISPLAY_ID_SUB { 5 };
-const int32_t DISPLAY_ID_CAR_CO_PILOT { 1 };
-const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 }
 
 namespace fs = std::filesystem;
-
-static bool IsDualDisplayFoldDevice()
-{
-    return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '2' || FOLD_SCREEN_FLAG[0] == '4'));
-}
 
 int32_t BindInfo::GetInputDeviceId() const
 {
@@ -389,11 +380,10 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
 {
     CALL_DEBUG_ENTER;
     auto inputDeviceName = configFileInfos_->GetInputDeviceByDisplayName(name);
-    if (IsDualDisplayFoldDevice() || PRODUCT_TYPE == "car") {
-        std::string deviceName = GetInputDeviceById(id);
-        if (!deviceName.empty()) {
-            inputDeviceName = deviceName;
-        }
+    
+    std::string deviceName = GetInputDeviceById(id);
+    if (!deviceName.empty()) {
+        inputDeviceName = deviceName;
     }
     BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
     info.AddDisplay(id, name);
@@ -420,11 +410,9 @@ void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name
     bool IsStore = false;
     for (auto &item : unbindDevices) {
         auto inputDeviceName = item;
-        if (IsDualDisplayFoldDevice()) {
-            std::string deviceName = GetInputDeviceById(id);
-            if (!deviceName.empty()) {
-                inputDeviceName = deviceName;
-            }
+        std::string deviceName = GetInputDeviceById(id);
+        if (!deviceName.empty()) {
+            inputDeviceName = deviceName;
         }
         BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
         info.AddDisplay(id, name);
@@ -440,10 +428,6 @@ void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name
 std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
 {
     CALL_DEBUG_ENTER;
-    if (id != DISPLAY_ID_MAIN && id != DISPLAY_ID_SUB &&
-        id != DISPLAY_ID_CAR_CO_PILOT) {
-        return "";
-    }
     std::string inputNodeName = GetInputNodeNameByCfg(id);
     if (inputNodeName.empty()) {
         return "";

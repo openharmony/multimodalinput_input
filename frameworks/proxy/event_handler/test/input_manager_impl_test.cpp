@@ -2218,6 +2218,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackWindowGroupInfo_001,
     windowInfo.windowType = 1;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = false;
     windowInfo.windowNameType = 0;
+    windowInfo.agentPid = 1234;
     windowInfo.rectChangeBySystem = false;
     InputMgrImpl.windowGroupInfo_.windowsInfo.push_back(windowInfo);
 
@@ -2257,5 +2258,53 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetExternalObject_001, TestS
     auto ret = InputMgrImpl.GetExternalObject(pluginName, inputDevicePluginStub);
     ASSERT_NE(ret, RET_OK);
 }
+
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+/**
+ * @tc.name: AddKeyEventHook_001
+ * @tc.desc: Test AddKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, AddKeyEventHook_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    int32_t hookId = 1;
+    auto callback = [](std::shared_ptr<KeyEvent>) {};
+    int32_t ret = inputManagerImpl.AddKeyEventHook(callback, hookId);
+    EXPECT_EQ(ret, RET_OK);
+}
+ 
+/**
+ * @tc.name: RemoveKeyEventHook_001
+ * @tc.desc: Test RemoveKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, RemoveKeyEventHook_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    int32_t keyEventHookId = 1;
+    int32_t ret = inputManagerImpl.RemoveKeyEventHook(keyEventHookId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+ 
+/**
+ * @tc.name: DispatchToNextHandler_001
+ * @tc.desc: Test DispatchToNextHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, DispatchToNextHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    int32_t eventId = 1;
+    int32_t ret = inputManagerImpl.DispatchToNextHandler(eventId);
+    EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
+}
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
 } // namespace MMI
 } // namespace OHOS

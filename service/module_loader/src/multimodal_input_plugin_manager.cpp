@@ -18,6 +18,7 @@
 #include "multimodal_input_plugin_manager.h"
 #include "i_input_event_handler.h"
 #include "input_event_handler.h"
+#include "key_monitor_manager.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -35,11 +36,13 @@ const int32_t MAX_TIMER = 3;
 
 InputPluginManager::~InputPluginManager()
 {
+    // LCOV_EXCL_START
     plugins_.clear();
     if (instance_ != nullptr) {
         instance_ = nullptr;
     }
     MMI_HILOGI("~InputPluginManager");
+    // LCOV_EXCL_STOP
 }
 
 InputPluginManager* InputPluginManager::GetInstance(const std::string &directory)
@@ -135,6 +138,7 @@ bool InputPluginManager::LoadPlugin(const std::string &path)
 
 void InputPluginManager::PrintPlugins()
 {
+    // LCOV_EXCL_START
     for (const auto &stagePlugins : plugins_) {
         MMI_HILOGI("InputPluginManager InputPluginStage : %{public}d", stagePlugins.first);
         for (const auto &plugin : stagePlugins.second) {
@@ -142,6 +146,7 @@ void InputPluginManager::PrintPlugins()
                 plugin->GetName().c_str(), plugin->GetPriority());
         }
     }
+    // LCOV_EXCL_STOP
 }
 
 void InputPluginManager::PluginAssignmentCallBack(
@@ -343,6 +348,23 @@ UDSServer* InputPluginManager::GetUdsServer()
     return udsServer_;
 }
 
+void InputPluginManager::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
+{
+    CALL_INFO_TRACE;
+    MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
+        monitorStatus, monitorType.c_str());
+    auto it = plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    if (it == plugins_.end()) {
+        MMI_HILOGE("plugins_ not stage:%{public}d", InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+        return;
+    }
+    for (auto &plugin : it->second) {
+        if (plugin != nullptr) {
+            plugin->HandleMonitorStatus(monitorStatus, monitorType);
+        }
+    }
+}
+
 int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
 {
     name_ = pin->GetName();
@@ -354,11 +376,13 @@ int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
 
 void InputPlugin::UnInit()
 {
+    // LCOV_EXCL_START
     CHKPV(plugin_);
     MMI_HILOGI("InputPlugin UnInit Start name:%{public}s.", name_.c_str());
     if (unintPlugin_) {
         unintPlugin_(plugin_);
     }
+    // LCOV_EXCL_STOP
 }
 
 void InputPlugin::DispatchEvent(PluginEventType pluginEvent, int64_t frameTime)
@@ -407,12 +431,14 @@ void InputPlugin::DispatchEvent(PluginEventType pluginEvent, InputDispatchStage 
         }
     }
 
-    std::visit(overloaded{
+    if (eventHandler) {
+        std::visit(overloaded{
         [&eventHandler](std::shared_ptr<KeyEvent> evt) { return eventHandler->HandleKeyEvent(evt); },
         [&eventHandler](std::shared_ptr<PointerEvent> evt) { return eventHandler->HandlePointerEvent(evt); },
         [](libinput_event* evt) { return; },
         [](std::shared_ptr<AxisEvent> evt) { return; }
-    }, pluginEvent);
+        }, pluginEvent);
+    }
 }
 
 void InputPlugin::DispatchEvent(NetPacket& pkt, int32_t pid)
@@ -482,7 +508,7 @@ int32_t InputPlugin::GetPriority()
     return prio_;
 }
 
-void InputPlugin::SetCallback(std::function<void(PluginEventType, int64_t)>& callback)
+void InputPlugin::SetCallback(std::function<void(PluginEventType, int64_t)> callback)
 {
     callback_ = callback;
 }
@@ -494,11 +520,21 @@ std::shared_ptr<IInputPlugin> InputPlugin::GetPlugin()
 
 InputPlugin::~InputPlugin()
 {
+    // LCOV_EXCL_START
     if (handle_) {
         dlclose(handle_);
         handle_ = nullptr;
     }
     MMI_HILOGI("~InputPlugin");
+    // LCOV_EXCL_STOP
+}
+
+void InputPlugin::HandleMonitorStatus(bool monitorStatus, const std::string &monitorType)
+{
+    CHKPV(plugin_);
+    MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
+        monitorStatus, monitorType.c_str());
+    return plugin_->HandleMonitorStatus(monitorStatus, monitorType);
 }
 } // namespace MMI
 } // namespace OHOS
