@@ -269,8 +269,8 @@ private:
     bool IsMusicActivate();
     template <class T>
     void CreateStatusConfigObserver(T& item);
-    template <class T>
-    void CreateKnuckleConfigObserver(T& item);
+    bool GetKnuckleSwitchStatus(const std::string& key, const std::string &strUri, bool defaultValue);
+    void CreateKnuckleConfigObserver(KnuckleSwitch& item);
     void ResetCurrentLaunchAbilityKey()
     {
         currentLaunchAbilityKey_.preKeys.clear();

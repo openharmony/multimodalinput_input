@@ -1345,8 +1345,23 @@ int32_t KeyCommandHandler::RegisterKnuckleSwitchByUserId(int32_t userId)
     return RET_OK;
 }
 
-template <class T>
-void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
+bool KeyCommandHandler::GetKnuckleSwitchStatus(const std::string& key, const std::string &strUri, bool defaultValue)
+{
+    std::string strVal;
+    int32_t ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetStringValue(key, strVal, strUri);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get value from setting data fail, the default value=%{public}d", defaultValue);
+        return defaultValue;
+    }
+
+    if (strVal != "1" && strVal != "0") {
+        MMI_HILOGE("Invalid value=%{public}s, the default value=%{public}d", strVal.c_str(), defaultValue);
+        return defaultValue;
+    }
+    return (strVal == "1") ? true : false;
+}
+
+void KeyCommandHandler::CreateKnuckleConfigObserver(KnuckleSwitch &item)
 {
     CALL_DEBUG_ENTER;
     char buf[DEFAULT_BUFFER_LENGTH] {};
@@ -1354,43 +1369,28 @@ void KeyCommandHandler::CreateKnuckleConfigObserver(T& item)
         MMI_HILOGE("Failed to format URI");
         return;
     }
-    SettingObserver::UpdateFunc updateFunc = [weak = weak_from_this(), &item, buf](const std::string& key) {
+    std::string strUri(buf);
+    SettingObserver::UpdateFunc updateFunc = [weak = weak_from_this(), &item, strUri](const std::string& key) {
         auto ptr = weak.lock();
         if (ptr == nullptr) {
+            MMI_HILOGE("KeyCommandHandler object is nullptr");
             return;
         }
-        bool statusValue = true;
-        ErrCode ret = RET_ERR;
-        MMI_HILOGI("The statusConfig:%s", item.statusConfig.c_str());
-        ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue,
-            std::string(buf));
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get value from setting data fail");
-            item.statusConfigValue = true;
-            return;
-        }
-        MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
-        item.statusConfigValue = statusValue;
+        item.statusConfigValue = ptr->GetKnuckleSwitchStatus(key, strUri, true);
+        MMI_HILOGW("knuckle switch status update, key:%{public}s, value:%{public}d", key.c_str(),
+            item.statusConfigValue);
         ptr->OnKunckleSwitchStatusChange(item.statusConfig);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.statusConfig, updateFunc);
-    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver,
-        std::string(buf));
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver, strUri);
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
-    bool configValue = true;
-    ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .GetBoolValue(item.statusConfig, configValue, std::string(buf));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get value from setting data fail");
-        item.statusConfigValue = true;
-        return;
-    }
-    MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configValue);
-    item.statusConfigValue = configValue;
+    item.statusConfigValue = GetKnuckleSwitchStatus(item.statusConfig, strUri, true);
+    MMI_HILOGW("knuckle switch status update, key:%s, value:%{public}d", item.statusConfig.c_str(),
+        item.statusConfigValue);
 }
 
 std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed)
@@ -3096,7 +3096,7 @@ void KeyCommandHandler::RegisterProximitySensor()
 int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
 {
     gameForbidFingerKnuckle_ = !knuckleSwitch;
-    MMI_HILOGI("SetKnuckleSwitch is successful in keyCommand handler, knuckleSwitch:%{public}d", knuckleSwitch);
+    MMI_HILOGW("SetKnuckleSwitch is successful in keyCommand handler, knuckleSwitch:%{public}d", knuckleSwitch);
     return RET_OK;
 }
 
@@ -3182,7 +3182,7 @@ int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType
     } else {
         screenCapturePermission_ &= ~permissionType;
     }
-    MMI_HILOGI("SwitchScreenCapturePermission is successful in keyCommand handler, "
+    MMI_HILOGW("SwitchScreenCapturePermission is successful in keyCommand handler, "
                "screenCapturePermission_:%{public}d, permissionType:%{public}d, "
                "enable:%{public}d",
         screenCapturePermission_,
