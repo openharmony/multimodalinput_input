@@ -264,14 +264,15 @@ private:
     void CheckFocusWindowChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const std::vector<WindowInfo> &oldWindowsInfo,
         const std::vector<WindowInfo> &newWindowsInfo);
-    void UpdateDisplayIdAndName();
+    void UpdateDisplayIdAndName(int32_t groupId = DEFAULT_GROUP_ID);
     void UpdateCustomStyle(int32_t windowId, PointerStyle pointerStyle);
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
     bool IsWritePen(PointerEvent::PointerItem &pointerItem) const;
     bool IsWriteTablet(PointerEvent::PointerItem &pointerItem) const;
     void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, OLD::DisplayGroupInfo &displayGroupInfo);
-    void UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo,
+        const std::vector<int32_t> &deleteGroups);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
     bool IsValidZorderWindow(const WindowInfo &window, const std::shared_ptr<PointerEvent>& pointerEvent);
     bool SkipPrivacyProtectionWindow(const std::shared_ptr<PointerEvent>& pointerEvent, const bool &isSkip);
@@ -312,7 +313,6 @@ private:
     void InitPointerStyle(int32_t groupId = DEFAULT_GROUP_ID);
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     const std::vector<OLD::DisplayInfo>& GetDisplayInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
-    const std::vector<OLD::DisplayInfo> GetAllUsersDisplays() const;
     const std::vector<WindowInfo>& GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetMainDisplayId(int32_t groupId = DEFAULT_GROUP_ID) const;

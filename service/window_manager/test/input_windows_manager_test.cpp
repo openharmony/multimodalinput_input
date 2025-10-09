@@ -647,31 +647,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetAllUsersDisplays_001
- * @tc.desc: Test GetAllUsersDisplays
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetAllUsersDisplays_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    OHOS::MMI::WindowInfo win1 = {.id = NUM_1, .pid = NUM_100};
-    OHOS::MMI::WindowInfo win2 = {.id = NUM_2, .pid = NUM_200};
-    std::vector<OHOS::MMI::WindowInfo> windowsInfo1 = { win1, win2 };
-    std::vector<OHOS::MMI::WindowInfo> windowsInfo2 = { win2 };
-    OLD::DisplayGroupInfo group1 = InputWindowsManagerTest::CreateDisplayGroupInfo(NUM_100, NUM_100, NUM_100 + NUM_1);
-    group1.windowsInfo = windowsInfo1;
-    OLD::DisplayGroupInfo group2 = InputWindowsManagerTest::CreateDisplayGroupInfo(NUM_200, NUM_200);
-    group2.windowsInfo = windowsInfo2;
-
-    WIN_MGR->UpdateDisplayInfo(group1);
-    WIN_MGR->UpdateDisplayInfo(group2);
-
-    std::vector<OLD::DisplayInfo> displays = WIN_MGR->GetAllUsersDisplays();
-    EXPECT_EQ(displays.size(), NUM_1 + NUM_2);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_GetDisplayBindInfo_001
  * @tc.desc: Test getting display binding information
  * @tc.type: FUNC
@@ -732,7 +707,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDi
     CALL_TEST_DEBUG;
     OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 2;
-    WIN_MGR->UpdateWindowsInfoPerDisplay(displayGroupInfo);
+    std::vector<int32_t> deleteGroups;
+    WIN_MGR->UpdateWindowsInfoPerDisplay(displayGroupInfo, deleteGroups);
     WindowInfo window1 {1};
     WindowInfo window2 {2};
     displayGroupInfo.windowsInfo.push_back(window1);
@@ -7374,11 +7350,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDi
     displayGroupInfo.focusWindowId = 300;
     displayGroupInfo.windowsInfo.push_back(winInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, winGroupInfo));
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo));
+    std::vector<int32_t> deleteGroups;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo, deleteGroups));
 
     winInfo.windowType = static_cast<int32_t>(Rosen::WindowType::WINDOW_TYPE_TRANSPARENT_VIEW);
     displayGroupInfo.windowsInfo.push_back(winInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateWindowsInfoPerDisplay(displayGroupInfo, deleteGroups));
 }
 
 /**
