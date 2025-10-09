@@ -16,7 +16,7 @@
 #include "ohos.multimodalInput.shortKey.proj.hpp"
 #include "ohos.multimodalInput.shortKey.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 using namespace taihe;
 using namespace ohos::multimodalInput::shortKey;
