@@ -16,7 +16,7 @@
 #include "ohos.multimodalInput.inputMonitor.proj.hpp"
 #include "ohos.multimodalInput.inputMonitor.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 using namespace taihe;
 using namespace ohos::multimodalInput::inputMonitor;

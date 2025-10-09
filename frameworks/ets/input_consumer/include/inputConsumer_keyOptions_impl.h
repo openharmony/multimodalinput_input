@@ -19,7 +19,7 @@
 #include "ohos.multimodalInput.inputConsumer.proj.hpp"
 #include "ohos.multimodalInput.inputConsumer.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -30,7 +30,7 @@ using namespace ohos::multimodalInput::inputConsumer;
 
 ohos::multimodalInput::keyEvent::KeyEvent TaiheInvalidKeyPressed();
 std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption);
-KeyOptions ConverTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption);
+KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_CONSUMER_KEY_OPTIONS_IMPL_H
