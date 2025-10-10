@@ -479,6 +479,9 @@ private:
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
+    void DeleteInvalidDisplayGroups(const OLD::DisplayGroupInfo &displayGroupInfo,
+        std::vector<int32_t> &deleteGroups);
+    void DeleteInvalidWindowGroups(const std::vector<int32_t> &deleteGroups);
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
