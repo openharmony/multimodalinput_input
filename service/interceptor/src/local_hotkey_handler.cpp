@@ -27,7 +27,7 @@
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "EventInterceptorHandler"
+#define MMI_LOG_TAG "LocalHotKeyHandler"
 
 namespace OHOS {
 namespace MMI {
@@ -274,7 +274,7 @@ static void PickSystemHotKeys(LocalHotKeyMap &hotKeys, std::set<int32_t> &system
         }
         if (iter->first.modifiers_ & LOCAL_HOT_KEY_WITH_ALL_MODIFIERS_OPTIONAL) {
             systemHotKeys.emplace(iter->first.keyCode_);
-            MMI_HILOGD("Pick system hot key: %{public}d", iter->first.keyCode_);
+            MMI_HILOGD("Pick system hot key: %{private}d", iter->first.keyCode_);
         }
         iter = hotKeys.erase(iter);
     }
@@ -356,6 +356,13 @@ static void ParseSystemLocalHotKeys(const std::string &paramValue, std::set<int3
 
 void LocalHotKeySteward::LoadSystemLocalHotKeys()
 {
+    {
+        std::unique_lock<std::shared_mutex> lock(mutex_);
+        if (!localHotKeys_.empty() || !systemHotKeys_.empty()) {
+            MMI_HILOGW("No need to read system paramter due to existing config");
+            return;
+        }
+    }
     std::string paramName { "const.multimodalinput.keyevent_intercept_whitelist" };
     std::string paramValue {};
 
@@ -493,7 +500,7 @@ void LocalHotKeySteward::Dump(int32_t fd, const std::vector<std::string> &args) 
 LocalHotKeySteward LocalHotKeyHandler::steward_;
 
 bool LocalHotKeyHandler::HandleEvent(std::shared_ptr<KeyEvent> keyEvent,
-    std::function<void(std::shared_ptr<KeyEvent>)> intercept)
+    std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
     CHKPF(keyEvent);
     static std::once_flag flag;
@@ -508,13 +515,70 @@ bool LocalHotKeyHandler::HandleEvent(std::shared_ptr<KeyEvent> keyEvent,
     return HandleKeyUp(keyEvent, intercept);
 }
 
+void LocalHotKeyHandler::MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action)
+{
+    CHKPV(keyEvent);
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        return;
+    }
+    auto iter = consumedKeys_.find(keyEvent->GetKeyCode());
+    if (iter == consumedKeys_.end()) {
+        consumedKeys_.emplace(keyEvent->GetKeyCode(), action);
+        return;
+    }
+    if (action == LocalHotKeyAction::INTERCEPT) {
+        if (iter->second == LocalHotKeyAction::OVER) {
+            iter->second = LocalHotKeyAction::COPY;
+        }
+    } else if (action == LocalHotKeyAction::OVER) {
+        if (iter->second == LocalHotKeyAction::INTERCEPT) {
+            iter->second = LocalHotKeyAction::COPY;
+        }
+    }
+}
+
+void LocalHotKeyHandler::HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, IInputEventHandler &handler)
+{
+    CHKPV(keyEvent);
+    auto event = KeyEvent::Create();
+    CHKPV(event);
+    std::vector<KeyEvent::KeyItem> pressedKeys;
+
+    for (const auto &keyItem : keyEvent->GetKeyItems()) {
+        if (!keyItem.IsPressed() || (keyItem.GetKeyCode() == keyEvent->GetKeyCode())) {
+            continue;
+        }
+        if (KeyShortcutManager::IsModifier(keyItem.GetKeyCode())) {
+            pressedKeys.push_back(keyItem);
+        } else {
+            event->AddPressedKeyItems(keyItem);
+        }
+    }
+    for (auto &keyItem : pressedKeys) {
+        if (HasKeyBeenDispatched(keyItem.GetKeyCode())) {
+            continue;
+        }
+        auto actionTime = GetSysClockTime();
+        event->SetActionTime(actionTime);
+        event->SetKeyCode(keyItem.GetKeyCode());
+        event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+        event->SetDeviceId(keyItem.GetDeviceId());
+
+        keyItem.SetDownTime(actionTime);
+        event->AddPressedKeyItems(keyItem);
+
+        handler.HandleKeyEvent(event);
+        MarkProcessed(event, LocalHotKeyAction::OVER);
+    }
+}
+
 void LocalHotKeyHandler::Dump(int32_t fd, const std::vector<std::string> &args) const
 {
     steward_.Dump(fd, args);
 }
 
 bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
-    std::function<void(std::shared_ptr<KeyEvent>)> intercept)
+    std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
     auto hotKeyOpt = KeyEvent2LocalHotKey(keyEvent);
     if (!hotKeyOpt) {
@@ -523,13 +587,12 @@ bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
     auto action = steward_.QueryAction(*hotKeyOpt);
     switch (action) {
         case LocalHotKeyAction::COPY: {
-            if (intercept) {
-                intercept(keyEvent);
+            if (intercept && intercept(keyEvent)) {
+                MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
             }
-            [[fallthrough]];
+            return true;
         }
         case LocalHotKeyAction::OVER: {
-            consumedKeys_.emplace(keyEvent->GetKeyCode(), action);
             return true;
         }
         default: {
@@ -540,7 +603,7 @@ bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
 }
 
 bool LocalHotKeyHandler::HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent,
-    std::function<void(std::shared_ptr<KeyEvent>)> intercept)
+    std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
     CHKPF(keyEvent);
     if (auto iter = consumedKeys_.find(keyEvent->GetKeyCode()); iter != consumedKeys_.cend()) {
@@ -549,7 +612,7 @@ bool LocalHotKeyHandler::HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent,
         if ((action == LocalHotKeyAction::COPY) && intercept) {
             intercept(keyEvent);
         }
-        return true;
+        return ((action == LocalHotKeyAction::OVER) || (action == LocalHotKeyAction::COPY));
     }
     return false;
 }
@@ -567,6 +630,13 @@ std::optional<LocalHotKey> LocalHotKeyHandler::KeyEvent2LocalHotKey(std::shared_
         hotKey.modifiers_ |= KeyShortcutManager::Key2Modifier(pressedKey);
     }
     return hotKey;
+}
+
+bool LocalHotKeyHandler::HasKeyBeenDispatched(int32_t keyCode) const
+{
+    auto iter = consumedKeys_.find(keyCode);
+    return ((iter != consumedKeys_.end()) &&
+            ((iter->second == LocalHotKeyAction::OVER) || (iter->second == LocalHotKeyAction::COPY)));
 }
 } // namespace MMI
 } // namespace OHOS

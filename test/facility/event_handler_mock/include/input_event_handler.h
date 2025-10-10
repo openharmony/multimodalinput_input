@@ -23,6 +23,7 @@
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "switch_subscriber_handler.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +32,7 @@ public:
     IInputEventHandlerManager() = default;
     virtual ~IInputEventHandlerManager() = default;
 
+    virtual UDSServer* GetUDSServer() const = 0;
     virtual std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const = 0;
     virtual std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const = 0;
     virtual std::shared_ptr<KeySubscriberHandler> GetSubscriberHandler() const = 0;
@@ -46,6 +48,7 @@ public:
     InputEventHandlerManager() = default;
     ~InputEventHandlerManager() override = default;
 
+    MOCK_METHOD(UDSServer*, GetUDSServer, (), (const));
     MOCK_METHOD(std::shared_ptr<EventNormalizeHandler>, GetEventNormalizeHandler, (), (const));
     MOCK_METHOD(std::shared_ptr<EventInterceptorHandler>, GetInterceptorHandler, (), (const));
     MOCK_METHOD(std::shared_ptr<KeySubscriberHandler>, GetSubscriberHandler, (), (const));
