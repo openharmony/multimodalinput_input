@@ -48,12 +48,12 @@ std::unordered_map<int32_t, std::string>  g_taiheAxisType = {
     { ABS_MT_WIDTH_MINOR, "toolminor" },
 };
 
-TaihesType TaiheInputDeviceUtils::ConverterSType(const std::string &sourceType)
+TaihesType TaiheInputDeviceUtils::ConverterSourceTypeValue(const std::string &sourceType)
 {
     return ohos::multimodalInput::inputDevice::sourceType::from_value(sourceType);
 }
 
-TaiheaType TaiheInputDeviceUtils::ConverterATxis(const std::string &axisType)
+TaiheaType TaiheInputDeviceUtils::ConverterAxisTypeValue(const std::string &axisType)
 {
     return ohos::multimodalInput::inputDevice::axisType::from_value(axisType);
 }
@@ -73,8 +73,8 @@ TaiheAxisRange TaiheInputDeviceUtils::ConverterAxisRange(const InputDevice::Axis
     const std::string &sourceType, const std::string &axisType)
 {
     TaiheAxisRange result {
-        .source = ConverterSourceType(ConverterSType(sourceType)),
-        .axis = ConverterAxisType(ConverterATxis(axisType)),
+        .source = ConverterSourceType(ConverterSourceTypeValue(sourceType)),
+        .axis = ConverterAxisType(ConverterAxisTypeValue(axisType)),
     };
     result.max = axisInfo.GetMaximum();
     result.min = axisInfo.GetMinimum();
@@ -84,7 +84,7 @@ TaiheAxisRange TaiheInputDeviceUtils::ConverterAxisRange(const InputDevice::Axis
     return result;
 }
 
-TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr<InputDevice> &device)
+TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(const std::shared_ptr<InputDevice> &device)
 {
     TaiheInputDeviceData result {};
     if (device == nullptr) {
@@ -98,7 +98,7 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr
     for (const auto& item : g_taiheDeviceType) {
         if (types &item.typeBit) {
             sourceType = item.sourceTypeName;
-            vecSourceTypes.push_back(ConverterSourceType(ConverterSType(sourceType)));
+            vecSourceTypes.push_back(ConverterSourceType(ConverterSourceTypeValue(sourceType)));
         }
     }
     result.sources = taihe::array<TaiheSType>(vecSourceTypes);

@@ -16,7 +16,7 @@
 #include "ohos.multimodalInput.touchEvent.proj.hpp"
 #include "ohos.multimodalInput.touchEvent.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 using namespace taihe;
 using namespace ohos::multimodalInput::touchEvent;
