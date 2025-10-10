@@ -35,7 +35,7 @@ using namespace testing::ext;
 class MockMultimodalInputConnectStub : public MultimodalInputConnectStub {
 public:
     MOCK_METHOD(int32_t, AllocSocketFd,
-                (const int32_t moduleType, int32_t &socketFd, int32_t &tokenType),
+                (const std::string &programName, const int32_t moduleType, int32_t &socketFd, int32_t &tokenType),
                 (override));
     MOCK_METHOD(int32_t, AddInputEventFilter,
                 (sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags), (override));
