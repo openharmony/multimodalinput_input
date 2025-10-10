@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "event_interceptor_handler.h"
+#include "key_shortcut_manager.h"
 #include "mmi_log.h"
 #include "uds_server.h"
 
@@ -26,17 +27,90 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t UID_ROOT { 0 };
+constexpr size_t TWO_ITEMS { 2 };
 const std::string PROGRAM_NAME = "uds_sesion_test";
 int32_t g_moduleType = 3;
 int32_t g_pid = 0;
 int32_t g_writeFd = -1;
 } // namespace
 
+struct InputEventHandlerMock : public IInputEventHandler {
+    InputEventHandlerMock() = default;
+    virtual ~InputEventHandlerMock() = default;
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override
+    {
+        auto event = KeyEvent::Clone(keyEvent);
+        if (event != nullptr) {
+            events_.push_back(event);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent>) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent>) override {}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+    std::vector<std::shared_ptr<KeyEvent>> events_;
+};
+
 class EventInterceptorHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
+
+/**
+ * @tc.name: HandleKeyEvent_001
+ * @tc.desc: Test EventInterceptorHandler::HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LocalHotKeyHandler::steward_.localHotKeys_.emplace(
+        LocalHotKey {
+            .keyCode_ = KeyEvent::KEYCODE_A,
+            .modifiers_ = KeyShortcutManager::SHORTCUT_MODIFIER_CTRL,
+        }, LocalHotKeyAction::COPY);
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_A);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyEvent::KeyItem key1 {};
+    key1.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    key1.SetPressed(true);
+    event->AddPressedKeyItems(key1);
+
+    KeyEvent::KeyItem key2 {};
+    key2.SetKeyCode(KeyEvent::KEYCODE_A);
+    key2.SetPressed(true);
+    event->AddPressedKeyItems(key2);
+
+    auto eventHandler = std::make_shared<InputEventHandlerMock>();
+    EventInterceptorHandler handler;
+    handler.SetNext(eventHandler);
+    handler.HandleKeyEvent(event);
+
+    EXPECT_EQ(eventHandler->events_.size(), TWO_ITEMS);
+    if (!eventHandler->events_.empty()) {
+        auto event = eventHandler->events_.front();
+        ASSERT_NE(event, nullptr);
+        EXPECT_EQ(event->GetKeyCode(), KeyEvent::KEYCODE_CTRL_LEFT);
+        EXPECT_EQ(event->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+    }
+    auto iter = handler.localHotKeyHandler_.consumedKeys_.find(KeyEvent::KEYCODE_CTRL_LEFT);
+    EXPECT_NE(iter, handler.localHotKeyHandler_.consumedKeys_.end());
+    if (iter != handler.localHotKeyHandler_.consumedKeys_.end()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+    }
+}
 
 /**
  * @tc.name: EventInterceptorHandler_Test_001
