@@ -39,6 +39,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent) override;
     bool PublishTabletEvent(const std::shared_ptr<SwitchEvent> switchEvent);
+    const std::string COMMON_EVENT_TABLET_MODE_CHANGED = "usual.event.TABLET_MODE_CHANGED";
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
