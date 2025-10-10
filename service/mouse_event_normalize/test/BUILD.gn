@@ -168,6 +168,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
