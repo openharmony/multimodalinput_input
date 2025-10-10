@@ -33,6 +33,7 @@ ohos_fuzztest("HandlerFuzzTest") {
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/joystick/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/key_command/include",
