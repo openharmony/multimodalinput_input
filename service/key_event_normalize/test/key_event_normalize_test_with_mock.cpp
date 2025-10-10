@@ -19,6 +19,7 @@
 #include "input_device_manager.h"
 #include "key_event_normalize.h"
 #include "libinput_mock.h"
+#include "key_auto_repeat.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyEventNormalizeWithMockTest"
@@ -315,6 +316,141 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
     if (vKeyboardDeviceId > 0) {
         INPUT_DEV_MGR->RemoveVirtualInputDevice(vKeyboardDeviceId);
     }
+}
+
+/**
+ * @tc.name: Test_ModifierKeyEventNormalize_001
+ * @tc.desc: Test_ModifierKeyEventNormalize.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierKeyEventNormalize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_ModifierKeyEventNormalize_001");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(nullptr));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->ClearFlag();
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+    keyEvent->ClearFlag();
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+    keyEvent->ClearFlag();
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+}
+
+/**
+ * @tc.name: Test_ModifierKeyEventNormalize_002
+ * @tc.desc: Test_ModifierKeyEventNormalize.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierkeyEventNormalize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_ModifierKeyEventNormalize_002");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t keyCode = KeyEvent::KEYCODE_CAPS_LOCK;
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(false);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+}
+
+/**
+ * @tc.name: Test_HandleModifierKeyAction_001
+ * @tc.desc: Test_HandleModifierKeyAction.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_HandleModifierKeyAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_HandleModifierKeyAction_001");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    EXPECT_FALSE(KeyEventHdr->HandleModifierKeyAction(nullptr));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_FALSE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    int32_t keyCode = KeyEvent::KEYCODE_CTRL_LEFT;
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    EXPECT_TRUE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(false);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_TRUE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    EXPECT_FALSE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(false);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyRepeat->SetRepeatKeyCode(-1);
+    EXPECT_TRUE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+    KeyEventHdr->keyEvent_ = nullptr;
+    EXPECT_FALSE(KeyEventHdr->HandleModifierKeyAction(keyEvent));
+}
+
+/**
+ * @tc.name: Test_SyncSwitchFunctionKeyState_001
+ * @tc.desc: Test_SyncSwitchFunctionKeyState.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_SyncSwitchFunctionKeyState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_SyncSwitchFunctionKeyState_001");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    int32_t FunctionKey = KeyEvent::KEYCODE_CAPS_LOCK;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncSwitchFunctionKeyState(keyEvent, FunctionKey));
 }
 }
 }
