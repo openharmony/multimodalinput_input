@@ -20,9 +20,7 @@
 #include "ohos.multimodalInput.keyCode.proj.hpp"
 #include "ohos.multimodalInput.keyCode.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
-
-#include <map>
+#include <stdexcept>
 
 namespace OHOS {
 namespace MMI {

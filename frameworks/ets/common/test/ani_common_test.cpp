@@ -41,6 +41,8 @@ HWTEST_F(AniCommonTest, AniCommonTest_GetApiError_001, TestSize.Level0) {
     auto code = TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR;
     bool result = TaiheConverter::GetApiError(code, codeMsg);
     EXPECT_TRUE(result);
+    EXPECT_EQ(codeMsg.errorCode, TaiheErrorCode::COMMON_PERMISSION_CHECK_ERROR);
+    EXPECT_STREQ(codeMsg.msg.c_str(), "Permission denied. An attempt was made to %s forbidden by permission:%s.");
 }
 
 /**
@@ -54,4 +56,6 @@ HWTEST_F(AniCommonTest, AniCommonTest_GetApiError_002, TestSize.Level0) {
     auto code = TaiheErrorCode::OTHER_ERROR;
     bool result = TaiheConverter::GetApiError(code, codeMsg);
     EXPECT_FALSE(result);
+    EXPECT_EQ(codeMsg.errorCode, 0);
+    EXPECT_STREQ(codeMsg.msg.c_str(), "");
 }

@@ -16,7 +16,7 @@
 #include "ohos.multimodalInput.keyEvent.proj.hpp"
 #include "ohos.multimodalInput.keyEvent.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 using namespace taihe;
 using namespace ohos::multimodalInput::keyEvent;

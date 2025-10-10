@@ -15,6 +15,7 @@
 
 @!namespace("@ohos.multimodalInput.inputConsumer", "inputConsumer")
 from ohos.multimodalInput.keyEvent use KeyEvent;
+
 @!sts_inject("""
 static { loadLibraryWithPermissionCheck("InputConsumer.z", "@ohos.multimodalInput.inputConsumer") }
 """)

@@ -19,7 +19,7 @@
 #include "ohos.multimodalInput.inputConsumer.proj.hpp"
 #include "ohos.multimodalInput.inputConsumer.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -35,7 +35,7 @@ enum EtsKeyAction {
     ETS_KEY_ACTION_UP,
 };
 
-const std::set<int32_t> allowedKeys_ {
+static const std::set<int32_t> allowedKeys_ {
     KeyEvent::KEYCODE_VOLUME_DOWN,
     KeyEvent::KEYCODE_VOLUME_UP,
 };
@@ -43,8 +43,8 @@ const std::set<int32_t> allowedKeys_ {
 int32_t EtsKeyActionToKeyAction(int32_t action);
 EtsKeyAction KeyActionEtsKeyAction(int32_t action);
 ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem);
-ohos::multimodalInput::keyEvent::Action ConverKeyAction(EtsKeyAction action);
-ohos::multimodalInput::keyEvent::KeyEvent ConverTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent);
+ohos::multimodalInput::keyEvent::Action ConvertKeyAction(EtsKeyAction action);
+ohos::multimodalInput::keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_CONSUMER_KEY_PRESSED_IMPL_H

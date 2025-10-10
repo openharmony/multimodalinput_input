@@ -51,7 +51,6 @@ const static std::map<int32_t, PointerStyle> POINTER_STYLE_TRANSFORMATION = {
     { TEXT_CURSOR_IMPL,                             PointerStyle::key_t::TEXT_CURSOR },
     { ZOOM_IN_IMPL,                                 PointerStyle::key_t::ZOOM_IN },
     { ZOOM_OUT_IMPL,                                PointerStyle::key_t::ZOOM_OUT },
-    { MOVE_IMPL,                                    PointerStyle::key_t::MOVE },
     { MIDDLE_BTN_EAST_IMPL,                         PointerStyle::key_t::MIDDLE_BTN_EAST },
     { MIDDLE_BTN_WEST_IMPL,                         PointerStyle::key_t::MIDDLE_BTN_WEST },
     { MIDDLE_BTN_SOUTH_IMPL,                        PointerStyle::key_t::MIDDLE_BTN_SOUTH },
@@ -121,7 +120,7 @@ void SetPointerStyleSync(int32_t windowId, PointerStyle pointerStyle)
 {
     OHOS::MMI::PointerStyle style;
     style.id = pointerStyle;
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetInstance()->SetPointerStyle(windowId, style);
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
         MMI_HILOGE("failed to get default SetPointerStyle!");
