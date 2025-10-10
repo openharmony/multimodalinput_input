@@ -586,40 +586,7 @@ void MMIService::RemoveAppDebugListener()
     // LCOV_EXCL_STOP
 }
 
-static std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId)
-{
-    CALL_INFO_TRACE;
-    std::string bundleName = "";
-    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    switch (tokenType) {
-        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
-            Security::AccessToken::HapTokenInfo hapInfo;
-            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != RET_OK) {
-                MMI_HILOGE("Get hap token info failed");
-            } else {
-                bundleName = hapInfo.bundleName;
-            }
-            break;
-        }
-        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE:
-        case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
-            Security::AccessToken::NativeTokenInfo tokenInfo;
-            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != RET_OK) {
-                MMI_HILOGE("Get native token info failed");
-            } else {
-                bundleName = tokenInfo.processName;
-            }
-            break;
-        }
-        default: {
-            MMI_HILOGW("token type not match");
-            break;
-        }
-    }
-    return bundleName;
-}
-
-ErrCode MMIService::AllocSocketFd(const int32_t moduleType, int32_t &toReturnClientFd,
+ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
     int32_t &tokenType)
 {
     int32_t pid = GetCallingPid();
@@ -627,7 +594,6 @@ ErrCode MMIService::AllocSocketFd(const int32_t moduleType, int32_t &toReturnCli
         MMI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
         return MMISERVICE_NOT_RUNNING;
     }
-    std::string programName = GetPackageName(IPCSkeleton::GetCallingTokenID());
     if (programName.empty()) {
         MMI_HILOGE("Invalid programName");
         return RET_ERR;
@@ -2375,9 +2341,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
         ACCOUNT_MGR->GetCurrentAccountSetting();
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
+#if (defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)) || \
+    defined(OHOS_BUILD_ENABLE_WATCH)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // (OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) || OHOS_BUILD_ENABLE_WATCH
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinputAdapter_.RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD

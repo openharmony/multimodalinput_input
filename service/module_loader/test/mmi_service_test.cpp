@@ -266,10 +266,11 @@ HWTEST_F(MMIServerTest, AllocSocketFd_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     MMIService mmiService;
+    const std::string programName = "programName";
     const int32_t moduleType = 1;
     int32_t toReturnClientFd = 1;
     int32_t tokenType = 1;
-    int32_t ret = mmiService.AllocSocketFd(moduleType, toReturnClientFd, tokenType);
+    int32_t ret = mmiService.AllocSocketFd(programName, moduleType, toReturnClientFd, tokenType);
     EXPECT_NE(ret, RET_ERR);
 }
 

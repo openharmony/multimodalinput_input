@@ -22,6 +22,8 @@
 #include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"
 #include "misc_product_type_parser.h"
+#include "libinput_adapter.h"
+#include "key_auto_repeat.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -33,6 +35,20 @@ namespace MMI {
 namespace {
 constexpr uint32_t KEYSTATUS { 0 };
 constexpr int32_t SWAP_VOLUME_KEYS_ON_FOLD { 0 };
+static const std::set<int32_t> g_ModifierKeys = {
+    KeyEvent::KEYCODE_ALT_LEFT,
+    KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_SHIFT_LEFT,
+    KeyEvent::KEYCODE_SHIFT_RIGHT,
+    KeyEvent::KEYCODE_CTRL_LEFT,
+    KeyEvent::KEYCODE_CTRL_RIGHT,
+    KeyEvent::KEYCODE_META_LEFT,
+    KeyEvent::KEYCODE_META_RIGHT,
+    KeyEvent::KEYCODE_CAPS_LOCK,
+    KeyEvent::KEYCODE_SCROLL_LOCK,
+    KeyEvent::KEYCODE_NUM_LOCK
+};
+
 class FoldStatusCallback : public Rosen::DisplayManagerLite::IFoldStatusListener {
 public:
     FoldStatusCallback() = default;
@@ -369,6 +385,134 @@ bool KeyEventNormalize::IsScreenFold()
 {
     CHKPF(g_foldStatusCallback);
     return g_foldStatusCallback->GetFoldStatus() == Rosen::FoldStatus::FOLDED;
+}
+
+void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t functionKey)
+{
+    CHKPV(keyEvent);
+    if (functionKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
+        return;
+    }
+    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPV(g_keyEvent);
+
+    std::vector<struct libinput_device*> input_devices;
+    int32_t deviceId = -1;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_devices);
+    if (input_devices.empty()) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return;
+    }
+    bool preState = g_keyEvent->GetFunctionKey(functionKey);
+    for (auto& device : input_devices) {
+        deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+        if (LibinputAdapter::DeviceLedUpdate(device, functionKey, !preState) != RET_OK) {
+            MMI_HILOGW("Failed to set the keyboard led, device id %{public}d", deviceId);
+            continue;
+        }
+        int32_t state = libinput_get_funckey_state(device, functionKey);
+        if (state != !preState) {
+            MMI_HILOGW("Failed to enable the function key, device id %{public}d", deviceId);
+        }
+    }
+    keyEvent->SetFunctionKey(functionKey, !preState);
+    g_keyEvent->SetFunctionKey(functionKey, !preState);
+    return;
+}
+
+bool KeyEventNormalize::HandleModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CHKPF(keyEvent);
+    auto keyItem = keyEvent->GetKeyItem();
+    CHK_KEY_ITEM(keyItem);
+    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPF(g_keyEvent);
+
+    int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t repeatKeyCode = KeyRepeat->GetRepeatKeyCode();
+    auto g_preKeyItem = g_keyEvent->GetKeyItem(keyCode);
+
+    keyItem->SetPressed(true);
+    if (repeatKeyCode != keyCode) {
+        KeyRepeat->RemoveTimer();
+        KeyRepeat->SetRepeatKeyCode(keyCode);
+    }
+    if (g_preKeyItem) {
+        if (g_preKeyItem->IsPressed()) {
+            g_preKeyItem->SetDownTime(keyItem->GetDownTime());
+            return true;
+        }
+        g_keyEvent->RemoveReleasedKeyItems(*g_preKeyItem);
+    }
+    int32_t functionKey = g_keyEvent->TransitionFunctionKey(keyCode);
+    if (functionKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
+        SyncSwitchFunctionKeyState(keyEvent, functionKey);
+    }
+    g_keyEvent->AddPressedKeyItems(*keyItem);
+    return true;
+}
+
+bool KeyEventNormalize::HandleModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CHKPF(keyEvent);
+    auto keyItem = keyEvent->GetKeyItem();
+    CHK_KEY_ITEM(keyItem);
+    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPF(g_keyEvent);
+
+    int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t repeatKeyCode = KeyRepeat->GetRepeatKeyCode();
+    auto g_preKeyItem = g_keyEvent->GetKeyItem(keyCode);
+
+    keyItem->SetPressed(false);
+    if (!g_preKeyItem) {
+        return false;
+    }
+    if (!g_preKeyItem->IsPressed()) {
+        return false;
+    }
+    g_keyEvent->RemoveReleasedKeyItems(*keyItem);
+    g_keyEvent->AddPressedKeyItems(*keyItem);
+    if (repeatKeyCode == keyCode) {
+        KeyRepeat->RemoveTimer();
+        KeyRepeat->SetRepeatKeyCode(keyCode);
+    }
+    g_keyEvent->AddPressedKeyItems(*keyItem);
+    return true;
+}
+
+bool KeyEventNormalize::HandleModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CHKPF(keyEvent);
+    int32_t keyAction = keyEvent->GetKeyAction();
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+        return HandleModifierKeyDown(keyEvent);
+    } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        return HandleModifierKeyUp(keyEvent);
+    }
+    return false;
+}
+
+void KeyEventNormalize::ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CHKPV(keyEvent);
+    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        return;
+    }
+    auto it = find(g_ModifierKeys.begin(), g_ModifierKeys.end(), keyEvent->GetKeyCode());
+    if (it == g_ModifierKeys.end()) {
+        return;
+    }
+    if (HandleModifierKeyAction(keyEvent)) {
+        auto g_keyEvent = KeyEventHdr->GetKeyEvent();
+        CHKPV(g_keyEvent);
+        g_keyEvent->SetKeyCode(keyEvent->GetKeyCode());
+        g_keyEvent->SetAction(keyEvent->GetKeyAction());
+        g_keyEvent->SetKeyAction(keyEvent->GetKeyAction());
+        g_keyEvent->SetDeviceId(keyEvent->GetDeviceId());
+        g_keyEvent->SetActionTime(keyEvent->GetActionTime());
+        g_keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

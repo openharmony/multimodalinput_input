@@ -79,7 +79,7 @@ EtsKeyAction KeyActionEtsKeyAction(int32_t action)
     }
 }
 
-ohos::multimodalInput::keyEvent::Action ConverKeyAction(EtsKeyAction action)
+ohos::multimodalInput::keyEvent::Action ConvertKeyAction(EtsKeyAction action)
 {
     switch (action) {
         case ETS_KEY_ACTION_CANCEL:
@@ -100,7 +100,7 @@ ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyI
     };
 }
 
-ohos::multimodalInput::keyEvent::KeyEvent ConverTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent)
+ohos::multimodalInput::keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
         MMI_HILOGE("keyEvent is nullptr");
@@ -130,7 +130,7 @@ ohos::multimodalInput::keyEvent::KeyEvent ConverTaiheKeyPressed(std::shared_ptr<
             keyEvent->GetTargetDisplayId(),
             keyEvent->GetTargetWindowId()
         },
-        ConverKeyAction(KeyActionEtsKeyAction(keyEvent->GetKeyAction())),
+        ConvertKeyAction(KeyActionEtsKeyAction(keyEvent->GetKeyAction())),
         keycode,
         keyItem->GetUnicode(),
         ::taihe::array<ohos::multimodalInput::keyEvent::Key>(etsKey),

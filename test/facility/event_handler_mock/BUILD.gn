@@ -14,7 +14,10 @@
 import("../../../multimodalinput_mini.gni")
 
 config("event_handler_mock_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/service/module_loader/include",
+  ]
 }
 
 ohos_source_set("event_handler_mock") {
@@ -27,7 +30,10 @@ ohos_source_set("event_handler_mock") {
 
   testonly = true
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/service/connect_manager/include",
+  ]
 
   sources = [
     "src/anr_manager.cpp",
@@ -52,6 +58,7 @@ ohos_source_set("event_handler_mock") {
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 
   part_name = "${mmi_part_name}"

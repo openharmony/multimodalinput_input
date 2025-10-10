@@ -19,7 +19,7 @@
 #include "ohos.multimodalInput.inputConsumer.proj.hpp"
 #include "ohos.multimodalInput.inputConsumer.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -48,7 +48,7 @@ static const std::vector<int32_t> finalKeyCodes = {
     KeyEvent::KEYCODE_META_RIGHT
 };
 
-HotkeyOptions ConverTaiheHotkeyOptions(std::shared_ptr<KeyOption> keyOption);
+HotkeyOptions ConvertTaiheHotkeyOptions(std::shared_ptr<KeyOption> keyOption);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_CONSUMER_HOT_KEY_OPTIONS_IMPL_H

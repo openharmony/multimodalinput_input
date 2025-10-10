@@ -25,6 +25,7 @@ bool TaiheConverter::GetApiError(int32_t code, TaiheError &codeMsg)
 {
     auto iter = TAIHE_ERRORS.find(code);
     if (iter == TAIHE_ERRORS.end()) {
+        MMI_HILOGE("The error code: %{public}d was not found", code);
         return false;
     }
     codeMsg = iter->second;

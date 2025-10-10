@@ -54,7 +54,6 @@ DisplayEventMonitor::~DisplayEventMonitor()
         static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this) & MMI_OBJECT_MASK));
 }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 class DisplayChangedReceiver : public EventFwk::CommonEventSubscriber {
 public:
     explicit DisplayChangedReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
@@ -190,6 +189,5 @@ void DisplayEventMonitor::SendCancelEventWhenLock()
         return RET_OK;
     });
 }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
 } // namespace OHOS
