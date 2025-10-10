@@ -63,7 +63,7 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
 {
     CHKPF(switchEvent);
     OHOS::AAFwk::Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TABLET_MODE_CHANGED);
+    want.SetAction(COMMON_EVENT_TABLET_MODE_CHANGED);
     want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_TABLET);
     want.SetParam("eventState", switchEvent->GetSwitchValue());
         
