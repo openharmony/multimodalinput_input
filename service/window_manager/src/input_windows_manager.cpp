@@ -4456,6 +4456,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
                 MMI_HILOGW("Rs process timeout");
             }
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+                dragFlag_ = false;
+                isDragBorder_ = false;
+            }
             return RET_ERR;
         }
         if (mouseDownInfo_.id != -1) {
