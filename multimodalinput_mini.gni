@@ -442,7 +442,6 @@ if (input_feature_product == "watch") {
   input_default_defines += [ "OHOS_BUILD_ENABLE_WATCH" ]
   libmmi_service_sources += [
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
-    "display_state_manager/src/display_event_monitor.cpp",
   ]
 } else {
   libmmi_service_sources += [
