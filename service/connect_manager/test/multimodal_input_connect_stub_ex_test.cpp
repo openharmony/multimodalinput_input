@@ -51,10 +51,13 @@ public:
         return (state_ == ServiceRunningState::STATE_RUNNING);
     }
 
-    int32_t AllocSocketFd(const int32_t moduleType,
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override
     {
         socketFd = moduleType;
+        if (programName == "fail") {
+            return -1;
+        }
         return 0;
     }
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
