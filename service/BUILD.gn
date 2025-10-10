@@ -299,13 +299,13 @@ ohos_shared_library("libmmi-server") {
 
   sources += [
     "account_manager/src/account_manager.cpp",
+    "display_state_manager/src/display_event_monitor.cpp",
     "subscriber/src/tablet_subscriber_handler.cpp",
     "window_manager/src/cursor_drawing_component.cpp",
   ]
 
   if (input_feature_keyboard) {
     sources += [
-      "display_state_manager/src/display_event_monitor.cpp",
       "key_event_normalize/src/key_event_normalize.cpp",
       "key_event_normalize/src/key_unicode_transformation.cpp",
       "monitor/src/event_pre_monitor_handler.cpp",
@@ -904,6 +904,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
@@ -1726,6 +1727,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
@@ -2842,6 +2844,7 @@ ohos_unittest("InputEventHandlerTest") {
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",

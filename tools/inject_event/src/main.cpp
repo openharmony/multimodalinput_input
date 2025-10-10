@@ -17,6 +17,7 @@
 #ifdef OHOS_BUILD_ENABLE_EVENT_RECORDER
 #include "input_replay_command.h"
 #endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
+#include "input_sendevent_command.h"
 
 int32_t main(int32_t argc, char** argv)
 {
@@ -25,6 +26,9 @@ int32_t main(int32_t argc, char** argv)
         return OHOS::MMI::InputReplayCommand::HandleRecordReplayCommand(argc, argv);
     }
 #endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
+    if (argc > 1 && (std::string(argv[1]) == "sendevent")) {
+        return OHOS::MMI::InputSendeventCommand::HandleSendEventCommand(argc, argv);
+    }
     OHOS::MMI::InputManagerCommand command;
     return command.ParseCommand(argc, argv);
 }

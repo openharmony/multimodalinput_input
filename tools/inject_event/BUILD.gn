@@ -16,7 +16,10 @@ import("//build/test.gni")
 import("../../multimodalinput_mini.gni")
 
 ohos_source_set("input-manager") {
-  sources = [ "src/input_manager_command.cpp" ]
+  sources = [
+    "src/input_manager_command.cpp",
+    "src/input_sendevent_command.cpp",
+  ]
   if (input_feature_event_recorder) {
     sources += [
       "src/device_manager.cpp",
@@ -100,7 +103,10 @@ ohos_unittest("InjectEventTest") {
     "${mmi_path}/util/json_parser/include"
     ]
 
-  sources = [ "test/inject_event_test.cpp" ]
+  sources = [
+    "test/inject_event_test.cpp",
+    "test/input_sendevent_command_test.cpp",
+  ]
   if (input_feature_event_recorder) {
     sources += [
       "test/device_manager_test.cpp",

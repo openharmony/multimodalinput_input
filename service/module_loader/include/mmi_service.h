@@ -55,7 +55,7 @@ public:
     void OnStop() override;
     static MMIService* GetInstance();
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
-    ErrCode AllocSocketFd(const int32_t moduleType,
+    ErrCode AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     ErrCode AddInputEventFilter(const sptr<IEventFilter>& filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;

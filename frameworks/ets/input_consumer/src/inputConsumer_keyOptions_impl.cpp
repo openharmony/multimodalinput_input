@@ -39,7 +39,7 @@ std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
     return subKeyNames;
 }
 
-KeyOptions ConverTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption)
+KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption)
 {
     if (keyOption == nullptr) {
         MMI_HILOGE("keyOption invalid");

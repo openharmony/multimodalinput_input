@@ -29,7 +29,10 @@ ohos_source_set("subscriber_mock") {
 
   include_dirs = [ "include" ]
 
-  sources = [ "src/key_monitor_manager.cpp" ]
+  sources = [
+    "src/key_monitor_manager.cpp",
+    "src/key_shortcut_manager.cpp",
+  ]
 
   public_configs = [ ":subscriber_mock_public_config" ]
 

@@ -16,7 +16,7 @@
 #include "ohos.multimodalInput.inputDevice.proj.hpp"
 #include "ohos.multimodalInput.inputDevice.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 #include "input_device.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
@@ -70,6 +70,7 @@ const std::string CHANGED_TYPE = "change";
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<InputDevice_t> _device = std::make_shared<InputDevice_t>();
+
     auto callback = [&_device](std::shared_ptr<InputDevice_t> device) {
         _device = device;
     };

@@ -186,9 +186,10 @@ int32_t UDSServer::SetFdProperty(int32_t &tokenType, int32_t &serverFd, int32_t 
         }
     }
     const std::vector<std::string> programWhitelist = {
-        "com.ohos.systemui", "security_component_service"};
+        "com.ohos.systemui", "security_component_service", "accesstoken_service"};
     if (std::find(programWhitelist.begin(), programWhitelist.end(), programName) == programWhitelist.end()) {
-        MMI_HILOGD("toReturnClientFd shutdown SHUT_WR , programName:%{public}s", programName.c_str());
+        MMI_HILOGE("toReturnClientFd shutdown SHUT_WR , programName:%{public}s, fd:%{public}d.",
+            programName.c_str(), toReturnClientFd);
     }
     return RET_OK;
 }

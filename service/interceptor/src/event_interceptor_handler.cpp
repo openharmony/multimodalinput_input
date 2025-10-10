@@ -46,19 +46,24 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
         return;
     }
-    bool isIntercept = localHotKeyHandler_.HandleEvent(keyEvent,
-        [this](std::shared_ptr<KeyEvent> keyEvent) {
-            OnHandleEvent(keyEvent);
+    auto isOver = localHotKeyHandler_.HandleEvent(keyEvent,
+        [this](std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            return OnHandleEvent(keyEvent);
         });
-    if (!isIntercept && OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event:%{private}d",
-            keyEvent->GetKeyCode());
+    if (isOver) {
+        if (nextHandler_ != nullptr) {
+            localHotKeyHandler_.HandleLocalHotKey(keyEvent, *nextHandler_);
+        }
+    } else if (OnHandleEvent(keyEvent)) {
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event:%{private}d", keyEvent->GetKeyCode());
+        localHotKeyHandler_.MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         DfxHisysevent::ReportKeyEvent("intercept");
         return;
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
+    localHotKeyHandler_.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
 }
 
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

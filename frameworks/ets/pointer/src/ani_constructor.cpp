@@ -14,15 +14,22 @@
  */
 
 #include "ohos.multimodalInput.pointer.ani.hpp"
+#include "define_multimodal.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "pointer_ani_constructor"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
+    CHKPR(vm, ANI_ERROR);
+    CHKPR(result, ANI_ERROR);
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        MMI_HILOGE("Failed to get ANI environment");
         return ANI_ERROR;
     }
     if (ANI_OK != ohos::multimodalInput::pointer::ANIRegister(env)) {
-        std::cerr << "Error from ohos::multimodalInput::pointer::ANIRegister" << std::endl;
+        MMI_HILOGE("Error from ohos::multimodalInput::pointer::ANIRegister");
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;

@@ -22,6 +22,10 @@
 
 namespace OHOS {
 namespace MMI {
+struct ShortcutKey {
+    int32_t finalKey { -1 };
+};
+
 class IKeyCommandHandler {
 public:
     IKeyCommandHandler() = default;

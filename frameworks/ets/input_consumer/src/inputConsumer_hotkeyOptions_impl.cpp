@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 
-HotkeyOptions ConverTaiheHotkeyOptions(std::shared_ptr<KeyOption> keyOption)
+HotkeyOptions ConvertTaiheHotkeyOptions(std::shared_ptr<KeyOption> keyOption)
 {
     if (keyOption == nullptr) {
         MMI_HILOGE("keyOption invalid");

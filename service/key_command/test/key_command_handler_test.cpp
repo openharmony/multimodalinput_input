@@ -8151,5 +8151,59 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_005, Te
     handler.isParseExcludeConfig_ = false;
     ASSERT_NO_FATAL_FAILURE(handler.IsEnableCombineKey(keyEvent_));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_GetKnuckleSwitchStatus_001
+ * @tc.desc: Test GetKnuckleSwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetKnuckleSwitchStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string strUri =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true";
+    bool ret = handler.GetKnuckleSwitchStatus("fingersense_smartshot_enabled", strUri, true);
+    EXPECT_TRUE(ret);
+    ret = handler.GetKnuckleSwitchStatus("fingersense_screen_recording_enabled", strUri, true);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_GetKnuckleSwitchStatus_002
+ * @tc.desc: Test GetKnuckleSwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetKnuckleSwitchStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string strUri =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_-1?Proxy=true";
+    bool ret = handler.GetKnuckleSwitchStatus("fingersense_smartshot_enabled", strUri, true);
+    EXPECT_TRUE(ret);
+    ret = handler.GetKnuckleSwitchStatus("fingersense_screen_recording_enabled", strUri, true);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CreateKnuckleConfigObserver_001
+ * @tc.desc: Test CreateKnuckleConfigObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CreateKnuckleConfigObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.screenshotSwitch_.statusConfigValue = false;
+    handler.CreateKnuckleConfigObserver(handler.screenshotSwitch_);
+    EXPECT_TRUE(handler.screenshotSwitch_.statusConfigValue);
+    handler.recordSwitch_.statusConfigValue = false;
+    handler.CreateKnuckleConfigObserver(handler.recordSwitch_);
+    EXPECT_TRUE(handler.recordSwitch_.statusConfigValue);
+}
 } // namespace MMI
 } // namespace OHOS

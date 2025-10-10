@@ -88,10 +88,6 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
         MMI_HILOGE("Get bool value fail");
         return ret;
     }
-    if (valueStr.empty()) {
-        MMI_HILOGE("Get null value");
-        return ERR_INVALID_VALUE;
-    }
     value = ((valueStr == "true") || (valueStr == "1"));
     return ERR_OK;
 }
@@ -274,7 +270,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHel
         if (strUri.empty()) {
             ret = DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
         } else {
-            ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, "");
+            ret = DataShare::DataShareHelper::Create(remoteObj_, strUri, SETTINGS_DATA_EXT_URI);
         }
     }
     BytraceAdapter::StopDataShare();

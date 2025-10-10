@@ -16,7 +16,7 @@
 #include "ohos.multimodalInput.inputConsumer.proj.hpp"
 #include "ohos.multimodalInput.inputConsumer.impl.hpp"
 #include "taihe/runtime.hpp"
-#include "stdexcept"
+#include <stdexcept>
 
 #include "inputConsumer_keyOptions_impl.h"
 #include "inputConsumer_hotkeyOptions_impl.h"
@@ -34,6 +34,9 @@ static constexpr size_t PRE_KEYS_SIZE { 4 };
 static constexpr int32_t INVALID_SUBSCRIBER_ID { -1 };
 static constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
 static constexpr int32_t OCCUPIED_BY_OTHER = -4;
+constexpr size_t FIRST_INDEX { 0 };
+constexpr size_t SECOND_INDEX { 1 };
+constexpr size_t THIRD_INDEX { 2 };
 const int64_t MILLISECONDS_IN_SECOND = 1000;
 
 enum ETS_CALLBACK_EVENT {
@@ -74,8 +77,12 @@ static Callbacks hotkeyCallbacks = {};
 static Callbacks keyCallbacks = {};
 
 
-using callbackType = std::variant<taihe::callback<void(KeyOptions const&)>, taihe::callback<void(HotkeyOptions const&)>,
-    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>>;
+using callbackType = std::variant<
+    taihe::callback<void(KeyOptions const&)>,
+    taihe::callback<void(HotkeyOptions const&)>,
+    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>
+>;
+
 struct CallbackObject {
     CallbackObject(callbackType cb, ani_ref ref) : callback(cb), ref(ref)
     {
@@ -182,8 +189,8 @@ bool UnregisterListener(std::string const &type, taihe::optional_view<uintptr_t>
         return false;
     }
     const auto pred = [env, targetRef = guard.get()](std::shared_ptr<CallbackObject> &obj) {
-        ani_boolean is_equal = false;
-        return (ANI_OK == env->Reference_StrictEquals(targetRef, obj->ref, &is_equal)) && is_equal;
+        ani_boolean isEqual = false;
+        return (ANI_OK == env->Reference_StrictEquals(targetRef, obj->ref, &isEqual)) && isEqual;
     };
     auto &callbacks = iter->second;
     const auto it = std::find_if(callbacks.begin(), callbacks.end(), pred);
@@ -210,9 +217,16 @@ void EmitKeyPerssedCallbackWork(size_t keyMonitorId, std::shared_ptr<KeyEvent> k
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[std::to_string(keyMonitorId)];
     for (auto &cb : cbVec) {
-        auto &func = std::get<taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>>(cb->callback);
-        auto keyPresseds = ConverTaiheKeyPressed(keyEvent);
-        func(keyPresseds);
+        if (cb == nullptr) {
+            continue;
+        }
+        size_t typeIndex = cb->callback.index();
+        if (typeIndex == THIRD_INDEX) {
+            auto &func = std::get<
+                taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>>(cb->callback);
+            auto keyPresseds = ConvertTaiheKeyPressed(keyEvent);
+            func(keyPresseds);
+        }
     }
 }
 
@@ -450,9 +464,15 @@ void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[reportEvent->eventType];
     for (auto &cb : cbVec) {
-        auto &func = std::get<taihe::callback<void(HotkeyOptions const&)>>(cb->callback);
-        auto hotkeyOptions = ConverTaiheHotkeyOptions(reportEvent->keyOption);
-        func(hotkeyOptions);
+        if (cb == nullptr) {
+            continue;
+        }
+        size_t typeIndex = cb->callback.index();
+        if (typeIndex == FIRST_INDEX) {
+            auto &func = std::get<taihe::callback<void(HotkeyOptions const&)>>(cb->callback);
+            auto hotkeyOptions = ConvertTaiheHotkeyOptions(reportEvent->keyOption);
+            func(hotkeyOptions);
+        }
     }
 }
 
@@ -522,18 +542,19 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
     }
     MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
     keyOption->SetPreKeys(preKeys);
-    std::string subKeyNames = "";
+
+    std::ostringstream oss;
     for (const auto &item : preKeys) {
         auto it = std::find(pressKeyCodes.begin(), pressKeyCodes.end(), item);
         if (it == pressKeyCodes.end()) {
             MMI_HILOGE("PreKeys is not expect");
-            taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKeys size invalid");
+            taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKey not expected");
             return RET_ERR;
         }
-        subKeyNames += std::to_string(item);
-        subKeyNames += ",";
+        oss << item << ",";
         MMI_HILOGD("PreKeys:%{private}d", item);
     }
+
     if (hotkeyOptions.finalKey < 0) {
         MMI_HILOGE("FinalKey:%{private}d is less 0, can not process", hotkeyOptions.finalKey);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "FinalKey must be greater than or equal to 0");
@@ -545,20 +566,17 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "FinalKey is not expect");
         return RET_ERR;
     }
-    subKeyNames += std::to_string(hotkeyOptions.finalKey);
-    subKeyNames += ",";
+    oss << hotkeyOptions.finalKey << ",";
     keyOption->SetFinalKey(hotkeyOptions.finalKey);
     MMI_HILOGD("FinalKey:%{private}d", hotkeyOptions.finalKey);
 
     bool isFinalKeyDown = true;
-    subKeyNames += std::to_string(isFinalKeyDown);
-    subKeyNames += ",";
+    oss << isFinalKeyDown << ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     MMI_HILOGD("IsFinalKeyDown:%{private}d,", (isFinalKeyDown == true ? 1 : 0));
 
     int32_t finalKeyDownDuration = 0;
-    subKeyNames += std::to_string(finalKeyDownDuration);
-    subKeyNames += ",";
+    oss << finalKeyDownDuration << ",";
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
 
     bool isRepeat = true;
@@ -567,10 +585,11 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
     } else {
         isRepeat = hotkeyOptions.isRepeat.value();
     }
-    subKeyNames += std::to_string(isRepeat);
+    oss << isRepeat;
     keyOption->SetRepeat(isRepeat);
     MMI_HILOGD("IsRepeat:%{public}s", (isRepeat ? "true" : "false"));
-    event->eventType = subKeyNames;
+
+    event->eventType = oss.str();
     return RET_OK;
 }
 
@@ -691,9 +710,15 @@ void EmitKeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[reportEvent->eventType];
     for (auto &cb : cbVec) {
-        auto &func = std::get<taihe::callback<void(KeyOptions const&)>>(cb->callback);
-        auto keyOptions = ConverTaiheKeyOptions(reportEvent->keyOption);
-        func(keyOptions);
+        if (cb == nullptr) {
+            continue;
+        }
+        size_t typeIndex = cb->callback.index();
+        if (typeIndex == SECOND_INDEX) {
+            auto &func = std::get<taihe::callback<void(KeyOptions const&)>>(cb->callback);
+            auto keyOptions = ConvertTaiheKeyOptions(reportEvent->keyOption);
+            func(keyOptions);
+        }
     }
 }
 
