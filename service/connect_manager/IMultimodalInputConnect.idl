@@ -36,7 +36,7 @@ interface OHOS.MMI.IAncoChannel;
 interface OHOS.MMI.IEventFilter;
 
 interface OHOS.MMI.IMultimodalInputConnect {
-    void AllocSocketFd([in] int moduleType,
+    void AllocSocketFd([in] String programName, [in] int moduleType,
         [out] FileDescriptorSan socketFd, [out] int tokenType);
     void AddInputEventFilter([in] IEventFilter filter, [in]int filterId, [in] int priority,
         [in] unsigned int deviceTags);
