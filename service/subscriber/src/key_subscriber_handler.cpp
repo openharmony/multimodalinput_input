@@ -1474,7 +1474,11 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     int32_t callType = DEVICE_MONITOR->GetCallType();
-    if (!callBahaviorState_) {
+    if (callType == -1) {
+        MMI_HILOGE("callType is false");
+        return false;
+    }
+    if (!callBahaviorState_ && callType == GetCallState) {
         MMI_HILOGD("CallBehaviorState is false");
         return false;
     }
