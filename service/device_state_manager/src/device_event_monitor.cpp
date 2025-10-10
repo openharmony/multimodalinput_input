@@ -95,6 +95,7 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    callType_ = 0;
     if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
         int32_t state = eventData.GetWant().GetIntParam("state", -1);
         if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
@@ -121,6 +122,7 @@ void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &event
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    callType_ = 1;
     if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
         int32_t state = eventData.GetWant().GetIntParam("state", -1);
         if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
@@ -142,6 +144,13 @@ void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &event
         CHKPV(subscriberHandler);
         subscriberHandler->ResetSkipPowerKeyUpFlag();
     }
+}
+
+int32_t DeviceEventMonitor::GetCallType()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("The callState:%{public}d", callType_);
+    return callType_;
 }
 
 int32_t DeviceEventMonitor::GetCallState()
