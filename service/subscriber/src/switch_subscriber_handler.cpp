@@ -72,8 +72,8 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
     bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
-    MMI_HILOGI("PublishCommonEvent: %{public}s %{public}d return %{public}d",
-        "SWITCH_TABLET", switchEvent->GetSwitchValue(), ret);
+    MMI_HILOGI("PublishCommonEvent: SWITCH_TABLET %{public}d return %{public}d",
+        switchEvent->GetSwitchValue(), ret);
     return ret;
 }
 
