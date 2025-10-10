@@ -151,6 +151,7 @@ void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &event
 int32_t DeviceEventMonitor::GetCallType()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(stateMutex_);
     MMI_HILOGI("The callState:%{public}d", callType_);
     return callType_;
 }
