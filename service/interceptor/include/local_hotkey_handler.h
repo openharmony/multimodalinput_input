@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "i_input_event_handler.h"
 #include "key_event.h"
 
 namespace OHOS {
@@ -67,15 +68,18 @@ public:
     DISALLOW_COPY_AND_MOVE(LocalHotKeyHandler);
 
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent,
-        std::function<void(std::shared_ptr<KeyEvent>)> intercept);
+        std::function<bool(std::shared_ptr<KeyEvent>)> intercept);
+    void MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action);
+    void HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, IInputEventHandler &handler);
     void Dump(int32_t fd, const std::vector<std::string> &args) const;
 
 private:
     bool HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
-        std::function<void(std::shared_ptr<KeyEvent>)> intercept);
+        std::function<bool(std::shared_ptr<KeyEvent>)> intercept);
     bool HandleKeyUp(std::shared_ptr<KeyEvent> keyEvent,
-        std::function<void(std::shared_ptr<KeyEvent>)> intercept);
+        std::function<bool(std::shared_ptr<KeyEvent>)> intercept);
     std::optional<LocalHotKey> KeyEvent2LocalHotKey(std::shared_ptr<KeyEvent> keyEvent) const;
+    bool HasKeyBeenDispatched(int32_t keyCode) const;
 
     static LocalHotKeySteward steward_;
     std::map<int32_t, LocalHotKeyAction> consumedKeys_;
