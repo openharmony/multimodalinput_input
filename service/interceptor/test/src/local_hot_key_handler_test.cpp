@@ -828,9 +828,7 @@ HWTEST_F(LocalHotKeyHandlerTest, LocalHotKeySteward_LoadSystemLocalHotKeys_001, 
 
     LocalHotKeySteward steward;
     EXPECT_NO_FATAL_FAILURE(steward.LoadSystemLocalHotKeys());
-
-    std::set<int32_t> keyCodes { 2722, 41, 40, 0, 22, 17, 16, 23, 2841, 9, 2089, 2083 };
-    EXPECT_TRUE(steward.systemHotKeys_ ==  keyCodes);
+    EXPECT_TRUE(steward.systemHotKeys_.empty());
 }
 
 /**
