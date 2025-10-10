@@ -3014,6 +3014,40 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded002, 
     ret = handler.HandleCallEnded(keyEvent);
     ASSERT_FALSE(ret);
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleCallEnded
+ * @tc.desc: Test HandleCallEnded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    auto keyEvent = KeyEvent::Create();
+    bool ret = true;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CUSTOM1);
+
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    handler.callType = 1;
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_DIALING;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    DEVICE_MONITOR->callState_ = CALL_STATUS_WAITING;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    DEVICE_MONITOR->callState_ = CALL_STATUS_DISCONNECTED;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+
+    DEVICE_MONITOR->callState_ = CALL_STATUS_DISCONNECTING;
+    ret = handler.HandleCallEnded(keyEvent);
+    ASSERT_FALSE(ret);
+}
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 
 /**

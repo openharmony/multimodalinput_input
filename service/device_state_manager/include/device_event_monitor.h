@@ -48,6 +48,7 @@ public:
     void SetHasHandleRingMute(bool hasHandleRingMute);
     bool GetHasHandleRingMute();
     int32_t GetVoipCallState();
+    int32_t GetCallType();
 private:
     bool hasInit_ { false };
     int32_t voipCallState_ { -1 };
@@ -55,6 +56,7 @@ private:
     bool hasHandleRingMute_ { false };
     std::mutex stateMutex_;
     std::mutex commonEventMutex_;
+    int32_t callType_ { -1 };
 };
 #define DEVICE_MONITOR ::OHOS::DelayedSingleton<DeviceEventMonitor>::GetInstance()
 } // namespace MMI

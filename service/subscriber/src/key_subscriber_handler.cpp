@@ -51,6 +51,8 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+constexpr int32_t NORMAL_CALL { 0 };
+constexpr int32_t VOIP_CALL { 1 };
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
@@ -1471,7 +1473,12 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-    if (!callBahaviorState_) {
+    int32_t callType = DEVICE_MONITOR->GetCallType();
+    if (callType == -1) {
+        MMI_HILOGE("callType is false");
+        return false;
+    }
+    if (!callBahaviorState_ && callType == GetCallState) {
         MMI_HILOGD("CallBehaviorState is false");
         return false;
     }
@@ -1489,8 +1496,13 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGI("The current screen is not on, so not allow end call");
         return false;
     }
-    int32_t ret = DEVICE_MONITOR->GetCallState();
-    MMI_HILOGE("Current call state:%{public}d", ret);
+    int32_t ret = -1;
+    if (callType == VOIP_CALL) {
+        ret = DEVICE_MONITOR->GetVoipCallState();
+    } else {
+        ret = DEVICE_MONITOR->GetCallState();
+    }
+    MMI_HILOGI("HandleCallEnded, The callState:%{public}d", ret);
 
     switch (ret) {
         case StateType::CALL_STATUS_HOLDING:
