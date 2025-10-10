@@ -53,7 +53,8 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    int32_t result = multimodalInputConnectService_->AllocSocketFd(moduleType, socketFd_, tokenType_);
+    const std::string programName(GetProgramName());
+    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
         MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;
