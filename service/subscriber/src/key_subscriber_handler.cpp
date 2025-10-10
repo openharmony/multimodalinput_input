@@ -51,6 +51,8 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+constexpr int32_t NORMAL_CALL { 0 };
+constexpr int32_t VOIP_CALL { 1 };
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
@@ -1491,7 +1493,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         return false;
     }
     int32_t ret = -1;
-    if (callType == 1){
+    if (callType == VOIP_CALL){
         ret = DEVICE_MONITOR->GetVoipCallState();
     } else {
         ret = DEVICE_MONITOR->GetCallState();
