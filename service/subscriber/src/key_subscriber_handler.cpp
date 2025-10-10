@@ -1493,7 +1493,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         return false;
     }
     int32_t ret = -1;
-    if (callType == VOIP_CALL){
+    if (callType == VOIP_CALL) {
         ret = DEVICE_MONITOR->GetVoipCallState();
     } else {
         ret = DEVICE_MONITOR->GetCallState();
