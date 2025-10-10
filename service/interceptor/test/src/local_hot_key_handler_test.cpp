@@ -52,6 +52,29 @@ struct LocalHotKeyInfo {
     LocalHotKeyAction action_ { LocalHotKeyAction::INTERCEPT };
 };
 
+struct InputEventHandlerMock : public IInputEventHandler {
+    InputEventHandlerMock() = default;
+    virtual ~InputEventHandlerMock() = default;
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override
+    {
+        auto event = KeyEvent::Clone(keyEvent);
+        if (event != nullptr) {
+            events_.push_back(event);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent>) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent>) override {}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+    std::vector<std::shared_ptr<KeyEvent>> events_;
+};
+
 class LocalHotKeyHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -361,7 +384,7 @@ HWTEST_F(LocalHotKeyHandlerTest, LocalHotKeySteward_LoadLocalHotKeys_004, TestSi
     ::setuid(panglaiUid);
     LocalHotKeySteward steward;
     EXPECT_NO_FATAL_FAILURE(steward.LoadLocalHotKeys());
-    EXPECT_TRUE(steward.localHotKeys_.empty());
+    EXPECT_FALSE(steward.localHotKeys_.empty());
     ::setuid(uid);
 }
 
@@ -938,8 +961,9 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleEvent_001, TestSize.Level1)
     LocalHotKeyHandler handler;
     bool intercepted = false;
     EXPECT_FALSE(handler.HandleEvent(nullptr,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_FALSE(intercepted);
 }
@@ -978,14 +1002,15 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleEvent_002, TestSize.Level1)
     bool intercepted = false;
 
     EXPECT_TRUE(handler.HandleEvent(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_TRUE(intercepted);
     auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
     EXPECT_NE(iter, handler.consumedKeys_.cend());
     if (iter != handler.consumedKeys_.cend()) {
-        EXPECT_EQ(iter->second, LocalHotKeyAction::COPY);
+        EXPECT_EQ(iter->second, LocalHotKeyAction::INTERCEPT);
     }
 }
 
@@ -1017,8 +1042,9 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleEvent_003, TestSize.Level1)
     handler.consumedKeys_.emplace(KeyEvent::KEYCODE_A, LocalHotKeyAction::COPY);
     bool intercepted = false;
     EXPECT_TRUE(handler.HandleEvent(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_TRUE(intercepted);
     EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.end());
@@ -1055,23 +1081,265 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleEvent_004, TestSize.Level1)
     LocalHotKeyHandler handler;
     bool intercepted = false;
     EXPECT_TRUE(handler.HandleEvent(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_FALSE(intercepted);
-    EXPECT_NE(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.end());
-    if (auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode()); iter != handler.consumedKeys_.cend()) {
-        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
-    }
+    EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.end());
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
 
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     intercepted = false;
     EXPECT_TRUE(handler.HandleEvent(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_FALSE(intercepted);
     EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.end());
+}
+
+/**
+ * @tc.name: MarkProcessed_001
+ * @tc.desc: Test LocalHotKeyHandler::MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MEDIA_RECORD);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(nullptr, LocalHotKeyAction::INTERCEPT);
+    EXPECT_TRUE(handler.consumedKeys_.empty());
+}
+
+/**
+ * @tc.name: MarkProcessed_002
+ * @tc.desc: Test LocalHotKeyHandler::MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_P);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
+    auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
+    EXPECT_NE(iter, handler.consumedKeys_.cend());
+    if (iter != handler.consumedKeys_.cend()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::INTERCEPT);
+    }
+}
+
+/**
+ * @tc.name: MarkProcessed_003
+ * @tc.desc: Test LocalHotKeyHandler::MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_P);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
+    auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
+    EXPECT_NE(iter, handler.consumedKeys_.cend());
+    if (iter != handler.consumedKeys_.cend()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::COPY);
+    }
+}
+
+/**
+ * @tc.name: MarkProcessed_004
+ * @tc.desc: Test LocalHotKeyHandler::MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_P);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
+    auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
+    EXPECT_NE(iter, handler.consumedKeys_.cend());
+    if (iter != handler.consumedKeys_.cend()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+    }
+}
+
+/**
+ * @tc.name: MarkProcessed_005
+ * @tc.desc: Test LocalHotKeyHandler::MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_P);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
+    auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
+    EXPECT_NE(iter, handler.consumedKeys_.cend());
+    if (iter != handler.consumedKeys_.cend()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::COPY);
+    }
+}
+
+/**
+ * @tc.name: MarkProcessed_006
+ * @tc.desc: Test LocalHotKeyHandler::MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, MarkProcessed_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_P);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
+    EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.cend());
+}
+
+/**
+ * @tc.name: HandleLocalHotKey_001
+ * @tc.desc: Test LocalHotKeyHandler::HandleLocalHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LocalHotKeyHandler handler;
+    InputEventHandlerMock eventHandler;
+    handler.HandleLocalHotKey(nullptr, eventHandler);
+    EXPECT_TRUE(eventHandler.events_.empty());
+}
+
+/**
+ * @tc.name: HandleLocalHotKey_002
+ * @tc.desc: Test LocalHotKeyHandler::HandleLocalHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyEvent::KeyItem key1 {};
+    key1.SetPressed(true);
+    key1.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEvent->AddPressedKeyItems(key1);
+
+    KeyEvent::KeyItem key2 {};
+    key2.SetPressed(true);
+    key2.SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->AddPressedKeyItems(key2);
+
+    LocalHotKeyHandler handler;
+    NiceMock<InputEventHandlerMock> eventHandler;
+    handler.HandleLocalHotKey(keyEvent, eventHandler);
+    EXPECT_EQ(eventHandler.events_.size(), SINGLE_ITEM);
+    if (!eventHandler.events_.empty()) {
+        const auto event = eventHandler.events_.front();
+        ASSERT_NE(event, nullptr);
+        EXPECT_EQ(event->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+        EXPECT_EQ(event->GetKeyCode(), KeyEvent::KEYCODE_CTRL_LEFT);
+    }
+    auto iter = handler.consumedKeys_.find(KeyEvent::KEYCODE_CTRL_LEFT);
+    EXPECT_NE(iter, handler.consumedKeys_.cend());
+    if (iter != handler.consumedKeys_.cend()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+    }
+}
+
+/**
+ * @tc.name: HandleLocalHotKey_003
+ * @tc.desc: Test LocalHotKeyHandler::HandleLocalHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyEvent::KeyItem key1 {};
+    key1.SetPressed(true);
+    key1.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyEvent->AddPressedKeyItems(key1);
+
+    LocalHotKeyHandler handler;
+    handler.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
+
+    KeyEvent::KeyItem key2 {};
+    key2.SetPressed(true);
+    key2.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
+    keyEvent->AddPressedKeyItems(key2);
+
+    KeyEvent::KeyItem key3 {};
+    key3.SetPressed(true);
+    key3.SetKeyCode(KeyEvent::KEYCODE_G);
+    keyEvent->AddPressedKeyItems(key3);
+
+    KeyEvent::KeyItem key4 {};
+    key4.SetPressed(true);
+    key4.SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->AddPressedKeyItems(key4);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
+
+    InputEventHandlerMock eventHandler;
+    handler.HandleLocalHotKey(keyEvent, eventHandler);
+    EXPECT_EQ(eventHandler.events_.size(), SINGLE_ITEM);
+    if (!eventHandler.events_.empty()) {
+        const auto event = eventHandler.events_.front();
+        ASSERT_NE(event, nullptr);
+        EXPECT_EQ(event->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+        EXPECT_EQ(event->GetKeyCode(), KeyEvent::KEYCODE_SHIFT_LEFT);
+    }
+    auto iter = handler.consumedKeys_.find(KeyEvent::KEYCODE_SHIFT_LEFT);
+    EXPECT_NE(iter, handler.consumedKeys_.cend());
+    if (iter != handler.consumedKeys_.cend()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+    }
 }
 
 void LocalHotKeyHandlerTest::DumpLocalHotKeys()
@@ -1320,7 +1588,10 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyDown_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     LocalHotKeyHandler handler;
-    EXPECT_FALSE(handler.HandleKeyDown(nullptr, [](std::shared_ptr<KeyEvent> keyEvent) {}));
+    EXPECT_FALSE(handler.HandleKeyDown(nullptr,
+        [](std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            return true;
+        }));
 }
 
 std::shared_ptr<KeyEvent> LocalHotKeyHandlerTest::BuildKeyEvent0201()
@@ -1354,7 +1625,10 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyDown_002, TestSize.Level1)
     auto keyEvent = BuildKeyEvent0201();
     ASSERT_NE(keyEvent, nullptr);
     LocalHotKeyHandler handler;
-    EXPECT_FALSE(handler.HandleKeyDown(keyEvent, [](std::shared_ptr<KeyEvent> keyEvent) {}));
+    EXPECT_FALSE(handler.HandleKeyDown(keyEvent,
+        [](std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            return true;
+        }));
 }
 
 /**
@@ -1376,8 +1650,9 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyDown_003, TestSize.Level1)
     LocalHotKeyHandler handler;
     bool intercepted = false;
     EXPECT_FALSE(handler.HandleKeyDown(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_FALSE(intercepted);
 }
@@ -1401,14 +1676,15 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyDown_004, TestSize.Level1)
     LocalHotKeyHandler handler;
     bool intercepted = false;
     EXPECT_TRUE(handler.HandleKeyDown(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_TRUE(intercepted);
     auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
     EXPECT_NE(iter, handler.consumedKeys_.cend());
     if (iter != handler.consumedKeys_.cend()) {
-        EXPECT_EQ(iter->second, LocalHotKeyAction::COPY);
+        EXPECT_EQ(iter->second, LocalHotKeyAction::INTERCEPT);
     }
 }
 
@@ -1432,15 +1708,12 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyDown_005, TestSize.Level1)
     bool intercepted = false;
 
     EXPECT_TRUE(handler.HandleKeyDown(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_FALSE(intercepted);
-    auto iter = handler.consumedKeys_.find(keyEvent->GetKeyCode());
-    EXPECT_NE(iter, handler.consumedKeys_.cend());
-    if (iter != handler.consumedKeys_.cend()) {
-        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
-    }
+    EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.cend());
 }
 
 std::shared_ptr<KeyEvent> LocalHotKeyHandlerTest::BuildKeyEvent0301()
@@ -1474,7 +1747,10 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyUp_001, TestSize.Level1)
     auto keyEvent = BuildKeyEvent0301();
     ASSERT_NE(keyEvent, nullptr);
     LocalHotKeyHandler handler;
-    EXPECT_FALSE(handler.HandleKeyUp(keyEvent, [](std::shared_ptr<KeyEvent> keyEvent) {}));
+    EXPECT_FALSE(handler.HandleKeyUp(keyEvent,
+        [](std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            return true;
+        }));
 }
 
 /**
@@ -1492,8 +1768,9 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyUp_002, TestSize.Level1)
     handler.consumedKeys_.emplace(KeyEvent::KEYCODE_A, LocalHotKeyAction::COPY);
     bool intercepted = false;
     EXPECT_TRUE(handler.HandleKeyUp(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_TRUE(intercepted);
     EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.end());
@@ -1514,8 +1791,9 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleKeyUp_003, TestSize.Level1)
     handler.consumedKeys_.emplace(KeyEvent::KEYCODE_A, LocalHotKeyAction::OVER);
     bool intercepted = false;
     EXPECT_TRUE(handler.HandleKeyUp(keyEvent,
-        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) {
+        [&intercepted](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             intercepted = true;
+            return true;
         }));
     EXPECT_FALSE(intercepted);
     EXPECT_EQ(handler.consumedKeys_.find(keyEvent->GetKeyCode()), handler.consumedKeys_.end());

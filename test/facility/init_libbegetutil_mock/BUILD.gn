@@ -13,11 +13,11 @@
 
 import("../../../multimodalinput_mini.gni")
 
-config("subscriber_mock_public_config") {
+config("init_libbegetutil_mock_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_source_set("subscriber_mock") {
+ohos_source_set("init_libbegetutil_mock") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -29,22 +29,11 @@ ohos_source_set("subscriber_mock") {
 
   include_dirs = [ "include" ]
 
-  sources = [
-    "src/key_monitor_manager.cpp",
-    "src/key_shortcut_manager.cpp",
-  ]
+  sources = [ "src/init_param.cpp" ]
 
-  public_configs = [ ":subscriber_mock_public_config" ]
+  public_configs = [ ":init_libbegetutil_mock_public_config" ]
 
-  deps = [
-    "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "googletest:gmock_main",
-  ]
+  external_deps = [ "googletest:gmock_main" ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"

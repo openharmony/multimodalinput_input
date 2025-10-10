@@ -33,6 +33,7 @@ public:
 
     virtual std::vector<int32_t> GetInputDeviceIds() const = 0;
     virtual std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId) const = 0;
+    virtual std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked) const = 0;
     virtual bool IsRemoteInputDevice(int32_t deviceId) const = 0;
     virtual int32_t FindInputDeviceId(struct libinput_device* inputDevice) = 0;
     virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
@@ -49,6 +50,7 @@ public:
 
     MOCK_METHOD(std::vector<int32_t>, GetInputDeviceIds, (), (const));
     MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t), (const));
+    MOCK_METHOD(std::shared_ptr<InputDevice>, GetInputDevice, (int32_t, bool), (const));
     MOCK_METHOD(bool, IsRemoteInputDevice, (int32_t), (const));
     MOCK_METHOD(int32_t, FindInputDeviceId, (struct libinput_device*));
     MOCK_METHOD(void, Attach, (std::shared_ptr<IDeviceObserver>));
