@@ -28,5 +28,21 @@ int32_t InputManager::GetPointerLocation(int32_t &displayId, double &displayX, d
     }
     return DfsMessageParcel::messageParcel->GetPointerLocation(displayId, displayX, displayY);
 }
+
+int32_t InputManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return RET_ERR;
+    }
+    return DfsMessageParcel::messageParcel->GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t InputManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return RET_ERR;
+    }
+    return DfsMessageParcel::messageParcel->GetUserDefinedCursorPixelMap(pixelMapPtr);
+}
 } // namespace MMI
 } // namespace OHOS

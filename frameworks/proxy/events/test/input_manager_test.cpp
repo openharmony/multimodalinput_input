@@ -6165,5 +6165,31 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceConsumer, TestSize.Lev
     std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
     EXPECT_NE(inputManager->SetInputDeviceConsumer(deviceNames, consumer), RET_OK);
 }
+
+/*
+ * @tc.name: InputManagerTest_GetCurrentCursorInfo_001
+ * @tc.desc: GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetCurrentCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool visible;
+    PointerStyle pointerStyle;
+    EXPECT_EQ(InputManager::GetInstance()->GetCurrentCursorInfo(visible, pointerStyle), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_GetUserDefinedCursorPixelMap_001
+ * @tc.desc: GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetUserDefinedCursorPixelMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NE(InputManager::GetInstance()->GetUserDefinedCursorPixelMap(nullptr), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

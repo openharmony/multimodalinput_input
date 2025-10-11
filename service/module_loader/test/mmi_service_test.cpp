@@ -4882,5 +4882,36 @@ HWTEST_F(MMIServerTest, MMIService_GetExternalObject_001, TestSize.Level1)
     ErrCode ret = mmiService.GetExternalObject(pluginName, remoteObj);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
 }
+
+/**
+ * @tc.name: MMIService_GetCurrentCursorInfo_001
+ * @tc.desc: Test the function GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetCurrentCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    bool visible;
+    PointerStyle style;
+    ErrCode ret = mmiService.GetCurrentCursorInfo(visible, style);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetUserDefinedCursorPixelMap_001
+ * @tc.desc: Test the function GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetUserDefinedCursorPixelMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::shared_ptr<PixelMap> pixelMap;
+    ErrCode ret = mmiService.GetUserDefinedCursorPixelMap(pixelMap);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

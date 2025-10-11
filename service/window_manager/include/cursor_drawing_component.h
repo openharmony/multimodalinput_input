@@ -94,6 +94,8 @@ public:
 #ifndef OHOS_BUILD_ENABLE_WATCH
     void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt);
 #endif // OHOS_BUILD_ENABLE_WATCH
+    int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
+    int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();

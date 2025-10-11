@@ -3539,5 +3539,94 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AoutPointer_001, Tes
     PointerStyle pointerStyle;
     EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerStylePreference(pointerStyle));
 }
+
+/**
+ * @tc.name: PointerDrawingManagerTest_GetCurrentCursorInfo_001
+ * @tc.desc: Test GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCurrentCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t style = 19;
+    pointerDrawingManager.mouseDisplayState_ = true;
+    pointerDrawingManager.lastMouseStyle_.id = style;
+    bool visible = false;
+    PointerStyle pointerStyle;
+    auto ret = pointerDrawingManager.GetCurrentCursorInfo(visible, pointerStyle);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(visible);
+    ASSERT_EQ(pointerStyle.id, style);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_GetCurrentCursorInfo_002
+ * @tc.desc: Test GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCurrentCursorInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.mouseDisplayState_ = false;
+    PointerStyle pointerStyle;
+    bool visible;
+    auto ret = pointerDrawingManager.GetCurrentCursorInfo(visible, pointerStyle);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(visible);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_GetCurrentCursorInfo_003
+ * @tc.desc: Test GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCurrentCursorInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerDrawingManager::PidInfo pidInfo;
+    pidInfo.visible = false;
+    pointerDrawingManager.pidInfos_.push_back(pidInfo);
+    PointerStyle pointerStyle;
+    bool visible;
+    auto ret = pointerDrawingManager.GetCurrentCursorInfo(visible, pointerStyle);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(visible);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_GetUserDefinedCursorPixelMap_001
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetUserDefinedCursorPixelMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    void *pixelMapPtr = nullptr;
+    auto ret = pointerDrawingManager.GetUserDefinedCursorPixelMap(pixelMapPtr);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_GetUserDefinedCursorPixelMap_002
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetUserDefinedCursorPixelMap_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
+    auto ret = pointerDrawingManager.GetUserDefinedCursorPixelMap(&pixelMap);
+    ASSERT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS

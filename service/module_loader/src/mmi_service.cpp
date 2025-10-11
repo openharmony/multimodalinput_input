@@ -5497,5 +5497,25 @@ ErrCode MMIService::GetExternalObject(const std::string &pluginName, sptr<IRemot
     CALL_INFO_TRACE;
     return InputPluginManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
 }
+
+ErrCode MMIService::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    CALL_INFO_TRACE;
+    auto ret = CursorDrawingComponent::GetInstance().GetCurrentCursorInfo(visible, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get current cursor info failed ret: %{public}d", ret);
+    }
+    return ret;
+}
+
+ErrCode MMIService::GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixelMap)
+{
+    CALL_INFO_TRACE;
+    auto ret = CursorDrawingComponent::GetInstance().GetUserDefinedCursorPixelMap(&pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get user defined cursor pixelMap failed ret: %{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

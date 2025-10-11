@@ -19,9 +19,33 @@
 #include "oh_input_manager.h"
 #include "mmi_log.h"
 #include "mock.h"
+#include "pixel_map.h"
+#include "image/pixelmap_native.h"
+#include "pixelmap_native_impl.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManagerEXTest"
+struct Input_CursorInfo {
+    bool visible { true };
+    Input_PointerStyle style;
+    int32_t sizeLevel { 0 };
+    uint32_t color { 0 };
+};
+
+struct Input_MouseEvent {
+    int32_t action;
+    int32_t displayX;
+    int32_t displayY;
+    int32_t globalX { INT32_MAX  };
+    int32_t globalY { INT32_MAX  };
+    int32_t button { -1 };
+    int32_t axisType { -1 };
+    float axisValue { 0.0f };
+    int64_t actionTime { -1 };
+    int32_t windowId { -1 };
+    int32_t displayId { -1 };
+    Input_CursorInfo cursorInfo;
+};
 
 namespace OHOS {
 namespace MMI {
@@ -169,6 +193,62 @@ HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_GetPointerLocation_007, Test
 
     Input_Result result = OH_Input_GetPointerLocation(&displayId, &displayX, nullptr);
     EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerEXTest_OH_Input_GetCursorInfo_001
+ * @tc.desc: Test OH_Input_GetCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerEXTest, OHInputManagerEXTest_OH_Input_GetCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = OH_Input_GetCursorInfo(nullptr, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    EXPECT_CALL(*messageParcelMock_, GetCurrentCursorInfo(_, _))
+        .WillOnce(Return(RET_ERR));
+    Input_CursorInfo cursorInfo;
+    ret = OH_Input_GetCursorInfo(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_SERVICE_EXCEPTION);
+
+    EXPECT_CALL(*messageParcelMock_, GetCurrentCursorInfo(_, _))
+        .WillOnce(Return(-2));
+    ret = OH_Input_GetCursorInfo(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(cursorInfo.visible, false);
+
+    EXPECT_CALL(*messageParcelMock_, GetCurrentCursorInfo(_, _))
+        .WillOnce(testing::DoAll(testing::SetArgReferee<0>(false), Return(RET_OK)));
+    ret = OH_Input_GetCursorInfo(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
+    EXPECT_CALL(*messageParcelMock_, GetCurrentCursorInfo(_, _))
+        .Times(2)
+        .WillRepeatedly(testing::DoAll(testing::SetArgReferee<0>(true), Return(RET_OK)));
+    ret = OH_Input_GetCursorInfo(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap;
+    OH_PixelmapNative* pixelmapNative = new OH_PixelmapNative(pixelMap);
+    ret = OH_Input_GetCursorInfo(&cursorInfo, &pixelmapNative);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+
+    PointerStyle pointerStyle;
+    pointerStyle.id = Input_PointerStyle::DEVELOPER_DEFINED_ICON;
+    EXPECT_CALL(*messageParcelMock_, GetCurrentCursorInfo(_, _))
+        .Times(2)
+        .WillRepeatedly(testing::DoAll(testing::SetArgReferee<0>(true), testing::SetArgReferee<1>(pointerStyle),
+            Return(RET_OK)));
+    EXPECT_CALL(*messageParcelMock_, GetUserDefinedCursorPixelMap(_))
+        .WillOnce(Return(RET_ERR));
+    ret = OH_Input_GetCursorInfo(&cursorInfo, &pixelmapNative);
+    ASSERT_EQ(ret, INPUT_SERVICE_EXCEPTION);
+
+    EXPECT_CALL(*messageParcelMock_, GetUserDefinedCursorPixelMap(_))
+        .WillOnce(Return(RET_OK));
+    ret = OH_Input_GetCursorInfo(&cursorInfo, &pixelmapNative);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    OH_PixelmapNative_Destroy(&pixelmapNative);
 }
 } // namespace MMI
 } // namespace OHOS
