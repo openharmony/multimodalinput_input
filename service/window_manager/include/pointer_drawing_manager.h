@@ -144,7 +144,8 @@ public:
     void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt) override;
 #endif // OHOS_BUILD_ENABLE_WATCH
     void RsRemoteDiedCallback();
-
+    int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
+    int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr) override;
 private:
     struct PixelMapInfo {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
@@ -210,7 +211,7 @@ private:
     bool SetCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle);
-    std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy();
+    std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy(bool setSurfaceNode = true);
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
     void SetSurfaceNodeBounds();
     int32_t DrawNewDpiPointer() override;

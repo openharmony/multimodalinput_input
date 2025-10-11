@@ -1883,6 +1883,30 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+int32_t PointerDrawingManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    visible = IsPointerVisible() && mouseDisplayState_;
+    if (!visible) {
+        MMI_HILOGD("current pointer is not visible");
+        return RET_OK;
+    }
+    pointerStyle.id = lastMouseStyle_.id;
+    pointerStyle.size = GetPointerSize();
+    pointerStyle.color = GetPointerColor();
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    CHKPR(pixelMapPtr, RET_ERR);
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    auto userIconPixelMap = GetUserIconCopy(false);
+    CHKPR(userIconPixelMap, RET_ERR);
+    *newPixelMapPtr = userIconPixelMap;
+    return RET_OK;
+}
+
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
@@ -3753,7 +3777,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
     }
 }
 
-std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
+std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy(bool setSurfaceNode)
 {
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPP(userIcon_);
@@ -3787,7 +3811,9 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         "userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
         cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
         focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
-    SetSurfaceNodeBounds();
+    if (setSurfaceNode) {
+        SetSurfaceNodeBounds();
+    }
     return pixelMapPtr;
 }
 

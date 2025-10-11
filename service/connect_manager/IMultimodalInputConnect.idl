@@ -186,4 +186,6 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void DispatchToNextHandler([in] int eventId);
     void GetExternalObject([in] String pluginName, [out] IRemoteObject pluginRemoteStub);
     void SetKeyStatusRecord([in] boolean enable, [in] int timeout);
+    void GetCurrentCursorInfo([out] boolean visible, [out] PointerStyle pointerStyle);
+    void GetUserDefinedCursorPixelMap([out] sharedptr<PixelMap> pixelMap);
 }

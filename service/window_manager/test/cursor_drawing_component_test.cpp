@@ -714,5 +714,37 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallb
 {
     EXPECT_NO_FATAL_FAILURE(instance_->InitPointerCallback());
 }
+
+/**
+ * @tc.name: CursorDrawingComponentTest_GetCurrentCursorInfo
+ * @tc.desc: Test GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentCursorInfo, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    bool visible;
+    PointerStyle pointerStyle;
+    ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_ERR);
+
+    instance_->isLoaded_ = true;
+    ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_ERR);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_GetUserDefinedCursorPixelMap
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetUserDefinedCursorPixelMap, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    ASSERT_EQ(instance_->GetUserDefinedCursorPixelMap(nullptr), RET_ERR);
+
+    instance_->isLoaded_ = true;
+    ASSERT_EQ(instance_->GetUserDefinedCursorPixelMap(nullptr), RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
