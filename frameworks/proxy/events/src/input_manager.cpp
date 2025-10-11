@@ -1025,6 +1025,11 @@ int32_t InputManager::QueryPointerRecord(int32_t count, std::vector<std::shared_
     return InputMgrImpl.QueryPointerRecord(count, pointerList);
 }
 
+int32_t InputManager::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    return InputMgrImpl.SetKeyStatusRecord(enable, timeout);
+}
+
 int32_t InputManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
 {
     return InputMgrImpl.GetCurrentCursorInfo(visible, pointerStyle);

@@ -18,6 +18,7 @@
 #include "input_replay_command.h"
 #endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
 #include "input_sendevent_command.h"
+#include "input_enable_key_status_command.h"
 
 int32_t main(int32_t argc, char** argv)
 {
@@ -28,6 +29,9 @@ int32_t main(int32_t argc, char** argv)
 #endif // OHOS_BUILD_ENABLE_EVENT_RECORDER
     if (argc > 1 && (std::string(argv[1]) == "sendevent")) {
         return OHOS::MMI::InputSendeventCommand::HandleSendEventCommand(argc, argv);
+    }
+    if (argc > 1 && (std::string(argv[1]) == "enable_key_status")) {
+        return OHOS::MMI::InputEnableKeyStatusCommand::HandleEnableKeyStatusCommand(argc, argv);
     }
     OHOS::MMI::InputManagerCommand command;
     return command.ParseCommand(argc, argv);
