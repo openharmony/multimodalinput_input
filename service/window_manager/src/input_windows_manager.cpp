@@ -5643,8 +5643,7 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
     for (auto iter = windowIds.begin(); iter != windowIds.end();) {
         int32_t windowId = *iter;
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
-        CHKCC(windowInfo);
-        if (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL) {
+        if (windowInfo && (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL)) {
             iter = windowIds.erase(iter);
         } else {
             ++iter;
