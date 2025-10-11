@@ -58,6 +58,8 @@ private:
     void FillPointerItem(PointerEvent::PointerItem &itemFirst, int32_t pointX, int32_t pointY, int32_t id, bool press);
     int32_t ActionPinchEvent(int32_t centerX, int32_t centerY, int32_t scalePercentNumerator);
     uint32_t KeyCodeToUnicode(int32_t keyCode);
+    int32_t QueryMouseInfo(int32_t argc, char *argv[]);
+    int32_t SavePixelMapToFile(const char *filePath);
     std::atomic_bool isFoldPC_ { false };
 };
 } // namespace MMI

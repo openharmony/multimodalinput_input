@@ -38,6 +38,8 @@ public:
     std::atomic<bool> isFirstAdddistributedKVDataService { true };
     std::atomic<bool> isInitDefaultMouseIconPath { false };
     std::atomic<bool> isPointerVisible { false };
+    std::atomic<int32_t> mouseId_ { 0 };
+    std::string mouseIcons_;
 
 private:
     PointerDeviceManager() = default;

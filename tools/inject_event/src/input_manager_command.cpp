@@ -17,6 +17,8 @@
 
 #include <getopt.h>
 
+#include <fcntl.h>
+
 #include <iostream>
 
 #include "string_ex.h"
@@ -26,6 +28,7 @@
 #include "input_manager.h"
 #include "product_name_definition.h"
 #include "product_type_parser.h"
+#include "pixel_map.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerCommand"
@@ -221,10 +224,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"scroll", required_argument, nullptr, 's'},
         {"drag", required_argument, nullptr, 'g'},
         {"interval", required_argument, nullptr, 'i'},
+        {"query", required_argument, nullptr, '1'},
         {nullptr, 0, nullptr, 0}
     };
     struct option keyboardSensorOptions[] = {
-        {"enable", required_argument, nullptr, 'e'},
         {"down", required_argument, nullptr, 'd'},
         {"up", required_argument, nullptr, 'u'},
         {"long_press", required_argument, nullptr, 'l'},
@@ -770,6 +773,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::this_thread::sleep_for(std::chrono::milliseconds(tookTime));
                             break;
                         }
+                        case 'q': {
+                            return QueryMouseInfo(argc, argv);
+                        }
                         default: {
                             std::cout << "invalid command to virtual mouse" << std::endl;
                             ShowUsage();
@@ -787,7 +793,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int64_t time = GetSysClockTime();
                 int32_t count = 0;
                 bool inputText = false;
-                while ((c = getopt_long(argc, argv, "e:d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
                     // Prompt when combining other commands after using the text command. Ex: "uinput -d 2017 -t text"
                     if (inputText) {
                         std::cout << "The text command cannot be used with other commands." << std::endl;
@@ -1774,6 +1780,73 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
+int32_t InputManagerCommand::QueryMouseInfo(int32_t argc, char *argv[])
+{
+    if (argc - optind > 1) {
+        std::cerr << "Too many arguments" << std::endl;
+        return RET_ERR;
+    }
+    if (InputManager::GetInstance()->IsPointerInit()) {
+        std::cerr << "Query failed, maybe no mouse device." << std::endl;
+        return RET_ERR;
+    }
+    bool g_mouseIsVisible  = false;
+    PointerStyle g_pointerStyle;
+    if (InputManager::GetInstance()->GetCurrentCursorInfo(g_mouseIsVisible, g_pointerStyle) != RET_OK) {
+        std::cerr << "Query failed, maybe service is abnormal." << std::endl;
+        return RET_ERR;
+    }
+    if (g_mouseIsVisible) {
+        std::cout << "Mouse is visible" << std::endl;
+        std::cout << "pointerStyle id:" << g_pointerStyle.id << std::endl;
+    } else {
+        std::cerr << "Mouse is invisible" << std::endl;
+        return RET_ERR;
+    }
+    if (argc - optind <= 0) {
+        return RET_OK;
+    }
+    return SavePixelMapToFile(argv[optind]);
+}
+
+int32_t InputManagerCommand::SavePixelMapToFile(const char *filePath)
+{
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath, realPath) == nullptr) {
+        std::cerr << "Invalid file path:" << filePath << std::endl;
+        return RET_ERR;
+    }
+    std::shared_ptr<Media::PixelMap> g_pixelMap;
+    if (InputManager::GetInstance()->GetUserDefinedCursorPixelMap(&g_pixelMap) != RET_OK) {
+        std::cerr << "Query PixelMap failed." << std::endl;
+        return RET_ERR;
+    }
+    if (g_pixelMap == nullptr) {
+        std::cerr << "PixelMap is null" << std::endl;
+        return RET_ERR;
+    }
+    uint64_t g_bufferSize = static_cast<uint64_t>(g_pixelMap->GetAllocationByteCount());
+    uint8_t* g_mappedAddr = static_cast<uint8_t*>(malloc(g_bufferSize));
+    (void)g_pixelMap->ReadPixels(g_bufferSize, g_mappedAddr);
+    int32_t g_fd = open(realPath, O_RDWR | O_TRUNC);
+    if (g_fd < 0) {
+        std::cerr << "Open file failed, path:" << filePath << std::endl;
+        close(g_fd);
+        free(g_mappedAddr);
+        return RET_ERR;
+    }
+    uint64_t ret = write(g_fd, g_mappedAddr, g_bufferSize);
+    if (ret < g_bufferSize) {
+        std::cerr << "Save file failed" << std::endl;
+        close(g_fd);
+        free(g_mappedAddr);
+        return RET_ERR;
+    }
+    close(g_fd);
+    free(g_mappedAddr);
+    return RET_OK;
+}
+
 struct SpecialChar {
     int32_t keyCode = 0;
     bool isPressShift = false;
@@ -2437,6 +2510,9 @@ void InputManagerCommand::PrintMouseUsage()
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth drag"         << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
+    std::cout << "-q [file path]            --query [file path]  -if a file path is provided," << std::endl;
+    std::cout << "                                                the pixelmap will be written to the file";
+    std::cout << std::endl;
     std::cout << "Mouse button type:" << std::endl;
     std::cout << "   key value:0 - button left"     << std::endl;
     std::cout << "   key value:1 - button right"    << std::endl;
@@ -2523,7 +2599,7 @@ void InputManagerCommand::PrintTouchPadUsage()
     std::cout << "-s <startX> <startY> <endX> <endY>  --startX, startY, endX, endY are all greater than 0";
     std::cout << std::endl;
     std::cout << "   While simulate this, make sure that your actual action is available"              << std::endl;
-    std::cout << "-r <rotateValue> --rotateValue must be within (-360,360)"                         << std::endl;
+    std::cout << "-r <rotateValue> --rotateValue must be within [-359,359]"                         << std::endl;
 }
 
 void InputManagerCommand::PrintEnableKeyStatusRecordUsage()
