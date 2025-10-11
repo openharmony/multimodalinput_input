@@ -231,6 +231,7 @@ public:
     ErrCode SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
     ErrCode ClearMouseHideFlag(int32_t eventId) override;
     ErrCode QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList) override;
+    ErrCode SetKeyStatusRecord(bool enable, int32_t timeout) override;
 
 protected:
     void OnConnected(SessionPtr s) override;

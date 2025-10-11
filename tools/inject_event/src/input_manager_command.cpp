@@ -224,6 +224,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {nullptr, 0, nullptr, 0}
     };
     struct option keyboardSensorOptions[] = {
+        {"enable", required_argument, nullptr, 'e'},
         {"down", required_argument, nullptr, 'd'},
         {"up", required_argument, nullptr, 'u'},
         {"long_press", required_argument, nullptr, 'l'},
@@ -786,7 +787,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int64_t time = GetSysClockTime();
                 int32_t count = 0;
                 bool inputText = false;
-                while ((c = getopt_long(argc, argv, "d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "e:d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
                     // Prompt when combining other commands after using the text command. Ex: "uinput -d 2017 -t text"
                     if (inputText) {
                         std::cout << "The text command cannot be used with other commands." << std::endl;
@@ -2522,7 +2523,15 @@ void InputManagerCommand::PrintTouchPadUsage()
     std::cout << "-s <startX> <startY> <endX> <endY>  --startX, startY, endX, endY are all greater than 0";
     std::cout << std::endl;
     std::cout << "   While simulate this, make sure that your actual action is available"              << std::endl;
-    std::cout << "-r <rotateValue> --rotateValue must be within [-359,359]"                         << std::endl;
+    std::cout << "-r <rotateValue> --rotateValue must be within (-360,360)"                         << std::endl;
+}
+
+void InputManagerCommand::PrintEnableKeyStatusRecordUsage()
+{
+    std::cout << " [timeout] --enable or disable key status recording." << std::endl;
+    std::cout << " enable is A boolean value; '1' to enable, '0' to disable." << std::endl;
+    std::cout << " timeout The timeout for key status recording, in seconds, 1 <= timeout <= 10" << std::endl;
+    std::cout << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()
@@ -2552,6 +2561,12 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-T  --touch                                                   " << std::endl;
     std::cout << "commands for touch:                                           " << std::endl;
     PrintTouchUsage();
+    std::cout << std::endl;
+
+    std::cout << "The option are:                                               " << std::endl;
+    std::cout << "enable_key_status                                             " << std::endl;
+    std::cout << "commands for enable key status record:                        " << std::endl;
+    PrintEnableKeyStatusRecordUsage();
     std::cout << std::endl;
 
     std::cout << "-?  --help                                                    " << std::endl;
