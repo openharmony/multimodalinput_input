@@ -1355,6 +1355,59 @@ public:
          * @return Returns the orientation
          */
         int32_t GetOrientation();
+
+        /**
+         * @brief Obtains the visible of the cursor.
+         * @return Returns the visible
+         */
+        bool GetVisible() const;
+
+        /**
+         * @brief Sets the visible of the cursor.
+         * @param visible Indicates the cursor visible to set.
+         * @return void
+         */
+        void SetVisible(bool visible);
+
+        /**
+         * @brief Obtains the style of the cursor.
+         * @return Returns the style
+         */
+        int32_t GetStyle() const;
+
+        /**
+         * @brief Sets the style of the cursor.
+         * @param style Indicates the cursor style to set.
+         * @return void
+         */
+        void SetStyle(int32_t style);
+
+        /**
+         * @brief Obtains the size level of the cursor.
+         * @return Returns the size level
+         */
+        int32_t GetSizeLevel() const;
+
+        /**
+         * @brief Sets the size level of the cursor.
+         * @param sizeLevel Indicates the cursor size level to set.
+         * @return void
+         */
+        void SetSizeLevel(int32_t sizeLevel);
+ 
+        /**
+         * @brief Obtains the color of the cursor.
+         * @return Returns the color
+         */
+        uint32_t GetColor() const;
+
+        /**
+         * @brief Sets the color of the cursor.
+         * @param color Indicates the cursor color to set.
+         * @return void
+         */
+        void SetColor(uint32_t color);
+
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1397,6 +1450,10 @@ public:
         int32_t twist_ {};
         bool canceled_ { false };
         int32_t orientation_ {-1};
+        bool visible_ { false };
+        int32_t style_ {};
+        int32_t sizeLevel_ {};
+        uint32_t color_ {};
     };
 
 public:

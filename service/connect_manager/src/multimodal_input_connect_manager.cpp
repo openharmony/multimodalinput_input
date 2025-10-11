@@ -1259,5 +1259,21 @@ int32_t MultimodalInputConnectManager::GetExternalObject(
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetExternalObject(pluginName, pluginRemoteStub);
 }
+
+int32_t MultimodalInputConnectManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t MultimodalInputConnectManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(pixelMapPtr, ERROR_NULL_POINTER);
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    return multimodalInputConnectService_->GetUserDefinedCursorPixelMap(*newPixelMapPtr);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -39,6 +39,7 @@
 
 #include "oh_axis_type.h"
 #include "oh_key_code.h"
+#include "oh_pointer_style.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -236,6 +237,13 @@ typedef struct Input_TouchEvent Input_TouchEvent;
  * @since 12
  */
 typedef struct Input_AxisEvent Input_AxisEvent;
+
+/**
+ * @brief Defines the cursor information.
+ *
+ * @since 22
+ */
+typedef struct Input_CursorInfo Input_CursorInfo;
 
 /**
  * @brief Enumerates error codes.
@@ -2301,6 +2309,97 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig *cursorConf
  */
 Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* customCursor,
                                       Input_CursorConfig* cursorConfig);
+
+/**
+ * @brief Creates a cursor info object.
+ *
+ * @return Returns an {@link Input_CursorInfo} cursor object if the operation is successful.
+ *         Otherwise, a null cursor is returned. The possible cause is memory allocation failure.
+ * @since 22
+ */
+struct Input_CursorInfo* OH_Input_CursorInfo_Create();
+
+/**
+ * @brief Destroys a cursor info object.
+ *
+ * @param cursorInfo Cursor info object.
+ * @since 22
+ */
+void OH_Input_CursorInfo_Destroy(Input_CursorInfo** cursorInfo);
+
+/**
+ * @brief Obtains the cursor visibility of the cursorInfo.
+ *
+ * @param cursorInfo Cursor info object.
+ * @param visible Visibility of the cursorInfo.
+ * @return OH_Input_CursorInfo_IsVisible function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null cursor;
+ * @since 22
+ */
+Input_Result OH_Input_CursorInfo_IsVisible(Input_CursorInfo* cursorInfo, bool* visible);
+
+/**
+ * @brief Obtains the cursor style of the cursorInfo.
+ *
+ * @param cursorInfo Cursor info object.
+ * @param style Cursor style of the cursorInfo.
+ * @return OH_Input_CursorInfo_GetStyle function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null cursor or the cursor is invisible;
+ * @since 22
+ */
+Input_Result OH_Input_CursorInfo_GetStyle(Input_CursorInfo* cursorInfo, Input_PointerStyle* style);
+
+/**
+ * @brief Obtains the cursor sizeLevel of the cursorInfo.
+ *
+ * @param cursorInfo Cursor info object.
+ * @param sizeLevel Cursor size level of the cursorInfo.
+ * @return OH_Input_CursorInfo_GetSizeLevel function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null cursor or the cursor is invisible;
+ * @since 22
+ */
+Input_Result OH_Input_CursorInfo_GetSizeLevel(Input_CursorInfo* cursorInfo, int32_t* sizeLevel);
+
+/**
+ * @brief Obtains the cursor color of the cursorInfo represented as a 32-bit ARGB integer.
+ *
+ * @param cursorInfo Cursor info object.
+ * @param color Cursor color of the cursorInfo represented as a 32-bit ARGB integer.
+ * @return OH_Input_CursorInfo_GetColor function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null cursor or the cursor is invisible;
+ * @since 22
+ */
+Input_Result OH_Input_CursorInfo_GetColor(Input_CursorInfo* cursorInfo, uint32_t* color);
+
+/**
+ * @brief Get cursor info of the mouseEvent.
+ *
+ * @param mouseEvent The received mouseEvent.
+ * @param cursorInfo The object to receive the cursor info.
+ * @return OH_Input_GetMouseEventCursorInfo function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null cursor;
+ * @since 22
+ */
+Input_Result OH_Input_GetMouseEventCursorInfo(const struct Input_MouseEvent* mouseEvent, Input_CursorInfo* cursorInfo);
+
+/**
+ * @brief Retrieves cursor information. If the pixelmap parameter is specified, and the cursor is user-defined type
+ * currently, the cursor's pixelmap will be returned along with it.
+ *
+ * @param cursorInfo The object to receive the cursor info.
+ * @param pixelmap The object to receive the cursor pixelmap, null value will be ignored.
+ * @return OH_Input_GetCursorInfo function api result code
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if parameter is a null cursor;
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is exception.
+ * @since 22
+ */
+Input_Result OH_Input_GetCursorInfo(Input_CursorInfo* cursorInfo, OH_PixelmapNative** pixelmap);
 #ifdef __cplusplus
 }
 #endif
