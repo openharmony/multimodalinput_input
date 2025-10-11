@@ -1275,6 +1275,24 @@ public:
     */
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
+    /*
+    * @brief Get the current cursor info.
+    * @param visible indicates the pointer visible
+    * @param pointerStyle indicates the pointer style
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 22
+    */
+    int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
+
+    /*
+    * @brief Get the user-defined cursor pixelMap.
+    * @param pixelMapPtr Indicates the image resource for this mouse icon. which realtype must be
+    * std::shared_ptr<OHOS::Media::PixelMap>*.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 22
+    */
+    int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

@@ -3139,5 +3139,107 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValidCheckTouch_005, TestSize.Leve
     pointerEvent->AddPointerItem(item);
     EXPECT_FALSE(pointerEvent->IsValidCheckTouch());
 }
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_SetVisible_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_SetVisible_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetVisible(true);
+    ASSERT_EQ(item.GetVisible(), true);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_SetStyle_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_SetStyle_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    int32_t style = 19;
+    item.SetStyle(style);
+    ASSERT_EQ(item.GetStyle(), style);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_SetSizeLevel_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_SetSizeLevel_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    int32_t sizeLevel = 1;
+    item.SetSizeLevel(sizeLevel);
+    ASSERT_EQ(item.GetSizeLevel(), sizeLevel);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_SetColor_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_SetColor_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    uint32_t color = 0xFFFFFF;
+    item.SetColor(color);
+    ASSERT_EQ(item.GetColor(), color);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_WriteToParcel_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_WriteToParcel_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    Parcel out;
+    ASSERT_EQ(item.WriteToParcel(out), true);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_ReadFromParcel_001
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_ReadFromParcel_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    Parcel in;
+    ASSERT_EQ(item.WriteToParcel(in), true);
+}
+
+/**
+ * @tc.name: PointerEventTest_PointerItem_ReadFromParcel_002
+ * @tc.desc: Test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_ReadFromParcel_002, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    Parcel parcel;
+    item.WriteToParcel(parcel);
+    ASSERT_EQ(item.ReadFromParcel(parcel), true);
+}
 } // namespace MMI
 } // namespace OHOS

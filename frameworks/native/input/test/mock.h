@@ -27,6 +27,8 @@ public:
     virtual ~DfsMessageParcel() = default;
 public:
     virtual int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY) = 0;
+    virtual int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) = 0;
+    virtual int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -34,6 +36,8 @@ public:
 class MessageParcelMock : public DfsMessageParcel {
 public:
     MOCK_METHOD3(GetPointerLocation, int32_t(int32_t &displayId, double &displayX, double &displayY));
+    MOCK_METHOD2(GetCurrentCursorInfo, int32_t(bool& visible, PointerStyle& pointerStyle));
+    MOCK_METHOD1(GetUserDefinedCursorPixelMap, int32_t(void *pixelMapPtr));
 };
 } // namespace MMI
 } // namespace OHOS
