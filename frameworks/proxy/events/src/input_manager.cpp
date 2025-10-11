@@ -1024,5 +1024,15 @@ int32_t InputManager::QueryPointerRecord(int32_t count, std::vector<std::shared_
 {
     return InputMgrImpl.QueryPointerRecord(count, pointerList);
 }
+
+int32_t InputManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    return InputMgrImpl.GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t InputManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    return InputMgrImpl.GetUserDefinedCursorPixelMap(pixelMapPtr);
+}
 } // namespace MMI
 } // namespace OHOS
