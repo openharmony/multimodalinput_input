@@ -5476,7 +5476,7 @@ ErrCode MMIService::SetKeyStatusRecord(bool enable, int32_t timeout)
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (PER_HELPER->CheckInjectPermission()) {
+    if (!PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
