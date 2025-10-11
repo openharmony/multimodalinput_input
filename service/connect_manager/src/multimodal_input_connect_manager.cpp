@@ -1284,5 +1284,12 @@ int32_t MultimodalInputConnectManager::GetUserDefinedCursorPixelMap(void *pixelM
     std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
     return multimodalInputConnectService_->GetUserDefinedCursorPixelMap(*newPixelMapPtr);
 }
+
+int32_t MultimodalInputConnectManager::IsPointerInit(bool &status)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->IsPointerInit(status);
+}
 } // namespace MMI
 } // namespace OHOS

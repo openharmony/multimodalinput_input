@@ -1274,6 +1274,13 @@ public:
     * @since 20
     */
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+    
+    /**
+     * @brief Determine whether the pointer is initialized.
+     * @return If it has been initialized, return true; otherwise, return false.
+     * @since 22
+     */
+    bool IsPointerInit();
 
     /**
     * @brief Enables or disables key status recording.

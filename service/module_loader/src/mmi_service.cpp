@@ -5512,5 +5512,27 @@ ErrCode MMIService::GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixe
     }
     return ret;
 }
+
+int32_t MMIService::IsPointerInit(bool &status)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckInjectPermission()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask([&status] {
+        status = POINTER_DEV_MGR.isInit;
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask IsPointerInit failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
