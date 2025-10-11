@@ -2144,6 +2144,10 @@ ErrCode MMIService::InjectKeyEvent(const KeyEvent& keyEvent, bool isNativeInject
     }
     auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
+    bool isShell = PER_HELPER->RequestFromShell();
+    if (isShell) {
+        keyEventPtr->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret;
     int32_t pid = GetCallingPid();
@@ -5463,6 +5467,30 @@ ErrCode MMIService::GetExternalObject(const std::string &pluginName, sptr<IRemot
 {
     CALL_INFO_TRACE;
     return InputPluginManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
+}
+
+ErrCode MMIService::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckInjectPermission()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask([enable, timeout] {
+        KeyEventHdr->SetKeyStatusRecord(enable, timeout);
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask SetKeyStatusRecord failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
 }
 
 ErrCode MMIService::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)

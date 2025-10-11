@@ -319,15 +319,15 @@ HWTEST_F(KeyEventNormalizeWithMockTest, KeyEventNormalizeWithMockTest_SyncLedSta
 }
 
 /**
- * @tc.name: Test_ModifierKeyEventNormalize_001
- * @tc.desc: Test_ModifierKeyEventNormalize.
+ * @tc.name: Test_ModifierkeyEventNormalize_001
+ * @tc.desc: Test_ModifierkeyEventNormalize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierKeyEventNormalize_001, TestSize.Level1)
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierkeyEventNormalize_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    MMI_HILOGI("Test_ModifierKeyEventNormalize_001");
+    MMI_HILOGI("Test_ModifierkeyEventNormalize_001");
     ASSERT_NE(KeyEventHdr, nullptr);
     KeyEventHdr->keyEvent_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(nullptr));
@@ -349,15 +349,15 @@ HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierKeyEventNormalize_001, Test
 }
 
 /**
- * @tc.name: Test_ModifierKeyEventNormalize_002
- * @tc.desc: Test_ModifierKeyEventNormalize.
+ * @tc.name: Test_ModifierkeyEventNormalize_002
+ * @tc.desc: Test_ModifierkeyEventNormalize.
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierkeyEventNormalize_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    MMI_HILOGI("Test_ModifierKeyEventNormalize_002");
+    MMI_HILOGI("Test_ModifierkeyEventNormalize_002");
     ASSERT_NE(KeyEventHdr, nullptr);
     KeyEventHdr->keyEvent_ = nullptr;
     auto keyEvent = KeyEvent::Create();
@@ -380,6 +380,96 @@ HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierkeyEventNormalize_002, Test
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+}
+
+/**
+ * @tc.name: Test_ModifierkeyEventNormalize_003
+ * @tc.desc: Test_ModifierkeyEventNormalize.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierkeyEventNormalize_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_ModifierkeyEventNormalize_003");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t keyCode = KeyEvent::KEYCODE_CAPS_LOCK;
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(true);
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+    KeyEventHdr->keyStatusRecordSwitch_ = false;
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    KeyEventHdr->keyStatusRecordSwitch_ = true;
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(false);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+}
+
+/**
+ * @tc.name: Test_ModifierkeyEventNormalize_004
+ * @tc.desc: Test_ModifierkeyEventNormalize.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_ModifierkeyEventNormalize_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_ModifierkeyEventNormalize_004");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t keyCode = KeyEvent::KEYCODE_SHIFT_LEFT;
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(true);
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL));
+    EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+    KeyEventHdr->keyStatusRecordSwitch_ = false;
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    KeyEventHdr->keyStatusRecordSwitch_ = true;
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    item.SetPressed(false);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    EXPECT_NO_FATAL_FAILURE(KeyEventHdr->ModifierkeyEventNormalize(keyEvent));
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL));
     EXPECT_TRUE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
 }
 
@@ -451,6 +541,25 @@ HWTEST_F(KeyEventNormalizeWithMockTest, Test_SyncSwitchFunctionKeyState_001, Tes
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     EXPECT_NO_FATAL_FAILURE(KeyEventHdr->SyncSwitchFunctionKeyState(keyEvent, FunctionKey));
+}
+
+/**
+ * @tc.name: Test_KeyEventAutoUp_001
+ * @tc.desc: Test_KeyEventAutoUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventNormalizeWithMockTest, Test_KeyEventAutoUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMI_HILOGI("Test_KeyEventAutoUp_001");
+    ASSERT_NE(KeyEventHdr, nullptr);
+    KeyEventHdr->keyEvent_ = nullptr;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t timeout = 2000;
+    int32_t timerId = KeyEventHdr->KeyEventAutoUp(keyEvent, timeout);
+    EXPECT_NE(timerId, -1);
 }
 }
 }
