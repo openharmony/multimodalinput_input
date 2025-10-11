@@ -3006,5 +3006,35 @@ int32_t InputManagerImpl::GetExternalObject(const std::string &pluginName, sptr<
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, pluginRemoteStub);
 }
+
+int32_t InputManagerImpl::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetCurrentCursorInfo(visible, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the current cursor info failed, ret: %{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetUserDefinedCursorPixelMap(pixelMapPtr);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the user defined cursor pixelMap failed, ret: %{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
 } // namespace MMI
 } // namespace OHOS

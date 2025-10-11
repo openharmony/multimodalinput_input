@@ -262,6 +262,8 @@ public:
     int32_t SetHookIdUpdater(std::function<void(int32_t)> callback);
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
     int32_t SetKeyStatusRecord(bool enable, int32_t timeout);
+    int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
+    int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
     int32_t PackDisplayGroupsInfo(NetPacket &pkt, const std::vector<DisplayGroupInfo> &displayGroups);

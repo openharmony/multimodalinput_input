@@ -1029,5 +1029,15 @@ int32_t InputManager::SetKeyStatusRecord(bool enable, int32_t timeout)
 {
     return InputMgrImpl.SetKeyStatusRecord(enable, timeout);
 }
+
+int32_t InputManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    return InputMgrImpl.GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t InputManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    return InputMgrImpl.GetUserDefinedCursorPixelMap(pixelMapPtr);
+}
 } // namespace MMI
 } // namespace OHOS

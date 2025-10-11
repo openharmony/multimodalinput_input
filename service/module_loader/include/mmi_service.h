@@ -232,6 +232,8 @@ public:
     ErrCode ClearMouseHideFlag(int32_t eventId) override;
     ErrCode QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList) override;
     ErrCode SetKeyStatusRecord(bool enable, int32_t timeout) override;
+    ErrCode GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
+    ErrCode GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixelMap) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
