@@ -49,6 +49,7 @@ public:
     int32_t GetCurrentShieldMode();
     bool IsScreenFold();
     void ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent>& keyEvent);
+    void SetKeyStatusRecord(bool enable, int32_t timeout);
 
 private:
     void ReadProductConfig(InputProductConfig &config) const;
@@ -60,6 +61,7 @@ private:
     bool HandleModifierKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);
     bool HandleModifierKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
     void SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent>& keyEvent, int32_t funckey);
+    int32_t KeyEventAutoUp(const std::shared_ptr<KeyEvent>& keyEvent, int32_t timeout);
 
 private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
@@ -69,6 +71,8 @@ private:
     };
     int32_t lastShieldMode_ { -1 };
     std::mutex mtx_;
+    bool keyStatusRecordSwitch_ { false };
+    int32_t keyStatusRecordTimeout_ { 10000 };
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI

@@ -36,6 +36,7 @@ private:
     void PrintTouchUsage();
     void PrintKnuckleUsage();
     void PrintTouchPadUsage();
+    void PrintEnableKeyStatusRecordUsage();
     bool IsCoordinateInvalid(int32_t firstDownX, int32_t firstDownY, int32_t secondDownX, int32_t secondDownY);
     int32_t SingleKnuckleClickEvent(int32_t downX, int32_t downY);
     int32_t DoubleKnuckleClickEvent(int32_t downX, int32_t downY);

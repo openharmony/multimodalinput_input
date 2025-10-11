@@ -1260,5 +1260,13 @@ int32_t MultimodalInputConnectManager::GetExternalObject(
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetExternalObject(pluginName, pluginRemoteStub);
 }
+
+int32_t MultimodalInputConnectManager::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetKeyStatusRecord(enable, timeout);
+}
 } // namespace MMI
 } // namespace OHOS

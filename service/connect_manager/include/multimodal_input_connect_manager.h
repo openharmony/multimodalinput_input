@@ -197,6 +197,7 @@ public:
     int32_t RemoveKeyEventHook(int32_t hookId);
     int32_t DispatchToNextHandler(int32_t eventId);
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+    int32_t SetKeyStatusRecord(bool enable, int32_t timeout);
 
 private:
     MultimodalInputConnectManager() = default;

@@ -1275,6 +1275,15 @@ public:
     */
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
+    /**
+    * @brief Enables or disables key status recording.
+    * @note Only users with specific shell permissions are allowed to call this interface.
+    * @param enable A boolean value; true to enable key status recording, false to disable it.
+    * @param timeout The timeout for key status recording, in milliseconds.
+    * @return Returns 0 on success, or a non-zero error code on failure.
+    * @since 22
+    */
+    int32_t SetKeyStatusRecord(bool enable, int32_t timeout);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

@@ -2959,6 +2959,10 @@ int32_t InputManagerImpl::AddKeyEventHook(std::function<void(std::shared_ptr<Key
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
 
+int32_t InputManagerImpl::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetKeyStatusRecord(enable, timeout);
+}
 int32_t InputManagerImpl::RemoveKeyEventHook(int32_t keyEventHookId)
 {
     CALL_INFO_TRACE;

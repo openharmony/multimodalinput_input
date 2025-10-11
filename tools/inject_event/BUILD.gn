@@ -19,6 +19,7 @@ ohos_source_set("input-manager") {
   sources = [
     "src/input_manager_command.cpp",
     "src/input_sendevent_command.cpp",
+    "src/input_enable_key_status_command.cpp",
   ]
   if (input_feature_event_recorder) {
     sources += [
@@ -106,6 +107,7 @@ ohos_unittest("InjectEventTest") {
   sources = [
     "test/inject_event_test.cpp",
     "test/input_sendevent_command_test.cpp",
+    "test/input_enable_key_status_command_test.cpp",
   ]
   if (input_feature_event_recorder) {
     sources += [
