@@ -92,6 +92,13 @@ inline bool IsValidHandlerId(int32_t handlerId)
 {
     return ((handlerId >= MIN_HANDLER_ID) && (handlerId < MAX_HANDLER_ID));
 }
+
+using HookEventType = uint32_t;
+inline constexpr HookEventType HOOK_EVENT_TYPE_NONE { 0x0 };
+inline constexpr HookEventType HOOK_EVENT_TYPE_KEY { 1u };
+inline constexpr HookEventType HOOK_EVENT_TYPE_TOUCH { 1u << 1 };
+inline constexpr HookEventType HOOK_EVENT_TYPE_MOUSE { 1u << 2 };
+
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_HANDLER_TYPE_H

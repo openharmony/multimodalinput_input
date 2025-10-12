@@ -709,6 +709,12 @@ std::string PointerEvent::ToString()
     return eventStr;
 }
 
+size_t PointerEvent::Hash()
+{
+    std::hash<std::string> hasher;
+    return hasher(ToString());
+}
+
 int32_t PointerEvent::GetPointerAction() const
 {
     return pointerAction_;

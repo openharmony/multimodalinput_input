@@ -15,6 +15,8 @@
 
 #include "input_event.h"
 
+#include <algorithm>
+
 #include "axis_event.h"
 #include "event_log_helper.h"
 
@@ -70,11 +72,18 @@ void InputEvent::Reset()
 
 std::string InputEvent::ToString()
 {
-    std::string eventStr = "eventType:" + std::to_string(eventType_);
+    std::string eventStr = "Id:" + std::to_string(id_);
+    eventStr += "eventType:" + std::to_string(eventType_);
     eventStr += ",actionTime:" + std::to_string(actionTime_);
     eventStr += ",deviceId:" + std::to_string(deviceId_);
     eventStr += ",sourceType:" + std::to_string(sourceType_);
     return eventStr;
+}
+
+size_t InputEvent::Hash()
+{
+    std::hash<std::string> hasher;
+    return hasher(ToString());
 }
 
 std::shared_ptr<InputEvent> InputEvent::Create()

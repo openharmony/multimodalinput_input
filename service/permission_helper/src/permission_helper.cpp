@@ -121,8 +121,8 @@ bool PermissionHelper::AddPermissionUsedRecord(Security::AccessToken::AccessToke
 {
     if (int32_t ret = Security::AccessToken::PrivacyKit::AddPermissionUsedRecord(
         tokenID, permissionName, successCount, failCount) != RET_OK) {
-        MMI_HILOGW("AddPermissionUsedRecord %{public}s failed, succ:%{public}d, fail:%{public}d",
-            permissionName.c_str(), successCount, failCount);
+        MMI_HILOGW("AddPermissionUsedRecord %{public}s failed, ret:%{public}d succ:%{public}d, fail:%{public}d",
+            permissionName.c_str(), ret, successCount, failCount);
         return false;
     }
     MMI_HILOGI("AddPermissionUsedRecord %{public}s success, succ:%{public}d, fail:%{public}d",

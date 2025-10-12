@@ -30,6 +30,7 @@
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#include "input_event_hook_handler.h"
 #include "long_press_event_subscribe_manager.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -3005,6 +3006,21 @@ int32_t InputManagerImpl::SetHookIdUpdater(std::function<void(int32_t)> callback
 int32_t InputManagerImpl::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, pluginRemoteStub);
+}
+
+int32_t InputManagerImpl::AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer, HookEventType hookEventType)
+{
+    return INPUT_EVENT_HOOK_HANDLER.AddInputEventHook(consumer, hookEventType);
+}
+
+int32_t InputManagerImpl::RemoveInputEventHook(HookEventType hookEventType)
+{
+    return INPUT_EVENT_HOOK_HANDLER.RemoveInputEventHook(hookEventType);
+}
+
+int32_t InputManagerImpl::DispatchToNextHandler(int32_t eventId, HookEventType hookEventType)
+{
+    return INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId, hookEventType);
 }
 
 int32_t InputManagerImpl::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
