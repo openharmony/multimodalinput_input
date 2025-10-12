@@ -325,6 +325,8 @@ protected:
     ErrCode RemoveKeyEventHook(int32_t hookId) override;
     ErrCode DispatchToNextHandler(int32_t eventId) override;
     ErrCode InitCustomConfig();
+    int32_t IsPointerInit(bool &status) override;
+
 private:
     MMIService();
     ~MMIService();
