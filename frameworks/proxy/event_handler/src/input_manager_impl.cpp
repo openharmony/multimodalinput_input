@@ -3010,17 +3010,29 @@ int32_t InputManagerImpl::GetExternalObject(const std::string &pluginName, sptr<
 
 int32_t InputManagerImpl::AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer, HookEventType hookEventType)
 {
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return INPUT_EVENT_HOOK_HANDLER.AddInputEventHook(consumer, hookEventType);
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 }
 
 int32_t InputManagerImpl::RemoveInputEventHook(HookEventType hookEventType)
 {
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return INPUT_EVENT_HOOK_HANDLER.RemoveInputEventHook(hookEventType);
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 }
 
 int32_t InputManagerImpl::DispatchToNextHandler(int32_t eventId, HookEventType hookEventType)
 {
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     return INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId, hookEventType);
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
 }
 
 int32_t InputManagerImpl::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
