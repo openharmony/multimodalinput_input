@@ -192,4 +192,5 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void SetKeyStatusRecord([in] boolean enable, [in] int timeout);
     void GetCurrentCursorInfo([out] boolean visible, [out] PointerStyle pointerStyle);
     void GetUserDefinedCursorPixelMap([out] sharedptr<PixelMap> pixelMap);
+    void IsPointerInit([out] boolean status);
 }

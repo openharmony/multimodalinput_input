@@ -3052,5 +3052,17 @@ int32_t InputManagerImpl::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+
+bool InputManagerImpl::IsPointerInit()
+{
+    CALL_DEBUG_ENTER;
+    bool isInit = false;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->IsPointerInit(isInit);
+    if (ret != 0) {
+        MMI_HILOGE("Get pointer init status failed, ret:%{public}d", ret);
+        return false;
+    }
+    return isInit;
+}
 } // namespace MMI
 } // namespace OHOS

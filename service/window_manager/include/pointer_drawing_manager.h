@@ -146,6 +146,9 @@ public:
     void RsRemoteDiedCallback();
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr) override;
+    void RecordCursorIdAndImageAddress();
+    void RecordCursorVisibleStatus(bool status);
+
 private:
     struct PixelMapInfo {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };

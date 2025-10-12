@@ -204,6 +204,7 @@ public:
     int32_t SetKeyStatusRecord(bool enable, int32_t timeout);
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
+    int32_t IsPointerInit(bool &status);
 
 private:
     MultimodalInputConnectManager() = default;

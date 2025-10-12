@@ -1054,5 +1054,10 @@ int32_t InputManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
 {
     return InputMgrImpl.GetUserDefinedCursorPixelMap(pixelMapPtr);
 }
+
+bool InputManager::IsPointerInit()
+{
+    return InputMgrImpl.IsPointerInit();
+}
 } // namespace MMI
 } // namespace OHOS
