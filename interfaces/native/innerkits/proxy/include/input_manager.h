@@ -1276,6 +1276,33 @@ public:
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 
     /**
+    * @brief Add input event hook by hookEventType.
+    * @param inputEventConsumer Indicates the hook consumer to set.
+    * @param hookEventType Indicates the eventType for hook.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 22
+    */
+    int32_t AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer,
+        HookEventType hookEventType = HOOK_EVENT_TYPE_NONE);
+
+    /**
+    * @brief Remove input event hook by hookEventType.
+    * @param hookEventType Indicates the eventType of hook.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 22
+    */
+    int32_t RemoveInputEventHook(HookEventType hookEventType);
+
+    /**
+    * @brief Redispatch keyEvent.
+    * @param eventId InputEvent eventId.
+    * @param hookEventType Indicates the eventType of hook.
+    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 22
+    */
+    int32_t DispatchToNextHandler(int32_t eventId, HookEventType hookEventType);
+
+    /**
     * @brief Enables or disables key status recording.
     * @note Only users with specific shell permissions are allowed to call this interface.
     * @param enable A boolean value; true to enable key status recording, false to disable it.

@@ -1044,6 +1044,12 @@ std::string KeyEvent::ToString()
     return eventStr;
 }
 
+size_t KeyEvent::Hash()
+{
+    std::hash<std::string> hasher;
+    return hasher(ToString());
+}
+
 int32_t KeyEvent::GetKeyCode() const
 {
     return keyCode_;

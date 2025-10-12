@@ -194,6 +194,9 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   if (input_ext_feature_anco) {
@@ -367,6 +370,9 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   if (input_ext_feature_anco) {

@@ -42,6 +42,9 @@ ohos_fuzztest("ModuleLoaderGetCursorSurfaceIdFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
   cflags = [
     "-g",

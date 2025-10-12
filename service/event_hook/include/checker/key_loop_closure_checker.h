@@ -13,22 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef DISPATCH_ORDER_CHECKER_H
-#define DISPATCH_ORDER_CHECKER_H
+#ifndef KEY_LOOP_CLOSURE_CHECKER_H
+#define KEY_LOOP_CLOSURE_CHECKER_H
 
-#include <atomic>
+#include <shared_mutex>
+#include <unordered_set>
+
+#include "key_event.h"
 
 namespace OHOS {
 namespace MMI {
-class DispatchOrderChecker {
+class KeyLoopClosureChecker {
 public:
-    bool CheckOrder(int32_t eventId);
-    void UpdateEvent(int32_t eventId);
+    int32_t CheckAndUpdateEventLoopClosure(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
-    std::atomic_int32_t lastDispatchedEventId_ { -1 };
+    int32_t HandleEventLoopClosureKeyDown(int32_t keyCode);
+    int32_t HandleEventLoopClosureKeyUpOrCancel(int32_t keyCode);
+    int32_t CheckLoopClosure(int32_t keyCode);
+    int32_t UpdatePendingDownKeys(int32_t keyCode);
+    int32_t RemovePendingDownKeys(int32_t keyCode);
+private:
+    std::unordered_set<int32_t> pendingDownKeys_; // pending down keyCode
+    std::shared_mutex rwMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
-
-#endif // DISPATCH_ORDER_CHECKER_H
+#endif // KEY_LOOP_CLOSURE_CHECKER_H
