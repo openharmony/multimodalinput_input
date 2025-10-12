@@ -14,6 +14,7 @@
  */
 
 #include <cinttypes>
+#include <iostream>
 #include <semaphore.h>
 
 #include <cJSON.h>
@@ -101,6 +102,30 @@ class IEventObserver : public MMI::MMIEventObserver {
 public:
     void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus) override;
 };
+
+class HookConsumer : public IInputEventConsumer {
+public:
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
+};
+
+void HookConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CHKPV(keyEvent);
+    std::cout << keyEvent->GetId() << " keycode:" << keyEvent->GetKeyCode() << std::endl;
+}
+
+void HookConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CHKPV(pointerEvent);
+    std::cout << pointerEvent->GetId() << " sourceType:" <<  pointerEvent->GetSourceType() <<
+        " action:" << pointerEvent->GetPointerAction() << std::endl;
+}
+
+void HookConsumer::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const
+{
+}
 
 void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus)
 {
@@ -6167,6 +6192,161 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceConsumer, TestSize.Lev
 }
 
 /*
+ * @tc.name: InputManagerTest_AddInputEventHook_001
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_KEY), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_KEY), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_AddInputEventHook_002
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_AddInputEventHook_003
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<HookConsumer>();
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
+}
+
+class UpHookConsumer : public IInputEventConsumer {
+public:
+    explicit UpHookConsumer(HookEventType hooType) : hookEventType(hooType) {}
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {}
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
+        CHKPV(pointerEvent);
+        auto eventId = pointerEvent->GetId();
+        std::cout << eventId << " sourceType:" <<  pointerEvent->GetSourceType() <<
+            " action:" << pointerEvent->GetPointerAction() << std::endl;
+        PointerEvent::PointerItem item;
+        if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item))) {
+            MMI_HILOGE("Can not get pointerItem for the pointer event");
+            return;
+        }
+        auto y = item.GetDisplayY();
+        if (y >= height / 2) {
+            EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType), RET_OK);
+            std::cout << "DispatchToNextHandler " << eventId << std::endl;
+        }
+    }
+private:
+    int32_t width { 1260 };
+    int32_t height { 2720 };
+    HookEventType hookEventType { HOOK_EVENT_TYPE_NONE };
+};
+
+class DownHookConsumer : public IInputEventConsumer {
+public:
+    explicit DownHookConsumer(HookEventType hooType) : hookEventType(hooType) {}
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {}
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
+        CHKPV(pointerEvent);
+        auto eventId = pointerEvent->GetId();
+        std::cout << eventId << " sourceType:" <<  pointerEvent->GetSourceType() <<
+            " action:" << pointerEvent->GetPointerAction() << std::endl;
+        PointerEvent::PointerItem item;
+        if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item))) {
+            MMI_HILOGE("Can not get pointerItem for the pointer event");
+            return;
+        }
+        auto y = item.GetDisplayY();
+        if (y < height / 2) {
+            EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType), RET_OK);
+            std::cout << "DispatchToNextHandler " << eventId << std::endl;
+        }
+    }
+private:
+    int32_t width { 1260 };
+    int32_t height { 2720 };
+    HookEventType hookEventType { HOOK_EVENT_TYPE_NONE };
+};
+
+/*
+ * @tc.name: InputManagerTest_AddInputEventHook_004
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_AddInputEventHook_005
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<DownHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_AddInputEventHook_006
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_TOUCH);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
+}
+
+/*
+ * @tc.name: InputManagerTest_AddInputEventHook_007
+ * @tc.desc: AddInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = std::make_shared<DownHookConsumer>(HOOK_EVENT_TYPE_TOUCH);
+    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
+}
+
+/*
+
  * @tc.name: InputManagerTest_GetCurrentCursorInfo_001
  * @tc.desc: GetCurrentCursorInfo
  * @tc.type: FUNC

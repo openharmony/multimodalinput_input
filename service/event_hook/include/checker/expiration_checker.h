@@ -13,22 +13,34 @@
  * limitations under the License.
  */
 
-#ifndef DISPATCH_ORDER_CHECKER_H
-#define DISPATCH_ORDER_CHECKER_H
+#ifndef EXPIRATION_CHECKER_H
+#define EXPIRATION_CHECKER_H
 
-#include <atomic>
+#include <queue>
+#include <shared_mutex>
+
+#include "input_event.h"
 
 namespace OHOS {
 namespace MMI {
-class DispatchOrderChecker {
+class ExpirationChecker {
 public:
-    bool CheckOrder(int32_t eventId);
-    void UpdateEvent(int32_t eventId);
+    bool CheckExpiration(int32_t eventId);
+    bool CheckValid(const std::shared_ptr<InputEvent> event);
+    void UpdateInputEvent(const std::shared_ptr<InputEvent> event);
 
 private:
-    std::atomic_int32_t lastDispatchedEventId_ { -1 };
+    void RemoveExpiredEvent();
+
+private:
+    struct StashEvent {
+        long long timeStampRcvd { 0 };
+        int32_t eventId { -1 };
+        size_t hashCode { 0 };
+    };
+    std::deque<StashEvent> stashEvents_; // dispatched events
+    std::shared_mutex rwMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
-
-#endif // DISPATCH_ORDER_CHECKER_H
+#endif // EXPIRATION_CHECKER_H
