@@ -427,6 +427,9 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     handler->SetNext(eventMonitorHandler_);
     handler = eventMonitorHandler_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
+    inputEventHookMgr_ = std::make_shared<InputEventHookManager>();
+    handler->SetNext(inputEventHookMgr_);
+    handler = inputEventHookMgr_;
     eventDispatchHandler_ = std::make_shared<EventDispatchHandler>();
     handler->SetNext(eventDispatchHandler_);
     return RET_OK;
@@ -504,6 +507,11 @@ int32_t InputEventHandler::SetMoveEventFilters(bool flag)
 std::shared_ptr<InputActiveSubscriberHandler> InputEventHandler::GetInputActiveSubscriberHandler() const
 {
     return inputActiveSubscriberHandler_;
+}
+
+std::shared_ptr<InputEventHookManager> InputEventHandler::GetInputEventHook() const
+{
+    return inputEventHookMgr_;
 }
 } // namespace MMI
 } // namespace OHOS

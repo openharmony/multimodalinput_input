@@ -13,22 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef DISPATCH_ORDER_CHECKER_H
-#define DISPATCH_ORDER_CHECKER_H
+#include "dispatch_order_checker.h"
 
-#include <atomic>
+#include "define_multimodal.h"
+#include "mmi_log.h"
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DispatchOrderChecker"
 
 namespace OHOS {
 namespace MMI {
-class DispatchOrderChecker {
-public:
-    bool CheckOrder(int32_t eventId);
-    void UpdateEvent(int32_t eventId);
+bool DispatchOrderChecker::CheckOrder(int32_t eventId)
+{
+    MMI_HILOGD("Check lastId:%{public}d, eventId:%{public}d", lastDispatchedEventId_.load(), eventId);
+    return lastDispatchedEventId_.load() < eventId;
+}
 
-private:
-    std::atomic_int32_t lastDispatchedEventId_ { -1 };
-};
+void DispatchOrderChecker::UpdateEvent(int32_t eventId)
+{
+    MMI_HILOGD("Store lastId:%{public}d, eventId:%{public}d", lastDispatchedEventId_.load(), eventId);
+    lastDispatchedEventId_.store(eventId);
+}
 } // namespace MMI
 } // namespace OHOS
-
-#endif // DISPATCH_ORDER_CHECKER_H

@@ -45,6 +45,7 @@
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#include "input_event_hook_manager.h"
 #include "event_dump.h"
 #include "event_statistic.h"
 #include "event_log_helper.h"
@@ -5467,6 +5468,102 @@ ErrCode MMIService::GetExternalObject(const std::string &pluginName, sptr<IRemot
 {
     CALL_INFO_TRACE;
     return InputPluginManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
+}
+
+ErrCode MMIService::AddInputEventHook(HookEventType hookEventType)
+{
+    CALL_INFO_TRACE;
+    if (hookEventType & HOOK_EVENT_TYPE_KEY) {
+        if (!PER_HELPER->CheckKeyEventHook()) {
+            MMI_HILOGE("CheckKeyEventHook failed");
+            return ERROR_NO_PERMISSION;
+        }
+    }
+    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), this, hookEventType] () -> int32_t {
+        auto hookMgr = InputHandler->GetInputEventHook();
+        CHKPR(hookMgr, RET_ERR);
+        if (int32_t result = hookMgr->AddInputEventHook(pid, hookEventType); result != RET_OK) {
+            MMI_HILOGE("AddKeyEventHook failed, ret:%{public}d", result);
+            return result;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask AddKeyEventHook failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("AddInputEventHook success hookEventType:%{public}u", hookEventType);
+    return RET_OK;
+}
+
+ErrCode MMIService::RemoveInputEventHook(HookEventType hookEventType)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), this, hookEventType] () -> int32_t {
+        auto hookMgr = InputHandler->GetInputEventHook();
+        CHKPR(hookMgr, RET_ERR);
+        if (int32_t result = hookMgr->RemoveInputEventHook(pid, hookEventType); result != RET_OK) {
+            MMI_HILOGE("RemoveInputEventHook failed, ret:%{public}d", result);
+            return result;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask RemoveInputEventHook failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGI("RemoveInputEventHook success hookEventType:%{public}u", hookEventType);
+    return RET_OK;
+}
+
+ErrCode MMIService::DispatchToNextHandler(const KeyEvent &keyEvent)
+{
+    auto keyEventPtr = std::make_shared<KeyEvent>(keyEvent);
+    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), keyEventPtr] () -> int32_t {
+        auto hookMgr = InputHandler->GetInputEventHook();
+        CHKPR(hookMgr, RET_ERR);
+        if (int32_t result = hookMgr->DispatchToNextHandler(pid, keyEventPtr); result != RET_OK) {
+            MMI_HILOGE("DispatchToNextHandler failed, ret:%{public}d", result);
+            return result;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask DispatchToNextHandler failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::DispatchToNextHandler(const PointerEvent &pointerEvent)
+{
+    auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
+    CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask([pid = GetCallingPid(), pointerEventPtr] () -> int32_t {
+        auto sourceType = pointerEventPtr->GetSourceType();
+        auto hookMgr = InputHandler->GetInputEventHook();
+        CHKPR(hookMgr, RET_ERR);
+        if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            if (int32_t result = hookMgr->DispatchTouchToNextHandler(pid, pointerEventPtr); result != RET_OK) {
+                MMI_HILOGE("DispatchTouchToNextHandler failed, ret:%{public}d", result);
+                return result;
+            }
+        } else if (sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+            if (int32_t result = hookMgr->DispatchMouseToNextHandler(pid, pointerEventPtr); result != RET_OK) {
+                MMI_HILOGE("DispatchMouseToNextHandler failed, ret:%{public}d", result);
+                return result;
+            }
+        } else {
+            return RET_ERR;
+        }
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask DispatchToNextHandler failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 
 ErrCode MMIService::SetKeyStatusRecord(bool enable, int32_t timeout)
