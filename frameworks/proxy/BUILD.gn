@@ -928,8 +928,10 @@ ohos_unittest("KeyEventHookHandlerTest") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
-    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
  
   sources = [

@@ -56,6 +56,9 @@ ohos_unittest("InputDeviceManagerTestWithMock") {
     "${mmi_path}/service/product_property_config/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   sources = [

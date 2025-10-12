@@ -262,6 +262,13 @@ public:
     virtual std::string ToString();
 
     /**
+     * @brief Get the hash value of an input event.
+     * @return size_t
+     * @since 22
+     */
+    virtual size_t Hash();
+
+    /**
      * @brief Obtains the unique ID of an input event.
      * @return Returns the unique ID of the input event.
      * @since 9
