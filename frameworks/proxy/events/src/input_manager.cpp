@@ -1025,6 +1025,21 @@ int32_t InputManager::QueryPointerRecord(int32_t count, std::vector<std::shared_
     return InputMgrImpl.QueryPointerRecord(count, pointerList);
 }
 
+int32_t InputManager::AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer, HookEventType hookEventType)
+{
+    return InputMgrImpl.AddInputEventHook(consumer, hookEventType);
+}
+
+int32_t InputManager::RemoveInputEventHook(HookEventType hookEventType)
+{
+    return InputMgrImpl.RemoveInputEventHook(hookEventType);
+}
+
+int32_t InputManager::DispatchToNextHandler(int32_t eventId, HookEventType hookEventType)
+{
+    return InputMgrImpl.DispatchToNextHandler(eventId, hookEventType);
+}
+
 int32_t InputManager::SetKeyStatusRecord(bool enable, int32_t timeout)
 {
     return InputMgrImpl.SetKeyStatusRecord(enable, timeout);

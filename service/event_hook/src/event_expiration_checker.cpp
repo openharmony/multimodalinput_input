@@ -45,8 +45,8 @@ int32_t EventExpirationChecker::CheckExpiration(int32_t hookId, int32_t eventId)
         MMI_HILOGW("No checker of hook:%{public}d existed", hookId);
         return RET_ERR;
     }
-    auto iter = std::find_if(stashEvents_[hookId].begin(), stashEvents_[hookId].end(),
-        [eventId] (const auto &stashEvent) {
+    auto iter = std::find_if(stashEvents_[hookId].begin(),
+        stashEvents_[hookId].end(), [eventId] (const auto &stashEvent) {
             CHKPF(stashEvent.keyEvent);
             return stashEvent.keyEvent->GetId() == eventId;
         }
@@ -75,8 +75,8 @@ std::shared_ptr<KeyEvent> EventExpirationChecker::GetKeyEvent(int32_t hookId, in
         MMI_HILOGW("No checker of hook:%{public}d existed", hookId);
         return nullptr;
     }
-    auto iter = std::find_if(stashEvents_[hookId].begin(), stashEvents_[hookId].end(),
-        [eventId] (const auto &stashEvent) {
+    auto iter = std::find_if(stashEvents_[hookId].begin(),
+        stashEvents_[hookId].end(), [eventId] (const auto &stashEvent) {
             CHKPF(stashEvent.keyEvent);
             return stashEvent.keyEvent->GetId() == eventId;
         }

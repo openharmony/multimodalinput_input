@@ -21,6 +21,7 @@
 #include "config_policy_utils.h"
 
 #include "event_log_helper.h"
+#include "input_event_hook_handler.h"
 #include "input_manager_impl.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
@@ -70,6 +71,7 @@ void OnConnected(const IfMMIClient& client)
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
     KEY_EVENT_HOOK_HANDLER.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+    INPUT_EVENT_HOOK_HANDLER.OnConnected();
 }
 
 void OnDisconnected(const IfMMIClient &client)
