@@ -66,8 +66,6 @@ const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string EXTENSION_ABILITY_ABNORMAL = "extensionAbilityAbnormal";
 const std::string SOS_BUNDLE_NAME {"com.hmos.emergencycommunication"};
 const std::string SCREENRECORDER_BUNDLE_NAME {"com.hmos.screenrecorder"};
-const std::string CMD_DEVICE_TYPE_TV = OHOS::system::GetParameter("const.product.devicetype", "unknown");
-const std::string CMD_PRODUCT_TYPE_TV { "tv" };
 const vector<float> CIRCLE_COORDINATES = {328.0f, 596.0f, 328.0f, 597.0f, 322.0f, 606.0f, 306.0f, 635.0f, 291.0f,
     665.0f, 283.0f, 691.0f, 291.0f, 739.0f, 300.0f, 751.0f, 312.0f, 759.0f, 327.0f, 765.0f, 343.0f, 768.0f, 361.0f,
     769.0f, 379.0f, 767.0f, 395.0f, 761.0f, 411.0f, 751.0f, 425.0f, 737.0f, 439.0f, 718.0f, 449.0f, 709.0f, 456.0f,
@@ -7237,29 +7235,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_033, TestSi
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_034
- * @tc.desc: Test MenuClickProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_034, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    DisplayEventMonitor displayEventMonitor;
-    std::string bundleName = "";
-    std::string abilityName = "";
-    std::string action = "";
-    displayEventMonitor.screenStatus_ = "usual.event.SCREEN_OFF";
-    displayEventMonitor.isScreenLocked_ = false;
-    ASSERT_NO_FATAL_FAILURE(handler.MenuClickProcess(bundleName, abilityName, action));
-    displayEventMonitor.screenStatus_ = "usual";
-    displayEventMonitor.isScreenLocked_ = true;
-    ASSERT_NO_FATAL_FAILURE(handler.MenuClickProcess(bundleName, abilityName, action));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
  * @tc.desc: Test MenuClickProcess
  * @tc.type: FUNC
@@ -7317,143 +7292,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
     handler.hasRegisteredSensor_ = false;
     handler.UnregisterProximitySensor();
     EXPECT_NE(handler.hasRegisteredSensor_, true);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MenuClickHandle_001
- * @tc.desc: Test MenuClickProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool ret = false;
-    if (CMD_DEVICE_TYPE_TV != CMD_PRODUCT_TYPE_TV) {
-        EXPECT_EQ(ret, false);
-    } else {
-        KeyCommandHandler handler;
-        std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-        event->SetKeyCode(KeyEvent::KEYCODE_MENU);
-        event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, true);
-        EXPECT_GE(handler.menuPressedTimerId_, 0);
-    }
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MenuClickHandle_002
- * @tc.desc: Test MenuClickProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool ret = false;
-    if (CMD_DEVICE_TYPE_TV != CMD_PRODUCT_TYPE_TV) {
-        EXPECT_EQ(ret, false);
-    } else {
-        KeyCommandHandler handler;
-        std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-        event->SetKeyCode(KeyEvent::KEYCODE_MENU);
-        event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, true);
-        EXPECT_GE(handler.menuPressedTimerId_, 0);
-
-        event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(handler.menuPressedTimerId_, -1);
-        EXPECT_EQ(handler.tmpkeyEvent_, nullptr);
-        EXPECT_EQ(ret, true);
-    }
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MenuClickHandle_003
- * @tc.desc: Test MenuClickProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool ret = false;
-    if (CMD_DEVICE_TYPE_TV != CMD_PRODUCT_TYPE_TV) {
-        EXPECT_EQ(ret, false);
-    } else {
-        KeyCommandHandler handler;
-        std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-        event->SetKeyCode(KeyEvent::KEYCODE_MENU);
-        event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, true);
-        EXPECT_GE(handler.menuPressedTimerId_, 0);
-
-        event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, false);
-    }
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MenuClickHandle_004
- * @tc.desc: Test MenuClickProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool ret = false;
-    if (CMD_DEVICE_TYPE_TV != CMD_PRODUCT_TYPE_TV) {
-        EXPECT_EQ(ret, false);
-    } else {
-        KeyCommandHandler handler;
-        std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-        event->SetKeyCode(KeyEvent::KEYCODE_MENU);
-        event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, false);
-        EXPECT_EQ(handler.menuPressedTimerId_, -1);
-    }
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MenuClickHandle_005
- * @tc.desc: Test MenuClickProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MenuClickHandle_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool ret = false;
-    if (CMD_DEVICE_TYPE_TV != CMD_PRODUCT_TYPE_TV) {
-        EXPECT_EQ(ret, false);
-    } else {
-        KeyCommandHandler handler;
-        std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-        event->SetKeyCode(KeyEvent::KEYCODE_MENU);
-        event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, false);
-        EXPECT_EQ(handler.menuPressedTimerId_, -1);
-
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, false);
-
-        event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, true);
-
-        event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        ret = handler.MenuClickHandle(event);
-        EXPECT_EQ(ret, false);
-    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION

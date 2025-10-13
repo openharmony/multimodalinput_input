@@ -73,9 +73,6 @@ const char* KEY_STATUS { "status" };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
 const std::string SECURE_SETTING_URI_PROXY {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
-const char *TV_MENU_BUNDLE_NAME = "com.ohos.sceneboard";
-const char *TV_MENU_ABILITY_NAME = "com.ohos.sceneboard.MultimodalInputService";
-constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
 constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
@@ -85,8 +82,6 @@ std::atomic<int32_t> g_distance { 0 };
 const char* LOADMISTOUCH_LIBPATH = "libmistouch_prevention.z.so";
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
 constexpr int32_t LIGHT_STAY_AWAY { 0 };
-const std::string DEVICE_TYPE_TV = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRODUCT_TYPE_TV = "tv";
 } // namespace
 
 static void SensorDataCallbackImpl(SensorEvent *event)
@@ -111,10 +106,6 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
-        return;
-    }
-    if (MenuClickHandle(keyEvent)) {
-        MMI_HILOGD("MenuClickHandle return true:%{private}d", keyEvent->GetKeyCode());
         return;
     }
     if (OnHandleEvent(keyEvent)) {
@@ -2981,86 +2972,6 @@ void KeyCommandHandler::OnKunckleSwitchStatusChange(const std::string switchName
         MMI_HILOGE("sync knuckle status error., ret:%{public}d", ret);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-}
-
-bool KeyCommandHandler::MenuClickHandle(std::shared_ptr<KeyEvent> event)
-{
-    CALL_DEBUG_ENTER;
-    if (DEVICE_TYPE_TV != PRODUCT_TYPE_TV) {
-        MMI_HILOGD("In non-TV scenarios, the menu key does not support this feature");
-        return false;
-    }
-    CHKPF(event);
-    if ((event->GetKeyCode() == KeyEvent::KEYCODE_MENU) && (event->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
-        if (menuPressedTimerId_ < 0) {
-            MMI_HILOGD("Trigger key menu long press detection");
-            tmpkeyEvent_ = KeyEvent::Clone(event);
-            menuPressedTimerId_ = TimerMgr->AddTimer(MENU_KEY_DOWN_DELAY, REPEAT_ONCE,
-                [this]() {
-                    tmpkeyEvent_ = nullptr;
-                    menuPressedTimerId_ = std::numeric_limits<int32_t>::max();
-                    MMI_HILOGD("Key menu long press, send bundlname to TV");
-                    MenuClickProcess(TV_MENU_BUNDLE_NAME, TV_MENU_ABILITY_NAME, "key_menu_longpress");
-                });
-        }
-        return true;
-    }
-    bool keyMenuConsumed { false };
-
-    if (menuPressedTimerId_ >= 0) {
-        TimerMgr->RemoveTimer(menuPressedTimerId_);
-        if ((event->GetKeyCode() == KeyEvent::KEYCODE_MENU) && (event->GetKeyAction() == KeyEvent::KEY_ACTION_UP)) {
-            if (menuPressedTimerId_ == std::numeric_limits<int32_t>::max()) {
-                keyMenuConsumed = true;
-            }
-            MMI_HILOGD("Reset key menu long press detection");
-            menuPressedTimerId_ = -1;
-        }
-    }
-    if (tmpkeyEvent_ != nullptr) {
-        MMI_HILOGD("Key menu short press");
-        SendSaveEvent(tmpkeyEvent_);
-        tmpkeyEvent_ = nullptr;
-    }
-    return keyMenuConsumed;
-}
-
-void KeyCommandHandler::SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    CALL_DEBUG_ENTER;
-    if (OnHandleEvent(keyEvent)) {
-        if (DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            auto monitorHandler = InputHandler->GetMonitorHandler();
-            CHKPV(monitorHandler);
-            keyEvent->SetFourceMonitorFlag(true);
-#ifndef OHOS_BUILD_EMULATOR
-            monitorHandler->OnHandleEvent(keyEvent);
-#endif // OHOS_BUILD_EMULATOR
-            keyEvent->SetFourceMonitorFlag(false);
-        }
-        MMI_HILOGD("The keyEvent start launch an ability:%{private}d", keyEvent->GetKeyCode());
-        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
-        return;
-    }
-    CHKPV(nextHandler_);
-    nextHandler_->HandleKeyEvent(keyEvent);
-}
-
-void KeyCommandHandler::MenuClickProcess(const std::string bundleName,
-                                         const std::string abilityName, const std::string action)
-{
-    CALL_DEBUG_ENTER;
-    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
-        MMI_HILOGE("The current screen is not in the unlocked state with the screen on");
-        return;
-    }
-    Ability ability;
-    ability.bundleName = bundleName;
-    ability.abilityName = abilityName;
-    ability.params.emplace(std::make_pair("trigger_type", action));
-    LaunchAbility(ability, NO_DELAY);
 }
 
 void KeyCommandHandler::RegisterProximitySensor()
