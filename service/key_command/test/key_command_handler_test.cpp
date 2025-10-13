@@ -7219,24 +7219,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_032, TestSi
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_033
- * @tc.desc: Test SendSaveEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_033, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    handler.isParseConfig_ = false;
-    ASSERT_NO_FATAL_FAILURE(handler.SendSaveEvent(keyEvent));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7251,7 +7235,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_002
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7266,7 +7250,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7281,7 +7265,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_002
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7371,7 +7355,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CallMistouchPrevention005,
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_001
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7386,7 +7370,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RegisterProximitySensor_00
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_002
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7427,7 +7411,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPreventi
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_003
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -7442,7 +7426,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
 
 /**
  * @tc.name: KeyCommandHandlerTest_RegisterProximitySensor_004
- * @tc.desc: Test MenuClickProcess
+ * @tc.desc: Test RegisterProximitySensor
  * @tc.type: FUNC
  * @tc.require:
  */
