@@ -65,6 +65,7 @@ declare_args() {
   input_feature_watch_cfg_source = false
   input_feature_upgrade_skia = false
   input_feature_mistouch_prevention = false
+  input_feature_input_event_hook = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -357,6 +358,10 @@ if (input_feature_monitor) {
 
 if (input_feature_key_hook) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_KEY_HOOK" ]
+}
+
+if (input_feature_input_event_hook) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK" ]
 }
 
 if (input_feature_touchscreen) {
