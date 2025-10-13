@@ -74,6 +74,7 @@ constexpr int32_t ONE_ARGC = 1;
 constexpr int32_t TWO_ARGC = 2;
 constexpr int32_t THREE_ARGC = 3;
 constexpr int32_t FOUR_ARGC = 4;
+constexpr int32_t THIRD_PARTY_CURSOR_ID = -100;
 const std::string PRODUCT_TYPE_HYM = OHOS::system::GetParameter("const.build.product", "HYM");
 
 enum JoystickEvent {
@@ -1786,7 +1787,7 @@ int32_t InputManagerCommand::QueryMouseInfo(int32_t argc, char *argv[])
         std::cerr << "Too many arguments" << std::endl;
         return RET_ERR;
     }
-    if (InputManager::GetInstance()->IsPointerInit()) {
+    if (!InputManager::GetInstance()->IsPointerInit()) {
         std::cerr << "Query failed, maybe no mouse device." << std::endl;
         return RET_ERR;
     }
@@ -1800,6 +1801,10 @@ int32_t InputManagerCommand::QueryMouseInfo(int32_t argc, char *argv[])
         std::cout << "Mouse is visible" << std::endl;
         std::cout << "pointerStyle id:" << g_pointerStyle.id << std::endl;
     } else {
+        std::cerr << "Mouse is invisible" << std::endl;
+        return RET_ERR;
+    }
+    if (g_pointerStyle.id != THIRD_PARTY_CURSOR_ID) {
         std::cerr << "Mouse is invisible" << std::endl;
         return RET_ERR;
     }
@@ -1827,12 +1832,16 @@ int32_t InputManagerCommand::SavePixelMapToFile(const char *filePath)
     }
     uint64_t g_bufferSize = static_cast<uint64_t>(g_pixelMap->GetAllocationByteCount());
     uint8_t* g_mappedAddr = static_cast<uint8_t*>(malloc(g_bufferSize));
+    if (g_mappedAddr == nullptr) {
+        std::cerr << "Malloc failed" << std::endl;
+        return RET_ERR;
+    }
     (void)g_pixelMap->ReadPixels(g_bufferSize, g_mappedAddr);
     int32_t g_fd = open(realPath, O_RDWR | O_TRUNC);
     if (g_fd < 0) {
         std::cerr << "Open file failed, path:" << filePath << std::endl;
-        close(g_fd);
         free(g_mappedAddr);
+        g_mappedAddr = nullptr;
         return RET_ERR;
     }
     uint64_t ret = write(g_fd, g_mappedAddr, g_bufferSize);
@@ -1840,10 +1849,12 @@ int32_t InputManagerCommand::SavePixelMapToFile(const char *filePath)
         std::cerr << "Save file failed" << std::endl;
         close(g_fd);
         free(g_mappedAddr);
+        g_mappedAddr = nullptr;
         return RET_ERR;
     }
     close(g_fd);
     free(g_mappedAddr);
+    g_mappedAddr = nullptr;
     return RET_OK;
 }
 
