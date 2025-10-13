@@ -108,7 +108,7 @@ void FoldingAreaToast::FoldingAreaLongPressProcess(void)
         touchId2KeepDownTimes_[touchId_] = GetMillisTime() - touchId2FirstDownTimes_[touchId_];
     }
     if (touchId2KeepDownTimes_.count(touchId_) && touchId2KeepDownTimes_[touchId_] > FOLDAREA_MAX_PRESS_TIMES) {
-        MMI_HILOGD(
+        MMI_HILOGI(
             "TAC detect touch:%d, position = [%d,%d] long press frames %d cost times:%d, in folding area over 0.5s",
             touchId_, pointX_, pointY_, touchId2KeepFrames_[touchId_], touchId2KeepDownTimes_[touchId_]);
         NotifyFoldingAreaTouchStatus(1);
@@ -155,7 +155,7 @@ void FoldingAreaToast::FoldingAreaFastClickProcess(void)
         FoldingAreaGetTouchid2TouchNum();
         for (auto touchNum : touchId2touchNum_) {
             if (touchNum.second >= FOLDAREA_MAX_CLK_NUM) {
-                MMI_HILOGD(
+                MMI_HILOGI(
                     "TAC detect touch:%d fast click %d times position = [%d,%d] in 1s in folding area",
                     touchNum.first, touchNum.second, touchId2clickTouchs_[touchNum.first].first,
                     touchId2clickTouchs_[touchNum.first].second);
@@ -189,7 +189,8 @@ void FoldingAreaToast::FoldingAreaProcess(struct libinput_event *event)
     libinput_event_type eventType = libinput_event_get_type(event);
     libinput_event_touch* touch = nullptr;
     if (eventType == LIBINPUT_EVENT_TOUCH_DOWN || eventType == LIBINPUT_EVENT_TOUCH_UP ||
-        eventType == LIBINPUT_EVENT_TOUCH_MOTION || eventType == LIBINPUT_EVENT_TOUCH_CANCEL) {
+        eventType == LIBINPUT_EVENT_TOUCH_MOTION || eventType == LIBINPUT_EVENT_TOUCH_CANCEL ||
+        eventType == LIBINPUT_EVENT_TOUCH_FRAME) {
         touch = libinput_event_get_touch_event(event);
         if (!touch) {
             FoldingAreaClear();
@@ -204,12 +205,14 @@ void FoldingAreaToast::FoldingAreaProcess(struct libinput_event *event)
             pointX_ = static_cast<uint16_t>(touchInfo.point.x);
             pointY_ = static_cast<uint16_t>(touchInfo.point.y);
             auto displayInfo = WIN_MGR->GetPhysicalDisplay(logicalDisplayId);
-            if (!displayInfo || (displayInfo != nullptr && displayInfo->direction != Direction::DIRECTION0)) {
+            if (!displayInfo || (displayInfo != nullptr && displayInfo->direction > Direction::DIRECTION0)) {
                 FoldingAreaClear();
                 return;
             }
         }
-        touchId_ = libinput_event_touch_get_slot(touch);
+        if (eventType != LIBINPUT_EVENT_TOUCH_FRAME) {
+            touchId_ = libinput_event_touch_get_slot(touch);
+        }
         if (eventType == LIBINPUT_EVENT_TOUCH_UP || eventType == LIBINPUT_EVENT_TOUCH_CANCEL) {
             touchId2KeepFrames_[touchId_] = 0;
             touchId2KeepDownTimes_[touchId_] = 0;
