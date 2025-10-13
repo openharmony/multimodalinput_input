@@ -974,8 +974,6 @@ void LibinputAdapter::OnEventHandler()
         std::string msg = "OnEventHandler, eventType is: " + std::to_string(eventType);
         BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        foldingAreaToast_.FoldingAreaProcess(event);
-
         // confirm boot completed msg in case of mmi restart.
         UpdateBootFlag();
 
