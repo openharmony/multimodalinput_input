@@ -129,8 +129,10 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            if (fingerDown_-- == NON_FINGER || fingerDown_ == NON_FINGER) {
+            fingerDown_--;
+            if (fingerDown_ <= NON_FINGER) {
                 screenState_ = false;
+                fingerDown_ = NON_FINGER;
             }
             break;
         }
