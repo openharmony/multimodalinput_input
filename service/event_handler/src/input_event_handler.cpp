@@ -427,9 +427,11 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     handler->SetNext(eventMonitorHandler_);
     handler = eventMonitorHandler_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     inputEventHookMgr_ = std::make_shared<InputEventHookManager>();
     handler->SetNext(inputEventHookMgr_);
     handler = inputEventHookMgr_;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
     eventDispatchHandler_ = std::make_shared<EventDispatchHandler>();
     handler->SetNext(eventDispatchHandler_);
     return RET_OK;
