@@ -85,7 +85,9 @@ ohos_source_set("mmi_connect_manager_service") {
   deps = [
     ":multimodal_input_interface",
     ":multimodal_input_binder_client_interface",
+    "${mmi_path}/common/anco/comm:anco_channel_interface",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service/filter:event_filter_interface",
   ]
 
   external_deps = [
@@ -169,7 +171,9 @@ ohos_source_set("mmi_connect_manager_proxy") {
   deps = [
     ":multimodal_input_interface",
     ":multimodal_input_binder_client_interface",
+    "${mmi_path}/common/anco/comm:anco_channel_interface",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service/filter:event_filter_interface",
   ]
   external_deps = [
     "bounds_checking_function:libsec_shared",
