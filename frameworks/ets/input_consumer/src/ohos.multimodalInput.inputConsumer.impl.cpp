@@ -982,11 +982,11 @@ bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMo
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_onKey(onKey);
-TH_EXPORT_CPP_API_offKey(offKey);
+TH_EXPORT_CPP_API_offKeyImpl(offKey);
 TH_EXPORT_CPP_API_onHotkeyChange(onHotkeyChange);
-TH_EXPORT_CPP_API_offHotkeyChange(offHotkeyChange);
+TH_EXPORT_CPP_API_offHotkeyChangeImpl(offHotkeyChange);
 TH_EXPORT_CPP_API_onKeyPressed(onKeyPressed);
-TH_EXPORT_CPP_API_offKeyPressed(offKeyPressed);
+TH_EXPORT_CPP_API_offKeyPressedImpl(offKeyPressed);
 TH_EXPORT_CPP_API_SetShieldStatus(SetShieldStatus);
 TH_EXPORT_CPP_API_GetShieldStatus(GetShieldStatus);
 TH_EXPORT_CPP_API_GetAllSystemHotkeysSync(GetAllSystemHotkeysSync);
