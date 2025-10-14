@@ -234,6 +234,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "graphic_2d:librender_service_client",
     "graphic_surface:surface",
     "hisysevent:libhisysevent",
+    "hicollie:libhicollie",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "libinput:libinput-third-mmi",
