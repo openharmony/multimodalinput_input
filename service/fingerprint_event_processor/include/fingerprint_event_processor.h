@@ -96,6 +96,7 @@ private:
     std::atomic_bool antiFalseTouchSwitch_ { true };
     std::mutex mutex_;
     struct SmartKeySwitch smartKeySwitch_;
+    int32_t fingerDown_ { 0 };
 };
 #define FingerprintEventHdr ::OHOS::DelayedSingleton<FingerprintEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
