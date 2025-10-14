@@ -20,9 +20,6 @@
 
 #include "hotplug_detector.h"
 #include "libinput.h"
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-#include "folding_area_toast.h"
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 namespace OHOS {
 namespace MMI {
@@ -154,7 +151,6 @@ private:
     // set as true once subscriber succeeded.
     std::atomic_bool hasInitSubscriber_ { false };
     static std::atomic_bool isBootCompleted_;
-    FoldingAreaToast foldingAreaToast_;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
