@@ -119,12 +119,14 @@ void RemovePhysicalInputDeviceInnerFuzzTest(FuzzedDataProvider &provider)
     };
     int32_t deviceId = provider.ConsumeIntegral<int32_t>();
     bool enable = provider.ConsumeBool();
+    bool isDeviceReportEvent = provider.ConsumeBool();
     InputDeviceManager::InputDeviceInfo deviceInfo;
     deviceInfo.inputDeviceOrigin = &libDev;
     deviceInfo.isRemote = provider.ConsumeBool();
     deviceInfo.enable = provider.ConsumeBool();
+    deviceInfo.isDeviceReportEvent = provider.ConsumeBool();
     INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
-    INPUT_DEV_MGR->RemovePhysicalInputDeviceInner(&libDev, deviceId, enable);
+    INPUT_DEV_MGR->RemovePhysicalInputDeviceInner(libDev, deviceId, enable, isDeviceReportEvent);
 }
 
 bool LibinputDeviceManagerFuzzTest(const uint8_t *data, size_t size)

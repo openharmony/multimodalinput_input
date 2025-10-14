@@ -151,6 +151,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             MMI_HILOGE("The current device has been disabled");
             return;
         }
+        if (!INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId)) {
+            INPUT_DEV_MGR->SetIsDeviceReportEvent(deviceId, true);
+        }
     }
     std::string name = libinput_device_get_name(device);
     size_t pos = name.find("hand_status_dev");
