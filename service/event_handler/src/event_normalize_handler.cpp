@@ -81,6 +81,8 @@ int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
 int32_t g_touchPadDeviceAxisY { 1 };
 bool g_isSwipeInward {false};
 bool g_buttonPressed {false};
+bool g_isLeftEdgeSwipe {false};
+bool g_isRightEdgeSwipe {false};
 constexpr int32_t SWIPE_INWARD_ANGLE_JUDGE { 2 };
 int64_t g_lastKeyboardEventTime { 0 };
 constexpr int32_t MT_TOOL_PALM { 2 };
@@ -1195,6 +1197,7 @@ void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> 
         g_isSwipeInward = true;
         
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+        DfxHisysevent::ReportTouchpadSwipeInwardEvent();
     }
 }
 
@@ -1259,6 +1262,7 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
         keyEvent->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad single knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
+        DfxHisysevent::ReportTouchpadKnuckleDoubleClickEvent(1);
         return true;
     }
     if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE &&
@@ -1266,6 +1270,7 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
         keyEvent->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad double knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
+        DfxHisysevent::ReportTouchpadKnuckleDoubleClickEvent(2); // 2 fingers knuckle double click event
         return true;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1276,6 +1281,43 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return false;
+}
+
+int32_t GetTouchpadEdgeSwipeKeyCode(double pressure)
+{
+    if (g_isLeftEdgeSwipe && pressure == DEFAULT_TOUCHPAD_ABS_PRESSURE_VALUE) {
+        DfxHisysevent::ReportTouchpadLeftEdgeSlideEvent();
+        g_isLeftEdgeSwipe = false;
+    }
+    if (g_isRightEdgeSwipe && pressure == DEFAULT_TOUCHPAD_ABS_PRESSURE_VALUE) {
+        DfxHisysevent::ReportTouchpadRightEdgeSlideEvent();
+        g_isRightEdgeSwipe = false;
+    }
+    int64_t currentTime = GetSysClockTime();
+    if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
+        g_isLeftEdgeSwipe = true;
+        return KeyEvent::KEYCODE_BRIGHTNESS_UP;
+    }
+    if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
+        g_isLeftEdgeSwipe = true;
+        return KeyEvent::KEYCODE_BRIGHTNESS_DOWN;
+    }
+    if (pressure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
+        g_isRightEdgeSwipe = true;
+        return KeyEvent::KEYCODE_VOLUME_UP;
+    }
+    if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
+        g_isRightEdgeSwipe = true;
+        return KeyEvent::KEYCODE_VOLUME_DOWN;
+    }
+    if (pressure < 0 || pressure > DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+        MMI_HILOGE("Pressure is error!");
+    }
+    return -1;
 }
 
 bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
@@ -1295,23 +1337,8 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     int32_t keyCode = -1;
     keyDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    int64_t currentTime = GetSysClockTime();
-    if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE &&
-        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
-        keyCode = KeyEvent::KEYCODE_BRIGHTNESS_UP;
-    } else if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE &&
-        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
-        keyCode = KeyEvent::KEYCODE_BRIGHTNESS_DOWN;
-    } else if (pressure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE &&
-        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
-        keyCode = KeyEvent::KEYCODE_VOLUME_UP;
-    } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE &&
-        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
-        keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    } else if (pressure < 0 || pressure > DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
-        MMI_HILOGE("Pressure is error!");
-        return false;
-    } else {
+    keyCode = GetTouchpadEdgeSwipeKeyCode(pressure);
+    if (keyCode == -1) {
         return false;
     }
     MMI_HILOGI("Touchpad edge swipe{%{public}f}", pressure);
