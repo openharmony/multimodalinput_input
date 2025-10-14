@@ -483,19 +483,21 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
         case VKeyboardEventType::StopLongPress:
             [[fallthrough]];
         case VKeyboardEventType::NormalKeyboardEvent: {
-            for (auto event : keyboardEvents) {
+            for (auto &event : keyboardEvents) {
                 CHKPC(event);
                 funInputEvent_(event, frameTime);
                 free(event);
+                event = nullptr;
             }
             keyboardEvents.clear();
             break;
         }
         case VKeyboardEventType::UpdateCaps: {
-            for (auto event : keyboardEvents) {
+            for (auto &event : keyboardEvents) {
                 CHKPC(event);
                 funInputEvent_(event, frameTime);
                 free(event);
+                event = nullptr;
             }
             keyboardEvents.clear();
             newCapsLockState = !newCapsLockState;
@@ -526,11 +528,11 @@ void LibinputAdapter::HandleVTrackpadMessage(VTrackpadEventType eventType, std::
         return;
     }
 
-    for (auto event : events) {
-        libinput_event_type injectEventType = libinput_event_get_type(event);
-        funInputEvent_(event, frameTime);
-        free(event);
-        event = nullptr;
+    for (auto &vtpEvent : events) {
+        libinput_event_type injectEventType = libinput_event_get_type(vtpEvent);
+        funInputEvent_(vtpEvent, frameTime);
+        free(vtpEvent);
+        vtpEvent = nullptr;
 
         if (injectEventType == libinput_event_type::LIBINPUT_EVENT_GESTURE_PINCH_BEGIN) {
             InjectEventForTwoFingerOnTouchpad(touch, libinput_event_type::LIBINPUT_EVENT_TOUCHPAD_DOWN,
