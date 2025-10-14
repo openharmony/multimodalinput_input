@@ -2105,5 +2105,39 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsVirtualKeyboardDeviceE
     EXPECT_EQ(inputDeviceManager.IsVirtualKeyboardDeviceEverConnected(), true);
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetIsDeviceReportEvent_001
+ * @tc.desc: Test the function SetIsDeviceReportEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetIsDeviceReportEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo info;
+    inputDeviceManager.inputDevice_.insert(std::make_pair(deviceId, info));
+    inputDeviceManager.SetIsDeviceReportEvent(deviceId, false);
+    EXPECT_EQ(inputDeviceManager.inputDevice_[deviceId].isDeviceReportEvent, false);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetIsDeviceReportEvent_001
+ * @tc.desc: Test the function GetIsDeviceReportEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetIsDeviceReportEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo info;
+    info.isDeviceReportEvent = true;
+    inputDeviceManager.inputDevice_.insert(std::make_pair(deviceId, info));
+    EXPECT_EQ(inputDeviceManager.GetIsDeviceReportEvent(deviceId), true);
+}
 } // namespace MMI
 } // namespace OHOS
