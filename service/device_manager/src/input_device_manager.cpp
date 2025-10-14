@@ -522,13 +522,12 @@ void InputDeviceManager::SetIsDeviceReportEvent(int32_t deviceId, bool isDeviceR
 bool InputDeviceManager::GetIsDeviceReportEvent(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
-    bool isDeviceReportEvent = false;
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         MMI_HILOGE("Get inputDevice isReportEvent failed, Invalid deviceId.");
-        return isDeviceReportEvent;
+        return false;
     }
-    isDeviceReportEvent = item->second.isDeviceReportEvent;
+    bool isDeviceReportEvent = item->second.isDeviceReportEvent;
     return isDeviceReportEvent;
 }
 
