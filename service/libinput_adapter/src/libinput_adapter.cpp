@@ -489,7 +489,6 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
                 free(event);
                 event = nullptr;
             }
-            keyboardEvents.clear();
             break;
         }
         case VKeyboardEventType::UpdateCaps: {
@@ -499,7 +498,6 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
                 free(event);
                 event = nullptr;
             }
-            keyboardEvents.clear();
             newCapsLockState = !newCapsLockState;
             if (keyEvent != nullptr) {
                 keyEvent->SetFunctionKey(MMI::KeyEvent::CAPS_LOCK_FUNCTION_KEY, newCapsLockState);
@@ -514,6 +512,7 @@ void LibinputAdapter::HandleVKeyboardMessage(VKeyboardEventType eventType,
         default:
             break;
     }
+    keyboardEvents.clear();
     if (libinputCapsLockOn != newCapsLockState) {
         // if a mismatch is found, sync it now.
         libinput_toggle_caps_key();
