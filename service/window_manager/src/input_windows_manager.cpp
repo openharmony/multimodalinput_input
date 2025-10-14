@@ -847,6 +847,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
+        SimulateKeyEventIfNeeded(keyEvent);
         return secSubWindows;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1583,6 +1584,16 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 bool InputWindowsManager::IsPointerActiveRectValid(const OLD::DisplayInfo &currentDisplay)
 {
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+
+bool InputWindowsManager::IsKeyEventFromVKeyboard(std::shared_ptr<KeyEvent> keyEvent)
+{
+    auto device = INPUT_DEV_MGR->GetInputDevice(keyEvent->GetDeviceId());
+    if (device == nullptr) {
+        MMI_HILOGE("Failed to get inputDevice by deviceId: %{public}d", keyEvent->GetDeviceId());
+        return false;
+    }
+    return PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC && device->GetName() == "input_mt_wrapper";
 }
 
 bool InputWindowsManager::IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const {
@@ -7203,6 +7214,27 @@ void InputWindowsManager::CleanInvalidPiexMap(int32_t groupId)
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
+
+void InputWindowsManager::SimulateKeyEventIfNeeded(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+        (!INPUT_DEV_MGR->IsLocalDevice(keyEvent->GetDeviceId()) ||
+            !keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))) {
+        SimulateKeyExt(keyEvent);
+    } else {
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        // if key event is created by fold pc vkeyboard, should simulate to Anco
+        if (IsKeyEventFromVKeyboard(keyEvent)) {
+            SimulateKeyExt(keyEvent);
+        } else {
+            MMI_HILOG_DISPATCHW("The accessibility scenarios do not injecting keyevents into the anco");
+        }
+#else
+        MMI_HILOG_DISPATCHW("The accessibility scenarios do not injecting keyevents into the anco");
+#endif  // OHOS_BUILD_ENABLE_VKEYBOARD
+    }
+}
+
 bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
