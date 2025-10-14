@@ -40,7 +40,6 @@ constexpr int32_t MAX_PIXELMAP_SIZE { 256 };
 } // namespace
 
 bool JsPointerContext::isCustomCursorEx_ { false };
-napi_env JsPointerContext::env_ = nullptr;
 
 JsPointerContext::JsPointerContext() : env_(env), mgr_(std::make_shared<JsPointerManager>()) {}
 
