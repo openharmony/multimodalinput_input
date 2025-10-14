@@ -49,6 +49,7 @@ const char* NEED_SHOW_DIALOG = "1";
 const char* SMART_KEY_IS_OPEN = "1";
 const char* SMART_KEY_IS_CLOSE = "0";
 constexpr int32_t IS_SHOW_DIALOG = 1;
+constexpr int32_t NON_FINGER { 0 };
 }
 FingerprintEventProcessor::FingerprintEventProcessor()
 {}
@@ -124,10 +125,15 @@ void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             screenState_ = true;
+            fingerDown_++;
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            screenState_ = false;
+            fingerDown_--;
+            if (fingerDown_ <= NON_FINGER) {
+                screenState_ = false;
+                fingerDown_ = NON_FINGER;
+            }
             break;
         }
         default: {
