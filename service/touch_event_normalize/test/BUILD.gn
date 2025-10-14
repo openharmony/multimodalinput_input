@@ -256,6 +256,7 @@ ohos_unittest("GestureTransformTest") {
   }
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
