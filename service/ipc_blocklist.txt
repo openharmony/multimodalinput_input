@@ -23,4 +23,3 @@ src:*foundation/multimodalinput/input/service/event_dump/test/*
 src:*foundation/multimodalinput/input/service/crown_transform_processor/test/*
 src:*foundation/multimodalinput/input/service/mouse_event_normalize/test/*
 src:*foundation/multimodalinput/input/service/key_event_normalize/test/*
-src:*foundation/multimodalinput/input/service/device_manager/test/*
