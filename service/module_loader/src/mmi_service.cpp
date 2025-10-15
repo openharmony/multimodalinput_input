@@ -5067,7 +5067,8 @@ ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
     CALL_INFO_TRACE;
     int32_t callingUid = GetCallingUid();
     int32_t gameUid = 7011;
-    if (callingUid != gameUid || !PER_HELPER->VerifySystemApp()) {
+    int32_t ussUid = 6699;
+    if ((callingUid != gameUid && callingUid != ussUid) || !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
