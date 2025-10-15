@@ -47,6 +47,7 @@ private:
     int32_t ParseBundleNameMap(const JsonParser &jsonParser);
     int32_t ParseBundleNameItem(const cJSON *json, BundleNameItem &bundleNameItem);
     void PrintBundleNames();
+    int32_t InitializeImpl();
  
 private:
     std::map<std::string, std::string> bundleNames_;
