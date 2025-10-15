@@ -40,10 +40,18 @@ BundleNameParser& BundleNameParser::GetInstance()
 
 int32_t BundleNameParser::Init()
 {
+    CALL_DEBUG_ENTER;
+    static std::once_flag init_flag;
+    static int32_t initRes = RET_ERR;
+    std::call_once(init_flag, [this]() {
+        initRes = InitializeImpl();
+    });
+    return initRes;
+}
+
+int32_t BundleNameParser::InitializeImpl()
+{
     CALL_INFO_TRACE;
-    if (isInitialized_.load()) {
-        return RET_OK;
-    }
     std::string jsonStr = ReadJsonFile(std::string(bundleNameConfigDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read bundleName failed");
@@ -59,7 +67,6 @@ int32_t BundleNameParser::Init()
         return RET_ERR;
     }
     PrintBundleNames();
-    isInitialized_.store(true);
     return RET_OK;
 }
 

@@ -44,6 +44,7 @@ private:
     int32_t ParseSensorSaListenerProduct(const JsonParser &jsonParser);
     inline int32_t InsertToMiscProductTypes(const std::string &key, const std::vector<std::string> &value);
     void PrintMiscProductTypes();
+    int32_t InitializeImpl();
  
 private:
     std::map<std::string, std::vector<std::string>> miscProductTypes_;
