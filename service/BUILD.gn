@@ -3336,14 +3336,6 @@ ohos_unittest("DeviceManagerExTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = true
-    blocklist = "./ipc_blocklist.txt"
-  }
-
   sources = [
     "device_manager/src/input_device_manager.cpp",
     "device_manager/test/input_device_manager_ex_test.cpp",
@@ -3351,7 +3343,6 @@ ohos_unittest("DeviceManagerExTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/cursor_drawing_component_mock:cursor_drawing_component_mock",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
