@@ -59,10 +59,10 @@ bool HardwareCursorPointerManager::IsSupported()
     }
     if (!isEnable_) {
         std::function<void (void *)> callbackFunc = [](void *) {
-            MMI_HILOGW("Get Display Composer Interface XCollie: pid:%{public}s, tid:%{public}s",
+            MMI_HILOGW("IsSupported timeout, Get DisplayComposerInterface XCollie: pid:%{public}s, tid:%{public}s",
                 std::to_string(getpid()).c_str(), std::to_string(gettid()).c_str());
         };
-        int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("multimodalinput: GET_DISPLAY_COMPOSER_INTERFACE",
+        int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("multimodalinput: HardCursor IsSupported timer",
             GET_POWER_INTERFACE_TIMER_SPAN_S, callbackFunc, nullptr, HiviewDFX::XCOLLIE_FLAG_DEFAULT);
         auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
         HiviewDFX::XCollie::GetInstance().CancelTimer(id);
@@ -99,10 +99,10 @@ int32_t HardwareCursorPointerManager::SetPosition(uint32_t devId, int32_t x, int
         MMI_HILOGE("UpdateHardwareCursor failed, attempting to reinitialize interface");
         {
             std::function<void (void *)> callbackFunc = [](void *) {
-                MMI_HILOGW("Get Display Composer Interface XCollie: pid:%{public}s, tid:%{public}s",
+                MMI_HILOGW("SetPosition timeout, Get DisplayComposerInterface XCollie: pid:%{public}s, tid:%{public}s",
                     std::to_string(getpid()).c_str(), std::to_string(gettid()).c_str());
             };
-            int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("multimodalinput: GET_DISPLAY_COMPOSER_INTERFACE",
+            int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("multimodalinput: HardCursor SetPosition timer",
                 GET_POWER_INTERFACE_TIMER_SPAN_S, callbackFunc, nullptr, HiviewDFX::XCOLLIE_FLAG_DEFAULT);
             auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
             HiviewDFX::XCollie::GetInstance().CancelTimer(id);
