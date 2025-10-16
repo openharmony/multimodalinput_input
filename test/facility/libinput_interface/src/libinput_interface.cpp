@@ -382,11 +382,17 @@ const char* libinput_device_get_uniq(struct libinput_device* device)
 
 const char* libinput_device_get_sysname(struct libinput_device *device)
 {
+    if (g_instance == nullptr) {
+        return nullptr;
+    }
     return g_instance->DeviceGetSysname(device);
 }
 
 struct udev_device* libinput_device_get_udev_device(struct libinput_device *device)
 {
+    if (g_instance == nullptr) {
+        return nullptr;
+    }
     return g_instance->DeviceGetUdevDevice(device);
 }
 
