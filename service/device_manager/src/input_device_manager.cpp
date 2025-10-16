@@ -129,7 +129,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId
 
 void InputDeviceManager::FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPV(inputDevice);
     CHKPV(deviceOrigin);
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(deviceOrigin)));
@@ -149,12 +149,12 @@ void InputDeviceManager::FillInputDevice(std::shared_ptr<InputDevice> inputDevic
             inputDevice->AddCapability(second);
         }
     }
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
@@ -164,7 +164,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
         ids.push_back(item.first);
     }
     return ids;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke)
@@ -190,7 +190,7 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
 
 bool InputDeviceManager::IsMatchKeys(struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(device);
     for (const auto &key : keyCodes) {
         int32_t value = InputTransformationKeyValue(key);
@@ -199,7 +199,7 @@ bool InputDeviceManager::IsMatchKeys(struct libinput_device *device, const std::
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType)
@@ -321,53 +321,53 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.isPointerDevice) {
             return true;
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::HasVirtualPointerDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsPointerDevice(it->second)) {
             return true;
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 bool InputDeviceManager::HasVirtualKeyboardDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     for (auto it = virtualInputDevices_.begin(); it != virtualInputDevices_.end(); ++it) {
         if (IsKeyboardDevice(it->second)) {
             return true;
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsVirtualKeyboardDeviceEverConnected()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     return virtualKeyboardEverConnected_;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
 bool InputDeviceManager::HasTouchDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.isTouchableDevice) {
@@ -375,12 +375,12 @@ bool InputDeviceManager::HasTouchDevice()
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 std::string InputDeviceManager::GetInputIdentification(struct libinput_device *inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     int32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
     int32_t deviceProduct = libinput_device_get_id_product(inputDevice);
@@ -402,7 +402,7 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device *i
     std::string deviceIdentification = sysPath.substr(0, sysPath.find(vendorProduct)) + vendorProduct;
     MMI_HILOGI("Device identification is:%{public}s", deviceIdentification.c_str());
     return deviceIdentification;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice)
@@ -430,7 +430,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
 
 int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     std::regex pattern("^event(\\d+)$");
     std::smatch mr;
@@ -448,12 +448,12 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER, errStr);
 #endif
     return RET_ERR;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     if (CheckDuplicateInputDevice(inputDevice)) {
@@ -488,12 +488,12 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device added successfully");
 #endif
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo &info)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     info.inputDeviceOrigin = inputDevice;
     info.isRemote = IsRemote(inputDevice);
     info.enable = info.isRemote ? false : true;
@@ -503,12 +503,12 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
 #ifndef OHOS_BUILD_ENABLE_WATCH
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
 #endif // OHOS_BUILD_ENABLE_WATCH
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
@@ -538,13 +538,13 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         DfxHisyseventDevice::ReportDeviceFault(DfxHisyseventDevice::DeviceFaultType::DEVICE_FAULT_TYPE_INNER,
                                                "Device reomved failed becaused of not found");
 #endif
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
     }
 }
 
 void InputDeviceManager::ScanPointerDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     bool existEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     // parse virtual devices for pointer devices.
@@ -561,12 +561,12 @@ void InputDeviceManager::ScanPointerDevice()
             CursorDrawingComponent::GetInstance().UnLoad();
         }
     }
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
@@ -576,50 +576,50 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
     }
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
             EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsKeyboardDevice(struct libinput_device *device) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsTouchDevice(struct libinput_device *device) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(device);
     return libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_TOUCH);
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsTouchPadDevice(struct libinput_device *device) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     return udevTags & EVDEV_UDEV_TAG_TOUCHPAD;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     observers_.push_back(observer);
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     observers_.remove(observer);
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug)
@@ -633,7 +633,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisib
 
 int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device *inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto &item : inputDevice_) {
@@ -644,12 +644,12 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device *inputDevic
     }
     MMI_HILOGE("Find input device id failed");
     return INVALID_DEVICE_ID;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 struct libinput_device *InputDeviceManager::GetKeyboardDevice() const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     std::vector<int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
@@ -663,12 +663,12 @@ struct libinput_device *InputDeviceManager::GetKeyboardDevice() const
     }
     MMI_HILOGW("No keyboard device is currently available");
     return nullptr;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     std::vector<int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
@@ -680,7 +680,7 @@ void InputDeviceManager::GetMultiKeyboardDevice(std::vector<struct libinput_devi
             inputDevice.push_back(device);
         }
     }
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -731,7 +731,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 
 bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(inputDevice);
     bool isRemote = false;
     const char *name = libinput_device_get_name(inputDevice);
@@ -746,7 +746,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
     }
     MMI_HILOGD("The isRemote:%{public}s", isRemote ? "true" : "false");
     return isRemote;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsRemote(int32_t id) const
@@ -805,7 +805,7 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
 
 int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     CHKPR(device, RET_ERR);
     if (CheckDuplicateInputDevice(device)) {
@@ -843,12 +843,12 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
 #endif
     return RET_OK;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::CheckDuplicateInputDevice(struct libinput_device *inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(inputDevice);
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
@@ -862,12 +862,12 @@ bool InputDeviceManager::CheckDuplicateInputDevice(struct libinput_device *input
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::CheckDuplicateInputDevice(std::shared_ptr<InputDevice> inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(inputDevice);
     for (const auto &item: virtualInputDevices_) {
         CHKPC(item.second);
@@ -877,7 +877,7 @@ bool InputDeviceManager::CheckDuplicateInputDevice(std::shared_ptr<InputDevice> 
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const struct InputDeviceInfo& info)
@@ -887,19 +887,19 @@ void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const str
 
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     virtualInputDevices_[deviceId] = inputDevice;
     if (IsKeyboardDevice(inputDevice)) {
         // mark true if vkbd has ever connected before; (does not set to false during disconnection)
         virtualKeyboardEverConnected_ = true;
     }
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::RemovePhysicalInputDeviceInner(
     struct libinput_device *inputDevice, int32_t &deviceId, bool &enable)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPV(inputDevice);
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin == inputDevice) {
@@ -914,7 +914,7 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
             break;
         }
     }
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputDeviceManager::RemoveVirtualInputDeviceInner(int32_t deviceId, struct InputDeviceInfo& info)
@@ -935,7 +935,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDeviceInner(int32_t deviceId, stru
 
 bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     for (const auto &item : inputDevice_) {
         if ((!item.second.isRemote && item.second.isPointerDevice) ||
             (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
@@ -945,7 +945,7 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
         }
     }
     return false;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::NotifyAddDeviceListeners(int32_t deviceId)
@@ -966,7 +966,7 @@ void InputDeviceManager::NotifyRemoveDeviceListeners(int32_t deviceId)
 
 void InputDeviceManager::PointerDeviceInit()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     MMI_HILOGI("start");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!CursorDrawingComponent::GetInstance().Init()) {
@@ -994,7 +994,7 @@ void InputDeviceManager::PointerDeviceInit()
     POINTER_DEV_MGR.isFirstAdddistributedKVDataService = false;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     POINTER_DEV_MGR.isInit = true;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice,
@@ -1057,7 +1057,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 
 int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     CHKPR(device, ERROR_NULL_POINTER);
     deviceInfo = {
@@ -1067,7 +1067,7 @@ int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> d
         .enable = true,
     };
     return RET_OK;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
@@ -1124,7 +1124,7 @@ int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std
 
 void InputDeviceManager::InitSessionLostCallback()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     if (sessionLostCallbackInitialized_) {
         MMI_HILOGD("Init session is failed");
         return;
@@ -1137,7 +1137,7 @@ void InputDeviceManager::InitSessionLostCallback()
     );
     sessionLostCallbackInitialized_ = true;
     MMI_HILOGI("The callback on session deleted is registered successfully");
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void InputDeviceManager::OnSessionLost(SessionPtr session)
@@ -1149,7 +1149,7 @@ void InputDeviceManager::OnSessionLost(SessionPtr session)
 
 std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
@@ -1163,12 +1163,12 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
         }
     }
     return ids;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 std::vector<libinput_device*> InputDeviceManager::GetTouchPadDeviceOrigins()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     std::vector<libinput_device*> touchPadDevices;
     for (const auto &item : inputDevice_) {
@@ -1183,31 +1183,31 @@ std::vector<libinput_device*> InputDeviceManager::GetTouchPadDeviceOrigins()
         }
     }
     return touchPadDevices;
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(inputDevice);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(inputDevice);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPF(inputDevice);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputDeviceManager::NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result)
@@ -1289,7 +1289,7 @@ bool InputDeviceManager::IsLocalDevice(int32_t deviceId)
 void InputDeviceManager::FillInputDeviceWithVirtualCapability(
     std::shared_ptr<InputDevice> inputDevice, const InputDeviceInfo &deviceInfo) const
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     CHKPV(inputDevice);
     if (!deviceInfo.isTouchableDevice) {
         // not adding capability from virtual devices for devices other than the touch screen.
@@ -1304,7 +1304,7 @@ void InputDeviceManager::FillInputDeviceWithVirtualCapability(
             MMI_HILOGD("add virtual trackpad capability for touchscreen dev");
         }
     }
-    // LOCV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 int32_t InputDeviceManager::GetTouchscreenKeyboardType(const InputDeviceInfo &deviceInfo, int32_t &keyboardType)
