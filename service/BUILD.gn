@@ -94,7 +94,9 @@ config("libmmi_server_config") {
     "${mmi_path}/util/json_parser/include",
     "${mmi_service_path}/product_property_config/include",
     "${mmi_service_path}/custom_config_parser/include",
-
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   if (input_feature_product != "watch") {
@@ -232,6 +234,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "graphic_2d:librender_service_client",
     "graphic_surface:surface",
     "hisysevent:libhisysevent",
+    "hicollie:libhicollie",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "libinput:libinput-third-mmi",
@@ -911,6 +914,9 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/subscriber/test/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   if (input_ext_feature_anco) {
@@ -1736,6 +1742,9 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
     "window_manager/test",
   ]
 
@@ -2503,6 +2512,9 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/test/unittest/common/include",
     "joystick/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   configs = [
@@ -2853,6 +2865,9 @@ ohos_unittest("InputEventHandlerTest") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/facility/mock/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   if (input_feature_joystick) {
@@ -3304,6 +3319,9 @@ ohos_unittest("DeviceManagerExTest") {
     "window_manager/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
 
   configs = [
@@ -4141,9 +4159,11 @@ ohos_unittest("KeyEventHookManagerTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
-    "${mmi_path}/service/event_hook/include",
     "${mmi_path}/test/facility/mock/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
  
   if (input_feature_joystick) {
@@ -4204,6 +4224,9 @@ ohos_unittest("EventExpirationCheckerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/test/facility/mock/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/event_hook/include",
+    "${mmi_path}/service/event_hook/include/hook",
+    "${mmi_path}/service/event_hook/include/checker",
   ]
  
   sources = [ "event_hook/test/event_expiration_checker_test.cpp" ]

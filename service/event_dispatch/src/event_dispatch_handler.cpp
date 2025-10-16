@@ -23,6 +23,7 @@
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_event_hook_manager.h"
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_manager.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK

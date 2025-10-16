@@ -177,6 +177,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #else
                 mprintf(fd, "Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+                auto hookMgr = InputHandler->GetInputEventHook();
+                CHKPV(hookMgr);
+                hookMgr->Dump(fd, args);
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
                 KEY_EVENT_HOOK_MGR.Dump(fd, args);
 #else

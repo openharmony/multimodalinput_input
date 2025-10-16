@@ -335,9 +335,6 @@ private:
     void SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent);
     bool CheckBundleName(const std::shared_ptr<PointerEvent> touchEvent);
     void OnKunckleSwitchStatusChange(const std::string switchName);
-    void SendSaveEvent(std::shared_ptr<KeyEvent> keyEvent);
-    bool MenuClickHandle(std::shared_ptr<KeyEvent> event);
-    void MenuClickProcess(const std::string bundleName, const std::string abilityName, const std::string action);
     int32_t CheckTwoFingerGesture(int32_t pid);
     bool HasScreenCapturePermission(uint32_t permissionType);
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
@@ -424,8 +421,6 @@ private:
     int64_t sosLaunchTime_ { -1 };
     int64_t powerUpTime_ { 0 };
     int32_t currentUserId_ { -1 };
-    int32_t menuPressedTimerId_ { -1 };
-    std::shared_ptr<KeyEvent> tmpkeyEvent_ {nullptr};
     bool gameForbidFingerKnuckle_ { false };
     bool hasRegisteredSensor_ { false };
     uint32_t screenCapturePermission_ { ScreenCapturePermissionType::DEFAULT_PERMISSIONS };

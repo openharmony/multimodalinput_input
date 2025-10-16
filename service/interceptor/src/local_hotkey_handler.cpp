@@ -60,10 +60,6 @@ bool LocalHotKey::operator<(const LocalHotKey &other) const
 
 static bool ReadHotKeyCode(int32_t index, cJSON *jsonHotKey, int32_t &keyCode)
 {
-    if (!cJSON_IsObject(jsonHotKey)) {
-        MMI_HILOGE("The jsonHotKey is not object");
-        return false;
-    }
     cJSON *jsonKeyCode = cJSON_GetObjectItemCaseSensitive(jsonHotKey, "KEYCODE");
     if (jsonKeyCode == nullptr) {
         MMI_HILOGE("The 'LOCAL_HOT_KEYS[%{public}d].KEYCODE' is missing", index);
@@ -111,10 +107,6 @@ static bool ReadModifiers(int32_t index, cJSON *jsonHotKey, const std::map<std::
         { "NONE", ModifierKeyAction::NONE },
     };
     for (const auto &[name, modifierBit] : names) {
-        if (!cJSON_IsObject(jsonModifiers)) {
-            MMI_HILOGE("The jsonModifiers is not object");
-            return false;
-        }
         cJSON *jsonModifier = cJSON_GetObjectItemCaseSensitive(jsonModifiers, name.c_str());
         if (jsonModifier == nullptr) {
             MMI_HILOGW("The 'LOCAL_HOT_KEYS[%{public}d].MODIFIERS.%{public}s' is missing", index, name.c_str());
@@ -175,10 +167,6 @@ static bool ReadHotKeyModifiers(int32_t index, cJSON *jsonHotKey, std::set<uint3
 
 static bool ReadHotKeyAction(int32_t index, cJSON *jsonHotKey, LocalHotKeyAction &hotKeyAction)
 {
-    if (!cJSON_IsObject(jsonHotKey)) {
-        MMI_HILOGE("The jsonHotKey is not object");
-        return false;
-    }
     cJSON *jsonAction = cJSON_GetObjectItemCaseSensitive(jsonHotKey, "ACTION");
     if (jsonAction == nullptr) {
         MMI_HILOGE("The 'LOCAL_HOT_KEYS[%{public}d].ACTION' is missing", index);
@@ -318,23 +306,23 @@ void LocalHotKeySteward::LoadLocalHotKeys()
     }
 }
 
-static bool ReadSystemLocalHotKeys(const std::string &paramName, std::string &paramValue)
+static void ReadSystemLocalHotKeys(const std::string &paramName, std::string &paramValue)
 {
     uint32_t size = 0;
     auto ret = ::SystemReadParam(paramName.c_str(), nullptr, &size);
     if (ret != 0) {
         MMI_HILOGE("SystemReadParam fail, error: %{public}d", ret);
-        return false;
+        return;
     }
     std::vector<char> value(size + 1);
     ret = ::SystemReadParam(paramName.c_str(), value.data(), &size);
     if (ret != 0) {
-        MMI_HILOGE("SystemReadParam fail, error: %{public}d", ret);
-        return false;
+        MMI_HILOGW("Use default due to SystemReadParam failure, error: %{public}d", ret);
+        paramValue = DEFAULT_KEYEVENT_INTERCEPT_WHITELIST;
+    } else {
+        paramValue = std::string(value.data());
     }
-    paramValue = std::string(value.data());
-    MMI_HILOGD("System white list of no interception: %{public}s", paramValue.c_str());
-    return true;
+    MMI_HILOGD("System white list of no interception: %{private}s", paramValue.c_str());
 }
 
 static void ParseSystemLocalHotKeys(const std::string &paramValue, std::set<int32_t> &systemHotKeys)
@@ -366,9 +354,7 @@ void LocalHotKeySteward::LoadSystemLocalHotKeys()
     std::string paramName { "const.multimodalinput.keyevent_intercept_whitelist" };
     std::string paramValue {};
 
-    if (!ReadSystemLocalHotKeys(paramName, paramValue)) {
-        paramValue = DEFAULT_KEYEVENT_INTERCEPT_WHITELIST;
-    }
+    ReadSystemLocalHotKeys(paramName, paramValue);
     {
         std::unique_lock<std::shared_mutex> lock(mutex_);
         ParseSystemLocalHotKeys(paramValue, systemHotKeys_);

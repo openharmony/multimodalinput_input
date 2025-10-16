@@ -30,6 +30,7 @@
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#include "input_event_hook_handler.h"
 #include "long_press_event_subscribe_manager.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -2959,6 +2960,10 @@ int32_t InputManagerImpl::AddKeyEventHook(std::function<void(std::shared_ptr<Key
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 }
 
+int32_t InputManagerImpl::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetKeyStatusRecord(enable, timeout);
+}
 int32_t InputManagerImpl::RemoveKeyEventHook(int32_t keyEventHookId)
 {
     CALL_INFO_TRACE;
@@ -3001,6 +3006,75 @@ int32_t InputManagerImpl::SetHookIdUpdater(std::function<void(int32_t)> callback
 int32_t InputManagerImpl::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->GetExternalObject(pluginName, pluginRemoteStub);
+}
+
+int32_t InputManagerImpl::AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer, HookEventType hookEventType)
+{
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+    return INPUT_EVENT_HOOK_HANDLER.AddInputEventHook(consumer, hookEventType);
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+}
+
+int32_t InputManagerImpl::RemoveInputEventHook(HookEventType hookEventType)
+{
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+    return INPUT_EVENT_HOOK_HANDLER.RemoveInputEventHook(hookEventType);
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+}
+
+int32_t InputManagerImpl::DispatchToNextHandler(int32_t eventId, HookEventType hookEventType)
+{
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+    return INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(eventId, hookEventType);
+#else
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+}
+
+int32_t InputManagerImpl::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetCurrentCursorInfo(visible, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the current cursor info failed, ret: %{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetUserDefinedCursorPixelMap(pixelMapPtr);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the user defined cursor pixelMap failed, ret: %{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+bool InputManagerImpl::IsPointerInit()
+{
+    CALL_DEBUG_ENTER;
+    bool isInit = false;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->IsPointerInit(isInit);
+    if (ret != 0) {
+        MMI_HILOGE("Get pointer init status failed, ret:%{public}d", ret);
+        return false;
+    }
+    return isInit;
 }
 } // namespace MMI
 } // namespace OHOS

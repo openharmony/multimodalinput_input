@@ -2305,6 +2305,51 @@ HWTEST_F(InputManagerImplTest, DispatchToNextHandler_001, TestSize.Level1)
     int32_t ret = inputManagerImpl.DispatchToNextHandler(eventId);
     EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
 }
+
+/**
+ * @tc.name: GetCurrentCursorInfo_001
+ * @tc.desc: Test GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, GetCurrentCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    bool visible;
+    PointerStyle pointerStyle;
+    int32_t ret = inputManagerImpl.GetCurrentCursorInfo(visible, pointerStyle);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: GetUserDefinedCursorPixelMap_001
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, GetUserDefinedCursorPixelMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    int32_t ret = inputManagerImpl.GetUserDefinedCursorPixelMap(nullptr);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: GetUserDefinedCursorPixelMap_002
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, GetUserDefinedCursorPixelMap_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr;
+    int32_t ret = inputManagerImpl.GetUserDefinedCursorPixelMap(&pixelMapPtr);
+    EXPECT_NE(ret, RET_OK);
+}
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 } // namespace MMI
 } // namespace OHOS

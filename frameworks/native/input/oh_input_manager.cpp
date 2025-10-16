@@ -32,9 +32,10 @@
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "screen_capture_monitor.h"
 #include "ipc_skeleton.h"
+#endif // PLAYER_FRAMEWORK_EXISTS
 #include "pixel_map.h"
 #include "image/pixelmap_native.h"
-#endif // PLAYER_FRAMEWORK_EXISTS
+#include "pixelmap_native_impl.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManager"
@@ -54,6 +55,13 @@ struct Input_KeyEvent {
     int32_t displayId { -1 };
 };
 
+struct Input_CursorInfo {
+    bool visible { true };
+    Input_PointerStyle style;
+    int32_t sizeLevel { 0 };
+    uint32_t color { 0 };
+};
+
 struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
@@ -66,6 +74,7 @@ struct Input_MouseEvent {
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
+    Input_CursorInfo cursorInfo;
 };
 
 struct Input_TouchEvent {
@@ -174,6 +183,7 @@ static int32_t g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
 static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
 static std::atomic_int32_t g_keyEventHookId = INVALID_INTERCEPTOR_ID;
 static int32_t UNKNOWN_MAX_TOUCH_POINTS { -1 };
+static int32_t NOT_ENABLE_POINTER { -2 };
 
 static const std::vector<int32_t> g_pressKeyCodes = {
     OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
@@ -1590,6 +1600,15 @@ static bool SetMouseEventButton(Input_MouseEvent* mouseEvent, int32_t button)
     return true;
 }
 
+void SetCursorInfo(OHOS::MMI::PointerEvent::PointerItem& item, Input_MouseEvent* mouseEvent)
+{
+    CHKPV(mouseEvent);
+    mouseEvent->cursorInfo.style = static_cast<Input_PointerStyle>(item.GetStyle());
+    mouseEvent->cursorInfo.sizeLevel = item.GetSizeLevel();
+    mouseEvent->cursorInfo.color = item.GetColor();
+    mouseEvent->cursorInfo.visible = item.GetVisible();
+}
+
 static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
 {
     CHKPV(event);
@@ -1616,6 +1635,7 @@ static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     mouseEvent->actionTime = event->GetActionTime();
     mouseEvent->windowId = event->GetTargetWindowId();
     mouseEvent->displayId = event->GetTargetDisplayId();
+    SetCursorInfo(item, mouseEvent);
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_mouseMonitorCallbacks) {
         callback(mouseEvent);
@@ -2008,6 +2028,7 @@ static void MouseEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     mouseEvent->actionTime = event->GetActionTime();
     mouseEvent->windowId = event->GetTargetWindowId();
     mouseEvent->displayId = event->GetTargetDisplayId();
+    SetCursorInfo(item, mouseEvent);
     g_pointerInterceptorCallback->mouseCallback(mouseEvent);
     OH_Input_DestroyMouseEvent(&mouseEvent);
 }
@@ -3466,6 +3487,121 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     if (ret != RET_OK) {
         MMI_HILOGE("SetCustomCursor fail, error:%{public}d", ret);
         return ret == OHOS::MMI::ERROR_UNSUPPORT ? INPUT_DEVICE_NOT_SUPPORTED : INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+struct Input_CursorInfo* OH_Input_CursorInfo_Create()
+{
+    CALL_DEBUG_ENTER;
+    Input_CursorInfo* cursorInfo = new (std::nothrow) Input_CursorInfo();
+    CHKPL(cursorInfo);
+    return cursorInfo;
+}
+
+void OH_Input_CursorInfo_Destroy(Input_CursorInfo** cursorInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cursorInfo);
+    CHKPV(*cursorInfo);
+    delete *cursorInfo;
+    *cursorInfo = nullptr;
+}
+
+Input_Result OH_Input_CursorInfo_IsVisible(Input_CursorInfo* cursorInfo, bool* visible)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(visible, INPUT_PARAMETER_ERROR);
+    *visible = cursorInfo->visible;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_CursorInfo_GetStyle(Input_CursorInfo* cursorInfo, Input_PointerStyle* style)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(style, INPUT_PARAMETER_ERROR);
+    if (!cursorInfo->visible) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    *style = cursorInfo->style;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_CursorInfo_GetSizeLevel(Input_CursorInfo* cursorInfo, int32_t* sizeLevel)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(sizeLevel, INPUT_PARAMETER_ERROR);
+    if (!cursorInfo->visible) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    *sizeLevel = cursorInfo->sizeLevel;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_CursorInfo_GetColor(Input_CursorInfo* cursorInfo, uint32_t* cursorColor)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(cursorColor, INPUT_PARAMETER_ERROR);
+    if (!cursorInfo->visible) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    *cursorColor = cursorInfo->color;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetMouseEventCursorInfo(const struct Input_MouseEvent* mouseEvent, Input_CursorInfo* cursorInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(mouseEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
+    *cursorInfo = mouseEvent->cursorInfo;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetCursorInfo(Input_CursorInfo* cursorInfo, OH_PixelmapNative** pixelmap)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(cursorInfo, INPUT_PARAMETER_ERROR);
+    Input_CursorInfo info;
+    bool visible = false;
+    OHOS::MMI::PointerStyle pointerStyle;
+
+    auto result = OHOS::MMI::InputManager::GetInstance()->GetCurrentCursorInfo(visible, pointerStyle);
+    if (result == NOT_ENABLE_POINTER) {
+        info.visible = false;
+        *cursorInfo = info;
+        return INPUT_SUCCESS;
+    }
+    if (result != RET_OK) {
+        MMI_HILOGE("GetCurrentCursorInfo failed, error: %{public}d", result);
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    info.visible = visible;
+    if (!visible) {
+        *cursorInfo = info;
+        return INPUT_SUCCESS;
+    }
+    info.style = static_cast<Input_PointerStyle>(pointerStyle.id);
+    info.sizeLevel = pointerStyle.size;
+    info.color = pointerStyle.color;
+    *cursorInfo = info;
+    CHKPR(pixelmap, INPUT_SUCCESS);
+    if (info.style == DEVELOPER_DEFINED_ICON) {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr;
+        result = OHOS::MMI::InputManager::GetInstance()->GetUserDefinedCursorPixelMap(&pixelMapPtr);
+        if (result != RET_OK) {
+            MMI_HILOGE("GetUserDefinedCursorPixelMap failed, error: %{public}d", result);
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        OH_PixelmapNative_Release(*pixelmap);
+        OH_PixelmapNative_Destroy(pixelmap);
+        OH_PixelmapNative* pixelmapNative = new (std::nothrow) OH_PixelmapNative(pixelMapPtr);
+        CHKPR(pixelmapNative, INPUT_SERVICE_EXCEPTION);
+        *pixelmap = pixelmapNative;
     }
     return INPUT_SUCCESS;
 }

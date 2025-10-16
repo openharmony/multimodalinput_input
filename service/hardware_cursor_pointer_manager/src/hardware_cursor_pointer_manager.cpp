@@ -14,6 +14,7 @@
  */
 
 #include "hardware_cursor_pointer_manager.h"
+#include "xcollie/xcollie.h"
 
 #include <thread>
 
@@ -26,6 +27,8 @@
 
 namespace OHOS {
 namespace MMI {
+constexpr int32_t GET_POWER_INTERFACE_TIMER_SPAN_S { 5 };
+
 void HardwareCursorPointerManager::SetTargetDevice(uint32_t devId)
 {
     if (static_cast<int32_t>(devId) < 0) {
@@ -55,7 +58,14 @@ bool HardwareCursorPointerManager::IsSupported()
         return false;
     }
     if (!isEnable_) {
+        std::function<void (void *)> callbackFunc = [](void *) {
+            MMI_HILOGW("IsSupported timeout, Get DisplayComposerInterface XCollie: pid:%{public}s, tid:%{public}s",
+                std::to_string(getpid()).c_str(), std::to_string(gettid()).c_str());
+        };
+        int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("multimodalinput: HardCursor IsSupported timer",
+            GET_POWER_INTERFACE_TIMER_SPAN_S, callbackFunc, nullptr, HiviewDFX::XCOLLIE_FLAG_DEFAULT);
         auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
+        HiviewDFX::XCollie::GetInstance().CancelTimer(id);
         std::lock_guard<std::mutex> guard(mtx_);
         powerInterface_ = DisplayComposer;
         CHKPF(powerInterface_);
@@ -88,7 +98,14 @@ int32_t HardwareCursorPointerManager::SetPosition(uint32_t devId, int32_t x, int
     if (powerInterface->UpdateHardwareCursor(devId, x, y, buffer) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("UpdateHardwareCursor failed, attempting to reinitialize interface");
         {
+            std::function<void (void *)> callbackFunc = [](void *) {
+                MMI_HILOGW("SetPosition timeout, Get DisplayComposerInterface XCollie: pid:%{public}s, tid:%{public}s",
+                    std::to_string(getpid()).c_str(), std::to_string(gettid()).c_str());
+            };
+            int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer("multimodalinput: HardCursor SetPosition timer",
+                GET_POWER_INTERFACE_TIMER_SPAN_S, callbackFunc, nullptr, HiviewDFX::XCOLLIE_FLAG_DEFAULT);
             auto DisplayComposer = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
+            HiviewDFX::XCollie::GetInstance().CancelTimer(id);
             std::lock_guard<std::mutex> guard(mtx_);
             powerInterface_ = DisplayComposer;
         }

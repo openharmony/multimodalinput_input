@@ -22,6 +22,8 @@
 
 namespace OHOS {
 namespace MMI {
+constexpr int32_t NORMAL_CALL { 0 };
+constexpr int32_t VOIP_CALL { 1 };
 const char* SOS_PAGE_CHANGE_EVENTS = "emergencycommunication.event.SOS_EMERGENCY_CALL_ABILITY_PAGE_CHANGE";
 const char* VOIP_CALL_CHANGE_EVENTS = "usual.event.VOIP_CALL_STATE_CHANGED";
 DeviceEventMonitor::DeviceEventMonitor() {}
@@ -95,6 +97,7 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    callType_ = NORMAL_CALL;
     if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
         int32_t state = eventData.GetWant().GetIntParam("state", -1);
         if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
@@ -121,6 +124,7 @@ void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &event
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(stateMutex_);
+    callType_ = VOIP_CALL;
     if (eventData.GetWant().GetIntParam("slotId", -1) != -1) {
         int32_t state = eventData.GetWant().GetIntParam("state", -1);
         if (hasHandleRingMute_ && (state == CALL_STATUS_INCOMING || state == CALL_STATUS_DISCONNECTED)) {
@@ -142,6 +146,14 @@ void DeviceEventMonitor::SetVoipCallState(const EventFwk::CommonEventData &event
         CHKPV(subscriberHandler);
         subscriberHandler->ResetSkipPowerKeyUpFlag();
     }
+}
+
+int32_t DeviceEventMonitor::GetCallType()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(stateMutex_);
+    MMI_HILOGI("The callState:%{public}d", callType_);
+    return callType_;
 }
 
 int32_t DeviceEventMonitor::GetCallState()

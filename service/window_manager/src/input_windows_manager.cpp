@@ -847,6 +847,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
+        SimulateKeyEventIfNeeded(keyEvent);
         return secSubWindows;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1583,6 +1584,16 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 bool InputWindowsManager::IsPointerActiveRectValid(const OLD::DisplayInfo &currentDisplay)
 {
     return currentDisplay.pointerActiveWidth > 0 && currentDisplay.pointerActiveHeight > 0;
+}
+
+bool InputWindowsManager::IsKeyEventFromVKeyboard(std::shared_ptr<KeyEvent> keyEvent)
+{
+    auto device = INPUT_DEV_MGR->GetInputDevice(keyEvent->GetDeviceId());
+    if (device == nullptr) {
+        MMI_HILOGE("Failed to get inputDevice by deviceId: %{public}d", keyEvent->GetDeviceId());
+        return false;
+    }
+    return PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC && device->GetName() == "input_mt_wrapper";
 }
 
 bool InputWindowsManager::IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const {
@@ -4389,6 +4400,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
+    pointerItem.SetColor(static_cast<uint32_t>(CursorDrawingComponent::GetInstance().GetPointerColor()));
+    pointerItem.SetSizeLevel(CursorDrawingComponent::GetInstance().GetPointerSize());
+    auto visible = CursorDrawingComponent::GetInstance().IsPointerVisible() &&
+        CursorDrawingComponent::GetInstance().GetMouseDisplayState();
+    pointerItem.SetVisible(visible);
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     int32_t physicalX = pointerItem.GetDisplayX();
@@ -4440,6 +4456,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                         physicalX, physicalY);
                 }
             }
+            pointerItem.SetStyle(lastPointerStyle_.id);
             MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
@@ -4594,6 +4611,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #endif
         CursorDrawingComponent::GetInstance().DrawPointer(physicalDisplayInfo->rsId, physicalX, physicalY,
             dragPointerStyle_, direction);
+        pointerItem.SetStyle(dragPointerStyle_.id);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -5643,8 +5661,7 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
     for (auto iter = windowIds.begin(); iter != windowIds.end();) {
         int32_t windowId = *iter;
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
-        CHKCC(windowInfo);
-        if (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL) {
+        if (windowInfo && (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL)) {
             iter = windowIds.erase(iter);
         } else {
             ++iter;
@@ -7197,6 +7214,27 @@ void InputWindowsManager::CleanInvalidPiexMap(int32_t groupId)
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
+
+void InputWindowsManager::SimulateKeyEventIfNeeded(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+        (!INPUT_DEV_MGR->IsLocalDevice(keyEvent->GetDeviceId()) ||
+            !keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))) {
+        SimulateKeyExt(keyEvent);
+    } else {
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        // if key event is created by fold pc vkeyboard, should simulate to Anco
+        if (IsKeyEventFromVKeyboard(keyEvent)) {
+            SimulateKeyExt(keyEvent);
+        } else {
+            MMI_HILOG_DISPATCHW("The accessibility scenarios do not injecting keyevents into the anco");
+        }
+#else
+        MMI_HILOG_DISPATCHW("The accessibility scenarios do not injecting keyevents into the anco");
+#endif  // OHOS_BUILD_ENABLE_VKEYBOARD
+    }
+}
+
 bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;

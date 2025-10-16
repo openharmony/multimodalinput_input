@@ -484,6 +484,46 @@ int32_t PointerEvent::PointerItem::GetOrientation()
     return orientation_;
 }
 
+bool PointerEvent::PointerItem::GetVisible() const
+{
+    return visible_;
+}
+
+void PointerEvent::PointerItem::SetVisible(bool visible)
+{
+    visible_ = visible;
+}
+
+int32_t PointerEvent::PointerItem::GetStyle() const
+{
+    return style_;
+}
+
+void PointerEvent::PointerItem::SetStyle(int32_t style)
+{
+    style_ = style;
+}
+
+int32_t PointerEvent::PointerItem::GetSizeLevel() const
+{
+    return sizeLevel_;
+}
+
+void PointerEvent::PointerItem::SetSizeLevel(int32_t sizeLevel)
+{
+    sizeLevel_ = sizeLevel;
+}
+
+uint32_t PointerEvent::PointerItem::GetColor() const
+{
+    return color_;
+}
+
+void PointerEvent::PointerItem::SetColor(uint32_t color)
+{
+    color_ = color;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -522,7 +562,11 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(fixedDisplayX_) &&
         out.WriteDouble(fixedDisplayY_) &&
         out.WriteDouble(globalX_) &&
-        out.WriteDouble(globalY_)
+        out.WriteDouble(globalY_) &&
+        out.WriteBool(visible_) &&
+        out.WriteInt32(style_) &&
+        out.WriteInt32(sizeLevel_) &&
+        out.WriteUint32(color_)
     );
 }
 
@@ -564,7 +608,11 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(fixedDisplayX_) &&
         in.ReadDouble(fixedDisplayY_) &&
         in.ReadDouble(globalX_) &&
-        in.ReadDouble(globalY_)
+        in.ReadDouble(globalY_) &&
+        in.ReadBool(visible_) &&
+        in.ReadInt32(style_) &&
+        in.ReadInt32(sizeLevel_) &&
+        in.ReadUint32(color_)
     );
 }
 
@@ -659,6 +707,12 @@ std::string PointerEvent::ToString()
     }
     eventStr += "]";
     return eventStr;
+}
+
+size_t PointerEvent::Hash()
+{
+    std::hash<std::string> hasher;
+    return hasher(ToString());
 }
 
 int32_t PointerEvent::GetPointerAction() const

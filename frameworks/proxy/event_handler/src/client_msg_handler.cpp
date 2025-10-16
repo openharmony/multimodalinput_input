@@ -25,6 +25,7 @@
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+#include "input_event_hook_handler.h"
 #include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -55,7 +56,7 @@ void ClientMsgHandler::Init()
             return this->OnPreKeyEvent(client, pkt); }},
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
         { MmiMessageId::ON_HOOK_KEY_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
-            return this->OnHookKeyEvent(client, pkt); }},
+             return this->OnHookKeyEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
@@ -94,6 +95,12 @@ void ClientMsgHandler::Init()
             return this->ReportDeviceConsumer(client, pkt); }},
         { MmiMessageId::ON_SUBSCRIBE_INPUT_ACTIVE, [this] (const UDSClient &client, NetPacket &pkt) {
             return this->OnSubscribeInputActiveCallback(client, pkt); }},
+        { MmiMessageId::ON_HOOK_KEY_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnHookKey(client, pkt); }},
+        { MmiMessageId::ON_HOOK_TOUCH_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnHookTouch(client, pkt); }},
+        { MmiMessageId::ON_HOOK_MOUSE_EVENT, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnHookMouse(client, pkt); }},
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -600,6 +607,45 @@ int32_t ClientMsgHandler::OnSubscribeInputActiveCallback(const UDSClient& client
     return handleEventType == HANDLE_EVENT_TYPE_KEY ?
         INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(keyEvent, subscribeId) :
         INPUT_ACTIVE_SUBSCRIBE_MGR.OnSubscribeInputActiveCallback(pointerEvent, subscribeId);
+}
+
+int32_t ClientMsgHandler::OnHookKey(const UDSClient &client, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto keyEvent = KeyEvent::Create();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
+    if (ret != RET_OK) {
+        MMI_HILOG_DISPATCHE("Read netPacket failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_HOOK_EVENT);
+    INPUT_EVENT_HOOK_HANDLER.OnKeyEvent(keyEvent);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnHookTouch(const UDSClient &client, NetPacket &pkt)
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return PACKET_READ_FAIL;
+    }
+    INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnHookMouse(const UDSClient &client, NetPacket &pkt)
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return PACKET_READ_FAIL;
+    }
+    INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

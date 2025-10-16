@@ -189,6 +189,14 @@ public:
 #ifndef OHOS_BUILD_ENABLE_WATCH
     virtual void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt) {}
 #endif // OHOS_BUILD_ENABLE_WATCH
+    virtual int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+    {
+        return 0;
+    }
+    virtual int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+    {
+        return 0;
+    }
 };
 } // namespace MMI
 } // namespace OHOS

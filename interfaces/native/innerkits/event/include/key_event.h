@@ -3332,6 +3332,13 @@ public:
     virtual std::string ToString() override;
 
     /**
+     * @brief Get the hash value.
+     * @return size_t
+     * @since 21
+     */
+    virtual size_t Hash() override;
+
+    /**
      * @brief Obtains the key code of this key event.
      * @return Returns the key code.
      * @since 9
