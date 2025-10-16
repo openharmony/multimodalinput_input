@@ -120,3 +120,84 @@ ohos_unittest("MultimodalEventHandlerTest") {
     "samgr:samgr_proxy",
   ]
 }
+
+ohos_unittest("InputEventHookHandlerTest") {
+  module_out_path = module_output_path
+ 
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+  ]
+ 
+  configs = [
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [ "-Wno-string-conversion" ]
+ 
+  sources = [
+    "input_event_hook_handler_test.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/input_event_hook_handler.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/util:libmmi-util"
+  ]
+ 
+  external_deps = [
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "samgr:samgr_proxy",
+  ]
+}
+ 
+ohos_unittest("InputEventStagerTest") {
+  module_out_path = module_output_path
+ 
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/connect_manager/include",
+  ]
+ 
+  configs = [
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [ "-Wno-string-conversion" ]
+ 
+  sources = [
+    "input_event_stager_test.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/input_event_stager.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/util:libmmi-util"
+  ]
+ 
+  external_deps = [
+    "c_utils:utilsbase",
+    "googletest:gmock_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "samgr:samgr_proxy",
+  ]
+}

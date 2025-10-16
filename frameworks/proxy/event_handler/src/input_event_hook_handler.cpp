@@ -27,9 +27,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr long long TIMEOUT_MS { 3000 };
-}
 
 InputEventHookHandler &InputEventHookHandler::GetInstance()
 {
@@ -42,7 +39,6 @@ int32_t InputEventHookHandler::AddInputEventHookLocal(std::shared_ptr<IInputEven
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, ERROR_INVALID_PARAMETER);
-    int32_t ret { RET_OK };
     if (hookEventType & HOOK_EVENT_TYPE_KEY) {
         AddKeyHook([consumer](std::shared_ptr<KeyEvent> event) {
             consumer->OnInputEvent(event);
