@@ -231,6 +231,13 @@ public:
     ErrCode SwitchScreenCapturePermission(uint32_t permissionType, bool enable) override;
     ErrCode ClearMouseHideFlag(int32_t eventId) override;
     ErrCode QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList) override;
+    ErrCode AddInputEventHook(HookEventType hookEventType) override;
+    ErrCode RemoveInputEventHook(HookEventType hookEventType) override;
+    ErrCode DispatchToNextHandler(const KeyEvent &keyEvent) override;
+    ErrCode DispatchToNextHandler(const PointerEvent &pointerEvent) override;
+    ErrCode SetKeyStatusRecord(bool enable, int32_t timeout) override;
+    ErrCode GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
+    ErrCode GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixelMap) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -318,6 +325,7 @@ protected:
     ErrCode RemoveKeyEventHook(int32_t hookId) override;
     ErrCode DispatchToNextHandler(int32_t eventId) override;
     ErrCode InitCustomConfig();
+    int32_t IsPointerInit(bool &status) override;
 
 private:
     MMIService();

@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#include "pointer_style.h"
 #include "cursorpixelmap_fuzzer.h"
+#include "fuzzer/FuzzedDataProvider.h"
 #include "image_source.h"
 #include "mmi_log.h"
+#include "pointer_style.h"
 
 #include "securec.h"
 
@@ -45,18 +46,19 @@ std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPa
     return pixelMap;
 }
 
-bool CursorPixelMapFuzzTest(const uint8_t *data, size_t size)
+void CursorPixelMapFuzzTest(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider provider(data, size);
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
     CursorPixelMap cursorPixelmap;
     cursorPixelmap.pixelMap = (void *)SetMouseIconTest(iconPath).get();
 
     Parcel parcel;
+    std::vector<uint8_t> buffer = provider.ConsumeRemainingBytes<uint8_t>();
+    parcel.WriteUInt8Vector(buffer);
     cursorPixelmap.Marshalling(parcel);
     cursorPixelmap.ReadFromParcel(parcel);
     cursorPixelmap.Unmarshalling(parcel);
-    MMI_HILOGD("CursorPixelMapFuzzTest");
-    return true;
 }
 } // MMI
 } // OHOS

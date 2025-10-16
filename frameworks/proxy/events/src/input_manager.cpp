@@ -1024,5 +1024,40 @@ int32_t InputManager::QueryPointerRecord(int32_t count, std::vector<std::shared_
 {
     return InputMgrImpl.QueryPointerRecord(count, pointerList);
 }
+
+int32_t InputManager::AddInputEventHook(std::shared_ptr<IInputEventConsumer> consumer, HookEventType hookEventType)
+{
+    return InputMgrImpl.AddInputEventHook(consumer, hookEventType);
+}
+
+int32_t InputManager::RemoveInputEventHook(HookEventType hookEventType)
+{
+    return InputMgrImpl.RemoveInputEventHook(hookEventType);
+}
+
+int32_t InputManager::DispatchToNextHandler(int32_t eventId, HookEventType hookEventType)
+{
+    return InputMgrImpl.DispatchToNextHandler(eventId, hookEventType);
+}
+
+int32_t InputManager::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    return InputMgrImpl.SetKeyStatusRecord(enable, timeout);
+}
+
+int32_t InputManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    return InputMgrImpl.GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t InputManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    return InputMgrImpl.GetUserDefinedCursorPixelMap(pixelMapPtr);
+}
+
+bool InputManager::IsPointerInit()
+{
+    return InputMgrImpl.IsPointerInit();
+}
 } // namespace MMI
 } // namespace OHOS

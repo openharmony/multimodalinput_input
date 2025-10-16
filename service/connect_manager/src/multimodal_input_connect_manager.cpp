@@ -1260,5 +1260,66 @@ int32_t MultimodalInputConnectManager::GetExternalObject(
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetExternalObject(pluginName, pluginRemoteStub);
 }
+
+int32_t MultimodalInputConnectManager::AddInputEventHook(HookEventType hookEventType)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddInputEventHook(hookEventType);
+}
+
+int32_t MultimodalInputConnectManager::RemoveInputEventHook(HookEventType hookEventType)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemoveInputEventHook(hookEventType);
+}
+
+int32_t MultimodalInputConnectManager::DispatchToNextHandler(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(keyEvent, ERR_INVALID_VALUE);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->DispatchToNextHandler(*keyEvent);
+}
+
+int32_t MultimodalInputConnectManager::DispatchToNextHandler(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(pointerEvent, ERR_INVALID_VALUE);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->DispatchToNextHandler(*pointerEvent);
+}
+
+int32_t MultimodalInputConnectManager::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetKeyStatusRecord(enable, timeout);
+}
+
+int32_t MultimodalInputConnectManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t MultimodalInputConnectManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    CHKPR(pixelMapPtr, ERROR_NULL_POINTER);
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    return multimodalInputConnectService_->GetUserDefinedCursorPixelMap(*newPixelMapPtr);
+}
+
+int32_t MultimodalInputConnectManager::IsPointerInit(bool &status)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->IsPointerInit(status);
+}
 } // namespace MMI
 } // namespace OHOS

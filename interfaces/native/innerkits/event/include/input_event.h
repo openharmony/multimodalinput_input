@@ -109,6 +109,7 @@ public:
     static constexpr uint32_t EVENT_FLAG_RAW_POINTER_MOVEMENT = 0x00000010;
     static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
     static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
+    static constexpr uint32_t EVENT_FLAG_SHELL = 0x00000080;
     static constexpr uint32_t EVENT_FLAG_ACCESSIBILITY = 0x00000100;
 
     /**
@@ -259,6 +260,13 @@ public:
     virtual void Reset();
 
     virtual std::string ToString();
+
+    /**
+     * @brief Get the hash value of an input event.
+     * @return size_t
+     * @since 22
+     */
+    virtual size_t Hash();
 
     /**
      * @brief Obtains the unique ID of an input event.

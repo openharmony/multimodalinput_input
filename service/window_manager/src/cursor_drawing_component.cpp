@@ -504,4 +504,16 @@ void CursorDrawingComponent::InitDefaultMouseIconPath()
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->InitDefaultMouseIconPath();
 }
+
+int32_t CursorDrawingComponent::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->GetCurrentCursorInfo(visible, pointerStyle);
+}
+
+int32_t CursorDrawingComponent::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    CHK_IS_LOADR(isLoaded_, pointerInstance_)
+    return pointerInstance_->GetUserDefinedCursorPixelMap(pixelMapPtr);
+}
 } // namespace OHOS

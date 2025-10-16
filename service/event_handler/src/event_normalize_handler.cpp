@@ -74,7 +74,7 @@ constexpr int32_t SWIPE_INWARD_TIME_THRE { 60000 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
-constexpr int64_t KNUCKLE_BLOCK_THRETHOLD { MS2US(800) };
+constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
 int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
@@ -1255,14 +1255,14 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     CHKPF(keyEvent);
     int64_t currentTime = GetSysClockTime();
     if (std::fabs(SINGLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon() &&
-        currentTime - g_lastKeyboardEventTime > KNUCKLE_BLOCK_THRETHOLD) {
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
         keyEvent->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad single knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
         return true;
     }
     if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE &&
-        currentTime - g_lastKeyboardEventTime > KNUCKLE_BLOCK_THRETHOLD) {
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
         keyEvent->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad double knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
@@ -1295,14 +1295,18 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     int32_t keyCode = -1;
     keyDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-
-    if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE) {
+    int64_t currentTime = GetSysClockTime();
+    if (pressure == LEFT_SILDE_UP_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
         keyCode = KeyEvent::KEYCODE_BRIGHTNESS_UP;
-    } else if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
+    } else if (pressure == LEFT_SILDE_DOWN_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
         keyCode = KeyEvent::KEYCODE_BRIGHTNESS_DOWN;
-    } else if (pressure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE) {
+    } else if (pressure == RIGHT_SILDE_UP_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
         keyCode = KeyEvent::KEYCODE_VOLUME_UP;
-    } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE) {
+    } else if (pressure == RIGHT_SILDE_DOWN_ABS_PRESSURE_VALUE &&
+        currentTime - g_lastKeyboardEventTime > FREETOUCH_GES_BLOCK_THRETHOLD) {
         keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     } else if (pressure < 0 || pressure > DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
         MMI_HILOGE("Pressure is error!");

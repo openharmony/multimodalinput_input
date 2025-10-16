@@ -1883,6 +1883,30 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+int32_t PointerDrawingManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    visible = IsPointerVisible() && mouseDisplayState_;
+    if (!visible) {
+        MMI_HILOGD("current pointer is not visible");
+        return RET_OK;
+    }
+    pointerStyle.id = lastMouseStyle_.id;
+    pointerStyle.size = GetPointerSize();
+    pointerStyle.color = GetPointerColor();
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
+{
+    CHKPR(pixelMapPtr, RET_ERR);
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    auto userIconPixelMap = GetUserIconCopy(false);
+    CHKPR(userIconPixelMap, RET_ERR);
+    *newPixelMapPtr = userIconPixelMap;
+    return RET_OK;
+}
+
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
@@ -2570,6 +2594,7 @@ void PointerDrawingManager::UpdatePointerVisible()
     std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
+    RecordCursorIdAndImageAddress();
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNodePtr->SetVisible(true);
         POINTER_DEV_MGR.isPointerVisible = true;
@@ -2593,7 +2618,7 @@ void PointerDrawingManager::UpdatePointerVisible()
             HideHardwareCursors();
         }
         surfaceNodePtr->SetVisible(false);
-        POINTER_DEV_MGR.isPointerVisible = false;
+        RecordCursorVisibleStatus(false);
         MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s displayId_:%{public}" PRIu64,
             mouseDisplayState_ ? "true" : "false", displayId_);
     }
@@ -3753,7 +3778,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
     }
 }
 
-std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
+std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy(bool setSurfaceNode)
 {
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPP(userIcon_);
@@ -3787,7 +3812,9 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy()
         "userIconHotSpotX_:%{private}d, userIconHotSpotY_:%{private}d",
         cursorWidth_, cursorHeight_, imageInfo.size.width, imageInfo.size.height,
         focusX_, focusY_, axis, userIconHotSpotX_, userIconHotSpotY_);
-    SetSurfaceNodeBounds();
+    if (setSurfaceNode) {
+        SetSurfaceNodeBounds();
+    }
     return pixelMapPtr;
 }
 
@@ -3933,5 +3960,21 @@ void PointerDrawingManager::NotifyPointerEventToRS(int32_t pointAction, int32_t 
     OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
+
+void PointerDrawingManager::RecordCursorIdAndImageAddress()
+{
+    const auto id = lastMouseStyle_.id;
+    if (id < 0 || id >= static_cast<int32_t>(mouseIcons_.size())) {
+        MMI_HILOGE("Invalid cursor id: %{public}d", id);
+        return;
+    }
+    POINTER_DEV_MGR.mouseId_ = id;
+    POINTER_DEV_MGR.mouseIcons_ = mouseIcons_.at(MOUSE_ICON(id)).iconPath;
+}
+
+void PointerDrawingManager::RecordCursorVisibleStatus(bool status)
+{
+    POINTER_DEV_MGR.isPointerVisible = status;
+}
 } // namespace MMI
 } // namespace OHOS

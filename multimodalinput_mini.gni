@@ -65,6 +65,7 @@ declare_args() {
   input_feature_watch_cfg_source = false
   input_feature_upgrade_skia = false
   input_feature_mistouch_prevention = false
+  input_feature_input_event_hook = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -106,6 +107,8 @@ declare_args() {
     "event_handler/src/client_msg_handler.cpp",
     "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_device_impl.cpp",
+    "event_handler/src/input_event_hook_handler.cpp",
+    "event_handler/src/input_event_stager.cpp",
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/long_press_event_subscribe_manager.cpp",
@@ -162,6 +165,14 @@ declare_args() {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
+    "event_hook/src/input_event_hook_manager.cpp",
+    "event_hook/src/hook/input_event_hook.cpp",
+    "event_hook/src/hook/key_event_hook.cpp",
+    "event_hook/src/hook/pointer_event_hook.cpp",
+    "event_hook/src/checker/dispatch_order_checker.cpp",
+    "event_hook/src/checker/expiration_checker.cpp",
+    "event_hook/src/checker/key_loop_closure_checker.cpp",
+    "event_hook/src/checker/pointer_loop_closure_checker.cpp",
   ]
 
   infraredemitter_sources = [ "src/js_register_module.cpp" ]
@@ -349,6 +360,10 @@ if (input_feature_key_hook) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_KEY_HOOK" ]
 }
 
+if (input_feature_input_event_hook) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK" ]
+}
+
 if (input_feature_touchscreen) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
 }
@@ -500,7 +515,6 @@ if (defined(global_parts_info) &&
 
 if (input_feature_virtual_keyboard) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_VKEYBOARD" ]
-  libmmi_service_sources += [ "libinput_adapter/src/folding_area_toast.cpp" ]
 }
 
 if (input_feature_dfx_radar_enable) {

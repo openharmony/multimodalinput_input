@@ -29,6 +29,8 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManagerTest"
 
+void SetCursorInfo(OHOS::MMI::PointerEvent::PointerItem& item, Input_MouseEvent* mouseEvent);
+
 struct Input_KeyState {
     int32_t keyCode;
     int32_t keyState;
@@ -44,6 +46,13 @@ struct Input_KeyEvent {
     int32_t displayId { -1 };
 };
 
+struct Input_CursorInfo {
+    bool visible { true };
+    Input_PointerStyle style;
+    int32_t sizeLevel { 0 };
+    uint32_t color { 0 };
+};
+
 struct Input_MouseEvent {
     int32_t action;
     int32_t displayX;
@@ -56,6 +65,7 @@ struct Input_MouseEvent {
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
+    Input_CursorInfo cursorInfo;
 };
 
 struct Input_TouchEvent {
@@ -4230,6 +4240,298 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_001, Te
     int32_t windowId = 0;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
     EXPECT_EQ(res, INPUT_SUCCESS);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_SetCursorInfo_001
+ * @tc.desc: Test SetCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_SetCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::PointerEvent::PointerItem item;
+    int32_t style = 19;
+    int32_t sizeLevel = 1;
+    uint32_t color = 0xFFFFFF;
+    bool visible = true;
+    item.SetStyle(style);
+    item.SetSizeLevel(sizeLevel);
+    item.SetColor(color);
+    item.SetVisible(visible);
+    Input_MouseEvent mouseEvent;
+    SetCursorInfo(item, &mouseEvent);
+    ASSERT_EQ(mouseEvent.cursorInfo.style, style);
+    ASSERT_EQ(mouseEvent.cursorInfo.visible, visible);
+    ASSERT_EQ(mouseEvent.cursorInfo.sizeLevel, sizeLevel);
+    ASSERT_EQ(mouseEvent.cursorInfo.color, color);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_Create_001
+ * @tc.desc: Test OH_Input_CursorInfo_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_Create_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo* cursorInfo = OH_Input_CursorInfo_Create();
+    ASSERT_EQ(cursorInfo->visible, false);
+    ASSERT_EQ(cursorInfo->style, 0);
+    ASSERT_EQ(cursorInfo->sizeLevel, 0);
+    ASSERT_EQ(cursorInfo->color, 0);
+    OH_Input_CursorInfo_Destroy(&cursorInfo);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_Destroy_001
+ * @tc.desc: Test OH_Input_CursorInfo_Destroy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_Destroy_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo** cursorInfo = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CursorInfo_Destroy(cursorInfo));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_Destroy_002
+ * @tc.desc: Test OH_Input_CursorInfo_Destroy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_Destroy_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo** cursorInfo = new Input_CursorInfo*;
+    *cursorInfo = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CursorInfo_Destroy(cursorInfo));
+    delete cursorInfo;
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_Destroy_003
+ * @tc.desc: Test OH_Input_CursorInfo_Destroy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_Destroy_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo* cursorInfo = nullptr;
+    Input_CursorInfo** info = &cursorInfo;
+    auto ret = OH_Input_CursorInfo_GetStyle(cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_CursorInfo_IsVisible(cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_CursorInfo_GetSizeLevel(cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_CursorInfo_GetColor(cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CursorInfo_Destroy(info));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_Destroy_004
+ * @tc.desc: Test OH_Input_CursorInfo_Destroy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_Destroy_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo* cursorInfo = new Input_CursorInfo();
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CursorInfo_Destroy(&cursorInfo));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_IsVisible_001
+ * @tc.desc: Test OH_Input_CursorInfo_IsVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_IsVisible_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = true;
+    bool visible;
+    auto ret = OH_Input_CursorInfo_IsVisible(&cursorInfo, &visible);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(visible, true);
+    ret = OH_Input_CursorInfo_IsVisible(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetStyle_001
+ * @tc.desc: Test OH_Input_CursorInfo_GetStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = true;
+    cursorInfo.style = Input_PointerStyle::DEVELOPER_DEFINED_ICON;
+    Input_PointerStyle pointerStyle;
+    auto ret = OH_Input_CursorInfo_GetStyle(&cursorInfo, &pointerStyle);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(pointerStyle, Input_PointerStyle::DEVELOPER_DEFINED_ICON);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetStyle_002
+ * @tc.desc: Test OH_Input_CursorInfo_GetStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = false;
+    Input_PointerStyle pointerStyle;
+    auto ret = OH_Input_CursorInfo_GetStyle(&cursorInfo, &pointerStyle);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_CursorInfo_GetStyle(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetStyle_003
+ * @tc.desc: Test OH_Input_CursorInfo_GetStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = OH_Input_CursorInfo_GetStyle(nullptr, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetSizeLevel_001
+ * @tc.desc: Test OH_Input_CursorInfo_GetSizeLevel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetSizeLevel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = true;
+    cursorInfo.sizeLevel = 1;
+    int32_t sizeLevel;
+    auto ret = OH_Input_CursorInfo_GetSizeLevel(&cursorInfo, &sizeLevel);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(sizeLevel, 1);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetSizeLevel_002
+ * @tc.desc: Test OH_Input_CursorInfo_GetSizeLevel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetSizeLevel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = false;
+    int32_t sizeLevel;
+    auto ret = OH_Input_CursorInfo_GetSizeLevel(&cursorInfo, &sizeLevel);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_CursorInfo_GetSizeLevel(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetSizeLevel_003
+ * @tc.desc: Test OH_Input_CursorInfo_GetSizeLevel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetSizeLevel_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = OH_Input_CursorInfo_GetSizeLevel(nullptr, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetColor_001
+ * @tc.desc: Test OH_Input_CursorInfo_GetColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = true;
+    uint32_t whiteColor = 0xFFFFFF;
+    cursorInfo.color = whiteColor;
+    uint32_t color;
+    auto ret = OH_Input_CursorInfo_GetColor(&cursorInfo, &color);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
+    ASSERT_EQ(color, whiteColor);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetColor_002
+ * @tc.desc: Test OH_Input_CursorInfo_GetColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetColor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_CursorInfo cursorInfo;
+    cursorInfo.visible = false;
+    uint32_t color;
+    auto ret = OH_Input_CursorInfo_GetColor(&cursorInfo, &color);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_CursorInfo_GetColor(&cursorInfo, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorInfo_GetColor_003
+ * @tc.desc: Test OH_Input_CursorInfo_GetColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_GetColor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = OH_Input_CursorInfo_GetColor(nullptr, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventCursorInfo_001
+ * @tc.desc: Test OH_Input_GetMouseEventCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = OH_Input_GetMouseEventCursorInfo(nullptr, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    Input_MouseEvent mouseEvent;
+    ret = OH_Input_GetMouseEventCursorInfo(&mouseEvent, nullptr);
+    ASSERT_EQ(ret, INPUT_PARAMETER_ERROR);
+    Input_CursorInfo cursorInfo;
+    ret = OH_Input_GetMouseEventCursorInfo(&mouseEvent, &cursorInfo);
+    ASSERT_EQ(ret, INPUT_SUCCESS);
 }
 } // namespace MMI
 } // namespace OHOS

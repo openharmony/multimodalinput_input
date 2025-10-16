@@ -24,6 +24,8 @@
 #include "misc_product_type_parser.h"
 #include "libinput_adapter.h"
 #include "key_auto_repeat.h"
+#include "libinput_adapter.h"
+#include "key_auto_repeat.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -48,6 +50,7 @@ static const std::set<int32_t> g_ModifierKeys = {
     KeyEvent::KEYCODE_SCROLL_LOCK,
     KeyEvent::KEYCODE_NUM_LOCK
 };
+constexpr int32_t MAX_TIMEOUT_MS { 10000 };
 
 class FoldStatusCallback : public Rosen::DisplayManagerLite::IFoldStatusListener {
 public:
@@ -503,7 +506,21 @@ void KeyEventNormalize::ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent
     if (it == g_ModifierKeys.end()) {
         return;
     }
+    if (keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
+        if (!keyStatusRecordSwitch_) {
+            return;
+        }
+        int32_t funcKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
+        if (funcKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
+            return;
+        }
+    }
     if (HandleModifierKeyAction(keyEvent)) {
+        int32_t keyAction = keyEvent->GetKeyAction();
+        if (keyAction == KeyEvent::KEY_ACTION_DOWN && keyStatusRecordSwitch_
+            && keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
+            KeyEventAutoUp(keyEvent, keyStatusRecordTimeout_);
+        }
         auto g_keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(g_keyEvent);
         g_keyEvent->SetKeyCode(keyEvent->GetKeyCode());
@@ -513,6 +530,38 @@ void KeyEventNormalize::ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent
         g_keyEvent->SetActionTime(keyEvent->GetActionTime());
         g_keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
     }
+}
+
+int32_t KeyEventNormalize::KeyEventAutoUp(const std::shared_ptr<KeyEvent>& keyEvent, int32_t timeout)
+{
+    if (timeout <= 0 || timeout > MAX_TIMEOUT_MS) {
+        timeout = MAX_TIMEOUT_MS;
+    }
+    int32_t timerId = TimerMgr->AddTimer(timeout, 1, [keyEvent]() {
+        CHKPV(keyEvent);
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        int64_t time = GetSysClockTime();
+        auto keyItem = keyEvent->GetKeyItem();
+        if (keyItem.has_value()) {
+            keyItem->SetPressed(false);
+            keyItem->SetDownTime(time);
+        }
+        keyEvent->RemoveReleasedKeyItems(*keyItem);
+        keyEvent->AddPressedKeyItems(*keyItem);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+        keyEvent->SetActionTime(time);
+        LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+        inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
+        keyEvent->UpdateId();
+    }, "KeyEventAutoUp");
+    return timerId;
+}
+
+void KeyEventNormalize::SetKeyStatusRecord(bool enable, int32_t timeout)
+{
+    keyStatusRecordSwitch_ = enable;
+    keyStatusRecordTimeout_ = timeout;
 }
 } // namespace MMI
 } // namespace OHOS
