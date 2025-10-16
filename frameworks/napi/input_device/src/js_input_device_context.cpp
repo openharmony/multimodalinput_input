@@ -36,7 +36,7 @@ constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 } // namespace
 
-JsInputDeviceContext::JsInputDeviceContext(napi_env env) : mgr_(std::make_shared<JsPointerManager>()), env_(env) {}
+JsInputDeviceContext::JsInputDeviceContext(napi_env env) : mgr_(std::make_shared<JsInputDeviceManager>()), env_(env) {}
 
 JsInputDeviceContext::~JsInputDeviceContext()
 {
