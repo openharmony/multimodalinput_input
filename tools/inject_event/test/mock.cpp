@@ -15,7 +15,7 @@
 #include "mock.h"
  
 #include <fcntl.h>
-#include <stdlib.h>
+#include <cstdlib.h>
 #include <iostream>
  
 namespace OHOS {
