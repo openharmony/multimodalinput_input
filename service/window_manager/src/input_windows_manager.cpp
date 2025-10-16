@@ -5600,7 +5600,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             cursorPos);
         CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId, static_cast<int32_t>(cursorPos.x),
             static_cast<int32_t>(cursorPos.y), pointerStyle, physicDisplayInfo->direction);
-    } else if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
+    } else if (POINTER_DEV_MGR.mouseDisplayState) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
             MMI_HILOG_DISPATCHD("PointerAction is to leave the window");
