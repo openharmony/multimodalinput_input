@@ -141,7 +141,36 @@ ohos_unittest("InjectEventTest") {
   ]
 }
 
+ohos_unittest("QueryMouseInfoCommandTest") {
+  module_out_path = module_output_path
+  configs = [ "${mmi_path}:coverage_flags" ]
+  include_dirs = [ "include" ]
+ 
+  sources = [
+    "test/query_mouse_info_command_test.cpp",
+    "test/mock.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/tools/inject_event:input-manager",
+    "${mmi_path}/util:libmmi-util",
+  ]
+ 
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_core",
+  ]
+}
+ 
 group("inject_event") {
   testonly = true
-  deps = [ ":InjectEventTest" ]
+  deps = [
+    ":InjectEventTest",
+    ":QueryMouseInfoCommandTest",
+  ]
 }
