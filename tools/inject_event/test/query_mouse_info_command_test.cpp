@@ -106,5 +106,142 @@ HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_002, TestSize.Level1)
     result = inputManagerCommand->ParseCommand(4, argv);
     EXPECT_EQ(RET_OK, result);
 }
+
+/**
+ * @tc.name: Test_QueryMouseInfo_003
+ * @tc.desc: test query mouse info with different parameter combinations
+ * @tc.type: FUNC
+ */
+HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_003, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-M"};
+    char command3[] = {"-q"};
+    char command4[] = {"--query"};
+
+    char *argv1[] = {command1, command2, command4};
+
+    MOCKHANDLER->mockIsPointerInitRet = true;
+    MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_OK;
+    MOCKHANDLER->mockVisible = true;
+    MOCKHANDLER->mockPointerStyleId = 1;
+
+    int32_t result = inputManagerCommand->ParseCommand(3, argv1);
+    EXPECT_EQ(RET_OK, result);
+
+    char *argv2[] = {command1, command3};
+    result = inputManagerCommand->ParseCommand(2, argv2);
+    EXPECT_EQ(RET_ERR, result);
+
+    char *argv3[] = {command1, command2};
+    result = inputManagerCommand->ParseCommand(2, argv3);
+    EXPECT_EQ(RET_ERR, result);
+}
+
+/**
+ * @tc.name: Test_QueryMouseInfo_004
+ * @tc.desc: test query mouse info with various pointer styles
+ * @tc.type: FUNC
+ */
+HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_004, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-M"};
+    char command3[] = {"-q"};
+
+    char *argv[] = {command1, command2, command3};
+
+    MOCKHANDLER->mockIsPointerInitRet = true;
+    MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_OK;
+    MOCKHANDLER->mockVisible = true;
+
+    MOCKHANDLER->mockPointerStyleId = 5;
+    int32_t result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_OK, result);
+
+    MOCKHANDLER->mockPointerStyleId = 100;
+    result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_OK, result);
+
+    MOCKHANDLER->mockPointerStyleId = INT32_MAX;
+    result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_OK, result);
+}
+
+/**
+ * @tc.name: Test_QueryMouseInfo_005
+ * @tc.desc: test query mouse info error handling
+ * @tc.type: FUNC
+ */
+HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_005, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-M"};
+    char command3[] = {"-q"};
+    
+    char *argv[] = {command1, command2, command3};
+
+    MOCKHANDLER->mockIsPointerInitRet = false;
+    int32_t result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_ERR, result);
+    
+    MOCKHANDLER->mockIsPointerInitRet = true;
+    MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_OK;
+    MOCKHANDLER->mockVisible = true;
+    MOCKHANDLER->mockPointerStyleId = 0;
+    result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_OK, result);
+
+    MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_ERR;
+    result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_ERR, result);
+
+    MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_OK;
+    MOCKHANDLER->mockVisible = false;
+    result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_ERR, result);
+
+    MOCKHANDLER->mockVisible = true;
+    result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_OK, result);
+}
+
+/**
+ * @tc.name: Test_QueryMouseInfo_006
+ * @tc.desc: test query mouse info memory boundary conditions
+ * @tc.type: FUNC
+ */
+HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_006, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-M"};
+    char command3[] = {"-q"};
+
+    char* argv[100];
+    argv[0] = command1;
+    argv[1] = command2;
+    argv[2] = command3;
+
+    for (int i = 3; i < 100; i++) {
+        argv[i] = new char[10];
+        sprintf(argv[i], "-p%d", i);
+    }
+
+    MOCKHANDLER->mockIsPointerInitRet = true;
+    MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_OK;
+    MOCKHANDLER->mockVisible = true;
+    MOCKHANDLER->mockPointerStyleId = 0;
+
+    int32_t result = inputManagerCommand->ParseCommand(3, argv);
+    EXPECT_EQ(RET_OK, result);
+
+    for (int i = 3; i < 100; i++) {
+        delete[] argv[i];
+    }
+}
 } // namespace MMI
 } // namespace OHOS
