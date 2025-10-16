@@ -527,8 +527,7 @@ bool InputDeviceManager::GetIsDeviceReportEvent(int32_t deviceId)
         MMI_HILOGE("Get inputDevice isReportEvent failed, Invalid deviceId.");
         return false;
     }
-    bool isDeviceReportEvent = item->second.isDeviceReportEvent;
-    return isDeviceReportEvent;
+    return item->second.isDeviceReportEvent;
 }
 
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo &info)
