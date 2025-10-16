@@ -1787,12 +1787,12 @@ int32_t InputManagerCommand::QueryMouseInfo(int32_t argc, char *argv[])
         std::cerr << "Too many arguments" << std::endl;
         return RET_ERR;
     }
-    if (!InputManager::GetInstance()->IsPointerInit()) {
-        std::cerr << "Query failed, maybe no mouse device." << std::endl;
-        return RET_ERR;
-    }
     bool g_mouseIsVisible  = false;
     PointerStyle g_pointerStyle;
+    if (g_pointerStyle.id != THIRD_PARTY_CURSOR_ID) {
+        std::cerr << "Not third-part cursor" << std::endl;
+        return RET_ERR;
+    }
     if (InputManager::GetInstance()->GetCurrentCursorInfo(g_mouseIsVisible, g_pointerStyle) != RET_OK) {
         std::cerr << "Query failed, maybe service is abnormal." << std::endl;
         return RET_ERR;
