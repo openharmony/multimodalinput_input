@@ -52,12 +52,26 @@ void QueryPointerRecordFuzz(FuzzedDataProvider &fdp)
     MULTIMODAL_INPUT_CONNECT_MGR->QueryPointerRecord(count, pointerList);
 }
 
+void DispatchToNextHandlerFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t eventId = fdp.ConsumeIntegral<int32_t>();
+    MULTIMODAL_INPUT_CONNECT_MGR->DispatchToNextHandler(eventId);
+}
+
+void RemoveKeyEventHookFuzz(FuzzedDataProvider &fdp)
+{
+    int32_t hookId = fdp.ConsumeIntegral<int32_t>();
+    MULTIMODAL_INPUT_CONNECT_MGR->RemoveKeyEventHook(hookId);
+}
+
 void ConnectProxy15FuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);
     SetMouseAccelerateMotionSwitchFuzz(fdp);
     SwitchScreenCapturePermissionFuzz(fdp);
     QueryPointerRecordFuzz(fdp);
+    DispatchToNextHandlerFuzz(fdp);
+    RemoveKeyEventHookFuzz(fdp);
 }
 } // MMI
 } // OHOS
