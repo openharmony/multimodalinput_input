@@ -323,7 +323,8 @@ bool InputDeviceManager::HasPointerDevice()
 {
     // LOCV_EXCL_START
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.isPointerDevice) {
+        if ((it->second.isPointerDevice && it->second.isRemote) ||
+            (it->second.isPointerDevice && !it->second.isRemote && it->second.isDeviceReportEvent)) {
             return true;
         }
     }
@@ -459,14 +460,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (CheckDuplicateInputDevice(inputDevice)) {
         return;
     }
-    // if we have enabled physical/virtual pointer before adding this one.
-    bool existEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    // parse virtual devices for pointer devices.
-    if (HasVirtualPointerDevice()) {
-        existEnabledPointerDevice = true;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t deviceId = ParseDeviceId(inputDevice);
     if (deviceId < 0) {
         return;
@@ -484,11 +477,57 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     NotifyDeviceAdded(deviceId);
     NotifyDevCallback(deviceId, info);
-    NotifyAddPointerDevice(info.isPointerDevice, existEnabledPointerDevice);
+    if (info.isPointerDevice && !POINTER_DEV_MGR.isInit) {
+        PointerDeviceInit();
+    }
+    if (IsTouchPadDevice(inputDevice)) {
+        bool existEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+        // parse virtual devices for pointer devices.
+        if (HasVirtualPointerDevice()) {
+            existEnabledPointerDevice = true;
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+        inputDevice_[deviceId].isDeviceReportEvent = true;
+        NotifyAddPointerDevice(info.isPointerDevice, existEnabledPointerDevice);
+    }
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device added successfully");
 #endif
     // LOCV_EXCL_STOP
+}
+
+void InputDeviceManager::SetIsDeviceReportEvent(int32_t deviceId, bool isDeviceReportEvent)
+{
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("Failed to search for the deviceId");
+        return;
+    }
+    MMI_HILOGI("DeviceId:%{public}d, isReportEvent:%{public}d", deviceId, isDeviceReportEvent);
+    // if we have enabled physical/virtual pointer before adding this one.
+    bool existEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    // parse virtual devices for pointer devices.
+    if (HasVirtualPointerDevice()) {
+        existEnabledPointerDevice = true;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    item->second.isDeviceReportEvent = isDeviceReportEvent;
+    if (isDeviceReportEvent) {
+        NotifyAddPointerDevice(item->second.isPointerDevice, existEnabledPointerDevice);
+    }
+}
+ 
+bool InputDeviceManager::GetIsDeviceReportEvent(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("Get inputDevice isReportEvent failed, Invalid deviceId.");
+        return false;
+    }
+    return item->second.isDeviceReportEvent;
 }
 
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo &info)
@@ -513,7 +552,8 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
     bool enable = false;
-    RemovePhysicalInputDeviceInner(inputDevice, deviceId, enable);
+    bool isDeviceReportEvent = false;
+    RemovePhysicalInputDeviceInner(inputDevice, deviceId, enable, isDeviceReportEvent);
     WIN_MGR->ClearTargetDeviceWindowId(deviceId);
     std::string sysUid = GetInputIdentification(inputDevice);
     if (!sysUid.empty()) {
@@ -527,7 +567,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             "status:remove", deviceId, name.c_str(), sysUid.c_str());
     }
 
-    NotifyRemovePointerDevice(IsPointerDevice(inputDevice));
+    if (isDeviceReportEvent) {
+        NotifyRemovePointerDevice(IsPointerDevice(inputDevice));
+    }
     if (enable) {
         NotifyRemoveDeviceListeners(deviceId);
     }
@@ -546,20 +588,22 @@ void InputDeviceManager::ScanPointerDevice()
 {
     // LOCV_EXCL_START
     bool existEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
+    bool existEnabledNoEventReportedPointerDevice = HasEnabledNoEventReportedPhysicalPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     // parse virtual devices for pointer devices.
     if (HasVirtualPointerDevice()) {
         existEnabledPointerDevice = true;
+        existEnabledNoEventReportedPointerDevice = true;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (!existEnabledPointerDevice) {
         NotifyPointerDevice(false, false, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
         MMI_HILOGI("Set para input.pointer.device false");
-        if (POINTER_DEV_MGR.isInit) {
-            POINTER_DEV_MGR.isInit = false;
-            CursorDrawingComponent::GetInstance().UnLoad();
-        }
+    }
+    if (!existEnabledNoEventReportedPointerDevice && POINTER_DEV_MGR.isInit) {
+        POINTER_DEV_MGR.isInit = false;
+        CursorDrawingComponent::GetInstance().UnLoad();
     }
     // LOCV_EXCL_STOP
 }
@@ -838,6 +882,9 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     NotifyAddDeviceListeners(deviceId);
     NotifyDeviceAdded(deviceId);
     NotifyDevCallback(deviceId, deviceInfo);
+    if (deviceInfo.isPointerDevice && !POINTER_DEV_MGR.isInit) {
+        PointerDeviceInit();
+    }
     NotifyAddPointerDevice(deviceInfo.isPointerDevice, existEnabledPointerDevice, true);
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "AddVirtualInputDevice successfully");
@@ -897,7 +944,7 @@ void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::share
 }
 
 void InputDeviceManager::RemovePhysicalInputDeviceInner(
-    struct libinput_device *inputDevice, int32_t &deviceId, bool &enable)
+    struct libinput_device *inputDevice, int32_t &deviceId, bool &enable, bool &isDeviceReportEvent)
 {
     // LOCV_EXCL_START
     CHKPV(inputDevice);
@@ -905,6 +952,7 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
         if (it->second.inputDeviceOrigin == inputDevice) {
             deviceId = it->first;
             enable = it->second.enable;
+            isDeviceReportEvent = it->second.isDeviceReportEvent;
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device removed successfully");
 #endif
@@ -934,6 +982,21 @@ int32_t InputDeviceManager::RemoveVirtualInputDeviceInner(int32_t deviceId, stru
 }
 
 bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
+{
+    // LOCV_EXCL_START
+    for (const auto &item : inputDevice_) {
+        if ((!item.second.isRemote && item.second.isPointerDevice && item.second.isDeviceReportEvent) ||
+            (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
+            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+                item.second.isRemote, item.second.sysUid.c_str());
+            return true;
+        }
+    }
+    return false;
+    // LOCV_EXCL_STOP
+}
+ 
+bool InputDeviceManager::HasEnabledNoEventReportedPhysicalPointerDevice()
 {
     // LOCV_EXCL_START
     for (const auto &item : inputDevice_) {
@@ -1002,9 +1065,6 @@ void InputDeviceManager::NotifyAddPointerDevice(bool addNewPointerDevice, bool e
 {
     MMI_HILOGI("AddNewPointerDevice:%{public}d, existEnabledPointerDevice:%{public}d", addNewPointerDevice,
         existEnabledPointerDevice);
-    if (addNewPointerDevice && !POINTER_DEV_MGR.isInit) {
-        PointerDeviceInit();
-    }
     if (addNewPointerDevice && !existEnabledPointerDevice) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice() && !isVirtualPointerDev) {
