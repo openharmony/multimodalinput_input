@@ -288,6 +288,7 @@ private:
     std::list<PidInfo> hapPidInfos_;
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
+    bool offRenderScaleUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;
