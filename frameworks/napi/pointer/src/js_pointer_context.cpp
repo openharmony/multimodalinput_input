@@ -40,9 +40,8 @@ constexpr int32_t MAX_PIXELMAP_SIZE { 256 };
 } // namespace
 
 bool JsPointerContext::isCustomCursorEx_ { false };
-napi_env JsPointerContext::env_ = nullptr;
 
-JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
+JsPointerContext::JsPointerContext(napi_env env) : mgr_(std::make_shared<JsPointerManager>()), env_(env) {}
 
 JsPointerContext::~JsPointerContext()
 {
@@ -96,7 +95,7 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
 
-    JsPointerContext *jsContext = new (std::nothrow) JsPointerContext();
+    JsPointerContext *jsContext = new (std::nothrow) JsPointerContext(env);
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("Jsvm ends");
@@ -1819,7 +1818,6 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
-    env_ = env;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         THROWERR(env, "Failed to create instance");
