@@ -1288,7 +1288,7 @@ void DfxHisysevent::ReportTouchpadKnuckleDoubleClickEvent(int32_t fingerCount)
 {
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::CLICKPAD_UE,
-        fingerCount == 1 ? "FREETOUCH_GESTURE_KNUCKLE_SIGNLE" : "FREETOUCH_GESTURE_KNUCKLE_DOUBLE",
+        fingerCount == 1 ? "FREETOUCH_GESTURE_KNUCKLE_SINGLE" : "FREETOUCH_GESTURE_KNUCKLE_DOUBLE",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC);
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
