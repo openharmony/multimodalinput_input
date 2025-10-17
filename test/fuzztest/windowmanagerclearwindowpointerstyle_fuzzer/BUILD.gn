@@ -24,7 +24,7 @@ ohos_fuzztest("WindowManagerClearWindowPointerStyleFuzzTest") {
   include_dirs = [
     "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/window_manager/include"，
+    "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
   ]
   cflags = [
