@@ -25,7 +25,7 @@ using SetTouchpadInt32DataFunc = std::function<napi_value (napi_env env, int32_t
 using GetTouchpadFunc = std::function<napi_value (napi_env env, napi_value handle)>;
 
 public:
-    JsPointerContext();
+    JsPointerContext(napi_env env);
     DISALLOW_COPY_AND_MOVE(JsPointerContext);
     ~JsPointerContext();
     static napi_value Export(napi_env env, napi_value exports);
@@ -112,7 +112,7 @@ private:
     std::shared_ptr<JsPointerManager> mgr_ { nullptr };
     static bool isCustomCursorEx_;
     napi_ref contextRef_ { nullptr };
-    static napi_env env_;
+    napi_env env_;
 };
 } // namespace MMI
 } // namespace OHOS
