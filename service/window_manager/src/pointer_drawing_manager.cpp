@@ -437,7 +437,8 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     if (GetHardCursorEnabled()) {
         UpdateBindDisplayId(rsId);
     }
-    if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
+    if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ &&
+        lastDirection_ == direction && !offRenderScaleUpdate_) {
         if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             return RET_ERR;
         }
@@ -460,6 +461,7 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
         UpdatePointerVisible();
     }
     mouseIconUpdate_ = false;
+    offRenderScaleUpdate_ = false;
     MMI_HILOGD("Leave, rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
     return RET_OK;
@@ -2284,6 +2286,11 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
     }
 
     hasDisplay_ = true;
+    if ((displayInfo.width != 0) && (displayInfo_.width != 0) &&
+        ((float(displayInfo_.screenRealWidth) / displayInfo_.width) !=
+        (float(displayInfo.screenRealWidth) / displayInfo.width))) {
+        offRenderScaleUpdate_ = true;
+    }
     displayInfo_ = displayInfo;
     int32_t size = GetPointerSize();
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
