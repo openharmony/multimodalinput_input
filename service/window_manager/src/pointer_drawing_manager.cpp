@@ -2272,18 +2272,13 @@ int32_t PointerDrawingManager::GetPointerColor()
 void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
-    bool isScaleChanged = false;
     if (GetHardCursorEnabled()) {
         if (screenPointers_.count(displayInfo.rsId)) {
             auto sp = screenPointers_[displayInfo.rsId];
             CHKPV(sp);
-            float lastScale = sp->GetScale();
             sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
             if (sp->IsMain()) {
                 UpdateMirrorScreens(sp, displayInfo);
-            }
-            if (lastScale != sp->GetScale()) {
-                isScaleChanged = true;
             }
         }
     }
@@ -2298,9 +2293,6 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetDisplayInfo(displayInfo);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (isScaleChanged) {
-        DrawNewDpiPointer();
-    }
 }
 
 int32_t PointerDrawingManager::GetIndependentPixels()
