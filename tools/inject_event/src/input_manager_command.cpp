@@ -1804,12 +1804,12 @@ int32_t InputManagerCommand::QueryMouseInfo(int32_t argc, char *argv[])
         std::cerr << "Mouse is invisible" << std::endl;
         return RET_ERR;
     }
-    if (g_pointerStyle.id != THIRD_PARTY_CURSOR_ID) {
-        std::cerr << "Mouse is invisible" << std::endl;
-        return RET_ERR;
-    }
     if (argc - optind <= 0) {
         return RET_OK;
+    }
+    if (g_pointerStyle.id != THIRD_PARTY_CURSOR_ID) {
+        std::cerr << "Not third-part cursor" << std::endl;
+        return RET_ERR;
     }
     return SavePixelMapToFile(argv[optind]);
 }
