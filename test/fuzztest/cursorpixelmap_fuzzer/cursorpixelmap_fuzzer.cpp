@@ -51,7 +51,8 @@ void CursorPixelMapFuzzTest(const uint8_t *data, size_t size)
     FuzzedDataProvider provider(data, size);
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
     CursorPixelMap cursorPixelmap;
-    cursorPixelmap.pixelMap = (void *)SetMouseIconTest(iconPath).get();
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    cursorPixelmap.pixelMap = static_cast<void*>(pixelMap.get());
 
     Parcel parcel;
     std::vector<uint8_t> buffer = provider.ConsumeRemainingBytes<uint8_t>();
