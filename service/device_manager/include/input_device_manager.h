@@ -32,6 +32,7 @@ private:
         bool isRemote { false };
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
+        bool isDeviceReportEvent { false };
         bool enable { false };
         std::string dhid;
         std::string sysUid;
@@ -82,9 +83,11 @@ public:
     bool CheckDuplicateInputDevice(std::shared_ptr<InputDevice> inputDevice);
     void AddPhysicalInputDeviceInner(int32_t deviceId, const struct InputDeviceInfo& info);
     void AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice);
-    void RemovePhysicalInputDeviceInner(struct libinput_device *inputDevice, int32_t &deviceId, bool &enable);
+    void RemovePhysicalInputDeviceInner(struct libinput_device *inputDevice, int32_t &deviceId, bool &enable,
+        bool &isDeviceReportEvent);
     int32_t RemoveVirtualInputDeviceInner(int32_t deviceId, struct InputDeviceInfo& info);
     bool HasEnabledPhysicalPointerDevice();
+    bool HasEnabledNoEventReportedPhysicalPointerDevice();
     void NotifyAddDeviceListeners(int32_t deviceId);
     void NotifyRemoveDeviceListeners(int32_t deviceId);
     void NotifyAddPointerDevice(bool addNewPointerDevice, bool existEnabledPointerDevice,
@@ -106,6 +109,8 @@ public:
     bool IsAddKeyboardExtFlag(int32_t deviceId, uint32_t &flag);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     bool IsLocalDevice(int32_t deviceId);
+    void SetIsDeviceReportEvent(int32_t deviceId, bool isReportEvent);
+    bool GetIsDeviceReportEvent(int32_t deviceId);
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);

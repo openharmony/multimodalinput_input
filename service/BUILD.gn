@@ -3344,6 +3344,7 @@ ohos_unittest("DeviceManagerExTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
