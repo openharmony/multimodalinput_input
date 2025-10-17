@@ -76,7 +76,8 @@ extern "C" bool IsMusicActivate()
         if (info->rendererState == AudioStandard::RENDERER_RUNNING &&
             (info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_ULTRASONIC ||
             info->rendererInfo.streamUsage != AudioStandard::STREAM_USAGE_INVALID)) {
-            MMI_HILOGI("Find music activate, streamUsage:%{public}d", info->rendererInfo.streamUsage);
+            MMI_HILOGI("Find music activate, streamUsage:%{public}d, sessionId:%{public}d",
+                info->rendererInfo.streamUsage, info->rendererInfo.sessionId);
             return true;
         }
     }
