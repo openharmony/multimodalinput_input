@@ -333,11 +333,21 @@ std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inpu
 void InputDisplayBindHelper::AddInputDevice(int32_t id, const std::string &nodeName, const std::string &sysUid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Param: id:%{public}d, nodeName:%{public}s, name:%{public}s", id, nodeName.c_str(), sysUid.c_str());
+    MMI_HILOGI("Param: id:%{public}d, nodeName:%{public}s, name:%{private}s", id, nodeName.c_str(), sysUid.c_str());
     CHKPV(configFileInfos_);
     auto displayName = configFileInfos_->GetDisplayNameByInputDevice(sysUid);
     BindInfo info = infos_->GetUnbindInputDevice(displayName);
     info.AddInputDevice(id, nodeName, sysUid);
+    if (info.IsUnbind()) {
+        int32_t cfgRsId = 0;
+        if (GetRsIdByNodeNameCfg(nodeName, cfgRsId)) {
+            std::string displayName = "default" + std::to_string(cfgRsId);
+            info.AddDisplay(cfgRsId, displayName);
+            MMI_HILOGI("info:{%{public}d,%{public}s,%{public}d,%{public}s",
+                info.GetInputDeviceId(), info.GetInputNodeName().c_str(),
+                info.GetDisplayId(), info.GetDisplayName().c_str());
+        }
+    }
     infos_->Add(info);
     Store();
 }
@@ -488,6 +498,39 @@ std::string InputDisplayBindHelper::GetInputNodeNameByCfg(int32_t id)
         res.pop_back();
     }
     return res;
+}
+
+bool InputDisplayBindHelper::GetRsIdByNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId)
+{
+    CALL_DEBUG_ENTER;
+    bool ret = false;
+    char realPath[PATH_MAX] = {};
+    if (realpath(INPUT_DEVICE_NAME_CONFIG, realPath) == nullptr) {
+        MMI_HILOGE("The realpath return nullptr");
+        return ret;
+    }
+    std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            const std::string delim = "<=>";
+            size_t pos = line.find(delim);
+            if (pos == std::string::npos) {
+                continue;
+            }
+            std::string rsId = line.substr(0, pos);
+            std::string inputNodeName = line.substr(pos + delim.length());
+            if (!rsId.empty() && !inputNodeName.empty()
+                && std::all_of(rsId.begin(), rsId.end(), ::isdigit)
+                && nodeName == inputNodeName) {
+                cfgRsId = std::atoi(rsId.c_str());
+                ret = true;
+                break;
+            }
+        }
+        file.close();
+    }
+    return ret;
 }
 
 std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
