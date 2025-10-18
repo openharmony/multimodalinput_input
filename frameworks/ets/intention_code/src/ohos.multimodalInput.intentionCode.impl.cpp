@@ -15,8 +15,10 @@
 
 #include "ohos.multimodalInput.intentionCode.proj.hpp"
 #include "ohos.multimodalInput.intentionCode.impl.hpp"
-#include "taihe/runtime.hpp"
+
 #include <stdexcept>
+
+#include "taihe/runtime.hpp"
 
 using namespace taihe;
 using namespace ohos::multimodalInput::intentionCode;

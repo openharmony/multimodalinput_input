@@ -15,8 +15,10 @@
 
 #include "ohos.multimodalInput.mouseEvent.proj.hpp"
 #include "ohos.multimodalInput.mouseEvent.impl.hpp"
-#include "taihe/runtime.hpp"
+
 #include <stdexcept>
+
+#include "taihe/runtime.hpp"
 
 using namespace taihe;
 using namespace ohos::multimodalInput::mouseEvent;
