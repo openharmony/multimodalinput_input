@@ -16,18 +16,20 @@
 #ifndef INPUT_CONSUMER_KEY_PRESSED_IMPL_H
 #define INPUT_CONSUMER_KEY_PRESSED_IMPL_H
 
-#include "ohos.multimodalInput.inputConsumer.proj.hpp"
-#include "ohos.multimodalInput.inputConsumer.impl.hpp"
-#include "taihe/runtime.hpp"
 #include <stdexcept>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "ohos.multimodalInput.inputConsumer.proj.hpp"
+#include "ohos.multimodalInput.inputConsumer.impl.hpp"
 #include "ohos.multimodalInput.keyCode.impl.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace MMI {
-using namespace ohos::multimodalInput::inputConsumer;
+namespace inputConsumer = ohos::multimodalInput::inputConsumer;
+namespace keyEvent = ohos::multimodalInput::keyEvent;
+namespace keyCode = ohos::multimodalInput::keyCode;
 
 enum EtsKeyAction {
     ETS_KEY_ACTION_CANCEL,
@@ -42,9 +44,9 @@ static const std::set<int32_t> allowedKeys_ {
 
 int32_t EtsKeyActionToKeyAction(int32_t action);
 EtsKeyAction KeyActionEtsKeyAction(int32_t action);
-ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem);
-ohos::multimodalInput::keyEvent::Action ConvertKeyAction(EtsKeyAction action);
-ohos::multimodalInput::keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent);
+keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem);
+keyEvent::Action ConvertKeyAction(EtsKeyAction action);
+keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_CONSUMER_KEY_PRESSED_IMPL_H

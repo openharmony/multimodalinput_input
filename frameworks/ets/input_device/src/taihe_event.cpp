@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-
 #include "taihe_event.h"
 
 #undef MMI_LOG_TAG
@@ -30,7 +28,6 @@ enum INPUT_DEVICE_CALLBACK_EVENT {
 namespace OHOS {
 namespace MMI {
 
-std::mutex taiheCbMapMutex;
 const std::string CHANGED_TYPE = "change";
 
 std::shared_ptr<TaiheEvent> TaiheEvent::GetInstance()
@@ -46,7 +43,6 @@ std::shared_ptr<TaiheEvent> TaiheEvent::GetInstance()
 bool TaiheEvent::AddCallback(std::string const &type, callbackTypes &&cb, uintptr_t opq)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(taiheCbMapMutex);
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
     ani_ref callbackRef;
     ani_env *env = taihe::get_env();
@@ -73,7 +69,6 @@ bool TaiheEvent::AddCallback(std::string const &type, callbackTypes &&cb, uintpt
 bool TaiheEvent::RemoveCallback(std::string const &type, uintptr_t opq)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(taiheCbMapMutex);
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
     ani_env *env = taihe::get_env();
     if (env == nullptr) {

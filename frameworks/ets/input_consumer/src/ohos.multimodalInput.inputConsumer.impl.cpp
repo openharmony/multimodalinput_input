@@ -13,11 +13,6 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.inputConsumer.proj.hpp"
-#include "ohos.multimodalInput.inputConsumer.impl.hpp"
-#include "taihe/runtime.hpp"
-#include <stdexcept>
-
 #include "inputConsumer_keyOptions_impl.h"
 #include "inputConsumer_hotkeyOptions_impl.h"
 #include "inputConsumer_keyPressed_impl.h"
@@ -75,7 +70,6 @@ struct KeyEventMonitorInfo {
 typedef std::map<std::string, std::list<std::shared_ptr<KeyEventMonitorInfo>>> Callbacks;
 static Callbacks hotkeyCallbacks = {};
 static Callbacks keyCallbacks = {};
-
 
 using callbackType = std::variant<
     taihe::callback<void(KeyOptions const&)>,
@@ -135,7 +129,7 @@ std::map<std::string, std::vector<std::shared_ptr<CallbackObject>>> jsCbMap_;
 std::mutex g_mutex;
 std::mutex sCallBacksMutex;
 std::mutex jsCbMapMutex;
-size_t g_baseId { 0 };
+std::atomic<size_t> g_baseId { 0 };
 
 KeyEventMonitorInfo::~KeyEventMonitorInfo() {}
 
@@ -299,6 +293,8 @@ void SubscribeKeyMonitor(KeyPressedConfig const& options,
         } else {
             MMI_HILOGE("SubscribeKeyMonitor fail, error:%{public}d", subscriberId);
         }
+        jsCbMap_.erase(std::to_string(keyMonitorId));
+        return;
     }
     MMI_HILOGI("[ETS] Subscribe key monitor(ID:%{public}zu, subscriberId:%{public}d)", keyMonitorId, subscriberId);
     if (result == ETS_CALLBACK_EVENT_SUCCESS) {
@@ -440,7 +436,7 @@ bool MatchCombinationKeys(std::shared_ptr<KeyEventMonitorInfo> monitorInfo, std:
         }
         count++;
     }
-    MMI_HILOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
+    MMI_HILOGD("keyEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
     if (!keyItem) {
         MMI_HILOGE("The keyItem is nullopt");
@@ -456,6 +452,12 @@ bool MatchCombinationKeys(std::shared_ptr<KeyEventMonitorInfo> monitorInfo, std:
     }
     return count == infoSize;
 }
+
+using callbackType = std::variant<
+    taihe::callback<void(KeyOptions const&)>,
+    taihe::callback<void(HotkeyOptions const&)>,
+    taihe::callback<void(ohos::multimodalInput::keyEvent::KeyEvent const&)>
+>;
 
 void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
 {

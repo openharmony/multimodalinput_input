@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "define_multimodal.h"
 #include "taihe_input_device_utils.h"
 
 #undef MMI_LOG_TAG
@@ -110,7 +109,7 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(const std::shar
         if (iter != g_taiheAxisType.end()) {
             axisType = iter->second;
         } else {
-            MMI_HILOGD("Find axisType failed");
+            MMI_HILOGD("Find axisType failed, axisType: %{public}d", item.GetAxisType());
             continue;
         }
         TaiheAxisRange axisRange = ConverterAxisRange(item, sourceType, axisType);

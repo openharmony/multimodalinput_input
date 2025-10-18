@@ -16,13 +16,7 @@
 #ifndef TAIHE_INPUT_DEVICE_IMPL_H
 #define TAIHE_INPUT_DEVICE_IMPL_H
 
-#include "ohos.multimodalInput.inputDevice.proj.hpp"
-#include "ohos.multimodalInput.inputDevice.impl.hpp"
-#include "define_multimodal.h"
-#include "input_manager.h"
-#include <ani.h>
-#include "taihe/runtime.hpp"
-#include <stdexcept>
+#include "taihe_input_device_utils.h"
 
 namespace OHOS {
 namespace MMI {

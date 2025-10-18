@@ -13,19 +13,7 @@
  * limitations under the License.
  */
 
-#include "ohos.multimodalInput.inputDevice.proj.hpp"
-#include "ohos.multimodalInput.inputDevice.impl.hpp"
-#include "taihe/runtime.hpp"
-#include <stdexcept>
-#include "input_device.h"
-#include "define_multimodal.h"
-#include "input_manager.h"
-#include "ani_common.h"
-#include <map>
-#include <ani.h>
-#include "ohos.multimodalInput.inputDevice.impl.h"
 #include "taihe_event.h"
-#include "taihe_input_device_utils.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TaiheInputDeviceImpl"
@@ -85,7 +73,6 @@ const std::string CHANGED_TYPE = "change";
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get device info, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
-        std::shared_ptr<InputDevice> errDevice = nullptr;
         return result;
     }
     return TaiheInputDeviceUtils::ConverterInputDevice(_device);
