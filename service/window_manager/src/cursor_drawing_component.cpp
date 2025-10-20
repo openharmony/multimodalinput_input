@@ -174,6 +174,12 @@ void CursorDrawingComponent::UpdateDisplayInfo(const OLD::DisplayInfo &displayIn
     pointerInstance_->UpdateDisplayInfo(displayInfo);
 }
 
+void CursorDrawingComponent::UpdateBindDisplayId(uint64_t rsId)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->UpdateBindDisplayId(rsId);
+}
+
 void CursorDrawingComponent::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)

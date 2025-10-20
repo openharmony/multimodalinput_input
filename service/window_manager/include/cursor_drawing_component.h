@@ -35,6 +35,7 @@ public:
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
+    void UpdateBindDisplayId(uint64_t rsId);
     void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo);
     void OnWindowInfo(const WinInfo &info);
     bool Init();
