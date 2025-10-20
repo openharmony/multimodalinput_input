@@ -627,6 +627,18 @@ int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
     return DEFAULT_GROUP_ID;
 }
 
+int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
+{
+    for (const auto& it : displayGroupInfoMap_) {
+        for (const auto& item : it.second.displaysInfo) {
+            if (item.id == displayId) {
+                return it.second.currentUserId;
+            }
+        }
+    }
+    return RET_ERR;
+}
+
 OLD::DisplayGroupInfo& InputWindowsManager::GetDefaultDisplayGroupInfo()
 {
     for (auto &item : displayGroupInfoMap_) {
@@ -7104,16 +7116,19 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
     return true;
 }
 
-void InputWindowsManager::SetWindowStateNotifyPid(int32_t pid)
+void InputWindowsManager::SetWindowStateNotifyPid(int32_t userId, int32_t pid)
 {
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        windowStateNotifyPid_ = pid;
+        windowStateNotifyUserIdPid_[userId] = pid;
     }
 }
 
-int32_t InputWindowsManager::GetWindowStateNotifyPid()
+int32_t InputWindowsManager::GetWindowStateNotifyPid(int32_t userId)
 {
-    return windowStateNotifyPid_;
+    if (windowStateNotifyUserIdPid_.find(userId) != windowStateNotifyUserIdPid_.end()) {
+        return windowStateNotifyUserIdPid_[userId];
+    }
+    return -1;
 }
 
 int32_t InputWindowsManager::GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId)

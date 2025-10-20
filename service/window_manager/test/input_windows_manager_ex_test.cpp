@@ -4271,10 +4271,11 @@ HWTEST_F(InputWindowsManagerTest, SetWindowStateNotifyPid_001, TestSize.Level1)
 
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
     int32_t pid = 0;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+    int32_t userId = 100;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(userId, pid));
 
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(pid));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SetWindowStateNotifyPid(userId, pid));
 }
 
 /**

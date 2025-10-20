@@ -83,6 +83,7 @@ constexpr float FACTOR_55 { 1.6f };
 constexpr float FACTOR_MAX { 2.4f };
 constexpr int64_t QUERY_AUTHORIZE_MAX_INTERVAL_TIME { 3000 };
 constexpr uint32_t MAX_ENHANCE_CONFIG_SIZE { 1000 };
+constexpr int32_t BASE_USER_RANGE { 200000 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -891,15 +892,15 @@ int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetP
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t tokenType = sess->GetTokenType();
-    if (tokenType != TokenType::TOKEN_NATIVE && tokenType != TokenType::TOKEN_SHELL &&
-        tokenType !=TokenType::TOKEN_SYSTEM_HAP) {
-        MMI_HILOGW("Not native or systemapp skip, pid:%{public}d tokenType:%{public}d", sess->GetPid(), tokenType);
+    const std::string sceneboard = "com.ohos.sceneboard";
+    if (sess->GetProgramName() != sceneboard) {
+        MMI_HILOGE("sess is not com.ohos.sceneboard");
         return RET_ERR;
     }
+    int32_t userId =  sess->GetUid() / BASE_USER_RANGE;
     int32_t pid = sess->GetPid();
-    WIN_MGR->SetWindowStateNotifyPid(pid);
-    MMI_HILOGI("The pid:%{public}d", pid);
+    WIN_MGR->SetWindowStateNotifyPid(userId, pid);
+    MMI_HILOGI("%{private}d,%{public}d", userId, pid);
     return RET_OK;
 }
 
