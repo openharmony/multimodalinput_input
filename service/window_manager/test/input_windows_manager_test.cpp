@@ -10662,7 +10662,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowStateNotifyPi
 {
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
-    EXPECT_NO_FATAL_FAILURE(manager.GetWindowStateNotifyPid());
+    int32_t userId = 100;
+    EXPECT_NO_FATAL_FAILURE(manager.GetWindowStateNotifyPid(userId));
 }
 
 /**

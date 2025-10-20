@@ -2159,10 +2159,11 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_001, TestSize
     EventDispatchHandler eventdispatchhandler;
     int32_t fd = 1;
     int32_t windowId = 3;
+    int32_t userId = 100;
     auto udsServer = std::make_unique<UDSServer>();
     InputHandler->udsServer_ = udsServer.get();
     EXPECT_NE(InputHandler->udsServer_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(fd, windowId));
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(userId, fd, windowId));
     InputHandler->udsServer_ = nullptr;
 }
 

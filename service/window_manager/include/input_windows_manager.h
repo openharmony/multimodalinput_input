@@ -206,10 +206,11 @@ public:
     bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
-    void SetWindowStateNotifyPid(int32_t pid);
-    int32_t GetWindowStateNotifyPid();
+    void SetWindowStateNotifyPid(int32_t userId, int32_t pid);
+    int32_t GetWindowStateNotifyPid(int32_t userId);
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
     int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
+    int32_t FindDisplayUserId(int32_t displayId) const;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
@@ -581,7 +582,7 @@ private:
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
-    int32_t windowStateNotifyPid_ { -1 };
+    std::map<int32_t, int32_t> windowStateNotifyUserIdPid_;
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
