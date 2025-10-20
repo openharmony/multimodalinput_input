@@ -4524,15 +4524,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             IsMouseDrawing(pointerEvent->GetPointerAction()) &&
             pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
+            CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
+            CursorDrawingComponent::GetInstance().UpdateBindDisplayId(physicalDisplayInfo->rsId);
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
         pointerStyle = CursorDrawingComponent::GetInstance().GetLastMouseStyle();
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
             pointerStyle.id, lastPointerStyle_.id);
-        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
-        WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
     } else {
         if (timerId_ != DEFAULT_VALUE) {
             TimerMgr->RemoveTimer(timerId_);
@@ -4544,10 +4543,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
-        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
-        WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
     }
+    CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
+    WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
+    CursorDrawingComponent::GetInstance().OnWindowInfo(info);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_EMULATOR
     if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
