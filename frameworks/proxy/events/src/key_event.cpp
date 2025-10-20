@@ -1476,6 +1476,25 @@ void KeyEvent::SetRepeatKey(bool repeatKey)
     // LCOV_EXCL_STOP
 }
 
+bool KeyEvent::IsKeyPressed(int32_t keyCode) const
+{
+    if (keyCode == GetKeyCode()) {
+        int32_t keyAction = GetKeyAction();
+        return keyAction == KEY_ACTION_DOWN;
+    }
+    return HasKeyItem(keyCode);
+}
+
+bool KeyEvent::HasKeyItem(int32_t keyCode) const
+{
+    for (const auto &item : keys_) {
+        if (item.GetKeyCode() == keyCode) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::string_view KeyEvent::ActionToShortStr(int32_t action)
 {
     // LCOV_EXCL_START

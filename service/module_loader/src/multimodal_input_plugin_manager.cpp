@@ -15,9 +15,13 @@
 
 #include <iostream>
 #include <memory>
+
 #include "multimodal_input_plugin_manager.h"
+
+#include "app_mgr_client.h"
 #include "i_input_event_handler.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "key_monitor_manager.h"
 #include "mmi_log.h"
 
@@ -535,6 +539,28 @@ void InputPlugin::HandleMonitorStatus(bool monitorStatus, const std::string &mon
     MMI_HILOGI("The monitorStatus:%{public}d, monitorType:%{public}s",
         monitorStatus, monitorType.c_str());
     return plugin_->HandleMonitorStatus(monitorStatus, monitorType);
+}
+
+std::string InputPlugin::GetFocusedAppInfo()
+{
+    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    if (!appMgrClient) {
+        MMI_HILOGE("Get app manager client faield");
+        return "";
+    }
+    int32_t appPid = WIN_MGR->GetFocusPid();
+    if (appPid == -1) {
+        MMI_HILOGE("Window manager get focused pid failed");
+        return "";
+    }
+
+    AppExecFwk::RunningProcessInfo info;
+    int32_t res = appMgrClient->GetRunningProcessInfoByPid(static_cast<pid_t>(appPid), info);
+    if(res != RET_OK) {
+        MMI_HILOGE("Get Running Process info by pid:%{private}d faied", appPid);
+        return "";
+    }
+    return info.processName_;
 }
 } // namespace MMI
 } // namespace OHOS
