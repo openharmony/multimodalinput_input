@@ -31,6 +31,7 @@ namespace MMI {
 namespace {
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 constexpr double THRESHOLD { 0.01 };
+constexpr int32_t LIBINPUT_BUTTON_STATE_REPEAT { 2 };
 } // namespace
 
 JoystickEventProcessor::JoystickEventProcessor(int32_t deviceId)
