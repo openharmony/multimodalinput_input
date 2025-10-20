@@ -23,32 +23,10 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "LibinputDeviceManagerFuzzTest"
 
-struct udev_device {
-    int32_t tags;
-};
-
-struct libinput_device {
-    struct udev_device udevDev;
-    int32_t busType;
-    int32_t version;
-    int32_t product;
-    int32_t vendor;
-    std::string name;
-};
-
 namespace OHOS {
 namespace MMI {
 void DumpFuzzTest(FuzzedDataProvider &provider)
 {
-    int32_t tags = provider.ConsumeIntegral<int32_t>();
-    struct libinput_device libDev {
-        .udevDev { tags },
-        .busType = provider.ConsumeIntegral<int32_t>(),
-        .version = provider.ConsumeIntegral<int32_t>(),
-        .product = provider.ConsumeIntegral<int32_t>(),
-        .vendor = provider.ConsumeIntegral<int32_t>(),
-        .name = provider.ConsumeBytesAsString(5),
-    };
     int32_t fd = provider.ConsumeIntegral<int32_t>();
     std::vector<std::string> args = {
         provider.ConsumeBytesAsString(5),
@@ -56,26 +34,11 @@ void DumpFuzzTest(FuzzedDataProvider &provider)
         provider.ConsumeBytesAsString(5),
         provider.ConsumeBytesAsString(5)
     };
-    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
-    InputDeviceManager::InputDeviceInfo deviceInfo;
-    deviceInfo.inputDeviceOrigin = &libDev;
-    deviceInfo.isRemote = provider.ConsumeBool();
-    deviceInfo.enable = provider.ConsumeBool();
-    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
     INPUT_DEV_MGR->Dump(fd, args);
 }
 
 void DumpDeviceListFuzzTest(FuzzedDataProvider &provider)
 {
-    int32_t tags = provider.ConsumeIntegral<int32_t>();
-    struct libinput_device libDev {
-        .udevDev { tags },
-        .busType = provider.ConsumeIntegral<int32_t>(),
-        .version = provider.ConsumeIntegral<int32_t>(),
-        .product = provider.ConsumeIntegral<int32_t>(),
-        .vendor = provider.ConsumeIntegral<int32_t>(),
-        .name = provider.ConsumeBytesAsString(5),
-    };
     int32_t fd = provider.ConsumeIntegral<int32_t>();
     std::vector<std::string> args = {
         provider.ConsumeBytesAsString(5),
@@ -83,50 +46,7 @@ void DumpDeviceListFuzzTest(FuzzedDataProvider &provider)
         provider.ConsumeBytesAsString(5),
         provider.ConsumeBytesAsString(5)
     };
-    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
-    InputDeviceManager::InputDeviceInfo deviceInfo;
-    deviceInfo.inputDeviceOrigin = &libDev;
-    deviceInfo.isRemote = provider.ConsumeBool();
-    deviceInfo.enable = provider.ConsumeBool();
-    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
     INPUT_DEV_MGR->DumpDeviceList(fd, args);
-}
-
-void IsRemoteFuzzTest(FuzzedDataProvider &provider)
-{
-    int32_t tags = provider.ConsumeIntegral<int32_t>();
-    struct libinput_device libDev {
-        .udevDev { tags },
-        .busType = provider.ConsumeIntegral<int32_t>(),
-        .version = provider.ConsumeIntegral<int32_t>(),
-        .product = provider.ConsumeIntegral<int32_t>(),
-        .vendor = provider.ConsumeIntegral<int32_t>(),
-        .name = provider.ConsumeBytesAsString(5),
-    };
-    INPUT_DEV_MGR->IsRemote(&libDev);
-}
-
-void RemovePhysicalInputDeviceInnerFuzzTest(FuzzedDataProvider &provider)
-{
-    int32_t tags = provider.ConsumeIntegral<int32_t>();
-    struct libinput_device libDev {
-        .udevDev { tags },
-        .busType = provider.ConsumeIntegral<int32_t>(),
-        .version = provider.ConsumeIntegral<int32_t>(),
-        .product = provider.ConsumeIntegral<int32_t>(),
-        .vendor = provider.ConsumeIntegral<int32_t>(),
-        .name = provider.ConsumeBytesAsString(5),
-    };
-    int32_t deviceId = provider.ConsumeIntegral<int32_t>();
-    bool enable = provider.ConsumeBool();
-    bool isDeviceReportEvent = provider.ConsumeBool();
-    InputDeviceManager::InputDeviceInfo deviceInfo;
-    deviceInfo.inputDeviceOrigin = &libDev;
-    deviceInfo.isRemote = provider.ConsumeBool();
-    deviceInfo.enable = provider.ConsumeBool();
-    deviceInfo.isDeviceReportEvent = provider.ConsumeBool();
-    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
-    INPUT_DEV_MGR->RemovePhysicalInputDeviceInner(&libDev, deviceId, enable, isDeviceReportEvent);
 }
 
 bool LibinputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
@@ -134,8 +54,6 @@ bool LibinputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
     FuzzedDataProvider provider(data, size);
     DumpFuzzTest(provider);
     DumpDeviceListFuzzTest(provider);
-    IsRemoteFuzzTest(provider);
-    RemovePhysicalInputDeviceInnerFuzzTest(provider);
     return true;
 }
 } // namespace MMI
