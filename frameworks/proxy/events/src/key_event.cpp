@@ -1479,8 +1479,7 @@ void KeyEvent::SetRepeatKey(bool repeatKey)
 bool KeyEvent::IsKeyPressed(int32_t keyCode) const
 {
     if (keyCode == GetKeyCode()) {
-        int32_t keyAction = GetKeyAction();
-        return keyAction == KEY_ACTION_DOWN;
+        return GetKeyAction() == KEY_ACTION_DOWN;
     }
     return HasKeyItem(keyCode);
 }
