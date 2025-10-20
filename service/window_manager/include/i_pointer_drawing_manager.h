@@ -197,6 +197,7 @@ public:
     {
         return 0;
     }
+    virtual void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) {};
 };
 } // namespace MMI
 } // namespace OHOS

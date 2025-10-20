@@ -516,4 +516,10 @@ int32_t CursorDrawingComponent::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
     return pointerInstance_->GetUserDefinedCursorPixelMap(pixelMapPtr);
 }
+
+void CursorDrawingComponent::UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->UpdatePointerItemCursorInfo(pointerItem);
+}
 } // namespace OHOS

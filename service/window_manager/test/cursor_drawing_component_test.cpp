@@ -746,5 +746,37 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetUserDefinedCu
     instance_->isLoaded_ = true;
     ASSERT_EQ(instance_->GetUserDefinedCursorPixelMap(nullptr), RET_ERR);
 }
+
+/**
+ * @tc.name: CursorDrawingComponentTest_UpdatePointerItemCursorInfo_001
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerItemCursorInfo_001, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = 1;
+    pointerItem.SetPointerId(pointerId);
+    instance_->UpdatePointerItemCursorInfo(pointerItem);
+    ASSERT_EQ(pointerItem.GetPointerId(), pointerId);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_UpdatePointerItemCursorInfo_002
+ * @tc.desc: Test GetUserDefinedCursorPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerItemCursorInfo_002, TestSize.Level1)
+{
+    instance_->isLoaded_ = true;
+    PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = 1;
+    pointerItem.SetPointerId(pointerId);
+    instance_->UpdatePointerItemCursorInfo(pointerItem);
+    ASSERT_EQ(pointerItem.GetPointerId(), pointerId);
+}
 } // namespace MMI
 } // namespace OHOS

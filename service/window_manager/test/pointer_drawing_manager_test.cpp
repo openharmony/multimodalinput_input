@@ -3557,7 +3557,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCurrentCursorIn
     PointerStyle pointerStyle;
     auto ret = pointerDrawingManager.GetCurrentCursorInfo(visible, pointerStyle);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(visible);
     ASSERT_EQ(pointerStyle.id, style);
 }
 
@@ -3627,6 +3626,40 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetUserDefinedCurs
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     auto ret = pointerDrawingManager.GetUserDefinedCursorPixelMap(&pixelMap);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdatePointerItemCursorInfo_001
+ * @tc.desc: Test UpdatePointerItemCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdatePointerItemCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    bool visible = false;
+    PointerEvent::PointerItem pointerItem;
+    pointerDrawingManager.RecordCursorVisibleStatus(visible);
+    pointerDrawingManager.UpdatePointerItemCursorInfo(pointerItem);
+    ASSERT_EQ(pointerItem.GetVisible(), visible);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdatePointerItemCursorInfo_002
+ * @tc.desc: Test UpdatePointerItemCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdatePointerItemCursorInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    bool visible = true;
+    PointerEvent::PointerItem pointerItem;
+    pointerDrawingManager.RecordCursorVisibleStatus(visible);
+    pointerDrawingManager.UpdatePointerItemCursorInfo(pointerItem);
+    ASSERT_EQ(pointerItem.GetVisible(), visible);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -4409,11 +4409,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    pointerItem.SetColor(static_cast<uint32_t>(CursorDrawingComponent::GetInstance().GetPointerColor()));
-    pointerItem.SetSizeLevel(CursorDrawingComponent::GetInstance().GetPointerSize());
-    auto visible = CursorDrawingComponent::GetInstance().IsPointerVisible() &&
-        CursorDrawingComponent::GetInstance().GetMouseDisplayState();
-    pointerItem.SetVisible(visible);
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     int32_t physicalX = pointerItem.GetDisplayX();
@@ -4465,7 +4460,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                         physicalX, physicalY);
                 }
             }
-            pointerItem.SetStyle(lastPointerStyle_.id);
+            CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
+            pointerEvent->UpdatePointerItem(pointerId, pointerItem);
             MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
@@ -4620,7 +4616,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #endif
         CursorDrawingComponent::GetInstance().DrawPointer(physicalDisplayInfo->rsId, physicalX, physicalY,
             dragPointerStyle_, direction);
-        pointerItem.SetStyle(dragPointerStyle_.id);
+        CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
