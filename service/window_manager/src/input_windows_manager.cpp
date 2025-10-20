@@ -3309,6 +3309,19 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
     return 0;
 }
 
+int32_t InputWindowsManager::GetFocusPid(int32_t groupId) const
+{
+    auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (const auto& windowInfo: iter->second.windowsInfo) {
+            if (windowInfo.id == iter->second.focusWindowId) {
+                return windowInfo.pid;
+            }
+        }
+    }
+    return -1;
+}
+
 int32_t InputWindowsManager::GetMainDisplayId(int32_t groupId) const
 {
     auto iter = displayGroupInfoMap_.find(groupId);

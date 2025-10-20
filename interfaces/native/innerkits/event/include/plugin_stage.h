@@ -121,6 +121,7 @@ struct IPluginContext {
     virtual PluginResult HandleEvent(std::shared_ptr<KeyEvent> keyEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) = 0;
+    virtual std::string GetFocusedAppInfo() = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

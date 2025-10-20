@@ -117,6 +117,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     virtual int32_t SetHoverScrollState(bool state) = 0;
     virtual int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
+    virtual int32_t GetFocusPid(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
     virtual bool GetHoverScrollState() const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
