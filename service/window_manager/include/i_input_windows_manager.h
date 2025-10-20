@@ -168,10 +168,11 @@ public:
         int32_t deviceId) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
-    virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
-    virtual int32_t GetWindowStateNotifyPid() = 0;
+    virtual void SetWindowStateNotifyPid(int32_t userId, int32_t pid) = 0;
+    virtual int32_t GetWindowStateNotifyPid(int32_t userId) = 0;
     virtual int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
     virtual int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
+    virtual int32_t FindDisplayUserId(int32_t displayId) const = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
