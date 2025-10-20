@@ -148,6 +148,7 @@ public:
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr) override;
     void RecordCursorIdAndImageAddress();
     void RecordCursorVisibleStatus(bool status);
+    void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) override;
 
 private:
     struct PixelMapInfo {
