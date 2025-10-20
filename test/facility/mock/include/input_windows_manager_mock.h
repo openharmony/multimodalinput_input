@@ -81,6 +81,7 @@ public:
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(int32_t, GetFocusWindowId, (int32_t), (const));
+    MOCK_METHOD(int32_t, GetFocusPid, (int32_t), (const));
     MOCK_METHOD(bool, IsMouseSimulate, ());
     MOCK_METHOD(bool, HasMouseHideFlag, ());
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
