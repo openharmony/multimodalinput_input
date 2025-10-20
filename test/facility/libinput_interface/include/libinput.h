@@ -109,7 +109,7 @@ enum libinput_tablet_tool_tip_state {
 
 enum libinput_button_state {
     LIBINPUT_BUTTON_STATE_RELEASED = 0,
-    LIBINPUT_BUTTON_STATE_PRESSED = 1,
+    LIBINPUT_BUTTON_STATE_PRESSED = 1
 };
 
 enum libinput_pointer_axis_source {
