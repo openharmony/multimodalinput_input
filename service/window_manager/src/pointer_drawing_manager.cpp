@@ -1886,7 +1886,7 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 int32_t PointerDrawingManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    visible = IsPointerVisible() && mouseDisplayState_;
+    visible = POINTER_DEV_MGR.isPointerVisible;
     if (!visible) {
         MMI_HILOGD("current pointer is not visible");
         return RET_OK;
@@ -3975,6 +3975,17 @@ void PointerDrawingManager::RecordCursorIdAndImageAddress()
 void PointerDrawingManager::RecordCursorVisibleStatus(bool status)
 {
     POINTER_DEV_MGR.isPointerVisible = status;
+}
+
+void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem)
+{
+    pointerItem.SetVisible(POINTER_DEV_MGR.isPointerVisible);
+    if (!pointerItem.GetVisible()) {
+        return;
+    }
+    pointerItem.SetStyle(lastMouseStyle_.id);
+    pointerItem.SetSizeLevel(GetPointerSize());
+    pointerItem.SetColor(static_cast<uint32_t>(GetPointerColor()));
 }
 } // namespace MMI
 } // namespace OHOS

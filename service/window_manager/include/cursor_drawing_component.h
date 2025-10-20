@@ -96,6 +96,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_WATCH
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
+    void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem);
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();
