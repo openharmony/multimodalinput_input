@@ -3773,6 +3773,7 @@ ohos_unittest("KnuckleDrawingComponentTest") {
   deps = [
     "${mmi_path}/service:libmmi-knuckle",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
