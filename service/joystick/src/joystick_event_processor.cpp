@@ -31,6 +31,7 @@ namespace MMI {
 namespace {
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 constexpr double THRESHOLD { 0.01 };
+constexpr int32_t LIBINPUT_BUTTON_STATE_REPEAT { 2 };
 } // namespace
 
 JoystickEventProcessor::JoystickEventProcessor(int32_t deviceId)
@@ -48,10 +49,11 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::OnButtonEvent(struct libinput_
 
     KeyEvent::KeyItem button {};
     button.SetKeyCode(keyCode);
-    button.SetPressed(rawBtnState == LIBINPUT_BUTTON_STATE_PRESSED);
+    button.SetPressed(rawBtnState != LIBINPUT_BUTTON_STATE_RELEASED);
 
     auto btnEvent = FormatButtonEvent(button);
     if (btnEvent != nullptr) {
+        btnEvent->SetRepeatKey(rawBtnState == LIBINPUT_BUTTON_STATE_REPEAT);
         MMI_HILOGI("Joystick_button_event, No:%{public}d,KC:%{private}d,KA:%{public}d,Intention:%{public}d",
             btnEvent->GetId(), btnEvent->GetKeyCode(), btnEvent->GetKeyAction(), btnEvent->GetKeyIntention());
     }
@@ -198,7 +200,7 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEve
         keyEvent->SetActionStartTime(time);
     }
     keyEvent->SetRepeat(false);
-
+    keyEvent->SetRepeatKey(false);
     KeyEvent::KeyItem keyItem {};
     keyItem.SetDownTime(time);
     keyItem.SetKeyCode(button.GetKeyCode());

@@ -319,6 +319,7 @@ private:
     const std::vector<WindowInfo>& GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetMainDisplayId(int32_t groupId = DEFAULT_GROUP_ID) const;
+    int32_t GetFocusPid(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetLogicalPositionX(int32_t id);
     int32_t GetLogicalPositionY(int32_t id);
     Direction GetLogicalPositionDirection(int32_t id);

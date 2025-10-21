@@ -67,6 +67,7 @@ public:
     void DispatchEvent(PluginEventType pluginEvent, InputDispatchStage stage) override;
     void DispatchEvent(NetPacket &pkt, int32_t pid) override;
     void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) override;
+    virtual std::string GetFocusedAppInfo() override;
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;
