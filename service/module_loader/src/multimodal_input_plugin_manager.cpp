@@ -556,7 +556,7 @@ std::string InputPlugin::GetFocusedAppInfo()
 
     AppExecFwk::RunningProcessInfo info;
     int32_t res = appMgrClient->GetRunningProcessInfoByPid(static_cast<pid_t>(appPid), info);
-    if(res != RET_OK) {
+    if (res != RET_OK) {
         MMI_HILOGE("Get Running Process info by pid:%{private}d faied", appPid);
         return "";
     }
