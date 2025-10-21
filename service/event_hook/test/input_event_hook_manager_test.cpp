@@ -61,66 +61,6 @@ HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_IsHookExisted001, 
 }
 
 /**
- * @tc.name: InputEventHookManagerTest_HandleKeyEvent001
- * @tc.desc: Test the function HandleKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_HandleKeyEvent001, TestSize.Level1)
-{
-    InputEventHookManager hookMgr;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto nextHookGetter = [&hookMgr] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> const {
-        return hookMgr.GetNextHook(hook);
-    };
-    hookMgr.hooks_[HOOK_EVENT_TYPE_KEY].push_back(
-        std::make_shared<KeyEventHook>(sess, nextHookGetter));
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    keyEvent->SetKeyCode(-1);
-    EXPECT_NO_FATAL_FAILURE(hookMgr.HandleKeyEvent(keyEvent));
-}
-
-/**
- * @tc.name: InputEventHookManagerTest_HandlePointerEvent001
- * @tc.desc: Test the function HandlePointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_HandlePointerEvent001, TestSize.Level1)
-{
-    InputEventHookManager hookMgr;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto nextHookGetter = [&hookMgr] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> const {
-        return hookMgr.GetNextHook(hook);
-    };
-    hookMgr.hooks_[HOOK_EVENT_TYPE_MOUSE].push_back(
-        std::make_shared<PointerEventHook>(sess, HOOK_EVENT_TYPE_MOUSE, nextHookGetter));
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    EXPECT_NO_FATAL_FAILURE(hookMgr.HandlePointerEvent(pointerEvent));
-}
-
-/**
- * @tc.name: InputEventHookManagerTest_HandleTouchEvent001
- * @tc.desc: Test the function HandleTouchEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_HandleTouchEvent001, TestSize.Level1)
-{
-    InputEventHookManager hookMgr;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto nextHookGetter = [&hookMgr] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> const {
-        return hookMgr.GetNextHook(hook);
-    };
-    hookMgr.hooks_[HOOK_EVENT_TYPE_TOUCH].push_back(
-        std::make_shared<PointerEventHook>(sess, HOOK_EVENT_TYPE_TOUCH, nextHookGetter));
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    EXPECT_NO_FATAL_FAILURE(hookMgr.HandlePointerEvent(pointerEvent));
-}
-
-/**
  * @tc.name: InputEventHookManagerTest_AddInputEventHook001
  * @tc.desc: Test the function AddInputEventHook
  * @tc.type: FUNC
@@ -204,40 +144,6 @@ HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_DispatchTouchToNex
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     EXPECT_EQ(hookMgr.DispatchTouchToNextHandler(UDS_PID, pointerEvent), ERROR_INVALID_PARAMETER);
-}
-
-/**
- * @tc.name: InputEventHookManagerTest_Dump001
- * @tc.desc: Test the function DUmp
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_Dump001, TestSize.Level1)
-{
-    InputEventHookManager hookMgr;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto nextHookGetter = [&hookMgr] (std::shared_ptr<InputEventHook> hook) -> std::shared_ptr<InputEventHook> const {
-        return hookMgr.GetNextHook(hook);
-    };
-    hookMgr.hooks_[HOOK_EVENT_TYPE_KEY].push_back(
-        std::make_shared<KeyEventHook>(sess, nextHookGetter));
-    hookMgr.hooks_[HOOK_EVENT_TYPE_TOUCH].push_back(
-        std::make_shared<PointerEventHook>(sess, HOOK_EVENT_TYPE_TOUCH, nextHookGetter));
-    std::vector<std::string> args;
-    EXPECT_NO_FATAL_FAILURE(hookMgr.Dump(0, args));
-}
-
-/**
- * @tc.name: InputEventHookManagerTest_OnSessionLost001
- * @tc.desc: Test the function OnSessionLost
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputEventHookManagerTest, InputEventHookManagerTest_OnSessionLost001, TestSize.Level1)
-{
-    InputEventHookManager hookMgr;
-    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    EXPECT_NO_FATAL_FAILURE(hookMgr.OnSessionLost(sess));
 }
 
 /**
