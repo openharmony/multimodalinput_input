@@ -6371,5 +6371,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetUserDefinedCursorPixelMap_001, Te
     CALL_TEST_DEBUG;
     EXPECT_NE(InputManager::GetInstance()->GetUserDefinedCursorPixelMap(nullptr), RET_OK);
 }
+
+/*
+ * @tc.name: InputManagerTest_IsPointerInit
+ * @tc.desc: IsPointerInit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_IsPointerInit, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = InputManager::GetInstance()->IsPointerInit();
+    EXPECT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
