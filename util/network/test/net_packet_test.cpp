@@ -242,9 +242,8 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
  */
 HWTEST_F(NetPacketTest, GetMsgId_005, TestSize.Level1)
 {
-
     MmiMessageId idMsg = static_cast<MmiMessageId>(12345);
-
+    
     NetPacket pkt(idMsg);
     NetPacket packTmp = pkt;
     const MmiMessageId retResult = packTmp.GetMsgId();
