@@ -15,8 +15,10 @@
 
 #include "ohos.multimodalInput.inputEventClient.proj.hpp"
 #include "ohos.multimodalInput.inputEventClient.impl.hpp"
-#include "taihe/runtime.hpp"
+
 #include <stdexcept>
+
+#include "taihe/runtime.hpp"
 
 using namespace taihe;
 using namespace ohos::multimodalInput::inputEventClient;

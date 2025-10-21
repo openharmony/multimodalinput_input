@@ -17,8 +17,6 @@
 #define TAIHE_EVENT_H
 
 #include "ohos.multimodalInput.inputDevice.impl.h"
-#include "define_multimodal.h"
-#include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {
