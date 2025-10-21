@@ -90,7 +90,7 @@ HWTEST_F(InputEventDataTransformationTest, UnmarshallingEnhanceData_003, TestSiz
 HWTEST_F(InputEventDataTransformationTest, MarshallingEnhanceData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr pointerEvent = PointerEvent::Create();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     pkt << InputEventDataTransformation::MAX_HMAC_SIZE + 1;
@@ -107,7 +107,7 @@ HWTEST_F(InputEventDataTransformationTest, MarshallingEnhanceData_001, TestSize.
 HWTEST_F(InputEventDataTransformationTest, MarshallingEnhanceData_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr keyEvent = KeyEvent::Create();
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     pkt << 0;
@@ -124,7 +124,7 @@ HWTEST_F(InputEventDataTransformationTest, MarshallingEnhanceData_002, TestSize.
 HWTEST_F(InputEventDataTransformationTest, SwitchEventToNetPacket, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::shared_ptr switchEvent = std::make_shared(0);
+    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(0);
     ASSERT_NE(switchEvent, nullptr);
 
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
