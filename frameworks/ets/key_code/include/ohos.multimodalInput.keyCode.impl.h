@@ -16,15 +16,17 @@
 #ifndef OHOS_MULTIMODALINPUT_KEY_CODE_IMPL_H
 #define OHOS_MULTIMODALINPUT_KEY_CODE_IMPL_H
 
-#include "define_multimodal.h"
 #include "ohos.multimodalInput.keyCode.proj.hpp"
 #include "ohos.multimodalInput.keyCode.impl.hpp"
-#include "taihe/runtime.hpp"
+
 #include <stdexcept>
+
+#include "define_multimodal.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace MMI {
-using namespace ohos::multimodalInput::keyCode;
+namespace keyCode = ohos::multimodalInput::keyCode;
 
 enum KeyCodeEts {
     KEYCODE_FN_ETS = 0,
@@ -376,7 +378,7 @@ enum KeyCodeEts {
     KEYCODE_DAGGER_LONG_PRESS_ETS = 3213
 };
 
-KeyCode ConvertEtsKeyCode(int32_t keyCode);
+keyCode::KeyCode ConvertEtsKeyCode(int32_t keyCode);
 
 } // namespace MMI
 } // namespace OHOS

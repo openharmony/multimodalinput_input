@@ -28,8 +28,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         MMI_HILOGE("Failed to get ANI environment");
         return ANI_ERROR;
     }
-    if (ANI_OK != ohos::multimodalInput::mouseEvent::ANIRegister(env)) {
-        MMI_HILOGE("Error from ohos::multimodalInput::mouseEvent::ANIRegister");
+    if (int32_t ret = ohos::multimodalInput::mouseEvent::ANIRegister(env) != ANI_OK) {
+        MMI_HILOGE("ANIRegister failed, error: %{public}d", ret);
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;
