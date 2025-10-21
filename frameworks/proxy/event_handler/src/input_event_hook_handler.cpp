@@ -39,10 +39,6 @@ int32_t InputEventHookHandler::AddInputEventHookLocal(std::shared_ptr<IInputEven
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, ERROR_INVALID_PARAMETER);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
-        return RET_ERR;
-    }
     if (hookEventType & HOOK_EVENT_TYPE_KEY) {
         AddKeyHook([consumer](std::shared_ptr<KeyEvent> event) {
             consumer->OnInputEvent(event);
@@ -67,6 +63,10 @@ int32_t InputEventHookHandler::AddInputEventHook(std::shared_ptr<IInputEventCons
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, RET_ERR);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     if (IsHookExisted(hookEventType)) {
         MMI_HILOGE("Hook:%{public}u existed already hookEventType:%{public}u",
             currentHookStats_.load(std::memory_order_relaxed), hookEventType);
