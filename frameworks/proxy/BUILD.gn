@@ -91,6 +91,8 @@ ohos_source_set("libmmi-common") {
 if (is_arkui_x) {
   ohos_source_set("libmmi-client-crossplatform") {
     sources = libmmi_common_sources
+    sources += [ "${mmi_path}/util/common/src/mmi_log.cpp" ]
+
     public_configs = [ ":libmmi_public_client_config" ]
     include_dirs = [
       "${c_utils_root}/base/include",
