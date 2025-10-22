@@ -576,6 +576,7 @@ bool KeySubscriberHandler::InterceptByVm(const std::shared_ptr<KeyEvent> keyEvt)
 
 void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_INFO_TRACE;
     OHOS::AAFwk::Want want;
     want.SetAction("multimodal.event.MUTE_KEY_PRESS");
     want.SetParam("keyCode", keyEvent->GetKeyCode());
