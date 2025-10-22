@@ -206,10 +206,11 @@ public:
     bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
-    void SetWindowStateNotifyPid(int32_t pid);
-    int32_t GetWindowStateNotifyPid();
+    void SetWindowStateNotifyPid(int32_t userId, int32_t pid);
+    int32_t GetWindowStateNotifyPid(int32_t userId);
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
     int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId);
+    int32_t FindDisplayUserId(int32_t displayId) const;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco();
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
@@ -318,6 +319,7 @@ private:
     const std::vector<WindowInfo>& GetWindowInfoVector(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetMainDisplayId(int32_t groupId = DEFAULT_GROUP_ID) const;
+    int32_t GetFocusPid(int32_t groupId = DEFAULT_GROUP_ID) const;
     int32_t GetLogicalPositionX(int32_t id);
     int32_t GetLogicalPositionY(int32_t id);
     Direction GetLogicalPositionDirection(int32_t id);
@@ -482,6 +484,9 @@ private:
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
+    void DeleteInvalidDisplayGroups(const OLD::DisplayGroupInfo &displayGroupInfo,
+        std::vector<int32_t> &deleteGroups);
+    void DeleteInvalidWindowGroups(const std::vector<int32_t> &deleteGroups);
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -578,7 +583,7 @@ private:
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
-    int32_t windowStateNotifyPid_ { -1 };
+    std::map<int32_t, int32_t> windowStateNotifyUserIdPid_;
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };

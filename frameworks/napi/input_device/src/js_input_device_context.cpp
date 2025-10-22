@@ -36,12 +36,7 @@ constexpr int32_t ARGC_NUM { 2 };
 constexpr size_t INPUT_PARAMETER { 2 };
 } // namespace
 
-napi_env JsInputDeviceContext::env_ = nullptr;
-
-JsInputDeviceContext::JsInputDeviceContext()
-{
-    mgr_ = std::make_shared<JsInputDeviceManager>();
-}
+JsInputDeviceContext::JsInputDeviceContext(napi_env env) : mgr_(std::make_shared<JsInputDeviceManager>()), env_(env) {}
 
 JsInputDeviceContext::~JsInputDeviceContext()
 {
@@ -100,7 +95,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
 
-    JsInputDeviceContext *jsContext = new (std::nothrow) JsInputDeviceContext();
+    JsInputDeviceContext *jsContext = new (std::nothrow) JsInputDeviceContext(env);
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("jsvm ends");
@@ -843,7 +838,6 @@ napi_value JsInputDeviceContext::CreateEnumFunctionKey(napi_env env, napi_value 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
-    env_ = env;
     CHKPP(CreateInstance(env));
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),

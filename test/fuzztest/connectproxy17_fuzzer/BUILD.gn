@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("IsMatchKeysFuzzTest") {
+ohos_fuzztest("ConnectProxy17FuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/ismatchkeys_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/connectproxy17_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -43,8 +43,12 @@ ohos_fuzztest("IsMatchKeysFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
-    "${mmi_path}/service/device_manager/include",
-    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/account_manager/include",
+  ]
+  configs = [
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
   cflags = [
     "-g",
@@ -54,26 +58,30 @@ ohos_fuzztest("IsMatchKeysFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "ismatchkeys_fuzzer.cpp" ]
+  sources = [ "connectproxy17_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
   ]
 
   external_deps = [
-    "ability_runtime:app_manager",
+    "ability_runtime:abilitykit_native",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "cJSON:cjson",
     "c_utils:utils",
-    "data_share:datashare_consumer",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
+    "config_policy:configpolicy_util",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
-    "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
-    "libinput:libinput-third-mmi",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 
   if (security_component_enable) {
@@ -87,7 +95,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":IsMatchKeysFuzzTest",
+    ":ConnectProxy17FuzzTest",
   ]
 }
 ###############################################################################

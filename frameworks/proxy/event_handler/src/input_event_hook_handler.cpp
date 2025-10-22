@@ -27,9 +27,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr long long TIMEOUT_MS { 3000 };
-}
 
 InputEventHookHandler &InputEventHookHandler::GetInstance()
 {
@@ -42,7 +39,6 @@ int32_t InputEventHookHandler::AddInputEventHookLocal(std::shared_ptr<IInputEven
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, ERROR_INVALID_PARAMETER);
-    int32_t ret { RET_OK };
     if (hookEventType & HOOK_EVENT_TYPE_KEY) {
         AddKeyHook([consumer](std::shared_ptr<KeyEvent> event) {
             consumer->OnInputEvent(event);
@@ -67,6 +63,10 @@ int32_t InputEventHookHandler::AddInputEventHook(std::shared_ptr<IInputEventCons
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, RET_ERR);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     if (IsHookExisted(hookEventType)) {
         MMI_HILOGE("Hook:%{public}u existed already hookEventType:%{public}u",
             currentHookStats_.load(std::memory_order_relaxed), hookEventType);
@@ -170,6 +170,10 @@ void InputEventHookHandler::OnConnected()
     CALL_DEBUG_ENTER;
     if (currentHookStats_.load() == 0) {
         MMI_HILOGI("No hook existed");
+        return;
+    }
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
         return;
     }
     uint32_t hookEventType { 0 };

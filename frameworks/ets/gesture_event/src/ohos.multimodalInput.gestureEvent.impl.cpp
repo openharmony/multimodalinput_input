@@ -15,8 +15,10 @@
 
 #include "ohos.multimodalInput.gestureEvent.proj.hpp"
 #include "ohos.multimodalInput.gestureEvent.impl.hpp"
-#include "taihe/runtime.hpp"
+
 #include <stdexcept>
+
+#include "taihe/runtime.hpp"
 
 using namespace taihe;
 using namespace ohos::multimodalInput::gestureEvent;

@@ -19,36 +19,16 @@
 #include <fstream>
  
 #include "input_device_manager.h"
-#include "libinput.h"
- 
-struct udev_device {
-    uint32_t tags;
-};
- 
-struct libinput_device {
-    struct udev_device udevDev;
-    unsigned int busType;
-    unsigned int version;
-    unsigned int product;
-    unsigned int vendor;
-    char name[9];
-};
- 
-extern "C" {
-const char *libinput_device_get_name(struct libinput_device *device)
-{
-    const char* pName = device->name;
-    return pName;
-}
-}
- 
+#include "libinput_mock.h"
+#include "pointer_device_manager.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace testing;
 } // namespace
- 
+
 class InputDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -101,6 +81,8 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_002, TestSize.Level1)
     };
     inDevice.inputDeviceOrigin = &libDev;
     inDevice.isTouchableDevice = true;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("test")));
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceId, inDevice));
 }
  
@@ -153,7 +135,99 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_002, TestSize.Leve
     };
     inDevice.inputDeviceOrigin = &libDev;
     inDevice.sysUid = "test";
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("test")));
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevRemoveCallback(deviceId, inDevice));
+}
+
+/**
+ * @tc.name: IsPointerDevice_Test_001
+ * @tc.desc: Test the function IsPointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, IsPointerDevice_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    struct libinput_device *device = nullptr;
+    bool ret = inputDevice.IsPointerDevice(device);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnInputDeviceRemoved_Test_001
+ * @tc.desc: Test the function OnInputDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceRemoved_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    POINTER_DEV_MGR.isInit = false;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+ 
+    int32_t deviceId1 = 1;
+    int32_t deviceId2 = 2;
+    int32_t deviceId3 = 3;
+    InputDeviceManager::InputDeviceInfo info1;
+    InputDeviceManager::InputDeviceInfo info2;
+    InputDeviceManager::InputDeviceInfo info3;
+    struct libinput_device libDev1 {
+        .udevDev { 4 },
+        .name = "test1",
+    };
+    struct libinput_device libDev2 {
+        .udevDev { 4 },
+        .name = "test2",
+    };
+    struct libinput_device libDev3 {
+        .udevDev { 4 },
+        .name = "test3",
+    };
+    EXPECT_CALL(libinputMock, DeviceGetUdevDevice)
+        .WillOnce(Return(&libDev1.udevDev))
+        .WillOnce(Return(&libDev2.udevDev))
+        .WillOnce(Return(&libDev3.udevDev));
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("test")));
+    info1.inputDeviceOrigin = &libDev1;
+    info1.isDeviceReportEvent = true;
+    info2.inputDeviceOrigin = &libDev2;
+    info2.isDeviceReportEvent = false;
+    info3.inputDeviceOrigin = &libDev3;
+    info3.isDeviceReportEvent = true;
+    info3.isRemote = true;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId1, info1));
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId2, info2));
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId3, info3));
+    inputDevice.OnInputDeviceRemoved(&libDev1);
+    ASSERT_EQ(inputDevice.inputDevice_.count(deviceId1), 0);
+    inputDevice.OnInputDeviceRemoved(&libDev2);
+    ASSERT_EQ(inputDevice.inputDevice_.count(deviceId2), 0);
+    inputDevice.OnInputDeviceRemoved(&libDev3);
+    ASSERT_EQ(inputDevice.inputDevice_.count(deviceId3), 0);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetIsDeviceReportEvent_001
+ * @tc.desc: Test the function SetIsDeviceReportEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetIsDeviceReportEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo info;
+    inputDeviceManager.inputDevice_.insert(std::make_pair(deviceId, info));
+    int32_t virtualDeviceId = 2;
+    auto virtualDevice = std::make_shared<InputDevice>();
+    virtualDevice->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    inputDeviceManager.virtualInputDevices_[virtualDeviceId] = virtualDevice;
+    inputDeviceManager.SetIsDeviceReportEvent(deviceId, true);
+    EXPECT_EQ(inputDeviceManager.inputDevice_[deviceId].isDeviceReportEvent, true);
 }
 
 /**

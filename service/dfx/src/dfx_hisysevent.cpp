@@ -1283,5 +1283,49 @@ void DfxHisysevent::ReportCallingMute()
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+
+void DfxHisysevent::ReportTouchpadKnuckleDoubleClickEvent(int32_t fingerCount)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::CLICKPAD_UE,
+        fingerCount == 1 ? "FREETOUCH_GESTURE_KNUCKLE_SINGLE" : "FREETOUCH_GESTURE_KNUCKLE_DOUBLE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchpadLeftEdgeSlideEvent()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::CLICKPAD_UE,
+        "FREETOUCH_GES_LEFT_EDGE_SWIPE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchpadRightEdgeSlideEvent()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::CLICKPAD_UE,
+        "FREETOUCH_GES_RIGHT_EDGE_SWIPE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchpadSwipeInwardEvent()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::CLICKPAD_UE,
+        "CLICKPAD_GES_EDGE_INWARD_SWIPE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS

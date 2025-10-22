@@ -28,20 +28,19 @@ namespace MMI {
 namespace OHOS {
 const std::u16string FORMMGR_INTERFACE_TOKEN = IMultimodalInputConnect::GetDescriptor();
 
-bool OnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
+void OnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
-        return false;
+        return;
     }
     MessageParcel reply;
     MessageOption option;
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     FuzzedDataProvider provider(data, size);
-    uint32_t enumMax = static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_QUERY_POINTER_RECORD);
+    uint32_t enumMax = static_cast<uint32_t>(IMultimodalInputConnectIpcCode::COMMAND_DISPATCH_TO_NEXT_HANDLER);
     uint32_t code = provider.ConsumeIntegralInRange<uint32_t>(0, enumMax + 1);
     MMIService::GetInstance()->OnRemoteRequest(code, datas, reply, option);
-    return true;
 }
 } // namespace OHOS
 

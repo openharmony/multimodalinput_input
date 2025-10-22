@@ -153,6 +153,8 @@ public:
     virtual int32_t TouchpadDeviceGetFrequency(struct libinput_device *device) = 0;
     virtual enum libinput_tablet_tool_proximity_state TabletToolGetProximityState(
         struct libinput_event_tablet_tool *event) = 0;
+    virtual char* DeviceGetSysname(struct libinput_device *device) = 0;
+    virtual udev_device* DeviceGetUdevDevice(struct libinput_device *device) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -166,7 +166,6 @@ group("test") {
     "isinputdeviceenable_fuzzer:fuzztest",
     "isfocusedsession_fuzzer:fuzztest",
     "islocaldevice_fuzzer:fuzztest",
-    "ismatchkeys_fuzzer:fuzztest",
     "iswindowvisible_fuzzer:fuzztest",
     "judgecamerainfore_fuzzer:fuzztest",
     "keyevent_fuzzer:fuzztest",
@@ -408,6 +407,13 @@ group("test") {
     "unsubscribeinputactive_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
     "updatepointerevent_fuzzer:fuzztest",
-    "updatetouchstate_fuzzer:fuzztest"
+    "updatetouchstate_fuzzer:fuzztest",
+    "windowmanagerclearwindowpointerstyle_fuzzer:fuzztest",
+    "windowmanagerdeletepointervisible_fuzzer:fuzztest",
+    "windowmanagerdrawmovepointer_fuzzer:fuzztest",
+    "windowmanagerdrawpointer_fuzzer:fuzztest",
+    "windowmanagerenablehardwarecursorstats_fuzzer:fuzztest",
+    "windowmanagergetpointervisible_fuzzer:fuzztest",
+    "windowmanageronsessionlost_fuzzer:fuzztest",
   ]
 }

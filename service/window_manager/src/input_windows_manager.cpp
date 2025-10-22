@@ -213,12 +213,6 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
     CALL_INFO_TRACE;
     if (devStatus == "add") {
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
-        for (const auto &displayGroupInfo : displayGroupInfoMap_) {
-            if (!displayGroupInfo.second.displaysInfo.empty() &&
-                displayGroupInfo.second.userState == UserState::USER_ACTIVE) {
-                UpdateDisplayIdAndName(displayGroupInfo.second.groupId);
-            }
-        }
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
     }
@@ -631,6 +625,18 @@ int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
         }
     }
     return DEFAULT_GROUP_ID;
+}
+
+int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
+{
+    for (const auto& it : displayGroupInfoMap_) {
+        for (const auto& item : it.second.displaysInfo) {
+            if (item.id == displayId) {
+                return it.second.currentUserId;
+            }
+        }
+    }
+    return RET_ERR;
 }
 
 OLD::DisplayGroupInfo& InputWindowsManager::GetDefaultDisplayGroupInfo()
@@ -1138,13 +1144,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInf
     const std::vector<int32_t> &deleteGroups)
 {
     CALL_DEBUG_ENTER;
-    for (const auto &groupId : deleteGroups) {
-        auto group = windowsPerDisplayMap_.find(groupId);
-        if (group != windowsPerDisplayMap_.end()) {
-            MMI_HILOGI("windows delete group:%{public}d", groupId);
-            windowsPerDisplayMap_.erase(group);
-        }
-    }
+    DeleteInvalidWindowGroups(deleteGroups);
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay;
     int32_t groupId = displayGroupInfo.groupId;
     for (const auto &window : displayGroupInfo.windowsInfo) {
@@ -1966,16 +1966,7 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         CleanInvalidPiexMap(groupId);
         HandleValidDisplayChange(displayGroupInfo);
         std::vector<int32_t> deleteGroups;
-        for (auto it = displayGroupInfoMap_.begin(); it != displayGroupInfoMap_.end();) {
-            if (it->second.currentUserId == displayGroupInfo.currentUserId &&
-                it->first != displayGroupInfo.groupId) {
-                MMI_HILOGD("displays delete group:%{public}d", it->first);
-                deleteGroups.push_back(it->first);
-                it = displayGroupInfoMap_.erase(it);
-            } else {
-                ++it;
-            }
-        }
+        DeleteInvalidDisplayGroups(displayGroupInfo, deleteGroups);
         displayGroupInfoMap_[groupId] = displayGroupInfo;
         displayGroupInfo_ = displayGroupInfo;
         UpdateWindowsInfoPerDisplay(displayGroupInfo, deleteGroups);
@@ -2021,6 +2012,36 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+void InputWindowsManager::DeleteInvalidDisplayGroups(const OLD::DisplayGroupInfo &displayGroupInfo,
+    std::vector<int32_t> &deleteGroups)
+{
+    if (displayGroupInfo.type != GroupType::GROUP_DEFAULT) {
+        return;
+    }
+    for (auto it = displayGroupInfoMap_.begin(); it != displayGroupInfoMap_.end();) {
+        if (it->second.currentUserId == displayGroupInfo.currentUserId &&
+            it->second.type == GroupType::GROUP_DEFAULT &&
+            displayGroupInfo.type == GroupType::GROUP_DEFAULT &&
+            it->first != displayGroupInfo.groupId) {
+            MMI_HILOGI("displays delete group:%{public}d", it->first);
+            deleteGroups.push_back(it->first);
+            it = displayGroupInfoMap_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+void InputWindowsManager::DeleteInvalidWindowGroups(const std::vector<int32_t> &deleteGroups)
+{
+    for (const auto &groupId : deleteGroups) {
+        auto group = windowsPerDisplayMap_.find(groupId);
+        if (group != windowsPerDisplayMap_.end()) {
+            MMI_HILOGI("windows delete group:%{public}d", groupId);
+            windowsPerDisplayMap_.erase(group);
+        }
+    }
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -3300,6 +3321,19 @@ int32_t InputWindowsManager::GetFocusWindowId(int32_t groupId) const
     return 0;
 }
 
+int32_t InputWindowsManager::GetFocusPid(int32_t groupId) const
+{
+    auto iter = displayGroupInfoMap_.find(groupId);
+    if (iter != displayGroupInfoMap_.end()) {
+        for (const auto& windowInfo: iter->second.windowsInfo) {
+            if (windowInfo.id == iter->second.focusWindowId) {
+                return windowInfo.pid;
+            }
+        }
+    }
+    return -1;
+}
+
 int32_t InputWindowsManager::GetMainDisplayId(int32_t groupId) const
 {
     auto iter = displayGroupInfoMap_.find(groupId);
@@ -4400,11 +4434,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    pointerItem.SetColor(static_cast<uint32_t>(CursorDrawingComponent::GetInstance().GetPointerColor()));
-    pointerItem.SetSizeLevel(CursorDrawingComponent::GetInstance().GetPointerSize());
-    auto visible = CursorDrawingComponent::GetInstance().IsPointerVisible() &&
-        CursorDrawingComponent::GetInstance().GetMouseDisplayState();
-    pointerItem.SetVisible(visible);
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     int32_t physicalX = pointerItem.GetDisplayX();
@@ -4456,7 +4485,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                         physicalX, physicalY);
                 }
             }
-            pointerItem.SetStyle(lastPointerStyle_.id);
+            CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
+            pointerEvent->UpdatePointerItem(pointerId, pointerItem);
             MMI_HILOGI("UpdateMouseTarget id:%{public}" PRIu64 ", logicalX:%{private}d, logicalY:%{private}d,"
                 "displayX:%{private}d, displayY:%{private}d", physicalDisplayInfo->rsId, logicalX, logicalY,
                 physicalX, physicalY);
@@ -4515,15 +4545,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             IsMouseDrawing(pointerEvent->GetPointerAction()) &&
             pointerItem.GetMoveFlag() != POINTER_MOVEFLAG) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
+            CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
+            CursorDrawingComponent::GetInstance().UpdateBindDisplayId(physicalDisplayInfo->rsId);
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
         pointerStyle = CursorDrawingComponent::GetInstance().GetLastMouseStyle();
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
             pointerStyle.id, lastPointerStyle_.id);
-        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
-        WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
     } else {
         if (timerId_ != DEFAULT_VALUE) {
             TimerMgr->RemoveTimer(timerId_);
@@ -4535,10 +4564,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         }
-        CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
-        WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-        CursorDrawingComponent::GetInstance().OnWindowInfo(info);
     }
+    CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
+    WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
+    CursorDrawingComponent::GetInstance().OnWindowInfo(info);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_EMULATOR
     if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&
@@ -4611,7 +4640,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #endif
         CursorDrawingComponent::GetInstance().DrawPointer(physicalDisplayInfo->rsId, physicalX, physicalY,
             dragPointerStyle_, direction);
-        pointerItem.SetStyle(dragPointerStyle_.id);
+        CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -7099,16 +7128,19 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
     return true;
 }
 
-void InputWindowsManager::SetWindowStateNotifyPid(int32_t pid)
+void InputWindowsManager::SetWindowStateNotifyPid(int32_t userId, int32_t pid)
 {
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        windowStateNotifyPid_ = pid;
+        windowStateNotifyUserIdPid_[userId] = pid;
     }
 }
 
-int32_t InputWindowsManager::GetWindowStateNotifyPid()
+int32_t InputWindowsManager::GetWindowStateNotifyPid(int32_t userId)
 {
-    return windowStateNotifyPid_;
+    if (windowStateNotifyUserIdPid_.find(userId) != windowStateNotifyUserIdPid_.end()) {
+        return windowStateNotifyUserIdPid_[userId];
+    }
+    return -1;
 }
 
 int32_t InputWindowsManager::GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId)

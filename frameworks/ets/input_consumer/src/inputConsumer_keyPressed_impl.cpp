@@ -20,9 +20,8 @@
 
 namespace OHOS {
 namespace MMI {
-using namespace ohos::multimodalInput::keyCode;
 
-ohos::multimodalInput::keyEvent::KeyEvent TaiheInvalidKeyPressed()
+keyEvent::KeyEvent TaiheInvalidKeyPressed()
 {
     return {
         {
@@ -32,14 +31,14 @@ ohos::multimodalInput::keyEvent::KeyEvent TaiheInvalidKeyPressed()
             0,
             0
         },
-        ohos::multimodalInput::keyEvent::Action::key_t::CANCEL,
+        keyEvent::Action::key_t::CANCEL,
         {
-            ohos::multimodalInput::keyCode::KeyCode::key_t::KEYCODE_UNKNOWN,
+            keyCode::KeyCode::key_t::KEYCODE_UNKNOWN,
             0,
             0
         },
         0,
-        ::taihe::array<ohos::multimodalInput::keyEvent::Key>(nullptr, 0),
+        ::taihe::array<keyEvent::Key>(nullptr, 0),
         false,
         false,
         false,
@@ -79,19 +78,20 @@ EtsKeyAction KeyActionEtsKeyAction(int32_t action)
     }
 }
 
-ohos::multimodalInput::keyEvent::Action ConvertKeyAction(EtsKeyAction action)
+keyEvent::Action ConvertKeyAction(EtsKeyAction action)
 {
     switch (action) {
         case ETS_KEY_ACTION_CANCEL:
-            return ohos::multimodalInput::keyEvent::Action::key_t::CANCEL;
+            return keyEvent::Action::key_t::CANCEL;
         case ETS_KEY_ACTION_DOWN:
-            return ohos::multimodalInput::keyEvent::Action::key_t::DOWN;
+            return keyEvent::Action::key_t::DOWN;
         case ETS_KEY_ACTION_UP:
-            return ohos::multimodalInput::keyEvent::Action::key_t::UP;
+            return keyEvent::Action::key_t::UP;
     }
 }
 
-ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem)
+
+keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem)
 {
     return {
         ConvertEtsKeyCode(keyItem.GetKeyCode()),
@@ -100,7 +100,7 @@ ohos::multimodalInput::keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyI
     };
 }
 
-ohos::multimodalInput::keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent)
+keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
         MMI_HILOGE("keyEvent is nullptr");
@@ -111,15 +111,15 @@ ohos::multimodalInput::keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr
         MMI_HILOGE("No key item(No:%{public}d,KC:%{private}d)", keyEvent->GetId(), keyEvent->GetKeyCode());
         return TaiheInvalidKeyPressed();
     }
-    std::vector<ohos::multimodalInput::keyEvent::Key> etsKey;
-    ohos::multimodalInput::keyEvent::Key keycode = {
-        ohos::multimodalInput::keyCode::KeyCode::key_t::KEYCODE_UNKNOWN,
+    std::vector<keyEvent::Key> etsKey;
+    keyEvent::Key keycode = {
+        keyCode::KeyCode::key_t::KEYCODE_UNKNOWN,
         0,
         0
     };
     auto keyItems = keyEvent->GetKeyItems();
     for (const auto &keyItem : keyItems) {
-        keycode = KeyItemEtsKey(keyItem);
+        keycode  = KeyItemEtsKey(keyItem);
         etsKey.push_back(keycode);
     }
     return {
@@ -133,7 +133,7 @@ ohos::multimodalInput::keyEvent::KeyEvent ConvertTaiheKeyPressed(std::shared_ptr
         ConvertKeyAction(KeyActionEtsKeyAction(keyEvent->GetKeyAction())),
         keycode,
         keyItem->GetUnicode(),
-        ::taihe::array<ohos::multimodalInput::keyEvent::Key>(etsKey),
+        ::taihe::array<keyEvent::Key>(etsKey),
         keyEvent->GetKeyItem(KeyEvent::KEYCODE_CTRL_RIGHT).has_value(),
         keyEvent->GetKeyItem(KeyEvent::KEYCODE_ALT_RIGHT).has_value(),
         keyEvent->GetKeyItem(KeyEvent::KEYCODE_SHIFT_RIGHT).has_value(),

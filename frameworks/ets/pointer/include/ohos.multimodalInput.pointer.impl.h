@@ -16,14 +16,15 @@
 #ifndef OHOS_MULTIMODALINPUT_POINTER_IMPL_H
 #define OHOS_MULTIMODALINPUT_POINTER_IMPL_H
 
-#include "define_multimodal.h"
-#include "input_manager.h"
 #include "ohos.multimodalInput.pointer.proj.hpp"
 #include "ohos.multimodalInput.pointer.impl.hpp"
-#include <stdexcept>
-#include "taihe/runtime.hpp"
 
 #include <map>
+#include <stdexcept>
+
+#include "define_multimodal.h"
+#include "input_manager.h"
+#include "taihe/runtime.hpp"
 
 enum PointerStyleCode {
     DEFAULT_IMPL,

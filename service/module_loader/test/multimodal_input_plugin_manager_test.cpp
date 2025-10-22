@@ -70,6 +70,7 @@ public:
     MOCK_METHOD(PluginResult, HandleEvent, (std::shared_ptr<AxisEvent> axisEvent,
                 std::shared_ptr<IPluginData> data), (override));
     MOCK_METHOD(void, HandleMonitorStatus, (bool monitorStatus, const std::string &monitorType), (override));
+    MOCK_METHOD(std::string, GetFocusedAppInfo, (), (override));
 };
 
 class MockInputPlugin : public IInputPlugin {
