@@ -3241,5 +3241,21 @@ HWTEST_F(PointerEventTest, PointerEventTest_PointerItem_ReadFromParcel_002, Test
     item.WriteToParcel(parcel);
     ASSERT_EQ(item.ReadFromParcel(parcel), true);
 }
+
+/**
+ * @tc.name: PointerEventTest_Hash_001
+ * @tc.desc: Verify Hash
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_Hash_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    auto pointerEvent2 = PointerEvent::Create();
+    CHKPV(pointerEvent2);
+    ASSERT_EQ(pointerEvent->Hash(), pointerEvent2->Hash());
+}
 } // namespace MMI
 } // namespace OHOS
