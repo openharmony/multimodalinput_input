@@ -575,11 +575,11 @@ int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, s
 {
     uint32_t enHanceDataLen;
     pkt >> enHanceDataLen;
-    CHKRWER(pkt, RET_ERR);
-    CHKUPPER(enHanceDataLen, MAX_ENHANCE_DATA_LEN, RET_ERR);
     if (enHanceDataLen == 0) {
         return RET_OK;
     }
+    CHKRWER(pkt, RET_ERR);
+    CHKUPPER(enHanceDataLen, MAX_ENHANCE_DATA_LEN, RET_ERR);
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
