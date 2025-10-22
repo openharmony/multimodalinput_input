@@ -48,8 +48,9 @@ private:
     int32_t ParseProductnameTypeItem(const cJSON *json, ProductNameType &productNameType);
     inline int32_t InsertProductType(const ProductNameType &productNameType);
     void PrintProductType();
- 
-private:
+    int32_t InitializeImpl();
+
+    private:
     std::map<std::string, std::string> productTypes_;
     std::shared_mutex lock_;
     std::atomic_bool isInitialized_ { false };

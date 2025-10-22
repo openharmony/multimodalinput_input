@@ -47,8 +47,9 @@ private:
     ~ProductNameDefinitionParser() = default;
     void PrintProductNames();
     int32_t ParserProductNameItem(const cJSON *json, ProductNameDefinitionItem &productNameItem);
- 
-private:
+    int32_t InitializeImpl();
+
+    private:
     std::map<std::string, std::string> productNames_;
     std::shared_mutex lock_;
     std::atomic_bool isInitialized_ { false };

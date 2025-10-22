@@ -41,10 +41,18 @@ MiscProductTypeParser& MiscProductTypeParser::GetInstance()
 
 int32_t MiscProductTypeParser::Init()
 {
-    CALL_INFO_TRACE;
-    if (isInitialized_.load()) {
-        return RET_OK;
-    }
+    CALL_DEBUG_ENTER;
+    static std::once_flag init_flag;
+    static int32_t initRes = RET_ERR;
+    std::call_once(init_flag, [this]() {
+        initRes = InitializeImpl();
+    });
+    return initRes;
+}
+
+int32_t MiscProductTypeParser::InitializeImpl()
+{
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(std::string(miscProductTypeDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read miscProductType failed");
@@ -64,7 +72,6 @@ int32_t MiscProductTypeParser::Init()
         return RET_ERR;
     }
     PrintMiscProductTypes();
-    isInitialized_.store(true);
     return RET_OK;
 }
 
