@@ -6346,7 +6346,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_007, TestSize.Leve
 }
 
 /*
+ * @tc.name: InputManagerTest_DispatchToNextHandler_001
+ * @tc.desc: DispatchToNextHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_DispatchToNextHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventId { 0 };
+    EXPECT_EQ(InputManager::GetInstance()->DispatchToNextHandler(eventId, HOOK_EVENT_TYPE_TOUCH),
+        ERROR_INVALID_PARAMETER);
+}
 
+/*
  * @tc.name: InputManagerTest_GetCurrentCursorInfo_001
  * @tc.desc: GetCurrentCursorInfo
  * @tc.type: FUNC
