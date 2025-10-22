@@ -437,5 +437,22 @@ HWTEST_F(InputEventTest, InputEventTest_StartLogTraceId_004, TestSize.Level1)
     StartLogTraceId(traceId, 10, 20);
     EXPECT_NO_FATAL_FAILURE(StartLogTraceId(traceId, 11, 21));
 }
+
+/**
+ * @tc.name: InputEventTest_Hash_001
+ * @tc.desc: Verify Hash
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventTest, InputEventTest_Hash_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    CHKPV(inputEvent);
+    auto inputEvent2 = InputEvent::Create();
+    CHKPV(inputEvent2);
+    EXPECT_EQ(inputEvent->Hash(), inputEvent2->Hash());
+}
+
 } // namespace MMI
 } // namespace OHOS
