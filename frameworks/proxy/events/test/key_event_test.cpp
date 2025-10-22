@@ -773,5 +773,21 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadEnhanceDataFromParcel_003, TestSize.Leve
     bool ret = keyEvent.ReadEnhanceDataFromParcel(parcel);
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: KeyEventTest_Hash_001
+ * @tc.desc: Verify Hash
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_Hash_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto KeyEvent = KeyEvent::Create();
+    CHKPV(KeyEvent);
+    auto KeyEvent2 = KeyEvent::Create();
+    CHKPV(KeyEvent2);
+    EXPECT_EQ(KeyEvent->Hash(), KeyEvent2->Hash());
+}
 } // namespace MMI
 } // namespace OHOS
