@@ -35,6 +35,7 @@ public:
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
+    void UpdateBindDisplayId(uint64_t rsId);
     void OnDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo);
     void OnWindowInfo(const WinInfo &info);
     bool Init();
@@ -96,6 +97,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_WATCH
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
+    void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem);
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();

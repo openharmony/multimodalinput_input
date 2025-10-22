@@ -254,7 +254,8 @@ HWTEST_F(TouchTransformProcessorTestWithMock, AddInvalidAreaDownedEventTest_003,
     processor.AddInvalidAreaDownedEvent(seatSlot);
 
     ASSERT_EQ(processor.InvalidAreaDownedEvents_.size(), maxPointerItems);
-    ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.end()), seatSlot);
+    ASSERT_FALSE(processor.InvalidAreaDownedEvents_.empty());
+    ASSERT_EQ(processor.InvalidAreaDownedEvents_.back(), seatSlot);
 }
 
 

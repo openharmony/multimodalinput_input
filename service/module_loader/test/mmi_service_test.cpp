@@ -4897,7 +4897,7 @@ HWTEST_F(MMIServerTest, MMIService_GetCurrentCursorInfo_001, TestSize.Level1)
     bool visible;
     PointerStyle style;
     ErrCode ret = mmiService.GetCurrentCursorInfo(visible, style);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**

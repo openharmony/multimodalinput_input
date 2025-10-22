@@ -24,6 +24,10 @@ namespace MMI {
 std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
 {
     std::string subKeyNames;
+    if (keyOption == nullptr) {
+        MMI_HILOGE("keyOption is nullptr");
+        return subKeyNames;
+    }
     const std::set<int32_t>& preKeys = keyOption->GetPreKeys();
     int32_t finalKey = keyOption->GetFinalKey();
     bool isFinalKeyDown = keyOption->IsFinalKeyDown();
@@ -39,7 +43,7 @@ std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
     return subKeyNames;
 }
 
-KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption)
+inputConsumer::KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption)
 {
     if (keyOption == nullptr) {
         MMI_HILOGE("keyOption invalid");

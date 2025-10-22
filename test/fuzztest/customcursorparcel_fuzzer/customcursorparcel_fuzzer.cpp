@@ -49,11 +49,11 @@ std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPa
 bool CustomCursorParcelFuzzTest(const uint8_t *data, size_t size)
 {
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    auto pixelMap = (void *)SetMouseIconTest(iconPath).get();
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     FuzzedDataProvider provider(data, size);
     int32_t focusX = provider.ConsumeIntegral<int32_t>();
     int32_t focusY = provider.ConsumeIntegral<int32_t>();
-    CustomCursorParcel cursorParcel(pixelMap, focusX, focusY);
+    CustomCursorParcel cursorParcel(static_cast<void*>(pixelMap.get()), focusX, focusY);
 
     Parcel parcel;
     cursorParcel.Marshalling(parcel);

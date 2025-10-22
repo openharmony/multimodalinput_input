@@ -81,6 +81,7 @@ public:
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(int32_t, GetFocusWindowId, (int32_t), (const));
+    MOCK_METHOD(int32_t, GetFocusPid, (int32_t), (const));
     MOCK_METHOD(bool, IsMouseSimulate, ());
     MOCK_METHOD(bool, HasMouseHideFlag, ());
     MOCK_METHOD(bool, SelectPointerChangeArea, (int32_t, int32_t, int32_t));
@@ -126,8 +127,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
-    void SetWindowStateNotifyPid(int32_t pid) override {}
-    int32_t GetWindowStateNotifyPid() override { return 0; }
+    void SetWindowStateNotifyPid(int32_t userId, int32_t pid) override {}
+    int32_t GetWindowStateNotifyPid(int32_t userId) override { return 0; }
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
@@ -138,6 +139,7 @@ public:
     void GetTargetWindowIds(int32_t, int32_t, std::set<int32_t>&, int32_t) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
+    MOCK_METHOD(int32_t, FindDisplayUserId, (int32_t), (const));
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco() override {}
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));

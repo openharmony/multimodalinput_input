@@ -148,6 +148,7 @@ public:
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr) override;
     void RecordCursorIdAndImageAddress();
     void RecordCursorVisibleStatus(bool status);
+    void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) override;
 
 private:
     struct PixelMapInfo {
@@ -229,7 +230,7 @@ private:
     void PostMoveRetryTask(std::function<void()> task);
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
-    void UpdateBindDisplayId(uint64_t rsId);
+    void UpdateBindDisplayId(uint64_t rsId) override;
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
@@ -288,6 +289,7 @@ private:
     std::list<PidInfo> hapPidInfos_;
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
+    bool offRenderScaleUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace MMI {
 class JsInputDeviceContext final {
 public:
-    JsInputDeviceContext();
+    JsInputDeviceContext(napi_env env);
     DISALLOW_COPY_AND_MOVE(JsInputDeviceContext);
     ~JsInputDeviceContext();
     static napi_value Export(napi_env env, napi_value exports);
@@ -56,7 +56,7 @@ private:
     std::shared_ptr<JsInputDeviceManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
     std::mutex mtx_;
-    static napi_env env_;
+    napi_env env_;
 };
 } // namespace MMI
 } // namespace OHOS

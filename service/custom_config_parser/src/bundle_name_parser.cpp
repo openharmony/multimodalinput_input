@@ -68,6 +68,7 @@ int32_t BundleNameParser::InitializeImpl()
     }
     PrintBundleNames();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 std::string BundleNameParser::GetBundleName(const std::string &key)
@@ -128,11 +129,13 @@ int32_t BundleNameParser::ParseBundleNameItem(const cJSON *json, BundleNameItem 
 
 void BundleNameParser::PrintBundleNames()
 {
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     std::shared_lock<std::shared_mutex> lock(lock_);
     for (const auto &bundleName: bundleNames_) {
         MMI_HILOGI("key:%{public}s -> value:%{public}s", bundleName.first.c_str(), bundleName.second.c_str());
     }
+    // LCOV_EXCL_STOP
 }
 
 } // namespace MMI

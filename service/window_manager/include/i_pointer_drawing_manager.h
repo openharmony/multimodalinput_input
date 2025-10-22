@@ -31,6 +31,7 @@ public:
     virtual void DrawPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) {}
     virtual void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo) {}
+    virtual void UpdateBindDisplayId(uint64_t rsId) {}
     virtual void OnDisplayInfo(const OLD::DisplayGroupInfo& displayGroupInfo) {}
     virtual void OnWindowInfo(const WinInfo &info) {}
     virtual bool Init()
@@ -197,6 +198,7 @@ public:
     {
         return 0;
     }
+    virtual void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) {};
 };
 } // namespace MMI
 } // namespace OHOS

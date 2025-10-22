@@ -16,21 +16,20 @@
 #ifndef INPUT_CONSUMER_KEY_OPTIONS_IMPL_H
 #define INPUT_CONSUMER_KEY_OPTIONS_IMPL_H
 
-#include "ohos.multimodalInput.inputConsumer.proj.hpp"
-#include "ohos.multimodalInput.inputConsumer.impl.hpp"
-#include "taihe/runtime.hpp"
 #include <stdexcept>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "ohos.multimodalInput.inputConsumer.proj.hpp"
+#include "ohos.multimodalInput.inputConsumer.impl.hpp"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace MMI {
-using namespace ohos::multimodalInput::inputConsumer;
+namespace inputConsumer = ohos::multimodalInput::inputConsumer;
 
-ohos::multimodalInput::keyEvent::KeyEvent TaiheInvalidKeyPressed();
 std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption);
-KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption);
+inputConsumer::KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_CONSUMER_KEY_OPTIONS_IMPL_H

@@ -2346,10 +2346,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
         ACCOUNT_MGR->GetCurrentAccountSetting();
-#if (defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)) || \
-    defined(OHOS_BUILD_ENABLE_WATCH)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
-#endif // (OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) || OHOS_BUILD_ENABLE_WATCH
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         libinputAdapter_.RegisterBootStatusReceiver();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
@@ -5067,7 +5064,8 @@ ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
     CALL_INFO_TRACE;
     int32_t callingUid = GetCallingUid();
     int32_t gameUid = 7011;
-    if (callingUid != gameUid || !PER_HELPER->VerifySystemApp()) {
+    int32_t ussUid = 6699;
+    if ((callingUid != gameUid && callingUid != ussUid) || !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }

@@ -3507,6 +3507,9 @@ public:
      */
     void SetRepeatKey(bool repeatKey);
 
+    bool IsKeyPressed(int32_t keyCode) const;
+
+    bool HasKeyItem(int32_t keyCode) const;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.

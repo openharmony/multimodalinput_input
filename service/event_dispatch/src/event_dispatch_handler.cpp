@@ -294,12 +294,12 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
     return true;
 }
 
-void EventDispatchHandler::SendWindowStateError(int32_t pid, int32_t windowId)
+void EventDispatchHandler::SendWindowStateError(int32_t userId, int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
+    auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid(userId));
     if (sess != nullptr) {
         NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
         pkt << pid << windowId;
@@ -342,7 +342,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         agentPid != -1 && point->GetTargetWindowId() != -1) {
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && agentPid == windowStateErrorInfo_.pid) {
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
-                SendWindowStateError(agentPid, point->GetTargetWindowId());
+                auto userId = WIN_MGR->FindDisplayUserId(point->GetTargetDisplayId());
+                SendWindowStateError(userId, agentPid, point->GetTargetWindowId());
             }
         } else {
             windowStateErrorInfo_.windowId = point->GetTargetWindowId();

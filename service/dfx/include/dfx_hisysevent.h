@@ -177,6 +177,10 @@ public:
         int32_t keyCode, int32_t errorCode);
     static void ReportFailHandleKey(std::string name, int32_t keyCode, int32_t errorCode);
     static void ReportCallingMute();
+    static void ReportTouchpadKnuckleDoubleClickEvent(int32_t fingerCount);
+    static void ReportTouchpadLeftEdgeSlideEvent();
+    static void ReportTouchpadRightEdgeSlideEvent();
+    static void ReportTouchpadSwipeInwardEvent();
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
