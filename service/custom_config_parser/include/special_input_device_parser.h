@@ -64,7 +64,8 @@ private:
     int32_t ParseSpecialInputDeviceItem(const cJSON *json, SpecialInputDevice &specialInputDev);
     bool IsAllKeywordsMatched(const std::string &name, const std::vector<std::string> &keywords);
     void PrintSpecialInputDevice();
- 
+    int32_t InitializeImpl();
+
 private:
     std::map<std::string, ExactlyMatchInputDevice> exactlyMatchInputDevice_;
     std::vector<ContainMatchInputDevice> containMatchInputDevice_;

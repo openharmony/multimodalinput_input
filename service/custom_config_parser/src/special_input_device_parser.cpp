@@ -41,10 +41,18 @@ SpecialInputDeviceParser& SpecialInputDeviceParser::GetInstance()
 
 int32_t SpecialInputDeviceParser::Init()
 {
+    CALL_DEBUG_ENTER;
+    static std::once_flag init_flag;
+    static int32_t initRes = RET_ERR;
+    std::call_once(init_flag, [this]() {
+        initRes = InitializeImpl();
+    });
+    return initRes;
+}
+
+int32_t SpecialInputDeviceParser::InitializeImpl()
+{
     CALL_INFO_TRACE;
-    if (isInitialized_.load()) {
-        return RET_OK;
-    }
     std::string jsonStr = ReadJsonFile(std::string(specialInputDeviceDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read specialInputDevice failed");
@@ -68,7 +76,6 @@ int32_t SpecialInputDeviceParser::Init()
         return RET_ERR;
     }
     PrintSpecialInputDevice();
-    isInitialized_.store(true);
     return RET_OK;
 }
 

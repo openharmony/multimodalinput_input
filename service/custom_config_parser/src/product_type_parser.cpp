@@ -44,10 +44,18 @@ ProductTypeParser& ProductTypeParser::GetInstance()
 
 int32_t ProductTypeParser::Init()
 {
-    CALL_INFO_TRACE;
-    if (isInitialized_.load()) {
-        return RET_OK;
-    }
+    CALL_DEBUG_ENTER;
+    static std::once_flag init_flag;
+    static int32_t initRes = RET_ERR;
+    std::call_once(init_flag, [this]() {
+        initRes = InitializeImpl();
+    });
+    return initRes;
+}
+
+int32_t ProductTypeParser::InitializeImpl()
+{
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(std::string(productTypeDir));
     if (jsonStr.empty()) {
         MMI_HILOGE("Read productType failed");
@@ -82,7 +90,6 @@ int32_t ProductTypeParser::Init()
         InsertProductType(productNameType);
     }
     PrintProductType();
-    isInitialized_.store(true);
     return RET_OK;
 }
 
