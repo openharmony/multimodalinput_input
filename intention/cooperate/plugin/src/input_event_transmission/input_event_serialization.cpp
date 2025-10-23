@@ -301,7 +301,6 @@ int32_t InputEventSerialization::DeserializePressedButtons(NetPacket &pkt, std::
     int32_t btnId {};
 
     pkt >> nPressed;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(nPressed, MAX_PRESSED_BUTTONS, RET_ERR);
 
     for (; nPressed > 0; --nPressed) {
@@ -401,7 +400,6 @@ int32_t InputEventSerialization::DeserializePressedKeys(NetPacket &pkt, std::sha
 {
     std::vector<int32_t>::size_type nPressed = 0;
     pkt >> nPressed;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(nPressed, MAX_PRESSED_KEYS, RET_ERR);
 
     std::vector<int32_t> pressedKeys;
@@ -441,7 +439,6 @@ int32_t InputEventSerialization::DeserializeBuffer(NetPacket &pkt, std::shared_p
 {
     std::vector<uint8_t>::size_type bufSize = 0;
     pkt >> bufSize;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(bufSize, MMI::ExtraData::MAX_BUFFER_SIZE, RET_ERR);
 
     std::vector<uint8_t> buffer;
@@ -578,11 +575,10 @@ int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::s
 {
     uint32_t enHanceDataLen = 0;
     pkt >> enHanceDataLen;
-    CHKRWER(pkt, RET_ERR);
-    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     if (enHanceDataLen == 0) {
         return RET_OK;
     }
+    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
@@ -633,11 +629,10 @@ int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::s
 {
     uint32_t enHanceDataLen = 0;
     pkt >> enHanceDataLen;
-    CHKRWER(pkt, RET_ERR);
-    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     if (enHanceDataLen == 0) {
         return RET_OK;
     }
+    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
