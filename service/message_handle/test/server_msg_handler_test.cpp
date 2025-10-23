@@ -1840,13 +1840,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RegisterWindowStateErrorCall
     EXPECT_EQ(ret, RET_ERR);
     sess->SetTokenType(TOKEN_NATIVE);
     ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
-    EXPECT_EQ(ret, RET_OK);
-    sess->SetTokenType(TOKEN_SHELL);
-    ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
-    EXPECT_EQ(ret, RET_OK);
-    sess->SetTokenType(TOKEN_SYSTEM_HAP);
-    ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**

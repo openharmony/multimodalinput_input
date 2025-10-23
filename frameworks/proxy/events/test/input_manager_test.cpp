@@ -6384,5 +6384,23 @@ HWTEST_F(InputManagerTest, InputManagerTest_IsPointerInit, TestSize.Level1)
     auto ret = InputManager::GetInstance()->IsPointerInit();
     EXPECT_FALSE(ret);
 }
+
+/*
+ * @tc.name: InputManagerTest_DispatchToNextHandler
+ * @tc.desc: DispatchToNextHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_DispatchToNextHandler, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto eventId = pointerEvent->GetId();
+    HookEventType hookEventType = 2;
+    auto ret = InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType);
+    EXPECT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
