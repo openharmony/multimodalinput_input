@@ -1479,7 +1479,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("callType is false");
         return false;
     }
-    if (!callBahaviorState_ && callType == GetCallState) {
+    if (!callBahaviorState_) {
         MMI_HILOGD("CallBehaviorState is false");
         return false;
     }
@@ -1503,7 +1503,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
     } else {
         ret = DEVICE_MONITOR->GetCallState();
     }
-    MMI_HILOGI("HandleCallEnded, The callState:%{public}d", ret);
+    MMI_HILOGI("HandleCallEnded, The callType:%{public}d", ret);
 
     switch (ret) {
         case StateType::CALL_STATUS_HOLDING:
