@@ -51,6 +51,8 @@ constexpr int32_t NUMBER_TWO {2};
 constexpr double HALF_RATIO { 0.5 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr int32_t MOUSE_STYLE_OPT { 0 };
+constexpr int32_t MAGIC_STYLE_OPT { 1 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t WINDOW_NAME_TYPE_SCREENSHOT {1};
 constexpr float SCREEN_CAPTURE_WINDOW_ZORDER {8000.0};
@@ -1129,6 +1131,96 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, T
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_002
+ * @tc.desc: Test setting custom pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+    // set custom pointer style
+    PointerStyle style;
+    style.id = MOUSE_ICON::EAST;
+    int32_t ret = winMgr.SetPointerStyle(1, 1, style);
+    EXPECT_EQ(ret, RET_OK);
+
+    // get custom pointer style and compare
+    PointerStyle styleRet;
+    ret = winMgr.GetPointerStyle(1, 1, styleRet);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::EAST);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_003
+ * @tc.desc: Test setting global pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    // set global pointer style
+    PointerStyle style;
+    style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    style.options = MAGIC_STYLE_OPT;
+    int32_t ret = winMgr.SetPointerStyle(1, GLOBAL_WINDOW_ID, style);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(winMgr.globalStyle_.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    EXPECT_EQ(winMgr.globalStyle_.options, MAGIC_STYLE_OPT);
+
+    // get global pointer style and compare
+    PointerStyle styleRet;
+    ret = winMgr.GetPointerStyle(1, GLOBAL_WINDOW_ID, styleRet);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    EXPECT_EQ(styleRet.options, MAGIC_STYLE_OPT);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_004
+ * @tc.desc: Test setting custom pointer style and global pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager winMgr;
+
+    // set custom pointer style
+    PointerStyle style;
+    style.id = MOUSE_ICON::EAST;
+    style.options = MOUSE_STYLE_OPT;
+    int32_t ret = winMgr.SetPointerStyle(1, 1, style);
+    EXPECT_EQ(ret, RET_OK);
+
+    // set global pointer style
+    style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    style.options = MAGIC_STYLE_OPT;
+    ret = winMgr.SetPointerStyle(1, GLOBAL_WINDOW_ID, style);
+    EXPECT_EQ(ret, RET_OK);
+
+    // get custom pointer style and compare
+    PointerStyle styleRet1;
+    ret = winMgr.GetPointerStyle(1, 1, styleRet1);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet1.id, MOUSE_ICON::EAST);
+    EXPECT_EQ(styleRet1.options, MOUSE_STYLE_OPT);
+
+    // get global pointer style and compare
+    PointerStyle styleRet2;
+    ret = winMgr.GetPointerStyle(1, GLOBAL_WINDOW_ID, styleRet2);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(styleRet2.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    EXPECT_EQ(styleRet2.options, MAGIC_STYLE_OPT);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_ClearWindowPointerStyle_001
  * @tc.desc: Test clearing window pointer style
  * @tc.type: FUNC
@@ -1137,9 +1229,25 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, T
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t pid = 123;
-    int32_t windowId = 678;
-    int32_t ret = WIN_MGR->ClearWindowPointerStyle(pid, windowId);
+    InputWindowsManager winMgr;
+
+    // set custom pointer style, which pid=1, windowId=1
+    PointerStyle style;
+    style.id = MOUSE_ICON::EAST;
+    style.options = MOUSE_STYLE_OPT;
+    int32_t ret = winMgr.SetPointerStyle(1, 1, style);
+    EXPECT_EQ(ret, RET_OK);
+
+    // not found pid
+    ret = winMgr.ClearWindowPointerStyle(123, 456);
+    EXPECT_EQ(ret, RET_OK);
+
+    // found pid and not found windowId
+    ret = winMgr.ClearWindowPointerStyle(1, 2);
+    EXPECT_EQ(ret, RET_OK);
+
+    // found pid and windowId, clear success
+    ret = winMgr.ClearWindowPointerStyle(1, 1);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -1152,16 +1260,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyl
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerStyle style;
-    int32_t ret = WIN_MGR->GetPointerStyle(1, GLOBAL_WINDOW_ID, style);
+    InputWindowsManager winMgr;
+
+    // not found custom pointer style and return global pointer style
+    PointerStyle styleRet1;
+    int32_t ret = winMgr.GetPointerStyle(1, 1, styleRet1);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(style.id, 1);
-    ret = WIN_MGR->GetPointerStyle(3, 1, style);
+    EXPECT_EQ(styleRet1.id, MOUSE_ICON::DEFAULT);
+    EXPECT_EQ(styleRet1.options, MOUSE_STYLE_OPT);
+
+    // get global pointer style
+    PointerStyle styleRet2;
+    ret = winMgr.GetPointerStyle(1, GLOBAL_WINDOW_ID, styleRet2);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(style.id, 1);
-    ret = WIN_MGR->GetPointerStyle(1, 1, style);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(style.id, 1);
+    EXPECT_EQ(styleRet2.id, MOUSE_ICON::DEFAULT);
+    EXPECT_EQ(styleRet2.options, MOUSE_STYLE_OPT);
 }
 
 /**
@@ -3167,32 +3280,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointe
     pid = 1000;
     windowId = 123456789;
     EXPECT_EQ(inputWindowsManager.UpdateSceneBoardPointerStyle(pid, windowId, style, isUiExtension), RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle
- * @tc.desc: Test SetGlobalDefaultPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    int32_t defaultPointerStyle = 0;
-    int32_t cursorCircleStyle = 41;
-    int32_t pid = 100;
-    int32_t windowId = 1000;
-    PointerStyle pointerStyle;
-    pointerStyle.id = defaultPointerStyle;
-    std::map<int32_t, PointerStyle> pointerStyleMap;
-    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetGlobalDefaultPointerStyle());
-
-    pointerStyle.id = cursorCircleStyle;
-    inputWindowsManager.pointerStyle_[pid][windowId] = pointerStyle;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetGlobalDefaultPointerStyle());
 }
 
 /**
