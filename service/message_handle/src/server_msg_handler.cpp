@@ -743,7 +743,6 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
 {
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_UI_EXTENSION_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo extensionInfo;
@@ -799,7 +798,6 @@ int32_t ServerMsgHandler::ReadScreensInfo(NetPacket &pkt, UserScreenInfo &userSc
 {
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_SCREEN_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         ScreenInfo info;
@@ -815,7 +813,6 @@ int32_t ServerMsgHandler::ReadDisplayGroupsInfo(NetPacket &pkt, UserScreenInfo &
 {
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_DISPLAY_GROUP_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         DisplayGroupInfo info;
@@ -838,7 +835,6 @@ int32_t ServerMsgHandler::ReadDisplaysInfo(NetPacket &pkt, DisplayGroupInfo &dis
 {
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_DISPLAY_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
@@ -869,7 +865,6 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     CHKRWER(pkt, RET_ERR);
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_WINDOW_GROUP_INFO_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
@@ -915,7 +910,6 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     }
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_ENHANCE_CONFIG_SIZE, RET_ERR);
     uint8_t cfg[num];
     for (uint32_t i = 0; i < num; i++) {
@@ -1020,7 +1014,6 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
 {
     uint32_t num = 0;
     pkt >> num;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(num, MAX_WINDOWS_SIZE, RET_ERR);
     for (uint32_t i = 0; i < num; i++) {
             WindowInfo info;

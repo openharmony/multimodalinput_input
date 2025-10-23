@@ -29,9 +29,6 @@ namespace {
 constexpr size_t MAX_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_POINTER_COUNT { 10 };
 constexpr size_t MAX_PRESSED_KEYS { 10 };
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-constexpr uint32_t MAX_ENHANCE_DATA_LEN { 1000 };
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace
 
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
@@ -383,7 +380,6 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(nPressed, MAX_PRESSED_BUTTONS, RET_ERR);
     while (nPressed-- > 0) {
         pkt >> tField;
@@ -398,7 +394,6 @@ int32_t InputEventDataTransformation::DeserializePointerIds(std::shared_ptr<Poin
     CHKPR(event, ERROR_NULL_POINTER);
     std::vector<int32_t>::size_type pointerCnt;
     pkt >> pointerCnt;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(pointerCnt, MAX_POINTER_COUNT, RET_ERR);
     while (pointerCnt-- > 0) {
         PointerEvent::PointerItem item;
@@ -438,10 +433,9 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     }
 
     std::vector<int32_t> pressedKeys;
-    std::vector<int32_t>::size_type pressedKeySize;
+    std::vector<int32_t>::size_type pressedKeySize = 0;
     int32_t tField;
     pkt >> pressedKeySize;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(pressedKeySize, MAX_PRESSED_KEYS, RET_ERR);
     while (pressedKeySize-- > 0) {
         pkt >> tField;
@@ -451,9 +445,8 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     event->SetPressedKeys(pressedKeys);
 
     std::vector<uint8_t> buffer;
-    std::vector<uint8_t>::size_type bufferSize;
+    std::vector<uint8_t>::size_type bufferSize = 0;
     pkt >> bufferSize;
-    CHKRWER(pkt, RET_ERR);
     CHKUPPER(bufferSize, ExtraData::MAX_BUFFER_SIZE, RET_ERR);
     uint8_t buff = 0;
     while (bufferSize-- > 0) {
@@ -573,13 +566,12 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
 
 int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
 {
-    uint32_t enHanceDataLen;
+    uint32_t enHanceDataLen = 0;
     pkt >> enHanceDataLen;
     if (enHanceDataLen == 0) {
         return RET_OK;
     }
-    CHKRWER(pkt, RET_ERR);
-    CHKUPPER(enHanceDataLen, MAX_ENHANCE_DATA_LEN, RET_ERR);
+    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
@@ -627,11 +619,12 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Key
 
 int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<KeyEvent> event)
 {
-    uint32_t enHanceDataLen;
+    uint32_t enHanceDataLen = 0;
     pkt >> enHanceDataLen;
-    if (enHanceDataLen == 0 || enHanceDataLen > MAX_HMAC_SIZE) {
+    if (enHanceDataLen == 0) {
         return RET_OK;
     }
+    CHKUPPER(enHanceDataLen, MAX_HMAC_SIZE, RET_ERR);
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
     for (size_t i = 0; i < enHanceDataLen; i++) {
