@@ -75,6 +75,8 @@ constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
+constexpr int32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
+const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
 int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
@@ -1143,7 +1145,8 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         // product isolation
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
         if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
-            touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID) {
+            touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID &&
+            (std::stoi(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
             return g_isSwipeInward;
         }
         // get touchpad physic size
