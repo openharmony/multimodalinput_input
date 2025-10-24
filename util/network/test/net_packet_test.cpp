@@ -233,5 +233,21 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
     pkt >> r3;
     EXPECT_TRUE(pkt.ChkRWError());
 }
+
+/**
+ * @tc.name:construct_005
+ * @tc.desc:Verify net packet
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(NetPacketTest, GetMsgId_005, TestSize.Level1)
+{
+    MmiMessageId idMsg = static_cast<MmiMessageId>(12345);
+    
+    NetPacket pkt(idMsg);
+    NetPacket packTmp = pkt;
+    const MmiMessageId retResult = packTmp.GetMsgId();
+    EXPECT_TRUE(retResult == idMsg);
+}
 } // namespace MMI
 } // namespace OHOS
