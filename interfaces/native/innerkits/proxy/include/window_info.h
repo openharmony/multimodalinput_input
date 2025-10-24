@@ -226,14 +226,28 @@ struct WindowInfo {
      *
      * @since 12
      */
-    static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
+    static constexpr uint32_t FLAG_BIT_HANDWRITING = 1 << 1;
 
     /**
      * Disable user action window
      *
      * @since 21
      */
-    static constexpr uint32_t FLAG_BIT_DISABLE_USER_ACTION = 4;
+    static constexpr uint32_t FLAG_BIT_DISABLE_USER_ACTION = 1 << 2;
+
+    /**
+     * pointer locked window
+     *
+     * @since 22
+     */
+    static constexpr uint32_t FLAG_BIT_POINTER_LOCKED = 1 << 3;
+
+    /**
+     * pointer confined window
+     *
+     * @since 22
+     */
+    static constexpr uint32_t FLAG_BIT_POINTER_CONFINED = 1 << 4;
 
     /**
      * Globally unique identifier of the window

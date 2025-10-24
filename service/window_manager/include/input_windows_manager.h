@@ -109,6 +109,11 @@ public:
     CursorPosition GetCursorPos();
     CursorPosition ResetCursorPos();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true);
+    std::shared_ptr<PointerEvent> CreatePointerByLastPointer(int32_t pointerAction);
+    void EnterMouseCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void LimitMouseLocaltionInEvent(const OLD::DisplayInfo *displayInfo, int32_t &integerX, int32_t &integerY,
+        double &x, double &y, bool isRealData);
+    void ClearPointerLockedWindow();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const OLD::DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
@@ -600,6 +605,9 @@ private:
     mutable int32_t lastWinX_ { 0 };
     mutable int32_t lastWinY_ { 0 };
     mutable std::pair<int32_t, int32_t> currentDisplayXY_ { 0, 0 };
+    WindowInfo pointerLockedWindow_;
+    MouseLocation pointerLockedLocation_ = { -1, 0, 0 };
+    Coordinate2D pointerLockedCursorPos_ = { 0.0, 0.0 };
 };
 } // namespace MMI
 } // namespace OHOS
