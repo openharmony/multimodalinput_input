@@ -5057,7 +5057,6 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
 void InputWindowsManager::SendUIExtentionPointerEvent(double logicalX, double logicalY,
     const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
     CHKPV(pointerEvent);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -5111,9 +5110,9 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(double logicalX, doubl
         if (windowId == item.id) {
             return;
         }
+        MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,windowId:%{public}d,pid:%{public}d", item.id, item.pid);
         for (const auto& windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == windowId) {
-                MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
                 // If the event is sent to the security sub window, then a copy needs to be sent to the host window
                 pointerEvent->SetAgentWindowId(item.agentWindowId);
                 pointerEvent->SetTargetWindowId(item.id);
