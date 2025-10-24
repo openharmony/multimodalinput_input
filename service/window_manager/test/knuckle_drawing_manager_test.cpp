@@ -606,12 +606,12 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_DestoryWindow_001
- * @tc.desc: Test Overrides DestoryWindow function branches
+ * @tc.name: KnuckleDrawingManagerTest_DestroyWindow_001
+ * @tc.desc: Test Overrides DestroyWindow function branches
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_001, TestSize.Level1)
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestroyWindow_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
@@ -620,17 +620,17 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_001,
 #else
     kceDrawMgr.canvasNode_ = nullptr;
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-    ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_ERR);
+    ASSERT_EQ(kceDrawMgr.DestroyWindow(), RET_ERR);
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_DestoryWindow_002
- * @tc.desc: Test Overrides DestoryWindow function branches
+ * @tc.name: KnuckleDrawingManagerTest_DestroyWindow_002
+ * @tc.desc: Test Overrides DestroyWindow function branches
  * @tc.type: Function
  * @tc.require:
  */
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestroyWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
@@ -642,10 +642,10 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002,
     ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
     kceDrawMgr.trackCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.trackCanvasNode_, nullptr);
-    ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_OK);
+    ASSERT_EQ(kceDrawMgr.DestroyWindow(), RET_OK);
 }
 #else
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestroyWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
@@ -657,7 +657,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002,
     ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
-    ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_OK);
+    ASSERT_EQ(kceDrawMgr.DestroyWindow(), RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 

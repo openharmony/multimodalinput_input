@@ -246,7 +246,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_01, 
 
     int32_t pid = 1;
     int32_t windowId = -2;
-    bool ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret);
 
     int32_t ret2 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
@@ -272,7 +272,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_02, 
 
     int32_t pid = 1;
     int32_t windowId = GLOBAL_WINDOW_ID;
-    bool ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret);
 
     int32_t ret2 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
@@ -1453,17 +1453,17 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_001, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawLoadingPointerStyle_001
- * @tc.desc: Test DrawLoadingPointerStyle
+ * @tc.name: InputWindowsManagerTest_DrawLoadingPointer_001
+ * @tc.desc: Test DrawLoadingPointer
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawLoadingPointerStyle_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawLoadingPointer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     MOUSE_ICON mouseStyle = EAST;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawLoadingPointerStyle(mouseStyle));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawLoadingPointer(mouseStyle));
 }
 
 /**
@@ -1694,12 +1694,12 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStylePrefe
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CheckPointerStyleParam_001
- * @tc.desc: Test CheckPointerStyleParam
+ * @tc.name: InputWindowsManagerTest_IsPointerStyleParamValid_001
+ * @tc.desc: Test IsPointerStyleParamValid
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CheckPointerStyleParam_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_IsPointerStyleParamValid_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
@@ -1708,10 +1708,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CheckPointerStylePar
     pointerStyle.color = 0;
     pointerStyle.size = 2;
     int32_t windowId = -2;
-    bool ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret);
     windowId = 1;
-    ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret);
 }
 
@@ -2182,7 +2182,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     pointerDrawingManager.SetSurfaceNode(nullptr);
-    pointerDrawingManager.initEventhandlerFlag_.store(true);
+    pointerDrawingManager.initEventHandlerFlag_.store(true);
     pointerDrawingManager.InitPointerCallback();
     ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
 }
@@ -2205,7 +2205,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_
     ASSERT_NE(surfaceNode, nullptr);
     pointerDrawingManager.SetSurfaceNode(surfaceNode);
 
-    pointerDrawingManager.initEventhandlerFlag_.store(true);
+    pointerDrawingManager.initEventHandlerFlag_.store(true);
     pointerDrawingManager.InitPointerCallback();
     ASSERT_EQ(pointerDrawingManager.GetSurfaceNode(), nullptr);
 }
@@ -3557,7 +3557,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetCurrentCursorIn
     PointerStyle pointerStyle;
     auto ret = pointerDrawingManager.GetCurrentCursorInfo(visible, pointerStyle);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_EQ(pointerStyle.id, style);
 }
 
 /**

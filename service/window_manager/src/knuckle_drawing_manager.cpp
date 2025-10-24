@@ -36,7 +36,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t MAX_POINTER_NUM { 5 };
 constexpr int32_t MID_POINT { 2 };
 constexpr int32_t POINT_INDEX0 { 0 };
@@ -191,7 +190,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
         touchEvent->GetPointerIds().size() != 1 || isRotate_) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         if (!pointerInfos_.empty()) {
-            DestoryWindow();
+            DestroyWindow();
         } else if (isRotate_) {
             isRotate_ = false;
             if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
@@ -236,7 +235,7 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
 {
     CALL_DEBUG_ENTER;
     if (screenReadState_.state == SCREEN_READ_ENABLE) {
-        DestoryWindow();
+        DestroyWindow();
     }
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty())) ||
@@ -771,19 +770,19 @@ int32_t KnuckleDrawingManager::ProcessUpEvent(bool isNeedUpAnimation)
         if (addTimerFunc_) {
             int32_t repeatTime = 1;
             destroyTimerId_ = addTimerFunc_(PROTOCOL_DURATION, repeatTime, [this]() {
-                DestoryWindow();
+                DestroyWindow();
                 destroyTimerId_ = -1;
             }, "KnuckleDrawingManager");
             if (destroyTimerId_ < 0) {
                 MMI_HILOGE("Add timer failed, timerId:%{public}d", destroyTimerId_);
-                DestoryWindow();
+                DestroyWindow();
             }
         } else {
             MMI_HILOGE("addTimerFunc_ is invalid");
-            DestoryWindow();
+            DestroyWindow();
         }
     } else {
-        DestoryWindow();
+        DestroyWindow();
     }
     return RET_OK;
 }
@@ -856,7 +855,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
     } else {
         MMI_HILOGD("The isActionUp_ is true");
         isActionUp_ = false;
-        return DestoryWindow();
+        return DestroyWindow();
     }
     path_.Reset();
     canvasNode_->FinishRecording();
@@ -909,7 +908,7 @@ int32_t KnuckleDrawingManager::ClearBrushCanvas()
 #endif // OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
-int32_t KnuckleDrawingManager::DestoryWindow()
+int32_t KnuckleDrawingManager::DestroyWindow()
 {
     CALL_DEBUG_ENTER;
     pointerInfos_.clear();
@@ -927,7 +926,7 @@ int32_t KnuckleDrawingManager::DestoryWindow()
     return RET_OK;
 }
 #else
-int32_t KnuckleDrawingManager::DestoryWindow()
+int32_t KnuckleDrawingManager::DestroyWindow()
 {
     CALL_DEBUG_ENTER;
     pointerInfos_.clear();

@@ -151,7 +151,7 @@ public:
         return 0;
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    virtual void ForceClearPointerVisiableStatus() {}
+    virtual void ForceClearPointerVisibleStatus() {}
     virtual void InitPointerObserver() {}
     virtual void OnSessionLost(int32_t pid) {}
     virtual int32_t SkipPointerLayer(bool isSkip)

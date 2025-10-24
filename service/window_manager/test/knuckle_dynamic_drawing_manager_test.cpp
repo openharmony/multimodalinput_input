@@ -572,12 +572,12 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
 }
 
 /**
- * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_002
- * @tc.desc: Test DestoryWindow
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DestroyWindow_002
+ * @tc.desc: Test DestroyWindow
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestroyWindow_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
@@ -588,7 +588,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Dest
     ASSERT_NE(knuckleDynamicDrawingMgr->surfaceNode_, nullptr);
     knuckleDynamicDrawingMgr->canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(knuckleDynamicDrawingMgr->canvasNode_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestroyWindow());
 }
 
 /**
