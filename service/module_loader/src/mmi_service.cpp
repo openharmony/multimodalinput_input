@@ -1282,6 +1282,10 @@ ErrCode MMIService::GetPointerSpeed(int32_t &speed)
 ErrCode MMIService::NotifyNapOnline()
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     NapProcess::GetInstance()->NotifyNapOnline();
     return RET_OK;
 }
