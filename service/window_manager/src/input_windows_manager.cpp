@@ -5095,6 +5095,9 @@ void InputWindowsManager::SendUIExtentionPointerEvent(double logicalX, double lo
     CHKPRV(sess, "The window has disappeared");
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!sess->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
