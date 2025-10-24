@@ -43,6 +43,8 @@ class KeyShortcutRulesTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    int32_t CreateSubscribeParam01(int32_t keyCode, std::mutex& mutex, std::condition_variable& condVar);
+    int32_t CreateSubscribeParam02(int32_t keyCode, std::mutex& mutex, std::condition_variable& condVar);
 
 private:
     std::shared_ptr<KeyEvent> TriggerSystemKey0101();
@@ -98,6 +100,40 @@ std::shared_ptr<KeyEvent> KeyShortcutRulesTest::TriggerSystemKey0102()
     return keyEvent;
 }
 
+int32_t KeyShortcutRulesTest::CreateSubscribeParam01(int32_t keyCode, std::mutex& mutex,
+    std::condition_variable& condVar)
+{
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT });
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_Q);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(NO_LONG_PRESS);
+
+    return InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+        [&](std::shared_ptr<KeyEvent> keyEvent) {
+            std::unique_lock<std::mutex> guard { mutex };
+            keyCode = keyEvent->GetKeyCode();
+            condVar.notify_all();
+        });
+}
+
+int32_t KeyShortcutRulesTest::CreateSubscribeParam02(int32_t keyCode, std::mutex& mutex,
+    std::condition_variable& condVar)
+{
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_SHIFT_LEFT });
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_Q);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(NO_LONG_PRESS);
+
+    return InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
+        [&](std::shared_ptr<KeyEvent> keyEvent) {
+            std::unique_lock<std::mutex> guard { mutex };
+            keyCode = keyEvent->GetKeyCode();
+            condVar.notify_all();
+        });
+}
+
 /**
  * @tc.name: KeyShortcutRulesTest_TriggerSystemKey_01
  * @tc.desc: If a shortcut was triggered when keys were pressed, shortcut would not be
@@ -113,32 +149,10 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_01, TestSiz
     std::mutex mutex;
     std::condition_variable condVar;
 
-    auto keyOption1 = std::make_shared<KeyOption>();
-    keyOption1->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT });
-    keyOption1->SetFinalKey(KeyEvent::KEYCODE_Q);
-    keyOption1->SetFinalKeyDown(true);
-    keyOption1->SetFinalKeyDownDuration(NO_LONG_PRESS);
-
-    auto subscribe1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1,
-        [&](std::shared_ptr<KeyEvent> keyEvent) {
-            std::unique_lock<std::mutex> guard { mutex };
-            keyCode1 = keyEvent->GetKeyCode();
-            condVar.notify_all();
-        });
+    auto subscribe1 = CreateSubscribeParam01(keyCode1, mutex, condVar);
     EXPECT_TRUE(subscribe1 <= 0);
 
-    auto keyOption2 = std::make_shared<KeyOption>();
-    keyOption2->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_SHIFT_LEFT });
-    keyOption2->SetFinalKey(KeyEvent::KEYCODE_Q);
-    keyOption2->SetFinalKeyDown(false);
-    keyOption2->SetFinalKeyDownDuration(NO_LONG_PRESS);
-
-    auto subscribe2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
-        [&](std::shared_ptr<KeyEvent> keyEvent) {
-            std::unique_lock<std::mutex> guard { mutex };
-            keyCode2 = keyEvent->GetKeyCode();
-            condVar.notify_all();
-        });
+    auto subscribe2 = CreateSubscribeParam02(keyCode2, mutex, condVar);
     EXPECT_TRUE(subscribe2 <= 0);
 
     std::unique_lock<std::mutex> guard { mutex };
@@ -181,32 +195,10 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_02, TestSiz
     std::mutex mutex;
     std::condition_variable condVar;
 
-    auto keyOption1 = std::make_shared<KeyOption>();
-    keyOption1->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT });
-    keyOption1->SetFinalKey(KeyEvent::KEYCODE_Q);
-    keyOption1->SetFinalKeyDown(true);
-    keyOption1->SetFinalKeyDownDuration(NO_LONG_PRESS);
-
-    auto subscribe1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1,
-        [&](std::shared_ptr<KeyEvent> keyEvent) {
-            std::unique_lock<std::mutex> guard { mutex };
-            keyCode1 = keyEvent->GetKeyCode();
-            condVar.notify_all();
-        });
+    auto subscribe1 = CreateSubscribeParam01(keyCode1, mutex, condVar);
     EXPECT_TRUE(subscribe1 <= 0);
 
-    auto keyOption2 = std::make_shared<KeyOption>();
-    keyOption2->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_SHIFT_LEFT });
-    keyOption2->SetFinalKey(KeyEvent::KEYCODE_Q);
-    keyOption2->SetFinalKeyDown(false);
-    keyOption2->SetFinalKeyDownDuration(NO_LONG_PRESS);
-
-    auto subscribe2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
-        [&](std::shared_ptr<KeyEvent> keyEvent) {
-            std::unique_lock<std::mutex> guard { mutex };
-            keyCode2 = keyEvent->GetKeyCode();
-            condVar.notify_all();
-        });
+    auto subscribe2 = CreateSubscribeParam02(keyCode2, mutex, condVar);
     EXPECT_TRUE(subscribe2 <= 0);
 
     std::unique_lock<std::mutex> guard { mutex };
