@@ -44,7 +44,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_Init_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
-    ASSERT_NO_FATAL_FAILURE(delegateTasks.Init());
+    EXPECT_TRUE(delegateTasks.Init());
     ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
     EXPECT_EQ(delegateTasks.PostSyncTask(nullptr), ERROR_NULL_POINTER);
 }
@@ -183,7 +183,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_002, TestSize.Level1)
 
 /**
  * @tc.name:DelegateTasksTest_CreateKeyEvent_001
- * @tc.desc:Test the funcation CreateKeyEvent
+ * @tc.desc:Test the function CreateKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -200,7 +200,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_CreateKeyEvent_001, TestSize.Level
 
 /**
  * @tc.name:DelegateTasksTest_GetKeyEvent_001
- * @tc.desc:Test the funcation GetKeyEvent
+ * @tc.desc:Test the function GetKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -217,7 +217,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_GetKeyEvent_001, TestSize.Level1)
 
 /**
  * @tc.name:DelegateTasksTest_CreateKeyItem_001
- * @tc.desc:Test the funcation CreateKeyItem
+ * @tc.desc:Test the function CreateKeyItem
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -237,7 +237,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_CreateKeyItem_001, TestSize.Level1
 
 /**
  * @tc.name:DelegateTasksTest_GetKeyItem_001
- * @tc.desc:Test the funcation GetKeyItem
+ * @tc.desc:Test the function GetKeyItem
  * @tc.type: FUNC
  * @tc.require:
  */
