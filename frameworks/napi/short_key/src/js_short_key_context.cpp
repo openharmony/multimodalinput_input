@@ -44,7 +44,19 @@ enum class XKeyAction : int32_t {
 };
 } // namespace
 
-JsShortKeyContext::JsShortKeyContext() : mgr_(std::make_shared<JsShortKeyManager>()) {}
+JsShortKeyContext::JsShortKeyContext(napi_env env) : mgr_(std::make_shared<JsShortKeyManager>()), env_(env)  {}
+
+JsShortKeyContext::~JsShortKeyContext()
+{
+    CALL_DEBUG_ENTER;
+    if (env_ != nullptr) {
+        auto status = napi_delete_reference(env_, contextRef_);
+        if (status != napi_ok) {
+            MMI_HILOGE("napi_delete_reference is failed, status:%{public}d", status);
+            return;
+        }
+    }
+}
 
 napi_value JsShortKeyContext::CreateInstance(napi_env env)
 {
@@ -86,7 +98,7 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
 
-    JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext();
+    JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext(env);
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("jsvm ends");
