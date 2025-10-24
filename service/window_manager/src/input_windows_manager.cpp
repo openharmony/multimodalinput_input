@@ -8025,6 +8025,7 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
                 break;
             default:
                 MMI_HILOGE("unknown direction and coordinate is considered in condition DIRECTION0");
+                break;
         }
         int32_t changeAreasShortestSide = pointerLockedWindow_.pointerChangeAreas[TOP_AREA];
         int32_t changeAreasLongestSide = pointerLockedWindow_.pointerChangeAreas[TOP_LEFT_AREA];
@@ -8089,12 +8090,24 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
         }
         x = static_cast<double>(integerX) + (x - floor(x));
         y = static_cast<double>(integerY) + (y - floor(y));
+        MMI_HILOGD(
+            "mouse capture mode limit mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
+            integerX,
+            integerY,
+            x,
+            y);
     }
     if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED) {
         integerX = pointerLockedLocation_.physicalX;
         integerY = pointerLockedLocation_.physicalY;
         x = pointerLockedCursorPos_.x;
         y = pointerLockedCursorPos_.y;
+        MMI_HILOGD(
+            "mouse capture mode limit mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
+            integerX,
+            integerY,
+            x,
+            y);
     }
 }
 

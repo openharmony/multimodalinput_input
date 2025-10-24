@@ -241,7 +241,7 @@ struct WindowInfo {
      * @since 22
      */
     static constexpr uint32_t FLAG_BIT_POINTER_LOCKED = 1 << 3;
-+
+
     /**
      * pointer confined window
      *
