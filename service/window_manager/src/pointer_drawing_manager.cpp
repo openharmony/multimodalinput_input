@@ -110,9 +110,6 @@ constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
 constexpr size_t RETRY_TIMES { 3 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-bool g_isRsRemoteDied { false };
-bool g_isHdiRemoteDied { false };
-bool g_isReStartVsync { false };
 constexpr uint64_t FOLD_SCREEN_ID_FULL { 0 };
 constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
 constexpr float IMAGE_PIXEL { 0.0f };
@@ -121,8 +118,6 @@ constexpr int32_t QUEUE_SIZE { 5 };
 constexpr int32_t DYNAMIC_ROTATION_ANGLE { 12 };
 constexpr float CALCULATE_MOUSE_ICON_BAIS { 5.0f };
 constexpr int32_t SYNC_FENCE_WAIT_TIME { 3000 };
-float g_hardwareCanvasSize = { 512.0f };
-float g_focalPoint = { 256.0f };
 constexpr int32_t REPEAT_COOLING_TIME { 1000 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t MOVE_RETRY_TIME { 50 };
@@ -134,11 +129,16 @@ constexpr float MAX_CUSTOM_CURSOR_DIMENSION { 256.0f };
 constexpr uint32_t CURSOR_STRIDE { 4 };
 constexpr int32_t MAX_FAIL_COUNT { 1000 };
 constexpr int32_t CHECK_SLEEP_TIME { 10 };
-std::atomic<bool> g_isRsRestart { false };
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
 #endif // OHOS_BUILD_PC_PRIORITY
 const int32_t MULTIMODAL_INPUT_SERVICE_ID = 3101;
+bool g_isRsRemoteDied { false };
+bool g_isHdiRemoteDied { false };
+bool g_isReStartVsync { false };
+float g_hardwareCanvasSize = { 512.0f };
+float g_focalPoint = { 256.0f };
+std::atomic<bool> g_isRsRestart { false };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -227,12 +227,12 @@ void PointerDrawingManager::InitPointerCallback()
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (GetHardCursorEnabled() && !initEventhandlerFlag_.load()) {
+    if (GetHardCursorEnabled() && !initEventHandlerFlag_.load()) {
         renderThread_ = std::make_unique<std::thread>([this] { this->RenderThreadLoop(); });
         softCursorRenderThread_ =
             std::make_unique<std::thread>([this] { this->SoftCursorRenderThreadLoop(); });
         moveRetryThread_ = std::make_unique<std::thread>([this] { this->MoveRetryThreadLoop(); });
-        initEventhandlerFlag_.store(true);
+        initEventHandlerFlag_.store(true);
     }
 }
 
@@ -294,7 +294,10 @@ PointerDrawingManager::PointerDrawingManager()
     InitStyle();
     InitDefaultMouseIconPath();
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
-    if (GetHardCursorEnabled()) {
+    if (g_isHdiRemoteDied) {
+        hardwareCursorPointerManager_->SetHdiServiceState(false);
+    }
+    if (hardwareCursorPointerManager_->IsSupported()) {
         g_hardwareCanvasSize = GetCanvasSize();
         g_focalPoint = GetFocusCoordinates();
     }
@@ -303,7 +306,7 @@ PointerDrawingManager::PointerDrawingManager()
 PointerDrawingManager::~PointerDrawingManager()
 {
     MMI_HILOGI("~PointerDrawingManager enter");
-    if (GetHardCursorEnabled()) {
+    if (IsHardCursorEnabled()) {
         if (runner_ != nullptr) {
             runner_->Stop();
         }
@@ -397,7 +400,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
     return true;
 }
 
-void PointerDrawingManager::ForceClearPointerVisiableStatus()
+void PointerDrawingManager::ForceClearPointerVisibleStatus()
 {
     MMI_HILOGI("Force clear all pointer visiable status");
     pidInfos_.clear();
@@ -729,7 +732,7 @@ bool PointerDrawingManager::HasMagicCursor()
 int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
 {
     if (g_isReStartVsync) {
-        isRenderRuning_.store(true);
+        isRenderRunning_.store(true);
         auto rsClient = std::static_pointer_cast<Rosen::RSRenderServiceClient>(
             Rosen::RSIRenderClient::CreateRenderServiceClient());
         CHKPR(rsClient, RET_ERR);
@@ -787,7 +790,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
         }
-        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
+        std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         hardwareCanvasSize_ = g_hardwareCanvasSize;
         // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
         // repeatedly obtain the surfaceBuffer.
@@ -805,7 +808,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     CALL_DEBUG_ENTER;
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPR(surfaceNodePtr, RET_ERR);
-    DrawLoadingPointerStyle(mouseStyle);
+    DrawLoadingPointer(mouseStyle);
     DrawRunningPointerAnimate(mouseStyle);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
@@ -848,7 +851,7 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     return RET_OK;
 }
 
-void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
+void PointerDrawingManager::DrawLoadingPointer(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
     auto surfaceNodePtr = GetSurfaceNode();
@@ -996,8 +999,8 @@ void PointerDrawingManager::PostSoftCursorTask(std::function<void()> task)
     if (g_isHdiRemoteDied) {
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
-    if (softCursorHander_ != nullptr) {
-        softCursorHander_->PostTask(task);
+    if (softCursorHandler_ != nullptr) {
+        softCursorHandler_->PostTask(task);
     }
 }
 
@@ -1007,8 +1010,8 @@ void PointerDrawingManager::PostMoveRetryTask(std::function<void()> task)
     if (g_isHdiRemoteDied) {
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
-    if (moveRetryHander_ != nullptr) {
-        moveRetryHander_->PostTask(task);
+    if (moveRetryHandler_ != nullptr) {
+        moveRetryHandler_->PostTask(task);
     }
 }
 
@@ -1159,7 +1162,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         return;
     }
     PostTask([this]() -> void {
-        std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
+        std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
             MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
             return;
@@ -1203,7 +1206,7 @@ int32_t PointerDrawingManager::RequestNextVSync()
 
 void PointerDrawingManager::RenderThreadLoop()
 {
-    isRenderRuning_.store(true);
+    isRenderRunning_.store(true);
     runner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(runner_);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(runner_);
@@ -1236,8 +1239,8 @@ void PointerDrawingManager::SoftCursorRenderThreadLoop()
 #endif // OHOS_BUILD_PC_PRIORITY
     softCursorRunner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(softCursorRunner_);
-    softCursorHander_ = std::make_shared<AppExecFwk::EventHandler>(softCursorRunner_);
-    CHKPV(softCursorHander_);
+    softCursorHandler_ = std::make_shared<AppExecFwk::EventHandler>(softCursorRunner_);
+    CHKPV(softCursorHandler_);
     if (softCursorRunner_ != nullptr) {
         MMI_HILOGI("Runner is run");
         softCursorRunner_->Run();
@@ -1248,8 +1251,8 @@ void PointerDrawingManager::MoveRetryThreadLoop()
 {
     moveRetryRunner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(moveRetryRunner_);
-    moveRetryHander_ = std::make_shared<AppExecFwk::EventHandler>(moveRetryRunner_);
-    CHKPV(moveRetryHander_);
+    moveRetryHandler_ = std::make_shared<AppExecFwk::EventHandler>(moveRetryRunner_);
+    CHKPV(moveRetryHandler_);
     if (moveRetryRunner_ != nullptr) {
         MMI_HILOGI("Runner is run");
         moveRetryRunner_->Run();
@@ -1820,11 +1823,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
-    OHOS::Rosen::Drawing::scalar penWidth = 1;
-    pen.SetWidth(penWidth);
+    pen.SetWidth(OHOS::Rosen::Drawing::scalar(1));
     canvas.AttachPen(pen);
     std::shared_ptr<Rosen::Drawing::Image> image = nullptr;
-    std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
         auto userIconCopy = GetUserIconCopy();
@@ -1841,11 +1842,11 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
             ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         AdjustMouseFocusToSoftRenderOrigin(direction, mouseStyle, physicalX, physicalY);
         surfaceNodePtr->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
+        std::shared_ptr<OHOS::Media::PixelMap> pixelmap = nullptr;
         if (mouseStyle == MOUSE_ICON::RUNNING) {
-            pixelmap = DecodeImageToPixelMap(MOUSE_ICON::RUNNING_LEFT);
-        } else {
-            pixelmap = DecodeImageToPixelMap(mouseStyle);
+            mouseStyle = MOUSE_ICON::RUNNING_LEFT;
         }
+        pixelmap = DecodeImageToPixelMap(mouseStyle);
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1936,8 +1937,7 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
-    OHOS::Rosen::Drawing::scalar penWidth = 1;
-    pen.SetWidth(penWidth);
+    pen.SetWidth(OHOS::Rosen::Drawing::scalar(1));
     canvas.AttachPen(pen);
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
@@ -2070,6 +2070,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, Curso
     {
         std::lock_guard<std::mutex> guard(mtx_);
         userIcon_.reset(pixelMapPtr);
+        curPixelMap.pixelMap = nullptr;
     }
 
     mouseIconUpdate_ = true;
@@ -2598,7 +2599,7 @@ IPointerDrawingManager* IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::recursive_mutex> lg(rec_mtx_);
+    std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
     RecordCursorIdAndImageAddress();
@@ -2871,7 +2872,7 @@ std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIcons()
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-void PointerDrawingManager::UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath)
+void PointerDrawingManager::UpdateIconPath(const MOUSE_ICON mouseStyle, const std::string& iconPath)
 {
     auto iter = mouseIcons_.find(mouseStyle);
     if (iter == mouseIcons_.end()) {
@@ -2892,24 +2893,21 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
     return RET_OK;
 }
 
-bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle)
+bool PointerDrawingManager::IsPointerStyleParamValid(int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId < -1) {
         return false;
     }
-    if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle.id > MOUSE_ICON::LASER_CURSOR_DOT_RED) {
-        return false;
-    }
-    return true;
+    return !((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
+        pointerStyle.id > MOUSE_ICON::LASER_CURSOR_DOT_RED);
 }
 
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
     bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
-    if (!CheckPointerStyleParam(windowId, pointerStyle)) {
+    if (!IsPointerStyleParamValid(windowId, pointerStyle)) {
         MMI_HILOGE("PointerStyle param is invalid");
         return RET_ERR;
     }
@@ -3413,7 +3411,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     });
 }
 
-Direction PointerDrawingManager::CalculateRenderDirection(const bool isHard, const bool isWindowRotation)
+Direction PointerDrawingManager::CalculateRenderDirection(bool isHard, bool isWindowRotation)
 {
     Direction direction = DIRECTION0;
     if (isHard) {
@@ -3948,7 +3946,7 @@ void PointerDrawingManager::AdjustMouseFocusToSoftRenderOrigin(Direction directi
     }
 }
 
-bool PointerDrawingManager::GetHardCursorEnabled()
+bool PointerDrawingManager::IsHardCursorEnabled()
 {
     bool isHardCursorEnabled = true;
     CHKPF(hardwareCursorPointerManager_);
@@ -3959,6 +3957,11 @@ bool PointerDrawingManager::GetHardCursorEnabled()
         isHardCursorEnabled = false;
     }
     return isHardCursorEnabled;
+}
+
+bool PointerDrawingManager::GetHardCursorEnabled()
+{
+    return IsHardCursorEnabled();
 }
 
 #ifndef OHOS_BUILD_ENABLE_WATCH

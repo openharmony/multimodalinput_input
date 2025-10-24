@@ -71,7 +71,7 @@ public:
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable);
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount);
     OLD::DisplayInfo GetCurrentDisplayInfo();
-    void ForceClearPointerVisiableStatus();
+    void ForceClearPointerVisibleStatus();
     void InitPointerObserver();
     void OnSessionLost(int32_t pid);
     int32_t SkipPointerLayer(bool isSkip);

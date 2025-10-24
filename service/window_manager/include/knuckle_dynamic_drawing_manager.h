@@ -45,7 +45,7 @@ private:
     void UpdateTrackColors();
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
-    void DestoryWindow();
+    void DestroyWindow();
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };

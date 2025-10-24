@@ -277,7 +277,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
 
     int32_t pid = 1;
     int32_t windowId = 2;
-    bool ret1 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret1 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret1);
     int32_t ret2 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
@@ -415,27 +415,27 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_02,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CheckPointerStyleParam_01
- * @tc.desc: Test CheckPointerStyleParam
+ * @tc.name: InputWindowsManagerTest_IsPointerStyleParamValid_01
+ * @tc.desc: Test IsPointerStyleParamValid
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_CheckPointerStyleParam_01, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_IsPointerStyleParamValid_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     int32_t windowId = 2;
     PointerStyle pointerStyle;
     pointerStyle.id = -2;
-    bool ret1 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret1 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret1);
 
     pointerStyle.id = 46;
-    bool ret2 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret2 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret2);
 
     windowId = -3;
-    bool ret3 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret3 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret3);
 }
 
@@ -681,7 +681,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01
 
     int32_t pid = 1;
     int32_t windowId = -2;
-    bool ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret);
 
     int32_t ret2 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
@@ -707,7 +707,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_02
 
     int32_t pid = 1;
     int32_t windowId = GLOBAL_WINDOW_ID;
-    bool ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret);
 
     int32_t ret2 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
