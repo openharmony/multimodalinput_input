@@ -778,7 +778,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             return QueryMouseInfo(argc, argv);
                         }
                         default: {
-                            std::cout << "invalid command to virtual mouse" << std::endl;
+                            std::cout << "Invalid command to virtual mouse" << std::endl;
                             ShowUsage();
                             return EVENT_REG_FAIL;
                         }
