@@ -38,7 +38,6 @@ const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
 [[ maybe_unused ]] constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
 [[ maybe_unused ]] constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
 [[ maybe_unused ]] constexpr int32_t CALCULATE_MIDDLE { 2 };
-constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t MAX_POINTER_COLOR { 0x00ffff };
 constexpr int32_t TIME_DIMENSION { 1000 };
 constexpr int32_t PATH_COLOR { 0xFFCCCCCC };
@@ -139,7 +138,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
         if (!traceControlPoints_.empty()) {
             isStop_ = true;
             isDrawing_ = true;
-            DestoryWindow();
+            DestroyWindow();
         } else if (isRotate_) {
             isRotate_ = false;
             if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
@@ -156,7 +155,7 @@ bool KnuckleDynamicDrawingManager::CheckPointerAction(std::shared_ptr<PointerEve
     CALL_DEBUG_ENTER;
     CHKPF(knuckleDrawMgr_);
     if (knuckleDrawMgr_->GetScreenReadState() == SCREEN_READ_ENABLE) {
-        DestoryWindow();
+        DestroyWindow();
     }
     size_t size = pointerEvent->GetPointerIds().size();
     if (size > MIN_POINT_SIZE) {
@@ -212,7 +211,7 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
         glowTraceSystem_->ResetDivergentPoints(displayXY.first, displayXY.second);
     }
     isDrawing_ = true;
-    DestoryWindow();
+    DestroyWindow();
 }
 
 void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -410,7 +409,7 @@ void KnuckleDynamicDrawingManager::CreateCanvasNode()
     canvasNode_->SetRotation(0);
 }
 
-void KnuckleDynamicDrawingManager::DestoryWindow()
+void KnuckleDynamicDrawingManager::DestroyWindow()
 {
     CALL_DEBUG_ENTER;
     traceControlPoints_.clear();

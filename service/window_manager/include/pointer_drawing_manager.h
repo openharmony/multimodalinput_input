@@ -61,6 +61,9 @@ public:
 
     void NotifyScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens) override
     {
+        if (!callback_) {
+            return;
+        }
         return callback_(screens);
     }
 
@@ -157,9 +160,8 @@ private:
         int32_t imageHeight { 0 };
         int32_t pointerColor { 0 };
     };
-    IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void GetPreferenceKey(std::string &name);
-    void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
+    void DrawLoadingPointer(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(uint64_t rsId, int32_t physicalX, int32_t physicalY, Direction direction);
     int32_t CreatePointerWindowForScreenPointer(uint64_t rsId, int32_t physicalX, int32_t physicalY);
@@ -196,9 +198,9 @@ private:
     int32_t GetIndependentPixels();
     bool IsWindowRotation(const OLD::DisplayInfo *displayInfo);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
-    bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
+    bool IsPointerStyleParamValid(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
-    void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
+    void UpdateIconPath(const MOUSE_ICON mouseStyle, const std::string& iconPath);
     std::shared_ptr<Rosen::Drawing::ColorSpace> ConvertToColorSpace(Media::ColorSpace colorSpace);
     Rosen::Drawing::ColorType PixelFormatToColorType(Media::PixelFormat pixelFormat);
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
@@ -209,7 +211,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    void ForceClearPointerVisiableStatus() override;
+    void ForceClearPointerVisibleStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
     bool SetCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
@@ -239,7 +241,7 @@ private:
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint64_t screenId);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
-    Direction CalculateRenderDirection(const bool isHard, const bool isWindowRotation);
+    Direction CalculateRenderDirection(bool isHard, bool isWindowRotation);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
     void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
@@ -263,14 +265,22 @@ private:
     void AdjustMouseFocusToSoftRenderOrigin(Direction direction, const MOUSE_ICON pointerStyle, int32_t &physicalX,
         int32_t &physicalY);
     bool GetHardCursorEnabled() override;
+    bool IsHardCursorEnabled();
 private:
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };
     };
     bool hasDisplay_ { false };
-    OLD::DisplayInfo displayInfo_ {};
     bool hasPointerDevice_ { false };
+    bool mouseDisplayState_ { false };
+    bool mouseIconUpdate_ { false };
+    bool hasInitObserver_ { false };
+    bool isInit_ { false };
+    bool userIconFollowSystem_ { false };
+    bool followSystem_ { false };
+    bool offRenderScaleUpdate_ { false };
+    OLD::DisplayInfo displayInfo_ {};
     int32_t lastPhysicalX_ { -1 };
     int32_t lastPhysicalY_ { -1 };
     PointerStyle lastMouseStyle_ {};
@@ -287,9 +297,6 @@ private:
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     std::list<PidInfo> hapPidInfos_;
-    bool mouseDisplayState_ { false };
-    bool mouseIconUpdate_ { false };
-    bool offRenderScaleUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;
@@ -302,28 +309,25 @@ private:
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
-    bool hasInitObserver_ { false };
     int32_t frameCount_ { DEFAULT_FRAME_RATE };
     int32_t currentFrame_ { 0 };
     uint64_t displayId_ { 0 };
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
-    std::atomic<bool> isRenderRuning_{ false };
+    std::atomic<bool> isRenderRunning_{ false };
     std::unique_ptr<std::thread> renderThread_ { nullptr };
-    bool isInit_ { false };
     std::mutex mtx_;
-    std::recursive_mutex rec_mtx_;
+    std::recursive_mutex recursiveMtx_;
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
     sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
     std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers_;
     PointerRenderer pointerRenderer_;
-    bool userIconFollowSystem_ { false };
     std::shared_ptr<AppExecFwk::EventRunner> softCursorRunner_ { nullptr };
-    std::shared_ptr<AppExecFwk::EventHandler> softCursorHander_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> softCursorHandler_ { nullptr };
     std::unique_ptr<std::thread> softCursorRenderThread_ { nullptr };
     std::shared_ptr<AppExecFwk::EventRunner> moveRetryRunner_ { nullptr };
-    std::shared_ptr<AppExecFwk::EventHandler> moveRetryHander_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> moveRetryHandler_ { nullptr };
     std::unique_ptr<std::thread> moveRetryThread_ { nullptr };
     int32_t moveRetryTimerId_ { -1 };
     int32_t moveRetryCount_ { 0 };
@@ -337,10 +341,9 @@ private:
     std::mutex mousePixelMapMutex_;
     int32_t initLoadingAndLoadingRightPixelTimerId_ { -1 };
     int releaseFence_ { -1 };
-    bool followSystem_ { false };
     int32_t focusX_ { 0 };
     int32_t focusY_ { 0 };
-    std::atomic<bool> initEventhandlerFlag_ { false };
+    std::atomic<bool> initEventHandlerFlag_ { false };
     std::atomic<bool> initDisplayStatusReceiverFlag_ { false };
     std::shared_ptr<PointerDrawingManager> self_ { nullptr };
     Rosen::OnRemoteDiedCallback OnRemoteDiedCallback_ { nullptr };

@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
+constexpr int32_t DEFAULT_VALUE { -1 };
 using AddTimerCallbackFunc = std::function<int32_t(int, int, std::function<void()>, const std::string&)>;
 struct PointerInfo {
     float x { 0.0F };
@@ -39,7 +40,7 @@ struct ScreenReadState {
 
 class KnuckleDrawingManager {
 public:
-    void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t rsId = -1);
+    void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t rsId = DEFAULT_VALUE);
     void UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager();
@@ -55,7 +56,7 @@ private:
     int32_t GetPointerPos(std::shared_ptr<PointerEvent> touchEvent);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
     bool IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEvent> touchEvent);
-    int32_t DestoryWindow();
+    int32_t DestroyWindow();
     void CreateObserver();
     template <class T>
     void CreateScreenReadObserver(T& item);

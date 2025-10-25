@@ -321,7 +321,7 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMap)
     return 0;
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-void PointerDrawingManager::ForceClearPointerVisiableStatus()
+void PointerDrawingManager::ForceClearPointerVisibleStatus()
 {}
 void PointerDrawingManager::InitPointerCallback()
 {}
