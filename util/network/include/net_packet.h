@@ -34,7 +34,6 @@ class NetPacket : public StreamBuffer {
 public:
     explicit NetPacket(MmiMessageId msgId);
     NetPacket(const NetPacket &pkt);
-    NetPacket &operator = (const NetPacket &pkt);
     DISALLOW_MOVE(NetPacket);
     virtual ~NetPacket();
 
