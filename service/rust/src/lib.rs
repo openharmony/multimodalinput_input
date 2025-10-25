@@ -73,7 +73,7 @@ struct AxisAccelerateCurvesTouchpad {
 }
 impl PCMouseAccelerateCurves {
     fn pc_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -83,7 +83,7 @@ impl PCMouseAccelerateCurves {
 }
 impl SoftPcProMouseAccelerateCurves {
     fn soft_pc_pro_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -93,7 +93,7 @@ impl SoftPcProMouseAccelerateCurves {
 }
 impl HardPcProMouseAccelerateCurves {
     fn hard_pc_pro_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -103,7 +103,7 @@ impl HardPcProMouseAccelerateCurves {
 }
 impl PCTouchpadAccelerateCurves {
     fn pc_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -113,7 +113,7 @@ impl PCTouchpadAccelerateCurves {
 }
 impl SoftPcProTouchpadAccelerateCurves {
     fn soft_pc_pro_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -123,7 +123,7 @@ impl SoftPcProTouchpadAccelerateCurves {
 }
 impl HardPcProTouchpadAccelerateCurves {
     fn hard_pc_pro_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -133,7 +133,7 @@ impl HardPcProTouchpadAccelerateCurves {
 }
 impl TabletTouchpadAccelerateCurves {
     fn tablet_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -143,7 +143,7 @@ impl TabletTouchpadAccelerateCurves {
 }
 impl FoldPcTouchpadAccelerateCurves {
     fn fold_pc_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if speed > 0 && speed <= len {
            &self.data[speed - 1] 
         } else {
@@ -158,7 +158,7 @@ impl FoldPcVirtTouchpadAccelerateCurves {
 }
 impl AxisAccelerateCurvesTouchpad {
     fn get_axis_curve_by_speed_touchpad(&self, device_type: usize) -> &CurveItem {
-        let len = &self.data.len();
+        let len = self.data.len();
         if device_type > 0 && device_type <= len {
            &self.data[device_type - 1] 
         } else {
