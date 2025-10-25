@@ -21,9 +21,9 @@ namespace OHOS {
 namespace MMI {
 class JsShortKeyContext {
 public:
-    JsShortKeyContext();
+    JsShortKeyContext(napi_env env);
     DISALLOW_COPY_AND_MOVE(JsShortKeyContext);
-    ~JsShortKeyContext() = default;
+    ~JsShortKeyContext();
     static napi_value Export(napi_env env, napi_value exports);
     std::shared_ptr<JsShortKeyManager> GetJsShortKeyMgr() const;
     static napi_value SetKeyDownDuration(napi_env env, napi_callback_info info);
@@ -36,6 +36,7 @@ private:
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);
     std::shared_ptr<JsShortKeyManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
+    napi_env env_;
 };
 } // namespace MMI
 } // namespace OHOS
