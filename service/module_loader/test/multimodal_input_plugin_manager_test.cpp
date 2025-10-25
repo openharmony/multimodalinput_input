@@ -177,12 +177,12 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
     EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
-    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillRepeatedly(Return(nullptr));
     EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
-    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(axisEvent));
 }
 
 /**
