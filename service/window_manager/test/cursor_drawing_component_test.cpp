@@ -460,14 +460,14 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetHardwareCurso
 }
 
 /**
- * @tc.name: CursorDrawingComponentTest_ForceClearPointerVisiableStatus_001
- * @tc.desc: Test ForceClearPointerVisiableStatus
+ * @tc.name: CursorDrawingComponentTest_ForceClearPointerVisibleStatus_001
+ * @tc.desc: Test ForceClearPointerVisibleStatus
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ForceClearPointerVisiableStatus_001, TestSize.Level1)
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ForceClearPointerVisibleStatus_001, TestSize.Level1)
 {
-    EXPECT_NO_FATAL_FAILURE(instance_->ForceClearPointerVisiableStatus());
+    EXPECT_NO_FATAL_FAILURE(instance_->ForceClearPointerVisibleStatus());
 }
 
 /**

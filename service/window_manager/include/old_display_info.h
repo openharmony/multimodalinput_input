@@ -20,7 +20,7 @@ namespace MMI {
 namespace OLD {
 struct DisplayInfo {
     /**
-     * Unique ID of the physical display
+     * Unique ID of the logical display
      *
      * @since 9
      */

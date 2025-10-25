@@ -182,7 +182,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_RequestNextV
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    EXPECT_EQ(pointerDrawingManager.isRenderRuning_, false);
+    EXPECT_EQ(pointerDrawingManager.isRenderRunning_, false);
     auto rlt = pointerDrawingManager.RequestNextVSync();
     EXPECT_EQ(rlt, RET_ERR);
 }
@@ -371,7 +371,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_PostSoftCurs
     PointerDrawingManager pointerDrawingManager;
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
-    pointerDrawingManager.softCursorHander_ = nullptr;
+    pointerDrawingManager.softCursorHandler_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.PostSoftCursorTask([this]() {}));
 }
 
@@ -397,7 +397,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_PostSoftCurs
     pointerDrawingManager.CreatePointerWindow(rsId, physicalX, physicalY, Direction::DIRECTION90);
     pointerDrawingManager.softCursorRunner_ = AppExecFwk::EventRunner::Create(false);
     auto softCursorHander = std::make_shared<AppExecFwk::EventHandler>(pointerDrawingManager.softCursorRunner_);
-    pointerDrawingManager.softCursorHander_ = softCursorHander;
+    pointerDrawingManager.softCursorHandler_ = softCursorHander;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.PostSoftCursorTask([this]() {}));
 }
 
@@ -413,7 +413,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_PostMoveRetr
     PointerDrawingManager pointerDrawingManager;
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
-    pointerDrawingManager.moveRetryHander_ = nullptr;
+    pointerDrawingManager.moveRetryHandler_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.PostMoveRetryTask([this]() {}));
 }
 

@@ -23,22 +23,34 @@
 #include "timer_manager.h"
 
 #define MMI_LOG_TAG "CursorDrawingComponent"
-#define CHK_IS_LOADV(isLoaded, pointerInstance)                                                      \
-    if ((!isLoaded) || ((pointerInstance) == nullptr)) {                                             \
-        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded or instance does not exist");       \
-        return;                                                                                      \
+#define CHK_IS_LOADV(isLoaded, pointerInstance)                     \
+    if (!(isLoaded)) {                                              \
+        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
+        return;                                                     \
+    }                                                               \
+    if ((pointerInstance) == nullptr) {                             \
+        MMI_HILOGE("pointer instance does not exist");              \
+        return;                                                     \
     }
 
-#define CHK_IS_LOADF(isLoaded, pointerInstance)                                                      \
-    if ((!isLoaded) || ((pointerInstance) == nullptr)) {                                             \
-        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded or instance does not exist");       \
-        return false;                                                                                \
+#define CHK_IS_LOADF(isLoaded, pointerInstance)                     \
+    if (!(isLoaded)) {                                              \
+        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
+        return false;                                               \
+    }                                                               \
+    if ((pointerInstance) == nullptr) {                             \
+        MMI_HILOGE("pointer instance does not exist");              \
+        return false;                                               \
     }
 
-#define CHK_IS_LOADR(isLoaded, pointerInstance)                                                      \
-    if ((!isLoaded_) || ((pointerInstance_) == nullptr)) {                                           \
-        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded or instance does not exist");       \
-        return RET_ERR;                                                                              \
+#define CHK_IS_LOADR(isLoaded, pointerInstance)                     \
+    if (!(isLoaded)) {                                              \
+        MMI_HILOGE("libcursor_drawing_adapter.z.so is not loaded"); \
+        return RET_ERR;                                             \
+    }                                                               \
+    if ((pointerInstance) == nullptr) {                             \
+        MMI_HILOGE("pointer instance does not exist");              \
+        return RET_ERR;                                             \
     }
 
 namespace OHOS::MMI {
@@ -407,10 +419,10 @@ OLD::DisplayInfo CursorDrawingComponent::GetCurrentDisplayInfo()
     return pointerInstance_->GetCurrentDisplayInfo();
 }
 
-void CursorDrawingComponent::ForceClearPointerVisiableStatus()
+void CursorDrawingComponent::ForceClearPointerVisibleStatus()
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    return pointerInstance_->ForceClearPointerVisiableStatus();
+    return pointerInstance_->ForceClearPointerVisibleStatus();
 }
 
 void CursorDrawingComponent::InitPointerObserver()

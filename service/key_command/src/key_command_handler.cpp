@@ -2668,7 +2668,7 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
         MMI_HILOGI("Force make pointer visible");
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (POINTER_DEV_MGR.isInit) {
-        CursorDrawingComponent::GetInstance().ForceClearPointerVisiableStatus();
+        CursorDrawingComponent::GetInstance().ForceClearPointerVisibleStatus();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }

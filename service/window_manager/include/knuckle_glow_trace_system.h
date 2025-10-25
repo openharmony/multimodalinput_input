@@ -30,7 +30,7 @@ public:
     void Update();
     void Draw(Rosen::ExtendRecordingCanvas* canvas);
     void ResetDivergentPoints(double pointX, double pointY);
-    void AddGlowPoints(const Rosen::Drawing::Path &path, int64_t timeInterval);
+    void AddGlowPoints(const Rosen::Drawing::Path& path, int64_t timeInterval);
 
 private:
     std::vector<std::shared_ptr<KnuckleGlowPoint>> glowPoints_;
