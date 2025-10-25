@@ -1267,15 +1267,6 @@ public:
     int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
     
     /**
-    * @brief Get the plugin remote object by name.
-    * @param pluginName The name of the plugin.
-    * @param pluginRemoteStub The reference of plugin remote object.
-    * @return Returns <b>0</b> if successful; returns a non-0 value otherwise.
-    * @since 20
-    */
-    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
-    
-    /**
      * @brief Determine whether the pointer is initialized.
      * @return If it has been initialized, return true; otherwise, return false.
      * @since 22
