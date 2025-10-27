@@ -96,7 +96,8 @@ void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
-    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
+    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType,
+    uint32_t tokenId, bool isRealProcessName)
 {
     CALL_DEBUG_ENTER;
     int32_t sockFds[2] = { -1 };
@@ -132,6 +133,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         goto CLOSE_SOCK;
     }
     sess->SetTokenType(tokenType);
+    sess->SetTokenId(tokenId);
+    sess->SetIsRealProcessName(isRealProcessName);
     if (!AddSession(sess)) {
         MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
         goto CLOSE_SOCK;

@@ -129,6 +129,8 @@ ohos_shared_library("libmmi-util") {
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "access_token:libaccesstoken_sdk",
+    "ability_runtime:app_manager",
   ]
 
   if (security_component_enable) {

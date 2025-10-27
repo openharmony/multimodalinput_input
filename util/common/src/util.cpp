@@ -22,6 +22,10 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include "accesstoken_kit.h"
+#include "app_mgr_client.h"
+#include "singleton.h"
+
 #include "aggregator.h"
 #include "error_multimodal.h"
 #include "securec.h"
@@ -650,6 +654,45 @@ bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::
         key_ = key;
         return false;
     }
+}
+
+std::string GetProcessName(uint32_t tokenId, int32_t pid)
+{
+    CALL_INFO_TRACE;
+    std::string processName = "";
+    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
+            auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+            if (appMgrClient == nullptr) {
+                MMI_HILOGE("Get appMgrClient faield");
+                break;
+            }
+            AppExecFwk::RunningProcessInfo info;
+            int32_t res = appMgrClient->GetRunningProcessInfoByPid(pid, info);
+            if (res != RET_OK) {
+                MMI_HILOGE("Get Running Process info by pid:%{private}d faied, ret:%{public}d", pid, res);
+                break;
+            }
+            processName = info.processName_;
+            break;
+        }
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE:
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
+            Security::AccessToken::NativeTokenInfo tokenInfo;
+            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != RET_OK) {
+                MMI_HILOGE("Get native token info failed");
+            } else {
+                processName = tokenInfo.processName;
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGW("token type not match:%{public}d", tokenType);
+            break;
+        }
+    }
+    return processName;
 }
 
 void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const std::string &extraRecord)

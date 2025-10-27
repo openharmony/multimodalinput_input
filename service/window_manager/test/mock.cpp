@@ -112,7 +112,8 @@ int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd, bool readOnly)
 
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
-    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
+    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType,
+    uint32_t tokenId, bool isRealProcessName)
 {
     return RET_ERR;
 }
