@@ -312,6 +312,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
     pointerDrawingManager.surfaceNode_ = nullptr;
     uint64_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
+    EXPECT_EQ(pointerDrawingManager.displayId_, displayId);
 }
 
 /**
@@ -333,6 +334,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     uint64_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y, displayId));
+    EXPECT_EQ(pointerDrawingManager.displayId_, displayId);
 }
 
 /**

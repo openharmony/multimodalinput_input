@@ -919,7 +919,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ResetAllTriggering_01, T
 
 /**
  * @tc.name: KeyShortcutManagerTest_GetInstance_01
- * @tc.desc: Test the funcation GetInstance
+ * @tc.desc: Test the function GetInstance
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -936,7 +936,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetInstance_01, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_UnregisterHotKey_01
- * @tc.desc: Test the funcation UnregisterHotKey
+ * @tc.desc: Test the function UnregisterHotKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -963,7 +963,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UnregisterHotKey_01, Tes
 
 /**
  * @tc.name: KeyShortcutManagerTest_UpdateShortcutConsumed_01
- * @tc.desc: Test the funcation UpdateShortcutConsumed
+ * @tc.desc: Test the function UpdateShortcutConsumed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -983,7 +983,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UpdateShortcutConsumed_0
 
 /**
  * @tc.name: KeyShortcutManagerTest_MarkShortcutConsumed_01
- * @tc.desc: Test the funcation MarkShortcutConsumed(ShortcutKey)
+ * @tc.desc: Test the function MarkShortcutConsumed(ShortcutKey)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1009,7 +1009,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_MarkShortcutConsumed_01,
 
 /**
  * @tc.name: KeyShortcutManagerTest_MarkShortcutConsumed_001
- * @tc.desc: Test the funcation MarkShortcutConsumed(KeyOption)
+ * @tc.desc: Test the function MarkShortcutConsumed(KeyOption)
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1028,7 +1028,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_MarkShortcutConsumed_001
 
 /**
  * @tc.name: KeyShortcutManagerTest_ResetTriggering_01
- * @tc.desc: Test the funcation ResetTriggering
+ * @tc.desc: Test the function ResetTriggering
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1045,7 +1045,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ResetTriggering_01, Test
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleEvent_001
- * @tc.desc: Test the funcation HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1064,7 +1064,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleEvent_001, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_WillResetOnKeyDown_001
- * @tc.desc: Test the funcation WillResetOnKeyDown
+ * @tc.desc: Test the function WillResetOnKeyDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1084,7 +1084,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_WillResetOnKeyDown_001, 
 
 /**
  * @tc.name: KeyShortcutManagerTest_WillResetOnKeyUp_001
- * @tc.desc: Test the funcation WillResetOnKeyUp
+ * @tc.desc: Test the function WillResetOnKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1109,7 +1109,7 @@ void myCallback(std::shared_ptr<KeyEvent> event)
 
 /**
  * @tc.name: KeyShortcutManagerTest_TriggerUp_001
- * @tc.desc: Test the funcation TriggerUp
+ * @tc.desc: Test the function TriggerUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1129,7 +1129,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_001, TestSize.
 
 /**
  * @tc.name: KeyShortcutManagerTest_TriggerUp_002
- * @tc.desc: Test the funcation TriggerUp
+ * @tc.desc: Test the function TriggerUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1152,7 +1152,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_002, TestSize.
 
 /**
  * @tc.name: KeyShortcutManagerTest_RunShortcut_001
- * @tc.desc: Test the funcation RunShortcut
+ * @tc.desc: Test the function RunShortcut
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1167,7 +1167,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RunShortcut_001, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_RunShortcut_002
- * @tc.desc: Test the funcation RunShortcut
+ * @tc.desc: Test the function RunShortcut
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1184,7 +1184,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RunShortcut_002, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_TriggerDown_002
- * @tc.desc: Test the funcation TriggerDown
+ * @tc.desc: Test the function TriggerDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1207,7 +1207,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerDown_002, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleKeyUp_001
- * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.desc: Test the function HandleKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1231,7 +1231,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_001, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleKeyUp_002
- * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.desc: Test the function HandleKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1260,7 +1260,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_002, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_UnregisterSystemKey_001
- * @tc.desc: Test the funcation UnregisterSystemKey
+ * @tc.desc: Test the function UnregisterSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1281,7 +1281,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UnregisterSystemKey_001,
 
 /**
  * @tc.name: KeyShortcutManagerTest_UnregisterHotKey_002
- * @tc.desc: Test the funcation UnregisterHotKey
+ * @tc.desc: Test the function UnregisterHotKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1304,7 +1304,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UnregisterHotKey_002, Te
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleEvent_002
- * @tc.desc: Test the funcation HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1329,7 +1329,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleEvent_002, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_FormatPressedKeys_001
- * @tc.desc: Test the funcation FormatPressedKeys
+ * @tc.desc: Test the function FormatPressedKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1350,7 +1350,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatPressedKeys_001, T
 
 /**
  * @tc.name: KeyShortcutManagerTest_CheckGlobalKey_001
- * @tc.desc: Test the funcation CheckGlobalKey
+ * @tc.desc: Test the function CheckGlobalKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1377,7 +1377,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckGlobalKey_001, Test
 
 /**
  * @tc.name: KeyShortcutManagerTest_GetForegroundPids_001
- * @tc.desc: Test the funcation GetForegroundPids
+ * @tc.desc: Test the function GetForegroundPids
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1402,7 +1402,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetForegroundPids_001, T
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleKeyDown_001
- * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.desc: Test the function HandleKeyDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1426,7 +1426,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_001, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleKeyDown_002
- * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.desc: Test the function HandleKeyDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1455,7 +1455,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_002, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleKeyUp_003
- * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.desc: Test the function HandleKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1483,7 +1483,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_003, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_CheckPureModifiers_001
- * @tc.desc: Test the funcation CheckPureModifiers
+ * @tc.desc: Test the function CheckPureModifiers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1515,7 +1515,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckPureModifiers_001, 
 
 /**
  * @tc.name: KeyShortcutManagerTest_CheckModifiers_001
- * @tc.desc: Test the funcation CheckModifiers
+ * @tc.desc: Test the function CheckModifiers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1547,7 +1547,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckModifiers_001, Test
 
 /**
  * @tc.name: KeyShortcutManagerTest_TriggerDown_001
- * @tc.desc: Test the funcation TriggerDown
+ * @tc.desc: Test the function TriggerDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1571,7 +1571,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerDown_001, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_RunShortcut_003
- * @tc.desc: Test the funcation RunShortcut
+ * @tc.desc: Test the function RunShortcut
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1597,7 +1597,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RunShortcut_003, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_TriggerUp_003
- * @tc.desc: Test the funcation TriggerUp
+ * @tc.desc: Test the function TriggerUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1627,7 +1627,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_003, TestSize.
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadHotkey_001
- * @tc.desc: Test the funcation ReadHotkey
+ * @tc.desc: Test the function ReadHotkey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1643,7 +1643,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_001, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadHotkey_002
- * @tc.desc: Test the funcation ReadHotkey
+ * @tc.desc: Test the function ReadHotkey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1659,7 +1659,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_002, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadHotkey_003
- * @tc.desc: Test the funcation ReadHotkey
+ * @tc.desc: Test the function ReadHotkey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1676,7 +1676,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_003, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadHotkey_004
- * @tc.desc: Test the funcation ReadHotkey
+ * @tc.desc: Test the function ReadHotkey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1697,7 +1697,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_004, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadHotkey_005
- * @tc.desc: Test the funcation ReadHotkey
+ * @tc.desc: Test the function ReadHotkey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1719,7 +1719,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadHotkey_005, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKey_001
- * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.desc: Test the function ReadSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1735,7 +1735,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_001, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKey_002
- * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.desc: Test the function ReadSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1751,7 +1751,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_002, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKey_003
- * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.desc: Test the function ReadSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1769,7 +1769,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_003, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_001
- * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.desc: Test the function ReadExceptionalSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1785,7 +1785,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_002
- * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.desc: Test the function ReadExceptionalSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1801,7 +1801,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_003
- * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.desc: Test the function ReadExceptionalSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1819,7 +1819,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_004
- * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.desc: Test the function ReadExceptionalSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1841,7 +1841,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_005
- * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.desc: Test the function ReadExceptionalSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1862,7 +1862,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_IsReservedSystemKey
- * @tc.desc: Test the funcation IsReservedSystemKey
+ * @tc.desc: Test the function IsReservedSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1877,7 +1877,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_IsReservedSystemKey, Tes
 
 /**
  * @tc.name: KeyShortcutManagerTest_HaveRegisteredGlobalKey
- * @tc.desc: Test the funcation HaveRegisteredGlobalKey
+ * @tc.desc: Test the function HaveRegisteredGlobalKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1892,7 +1892,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HaveRegisteredGlobalKey,
 
 /**
  * @tc.name: KeyShortcutManagerTest_HandleKeyCancel
- * @tc.desc: Test the funcation HandleKeyCancel
+ * @tc.desc: Test the function HandleKeyCancel
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1907,7 +1907,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyCancel, TestSiz
 
 /**
  * @tc.name: KeyShortcutManagerTest_CheckCombination
- * @tc.desc: Test the funcation CheckCombination
+ * @tc.desc: Test the function CheckCombination
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1923,7 +1923,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckCombination, TestSi
 
 /**
  * @tc.name: KeyShortcutManagerTest_GetAllSystemHotkeys
- * @tc.desc: Test the funcation GetAllSystemHotkeys
+ * @tc.desc: Test the function GetAllSystemHotkeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1938,7 +1938,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetAllSystemHotkeys, Tes
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKeys
- * @tc.desc: Test the funcation ReadExceptionalSystemKeys
+ * @tc.desc: Test the function ReadExceptionalSystemKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1953,7 +1953,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_IsValid
- * @tc.desc: Test the funcation IsValid
+ * @tc.desc: Test the function IsValid
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1969,7 +1969,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_IsValid, TestSize.Level1
 
 /**
  * @tc.name: KeyShortcutManagerTest_RegisterHotKey_01
- * @tc.desc: Test the funcation RegisterHotKey
+ * @tc.desc: Test the function RegisterHotKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1994,7 +1994,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_01, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_RegisterHotKey_02
- * @tc.desc: Test the funcation RegisterHotKey
+ * @tc.desc: Test the function RegisterHotKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2013,7 +2013,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_02, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKeys
- * @tc.desc: Test the funcation RegisterHotKey
+ * @tc.desc: Test the function RegisterHotKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2027,7 +2027,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKeys, TestSize
 
 /**
  * @tc.name: KeyShortcutManagerTest_AddHotkey
- * @tc.desc: Test the funcation AddHotkey
+ * @tc.desc: Test the function AddHotkey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2051,7 +2051,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_AddHotkey, TestSize.Leve
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKey_004
- * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.desc: Test the function ReadSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2072,7 +2072,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_004, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKey_005
- * @tc.desc: Test the funcation ReadSystemKey
+ * @tc.desc: Test the function ReadSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2089,7 +2089,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_005, TestS
 
 /**
  * @tc.name: KeyShortcutManagerTest_AddSystemKey_001
- * @tc.desc: Test the funcation AddSystemKey
+ * @tc.desc: Test the function AddSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2110,7 +2110,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_AddSystemKey_001, TestSi
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKeys_001
- * @tc.desc: Test the funcation ReadExceptionalSystemKeys
+ * @tc.desc: Test the function ReadExceptionalSystemKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2138,7 +2138,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_006
- * @tc.desc: Test the funcation ReadExceptionalSystemKey
+ * @tc.desc: Test the function ReadExceptionalSystemKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2166,7 +2166,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey
 
 /**
  * @tc.name: KeyShortcutManagerTest_FormatModifiers
- * @tc.desc: Test the funcation FormatModifiers
+ * @tc.desc: Test the function FormatModifiers
  * @tc.type: FUNC
  * @tc.require:
  */

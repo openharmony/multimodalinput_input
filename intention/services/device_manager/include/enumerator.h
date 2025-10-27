@@ -18,9 +18,8 @@
 
 #include <set>
 
-#include "nocopyable.h"
-
 #include "i_device_mgr.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace Msdp {

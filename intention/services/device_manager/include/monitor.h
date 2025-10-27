@@ -21,11 +21,10 @@
 
 #include <sys/inotify.h>
 
-#include "nocopyable.h"
-
 #include "i_context.h"
 #include "i_device_mgr.h"
 #include "i_epoll_event_source.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace Msdp {
