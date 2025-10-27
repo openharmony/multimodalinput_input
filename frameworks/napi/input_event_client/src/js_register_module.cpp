@@ -524,7 +524,7 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     if (GetNamedPropertyInt32(env, touchObject, "screenY", screenY) != RET_OK) {
         MMI_HILOGE("Get screenY failed");
     }
-    int64_t pressedTime = 0;
+    int64_t pressedTime = 1;
     if (GetNamedPropertyInt64(env, touchObject, "pressedTime", pressedTime) != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
@@ -785,7 +785,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
             MMI_HILOGE("Get axis failed");
             return RET_ERR;
         }
-        double axisValue = 0.0;
+        double axisValue;
         if (GetNamedPropertyDouble(env, axisObject, "value", axisValue) != RET_OK) {
             MMI_HILOGE("Get axisValue failed");
             return RET_ERR;
