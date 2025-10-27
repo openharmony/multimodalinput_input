@@ -63,6 +63,7 @@
             OHOS::MMI::IsInteger*;
             OHOS::MMI::CursorPixelMap;
             OHOS::MMI::IsNumeric*;
+            "OHOS::MMI::GetProcessName(unsigned int, int)";
             "VTT for OHOS::MMI::CursorPixelMap";
             "vtable for OHOS::MMI::CursorPixelMap";
             "virtual thunk to OHOS::MMI::PointerEvent::~PointerEvent()";
