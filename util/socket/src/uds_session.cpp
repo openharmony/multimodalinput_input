@@ -261,11 +261,12 @@ std::vector<UDSSession::EventTime> UDSSession::GetEventsByType(int32_t type) con
 const std::string UDSSession::GetProgramName()
 {
     if (!isRealProcessName_) {
-        programName_ = GetProcessName(tokenId_, pid_);
-        if (programName_.empty()) {
-            MMI_HILOGW("programName_ empty:{%{public}d,%{public}d}", tokenId_, pid_);
+        auto processName = GetProcessName(tokenId_, pid_);
+        if (processName.empty()) {
+            MMI_HILOGW("processName empty:{%{public}d,%{public}d}", tokenId_, pid_);
         } else {
             isRealProcessName_ = true;
+            programName_ = processName;
         }
     }
 
