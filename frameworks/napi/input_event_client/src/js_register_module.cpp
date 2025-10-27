@@ -532,7 +532,7 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     if (GetNamedPropertyInt32(env, touchObject, "toolType", toolType) != RET_OK) {
         MMI_HILOGE("Get toolType failed");
     }
-    double pressure;
+    double pressure = 0.0;
     if (GetNamedPropertyDouble(env, touchObject, "pressure", pressure) != RET_OK) {
         MMI_HILOGE("Get pressure failed");
     }
@@ -785,7 +785,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
             MMI_HILOGE("Get axis failed");
             return RET_ERR;
         }
-        double axisValue;
+        double axisValue = 0.0;
         if (GetNamedPropertyDouble(env, axisObject, "value", axisValue) != RET_OK) {
             MMI_HILOGE("Get axisValue failed");
             return RET_ERR;
