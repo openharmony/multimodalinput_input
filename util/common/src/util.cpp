@@ -665,13 +665,13 @@ std::string GetProcessName(uint32_t tokenId, int32_t pid)
         case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
             auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
             if (appMgrClient == nullptr) {
-                MMI_HILOGE("Get appMgrClient faield");
+                MMI_HILOGE("Get appMgrClient failed");
                 break;
             }
             AppExecFwk::RunningProcessInfo info;
             int32_t res = appMgrClient->GetRunningProcessInfoByPid(pid, info);
             if (res != RET_OK) {
-                MMI_HILOGE("Get Running Process info by pid:%{private}d faied, ret:%{public}d", pid, res);
+                MMI_HILOGW("Get Running Process info by pid:%{private}d failed, ret:%{public}d", pid, res);
                 break;
             }
             processName = info.processName_;
@@ -681,7 +681,7 @@ std::string GetProcessName(uint32_t tokenId, int32_t pid)
         case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
             Security::AccessToken::NativeTokenInfo tokenInfo;
             if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != RET_OK) {
-                MMI_HILOGE("Get native token info failed");
+                MMI_HILOGW("Get native token info failed");
             } else {
                 processName = tokenInfo.processName;
             }
