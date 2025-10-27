@@ -524,7 +524,7 @@ static void HandleTouchAttribute(napi_env env, std::shared_ptr<PointerEvent> poi
     if (GetNamedPropertyInt32(env, touchObject, "screenY", screenY) != RET_OK) {
         MMI_HILOGE("Get screenY failed");
     }
-    int64_t pressedTime = 1;
+    int64_t pressedTime = 0;
     if (GetNamedPropertyInt64(env, touchObject, "pressedTime", pressedTime) != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
