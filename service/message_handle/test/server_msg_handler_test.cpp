@@ -2516,7 +2516,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_003, TestSize.
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
-    int32_t num = 1;
+    uint32_t num = 1;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     sess->SetTokenType(TOKEN_SYSTEM_HAP);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
@@ -3431,9 +3431,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadScreensInfo_003, TestSiz
     NetPacket pkt(idMsg);
     ScreenInfo info;
     uint32_t num = 1;
-    pkt << num << info.id << info.uniqueId << info.screenType << info.width << info.height << info.physicalWidth
-        << info.physicalHeight << info.tpDirection << info.dpi << info.ppi << info.rotation;
-    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    pkt << num;
     EXPECT_EQ(handler.ReadScreensInfo(pkt, userScreenInfo), RET_ERR);
 }
 
@@ -3492,8 +3490,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplayGroupsInfo_003, T
     NetPacket pkt(idMsg);
     DisplayGroupInfo info;
     uint32_t num = 1;
-    pkt << num << info.id << info.name << info.type << info.mainDisplayId << info.focusWindowId;
-    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    pkt << num;
     EXPECT_EQ(handler.ReadDisplayGroupsInfo(pkt, userScreenInfo), RET_ERR);
 }
 
