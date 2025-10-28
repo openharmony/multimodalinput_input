@@ -299,7 +299,7 @@ static ani_object StringArrayToObject(ani_env *env, const std::vector<std::strin
             MMI_HILOGE("String_NewUTF8 Faild ");
             break;
         }
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iC{std.core.Object}:", index, ani_str)) {
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, ani_str)) {
             MMI_HILOGE("Object_CallMethodByName_Void  $_set Faild ");
             break;
         }
@@ -561,7 +561,7 @@ static ani_object SetCreateArrayAxisRangesObj(ani_env *env, std::shared_ptr<Inpu
             continue;
         }
         ani_object objAxisRanges = CreatAxisRangesObj(env, sourceType, item);
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayAxisRangesObj, "$_set", "iC{std.core.Object}:", index,
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayAxisRangesObj, "$_set", "iY:", index,
             objAxisRanges)) {
             MMI_HILOGE("%{public}s Object_CallMethodByName_Void  $_set Faild", __FUNCTION__);
             return arrayAxisRangesObj;
@@ -662,7 +662,7 @@ static ani_object DoubleArrayToObject(ani_env *env, const std::shared_ptr<std::v
     ani_int index = 0;
     for (auto id : *ids) {
         ani_object aniValue = DoubleToObject(env, id);
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iC{std.core.Object}:", index, aniValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index, aniValue)) {
             MMI_HILOGI("Object_CallMethodByName_Void  $_set Faild ");
             break;
         }
