@@ -46,6 +46,7 @@ public:
     MOCK_METHOD(int32_t, ClearWindowPointerStyle, (int32_t, int32_t));
     void Dump(int32_t, const std::vector<std::string>&) override {}
     MOCK_METHOD(int32_t, GetWindowPid, (int32_t), (const));
+    MOCK_METHOD(int32_t, GetWindowAgentPid, (int32_t), (const));
     MOCK_METHOD(int32_t, SetMouseCaptureMode, (int32_t, bool));
     MOCK_METHOD(bool, GetMouseIsCaptureMode, (), (const));
     MOCK_METHOD(int32_t, GetDisplayBindInfo, (DisplayBindInfos&));
@@ -122,6 +123,7 @@ public:
     void SetWindowStateNotifyPid(int32_t pid) override {}
     int32_t GetWindowStateNotifyPid() override { return 0; }
     int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }

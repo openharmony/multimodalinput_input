@@ -3509,7 +3509,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_002, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_ERR);
 }
 
@@ -3536,7 +3536,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_003, TestSiz
     pkt << num << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
         << info.agentWindowId << info.flags << info.action << info.displayId << info.groupId << info.zOrder
         << info.pointerChangeAreas << info.transform << info.windowInputType << info.privacyMode << info.windowType
-        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << byteCount;
+        << info.isSkipSelfWhenShowOnVirtualScreen << info.windowNameType << info.agentPid << byteCount;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
     EXPECT_EQ(handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo), RET_OK);
 }
