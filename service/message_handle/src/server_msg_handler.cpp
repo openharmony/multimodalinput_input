@@ -745,7 +745,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.zOrder >> extensionInfo.pointerChangeAreas >> extensionInfo.transform
             >> extensionInfo.windowInputType >> extensionInfo.privacyMode >> extensionInfo.windowType
             >> extensionInfo.privacyUIFlag >> extensionInfo.rectChangeBySystem
-            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen >> extensionInfo.windowNameType;
+            >> extensionInfo.isSkipSelfWhenShowOnVirtualScreen
+            >> extensionInfo.windowNameType >> extensionInfo.agentPid;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -886,7 +887,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> info.isSkipSelfWhenShowOnVirtualScreen
-            >> info.windowNameType;
+            >> info.windowNameType >> info.agentPid;
         OnUiExtentionWindowInfo(pkt, info);
         pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
@@ -1048,7 +1049,7 @@ int32_t ServerMsgHandler::ReadWindowsInfo(NetPacket &pkt, DisplayGroupInfo &disp
                 >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
                 >> info.displayId >> info.groupId >> info.zOrder >> info.pointerChangeAreas >> info.transform
                 >> info.windowInputType >> info.privacyMode >> info.windowType
-                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> byteCount;
+                >> info.isSkipSelfWhenShowOnVirtualScreen >> info.windowNameType >> info.agentPid >> byteCount;
 
             OnUiExtentionWindowInfo(pkt, info);
             pkt >> info.rectChangeBySystem;
@@ -1187,7 +1188,9 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 itemDisplay.rsId, itemDisplay.offsetX, itemDisplay.offsetY,
                 itemDisplay.pointerActiveWidth, itemDisplay.pointerActiveHeight);
             for (auto& transform : itemDisplay.transform) {
-                MMI_HILOGD("%{public}f,", transform);
+                MMI_HILOGD(
+                "windows,id:%{public}d,pid:%{public}d,agentPid:%{public}d,displayId:%{public}d,groupId:%{public}d",
+                itemWindow.id, itemWindow.pid, itemWindow.agentPid, itemWindow.displayId, itemWindow.groupId);
             }
             numDisplayInfo++;
         }

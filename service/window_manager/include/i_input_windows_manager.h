@@ -82,6 +82,7 @@ public:
     virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) const = 0;
+    virtual int32_t GetWindowAgentPid(int32_t windowId) const = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual bool GetMouseIsCaptureMode() const = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
@@ -163,6 +164,7 @@ public:
     virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
     virtual int32_t GetWindowStateNotifyPid() = 0;
     virtual int32_t GetPidByWindowId(int32_t pid) = 0;
+    virtual int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;

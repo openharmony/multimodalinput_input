@@ -2216,6 +2216,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackWindowGroupInfo_001,
     windowInfo.windowType = 1;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = false;
     windowInfo.windowNameType = 0;
+    windowInfo.agentPid = 1234;
     windowInfo.rectChangeBySystem = false;
     InputMgrImpl.windowGroupInfo_.windowsInfo.push_back(windowInfo);
 
