@@ -145,14 +145,18 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             }
             case 'u': {
                 auto udsServer = InputHandler->GetUDSServer();
-                CHKPV(udsServer);
+                if (udsServer == nullptr) {
+                    goto RELEASE_RES;
+                }
                 udsServer->Dump(fd, args);
                 break;
             }
             case 's': {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 auto subscriberHandler = InputHandler->GetSubscriberHandler();
-                CHKPV(subscriberHandler);
+                if (subscriberHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
                 subscriberHandler->Dump(fd, args);
 #else
                 mprintf(fd, "Keyboard device does not support");
@@ -162,7 +166,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             case 'o': {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
                 auto monitorHandler = InputHandler->GetMonitorHandler();
-                CHKPV(monitorHandler);
+                if (monitorHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
                 monitorHandler->Dump(fd, args);
 #else
                 mprintf(fd, "Monitor function does not support");
@@ -172,13 +178,17 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             case 'i': {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
                 auto interceptorHandler = InputHandler->GetInterceptorHandler();
-                CHKPV(interceptorHandler);
+                if (interceptorHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
                 interceptorHandler->Dump(fd, args);
 #else
                 mprintf(fd, "Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
                 auto hookMgr = InputHandler->GetInputEventHook();
-                CHKPV(hookMgr);
+                if (hookMgr == nullptr) {
+                    goto RELEASE_RES;
+                }
                 hookMgr->Dump(fd, args);
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
                 KEY_EVENT_HOOK_MGR.Dump(fd, args);
@@ -189,7 +199,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             }
             case 'f': {
                 auto filterHandler = InputHandler->GetFilterHandler();
-                CHKPV(filterHandler);
+                if (filterHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
                 filterHandler->Dump(fd, args);
                 break;
             }
@@ -219,7 +231,135 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             case 'k': {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
                 auto keyHandler = InputHandler->GetKeyCommandHandler();
-                CHKPV(keyHandler);
+                if (keyHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
+                keyHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Combination key does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
+                break;
+            }
+            case 'e': {
+                EventStatistic::Dump(fd, args);
+                break;
+            }
+            default: {
+                mprintf(fd, "cmd param is error\n");
+                DumpHelp(fd);
+                break;
+            }
+        }
+    }
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmcke", dumpOptions, &optionIndex)) != -1) {
+        switch (c) {
+            case 'h': {
+                DumpEventHelp(fd, args);
+                break;
+            }
+            case 'd': {
+                INPUT_DEV_MGR->Dump(fd, args);
+                break;
+            }
+            case 'l': {
+                INPUT_DEV_MGR->DumpDeviceList(fd, args);
+                break;
+            }
+            case 'w': {
+                WIN_MGR->Dump(fd, args);
+                break;
+            }
+            case 'u': {
+                auto udsServer = InputHandler->GetUDSServer();
+                if (udsServer == nullptr) {
+                    goto RELEASE_RES;
+                }
+                udsServer->Dump(fd, args);
+                break;
+            }
+            case 's': {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+                auto subscriberHandler = InputHandler->GetSubscriberHandler();
+                if (subscriberHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
+                subscriberHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+                break;
+            }
+            case 'o': {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+                auto monitorHandler = InputHandler->GetMonitorHandler();
+                if (monitorHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
+                monitorHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Monitor function does not support");
+#endif // OHOS_BUILD_ENABLE_MONITOR
+                break;
+            }
+            case 'i': {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+                auto interceptorHandler = InputHandler->GetInterceptorHandler();
+                if (interceptorHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
+                interceptorHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Interceptor function does not support");
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+                auto hookMgr = InputHandler->GetInputEventHook();
+                if (hookMgr == nullptr) {
+                    goto RELEASE_RES;
+                }
+                hookMgr->Dump(fd, args);
+#ifdef OHOS_BUILD_ENABLE_KEY_HOOK
+                KEY_EVENT_HOOK_MGR.Dump(fd, args);
+#else
+                mprintf(fd, "Hook function does not support");
+#endif // OHOS_BUILD_ENABLE_KEY_HOOK
+                break;
+            }
+            case 'f': {
+                auto filterHandler = InputHandler->GetFilterHandler();
+                if (filterHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
+                filterHandler->Dump(fd, args);
+                break;
+            }
+            case 'm': {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+                MouseEventHdr->Dump(fd, args);
+#else
+                mprintf(fd, "Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
+                break;
+            }
+            case 'c': {
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+                CursorDrawingComponent::GetInstance().Dump(fd, args);
+#else
+                mprintf(fd, "Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+                TOUCH_DRAWING_MGR->Dump(fd, args);
+#endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#else
+                mprintf(fd, "Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_TOUCH
+                break;
+            }
+            case 'k': {
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
+                auto keyHandler = InputHandler->GetKeyCommandHandler();
+                if (keyHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
                 keyHandler->Dump(fd, args);
 #else
                 mprintf(fd, "Combination key does not support");
