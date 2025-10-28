@@ -80,6 +80,7 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     CHKPV(udsServer);
     auto pointerIdList = pointerEvent->GetPointerIds();
     if (pointerIdList.size() > 1) {
+        int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
