@@ -63,7 +63,8 @@ enum PointerStyle : i32 {
     CURSOR_CIRCLE,
     LOADING,
     RUNNING,
-    MIDDLE_BTN_EAST_WEST
+    MIDDLE_BTN_EAST_WEST,
+    SCREENRECORDER_CURSOR = 48
 }
 
 enum PrimaryButton : i32 {

@@ -71,7 +71,8 @@ enum PointerStyleCode {
     CURSOR_CIRCLE_IMPL,
     LOADING_IMPL,
     RUNNING_IMPL,
-    MIDDLE_BTN_EAST_WEST_IMPL
+    MIDDLE_BTN_EAST_WEST_IMPL,
+    SCREENRECORDER_CURSOR_IMPL = 48
 };
 
 enum EtsErrorCode : int32_t {
