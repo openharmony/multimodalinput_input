@@ -326,6 +326,12 @@ protected:
     ErrCode DispatchToNextHandler(int32_t eventId) override;
     ErrCode InitCustomConfig();
     int32_t IsPointerInit(bool &status) override;
+    int32_t SetCustomCursorPixelMapInner(int32_t windowId, int32_t focusX, int32_t focusY,
+        const CursorPixelMap& curPixelMap);
+    int32_t SetCustomCursorInner(int32_t windowId,
+        const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel);
+    int32_t SetMouseIconInner(int32_t windowId, const CursorPixelMap& curPixelMap);
+    int32_t SetPixelMapDataInner(int32_t infoId, const CursorPixelMap& curPixelMap);
 
 private:
     MMIService();

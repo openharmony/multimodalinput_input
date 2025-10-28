@@ -776,7 +776,7 @@ ErrCode MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
+int32_t MMIService::SetCustomCursorPixelMapInner(int32_t windowId, int32_t focusX, int32_t focusY,
     const CursorPixelMap& curPixelMap)
 {
     CALL_INFO_TRACE;
@@ -828,7 +828,19 @@ ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, in
     return RET_OK;
 }
 
-ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap)
+ErrCode MMIService::SetCustomCursorPixelMap(int32_t windowId, int32_t focusX, int32_t focusY,
+    const CursorPixelMap& curPixelMap)
+{
+    if (int32_t ret = SetCustomCursorPixelMapInner(windowId, focusX, focusY, curPixelMap); ret != RET_OK) {
+        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+        delete pixelMap;
+        MMI_HILOGE("SetCustomCursorPixelMap failed, release resource");
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& curPixelMap)
 {
     CALL_INFO_TRACE;
     if (!PER_HELPER->VerifySystemApp()) {
@@ -857,6 +869,18 @@ ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixe
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+ErrCode MMIService::SetMouseIcon(int32_t windowId, const CursorPixelMap& curPixelMap)
+{
+    CALL_INFO_TRACE;
+    if (int32_t ret = SetMouseIconInner(windowId, curPixelMap); ret != RET_OK) {
+        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+        delete pixelMap;
+        MMI_HILOGE("SetMouseIcon failed, release resource");
+        return ret;
+    }
     return RET_OK;
 }
 
@@ -4333,7 +4357,7 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
     // LCOV_EXCL_STOP
 }
 
-ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap)
+int32_t MMIService::SetPixelMapDataInner(int32_t infoId, const CursorPixelMap& curPixelMap)
 {
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
@@ -4357,6 +4381,17 @@ ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPix
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+ErrCode MMIService::SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap)
+{
+    if (int32_t ret = SetPixelMapDataInner(infoId, curPixelMap); ret != RET_OK) {
+        Media::PixelMap* pixelMap = static_cast<Media::PixelMap*>(curPixelMap.pixelMap);
+        delete pixelMap;
+        MMI_HILOGE("SetPixelMapData failed, release resource");
         return ret;
     }
     return RET_OK;
@@ -4958,6 +4993,19 @@ ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool aut
 }
 
 ErrCode MMIService::SetCustomCursor(int32_t windowId,
+    const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel)
+{
+    CALL_INFO_TRACE;
+    if (auto ret = SetCustomCursorInner(windowId, curParcel, cOptionParcel); ret != RET_OK) {
+        Media::PixelMap *pixelMap = static_cast<Media::PixelMap*>(curParcel.pixelMap);
+        delete pixelMap;
+        MMI_HILOGE("SetCustomCursor failed, release resource");
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetCustomCursorInner(int32_t windowId,
     const CustomCursorParcel& curParcel, const CursorOptionsParcel& cOptionParcel)
 {
     CALL_INFO_TRACE;
