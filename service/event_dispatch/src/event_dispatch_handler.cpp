@@ -80,13 +80,14 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     CHKPV(udsServer);
     auto pointerIdList = pointerEvent->GetPointerIds();
     if (pointerIdList.size() > 1) {
+        int32_t targetDisplayId = pointerEvent->GetTargetDisplayId();
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
                 MMI_HILOGW("Can't find this pointerItem");
                 continue;
             }
-            auto itemPid = WIN_MGR->GetWindowPid(pointeritem.GetTargetWindowId());
+            auto itemPid = WIN_MGR->GetAgentPidByDisplayIdAndWindowId(targetDisplayId, pointeritem.GetTargetWindowId());
             if ((itemPid >= 0) && (itemPid != udsServer->GetClientPid(fd))) {
                 pointerEvent->RemovePointerItem(id);
                 MMI_HILOGD("pointerIdList size:%{public}zu", pointerEvent->GetPointerIds().size());
@@ -214,7 +215,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
             CHKPV(udsServer);
-            fd = udsServer->GetClientFd(windowInfo->pid);
+            fd = udsServer->GetClientFd(windowInfo->agentPid);
             MMI_HILOGI("Window:%{public}d exit front desk, windowfd:%{public}d", windowId, fd);
         }
         pointerEvent->SetTargetWindowId(windowId);
@@ -321,23 +322,23 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         ResetDisplayXY(point);
         return;
     }
-    auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
-    int32_t fd = GetClientFd(pid, point);
+    auto agentPid = WIN_MGR->GetAgentPidByDisplayIdAndWindowId(point->GetTargetDisplayId(), point->GetTargetWindowId());
+    int32_t fd = GetClientFd(agentPid, point);
     auto udsServer = InputHandler->GetUDSServer();
     if (udsServer == nullptr) {
         ResetDisplayXY(point);
         return;
     }
     if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
-        pid != -1 && point->GetTargetWindowId() != -1) {
-        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
+        agentPid != -1 && point->GetTargetWindowId() != -1) {
+        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && agentPid == windowStateErrorInfo_.pid) {
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
-                SendWindowStateError(pid, point->GetTargetWindowId());
+                SendWindowStateError(agentPid, point->GetTargetWindowId());
             }
         } else {
             windowStateErrorInfo_.windowId = point->GetTargetWindowId();
             windowStateErrorInfo_.startTime = GetSysClockTime();
-            windowStateErrorInfo_.pid = pid;
+            windowStateErrorInfo_.pid = agentPid;
         }
     }
     DispatchPointerEventInner(point, fd);
