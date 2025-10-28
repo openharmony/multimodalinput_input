@@ -1187,10 +1187,10 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
                 itemDisplay.screenArea.area.y, itemDisplay.screenArea.area.width, itemDisplay.screenArea.area.height,
                 itemDisplay.rsId, itemDisplay.offsetX, itemDisplay.offsetY,
                 itemDisplay.pointerActiveWidth, itemDisplay.pointerActiveHeight);
-            for (auto& transform : itemDisplay.transform) {	
-                MMI_HILOGD("%{public}f,", transform);	
-            }	
-            numDisplayInfo++;	
+            for (auto& transform : itemDisplay.transform) {
+                MMI_HILOGD("%{public}f,", transform);
+            }
+            numDisplayInfo++;
         }
         for (const auto &itemWindow : item.windowsInfo) {
             MMI_HILOGD(
