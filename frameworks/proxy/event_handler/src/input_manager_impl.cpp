@@ -695,7 +695,6 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
-            << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType;
             << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
@@ -740,7 +739,6 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.privacyUIFlag << item.rectChangeBySystem
-            << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType;
             << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
     }
     if (pkt.ChkRWError()) {
