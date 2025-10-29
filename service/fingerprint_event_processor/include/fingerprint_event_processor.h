@@ -39,7 +39,6 @@ public:
     bool IsFingerprintEvent(struct libinput_event* event);
     int32_t HandleFingerprintEvent(struct libinput_event* event);
     void SetPowerAndVolumeKeyState(struct libinput_event* event);
-    void SetScreenState(struct libinput_event* event);
     void SetPowerKeyState(struct libinput_event* event);
 
     static constexpr int32_t FINGERPRINT_CODE_DOWN { 121 };
@@ -60,7 +59,7 @@ private:
     int32_t AnalysePointEvent(struct libinput_event *event);
     int32_t AnalyseMsdpPointEvent(struct libinput_event *event);
     int32_t SendFingerprintCancelEvent();
-    void ChangeScreenMissTouchFlag(bool screenState, bool cancel);
+    void ChangeScreenMissTouchFlag(bool cancel);
     bool CheckMisTouchState();
     bool CheckScreenMisTouchState();
     bool CheckKeyMisTouchState();
@@ -86,7 +85,6 @@ private:
             116, {0, std::chrono::high_resolution_clock::now()},
         },
     };
-    std::atomic_bool screenState_ { false };
     std::atomic_bool cancelState_ { false };
     std::atomic_bool fingerprintFlag_ {false};
     std::atomic_bool screenMissTouchFlag_ { false };
@@ -96,7 +94,6 @@ private:
     std::atomic_bool antiFalseTouchSwitch_ { true };
     std::mutex mutex_;
     struct SmartKeySwitch smartKeySwitch_;
-    int32_t fingerDown_ { 0 };
 };
 #define FingerprintEventHdr ::OHOS::DelayedSingleton<FingerprintEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT

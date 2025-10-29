@@ -87,6 +87,9 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_ev
         } else {
             processor = MakeTransformProcessor(deviceId, deviceType);
             CHKPP(processor);
+            if (deviceType == TouchEventNormalize::DeviceType::TOUCH) {
+                touch_processors_.insert(processor);
+            }
             auto [tIter, isOk] = processors_.emplace(deviceId, processor);
             if (!isOk) {
                 MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
@@ -225,6 +228,26 @@ int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) 
 {
     return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
+
+bool TouchEventNormalize::IsFingerPressed()
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &processor : touch_processors_) {
+        if (processor == nullptr) {
+            continue;
+        }
+        auto pointerEvent = processor->GetAllPointerItems();
+        if (pointerEvent == nullptr) {
+            continue;
+        }
+        for (auto &item : items) {
+            if (item.IsPressed()) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 void TouchEventNormalize::SetUpDeviceObserver()
@@ -251,6 +274,7 @@ void TouchEventNormalize::OnDeviceRemoved(int32_t deviceId)
         processors_.erase(iter);
         if (processor != nullptr) {
             processor->OnDeviceRemoved();
+            touch_processors_.earse(processor);
         }
     }
     if (auto iter = touchpad_processors_.find(deviceId); iter != touchpad_processors_.end()) {
