@@ -5073,6 +5073,10 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
 void InputWindowsManager::SendUIExtentionPointerEvent(double logicalX, double logicalY,
     const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
+    int32_t pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
+    }
     CHKPV(pointerEvent);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -5129,9 +5133,9 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(double logicalX, doubl
         if (windowId == item.id) {
             return;
         }
-        MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,windowId:%{public}d,pid:%{public}d", item.id, item.pid);
         for (const auto& windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == windowId) {
+                PrintPointerEventInfo(item, pointerEvent);
                 // If the event is sent to the security sub window, then a copy needs to be sent to the host window
                 pointerEvent->SetAgentWindowId(item.agentWindowId);
                 pointerEvent->SetTargetWindowId(item.id);
@@ -5144,6 +5148,13 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(double logicalX, doubl
     }
 }
 
+void InputWindowsManager::PrintPointerEventInfo(const WindowInfo& item, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
+    }
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
