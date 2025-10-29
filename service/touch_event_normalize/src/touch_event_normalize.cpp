@@ -236,10 +236,11 @@ bool TouchEventNormalize::IsFingerPressed()
         if (processor == nullptr) {
             continue;
         }
-        auto pointerEvent = processor->GetAllPointerItems();
+        auto pointerEvent = processor->GetPointerEvent();
         if (pointerEvent == nullptr) {
             continue;
         }
+        auto items = pointerEvent->GetAllPointerItems();
         for (auto &item : items) {
             if (item.IsPressed()) {
                 return true;
