@@ -424,7 +424,7 @@ typedef struct Input_DeviceInfo Input_DeviceInfo;
  * @since 22
  */
 typedef struct Input_CustomCursor Input_CustomCursor;
- 
+
 /**
  * @brief Defines the custom cursor configuration.
  *
@@ -2192,7 +2192,7 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
  * @since 22
  */
 Input_Result OH_Input_SetPointerVisible(bool visible);
- 
+
 /**
  * @brief Obtains the mouse pointer style.
  *
@@ -2205,7 +2205,7 @@ Input_Result OH_Input_SetPointerVisible(bool visible);
  * @since 22
  */
 Input_Result OH_Input_GetPointerStyle(int32_t windowId, int32_t *pointerStyle);
- 
+
 /**
  * @brief Sets the mouse pointer style.
  *
@@ -2218,7 +2218,7 @@ Input_Result OH_Input_GetPointerStyle(int32_t windowId, int32_t *pointerStyle);
  * @since 22
  */
 Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle);
- 
+
 /**
  * @brief Creates a CustomCursor object.
  *
@@ -2230,7 +2230,7 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle);
  * @since 22
  */
 Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, int32_t anchorX, int32_t anchorY);
- 
+
 /**
  * @brief Destroys a CustomCursor object.
  *
@@ -2238,7 +2238,7 @@ Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, in
  * @since 22
  */
 void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor);
- 
+
 /**
  * @brief Obtains the pixelMap of the CustomCursor.
  *
@@ -2250,7 +2250,7 @@ void OH_Input_CustomCursor_Destroy(Input_CustomCursor** customCursor);
  * @since 22
  */
 Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor, OH_PixelmapNative** pixelMap);
- 
+
 /**
  * @brief Obtains the anchor of the CustomCursor.
  *
@@ -2263,7 +2263,7 @@ Input_Result OH_Input_CustomCursor_GetPixelMap(Input_CustomCursor* customCursor,
  * @since 22
  */
 Input_Result OH_Input_CustomCursor_GetAnchor(Input_CustomCursor* customCursor, int32_t* anchorX, int32_t* anchorY);
- 
+
 /**
  * @brief Creates a CursorConfig object.
  *
@@ -2273,7 +2273,7 @@ Input_Result OH_Input_CustomCursor_GetAnchor(Input_CustomCursor* customCursor, i
  * @since 22
  */
 Input_CursorConfig* OH_Input_CursorConfig_Create(bool followSystem);
- 
+
 /**
  * @brief Destroys a CursorConfig object.
  *
@@ -2281,7 +2281,7 @@ Input_CursorConfig* OH_Input_CursorConfig_Create(bool followSystem);
  * @since 22
  */
 void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig);
- 
+
 /**
  * @brief Obtains the followSystem of the cursorConfig.
  *
@@ -2293,7 +2293,7 @@ void OH_Input_CursorConfig_Destroy(Input_CursorConfig** cursorConfig);
  * @since 22
  */
 Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig *cursorConfig, bool *followSystem);
- 
+
 /**
  * @brief Sets the custom cursor style.
  *

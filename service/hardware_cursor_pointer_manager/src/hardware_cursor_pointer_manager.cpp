@@ -35,7 +35,7 @@ void HardwareCursorPointerManager::SetTargetDevice(uint32_t devId)
         MMI_HILOGE("SetTargetDevice devId %{public}d is invalid", static_cast<int32_t>(devId));
         return;
     }
- 
+
     if (devId != devId_) {
         devId_ = devId;
         MMI_HILOGI("SetTargetDevice devId_ changed");

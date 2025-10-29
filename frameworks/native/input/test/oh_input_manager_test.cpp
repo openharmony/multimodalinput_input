@@ -3905,7 +3905,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventId_001, Test
     int32_t eventId { -1 };
     EXPECT_EQ(OH_Input_GetKeyEventId(&keyEvent, &eventId), INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_001
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3918,7 +3918,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_001, Te
     Input_Result ret = OH_Input_AddKeyEventHook(nullptr);
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_002
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3935,7 +3935,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_002, Te
     ret = OH_Input_RemoveKeyEventHook(HookCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_003
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3955,7 +3955,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_003, Te
     ret = OH_Input_RemoveKeyEventHook(HookCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventHook_004
  * @tc.desc: Test OH_Input_AddKeyEventHook
@@ -3971,7 +3971,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventHook_004, Te
     ret = OH_Input_RemoveKeyEventHook(HookCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_RemoveKeyEventHook_001
  * @tc.desc: Test OH_Input_RemoveKeyEventHook
@@ -3987,7 +3987,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveKeyEventHook_001,
     ret = OH_Input_RemoveKeyEventHook(testHook);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_001
  * @tc.desc: Test OH_Input_DispatchToNextHandler
@@ -4023,7 +4023,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_0
     ret = OH_Input_RemoveKeyEventHook(numberHook);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_002
  * @tc.desc: Test OH_Input_DispatchToNextHandler
@@ -4056,7 +4056,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DispatchToNextHandler_0
     ret = OH_Input_RemoveKeyEventHook(alphabetHook);
     EXPECT_EQ(ret, INPUT_SUCCESS);
 }
- 
+
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DispatchToNextHandler_003
  * @tc.desc: Test OH_Input_DispatchToNextHandler

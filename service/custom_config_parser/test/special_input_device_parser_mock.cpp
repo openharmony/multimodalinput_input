@@ -24,7 +24,7 @@ SpecialInputDeviceParserMock::SpecialInputDeviceParserMock()
 {
     mock = this;
 }
- 
+
 SpecialInputDeviceParserMock::~SpecialInputDeviceParserMock()
 {
     mock = nullptr;

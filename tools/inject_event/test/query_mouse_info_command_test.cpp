@@ -12,16 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
 #include <fcntl.h>
- 
+
 #include "input_manager.h"
 #include "input_manager_command.h"
 #include "pixel_map.h"
- 
+
 #include "mock.h"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -32,7 +32,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: Test_QueryMouseInfo_001
  * @tc.desc: test query mouse info
@@ -44,9 +44,9 @@ HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_001, TestSize.Level1)
     char command1[] = {"uinput"};
     char command2[] = {"-M"};
     char command3[] = {"-q"};
- 
+
     char *argv[] = {command1, command2, command3};
- 
+
     int32_t result = inputManagerCommand->ParseCommand(8, argv);
     EXPECT_EQ(RET_ERR, result);
     MOCKHANDLER->mockIsPointerInitRet = false;
@@ -65,7 +65,7 @@ HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_001, TestSize.Level1)
     result = inputManagerCommand->ParseCommand(3, argv);
     EXPECT_EQ(RET_OK, result);
 }
- 
+
 /**
  * @tc.name: Test_QueryMouseInfo_002
  * @tc.desc: test query mouse info
@@ -78,9 +78,9 @@ HWTEST_F(QueryMouseInfoCommandTest, Test_QueryMouseInfo_002, TestSize.Level1)
     char command2[] = {"-M"};
     char command3[] = {"-q"};
     char command4[] = {"/data/testFile"};
- 
+
     char *argv[] = {command1, command2, command3, command4};
- 
+
     MOCKHANDLER->mockIsPointerInitRet = true;
     MOCKHANDLER->mockGetCurrentCursorInfoRet = RET_OK;
     MOCKHANDLER->mockVisible = true;

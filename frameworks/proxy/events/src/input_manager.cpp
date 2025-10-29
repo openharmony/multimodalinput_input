@@ -180,7 +180,7 @@ int32_t InputManager::SubscribeLongPressEvent(const LongPressRequest &longPressR
 {
     return InputMgrImpl.SubscribeLongPressEvent(longPressRequest, callback);
 }
- 
+
 void InputManager::UnsubscribeLongPressEvent(int32_t subscriberId)
 {
     InputMgrImpl.UnsubscribeLongPressEvent(subscriberId);

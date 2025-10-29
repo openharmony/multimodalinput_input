@@ -15,18 +15,18 @@
 
 #ifndef PRODUCT_NAME_DEFINITION_PARSER_H
 #define PRODUCT_NAME_DEFINITION_PARSER_H
- 
+
 #include <shared_mutex>
 #include <string>
 #include <map>
 #include <vector>
- 
+
 #include "json_parser.h"
 #include "cJSON.h"
- 
+
 namespace OHOS {
 namespace MMI {
- 
+
 class ProductNameDefinitionParser {
 public:
     ProductNameDefinitionParser(const ProductNameDefinitionParser&) = delete;
@@ -35,13 +35,13 @@ public:
     int32_t Init();
     std::string GetProductName(const std::string &key);
     int32_t ParseProductNameMap(const JsonParser &jsonParser);
- 
+
 private:
     struct ProductNameDefinitionItem {
         std::string productAlias;
         std::string productName;
     };
- 
+
 private:
     ProductNameDefinitionParser() = default;
     ~ProductNameDefinitionParser() = default;
@@ -54,7 +54,7 @@ private:
     std::shared_mutex lock_;
     std::atomic_bool isInitialized_ { false };
 };
- 
+
 } // namespace MMI
 } // namespace OHOS
 #define PRODUCT_NAME_DEFINITION_PARSER OHOS::MMI::ProductNameDefinitionParser::GetInstance()

@@ -1394,7 +1394,7 @@ public:
          * @return void
          */
         void SetSizeLevel(int32_t sizeLevel);
- 
+
         /**
          * @brief Obtains the color of the cursor.
          * @return Returns the color
@@ -1977,7 +1977,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     // SetAncoDeal接口和GetAncoDeal接口,使用时需要和多模对齐使用场景
     void SetAncoDeal(bool ancoDeal);
- 
+
     bool GetAncoDeal() const;
 #endif // OHOS_BUILD_ENABLE_ANCO
 

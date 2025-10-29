@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 #include "mock.h"
- 
+
 namespace OHOS {
 using namespace OHOS::MMI;
- 
+
 sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> OHOS::HDI::Consumerir::V1_0::ConsumerIr::Get(
     const std::string& serviceName, bool isStub)
 {
@@ -25,7 +25,7 @@ sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> OHOS::HDI::Consumerir::V1_0::Consu
     }
     return OHOS::MMI::DfsMessageParcel::messageParcel->Get(serviceName, isStub);
 }
- 
+
 sptr<OHOS::HDI::DeviceManager::V1_0::IDeviceManager> OHOS::HDI::DeviceManager::V1_0::IDeviceManager::Get()
 {
     if (OHOS::MMI::DfsMessageParcel::messageParcel == nullptr) {

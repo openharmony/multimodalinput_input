@@ -1517,7 +1517,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level
     ret = pointerEvent->ActionToShortStr(action);
     ASSERT_EQ(ret, "P:?:");
 }
- 
+
 /**
  * @tc.name: PointerEventTest_ActionToShortStr_005
  * @tc.desc: Test the funcation ActionToShortStr

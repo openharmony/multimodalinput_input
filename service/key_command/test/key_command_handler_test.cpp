@@ -7395,7 +7395,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPreventi
     handler.UnregisterMistouchPrevention();
     EXPECT_FALSE(handler.hasRegisteredSensor_);
 }
- 
+
 /**
  * @tc.name  : KeyCommandHandlerTest_UnregisterMistouchPrevention002
  * @tc.number: UnregisterMistouchPreventionTest_002

@@ -364,7 +364,7 @@ const char* EventStatistic::ConvertEventTypeToString(int32_t eventType)
         }
     }
 }
- 
+
 const char* EventStatistic::ConvertSourceTypeToString(int32_t sourceType)
 {
     switch (sourceType) {
@@ -392,7 +392,7 @@ const char* EventStatistic::ConvertSourceTypeToString(int32_t sourceType)
         }
     }
 }
- 
+
 const char* EventStatistic::ConvertPointerActionToString(std::shared_ptr<PointerEvent> eventPtr)
 {
     int32_t pointerAction = eventPtr->GetPointerAction();
@@ -425,7 +425,7 @@ const char* EventStatistic::ConvertPointerActionToString(std::shared_ptr<Pointer
     }
     return "unknown";
 }
- 
+
 const char* EventStatistic::ConvertKeyActionToString(int32_t keyAction)
 {
     auto it = keyActionMap.find(keyAction);
@@ -434,7 +434,7 @@ const char* EventStatistic::ConvertKeyActionToString(int32_t keyAction)
     }
     return "unknown";
 }
- 
+
 const char* EventStatistic::ConvertSwitchTypeToString(int32_t switchType)
 {
     switch (switchType) {

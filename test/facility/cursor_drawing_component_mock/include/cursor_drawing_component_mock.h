@@ -25,7 +25,7 @@ class ICursorDrawingComponent {
 public:
     ICursorDrawingComponent() = default;
     virtual ~ICursorDrawingComponent() = default;
- 
+
     virtual void Load() = 0;
     virtual bool Init() = 0;
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) = 0;
@@ -41,7 +41,7 @@ class CursorDrawingComponent : public ICursorDrawingComponent {
 public:
     CursorDrawingComponent() = default;
     virtual ~CursorDrawingComponent() = default;
- 
+
     MOCK_METHOD(void, Load, ());
     MOCK_METHOD(bool, Init, ());
     MOCK_METHOD(void, SetDelegateProxy, (std::shared_ptr<DelegateInterface> proxy));
@@ -51,7 +51,7 @@ public:
     MOCK_METHOD(void, InitScreenInfo, ());
     MOCK_METHOD(void, SubscribeScreenModeChange, ());
     MOCK_METHOD(void, InitPointerObserver, ());
- 
+
     static CursorDrawingComponent& GetInstance();
 };
 } // namespace MMI

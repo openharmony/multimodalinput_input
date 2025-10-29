@@ -12,43 +12,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
- 
+
 #include "key_event_hook_handler.h"
 #include "key_event_hook_manager.h"
 #include "multimodal_input_connect_manager.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "multimodal_event_handler.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyEventHookHandlerTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 } // namespace
- 
+
 class KeyEventHookHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 class MockEventHookHandler {
 public:
     MockEventHookHandler() = default;
     ~MockEventHookHandler() = default;
- 
+
     MOCK_METHOD0(InitClient, bool());
     MOCK_METHOD1(AddKeyEventHook, int32_t(int32_t hookId));
     MOCK_METHOD1(RemoveKeyEventHook, int32_t(int32_t hookId));
     MOCK_METHOD1(DispatchToNextHandler, int32_t(int32_t eventId));
 };
- 
+
 /**
  * @tc.name: AddKeyEventHook_Test_001
  * @tc.desc: Test AddKeyEventHook
@@ -66,7 +66,7 @@ HWTEST_F(KeyEventHookHandlerTest, AddKeyEventHook_Test_001, TestSize.Level1)
     int32_t ret = hookHandler.AddKeyEventHook(callback, hookId);
     EXPECT_EQ(ret, RET_OK);
 }
- 
+
 /**
  * @tc.name: AddKeyEventHook_Test_002
  * @tc.desc: Test AddKeyEventHook
@@ -89,7 +89,7 @@ HWTEST_F(KeyEventHookHandlerTest, AddKeyEventHook_Test_002, TestSize.Level1)
     ret = hookHandler.AddKeyEventHook(callback, hookId);
     EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
 }
- 
+
 /**
  * @tc.name: RemoveKeyEventHook_Test_001
  * @tc.desc: Test RemoveKeyEventHook
@@ -106,7 +106,7 @@ HWTEST_F(KeyEventHookHandlerTest, RemoveKeyEventHook_Test_001, TestSize.Level1)
     int32_t ret = hookHandler.RemoveKeyEventHook(hookId);
     EXPECT_EQ(ret, RET_OK);
 }
- 
+
 /**
  * @tc.name: DispatchToNextHandler_Test_001
  * @tc.desc: Test DispatchToNextHandler
@@ -122,7 +122,7 @@ HWTEST_F(KeyEventHookHandlerTest, DispatchToNextHandler_Test_001, TestSize.Level
     int32_t ret = hookHandler.DispatchToNextHandler(eventId);
     EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
 }
- 
+
 /**
  * @tc.name: DispatchToNextHandler_Test_002
  * @tc.desc: Test DispatchToNextHandler
@@ -142,7 +142,7 @@ HWTEST_F(KeyEventHookHandlerTest, DispatchToNextHandler_Test_002, TestSize.Level
     int32_t ret = hookHandler.DispatchToNextHandler(eventId);
     EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
 }
- 
+
 /**
  * @tc.name: UpdatePendingKeys_Test_001
  * @tc.desc: Test UpdatePendingKeys
@@ -166,7 +166,7 @@ HWTEST_F(KeyEventHookHandlerTest, UpdatePendingKeys_Test_001, TestSize.Level1)
     hookHandler.UpdatePendingKeys();
     EXPECT_FALSE(hookHandler.pendingKeys_.empty());
 }
- 
+
 /**
  * @tc.name: RemoveExpiredPendingKeys_Test_001
  * @tc.desc: Test RemoveExpiredPendingKeys
@@ -180,17 +180,17 @@ HWTEST_F(KeyEventHookHandlerTest, RemoveExpiredPendingKeys_Test_001, TestSize.Le
     int32_t eventId = 1;
     hookHandler.RemoveAllPendingKeys();
     hookHandler.RemoveExpiredPendingKeys(eventId);
- 
+
     long long timeStamp = 10;
     hookHandler.AppendPendingKeys(eventId, timeStamp);
     hookHandler.RemoveExpiredPendingKeys(eventId);
- 
+
     hookHandler.AppendPendingKeys(eventId, timeStamp);
     eventId = 0;
     hookHandler.RemoveExpiredPendingKeys(eventId);
     EXPECT_FALSE(hookHandler.pendingKeys_.empty());
 }
- 
+
 /**
  * @tc.name: IsValidEvent_Test_001
  * @tc.desc: Test IsValidEvent
@@ -212,7 +212,7 @@ HWTEST_F(KeyEventHookHandlerTest, IsValidEvent_Test_001, TestSize.Level1)
     ret = hookHandler.IsValidEvent(2);
     EXPECT_EQ(ret, false);
 }
- 
+
 /**
  * @tc.name: OnConnected_Test_001
  * @tc.desc: Test OnConnected
@@ -227,7 +227,7 @@ HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_001, TestSize.Level1)
     hookHandler.OnConnected();
     EXPECT_EQ(hookHandler.hookCallback_, nullptr);
 }
- 
+
 /**
  * @tc.name: OnConnected_Test_002
  * @tc.desc: Test OnConnected
@@ -240,7 +240,7 @@ HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_002, TestSize.Level1)
     KeyEventHookHandler hookHandler;
     auto callback = [](std::shared_ptr<KeyEvent>) {};
     hookHandler.SetHookCallback(callback);
- 
+
     std::shared_ptr<MockEventHookHandler> mockHook = std::make_shared<MockEventHookHandler>();
     EXPECT_CALL(*mockHook, InitClient()).WillRepeatedly(testing::Return(true));
     EXPECT_CALL(*mockHook, AddKeyEventHook(testing::_)).WillRepeatedly(testing::Return(RET_ERR));

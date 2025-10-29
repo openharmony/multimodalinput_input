@@ -9839,7 +9839,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_006, Test
     displayGroupInfoMap_[0] = displayGroupInfo;
     inputWindowsManager->cursorPosMap_ = cursorPosMap_;
     inputWindowsManager->displayGroupInfoMap_ = displayGroupInfoMap_;
- 
+
     CursorPosition cursorPosRef;
     cursorPosRef = inputWindowsManager->GetCursorPos();
     EXPECT_EQ(cursorPosRef.displayId, displaysInfo.id);

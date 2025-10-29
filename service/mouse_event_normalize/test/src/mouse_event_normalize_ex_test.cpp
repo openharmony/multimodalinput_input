@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
- 
+
 #include "mmi_log.h"
 #include "mouse_event_normalize.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseEventNormalizeEXTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -31,7 +31,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: MouseEventNormalizeEXTest_GetPointerLocation_001
  * @tc.desc: Test GetPointerLocation

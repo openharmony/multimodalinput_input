@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- 
+
 #include "product_name_definition_parser.h"
 
 #include "util.h"

@@ -418,7 +418,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DrawImage_002, TestSize.Level1
     ret = renderer.DrawImage(canvas, config);
     EXPECT_EQ(ret, RET_OK);
 }
- 
+
 /**
  * @tc.name: PointerRendererTest_LoadCursorSvgWithColor_001
  * @tc.desc: Test LoadCursorSvgWithColor

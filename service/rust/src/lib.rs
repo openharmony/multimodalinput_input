@@ -591,7 +591,7 @@ impl AxisAccelerateCurvesTouchpad {
     fn get_instance() -> &'static AxisAccelerateCurvesTouchpad {
         static mut GLOBAL_CURVES: Option<AxisAccelerateCurvesTouchpad> = None;
         static ONCE: Once = Once::new();
- 
+
         ONCE.call_once(|| unsafe {
             GLOBAL_CURVES = Some(AxisAccelerateCurvesTouchpad {
                 data: vec![
@@ -1663,7 +1663,7 @@ fn test_handle_axis_accelerate_normal_touchpad()
     }
     assert_eq!(ret, RET_OK);
 }
- 
+
 #[test]
 fn test_handle_axis_accelerate_capture_mode_false_touchpad()
 {

@@ -12,28 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
- 
+
 #include "event_loop_closure_checker.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventLoopClosureCheckerTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 }  // namespace
- 
+
 class EventLoopClosureCheckerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: EventLoopClosureCheckerTest_CheckLoopClosure001
  * @tc.desc: Test CheckLoopClosure
@@ -53,7 +53,7 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_CheckLoopClosu
     result = EventLoopClosureChecker::GetInstance().CheckLoopClosure(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: EventLoopClosureCheckerTest_RemovePendingDownKeys001
  * @tc.desc: Test RemovePendingDownKeys
@@ -73,7 +73,7 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_RemovePendingD
     result = EventLoopClosureChecker::GetInstance().RemovePendingDownKeys(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: EventLoopClosureCheckerTest_UpdatePendingDownKeys001
  * @tc.desc: Test UpdatePendingDownKeys
@@ -92,7 +92,7 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_UpdatePendingD
     int32_t result = EventLoopClosureChecker::GetInstance().UpdatePendingDownKeys(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: EventLoopClosureCheckerTest_RemoveChecker001
  * @tc.desc: Test RemoveChecker

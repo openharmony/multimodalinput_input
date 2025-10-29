@@ -157,12 +157,12 @@ public:
             }
         }
     }
- 
+
     Direction GetDisplayDirection()
     {
         return displayDirection_;
     }
- 
+
     void SetIsWindowRotation(bool isWindowRotation)
     {
         isWindowRotation_ = isWindowRotation;

@@ -950,7 +950,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner_003, TestS
     pointerEvent->AddPointerItem(pointerItem);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandlePointerEventInner(pointerEvent));
 }
- 
+
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /**
  * @tc.name: EventDispatchTest_ResetDisplayXY_001
@@ -972,7 +972,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ResetDisplayXY_001, TestSize.Level
     eventdispatchhandler.currentXY_.fixed = true;;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.ResetDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_ResetDisplayXY_002
  * @tc.desc: Test the function ResetDisplayXY
@@ -993,7 +993,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ResetDisplayXY_002, TestSize.Level
     eventdispatchhandler.currentXY_.fixed = false;;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.ResetDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_ResetDisplayXY_003
  * @tc.desc: Test the function ResetDisplayXY
@@ -1014,7 +1014,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ResetDisplayXY_003, TestSize.Level
     eventdispatchhandler.currentXY_.fixed = false;;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.ResetDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_ResetDisplayXY_004
  * @tc.desc: Test the function ResetDisplayXY
@@ -1035,7 +1035,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_ResetDisplayXY_004, TestSize.Level
     eventdispatchhandler.currentXY_.fixed = true;;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.ResetDisplayXY(pointerEvent));
 }
- 
+
 /**
  * @tc.name: EventDispatchTest_ResetDisplayXY_005
  * @tc.desc: Test the function ResetDisplayXY

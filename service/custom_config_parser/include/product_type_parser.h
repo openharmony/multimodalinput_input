@@ -15,18 +15,18 @@
 
 #ifndef PRODUCT_TYPE_PARSER_H
 #define PRODUCT_TYPE_PARSER_H
- 
+
 #include <shared_mutex>
 #include <string>
 #include <map>
- 
+
 #include "device_type_definition.h"
 #include "json_parser.h"
 #include "cJSON.h"
- 
+
 namespace OHOS {
 namespace MMI {
- 
+
 class ProductTypeParser {
 public:
     ProductTypeParser(const ProductTypeParser&) = delete;
@@ -34,17 +34,17 @@ public:
     static ProductTypeParser& GetInstance();
     int32_t Init();
     int32_t GetProductType(const std::string &productName, DeviceType &deviceType);
- 
+
 private:
     ProductTypeParser() = default;
     ~ProductTypeParser() = default;
- 
+
 private:
     struct ProductNameType {
         std::string productName;
         std::string productType;
     };
- 
+
     int32_t ParseProductnameTypeItem(const cJSON *json, ProductNameType &productNameType);
     inline int32_t InsertProductType(const ProductNameType &productNameType);
     void PrintProductType();

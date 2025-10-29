@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
- 
+
 #ifndef PRODUCT_NAME_DEFINITION_H
 #define PRODUCT_NAME_DEFINITION_H
- 
+
 #include "product_name_definition_parser.h"
- 
+
 namespace OHOS {
 namespace MMI {
- 
+
 const std::string DEVICE_TYPE_FOLD_PC { PRODUCT_NAME_DEFINITION_PARSER.GetProductName("DEVICE_TYPE_FOLD_PC") };
 const std::string DEVICE_TYPE_PC_PRO { PRODUCT_NAME_DEFINITION_PARSER.GetProductName("DEVICE_TYPE_PC_PRO") };
 const std::string DEVICE_TYPE_TABLET { PRODUCT_NAME_DEFINITION_PARSER.GetProductName("DEVICE_TYPE_TABLET") };
 const std::string DEVICE_TYPE_TABLET_P { PRODUCT_NAME_DEFINITION_PARSER.GetProductName("DEVICE_TYPE_TABLET_P") };
- 
+
 } // namespace MMI
 } // namespace OHOS
 #endif // PRODUCT_NAME_DEFINITION_H

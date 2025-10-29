@@ -518,7 +518,7 @@ void InputDeviceManager::SetIsDeviceReportEvent(int32_t deviceId, bool isDeviceR
         NotifyAddPointerDevice(item->second.isPointerDevice, existEnabledPointerDevice);
     }
 }
- 
+
 bool InputDeviceManager::GetIsDeviceReportEvent(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
@@ -995,7 +995,7 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
     return false;
     // LOCV_EXCL_STOP
 }
- 
+
 bool InputDeviceManager::HasEnabledNoEventReportedPhysicalPointerDevice()
 {
     // LOCV_EXCL_START

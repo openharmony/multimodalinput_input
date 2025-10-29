@@ -10,13 +10,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
- 
+
 import("../../../multimodalinput_mini.gni")
- 
+
 config("cursor_drawing_component_mock_public_config") {
   include_dirs = [ "include" ]
 }
- 
+
 ohos_source_set("cursor_drawing_component_mock") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -24,9 +24,9 @@ ohos_source_set("cursor_drawing_component_mock") {
     cfi_cross_dso = true
     debug = false
   }
- 
+
   testonly = true
- 
+
   include_dirs = [
     "include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -35,23 +35,23 @@ ohos_source_set("cursor_drawing_component_mock") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/util/common/include",
   ]
- 
+
   sources = [
     "src/cursor_drawing_component_mock.cpp",
   ]
- 
+
   public_configs = [ ":cursor_drawing_component_mock_public_config" ]
- 
+
   deps = [
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
   ]
- 
+
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"
 }
