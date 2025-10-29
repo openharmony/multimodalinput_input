@@ -748,9 +748,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         mapPayload.clear();
     }
 #endif
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    FingerprintEventHdr->SetScreenState(event);
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;

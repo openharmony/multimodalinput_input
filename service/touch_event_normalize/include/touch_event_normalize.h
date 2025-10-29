@@ -69,6 +69,7 @@ public:
     void GetTouchpadRotateSwitch(bool &rotateSwitch) const;
     int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) const;
     void GetTouchpadDoubleTapAndDragState(bool &switchFlag) const;
+    bool IsFingerPressed();
 #endif // OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
     int32_t SetTouchpadScrollRows(int32_t rows);
@@ -87,6 +88,7 @@ private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
     std::map<int32_t, std::shared_ptr<TransformProcessor>> touchpad_processors_;
     std::map<int32_t, std::shared_ptr<TransformProcessor>> remote_control_processors_;
+    std::set<std::shared_ptr<TransformProcessor>> touch_processors_;
     std::shared_ptr<IDeviceObserver> inputDevObserver_;
 };
 
