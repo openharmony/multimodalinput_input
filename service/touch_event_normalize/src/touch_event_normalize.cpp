@@ -275,7 +275,7 @@ void TouchEventNormalize::OnDeviceRemoved(int32_t deviceId)
         processors_.erase(iter);
         if (processor != nullptr) {
             processor->OnDeviceRemoved();
-            touch_processors_.earse(processor);
+            touch_processors_.erase(processor);
         }
     }
     if (auto iter = touchpad_processors_.find(deviceId); iter != touchpad_processors_.end()) {
