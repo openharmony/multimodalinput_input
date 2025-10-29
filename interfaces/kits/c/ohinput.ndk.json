@@ -576,6 +576,22 @@
         "name": "OH_Input_InjectTouchEventGlobal"
     },
     {
+        "first_introduced": "21",
+        "name": "OH_Input_GetKeyEventId"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_AddKeyEventHook"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_RemoveKeyEventHook"
+    },
+    {
+        "first_introduced": "21",
+        "name": "OH_Input_DispatchToNextHandler"
+    },
+    {
         "first_introduced": "22",
         "name": "OH_Input_SetPointerVisible"
     },
