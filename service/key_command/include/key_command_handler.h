@@ -159,7 +159,7 @@ class IMistouchPrevention  {
 public:
     IMistouchPrevention() = default;
     virtual ~IMistouchPrevention() = default;
- 
+
     virtual int32_t MistouchPreventionConnector(MistouchPreventionCallbackFunc callbackFunc) = 0;
 
     virtual int32_t MistouchPreventionClose() = 0;

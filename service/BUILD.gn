@@ -3957,27 +3957,27 @@ ohos_unittest("SpecialInputDeviceParserTest") {
 
 ohos_unittest("EventDispatchOrderCheckerTest") {
   module_out_path = module_output_path
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-string-conversion" ]
- 
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
     blocklist = "./ipc_blocklist.txt"
   }
- 
+
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -4003,13 +4003,13 @@ ohos_unittest("EventDispatchOrderCheckerTest") {
     "${mmi_path}/test/facility/mock/include",
     "${mmi_path}/util/common/include",
   ]
- 
+
   if (input_feature_joystick) {
     include_dirs += [ "${mmi_path}/service/joystick/include" ]
   }
- 
+
   sources = [ "event_hook/test/event_dispatch_order_checker_test.cpp" ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
@@ -4017,7 +4017,7 @@ ohos_unittest("EventDispatchOrderCheckerTest") {
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -4035,30 +4035,30 @@ ohos_unittest("EventDispatchOrderCheckerTest") {
     "window_manager:libwm",
   ]
 }
- 
+
 ohos_unittest("EventLoopClosureCheckerTest") {
   module_out_path = module_output_path
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-string-conversion" ]
- 
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
     blocklist = "./ipc_blocklist.txt"
   }
- 
+
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -4084,13 +4084,13 @@ ohos_unittest("EventLoopClosureCheckerTest") {
     "${mmi_path}/test/facility/mock/include",
     "${mmi_path}/util/common/include",
   ]
- 
+
   if (input_feature_joystick) {
     include_dirs += [ "${mmi_path}/service/joystick/include" ]
   }
- 
+
   sources = [ "event_hook/test/event_loop_closure_checker_test.cpp" ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
@@ -4098,7 +4098,7 @@ ohos_unittest("EventLoopClosureCheckerTest") {
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -4119,27 +4119,27 @@ ohos_unittest("EventLoopClosureCheckerTest") {
 
 ohos_unittest("KeyEventHookManagerTest") {
   module_out_path = module_output_path
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-string-conversion" ]
- 
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
     blocklist = "./ipc_blocklist.txt"
   }
- 
+
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -4167,13 +4167,13 @@ ohos_unittest("KeyEventHookManagerTest") {
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
   ]
- 
+
   if (input_feature_joystick) {
     include_dirs += [ "${mmi_path}/service/joystick/include" ]
   }
- 
+
   sources = [ "event_hook/test/key_event_hook_manager_test.cpp" ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
@@ -4181,7 +4181,7 @@ ohos_unittest("KeyEventHookManagerTest") {
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
@@ -4202,26 +4202,26 @@ ohos_unittest("KeyEventHookManagerTest") {
 
 ohos_unittest("EventExpirationCheckerTest") {
   module_out_path = module_output_path
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   cflags_cc = [ "-Wno-string-conversion" ]
- 
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
     blocklist = "./ipc_blocklist.txt"
   }
- 
+
   include_dirs = [
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/test/facility/mock/include",
@@ -4230,14 +4230,14 @@ ohos_unittest("EventExpirationCheckerTest") {
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
   ]
- 
+
   sources = [ "event_hook/test/event_expiration_checker_test.cpp" ]
- 
+
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
- 
+
   external_deps = [
     "c_utils:utils",
     "googletest:gmock_main",

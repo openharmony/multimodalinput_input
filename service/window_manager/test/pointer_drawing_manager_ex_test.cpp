@@ -1858,7 +1858,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMou
     ASSERT_EQ(iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath, newIconPath);
     PreferencesManagerMock::ReleaseInstance();
 }
- 
+
 /**
  * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_003
  * @tc.desc: Test the funcation InitDefaultMouseIconPath

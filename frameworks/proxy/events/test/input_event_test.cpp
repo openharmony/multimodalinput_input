@@ -18,22 +18,22 @@
 #include "input_event.h"
 #include "window_info.h"
 #include "mmi_log.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEventTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 } // namespace
- 
+
 class InputEventTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: InputEventTest_EventTypeToString_001
  * @tc.desc: Test EventTypeToString

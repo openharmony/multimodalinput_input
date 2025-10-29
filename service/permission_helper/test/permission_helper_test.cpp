@@ -343,7 +343,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckKeyEventHook, TestSize.
     bool ret = PER_HELPER->CheckKeyEventHook();
     EXPECT_TRUE(ret);
 }
- 
+
 /**
  * @tc.name: PermissionHelperTest_AddPermissionUsedRecord001
  * @tc.desc: Test AddPermissionUsedRecord

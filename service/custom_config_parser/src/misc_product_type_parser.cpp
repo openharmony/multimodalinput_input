@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- 
+
 #include "misc_product_type_parser.h"
 
 #include "json_parser.h"

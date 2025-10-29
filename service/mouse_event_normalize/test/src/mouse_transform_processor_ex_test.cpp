@@ -12,11 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <linux/input.h>
- 
+
 #include "mmi_log.h"
 #include "mock.h"
 #include "mouse_transform_processor.h"
@@ -24,10 +24,10 @@
 #include "input_windows_manager.h"
 #include "i_input_windows_manager.h"
 #include "libinput_mock.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseTransformProcessorExTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -40,26 +40,26 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
- 
+
     static inline std::shared_ptr<MessageParcelMock> messageParcelMock_ = nullptr;
 };
- 
+
 void MouseTransformProcessorExTest::SetUpTestCase(void)
 {
     messageParcelMock_ = std::make_shared<MessageParcelMock>();
     MessageParcelMock::messageParcel = messageParcelMock_;
 }
- 
+
 void MouseTransformProcessorExTest::TearDownTestCase(void)
 {
     MessageParcelMock::messageParcel = nullptr;
     messageParcelMock_ = nullptr;
 }
- 
+
 void MouseTransformProcessorExTest::SetUp() {}
- 
+
 void MouseTransformProcessorExTest::TearDown() {}
- 
+
 /**
  * @tc.name: MouseTransformProcessorExTest_GetDisplayDirection_001
  * @tc.desc: Test the funcation GetDisplayDirection
@@ -108,7 +108,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
     uint32_t button = 272;
     ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadLeftButton(data, eventType, button));
 }
- 
+
 /**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadLeftButton_002
  * @tc.desc: Test the funcation HandleTouchpadRightButton
@@ -169,7 +169,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_Normalize_00
     processor.pointerEvent_ = PointerEvent::Create();
     EXPECT_EQ(processor.Normalize(&event), RET_ERR);
 }
- 
+
 /**
  * @tc.name: MouseTransformProcessorExTest_Normalize_002
  * @tc.desc: Test the branch that handles mouse movement events

@@ -533,7 +533,7 @@ int32_t MultimodalInputConnectManager::SubscribeLongPressEvent(int32_t subscribe
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SubscribeLongPressEvent(subscribeId, longPressRequest);
 }
- 
+
 int32_t MultimodalInputConnectManager::UnsubscribeLongPressEvent(int32_t subscribeId)
 {
     std::lock_guard<std::mutex> guard(lock_);

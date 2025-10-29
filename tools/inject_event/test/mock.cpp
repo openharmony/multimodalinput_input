@@ -13,24 +13,24 @@
 * limitations under the License.
 */
 #include "mock.h"
- 
+
 #include <fcntl.h>
 #include <iostream>
- 
+
 namespace OHOS {
 namespace MMI {
 bool InputManager::IsPointerInit()
 {
     return MOCKHANDLER->mockIsPointerInitRet;
 }
- 
+
 int32_t InputManager::GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
 {
     visible = MOCKHANDLER->mockVisible;
     pointerStyle.id = MOCKHANDLER->mockPointerStyleId;
     return MOCKHANDLER->mockGetCurrentCursorInfoRet;
 }
- 
+
 int32_t InputManager::GetUserDefinedCursorPixelMap(void *pixelMapPtr)
 {
     auto newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);

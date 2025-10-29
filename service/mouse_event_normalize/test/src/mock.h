@@ -14,11 +14,11 @@
  */
 #ifndef MESSAGE_PARCEL_MOCK_H
 #define MESSAGE_PARCEL_MOCK_H
- 
+
 #include <gmock/gmock.h>
- 
+
 #include "mouse_transform_processor.h"
- 
+
 namespace OHOS {
 namespace MMI {
 class DfsMessageParcel {

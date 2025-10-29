@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "bytrace_adapter.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -274,7 +274,7 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
     } else if (isFound && !iter->actionsType_.empty()) {
         return UpdateActionsTypeMonitor(iter, monitor, isFound);
     }
- 
+
     if (!monitor.actionsType_.empty()) {
         for (auto action : monitor.actionsType_) {
             if (std::find(insertToMonitorsActions_.begin(), insertToMonitorsActions_.end(), action) ==

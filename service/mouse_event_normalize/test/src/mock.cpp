@@ -13,34 +13,34 @@
  * limitations under the License.
  */
 #include "mock.h"
- 
+
 namespace OHOS {
 using namespace OHOS::MMI;
- 
+
 extern "C" {
 int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
     int32_t speed, int32_t deviceType)
 {
     return 0;
 }
- 
+
 int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
     int32_t speed, int32_t deviceType)
 {
     return 0;
 }
- 
+
 int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType)
 {
     return 0;
 }
- 
+
 int32_t HandleMotionDynamicAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
     int32_t speed, uint64_t delta_time, double display_ppi, double factor)
 {
     return 0;
 }
- 
+
 int32_t HandleMotionDynamicAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
     int32_t speed, double display_size, double touchpad_size, double touchpad_ppi, int32_t frequency)
 {

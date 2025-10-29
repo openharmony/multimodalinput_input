@@ -78,7 +78,7 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
         .width = DESIRED_SIZE,
         .height = DESIRED_SIZE
     };
- 
+
     decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
 

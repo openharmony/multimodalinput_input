@@ -978,7 +978,7 @@ int32_t KeyShortcutManager::ReadHotkey(cJSON *jsonHotkey)
     }
     std::set<int32_t> preKeys;
     int32_t nPreKeys = cJSON_GetArraySize(jsonPreKeys);
- 
+
     for (int32_t index = 0; index < nPreKeys; ++index) {
         cJSON *jsonPreKey = cJSON_GetArrayItem(jsonPreKeys, index);
         if (!cJSON_IsNumber(jsonPreKey)) {
@@ -1012,7 +1012,7 @@ int32_t KeyShortcutManager::AddHotkey(const std::set<int32_t> &preKeys, int32_t 
             return RET_ERR;
         }
     }
- 
+
     if (IsModifier(hotkey.finalKey)) {
         MMI_HILOGE("FinalKey is modifier");
         return RET_ERR;

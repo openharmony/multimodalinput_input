@@ -12,17 +12,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
- 
+
 #ifndef MOCK_H
 #define MOCK_H
- 
+
 #include <singleton.h>
- 
+
 #include "define_multimodal.h"
- 
+
 #include "input_manager.h"
 #include "pixel_map.h"
- 
+
 namespace OHOS {
 namespace MMI {
 class MockHandler : public DelayedSingleton<MockHandler> {

@@ -609,7 +609,7 @@ void DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::st
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MMI::MOUSE_ICON mouse_Style)
 {
     int32_t ret = HiSysEventWrite(
@@ -622,7 +622,7 @@ void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MM
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::string mouse_Size)
 {
     int32_t ret = HiSysEventWrite(
@@ -635,7 +635,7 @@ void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::stri
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorFault(std::string error_Code, std::string error_Name)
 {
     int32_t ret = HiSysEventWrite(

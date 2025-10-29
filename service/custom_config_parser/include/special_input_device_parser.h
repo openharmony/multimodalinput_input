@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
- 
+
 #ifndef SPECIAL_INPUT_DEVICE_PARSER_H
 #define SPECIAL_INPUT_DEVICE_PARSER_H
- 
+
 #include <shared_mutex>
 #include <string>
 #include <map>
- 
+
 #include "json_parser.h"
 #include "cJSON.h"
- 
+
 namespace OHOS {
 namespace MMI {
- 
+
 class SpecialInputDeviceParser {
 public:
     SpecialInputDeviceParser(const SpecialInputDeviceParser&) = delete;
@@ -35,26 +35,26 @@ public:
     int32_t Init();
     int32_t IsPointerDevice(const std::string &name, bool &isPointerDevice);
     std::string GetInputDevName(const std::string &alias);
- 
+
 private:
     SpecialInputDeviceParser() = default;
     ~SpecialInputDeviceParser() = default;
- 
+
     struct ExactlyMatchInputDevice {
         std::string devName;
         bool isMouse { false };
     };
- 
+
     struct ContainMatchInputDevice {
         std::vector<std::string> keywords;
         bool isMouse { false };
     };
- 
+
     struct SpecialInputDevice {
         std::string inputDevAlias;
         std::string inputDevName;
     };
- 
+
 private:
     int32_t ParseExactlyMatch(const JsonParser &jsonParser);
     int32_t ParseContainMatch(const JsonParser &jsonParser);
