@@ -368,7 +368,7 @@ const static std::map<int32_t, keyCode::KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_DAGGER_CLICK_ETS,              keyCode::KeyCode::key_t::KEYCODE_DAGGER_CLICK },
     { KEYCODE_DAGGER_DOUBLE_CLICK_ETS,       keyCode::KeyCode::key_t::KEYCODE_DAGGER_DOUBLE_CLICK },
     { KEYCODE_DAGGER_LONG_PRESS_ETS,         keyCode::KeyCode::key_t::KEYCODE_DAGGER_LONG_PRESS },
-    { KEYCODE_DIV_ETS,                       KeyCode::key_t::KEYCODE_DIV }
+    { KEYCODE_DIV_ETS,                       keyCode::KeyCode::key_t::KEYCODE_DIV }
 };
 
 keyCode::KeyCode ConvertEtsKeyCode(int32_t keyCode)
