@@ -3130,6 +3130,14 @@ ohos_unittest("ServerMsgHandlerTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   sources = [
     "message_handle/test/authorize_helper_test.cpp",
     "message_handle/test/client_death_handler_test.cpp",
