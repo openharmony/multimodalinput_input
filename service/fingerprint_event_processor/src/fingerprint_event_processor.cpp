@@ -28,7 +28,7 @@
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "special_input_device_parser.h"
-#include "event_normalize_handler.h"
+#include "touch_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -124,7 +124,8 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool cancel)
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
     bool isFingerPressed = TOUCH_EVENT_HDR->IsFingerPressed();
-    MMI_HILOGD("screenMissTouchFlag_ :%{private}d, screen:%{private}d, cancel:%{private}d", flag, isFingerPressed, cancel);
+    MMI_HILOGD("screenMissTouchFlag_ :%{private}d, screen:%{private}d, cancel:%{private}d",
+        flag, isFingerPressed, cancel);
     if (screenMissTouchFlag_ == false) {
         if (isFingerPressed == true) {
             screenMissTouchFlag_ = true;
