@@ -306,6 +306,7 @@ private:
         const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent);
     void DispatchUIExtentionPointerEvent(double logicalX, double logicalY,
         std::shared_ptr<PointerEvent> pointerEvent);
+    void PrintPointerEventInfo(const WindowInfo& item, std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::vector<int32_t> HandleHardwareCursor(const OLD::DisplayInfo *physicalDisplayInfo,
