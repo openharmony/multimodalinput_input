@@ -28,6 +28,7 @@
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "special_input_device_parser.h"
+#include "touch_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -116,42 +117,17 @@ void FingerprintEventProcessor::SetPowerAndVolumeKeyState(struct libinput_event*
     }
 }
 
-void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(event);
-    auto type = libinput_event_get_type(event);
-    MMI_HILOGD("smart key screen state is %{public}d", type);
-    switch (type) {
-        case LIBINPUT_EVENT_TOUCH_DOWN: {
-            screenState_ = true;
-            fingerDown_++;
-            break;
-        }
-        case LIBINPUT_EVENT_TOUCH_UP: {
-            fingerDown_--;
-            if (fingerDown_ <= NON_FINGER) {
-                screenState_ = false;
-                fingerDown_ = NON_FINGER;
-            }
-            break;
-        }
-        default: {
-            MMI_HILOGD("Unknown event type, touchType:%{public}d", type);
-            return;
-        }
-    }
-    ChangeScreenMissTouchFlag(screenState_, cancelState_);
-}
 /*
 * This is a poorly designed state machine for handling screen touch errors, SAD :(
 */
-void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool cancel)
+void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool cancel)
 {
     int32_t flag = screenMissTouchFlag_ ? 1 : 0;
-    MMI_HILOGD("screenMissTouchFlag_ :%{private}d, screen:%{private}d, cancel:%{private}d", flag, screen, screen);
+    bool isFingerPressed = TOUCH_EVENT_HDR->IsFingerPressed();
+    MMI_HILOGD("screenMissTouchFlag_ :%{private}d, screen:%{private}d, cancel:%{private}d",
+        flag, isFingerPressed, cancel);
     if (screenMissTouchFlag_ == false) {
-        if (screen == true) {
+        if (isFingerPressed == true) {
             screenMissTouchFlag_ = true;
             if (!fingerprintFlag_) {
                 return;
@@ -160,7 +136,7 @@ void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool canc
             return;
         }
     } else {
-        if (screen == false && cancel == true) {
+        if (isFingerPressed == false && cancel == true) {
             screenMissTouchFlag_ = false;
             return;
         }
@@ -280,7 +256,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
         case FINGERPRINT_CODE_DOWN: {
             fingerprintFlag_ = true;
             cancelState_ = false;
-            ChangeScreenMissTouchFlag(screenState_, true);
+            ChangeScreenMissTouchFlag(true);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN);
             ReportResSched(ResourceSchedule::ResType::RES_TYPE_CLICK_RECOGNIZE,
                 ResourceSchedule::ResType::ClickEventType::TOUCH_EVENT_DOWN);
@@ -288,7 +264,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
         }
         case FINGERPRINT_CODE_CANCEL: {
             cancelState_ = true;
-            ChangeScreenMissTouchFlag(screenState_, cancelState_);
+            ChangeScreenMissTouchFlag(cancelState_);
             MMI_HILOGI("Change cancel state and dont send point event");
             return RET_OK;
         }
