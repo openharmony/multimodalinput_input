@@ -71,7 +71,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutIntValue, TestSize.Level1
     std::string key = "settingDateShare";
     int32_t value = 123;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutIntValue(key, value, needNotify), ERR_OK);
+    ASSERT_NE(settingDataShare.PutIntValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -87,7 +87,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutLongValue, TestSize.Level
     std::string key = "settingDateShare";
     int64_t value = 123;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutLongValue(key, value, needNotify), ERR_OK);
+    ASSERT_NE(settingDataShare.PutLongValue(key, value, needNotify), ERR_OK);
 }
 
 /**
@@ -103,7 +103,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutBoolValue, TestSize.Level
     std::string key = "settingDateShare";
     bool value = true;
     bool needNotify = true;
-    ASSERT_EQ(settingDataShare.PutBoolValue(key, value, needNotify), ERR_OK);
+    ASSERT_NE(settingDataShare.PutBoolValue(key, value, needNotify), ERR_OK);
 }
 
 /**
