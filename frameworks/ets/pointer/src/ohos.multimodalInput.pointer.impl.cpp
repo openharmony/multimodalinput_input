@@ -67,6 +67,7 @@ const static std::map<int32_t, PointerStyle> POINTER_STYLE_TRANSFORMATION = {
     { LOADING_IMPL,                                 PointerStyle::key_t::LOADING },
     { RUNNING_IMPL,                                 PointerStyle::key_t::RUNNING },
     { MIDDLE_BTN_EAST_WEST_IMPL,                    PointerStyle::key_t::MIDDLE_BTN_EAST_WEST },
+    { SCREENRECORDER_CURSOR_IMPL,                   PointerStyle::key_t::SCREENRECORDER_CURSOR }
 };
 
 PointerStyle ConvertPointerStyle(int32_t pointerStyle)
