@@ -191,7 +191,7 @@ int32_t MultimodalEventHandler::SubscribeLongPressEvent(int32_t subscribeId,
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeLongPressEvent(subscribeId, longPressRequest);
 }
- 
+
 int32_t MultimodalEventHandler::UnsubscribeLongPressEvent(int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;

@@ -170,7 +170,7 @@ int32_t InputEventDataTransformation::LongPressEventToNetPacket(const LongPressE
     }
     return RET_OK;
 }
- 
+
 int32_t InputEventDataTransformation::NetPacketToLongPressEvent(NetPacket &pkt, LongPressEvent &longPressEvent)
 {
     int32_t data = 0;

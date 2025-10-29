@@ -675,7 +675,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_05, TestSize.Lev
     EXPECT_FALSE(InputMgrImpl.anrObservers_.empty());
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_OnConnected_06
  * @tc.desc: Test OnConnected
@@ -700,7 +700,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_06, TestSize.Lev
     InputMgrImpl.anrObservers_.push_back(observer);
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_OnConnected_07
  * @tc.desc: Test OnConnected
@@ -714,7 +714,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnConnected_07, TestSize.Lev
     EXPECT_TRUE(InputMgrImpl.currentUserId_ != -1);
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.OnConnected());
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_OnConnected_08
  * @tc.desc: Test OnConnected
@@ -1082,13 +1082,13 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_001, T
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 class MockNetPacket : public NetPacket {
 public:
     explicit MockNetPacket(MmiMessageId msgId) : NetPacket(msgId) {}
     MOCK_METHOD(bool, Write, (const char* data, size_t size), (override));
 };
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplayData_WriteFailure
  * @tc.desc: Test PackDisplayData_WriteFailure
@@ -1123,7 +1123,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_WriteFai
     int32_t result = InputMgrImpl.PackDisplayData(mock_pkt, userScreenInfo);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackWindowInfoReturnsError
  * @tc.desc: Test TestPackWindowInfoReturnsError
@@ -1154,7 +1154,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackWindowInfoReturnsErr
     int32_t result = InputMgrImpl.PackDisplayData(mockPacket, userScreenInfo);
     EXPECT_NE(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_PrintDisplayInfo_004
  * @tc.desc: Test TestPrintDisplayInfo
@@ -1197,7 +1197,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_PrintDisplayInfo_004, TestSi
     int32_t result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplayData_WriteFailure
  * @tc.desc: Test PackDisplayData_001
@@ -1235,7 +1235,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_001, Tes
     auto result = InputMgrImpl.PackDisplayData(pkt, userScreenInfo);
     EXPECT_EQ(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackScreensInfo
  * @tc.desc: Test PackScreensInfo_001
@@ -1254,7 +1254,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackScreensInfo_001, Tes
     auto result = InputMgrImpl.PackScreensInfo(pkt, screens);
     EXPECT_EQ(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplayGroupsInfo
  * @tc.desc: Test PackDisplayGroupsInfo_001
@@ -1273,7 +1273,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayGroupsInfo_00
     auto result = InputMgrImpl.PackDisplayGroupsInfo(pkt, group);
     EXPECT_EQ(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplaysInfo
  * @tc.desc: Test PackDisplaysInfo_001
@@ -1291,7 +1291,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplaysInfo_001, Te
     std::vector<DisplayInfo> displayInfo;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.PackDisplaysInfo(pkt, displayInfo));
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestUpdateDisplayInfo_002
  * @tc.desc: Test UpdateDisplayInfo
@@ -1323,7 +1323,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_002, T
     result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
     EXPECT_EQ(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplayData_002
  * @tc.desc: Test PackDisplayData_002
@@ -1347,7 +1347,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_002, Tes
     result = InputMgrImpl.PackDisplayData(pkt, userScreenInfo);
     EXPECT_EQ(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplayData_003
  * @tc.desc: Test PackDisplayData_003
@@ -1399,8 +1399,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_003, T
     result = InputMgrImpl.UpdateDisplayInfo(userScreenInfo);
     EXPECT_EQ(result, RET_ERR);
 }
- 
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPackDisplayData_004
  * @tc.desc: Test PackDisplayData_004
@@ -1420,7 +1419,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPackDisplayData_004, Tes
     auto result = InputMgrImpl.PackDisplayData(pkt, userScreenInfo);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPrintScreens
  * @tc.desc: Test PrintScreens
@@ -1434,7 +1433,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPrintScreens, TestSize.L
     userScreenInfo.userId = 0;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.PrintScreens(userScreenInfo.screens));
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPrintDisplayGroups
  * @tc.desc: Test PrintDisplayGroups
@@ -1448,7 +1447,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestPrintDisplayGroups, Test
     userScreenInfo.userId = 0;
     ASSERT_NO_FATAL_FAILURE(InputMgrImpl.PrintDisplayGroups(userScreenInfo.displayGroups));
 }
- 
+
 /**
  * @tc.name: InputManagerImplTest_TestPrintDisplaysInfo
  * @tc.desc: Test PrintDisplaysInfo
@@ -2275,7 +2274,7 @@ HWTEST_F(InputManagerImplTest, AddKeyEventHook_001, TestSize.Level1)
     int32_t ret = inputManagerImpl.AddKeyEventHook(callback, hookId);
     EXPECT_EQ(ret, RET_OK);
 }
- 
+
 /**
  * @tc.name: RemoveKeyEventHook_001
  * @tc.desc: Test RemoveKeyEventHook
@@ -2290,7 +2289,7 @@ HWTEST_F(InputManagerImplTest, RemoveKeyEventHook_001, TestSize.Level1)
     int32_t ret = inputManagerImpl.RemoveKeyEventHook(keyEventHookId);
     EXPECT_EQ(ret, RET_ERR);
 }
- 
+
 /**
  * @tc.name: DispatchToNextHandler_001
  * @tc.desc: Test DispatchToNextHandler

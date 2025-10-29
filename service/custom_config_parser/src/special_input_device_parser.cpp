@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- 
+
 #include "special_input_device_parser.h"
 
 #include "json_parser.h"

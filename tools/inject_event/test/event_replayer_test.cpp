@@ -264,7 +264,7 @@ HWTEST_F(EventReplayerTest, EventReplayerTest_InvaildFilePath, TestSize.Level1)
     EventReplayer replayer("/invaild/path");
     EXPECT_FALSE(replayer.Replay());
 }
- 
+
 /**
  * @tc.name: EventReplayerTest_VaildFilePath
  * @tc.desc: Test with valid file path but no available device

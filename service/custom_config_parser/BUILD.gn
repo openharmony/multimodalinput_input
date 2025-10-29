@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("../../multimodalinput_mini.gni")
- 
+
 config("mmi_custom_config_parser_cfg") {
   include_dirs = [
     "${mmi_path}/util/common/include",

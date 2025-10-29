@@ -12,22 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
- 
+
 #include <fstream>
- 
+
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
 #include "input_event_hook_handler.h"
 #include "input_event_stager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_manager.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEventHookHandlerTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -35,7 +35,7 @@ using namespace testing::ext;
 using namespace testing;
 std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
 } // namespace
- 
+
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
 {
     if (g_instance == nullptr) {
@@ -43,7 +43,7 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
     }
     return g_instance;
 }
- 
+
 int32_t MultimodalInputConnectManager::AddInputEventHook(HookEventType hookEventType)
 {
     if (hookEventType > HOOK_EVENT_TYPE_KEY + HOOK_EVENT_TYPE_MOUSE + HOOK_EVENT_TYPE_TOUCH) {
@@ -51,7 +51,7 @@ int32_t MultimodalInputConnectManager::AddInputEventHook(HookEventType hookEvent
     }
     return RET_OK;
 }
- 
+
 int32_t MultimodalInputConnectManager::RemoveInputEventHook(HookEventType hookEventType)
 {
     if (hookEventType > HOOK_EVENT_TYPE_KEY + HOOK_EVENT_TYPE_MOUSE + HOOK_EVENT_TYPE_TOUCH) {
@@ -59,7 +59,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventHook(HookEventType hookEv
     }
     return RET_OK;
 }
- 
+
 int32_t MultimodalInputConnectManager::DispatchToNextHandler(const std::shared_ptr<KeyEvent> keyEvent)
 {
     if (keyEvent == nullptr) {
@@ -67,7 +67,7 @@ int32_t MultimodalInputConnectManager::DispatchToNextHandler(const std::shared_p
     }
     return RET_OK;
 }
- 
+
 int32_t MultimodalInputConnectManager::DispatchToNextHandler(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent == nullptr) {
@@ -75,13 +75,13 @@ int32_t MultimodalInputConnectManager::DispatchToNextHandler(const std::shared_p
     }
     return RET_OK;
 }
- 
+
 InputEventStager &InputEventStager::GetInstance()
 {
     static InputEventStager instance;
     return instance;
 }
- 
+
 std::shared_ptr<KeyEvent> InputEventStager::GetKeyEvent(int32_t eventId)
 {
     if (eventId == 0) {
@@ -91,7 +91,7 @@ std::shared_ptr<KeyEvent> InputEventStager::GetKeyEvent(int32_t eventId)
         return keyEvent;
     }
 }
- 
+
 std::shared_ptr<PointerEvent> InputEventStager::GetTouchEvent(int32_t eventId)
 {
     if (eventId == 0) {
@@ -101,7 +101,7 @@ std::shared_ptr<PointerEvent> InputEventStager::GetTouchEvent(int32_t eventId)
         return keyEvent;
     }
 }
- 
+
 std::shared_ptr<PointerEvent> InputEventStager::GetMouseEvent(int32_t eventId)
 {
     if (eventId == 0) {
@@ -111,24 +111,24 @@ std::shared_ptr<PointerEvent> InputEventStager::GetMouseEvent(int32_t eventId)
         return keyEvent;
     }
 }
- 
+
 int32_t InputEventStager::UpdateKeyEvent(std::shared_ptr<KeyEvent> event)
 {
     return RET_OK;
 }
- 
+
 int32_t InputEventStager::UpdateTouchEvent(std::shared_ptr<PointerEvent> event)
 {
     return RET_OK;
 }
- 
+
 int32_t InputEventStager::UpdateMouseEvent(std::shared_ptr<PointerEvent> event)
 {
     return RET_OK;
 }
- 
+
 void InputEventStager::ClearStashEvents(HookEventType hookEventType) {}
- 
+
 class HookConsumer : public IInputEventConsumer {
 public:
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const { g_flag = 1; }
@@ -137,15 +137,15 @@ public:
 public:
     static int32_t g_flag;
 };
- 
+
 int32_t HookConsumer::g_flag = 0;
- 
+
 class InputEventHookHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 void ClearData()
 {
     INPUT_EVENT_HOOK_HANDLER.currentHookStats_ = 0;
@@ -153,7 +153,7 @@ void ClearData()
     INPUT_EVENT_HOOK_HANDLER.hookConsumer_.mouseHookCallback_ = nullptr;
     INPUT_EVENT_HOOK_HANDLER.hookConsumer_.touchHookCallback_ = nullptr;
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddInputEventHookLocal_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -170,7 +170,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddInputEventHookL
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddInputEventHookLocal_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -187,7 +187,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddInputEventHookL
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddInputEventHook_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -214,7 +214,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddInputEventHook_
     EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddInputEventHook_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -241,7 +241,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddInputEventHook_
     EXPECT_EQ(ret, RET_ERR);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddInputEventHook_003
  * @tc.desc: Test the function NotifyDevCallback
@@ -268,7 +268,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddInputEventHook_
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_RemoveInputEventHookLocal_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -295,7 +295,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_RemoveInputEventHo
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_RemoveInputEventHookLocal_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -322,7 +322,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_RemoveInputEventHo
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_RemoveInputEventHook_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -349,7 +349,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_RemoveInputEventHo
     EXPECT_EQ(ret, RET_ERR);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_RemoveInputEventHook_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -376,7 +376,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_RemoveInputEventHo
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -404,7 +404,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHand
     EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -432,7 +432,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHand
     EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_003
  * @tc.desc: Test the function NotifyDevCallback
@@ -460,7 +460,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHand
     EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_004
  * @tc.desc: Test the function NotifyDevCallback
@@ -488,7 +488,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHand
     EXPECT_EQ(ret, RET_ERR);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_DispatchToNextHandler_005
  * @tc.desc: Test the function NotifyDevCallback
@@ -502,23 +502,23 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_DispatchToNextHand
     auto ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(keyEvent);
     EXPECT_EQ(ret, RET_ERR);
     ClearData();
- 
+
     keyEvent = KeyEvent::Create();
     ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(keyEvent);
     EXPECT_EQ(ret, RET_OK);
     ClearData();
- 
+
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(pointerEvent);
     EXPECT_EQ(ret, RET_ERR);
     ClearData();
- 
+
     pointerEvent = PointerEvent::Create();
     ret = INPUT_EVENT_HOOK_HANDLER.DispatchToNextHandler(pointerEvent);
     EXPECT_EQ(ret, RET_OK);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_OnPointerEvent_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -546,7 +546,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnPointerEvent_001
     EXPECT_EQ(consumer->g_flag, 2);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_OnPointerEvent_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -574,7 +574,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnPointerEvent_002
     EXPECT_EQ(consumer->g_flag, 2);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_OnPointerEvent_003
  * @tc.desc: Test the function NotifyDevCallback
@@ -602,7 +602,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnPointerEvent_003
     EXPECT_EQ(consumer->g_flag, 0);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddKeyHook_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -624,7 +624,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddKeyHook_001, Te
     EXPECT_EQ(INPUT_EVENT_HOOK_HANDLER.currentHookStats_, 1);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddMouseHook_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -645,7 +645,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddMouseHook_001, 
     EXPECT_EQ(INPUT_EVENT_HOOK_HANDLER.currentHookStats_, 4);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddTouchHook_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -666,7 +666,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddTouchHook_001, 
     EXPECT_EQ(INPUT_EVENT_HOOK_HANDLER.currentHookStats_, 2);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_AddInputEventHookToServer_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -680,13 +680,13 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_AddInputEventHookT
     auto ret = INPUT_EVENT_HOOK_HANDLER.AddInputEventHookToServer(hookEventType);
     EXPECT_EQ(ret, RET_OK);
     ClearData();
- 
+
     hookEventType = 8;
     ret = INPUT_EVENT_HOOK_HANDLER.AddInputEventHookToServer(hookEventType);
     EXPECT_EQ(ret, RET_ERR);
     ClearData();
 }
- 
+
 /**
  * @tc.name: InputEventHookHandlerTest_RemoveInputEventHookOfServer_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -700,7 +700,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_RemoveInputEventHo
     auto ret = INPUT_EVENT_HOOK_HANDLER.RemoveInputEventHookOfServer(hookEventType);
     EXPECT_EQ(ret, RET_OK);
     ClearData();
- 
+
     hookEventType = 8;
     ret = INPUT_EVENT_HOOK_HANDLER.RemoveInputEventHookOfServer(hookEventType);
     EXPECT_EQ(ret, RET_ERR);

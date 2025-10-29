@@ -12,28 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
- 
+
 #include "event_dispatch_order_checker.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventDispatchOrderCheckerTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 } // namespace
- 
+
 class EventDispatchOrderCheckerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: EventDispatchOrderCheckerTest_CheckDispatchOrder001
  * @tc.desc: Test the function CheckDispatchOrder

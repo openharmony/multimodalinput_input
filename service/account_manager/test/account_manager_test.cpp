@@ -663,15 +663,15 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountId_01, TestSize
     data.SetCode(MAIN_ACCOUNT_ID);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
     EXPECT_EQ(MAIN_ACCOUNT_ID, ACCOUNT_MGR->GetCurrentAccountId());
- 
+
     data.SetCode(TEST_ACCOUNT_ID_001);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
     EXPECT_EQ(TEST_ACCOUNT_ID_001, ACCOUNT_MGR->GetCurrentAccountId());
- 
+
     data.SetCode(MAIN_ACCOUNT_ID);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnSwitchUser(data));
     EXPECT_EQ(MAIN_ACCOUNT_ID, ACCOUNT_MGR->GetCurrentAccountId());
- 
+
     data.SetCode(TEST_ACCOUNT_ID_001);
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- 
+
 #include "bundle_name_parser.h"
 
 #include "util.h"

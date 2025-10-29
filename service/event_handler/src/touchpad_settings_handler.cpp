@@ -137,14 +137,14 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterDatashareObserver(
         MMI_HILOGE("Invalid input parameter");
         return nullptr;
     }
- 
+
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     sptr<SettingObserver> settingObserver = settingHelper.CreateObserver(key, onUpdate);
     if (settingObserver == nullptr) {
         MMI_HILOGE("CreateObserver fail");
         return nullptr;
     }
- 
+
     ret = settingHelper.RegisterObserver(settingObserver, datashareUri_);
     if (ret != ERR_OK) {
         MMI_HILOGE("RegisterObserver failed");

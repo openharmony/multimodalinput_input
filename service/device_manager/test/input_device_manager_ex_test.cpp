@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
- 
+
 #include <fstream>
- 
+
 #include "input_device_manager.h"
 #include "libinput_mock.h"
 #include "pointer_device_manager.h"
@@ -41,7 +41,7 @@ public:
     MOCK_METHOD1(OnDeviceRemoved, void(int32_t deviceId));
     MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
 };
- 
+
 /**
  * @tc.name: NotifyDevCallback_Test_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -58,7 +58,7 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_001, TestSize.Level1)
     inDevice.isTouchableDevice = true;
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceId, inDevice));
 }
- 
+
 /**
  * @tc.name: NotifyDevCallback_Test_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -85,7 +85,7 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_002, TestSize.Level1)
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("test")));
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceId, inDevice));
 }
- 
+
 /**
  * @tc.name: NotifyDevRemoveCallback_Test_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -100,14 +100,14 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_001, TestSize.Leve
     InputDeviceCallback callback =
         [] (int status, std::string nodeName, const std::string& deviceName, const std::string& deviceId) {};
     inputDevice.SetInputStatusChangeCallback(callback);
- 
+
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
     inDevice.inputDeviceOrigin = nullptr;
     inDevice.sysUid = "test";
     ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevRemoveCallback(deviceId, inDevice));
 }
- 
+
 /**
  * @tc.name: NotifyDevRemoveCallback_Test_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -122,7 +122,7 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_002, TestSize.Leve
     InputDeviceCallback callback =
         [] (int status, std::string nodeName, const std::string& deviceName, const std::string& deviceId) {};
     inputDevice.SetInputStatusChangeCallback(callback);
- 
+
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
     struct libinput_device libDev {
@@ -167,7 +167,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceRemoved_Tes
     InputDeviceManager inputDevice;
     POINTER_DEV_MGR.isInit = false;
     NiceMock<LibinputInterfaceMock> libinputMock;
- 
+
     int32_t deviceId1 = 1;
     int32_t deviceId2 = 2;
     int32_t deviceId3 = 3;

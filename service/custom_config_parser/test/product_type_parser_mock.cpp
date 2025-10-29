@@ -24,7 +24,7 @@ ProductTypeParserMock::ProductTypeParserMock()
 {
     mock = this;
 }
- 
+
 ProductTypeParserMock::~ProductTypeParserMock()
 {
     mock = nullptr;

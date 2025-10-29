@@ -172,7 +172,7 @@ HWTEST_F(EventRecorderTest, EventRecorderTest_Start_emptyPath, TestSize.Level1)
     std::vector<InputDevice> devices;
     EXPECT_FALSE(recorder.Start(devices));
 }
- 
+
 /**
  * @tc.name: EventRecorderTest_Start_InvalidPath
  * @tc.desc: Test start with invalid output path
@@ -183,10 +183,10 @@ HWTEST_F(EventRecorderTest, EventRecorderTest_Start_InvalidPath, TestSize.Level1
 {
     EventRecorder recorder(TEST_FILE_PATH);
     recorder.outputPath_ = "/invalid/path";
- 
+
     std::vector<InputDevice> devices;
     bool result = recorder.Start(devices);
- 
+
     EXPECT_FALSE(result);
 }
 

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- 
+
 #include "product_type_parser.h"
 
 #include "define_multimodal.h"

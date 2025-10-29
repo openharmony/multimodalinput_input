@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef GET_DEVICE_OBJECT_H
 #define GET_DEVICE_OBJECT_H
 

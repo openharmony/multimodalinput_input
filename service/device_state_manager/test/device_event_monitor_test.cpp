@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
 
 #include "device_event_monitor.h"
@@ -220,7 +220,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
     deviceEventMonitor.hasHandleRingMute_ = true;
     deviceEventMonitor.SetVoipCallState(ced, 1);
     ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
- 
+
     want.SetParam("state", 5);
     ced.SetWant(want);
     deviceEventMonitor.SetVoipCallState(ced, 1);
@@ -231,7 +231,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
     deviceEventMonitor.SetVoipCallState(ced, 1);
     ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
 }
- 
+
 /**
  * @tc.name: SetVoipCallState_002
  * @tc.desc: Test the funcation SetVoipCallState
@@ -249,7 +249,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_002, TestSize.Level1)
     ced.SetWant(want);
     deviceEventMonitor.SetVoipCallState(ced, 1);
     ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
- 
+
     want.SetParam("state", 5);
     ced.SetWant(want);
     deviceEventMonitor.SetVoipCallState(ced, 1);
@@ -282,7 +282,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_005, TestSize.Level1)
     deviceEventMonitor.SetVoipCallState(ced, 1);
     ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
 }
- 
+
 /**
  * @tc.name: SetVoipCallState_006
  * @tc.desc: Test the funcation SetVoipCallState
