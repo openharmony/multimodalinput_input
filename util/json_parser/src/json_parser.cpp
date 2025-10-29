@@ -96,7 +96,7 @@ int32_t JsonParser::ParseInt32(const cJSON *json, const std::string &key, int32_
     value = jsonNode->valueint;
     return RET_OK;
 }
- 
+
 int32_t JsonParser::ParseString(const cJSON *json, const std::string &key, std::string &value)
 {
     if (!cJSON_IsObject(json)) {
@@ -112,7 +112,7 @@ int32_t JsonParser::ParseString(const cJSON *json, const std::string &key, std::
     value = jsonNode->valuestring;
     return RET_OK;
 }
- 
+
 int32_t JsonParser::ParseBool(const cJSON *json, const std::string &key, bool &value)
 {
     if (!cJSON_IsObject(json)) {
@@ -128,7 +128,7 @@ int32_t JsonParser::ParseBool(const cJSON *json, const std::string &key, bool &v
     value = cJSON_IsTrue(jsonNode);
     return RET_OK;
 }
- 
+
 int32_t JsonParser::ParseStringArray(const cJSON *json, const std::string &key, std::vector<std::string> &value,
     int32_t maxSize)
 {

@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
- 
+
 #ifndef DEVICE_TYPE_DEFINITION_H
 #define DEVICE_TYPE_DEFINITION_H
- 
+
 #include <unordered_map>
- 
+
 namespace OHOS {
 namespace MMI {
 enum class DeviceType {
@@ -33,7 +33,7 @@ enum class DeviceType {
     DEVICE_M_TABLET = 8,
     DEVICE_Q_TABLET = 9,
 };
- 
+
 static const std::unordered_map<std::string, DeviceType> gDeviceTypeMap {
     { "DEVICE_UNKNOWN", DeviceType::DEVICE_UNKNOWN },
     { "DEVICE_PC", DeviceType::DEVICE_PC },
@@ -46,7 +46,7 @@ static const std::unordered_map<std::string, DeviceType> gDeviceTypeMap {
     { "DEVICE_M_TABLET", DeviceType::DEVICE_M_TABLET },
     { "DEVICE_Q_TABLET", DeviceType::DEVICE_Q_TABLET }
 };
- 
+
 } // namespace MMI
 } // namespace OHOS
 #endif // DEVICE_TYPE_DEFINITION_H

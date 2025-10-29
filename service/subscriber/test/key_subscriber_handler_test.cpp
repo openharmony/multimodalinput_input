@@ -931,7 +931,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_008, 
     data.SetWant(want);
     int callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
@@ -952,12 +952,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, 
     data.SetWant(want);
     callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_010
  * @tc.desc: Test ring mute
@@ -978,7 +978,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_010, 
     data.SetWant(want);
     callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
@@ -1004,12 +1004,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleVoipRingMute_0
     data.SetWant(want);
     callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_F1);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleVoipRingMute_003
  * @tc.desc: Test ring mute
@@ -1026,12 +1026,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleVoipRingMute_0
     data.SetWant(want);
     int callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_013
  * @tc.desc: Test ring mute
@@ -1052,12 +1052,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_013, 
     data.SetWant(want);
     callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_014
  * @tc.desc: Test ring mute
@@ -1074,12 +1074,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_014, 
     data.SetWant(want);
     int callState = 0;
     DEVICE_MONITOR->SetVoipCallState(data, callState);
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_015
  * @tc.desc: Test ring mute
@@ -1090,12 +1090,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_015, 
 {
     CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_016
  * @tc.desc: Test ring mute
@@ -1106,7 +1106,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_016, 
 {
     CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
@@ -1672,7 +1672,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_017, 
     ret = handler.HandleRingMute(keyEvent);
     ASSERT_FALSE(ret);
 }
- 
+
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_018
  * @tc.desc: Test the funcation HandleRingMute
@@ -3537,7 +3537,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleVoipRingMute_0
 {
     CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
- 
+
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
@@ -3551,7 +3551,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleVoipRingMute_0
     ASSERT_FALSE(result);
     ASSERT_FALSE(DEVICE_MONITOR->GetHasHandleRingMute());
     ASSERT_FALSE(keySubscriberHandler.needSkipPowerKeyUp_);
- 
+
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     result = keySubscriberHandler.HandleRingMute(keyEvent);
     ASSERT_FALSE(DEVICE_MONITOR->GetHasHandleRingMute());

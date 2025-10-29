@@ -12,28 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gtest/gtest.h>
- 
+
 #include "event_expiration_checker.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventExpirationCheckerTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 }  // namespace
- 
+
 class EventExpirationCheckerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: EventExpirationCheckerTest_CheckExpiration001
  * @tc.desc: Test CheckExpiration
@@ -57,7 +57,7 @@ HWTEST_F(EventExpirationCheckerTest, EventExpirationCheckerTest_CheckExpiration0
     result = EventExpirationChecker::GetInstance().RemoveChecker(hookId);
     EXPECT_EQ(result, RET_ERR);
 }
- 
+
 /**
  * @tc.name: EventExpirationCheckerTest_UpdateStashEvent001
  * @tc.desc: Test UpdateStashEvent
@@ -75,7 +75,7 @@ HWTEST_F(EventExpirationCheckerTest, EventExpirationCheckerTest_UpdateStashEvent
     result = EventExpirationChecker::GetInstance().RemoveChecker(hookId);
     EXPECT_EQ(result, RET_OK);
 }
- 
+
 /**
  * @tc.name: EventExpirationCheckerTest_GetKeyEvent001
  * @tc.desc: Test GetKeyEvent

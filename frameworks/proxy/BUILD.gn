@@ -935,7 +935,7 @@ ohos_unittest("KeyEventHookHandlerTest") {
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
   ]
- 
+
   sources = [
     "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
@@ -951,27 +951,27 @@ ohos_unittest("KeyEventHookHandlerTest") {
     "event_handler/test/key_event_hook_handler_test.cpp",
     "event_handler/test/tablet_event_input_subscribe_manager_test.cpp",
   ]
- 
+
   if (input_feature_switch) {
     sources += [ "event_handler/src/switch_event_input_subscribe_manager.cpp" ]
   }
- 
+
   if (input_ext_feature_anco) {
     sources += [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
   }
- 
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_test_util",
     "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
- 
+
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
   ]
- 
+
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
     "${mmi_path}/frameworks/proxy:libmmi-common",
@@ -981,7 +981,7 @@ ohos_unittest("KeyEventHookHandlerTest") {
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-client",
   ]
- 
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "cJSON:cjson",

@@ -12,35 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
- 
+
 #include <fstream>
- 
+
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
 #include "input_event_hook_handler.h"
 #include "input_event_stager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_manager.h"
- 
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEventStagerTest"
- 
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace testing;
 } // namespace
- 
+
 class InputEventStagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
- 
+
 /**
  * @tc.name: InputEventStagerTest_GetKeyEvent_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -57,7 +57,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_GetKeyEvent_001, TestSize.Le
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_GetKeyEvent_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -77,7 +77,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_GetKeyEvent_002, TestSize.Le
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_GetTouchEvent_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -94,7 +94,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_GetTouchEvent_001, TestSize.
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_GetTouchEvent_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -114,7 +114,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_GetTouchEvent_002, TestSize.
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_GetMouseEvent_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -131,7 +131,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_GetMouseEvent_001, TestSize.
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_GetMouseEvent_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -151,7 +151,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_GetMouseEvent_002, TestSize.
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_ClearStashEvents_001
  * @tc.desc: Test the function NotifyDevCallback
@@ -172,7 +172,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_ClearStashEvents_001, TestSi
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_ClearStashEvents_002
  * @tc.desc: Test the function NotifyDevCallback
@@ -193,7 +193,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_ClearStashEvents_002, TestSi
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_ClearStashEvents_003
  * @tc.desc: Test the function NotifyDevCallback
@@ -214,7 +214,7 @@ HWTEST_F(InputEventStagerTest, InputEventStagerTest_ClearStashEvents_003, TestSi
     INPUT_EVENT_STAGER.stashTouchEvents_.clear();
     INPUT_EVENT_STAGER.stashMouseEvents_.clear();
 }
- 
+
 /**
  * @tc.name: InputEventStagerTest_ClearStashEvents_004
  * @tc.desc: Test the function NotifyDevCallback

@@ -66,7 +66,7 @@ private:
     void UpdateFingerPoisition(std::shared_ptr<PointerEvent> touchEvent);
     void UpdatePositionHistory(double x, double y, double time);
     bool CheckSuddenStop() const;
- 
+
 private:
     FingerGesture fingerGesture_;
     std::shared_ptr<PointerEvent> touchEvent_ { nullptr };

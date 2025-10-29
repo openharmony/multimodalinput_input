@@ -3794,7 +3794,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
     }
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
- 
+
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_004
  * @tc.desc: Test the funcation AdjustDisplayRotation
@@ -5025,7 +5025,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_012
     inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(2, winInfoEx));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
- 
+
 /**
  * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest003
  * @tc.desc: Test the funcation HandleHardWareCursor
@@ -5132,14 +5132,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchEnterLeaveEvent, 
     touchWindow.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
     inputWindowsManager->lastTouchWindowInfo_.id = touchWindow.id;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
- 
+
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager->lastTouchWindowInfo_.id = 5;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
- 
+
     inputWindowsManager->lastTouchWindowInfo_.id = -1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
- 
+
     inputWindowsManager->lastTouchWindowInfo_.id = 5;
     touchWindow.windowInputType = WindowInputType::SLID_TOUCH_WINDOW;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));

@@ -375,7 +375,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ResetTouchWindow, Test
         "libmmi_touch_drawing_handler.z.so");
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.ResetTouchWindow());
 }
- 
+
 /**
  * @tc.name: TouchDrawingManagerTest_AddUpdateLabelsTimer_ShouldDoNothing_WhenTimerIsRunning
  * @tc.desc: Test AddUpdateLabelsTimer

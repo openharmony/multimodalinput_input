@@ -251,7 +251,7 @@ public:
      * @since 15
      */
     void RemovePreMonitor(int32_t monitorId);
- 
+
     /**
      * @brief Adds an input event monitor. After such a monitor is added,
      * an input event is copied and distributed to the monitor while being distributed to the original target.
