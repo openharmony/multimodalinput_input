@@ -64,15 +64,15 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     CHKFR((handlerId != INVALID_HANDLER_ID), INVALID_HANDLER_ID, "Exceeded limit of 32-bit maximum number of integers");
     CHKFR((eventType != HANDLE_EVENT_TYPE_NONE), INVALID_HANDLER_ID, "Invalid event type");
     const HandleEventType currentType = GetEventType();
-    MMI_HILOGD("Register new handler:%{public}d, currentType:%{public}d, deviceTags:%{public}d", handlerId, currentType,
-        deviceTags);
+    MMI_HILOGI("Register new handler:%{public}d, currentType:%{public}d, deviceTags:%{public}d,"
+        "handlerType:%{public}d", handlerId, currentType, deviceTags, handlerType);
     uint32_t currentTags = GetDeviceTags();
     if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, deviceTags, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType || ((currentTags & deviceTags) != deviceTags)) {
             uint32_t allDeviceTags = GetDeviceTags();
-            MMI_HILOGD("The handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
+            MMI_HILOGI("The handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
                 handlerType, newType, allDeviceTags, priority);
             int32_t ret = AddToServer(handlerType, newType, priority, allDeviceTags);
             if (ret != RET_OK) {
