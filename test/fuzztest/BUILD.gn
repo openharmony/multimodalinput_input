@@ -415,5 +415,12 @@ group("test") {
     "windowmanagerenablehardwarecursorstats_fuzzer:fuzztest",
     "windowmanagergetpointervisible_fuzzer:fuzztest",
     "windowmanageronsessionlost_fuzzer:fuzztest",
+    "windowmanagersetmousedisplaystate_fuzzer:fuzztest",
+    "windowmanagersetmousehotspot_fuzzer:fuzztest",
+    "windowmanagersetpointercolor_fuzzer:fuzztest",
+    "windowmanagersetpointerlocation_fuzzer:fuzztest",
+    "windowmanagersetpointersize_fuzzer:fuzztest",
+    "windowmanagersetpointervisible_fuzzer:fuzztest",
+    "windowmanagerskippointerlayer_fuzzer:fuzztest",
   ]
 }
