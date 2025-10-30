@@ -38,12 +38,12 @@ struct libinput_device {
 };
 
 struct libinput_event {
-    enum libinput_event_type type;
+    enum LibinputEventType type;
     struct libinput_device *device;
 };
 
 extern "C" {
-const char *libinput_device_get_name(struct libinput_device *device)
+const char *LibinputDeviceGetName(struct libinput_device *device)
 {
     const char* pName = device->name;
     return pName;
