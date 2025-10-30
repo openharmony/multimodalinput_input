@@ -41,6 +41,7 @@ ProductNameDefinitionParser& ProductNameDefinitionParser::GetInstance()
 
 int32_t ProductNameDefinitionParser::Init()
 {
+    // LCOV_EXCL_START
     CALL_DEBUG_ENTER;
     static std::once_flag init_flag;
     static int32_t initRes = RET_ERR;
@@ -48,10 +49,12 @@ int32_t ProductNameDefinitionParser::Init()
         initRes = InitializeImpl();
     });
     return initRes;
+    // LCOV_EXCL_STOP
 }
 
 int32_t ProductNameDefinitionParser::InitializeImpl()
 {
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     std::string jsonStr = ReadJsonFile(std::string(productNameDefinitionConfigDir));
     if (jsonStr.empty()) {
@@ -69,6 +72,7 @@ int32_t ProductNameDefinitionParser::InitializeImpl()
     }
     PrintProductNames();
     return RET_OK;
+    // LCOV_EXCL_STOP
 }
 
 std::string ProductNameDefinitionParser::GetProductName(const std::string &key)
@@ -131,11 +135,13 @@ int32_t ProductNameDefinitionParser::ParserProductNameItem(const cJSON *json,
 
 void ProductNameDefinitionParser::PrintProductNames()
 {
+    // LCOV_EXCL_START
     CALL_INFO_TRACE;
     std::shared_lock<std::shared_mutex> lock(lock_);
     for (const auto &productName: productNames_) {
         MMI_HILOGD("key:%{public}s -> value:%{public}s", productName.first.c_str(), productName.second.c_str());
     }
+    // LCOV_EXCL_STOP
 }
 
 } // namespace MMI
