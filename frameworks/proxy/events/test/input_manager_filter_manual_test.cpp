@@ -343,7 +343,7 @@ struct KeyFilter002 : public IInputEventFilter {
     {}
     bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
     {
-        MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d, exceptKeyCode:%{public}d", getpid(),
+        MMI_HILOGI("KeyFilter::OnInputEvent enter, pid:%{public}d, exceptKeyCode:%{private}d", getpid(),
             exceptKeyCode);
         do {
             result = false;

@@ -52,7 +52,7 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::OnButtonEvent(struct libinput_
 
     auto btnEvent = FormatButtonEvent(button);
     if (btnEvent != nullptr) {
-        MMI_HILOGI("Joystick_button_event, No:%{public}d,KC:%{public}d,KA:%{public}d,Intention:%{public}d",
+        MMI_HILOGI("Joystick_button_event, No:%{public}d,KC:%{private}d,KA:%{public}d,Intention:%{public}d",
             btnEvent->GetId(), btnEvent->GetKeyCode(), btnEvent->GetKeyAction(), btnEvent->GetKeyIntention());
     }
     return btnEvent;
@@ -113,7 +113,7 @@ void JoystickEventProcessor::CheckIntention(std::shared_ptr<PointerEvent> pointe
         UpdateButtonState(button);
         auto btnEvent = FormatButtonEvent(button);
         if (btnEvent != nullptr) {
-            MMI_HILOGI("Joystick_intention, No:%{public}d,KC:%{public}d,KA:%{public}d,Intention:%{public}d",
+            MMI_HILOGI("Joystick_intention, No:%{public}d,KC:%{private}d,KA:%{public}d,Intention:%{public}d",
                 btnEvent->GetId(), btnEvent->GetKeyCode(), btnEvent->GetKeyAction(), btnEvent->GetKeyIntention());
             handler(btnEvent);
         }
