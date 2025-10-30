@@ -266,6 +266,8 @@ private:
         int32_t &physicalY);
     bool GetHardCursorEnabled() override;
     bool IsHardCursorEnabled();
+    void ClearResources() override;
+    void ClearRunnerAndHandler();
 private:
     struct PidInfo {
         int32_t pid { 0 };
@@ -348,6 +350,8 @@ private:
     std::shared_ptr<PointerDrawingManager> self_ { nullptr };
     Rosen::OnRemoteDiedCallback OnRemoteDiedCallback_ { nullptr };
     std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ { nullptr };
+    bool isCleared_ { false };
+    std::mutex isClearedMtx_;
 };
 } // namespace MMI
 } // namespace OHOS
