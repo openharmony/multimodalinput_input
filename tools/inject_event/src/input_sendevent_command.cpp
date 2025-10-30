@@ -189,9 +189,7 @@ int32_t InputSendeventCommand::RunSendEvent()
         close(fd);
         return RET_ERR;
     }
-    if (fd >= 0) {
-        close(fd);
-    }
+    close(fd);
     return RET_OK;
 }
 } // namespace MMI
