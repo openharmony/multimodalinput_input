@@ -404,7 +404,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     int32_t lastPressedKey = -1;
     if (!pressedKeys.empty()) {
         lastPressedKey = pressedKeys.back();
-        MMI_HILOGD("The last repeat button, keyCode:%d", lastPressedKey);
+        MMI_HILOGD("The last repeat button, keyCode:%{private}d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
     EventStatistic::PushEvent(keyEvent);
@@ -433,7 +433,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
-        MMI_HILOGD("keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -501,7 +501,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
-        MMI_HILOGI("Pressed keyCode:%d", keyCode);
+        MMI_HILOGI("Pressed keyCode:%{private}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

@@ -238,7 +238,7 @@ void KeyMonitorManager::NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int
         MMI_HILOGI("Notify key monitor(PID:%{public}d)", session);
     } else {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGI("Notify key monitor(KC:%d, KA:%{public}d, PID:%{public}d)",
+            MMI_HILOGI("Notify key monitor(KC:%{private}d, KA:%{public}d, PID:%{public}d)",
                 keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), session);
         } else {
             MMI_HILOGI("Notify key monitor(KC:%{private}d, KA:%{public}d, PID:%{public}d)",
