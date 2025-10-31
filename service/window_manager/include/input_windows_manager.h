@@ -114,6 +114,7 @@ public:
     void LimitMouseLocaltionInEvent(const OLD::DisplayInfo *displayInfo, int32_t &integerX, int32_t &integerY,
         double &x, double &y, bool isRealData);
     void ClearPointerLockedWindow();
+    void RotateWindowArea(int32_t displayId, WindowInfo &window, Rect &windowArea);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const OLD::DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
@@ -607,7 +608,6 @@ private:
     mutable int32_t lastWinY_ { 0 };
     mutable std::pair<int32_t, int32_t> currentDisplayXY_ { 0, 0 };
     WindowInfo pointerLockedWindow_;
-    MouseLocation pointerLockedLocation_ = { -1, 0, 0 };
     Coordinate2D pointerLockedCursorPos_ = { 0.0, 0.0 };
 };
 } // namespace MMI
