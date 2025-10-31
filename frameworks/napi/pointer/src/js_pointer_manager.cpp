@@ -1147,7 +1147,10 @@ napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, Cus
     asyncContext->windowId = windowId;
     CHKPP(cursor.pixelMap);
     MessageParcel *pData = static_cast<MessageParcel*>(cursor.pixelMap);
-    CHKPP(pData);
+    if (pData == nullptr) {
+        delete asyncContext;
+        return nullptr;
+    }
     Media::PixelMap* pixelMapPtr =  Media::PixelMap::Unmarshalling(*pData);
     if (pixelMapPtr == nullptr) {
         delete asyncContext;
