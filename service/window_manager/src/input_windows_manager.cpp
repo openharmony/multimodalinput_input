@@ -8014,8 +8014,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
         RotateWindowArea(displayInfo->id, pointerLockedWindow_, windowArea);
         int32_t changeAreasShortestSide = pointerLockedWindow_.pointerChangeAreas[TOP_AREA];
         int32_t changeAreasLongestSide = pointerLockedWindow_.pointerChangeAreas[TOP_LEFT_AREA];
-       width = windowArea.x + windowArea.width - changeAreasShortestSide;
-       height = windowArea.y + windowArea.height - changeAreasShortestSide;
+        width = windowArea.x + windowArea.width - changeAreasShortestSide;
+        height = windowArea.y + windowArea.height - changeAreasShortestSide;
         if (displayDirection == DIRECTION0 || displayDirection == DIRECTION180) {
             width = std::min(width, displayInfo->validWidth);
             height = std::min(height, displayInfo->validHeight);
@@ -8041,8 +8041,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
         if (integerX >= width) {
             integerX = width - 1;
         }
-        if (integerY <= mouseY + changeAreasShortestSide) {
-            integerY = mouseY + changeAreasShortestSide + 1;
+        if (integerY <= windowArea.y + changeAreasShortestSide) {
+            integerY = windowArea.y + changeAreasShortestSide + 1;
         }
         if (integerY >= height) {
             integerY = height - 1;
@@ -8099,7 +8099,6 @@ void InputWindowsManager::ClearPointerLockedWindow()
     MMI_HILOGD("Clear pointer locked window");
 }
 
-
 void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window, Rect &windowArea)
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
@@ -8114,10 +8113,7 @@ void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window
         windowArea.width = static_cast<int32_t>(windowXYMaxResult[0] - windowArea.x);
         windowArea.height = static_cast<int32_t>(windowXYMaxResult[1] - windowArea.y);
         MMI_HILOGD("windowArea in transform, {X,Y}:{%{public}d,%{public}d}, {W,H}:{%{public}d,%{public}d}",
-            windowArea.x,
-            windowArea.y,
-            windowArea.width,
-            windowArea.height);
+            windowArea.x, windowArea.y, windowArea.width, windowArea.height);
     }
     Direction displayDirection = WIN_MGR->GetDisplayDirection(displayInfo);
     int32_t temp = 0;
@@ -8149,10 +8145,7 @@ void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window
             break;
     }
     MMI_HILOGD("windowArea {X,Y}:{%{public}d,%{public}d}, {W,H}:{%{public}d,%{public}d}",
-        windowArea.x,
-        windowArea.y,
-        windowArea.width,
-        windowArea.height);
+        windowArea.x, windowArea.y, windowArea.width, windowArea.height);
 }
 } // namespace MMI
 } // namespace OHOS
