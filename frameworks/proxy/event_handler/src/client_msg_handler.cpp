@@ -435,7 +435,6 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     }
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    MMI_HILOG_DISPATCHI("Client handlerType:%{public}d", handlerType);
     switch (handlerType) {
         case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
