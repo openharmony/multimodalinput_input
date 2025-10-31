@@ -7903,12 +7903,6 @@ std::shared_ptr<PointerEvent> InputWindowsManager::CreatePointerByLastPointer(in
 void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (!INPUT_DEV_MGR->HasPointerDevice() && !INPUT_DEV_MGR->HasVirtualPointerDevice()) {
-        MMI_HILOGD("The pointer device is not exist");
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t groupId = displayGroupInfo.groupId;
     if (groupId != DEFAULT_GROUP_ID) {
         MMI_HILOGD("groupId is error");
@@ -7936,18 +7930,20 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     }
     int32_t logicalX = 0;
     int32_t logicalY = 0;
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    RotateWindowArea(focusWindow.displayId, focusWindow, windowArea);
     auto mouseIt = mouseLocationMap_.find(groupId);
     if (mouseIt == mouseLocationMap_.end()) {
         MMI_HILOGD("failed to find groupId in mouseLocationMap: %{public}d", groupId);
-        mouseLocationMap_[groupId].physicalX = focusWindow.area.x + focusWindow.area.width / 2;
-        mouseLocationMap_[groupId].physicalY = focusWindow.area.y + focusWindow.area.height / 2;
+        mouseLocationMap_[groupId].physicalX = windowArea.x + windowArea.width / 2;
+        mouseLocationMap_[groupId].physicalY = windowArea.y + windowArea.height / 2;
         mouseIt = mouseLocationMap_.find(groupId);
     }
     auto cursorIt = cursorPosMap_.find(groupId);
     if (cursorIt == cursorPosMap_.end()) {
         MMI_HILOGD("failed to find groupId in cursorPosMap: %{public}d", groupId);
-        cursorPosMap_[groupId].cursorPos.x = focusWindow.area.x + focusWindow.area.width / 2;
-        cursorPosMap_[groupId].cursorPos.y = focusWindow.area.y + focusWindow.area.height / 2;
+        cursorPosMap_[groupId].cursorPos.x = windowArea.x + windowArea.width / 2;
+        cursorPosMap_[groupId].cursorPos.y = windowArea.y + windowArea.height / 2;
         cursorIt = cursorPosMap_.find(groupId);
     }
     logicalX = mouseIt->second.physicalX;
@@ -7958,8 +7954,6 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     if (IsInHotArea(logicalX, logicalY, focusWindow.pointerHotAreas, focusWindow) &&
         !SelectPointerChangeArea(focusWindowId, logicalX, logicalY)) {
         if (pointerLocked) {
-            pointerLockedLocation_.physicalX = mouseIt->second.physicalX;
-            pointerLockedLocation_.physicalY = mouseIt->second.physicalY;
             pointerLockedCursorPos_.x = cursorIt->second.cursorPos.x;
             pointerLockedCursorPos_.y = cursorIt->second.cursorPos.y;
         }
@@ -7972,14 +7966,12 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
                 MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
             }
             if (pointerLocked) {
-                pointerLockedCursorPos_.x = focusWindow.area.x + focusWindow.area.width / 2;
-                pointerLockedCursorPos_.y = focusWindow.area.y + focusWindow.area.height / 2;
-                pointerLockedLocation_.physicalX = focusWindow.area.x + focusWindow.area.width / 2;
-                pointerLockedLocation_.physicalY = focusWindow.area.y + focusWindow.area.height / 2;
+                pointerLockedCursorPos_.x = windowArea.x + windowArea.width / 2;
+                pointerLockedCursorPos_.y = windowArea.y + windowArea.height / 2;
             }
             if (pointerConfined && fistLockedWindowId) {
-                cursorIt->second.cursorPos.x = focusWindow.area.x + focusWindow.area.width / 2;
-                cursorIt->second.cursorPos.y = focusWindow.area.y + focusWindow.area.height / 2;
+                cursorIt->second.cursorPos.x = windowArea.x + windowArea.width / 2;
+                cursorIt->second.cursorPos.y = windowArea.y + windowArea.height / 2;
             }
             UpdateAndAdjustMouseLocation(
                 cursorIt->second.displayId, cursorIt->second.cursorPos.x, cursorIt->second.cursorPos.y);
@@ -8006,99 +7998,75 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
     const OLD::DisplayInfo *displayInfo, int32_t &integerX, int32_t &integerY, double &x, double &y, bool isRealData)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (!INPUT_DEV_MGR->HasPointerDevice() && !INPUT_DEV_MGR->HasVirtualPointerDevice()) {
-        MMI_HILOGD("The pointer device is not exist");
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    MMI_HILOGD("mouse capture mode before mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
+        integerX,
+        integerY,
+        x,
+        y);
     if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
         int32_t width = 0;
         int32_t height = 0;
-        int32_t mouseX = pointerLockedWindow_.area.x;
-        int32_t mouseY = pointerLockedWindow_.area.y;
         Direction displayDirection = WIN_MGR->GetDisplayDirection(displayInfo);
-        int32_t temp = 0;
-        switch (displayDirection) {
-            case DIRECTION0:
-                break;
-            case DIRECTION90:
-                temp = mouseX;
-                mouseX = mouseY;
-                mouseY = displayInfo->validWidth - temp - pointerLockedWindow_.area.width;
-                break;
-            case DIRECTION180:
-                mouseX = displayInfo->validWidth - mouseX - pointerLockedWindow_.area.width;
-                mouseY = displayInfo->validHeight - mouseY - pointerLockedWindow_.area.height;
-                break;
-            case DIRECTION270:
-                temp = mouseX;
-                mouseX = displayInfo->validHeight - mouseY - pointerLockedWindow_.area.height;
-                mouseY = temp;
-                break;
-            default:
-                MMI_HILOGE("unknown direction and coordinate is considered in condition DIRECTION0");
-                break;
-        }
+        Rect windowArea = { pointerLockedWindow_.area.x,
+            pointerLockedWindow_.area.y,
+            pointerLockedWindow_.area.width,
+            pointerLockedWindow_.area.height };
+        RotateWindowArea(displayInfo->id, pointerLockedWindow_, windowArea);
         int32_t changeAreasShortestSide = pointerLockedWindow_.pointerChangeAreas[TOP_AREA];
         int32_t changeAreasLongestSide = pointerLockedWindow_.pointerChangeAreas[TOP_LEFT_AREA];
+        width = windowArea.x + windowArea.width - changeAreasShortestSide;
+        height = windowArea.y + windowArea.height - changeAreasShortestSide;
         if (displayDirection == DIRECTION0 || displayDirection == DIRECTION180) {
-            width = mouseX + pointerLockedWindow_.area.width - changeAreasShortestSide;
-            height = mouseY + pointerLockedWindow_.area.height - changeAreasShortestSide;
             width = std::min(width, displayInfo->validWidth);
             height = std::min(height, displayInfo->validHeight);
         } else {
             if (!isRealData) {
-                width = mouseX + pointerLockedWindow_.area.width - changeAreasShortestSide;
-                height = mouseY + pointerLockedWindow_.area.height - changeAreasShortestSide;
                 width = std::min(width, displayInfo->validWidth);
                 height = std::min(height, displayInfo->validHeight);
             } else {
-                width = mouseX + pointerLockedWindow_.area.height - changeAreasShortestSide;
-                height = mouseY + pointerLockedWindow_.area.width - changeAreasShortestSide;
                 height = std::min(height, displayInfo->validWidth);
                 width = std::min(width, displayInfo->validHeight);
             }
         }
-        #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-            if (IsPointerActiveRectValid(*displayInfo)) {
-                width = std::min(width, displayInfo->pointerActiveWidth);
-                height = std::min(height, displayInfo->pointerActiveHeight);
-                MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
-            }
-        #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        if (integerX <= mouseX + changeAreasShortestSide) {
-            integerX = mouseX + changeAreasShortestSide + 1;
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+        if (IsPointerActiveRectValid(*displayInfo)) {
+            width = std::min(width, displayInfo->pointerActiveWidth);
+            height = std::min(height, displayInfo->pointerActiveHeight);
+            MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
+        }
+#endif // OHOS_BUILD_ENABLE_VKEYBOARD
+        if (integerY <= windowArea.y + changeAreasShortestSide) {
+            integerY = windowArea.y + changeAreasShortestSide + 1;
         }
         if (integerX >= width) {
             integerX = width - 1;
         }
-        if (integerY <= mouseY + changeAreasShortestSide) {
-            integerY = mouseY + changeAreasShortestSide + 1;
+        if (integerY <= windowArea.y + changeAreasShortestSide) {
+            integerY = windowArea.y + changeAreasShortestSide + 1;
         }
         if (integerY >= height) {
             integerY = height - 1;
         }
         if (changeAreasShortestSide < changeAreasLongestSide) {
-            if (integerX <= mouseX + changeAreasLongestSide &&
-                integerY <= mouseY + changeAreasLongestSide) {
-                integerX = mouseX + changeAreasLongestSide + 1;
-                integerY = mouseY + changeAreasLongestSide + 1;
+            if (integerX <= windowArea.x + changeAreasLongestSide &&
+                integerY <= windowArea.y + changeAreasLongestSide) {
+                integerX = windowArea.x + changeAreasLongestSide + 1;
+                integerY = windowArea.y + changeAreasLongestSide + 1;
             }
-            if (integerX <= mouseX + changeAreasLongestSide &&
-                integerY >= mouseY + pointerLockedWindow_.area.height - changeAreasLongestSide) {
-                integerX = mouseX + changeAreasLongestSide + 1;
-                integerY = mouseY + pointerLockedWindow_.area.height - changeAreasLongestSide - 1;
+            if (integerX <= windowArea.x + changeAreasLongestSide &&
+                integerY >= windowArea.y + windowArea.height - changeAreasLongestSide) {
+                integerX = windowArea.x + changeAreasLongestSide + 1;
+                integerY = windowArea.y + windowArea.height - changeAreasLongestSide - 1;
             }
-            if (integerX >= mouseX + pointerLockedWindow_.area.width - changeAreasLongestSide &&
-                integerY <= mouseY + changeAreasLongestSide) {
-                integerX = mouseX + pointerLockedWindow_.area.width - changeAreasLongestSide - 1;
-                integerY = mouseY + changeAreasLongestSide + 1;
+            if (integerX >= windowArea.x + windowArea.width - changeAreasLongestSide &&
+                integerY <= windowArea.y + changeAreasLongestSide) {
+                integerX = windowArea.x + windowArea.width - changeAreasLongestSide - 1;
+                integerY = windowArea.y + changeAreasLongestSide + 1;
             }
-            if (integerX >= mouseX + pointerLockedWindow_.area.width - changeAreasLongestSide &&
-                integerY >= mouseY + pointerLockedWindow_.area.height - changeAreasLongestSide) {
-                integerX = mouseX + pointerLockedWindow_.area.width - changeAreasLongestSide - 1;
-                integerY = mouseY + pointerLockedWindow_.area.height - changeAreasLongestSide - 1;
+            if (integerX >= windowArea.x + windowArea.width - changeAreasLongestSide &&
+                integerY >= windowArea.y + windowArea.height - changeAreasLongestSide) {
+                integerX = windowArea.x + windowArea.width - changeAreasLongestSide - 1;
+                integerY = windowArea.y + windowArea.height - changeAreasLongestSide - 1;
             }
         }
         x = static_cast<double>(integerX) + (x - floor(x));
@@ -8111,10 +8079,10 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
             y);
     }
     if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED) {
-        integerX = pointerLockedLocation_.physicalX;
-        integerY = pointerLockedLocation_.physicalY;
         x = pointerLockedCursorPos_.x;
         y = pointerLockedCursorPos_.y;
+        integerX = static_cast<int32_t>(x);
+        integerY = static_cast<int32_t>(y);
         MMI_HILOGD(
             "mouse capture mode limit mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
             integerX,
@@ -8129,6 +8097,55 @@ void InputWindowsManager::ClearPointerLockedWindow()
     pointerLockedWindow_.flags = 0;
     pointerLockedWindow_.id = -1;
     MMI_HILOGD("Clear pointer locked window");
+}
+
+void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window, Rect &windowArea)
+{
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(displayInfo);
+    Matrix3f transform(window.transform);
+    if (window.transform.size() == MATRIX3_SIZE && !transform.IsIdentity()) {
+        double windowXMax = windowArea.width;
+        double windowYMax = windowArea.height;
+        Vector3f windowXYMax(windowXMax, windowYMax, 1.0);
+        Matrix3f inverseTransform = transform.Inverse();
+        Vector3f windowXYMaxResult = inverseTransform * windowXYMax;
+        windowArea.width = static_cast<int32_t>(windowXYMaxResult[0] - windowArea.x);
+        windowArea.height = static_cast<int32_t>(windowXYMaxResult[1] - windowArea.y);
+        MMI_HILOGD("windowArea in transform, {X,Y}:{%{public}d,%{public}d}, {W,H}:{%{public}d,%{public}d}",
+            windowArea.x, windowArea.y, windowArea.width, windowArea.height);
+    }
+    Direction displayDirection = WIN_MGR->GetDisplayDirection(displayInfo);
+    int32_t temp = 0;
+    switch (displayDirection) {
+        case DIRECTION0:
+            break;
+        case DIRECTION90:
+            temp = windowArea.x;
+            windowArea.x = windowArea.y;
+            windowArea.y = displayInfo->validWidth - temp - windowArea.width;
+            temp = windowArea.height;
+            windowArea.height = windowArea.width;
+            windowArea.width = temp;
+            break;
+        case DIRECTION180:
+            windowArea.x = displayInfo->validWidth - windowArea.x - windowArea.width;
+            windowArea.y = displayInfo->validHeight - windowArea.y - windowArea.height;
+            break;
+        case DIRECTION270:
+            temp = windowArea.x;
+            windowArea.x = displayInfo->validHeight - windowArea.y - windowArea.height;
+            windowArea.y = temp;
+            temp = windowArea.height;
+            windowArea.height = windowArea.width;
+            windowArea.width = temp;
+            break;
+        default:
+            MMI_HILOGE("unknown direction and coordinate is considered in condition DIRECTION0");
+            break;
+    }
+    MMI_HILOGD("windowArea {X,Y}:{%{public}d,%{public}d}, {W,H}:{%{public}d,%{public}d}",
+        windowArea.x, windowArea.y, windowArea.width, windowArea.height);
 }
 } // namespace MMI
 } // namespace OHOS
