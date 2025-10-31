@@ -937,6 +937,11 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         cJSON_AddItemToArray(jsonArray, jsonData);
     }
     char *jsonString = cJSON_Print(jsonArray);
+    if (jsonString == nullptr) {
+        cJSON_Delete(jsonArray);
+        MMI_HILOGE("Failed to print JSON");
+        return {};
+    }
     std::string result = std::string(jsonString);
     cJSON_Delete(jsonArray);
     cJSON_free(jsonString);
