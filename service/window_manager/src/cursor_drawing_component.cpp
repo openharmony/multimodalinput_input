@@ -159,7 +159,7 @@ void CursorDrawingComponent::UnLoad()
         MMI_HILOGI("%{public}s has been UnLoaded", MULTIMODAL_PATH_NAME);
         return;
     }
-
+    pointerInstance_->ClearResources();
     if (dlclose(soHandle_) != 0) {
         const char *errorMsg = dlerror();
         MMI_HILOGE("dlclose %{public}s failed, err msg:%{public}s", MULTIMODAL_PATH_NAME,
