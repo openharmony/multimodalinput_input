@@ -305,26 +305,18 @@ PointerDrawingManager::PointerDrawingManager()
 
 PointerDrawingManager::~PointerDrawingManager()
 {
-    MMI_HILOGI("~PointerDrawingManager enter");
-    if (IsHardCursorEnabled()) {
-        if (runner_ != nullptr) {
-            runner_->Stop();
-        }
-        if ((renderThread_ != nullptr) && renderThread_->joinable()) {
-            renderThread_->join();
-        }
-        if (softCursorRunner_ != nullptr) {
-            softCursorRunner_->Stop();
-        }
-        if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
-            softCursorRenderThread_->join();
-        }
-        if (moveRetryRunner_ != nullptr) {
-            moveRetryRunner_->Stop();
-        }
-        if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
-            moveRetryThread_->join();
-        }
+    ClearResources();
+    MMI_HILOGI("~PointerDrawingManager");
+}
+
+void PointerDrawingManager::ClearResources()
+{
+    std::lock_guard<std::mutex> lock(isClearedMtx_);
+    if (isCleared_) {
+        return;
+    }
+    if (GetHardCursorEnabled()) {
+        ClearRunnerAndHandler();
         if (commonEventSubscriber_ != nullptr) {
             if (!OHOS::EventFwk::CommonEventManager::NewUnSubscribeCommonEventSync(commonEventSubscriber_)) {
                 MMI_HILOGW("UnSubscribeCommonEvent failed");
@@ -353,7 +345,30 @@ PointerDrawingManager::~PointerDrawingManager()
     }
     INPUT_DEV_MGR->Detach(self_);
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
-    MMI_HILOGI("~PointerDrawingManager complete");
+    isCleared_ = true;
+    MMI_HILOGI("resources of PointerDrawingManager is cleared");
+}
+
+void PointerDrawingManager::ClearRunnerAndHandler()
+{
+    if (runner_ != nullptr) {
+        runner_->Stop();
+    }
+    if ((renderThread_ != nullptr) && renderThread_->joinable()) {
+        renderThread_->join();
+    }
+    if (softCursorRunner_ != nullptr) {
+        softCursorRunner_->Stop();
+    }
+    if ((softCursorRenderThread_ != nullptr) && softCursorRenderThread_->joinable()) {
+        softCursorRenderThread_->join();
+    }
+    if (moveRetryRunner_ != nullptr) {
+        moveRetryRunner_->Stop();
+    }
+    if ((moveRetryThread_ != nullptr) && moveRetryThread_->joinable()) {
+        moveRetryThread_->join();
+    }
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
