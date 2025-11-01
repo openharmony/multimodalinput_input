@@ -17,12 +17,10 @@
 #include "define_multimodal.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "inputMonitor_ani_constructor"
+#define MMI_LOG_TAG "aniInputMonitorCtor"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
-    CHKPR(vm, ANI_ERROR);
-    CHKPR(result, ANI_ERROR);
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         MMI_HILOGE("Failed to get ANI environment");

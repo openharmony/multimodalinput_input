@@ -149,7 +149,7 @@ group("input_ets_group") {
   deps = [
     "frameworks/ets/input_event:ets_inputEvent_package",
     "frameworks/ets/intention_code:ets_intentionCode_package",
-    "frameworks/ets/input_monitor:ets_inputMonitor_package",
+    #"frameworks/ets/input_monitor:ets_inputMonitor_package",
     "frameworks/ets/key_code:ets_keyCode_package",
     "frameworks/ets/key_event:ets_keyEvent_package",
     "frameworks/ets/mouse_event:ets_mouseEvent_package",
