@@ -89,7 +89,6 @@ public:
 
     std::string GetInputDeviceById(int32_t id);
     std::string GetInputNodeNameByCfg(int32_t id);
-    bool GetRsIdByNodeNameCfg(const std::string &nodeName, int32_t &cfgRsId);
     std::string GetContent(const std::string &fileName);
     std::string GetInputNode(const std::string &inputNodeName);
 
