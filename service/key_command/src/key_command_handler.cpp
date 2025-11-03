@@ -925,7 +925,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
-        return {};
+        return "";
     }
     cJSON *jsonArray = cJSON_CreateArray();
     CHKFR(jsonArray, {}, "Invalid jsonArray");
@@ -937,6 +937,11 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         cJSON_AddItemToArray(jsonArray, jsonData);
     }
     char *jsonString = cJSON_Print(jsonArray);
+    if (jsonString == nullptr) {
+        cJSON_Delete(jsonArray);
+        MMI_HILOGE("Failed to print JSON");
+        return "";
+    }
     std::string result = std::string(jsonString);
     cJSON_Delete(jsonArray);
     cJSON_free(jsonString);

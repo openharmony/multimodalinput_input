@@ -5210,12 +5210,14 @@ void MMIService::UpdateConsumers(const cJSON* consumer)
     cJSON* name = cJSON_GetObjectItemCaseSensitive(consumer, "name");
     if (name != nullptr && cJSON_IsString(name)) {
         char *nameString = cJSON_Print(name);
-        std::string nameStr(nameString);
-        if (!nameStr.empty() && nameStr.front() == '"' && nameStr.back() == '"') {
-            nameStr = nameStr.substr(QUOTES_BEGIN, nameStr.size() - QUOTES_END);
+        if (nameString != nullptr) {
+            std::string nameStr(nameString);
+            if (!nameStr.empty() && nameStr.front() == '"' && nameStr.back() == '"') {
+                nameStr = nameStr.substr(QUOTES_BEGIN, nameStr.size() - QUOTES_END);
+            }
+            deviceConsumer.name = nameStr;
+            cJSON_free(nameString);
         }
-        deviceConsumer.name = nameStr;
-        cJSON_free(nameString);
     }
     cJSON* uid_array = cJSON_GetObjectItemCaseSensitive(consumer, "uids");
     if (uid_array != nullptr && cJSON_IsArray(uid_array)) {

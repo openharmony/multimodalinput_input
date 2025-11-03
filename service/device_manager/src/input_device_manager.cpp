@@ -386,7 +386,17 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device *i
     int32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
     int32_t deviceProduct = libinput_device_get_id_product(inputDevice);
     struct udev_device *udevDevice = libinput_device_get_udev_device(inputDevice);
-    std::string sysPath = udev_device_get_syspath(udevDevice);
+    if (udevDevice == nullptr) {
+        MMI_HILOGE("Failed to get udev device");
+        return "";
+    }
+    const char* sysPathCStr = udev_device_get_syspath(udevDevice);
+    if (sysPathCStr == nullptr) {
+        udev_device_unref(udevDevice);
+        MMI_HILOGE("Failed to get syspath from udev device");
+        return "";
+    }
+    std::string sysPath(sysPathCStr);
     udev_device_unref(udevDevice);
     if ((deviceVendor < 0) || (deviceProduct < 0) || sysPath.empty()) {
         MMI_HILOGE("Get device identification failed");
