@@ -87,18 +87,12 @@ public:
         const ConsumerParmType &param, callbackType &&cb, uintptr_t opq);
     static bool IsOnFunc(MONITORFUNTYPE funType)
     {
-        if (funType >= MONITORFUNTYPE::ON_TOUCH && funType <= MONITORFUNTYPE::ON_KEYPRESSED_KEYS) {
-            return true;
-        }
-        return false;
+        return funType >= MONITORFUNTYPE::ON_TOUCH && funType <= MONITORFUNTYPE::ON_KEYPRESSED_KEYS;
     }
 
     static bool IsOffFunc(MONITORFUNTYPE funType)
     {
-        if (funType >= MONITORFUNTYPE::OFF_TOUCH && funType <= MONITORFUNTYPE::OFF_KEYPRESSED_KEYS) {
-            return true;
-        }
-        return false;
+        return funType >= MONITORFUNTYPE::OFF_TOUCH && funType <= MONITORFUNTYPE::OFF_KEYPRESSED_KEYS;
     }
 
 protected:
