@@ -292,15 +292,12 @@ void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) c
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    {
-        std::lock_guard<std::mutex> guard(mutex_);
-        auto typeName = GetTypeName();
-        if (typeName == INVALID_TYPE_NAME || typeName != "keyPressed") {
-            MMI_HILOGE("Failed to process key event.");
-            return;
-        }
-        OnAniKeyEvent(keyEvent);
+    auto typeName = GetTypeName();
+    if (typeName == INVALID_TYPE_NAME || typeName != "keyPressed") {
+        MMI_HILOGE("Failed to process key event.");
+        return;
     }
+    OnAniKeyEvent(keyEvent);
 }
 
 bool AniInputMonitorConsumer::IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -1011,6 +1008,7 @@ void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> po
 void AniInputMonitorConsumer::OnAniKeyEvent(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     if (!isMonitoring_) {
         MMI_HILOGE("Js monitor stop");
         return;
