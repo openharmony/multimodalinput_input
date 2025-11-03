@@ -792,7 +792,7 @@ void AniInputMonitorConsumer::OnFourFingersSwipeCallback(std::shared_ptr<Pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-	if (!aniCallback_) {
+    if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
     }
