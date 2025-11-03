@@ -14,6 +14,7 @@
  */
 
 @!namespace("@ohos.multimodalInput.pointer", "pointer")
+@!sts_inject_into_module("import image from '@ohos.multimedia.image';")
 @!sts_inject("""
 static { loadLibraryWithPermissionCheck("Pointer.z", "@ohos.multimodalInput.pointer") }
 """)
@@ -91,3 +92,157 @@ function SetPointerStyleAsync(windowId: i32, pointerStyle: PointerStyle): void;
 function SetPointerVisibleSync(visible: bool): void;
 function GetPointerStyleSync(windowId: i32): PointerStyle;
 function SetPointerStyleSync(windowId: i32, pointerStyle: PointerStyle): void;
+
+struct CustomCursor {
+    pixelMap: @sts_type("image.PixelMap") Opaque;
+    focusX: Optional<i32>;
+    focusY: Optional<i32>;
+}
+
+@gen_async("setPointerVisible")
+@gen_promise("setPointerVisible")
+function SetPointerVisibleAsync(visible: bool): void;
+
+@gen_async("setPointerSpeed")
+@gen_promise("setPointerSpeed")
+function SetPointerSpeedAsync(speed: i32): void;
+
+@gen_async("getPointerSpeed")
+@gen_promise("getPointerSpeed")
+function GetPointerSpeedAsync(): i32;
+
+@gen_async("isPointerVisible")
+@gen_promise("isPointerVisible")
+function IsPointerVisibleAsync(): bool;
+
+@gen_async("getPointerStyle")
+@gen_promise("getPointerStyle")
+function GetPointerStyleAsync(windowId: i32): PointerStyle;
+
+@gen_async("getTouchpadDoubleTapAndDragState")
+@gen_promise("getTouchpadDoubleTapAndDragState")
+function GetTouchpadDoubleTapAndDragStateAsync(): bool;
+
+@gen_async("setTouchpadDoubleTapAndDragState")
+@gen_promise("setTouchpadDoubleTapAndDragState")
+function SetTouchpadDoubleTapAndDragStateAsync(isOpen: bool): void;
+
+function SetCustomCursorSync(windowId: i32, pixelMap: @sts_type("image.PixelMap") Opaque, focusX: Optional<i32>, focusY: Optional<i32>): void;
+
+@gen_promise("setCustomCursor")
+@overload("setCustomCursorAsync")
+function SetCustomCursorPixelMapAsync(windowId: i32, pixelMap: @sts_type("image.PixelMap") Opaque, focusX: Optional<i32>, focusY: Optional<i32>): void;
+
+@gen_promise("setCustomCursor")
+@overload("setCustomCursorAsync")
+function SetCustomCursorAsync(windowId: i32, cursor: CustomCursor, config: CursorConfig): void;
+
+function GetPointerSpeedSync(): i32;
+
+@gen_async("getTouchpadRightClickType")
+@gen_promise("getTouchpadRightClickType")
+function GetTouchpadRightClickTypeAsync(): RightClickType;
+
+@gen_async("setTouchpadRightClickType")
+@gen_promise("setTouchpadRightClickType")
+function SetTouchpadRightClickTypeAsync(type: RightClickType): void;
+
+@gen_async("getTouchpadSwipeSwitch")
+@gen_promise("getTouchpadSwipeSwitch")
+function GetTouchpadSwipeSwitchAsync(): bool;
+
+@gen_async("setTouchpadSwipeSwitch")
+@gen_promise("setTouchpadSwipeSwitch")
+function SetTouchpadSwipeSwitchAsync(state: bool): void;
+
+@gen_async("getTouchpadPinchSwitch")
+@gen_promise("getTouchpadPinchSwitch")
+function GetTouchpadPinchSwitchAsync(): bool;
+
+@gen_async("setTouchpadPinchSwitch")
+@gen_promise("setTouchpadPinchSwitch")
+function SetTouchpadPinchSwitchAsync(state: bool): void;
+
+@gen_async("getTouchpadPointerSpeed")
+@gen_promise("getTouchpadPointerSpeed")
+function GetTouchpadPointerSpeedAsync(): i32;
+
+@gen_async("setTouchpadPointerSpeed")
+@gen_promise("setTouchpadPointerSpeed")
+function SetTouchpadPointerSpeedAsync(speed: i32): void;
+
+@gen_async("getTouchpadTapSwitch")
+@gen_promise("getTouchpadTapSwitch")
+function GetTouchpadTapSwitchAsync(): bool;
+
+@gen_async("setTouchpadTapSwitch")
+@gen_promise("setTouchpadTapSwitch")
+function SetTouchpadTapSwitchAsync(state: bool): void;
+
+@gen_async("getTouchpadScrollDirection")
+@gen_promise("getTouchpadScrollDirection")
+function GetTouchpadScrollDirectionAsync(): bool;
+
+@gen_async("setTouchpadScrollDirection")
+@gen_promise("setTouchpadScrollDirection")
+function SetTouchpadScrollDirectionAsync(state: bool): void;
+
+@gen_async("getTouchpadScrollSwitch")
+@gen_promise("getTouchpadScrollSwitch")
+function GetTouchpadScrollSwitchAsync(): bool;
+
+@gen_async("setTouchpadScrollSwitch")
+@gen_promise("setTouchpadScrollSwitch")
+function SetTouchpadScrollSwitchAsync(state: bool): void;
+
+@gen_async("getMouseScrollRows")
+@gen_promise("getMouseScrollRows")
+function GetMouseScrollRowsAsync(): i32;
+
+@gen_async("setMouseScrollRows")
+@gen_promise("setMouseScrollRows")
+function SetMouseScrollRowsAsync(rows: i32): void;
+
+@gen_async("getHoverScrollState")
+@gen_promise("getHoverScrollState")
+function GetHoverScrollStateAsync(): bool;
+
+@gen_async("setHoverScrollState")
+@gen_promise("setHoverScrollState")
+function SetHoverScrollStateAsync(state: bool): void;
+
+@gen_async("getMousePrimaryButton")
+@gen_promise("getMousePrimaryButton")
+function GetMousePrimaryButtonAsync(): PrimaryButton;
+
+@gen_async("setMousePrimaryButton")
+@gen_promise("setMousePrimaryButton")
+function SetMousePrimaryButtonAsync(primary: PrimaryButton): void;
+
+@gen_async("getPointerSize")
+@gen_promise("getPointerSize")
+function GetPointerSizeAsync(): i32;
+
+function SetPointerSizeSync(size: i32): void;
+
+@gen_async("setPointerSize")
+@gen_promise("setPointerSize")
+function SetPointerSizeAsync(size: i32): void;
+
+@gen_async("getPointerColor")
+@gen_promise("getPointerColor")
+function GetPointerColorAsync(): i32;
+
+function SetPointerColorSync(color: i32): void;
+
+@gen_async("setPointerColor")
+@gen_promise("setPointerColor")
+function SetPointerColorAsync(color: i32): void;
+
+function SetPointerSpeedSync(speed: i32): void;
+
+function IsPointerVisibleSync(): bool;
+
+function GetPointerColorSync(): i32;
+
+function GetPointerSizeSync(): i32;
