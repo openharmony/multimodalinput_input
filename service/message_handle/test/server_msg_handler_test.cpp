@@ -1835,12 +1835,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RegisterWindowStateErrorCall
     sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
     EXPECT_EQ(ret, RET_ERR);
-    sess->SetTokenType(TOKEN_HAP);
+    sess->programName_ = "com.ohos.sceneboard";
     ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
-    EXPECT_EQ(ret, RET_ERR);
-    sess->SetTokenType(TOKEN_NATIVE);
-    ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -2514,12 +2511,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_003, TestSize.
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     sess->SetTokenType(TOKEN_SYSTEM_HAP);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    OLD::DisplayGroupInfo displayGroupInfo {
-        .focusWindowId = 10,
-        .currentUserId = 20,
-    };
-    pkt << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
-    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    UserScreenInfo userScreenInfo;
+    pkt << userScreenInfo.userId << userScreenInfo.userState << num;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
 
