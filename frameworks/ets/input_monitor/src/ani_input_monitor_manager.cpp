@@ -195,7 +195,7 @@ bool AniInputMonitorManager::RemoveMonitor(MONITORFUNTYPE funType, taihe::option
         return false;
     }
     std::lock_guard guard(mutex_);
-    if (false == opq.has_value()) {
+    if (!opq.has_value()) {
         for (auto it = monitors_.begin(); it != monitors_.end();) {
             auto monitor = it->second;
             if (monitor->CheckOffFuncParam(funType, fingers)) {
