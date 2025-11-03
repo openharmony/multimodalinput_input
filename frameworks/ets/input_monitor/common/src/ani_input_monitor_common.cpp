@@ -104,6 +104,7 @@ int32_t TaiheMonitorConverter::TouchActionToTaihe(int32_t action, TaiheTouchActi
         // 0702 The value corresponding to pull_down pull_move pull_up is not defined in the code
         default: {
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -123,6 +124,7 @@ int32_t TaiheMonitorConverter::SourceTypeToTaihe(int32_t sourceType, TaiheSource
         }
         default: {
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -143,6 +145,7 @@ int32_t TaiheMonitorConverter::FixedModeToTaihe(PointerEvent::FixedMode fixedMod
         // 0702 The value of the corresponding TaiheTouchAction::key_t::PEN is not implemented in the code
         default: {
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -209,6 +212,7 @@ int32_t TaiheMonitorConverter::TouchGestureActionToTaihe(int32_t action, TaiheTo
         default: {
             MMI_HILOGW("unknow action, action:%{public}d", action);
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -257,6 +261,7 @@ int32_t TaiheMonitorConverter::PinchActionToTaihe(int32_t action, TaiheGestureAc
         default: {
             MMI_HILOGD("Abnormal pointer action in pinch event");
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -282,6 +287,7 @@ int32_t TaiheMonitorConverter::SwipeInwardActionToTaihe(int32_t action, TaiheGes
         default: {
             MMI_HILOGE("Abnormal pointer action in swipe event");
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -306,6 +312,7 @@ int32_t TaiheMonitorConverter::SwipeActionToTaihe(int32_t action, TaiheGestureAc
         default: {
             MMI_HILOGD("Abnormal pointer action in swipe event");
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -322,6 +329,7 @@ int32_t TaiheMonitorConverter::MultiTapActionToTaihe(int32_t action, TaiheGestur
         default: {
             MMI_HILOGD("Abnormal pointer action in multi tap event");
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -484,6 +492,7 @@ int32_t TaiheMonitorConverter::FingerprintActionToTaihe(int32_t action, TaiheFin
         default: {
             MMI_HILOGE("Wrong action is %{public}d", action);
             ret = RET_ERR;
+            break;
         }
     }
     return ret;
@@ -714,6 +723,7 @@ int32_t TaiheMonitorConverter::MouseActionToTaihe(int32_t action, TaiheMouseActi
         default: {
             MMI_HILOGD("Abnormal pointer action");
             ret = RET_ERR;
+            break;
         }
         // 0702 The translation lacks the interface layer Action_down, Action_up,
     }
