@@ -789,5 +789,23 @@ HWTEST_F(KeyEventTest, KeyEventTest_Hash_001, TestSize.Level1)
     CHKPV(KeyEvent2);
     EXPECT_EQ(KeyEvent->Hash(), KeyEvent2->Hash());
 }
+
+/**
+ * @tc.name: KeyEventTest_IsKeyPressed
+ * @tc.desc: Verify IsKeyPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_IsKeyPressed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    auto result = keyEvent->IsKeyPressed(keyCode);
+    ASSERT_FALSE(result);
+    auto ret = keyEvent->HasKeyItem(keyCode);
+    ASSERT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
