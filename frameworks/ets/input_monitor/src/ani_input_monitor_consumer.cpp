@@ -277,8 +277,8 @@ std::shared_ptr<AniInputMonitorConsumer> AniInputMonitorConsumer::CreateAniInput
             keys = *pVal;
             break;
         }
-    default:
-        break;
+        default:
+            break;
     }
     std::shared_ptr<CallbackObject> callback;
     if (!ANI_INPUT_MONITOR_MGR.CreateCallback(std::forward<callbackType>(cb), opq, callback)) {
@@ -370,7 +370,9 @@ bool AniInputMonitorConsumer::PrepareData(std::shared_ptr<PointerEvent> pointerE
         if (++flowCtrl_ < MOUSE_FLOW) {
             MMI_HILOGE("Failed to flowCtrl_");
             return false;
-        } else { flowCtrl_ = 0; }
+        } else {
+            flowCtrl_ = 0;
+        }
     }
     auto typeName = GetTypeName();
     CHKFR(typeName != INVALID_TYPE_NAME, false, "Failed to process pointer event");
