@@ -93,6 +93,10 @@ bool CheckCustomCursor(OHOS::MMI::CustomCursor &cursor)
         return false;
     }
     OHOS::Media::PixelMap* newPixelMap = static_cast<OHOS::Media::PixelMap*>(cursor.pixelMap);
+    if (newPixelMap == nullptr) {
+        MMI_HILOGE("newPixelMap is invalid");
+        return false;
+    }
     if (newPixelMap->GetWidth() > MAX_PIXELMAP_SIZE || newPixelMap->GetHeight() > MAX_PIXELMAP_SIZE) {
         return false;
     }
@@ -166,7 +170,7 @@ void SetPointerStyleSync(int32_t windowId, TaihePointerStyle pointerStyle)
 {
     OHOS::MMI::PointerStyle style;
     style.id = pointerStyle;
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetInstance()->SetPointerStyle(windowId, style);
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
         MMI_HILOGE("failed to get default SetPointerStyle!");
