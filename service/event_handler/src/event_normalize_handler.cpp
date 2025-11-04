@@ -15,6 +15,8 @@
 
 #include "event_normalize_handler.h"
 
+#include <unordered_set>
+
 #include "bytrace_adapter.h"
 #include "crown_transform_processor.h"
 #include "dfx_hisysevent.h"
@@ -26,6 +28,10 @@
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+#include "i_joystick_event_normalize.h"
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
+#include "i_input_windows_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_scene_board_judgement.h"
@@ -903,7 +909,7 @@ int32_t EventNormalizeHandler::HandleJoystickButtonEvent(libinput_event *event)
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package joystick button event");
-    auto keyEvent = joystick_.OnButtonEvent(event);
+    auto keyEvent = JOYSTICK_NORMALIZER->OnButtonEvent(event);
     BytraceAdapter::StopPackageEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(keyEvent);
@@ -919,7 +925,7 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package joystick axis event");
-    auto pointerEvent = joystick_.OnAxisEvent(event);
+    auto pointerEvent = JOYSTICK_NORMALIZER->OnAxisEvent(event);
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     PointerEventSetPressedKeys(pointerEvent);
@@ -928,7 +934,7 @@ int32_t EventNormalizeHandler::HandleJoystickAxisEvent(libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     nextHandler_->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
-    joystick_.CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
+    JOYSTICK_NORMALIZER->CheckIntention(pointerEvent, [this](std::shared_ptr<KeyEvent> keyEvent) {
         BytraceAdapter::StartBytrace(keyEvent);
         EventStatistic::PushKeyEvent(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
