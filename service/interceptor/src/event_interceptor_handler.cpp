@@ -56,14 +56,12 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
         }
     } else if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event:%{private}d", keyEvent->GetKeyCode());
-        localHotKeyHandler_.MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         DfxHisysevent::ReportKeyEvent("intercept");
         return;
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
-    localHotKeyHandler_.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
 }
 
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
