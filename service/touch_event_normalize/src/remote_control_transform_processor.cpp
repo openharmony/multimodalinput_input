@@ -140,7 +140,10 @@ bool Remote_ControlTransformProcessor::HandlePostInner(struct libinput_event* ev
     pointerItem.SetWindowY(0);
     pointerItem.SetWindowXPos(0.0);
     pointerItem.SetWindowYPos(0.0);
-    pointerItem.SetPointerId(0);
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPF(touch);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+    pointerItem.SetPointerId(seatSlot);
     pointerItem.SetPressed(isPressed_);
 
     int64_t time = GetSysClockTime();
@@ -148,12 +151,9 @@ bool Remote_ControlTransformProcessor::HandlePostInner(struct libinput_event* ev
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetDeviceId(deviceId_);
-    auto touch = libinput_event_get_touch_event(event);
-    CHKPF(touch);
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
-    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     pointerItem.SetMoveFlag(POINTER_MOVEFLAG);
     pointerItem.SetPressure(pressure);
     pointerItem.SetLongAxis(longAxis);
