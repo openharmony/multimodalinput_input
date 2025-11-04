@@ -54,21 +54,22 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
     CALL_DEBUG_ENTER;
     std::vector<int64_t> vecPattern;
     if (infraredFrequency <= 0) {
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.value of infraredFrequencymust be greater than 0");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR,
+        "Parameter error.value of infraredFrequencymust be greater than 0");
         return;
     }
     for (auto it = pattern.begin(); it != pattern.end(); ++it) {
         if (*it <= 0) {
             taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
-                "Parameter error.The element of pattern must be positive.");
+            "Parameter error.The element of pattern must be positive.");
             return;
         }
         vecPattern.push_back(*it);
     }
     if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
-         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
-                "Parameter error.The size of pattern must be less than or equal 50.");
-            return;
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+        "Parameter error.The size of pattern must be less than or equal 50.");
+        return;
     }
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->TransmitInfrared(infraredFrequency, vecPattern);
     if (ret != RET_OK) {
