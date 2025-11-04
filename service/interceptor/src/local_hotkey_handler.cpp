@@ -570,11 +570,18 @@ bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
     if (!hotKeyOpt) {
         return false;
     }
-    auto action = steward_.QueryAction(*hotKeyOpt);
+    auto action = LocalHotKeyAction::INTERCEPT;
+
+    if (auto iter = consumedKeys_.find(keyEvent->GetKeyCode()); iter != consumedKeys_.cend()) {
+        action = iter->second;
+    } else {
+        action = steward_.QueryAction(*hotKeyOpt);
+        MarkProcessed(keyEvent, action);
+    }
     switch (action) {
         case LocalHotKeyAction::COPY: {
-            if (intercept && intercept(keyEvent)) {
-                MarkProcessed(keyEvent, LocalHotKeyAction::INTERCEPT);
+            if (intercept) {
+                intercept(keyEvent);
             }
             return true;
         }
