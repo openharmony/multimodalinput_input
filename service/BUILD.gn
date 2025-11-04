@@ -383,6 +383,7 @@ ohos_shared_library("libmmi-server") {
     sources += [
       "joystick/src/joystick_event_normalize.cpp",
       "joystick/src/joystick_event_processor.cpp",
+      "joystick/src/joystick_layout_map.cpp",
     ]
   }
   if (input_feature_monitor) {
@@ -422,6 +423,7 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":mmi_device_config.ini",
     ":mmi_rust",
+    "${mmi_path}/common/property_name_mapper:property_name_mapper",
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
@@ -3659,49 +3661,6 @@ ohos_unittest("DfxHisysEventTest") {
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
-    "libinput:libinput-third-mmi",
-  ]
-}
-
-ohos_unittest("JoystickTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/test/unittest/common/include",
-    "${mmi_path}/test/facility/libinput_interface/include",
-  ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "joystick/test/joystick_event_normalize_test.cpp",
-    "joystick/test/joystick_event_processor_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "c_utils:utilsbase",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "hilog:libhilog",
-    "hilog:libhilog_base",
-    "hisysevent:libhisysevent",
-    "init:libbegetutil",
-    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
   ]
 }

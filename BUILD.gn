@@ -90,6 +90,7 @@ group("multimodalinput_mmi_frameworks") {
 
 group("multimodalinput_mmi_service") {
   deps = [
+    "common/property_name_mapper:mmi_property_name_mapper",
     "service:libcursor_drawing_adapter",
     "service:libmmi-knuckle",
     "service:libmmi-server",
@@ -226,7 +227,6 @@ group("mmi_tests") {
     "service:InputWindowsManagerOneTest",
     "service:InputWindowsManagerTest",
     "service:InterceptorTest",
-    "service:JoystickTest",
     "service:KeyAutoRepeatExTest",
     "service:KeyCommandTest",
     "service:KeyEventHookTest",

@@ -19,6 +19,7 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_preference_manager.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

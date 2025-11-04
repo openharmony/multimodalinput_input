@@ -16,16 +16,29 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "input_device_manager.h"
+#include "key_auto_repeat.h"
+#include "key_map_manager.h"
+#include "libinput_mock.h"
 
 namespace OHOS {
 namespace MMI {
+using namespace testing;
 using namespace testing::ext;
 
 class InputDeviceManagerTestWithMock : public testing::Test {
 public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void SetUpTestCase();
+    static void TearDownTestCase();
 };
+
+void InputDeviceManagerTestWithMock::SetUpTestCase()
+{}
+
+void InputDeviceManagerTestWithMock::TearDownTestCase()
+{
+    KeyMapManager::ReleaseInstance();
+    KeyAutoRepeat::ReleaseInstance();
+}
 
 class InputDeviceObserver : public IDeviceObserver {
 public:
@@ -44,6 +57,44 @@ HWTEST_F(InputDeviceManagerTestWithMock, InputDeviceManager_001, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     EXPECT_TRUE(INPUT_DEV_MGR->observers_.empty());
+}
+
+/**
+ * @tc.name: GetLibinputDevice_001
+ * @tc.desc: Test the function InputDeviceManager::GetLibinputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, GetLibinputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 888 };
+    auto dev = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
+    EXPECT_EQ(dev, nullptr);
+}
+
+/**
+ * @tc.name: GetLibinputDevice_002
+ * @tc.desc: Test the function InputDeviceManager::GetLibinputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, GetLibinputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char sysName[] { "event1" };
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(sysName));
+    EXPECT_CALL(libinputMock, DeviceGetSysname).WillRepeatedly(Return(sysName));
+    EXPECT_CALL(*KeyMapMgr, InputTransferKeyValue).WillRepeatedly(Return(std::vector<int32_t>()));
+    EXPECT_CALL(*KeyRepeat, GetDeviceConfig).WillRepeatedly(Return(std::map<int32_t, DeviceConfig>()));
+
+    libinput_device rawDev {};
+    INPUT_DEV_MGR->OnInputDeviceAdded(&rawDev);
+
+    int32_t deviceId { 1 };
+    auto dev = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
+    EXPECT_EQ(dev, &rawDev);
 }
 
 /**
