@@ -21,13 +21,12 @@ copy_taihe_idl("infrared_emitter_taihe") {
 config("infraredEmitter_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "include",
-  ]
+  include_dirs = [ "include" ]
 }
 subsystem_name = "multimodalinput"
 part_name = "input"
-taihe_generated_file_path_infraredEmitter = "$taihe_file_path/out/$subsystem_name/$part_name/infraredEmitter"
+taihe_generated_file_path_infraredEmitter =
+    "$taihe_file_path/out/$subsystem_name/$part_name/infraredEmitter"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_infraredEmitter}"
   deps = [ ":infrared_emitter_taihe" ]
@@ -93,7 +92,7 @@ generate_static_abc("input_infrared_emitter_taihe_test") {
 
 group("ets_infraredEmitter_package") {
   deps = [
-    ":infrared_emitter_etc",
     ":InfraredEmitter",
+    ":infrared_emitter_etc",
   ]
 }
