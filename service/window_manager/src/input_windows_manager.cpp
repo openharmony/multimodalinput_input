@@ -6400,8 +6400,11 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     double oldX = x;
     double oldY = y;
     int32_t lastDisplayId = displayId;
-    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) != WindowInfo::FLAG_BIT_POINTER_LOCKED &&
-        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) != WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
+        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+        displayInfo = GetPhysicalDisplay(pointerLockedWindow_.displayId);
+        displayId = pointerLockedWindow_.displayId;
+    } else {
         if (!IsInsideDisplay(*displayInfo, x, y)) {
             FindPhysicalDisplay(*displayInfo, x, y, displayId);
             MMI_HILOGD("Not IsInsideDisplay, cursorXY:{%{private}f, %{private}f}->{%{private}f, %{private}f}",
