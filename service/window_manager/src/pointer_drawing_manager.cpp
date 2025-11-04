@@ -3780,21 +3780,16 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
             AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        Direction direction = static_cast<Direction>((
-            ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        if (GetHardCursorEnabled()) {
-            direction = displayInfo_.direction;
-            int32_t x = displayInfo_.width / CALCULATE_MIDDLE;
-            int32_t y = displayInfo_.height / CALCULATE_MIDDLE;
-            if (direction == DIRECTION90 || direction == DIRECTION270) {
-                std::swap(x, y);
-            }
-            MMI_HILOGD("DrawScreenCenterPointer, x=%{private}d, y=%{private}d", x, y);
-            DrawPointer(displayInfo_.rsId, x, y, pointerStyle, direction);
-        } else {
-            DrawPointer(displayInfo_.id, displayInfo_.validWidth / CALCULATE_MIDDLE,
-                        displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
+        int32_t validWidth = displayInfo_.validWidth;
+        int32_t validHeight = displayInfo_.validHeight;
+        Direction direction = GetDisplayDirection(&displayInfo_);
+        if (direction == DIRECTION90 || direction == DIRECTION270) {
+            std::swap(validWidth, validHeight);
         }
+        int32_t x = validWidth / CALCULATE_MIDDLE;
+        int32_t y = validHeight / CALCULATE_MIDDLE;
+        MMI_HILOGD("DrawScreenCenterPointer, x=%{private}d, y=%{private}d", x, y);
+        DrawPointer(displayInfo_.rsId, x, y, pointerStyle, direction);
     }
 }
 
