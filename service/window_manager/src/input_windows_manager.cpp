@@ -6400,14 +6400,20 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     double oldX = x;
     double oldY = y;
     int32_t lastDisplayId = displayId;
-    if (!IsInsideDisplay(*displayInfo, x, y)) {
-        FindPhysicalDisplay(*displayInfo, x, y, displayId);
-        MMI_HILOGI("Not IsInsideDisplay, cursorXY:{%{private}f, %{private}f}->{%{private}f, %{private}f}",
-            oldX, oldY, x, y);
-    }
-    if (displayId != lastDisplayId) {
-        displayInfo = GetPhysicalDisplay(displayId);
-        CHKPV(displayInfo);
+    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
+        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+        displayInfo = GetPhysicalDisplay(pointerLockedWindow_.displayId);
+        displayId = pointerLockedWindow_.displayId;
+    } else {
+        if (!IsInsideDisplay(*displayInfo, x, y)) {
+            FindPhysicalDisplay(*displayInfo, x, y, displayId);
+            MMI_HILOGD("Not IsInsideDisplay, cursorXY:{%{private}f, %{private}f}->{%{private}f, %{private}f}",
+                oldX, oldY, x, y);
+        }
+        if (displayId != lastDisplayId) {
+            displayInfo = GetPhysicalDisplay(displayId);
+            CHKPV(displayInfo);
+        }
     }
     int32_t width = 0;
     int32_t height = 0;
@@ -7945,12 +7951,14 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     auto cursorIt = cursorPosMap_.find(groupId);
     if (cursorIt == cursorPosMap_.end()) {
         MMI_HILOGD("failed to find groupId in cursorPosMap: %{public}d", groupId);
+        cursorPosMap_[groupId].displayId = 0;
         cursorPosMap_[groupId].cursorPos.x = windowArea.x + windowArea.width / 2;
         cursorPosMap_[groupId].cursorPos.y = windowArea.y + windowArea.height / 2;
         cursorIt = cursorPosMap_.find(groupId);
     }
-    logicalX = mouseIt->second.physicalX;
-    logicalY = mouseIt->second.physicalY;
+    UpdateCurrentDisplay(cursorPosMap_[groupId].displayId);
+    logicalX = mouseIt->second.physicalX + currentDisplayXY_.first;
+    logicalY = mouseIt->second.physicalY + currentDisplayXY_.second;
     bool fistLockedWindowId = focusWindow.id != pointerLockedWindow_.id ? true : false;
     pointerLockedWindow_ = focusWindow;
     MMI_HILOGD("mouse capture success, WindowId:%{public}d", pointerLockedWindow_.id);
@@ -8038,8 +8046,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
             MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
         }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        if (integerY <= windowArea.y + changeAreasShortestSide) {
-            integerY = windowArea.y + changeAreasShortestSide + 1;
+        if (integerX <= windowArea.x + changeAreasShortestSide) {
+            integerX = windowArea.x + changeAreasShortestSide + 1;
         }
         if (integerX >= width) {
             integerX = width - 1;
@@ -8107,6 +8115,9 @@ void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
     Matrix3f transform(window.transform);
+    UpdateCurrentDisplay(displayId);
+    windowArea.x = windowArea.x - currentDisplayXY_.first;
+    windowArea.y = windowArea.y - currentDisplayXY_.second;
     if (window.transform.size() == MATRIX3_SIZE && !transform.IsIdentity()) {
         double windowXMax = windowArea.width;
         double windowYMax = windowArea.height;
@@ -8115,7 +8126,7 @@ void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window
         Vector3f windowXYMaxResult = inverseTransform * windowXYMax;
         windowArea.width = static_cast<int32_t>(windowXYMaxResult[0] - windowArea.x);
         windowArea.height = static_cast<int32_t>(windowXYMaxResult[1] - windowArea.y);
-        MMI_HILOGD("windowArea in transform, {X,Y}:{%{public}d,%{public}d}, {W,H}:{%{public}d,%{public}d}",
+        MMI_HILOGD("windowArea in transform, {X,Y}:{%{private}d,%{private}d}, {W,H}:{%{private}d,%{private}d}",
             windowArea.x, windowArea.y, windowArea.width, windowArea.height);
     }
     Direction displayDirection = WIN_MGR->GetDisplayDirection(displayInfo);
@@ -8147,7 +8158,7 @@ void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window
             MMI_HILOGE("unknown direction and coordinate is considered in condition DIRECTION0");
             break;
     }
-    MMI_HILOGD("windowArea {X,Y}:{%{public}d,%{public}d}, {W,H}:{%{public}d,%{public}d}",
+    MMI_HILOGD("windowArea {X,Y}:{%{private}d,%{private}d}, {W,H}:{%{private}d,%{private}d}",
         windowArea.x, windowArea.y, windowArea.width, windowArea.height);
 }
 } // namespace MMI
