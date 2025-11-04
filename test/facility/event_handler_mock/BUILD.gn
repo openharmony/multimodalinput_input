@@ -39,6 +39,7 @@ ohos_source_set("event_handler_mock") {
     "src/anr_manager.cpp",
     "src/input_event_handler.cpp",
     "src/key_event_value_transformation.cpp",
+    "src/key_map_manager.cpp",
   ]
 
   public_configs = [ ":event_handler_mock_public_config" ]
@@ -48,6 +49,7 @@ ohos_source_set("event_handler_mock") {
     "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
     "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
     "${mmi_path}/test/facility/key_command_mock:key_command_mock",
+    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
     "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
     "${mmi_path}/util:libmmi-util",
