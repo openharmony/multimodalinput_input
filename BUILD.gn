@@ -123,9 +123,7 @@ group("input_jsapi_group") {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
     if (input_feature_mouse) {
-      deps += [
-        "frameworks/napi/pointer:pointer",
-      ]
+      deps += [ "frameworks/napi/pointer:pointer" ]
     }
     if (input_feature_keyboard) {
       deps += [
@@ -134,9 +132,7 @@ group("input_jsapi_group") {
       ]
     }
     if (input_feature_input_device) {
-      deps += [
-        "frameworks/napi/input_device:inputdevice",
-      ]
+      deps += [ "frameworks/napi/input_device:inputdevice" ]
     }
     if (input_feature_short_key) {
       deps += [ "frameworks/napi/short_key:shortkey" ]
@@ -147,19 +143,20 @@ group("input_jsapi_group") {
 
 group("input_ets_group") {
   deps = [
+    "frameworks/ets/gesture_event:ets_gestureEvent_package",
     "frameworks/ets/input_event:ets_inputEvent_package",
     "frameworks/ets/intention_code:ets_intentionCode_package",
+
     #"frameworks/ets/input_monitor:ets_inputMonitor_package",
     "frameworks/ets/key_code:ets_keyCode_package",
     "frameworks/ets/key_event:ets_keyEvent_package",
     "frameworks/ets/mouse_event:ets_mouseEvent_package",
     "frameworks/ets/touch_event:ets_touchEvent_package",
-    "frameworks/ets/gesture_event:ets_gestureEvent_package"
   ]
   if (input_feature_keyboard) {
     deps += [
       "frameworks/ets/input_consumer:ets_inputConsumer_package",
-      "frameworks/ets/input_event_client:ets_inputEventClient_package"
+      "frameworks/ets/input_event_client:ets_inputEventClient_package",
     ]
   }
   if (input_feature_input_device) {
@@ -167,7 +164,7 @@ group("input_ets_group") {
   }
   if (input_feature_mouse) {
     deps += [ "frameworks/ets/pointer:ets_pointer_package" ]
-    }
+  }
   if (input_feature_short_key) {
     deps += [ "frameworks/ets/short_key:ets_shortKey_package" ]
   }
@@ -252,8 +249,8 @@ group("mmi_tests") {
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
-    "service:ProductTypeParserTest",
     "service:PointerLoopClosureCheckerTest",
+    "service:ProductTypeParserTest",
     "service:ServerMsgHandlerTest",
     "service:SpecialInputDeviceParserTest",
     "service:StylusKeyTest",
@@ -280,17 +277,17 @@ group("mmi_tests") {
     "test/unittest/interfaces:InputNativeTest",
     "tools/inject_event:InjectEventTest",
     "util:UdsClientTest",
+    "util/common:InputEventDataTransformationTest",
     "util/common:UtilCommonTest",
     "util/json_parser:JsonParserTest",
-    "util/common:InputEventDataTransformationTest",
   ]
 
   if (input_feature_pointer_drawing) {
-    deps +=[
+    deps += [
       "service:InputWindowsManagerEXTest",
-      "service:PointerDrawingManagerTest",
       "service:PointerDrawingManagerExTest",
       "service:PointerDrawingManagerSupTest",
+      "service:PointerDrawingManagerTest",
     ]
   }
 
