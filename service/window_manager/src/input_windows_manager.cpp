@@ -7951,11 +7951,12 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     auto cursorIt = cursorPosMap_.find(groupId);
     if (cursorIt == cursorPosMap_.end()) {
         MMI_HILOGD("failed to find groupId in cursorPosMap: %{public}d", groupId);
+        cursorPosMap_[groupId].displayId = 0;
         cursorPosMap_[groupId].cursorPos.x = windowArea.x + windowArea.width / 2;
         cursorPosMap_[groupId].cursorPos.y = windowArea.y + windowArea.height / 2;
         cursorIt = cursorPosMap_.find(groupId);
     }
-    UpdateCurrentDisplay(focusWindow.displayId);
+    UpdateCurrentDisplay(cursorPosMap_[groupId].displayId);
     logicalX = mouseIt->second.physicalX + currentDisplayXY_.first;
     logicalY = mouseIt->second.physicalY + currentDisplayXY_.second;
     bool fistLockedWindowId = focusWindow.id != pointerLockedWindow_.id ? true : false;
