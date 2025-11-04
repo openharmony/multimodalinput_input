@@ -7996,6 +7996,10 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
             pointerEvent->SetTargetDisplayId(pointerLockedWindow_.displayId);
             pointerEvent->SetTargetWindowId(pointerLockedWindow_.id);
             pointerEvent->SetAgentWindowId(pointerLockedWindow_.agentWindowId);
+            if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
+                pointerEvent->AddFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+                MMI_HILOGD("mouse capture pointer event add hide flag");
+            }
             SetPrivacyModeFlag(pointerLockedWindow_.privacyMode, pointerEvent);
             UpdateTargetPointer(pointerEvent);
             auto filter = InputHandler->GetFilterHandler();
@@ -8023,10 +8027,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
             pointerLockedWindow_.area.width,
             pointerLockedWindow_.area.height };
         RotateWindowArea(displayInfo->id, pointerLockedWindow_, windowArea);
-        int32_t changeAreasShortestSide = pointerLockedWindow_.pointerChangeAreas[TOP_AREA];
-        int32_t changeAreasLongestSide = pointerLockedWindow_.pointerChangeAreas[TOP_LEFT_AREA];
-        width = windowArea.x + windowArea.width - changeAreasShortestSide;
-        height = windowArea.y + windowArea.height - changeAreasShortestSide;
+        width = windowArea.x + windowArea.width;
+        height = windowArea.y + windowArea.height;
         if (displayDirection == DIRECTION0 || displayDirection == DIRECTION180) {
             width = std::min(width, displayInfo->validWidth);
             height = std::min(height, displayInfo->validHeight);
@@ -8046,39 +8048,17 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
             MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
         }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        if (integerX <= windowArea.x + changeAreasShortestSide) {
-            integerX = windowArea.x + changeAreasShortestSide + 1;
+        if (integerX <= windowArea.x) {
+            integerX = windowArea.x + 1;
         }
         if (integerX >= width) {
             integerX = width - 1;
         }
-        if (integerY <= windowArea.y + changeAreasShortestSide) {
-            integerY = windowArea.y + changeAreasShortestSide + 1;
+        if (integerY <= windowArea.y) {
+            integerY = windowArea.y + 1;
         }
         if (integerY >= height) {
             integerY = height - 1;
-        }
-        if (changeAreasShortestSide < changeAreasLongestSide) {
-            if (integerX <= windowArea.x + changeAreasLongestSide &&
-                integerY <= windowArea.y + changeAreasLongestSide) {
-                integerX = windowArea.x + changeAreasLongestSide + 1;
-                integerY = windowArea.y + changeAreasLongestSide + 1;
-            }
-            if (integerX <= windowArea.x + changeAreasLongestSide &&
-                integerY >= windowArea.y + windowArea.height - changeAreasLongestSide) {
-                integerX = windowArea.x + changeAreasLongestSide + 1;
-                integerY = windowArea.y + windowArea.height - changeAreasLongestSide - 1;
-            }
-            if (integerX >= windowArea.x + windowArea.width - changeAreasLongestSide &&
-                integerY <= windowArea.y + changeAreasLongestSide) {
-                integerX = windowArea.x + windowArea.width - changeAreasLongestSide - 1;
-                integerY = windowArea.y + changeAreasLongestSide + 1;
-            }
-            if (integerX >= windowArea.x + windowArea.width - changeAreasLongestSide &&
-                integerY >= windowArea.y + windowArea.height - changeAreasLongestSide) {
-                integerX = windowArea.x + windowArea.width - changeAreasLongestSide - 1;
-                integerY = windowArea.y + windowArea.height - changeAreasLongestSide - 1;
-            }
         }
         x = static_cast<double>(integerX) + (x - floor(x));
         y = static_cast<double>(integerY) + (y - floor(y));
