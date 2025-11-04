@@ -15,14 +15,17 @@
 
 #ifndef MMI_EVENT_MONITOR_HANDLER_MOCK_H
 #define MMI_EVENT_MONITOR_HANDLER_MOCK_H
+
 #include <cstdint>
-#include <gmock/gmock.h>
+
+#include "gmock/gmock.h"
 #include "i_input_event_consumer.h"
+#include "i_input_event_handler.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IEventMonitorHandler {
+class IEventMonitorHandler : public IInputEventHandler {
 public:
     IEventMonitorHandler() = default;
     virtual ~IEventMonitorHandler() = default;
@@ -49,6 +52,9 @@ public:
     EventMonitorHandler() = default;
     virtual ~EventMonitorHandler() override = default;
 
+    MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, AddInputHandler,
         (InputHandlerType, HandleEventType, std::shared_ptr<IInputEventConsumer>, TouchGestureType, int32_t));
     MOCK_METHOD(void, RemoveInputHandler,

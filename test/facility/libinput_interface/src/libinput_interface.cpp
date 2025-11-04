@@ -407,37 +407,37 @@ enum evdev_device_udev_tags libinput_device_get_tags(struct libinput_device* dev
 
 int libinput_device_has_capability(struct libinput_device *device, enum libinput_device_capability capability)
 {
-    return 0;
+    return ((g_instance != nullptr) ? g_instance->DeviceHasCapability(device, capability) : false);
 }
 
 int32_t libinput_device_has_key(struct libinput_device* device, int32_t keyCode)
 {
-    return 0;
+    return ((g_instance != nullptr) ? g_instance->DeviceHasKey(device, keyCode) : false);
 }
 
 int32_t libinput_device_get_axis_min(struct libinput_device* device, int32_t code)
 {
-    return -1;
+    return ((g_instance != nullptr) ? g_instance->DeviceGetAxisMin(device, code) : -1);
 }
 
 int32_t libinput_device_get_axis_max(struct libinput_device* device, int32_t code)
 {
-    return -1;
+    return ((g_instance != nullptr) ? g_instance->DeviceGetAxisMax(device, code) : -1);
 }
 
 int32_t libinput_device_get_axis_fuzz(struct libinput_device* device, int32_t code)
 {
-    return -1;
+    return ((g_instance != nullptr) ? g_instance->DeviceGetAxisFuzz(device, code) : -1);
 }
 
 int32_t libinput_device_get_axis_flat(struct libinput_device* device, int32_t code)
 {
-    return -1;
+    return ((g_instance != nullptr) ? g_instance->DeviceGetAxisFlat(device, code) : -1);
 }
 
 int32_t libinput_device_get_axis_resolution(struct libinput_device* device, int32_t code)
 {
-    return -1;
+    return ((g_instance != nullptr) ? g_instance->DeviceGetAxisResolution(device, code) : -1);
 }
 
 int libinput_device_get_size(struct libinput_device *device, double *width, double *height)
@@ -542,5 +542,20 @@ uint32_t libinput_event_joystick_button_get_key(struct libinput_event_joystick_b
 enum libinput_button_state libinput_event_joystick_button_get_key_state(struct libinput_event_joystick_button *event)
 {
     return g_instance->JoystickButtonGetKeyState(event);
+}
+
+struct libinput_event_switch* libinput_event_get_switch_event(struct libinput_event *event)
+{
+    return g_instance->GetSwitchEvent(event);
+}
+
+enum libinput_switch libinput_event_switch_get_switch(struct libinput_event_switch *event)
+{
+    return g_instance->SwitchGetSwitch(event);
+}
+
+enum libinput_switch_state libinput_event_switch_get_switch_state(struct libinput_event_switch *event)
+{
+    return g_instance->SwitchGetSwitchState(event);
 }
 } // extern "C"

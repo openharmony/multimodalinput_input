@@ -13,24 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef MMI_EVENT_DISPATCH_HANDLER_MOCK_H
-#define MMI_EVENT_DISPATCH_HANDLER_MOCK_H
+#ifndef MMI_INPUT_ACTIVE_SUBSCRIBER_HANDLER_MOCK_H
+#define MMI_INPUT_ACTIVE_SUBSCRIBER_HANDLER_MOCK_H
 
-#include "gmock/gmock.h"
+#include <memory>
+
+#include "nocopyable.h"
+
 #include "i_input_event_handler.h"
+#include "key_event.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class IEventDispatchHandler : public IInputEventHandler {
+class IInputActiveSubscriberHandler : public IInputEventHandler {
 public:
-    IEventDispatchHandler() = default;
-    virtual ~IEventDispatchHandler() = default;
+    IInputActiveSubscriberHandler() = default;
+    virtual ~IInputActiveSubscriberHandler() = default;
 };
 
-class EventDispatchHandler : public IEventDispatchHandler {
+class InputActiveSubscriberHandler final : public IInputActiveSubscriberHandler {
 public:
-    EventDispatchHandler() = default;
-    virtual ~EventDispatchHandler() override = default;
+    InputActiveSubscriberHandler() = default;
+    ~InputActiveSubscriberHandler() override = default;
+    DISALLOW_COPY_AND_MOVE(InputActiveSubscriberHandler);
 
     MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
     MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
@@ -38,4 +44,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // MMI_EVENT_DISPATCH_HANDLER_MOCK_H
+#endif // MMI_INPUT_ACTIVE_SUBSCRIBER_HANDLER_MOCK_H

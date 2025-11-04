@@ -13,14 +13,14 @@
 
 import("../../../multimodalinput_mini.gni")
 
-config("event_filter_mock_public_config") {
+config("event_hook_mock_public_config") {
   include_dirs = [
     "include",
     "${mmi_path}/test/facility/event_handler_mock/include",
   ]
 }
 
-ohos_source_set("event_filter_mock") {
+ohos_source_set("event_hook_mock") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -37,11 +37,17 @@ ohos_source_set("event_filter_mock") {
 
   sources = []
 
-  public_configs = [ ":event_filter_mock_public_config" ]
+  public_configs = [ ":event_hook_mock_public_config" ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
-  external_deps = [ "googletest:gmock_main" ]
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+  ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"

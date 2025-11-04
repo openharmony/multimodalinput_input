@@ -15,8 +15,8 @@
 
 #ifndef MMI_CURSOR_DRAWING_COMPONENT_MOCK_H
 #define MMI_CURSOR_DRAWING_COMPONENT_MOCK_H
-#include <gmock/gmock.h>
 
+#include <gmock/gmock.h>
 #include "delegate_interface.h"
 
 namespace OHOS {
@@ -27,7 +27,10 @@ public:
     virtual ~ICursorDrawingComponent() = default;
 
     virtual void Load() = 0;
+    virtual void UnLoad() = 0;
     virtual bool Init() = 0;
+    virtual void SetMouseDisplayState(bool state) = 0;
+    virtual bool GetMouseDisplayState() = 0;
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) = 0;
     virtual void RegisterDisplayStatusReceiver() = 0;
     virtual void InitDefaultMouseIconPath() = 0;
@@ -40,10 +43,13 @@ public:
 class CursorDrawingComponent : public ICursorDrawingComponent {
 public:
     CursorDrawingComponent() = default;
-    virtual ~CursorDrawingComponent() = default;
+    virtual ~CursorDrawingComponent() override = default;
 
     MOCK_METHOD(void, Load, ());
+    MOCK_METHOD(void, UnLoad, ());
     MOCK_METHOD(bool, Init, ());
+    MOCK_METHOD(void, SetMouseDisplayState, (bool));
+    MOCK_METHOD(bool, GetMouseDisplayState, ());
     MOCK_METHOD(void, SetDelegateProxy, (std::shared_ptr<DelegateInterface> proxy));
     MOCK_METHOD(void, RegisterDisplayStatusReceiver, ());
     MOCK_METHOD(void, InitDefaultMouseIconPath, ());
