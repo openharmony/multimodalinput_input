@@ -67,7 +67,7 @@ std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(struct libinput_devic
 
     auto cfgName = FormatConfigName(device);
     if (cfgName.empty()) {
-        MMI_HILOGW("Empty config name");
+        MMI_HILOGW("No config was found");
         return nullptr;
     }
     MMI_HILOGD("[%{public}s] Loading joystick layout from '%{private}s'", devName, cfgName.c_str());
@@ -199,6 +199,10 @@ std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(const std::string &fi
                 cJSON_Delete(doc);
             }
         });
+    if (jsonDoc == nullptr) {
+        MMI_HILOGE("Failed to parse config");
+        return nullptr;
+    }
     auto keyLayout = std::make_shared<JoystickLayoutMap>(realPath.get());
     keyLayout->OnLoading();
     keyLayout->LoadKeys(jsonDoc.get());
@@ -228,8 +232,9 @@ void JoystickLayoutMap::LoadKeys(cJSON *jsonDoc)
     int32_t nKeys = cJSON_GetArraySize(jsonKeys);
     for (int32_t index = 0; index < nKeys; ++index) {
         auto jsonKey = cJSON_GetArrayItem(jsonKeys, index);
-        CHKPC(jsonKey);
-        LoadKeyItem(jsonKey, index);
+        if (jsonKey != nullptr) {
+            LoadKeyItem(jsonKey, index);
+        }
     }
 }
 

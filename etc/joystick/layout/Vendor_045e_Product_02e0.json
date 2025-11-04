@@ -35,6 +35,9 @@
 		}, {
 			"RAWCODE":	317,
 			"KEYCODE":	"BUTTON_R2"
+		}, {
+			"RAWCODE":	318,
+			"KEYCODE":	"BUTTON_MODE"
 		}],
 	"AXES":	[{
 			"RAWCODE":	17,
