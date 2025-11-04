@@ -13,11 +13,11 @@
 
 import("../../../multimodalinput_mini.gni")
 
-config("cursor_drawing_component_mock_public_config") {
+config("window_manager_mock_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_source_set("cursor_drawing_component_mock") {
+ohos_source_set("window_manager_mock") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -37,10 +37,10 @@ ohos_source_set("cursor_drawing_component_mock") {
   ]
 
   sources = [
-    "src/cursor_drawing_component_mock.cpp",
+    "src/cursor_drawing_component.cpp",
   ]
 
-  public_configs = [ ":cursor_drawing_component_mock_public_config" ]
+  public_configs = [ ":window_manager_mock_public_config" ]
 
   deps = [
     "${mmi_path}/util:libmmi-util",

@@ -15,7 +15,11 @@
 
 #ifndef MMI_KEY_EVENT_NORMALIZE_MOCK_H
 #define MMI_KEY_EVENT_NORMALIZE_MOCK_H
-#include <gmock/gmock.h>
+
+#include <memory>
+
+#include "gmock/gmock.h"
+#include "libinput.h"
 #include "key_event.h"
 
 namespace OHOS {
@@ -26,7 +30,11 @@ public:
     virtual ~IKeyEventNormalize() = default;
 
     virtual std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
+    virtual void ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent>&) = 0;
+    virtual int32_t Normalize(libinput_event*, std::shared_ptr<KeyEvent>) = 0;
+    virtual void ResetKeyEvent(struct libinput_device*) = 0;
     virtual int32_t SetShieldStatus(int32_t shieldMode, bool isShield) = 0;
+    virtual int32_t GetCurrentShieldMode() = 0;
     virtual int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) = 0;
 };
 
@@ -36,7 +44,11 @@ public:
     virtual ~KeyEventNormalizeMock() override = default;
 
     MOCK_METHOD(std::shared_ptr<KeyEvent>, GetKeyEvent, ());
+    MOCK_METHOD(void, ModifierkeyEventNormalize, (const std::shared_ptr<KeyEvent>&));
+    MOCK_METHOD(int32_t, Normalize, (libinput_event*, std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, ResetKeyEvent, (struct libinput_device*));
     MOCK_METHOD(int32_t, SetShieldStatus, (int32_t, bool));
+    MOCK_METHOD(int32_t, GetCurrentShieldMode, ());
     MOCK_METHOD(int32_t, GetShieldStatus, (int32_t, bool&));
 
     static std::shared_ptr<KeyEventNormalizeMock> GetInstance();

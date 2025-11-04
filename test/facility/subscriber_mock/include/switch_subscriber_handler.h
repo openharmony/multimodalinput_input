@@ -15,14 +15,17 @@
 
 #ifndef MMI_SWITCH_SUBSCRIBER_HANDLER_MOCK_H
 #define MMI_SWITCH_SUBSCRIBER_HANDLER_MOCK_H
+
 #include <cstdint>
-#include <gmock/gmock.h>
+
+#include "gmock/gmock.h"
+#include "i_input_event_handler.h"
 #include "key_option.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class ISwitchSubscriberHandler {
+class ISwitchSubscriberHandler : public IInputEventHandler {
 public:
     ISwitchSubscriberHandler() = default;
     virtual ~ISwitchSubscriberHandler() = default;
@@ -37,6 +40,9 @@ public:
     SwitchSubscriberHandler() = default;
     virtual ~SwitchSubscriberHandler() override = default;
 
+    MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, SubscribeSwitchEvent, (SessionPtr, int32_t, int32_t));
     MOCK_METHOD(int32_t, UnsubscribeSwitchEvent, (SessionPtr, int32_t));
     MOCK_METHOD(int32_t, QuerySwitchStatus, (int32_t, int32_t&));

@@ -14,7 +14,10 @@
 import("../../../multimodalinput_mini.gni")
 
 config("event_interceptor_mock_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/test/facility/event_handler_mock/include",
+  ]
 }
 
 ohos_source_set("event_interceptor_mock") {
@@ -27,7 +30,10 @@ ohos_source_set("event_interceptor_mock") {
 
   testonly = true
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/test/facility/event_handler_mock/include",
+  ]
 
   sources = []
 

@@ -61,6 +61,7 @@ struct libinput_event_joystick_axis_abs_info {
 enum libinput_event_type {
     LIBINPUT_EVENT_NONE = 0,
     LIBINPUT_EVENT_DEVICE_ADDED,
+    LIBINPUT_EVENT_DEVICE_REMOVED,
 
     LIBINPUT_EVENT_KEYBOARD_KEY = 300,
 
@@ -74,6 +75,9 @@ enum libinput_event_type {
     LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN,
     LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END,
 
+    LIBINPUT_EVENT_JOYSTICK_BUTTON = 450,
+    LIBINPUT_EVENT_JOYSTICK_AXIS,
+
     LIBINPUT_EVENT_TOUCH_DOWN = 500,
     LIBINPUT_EVENT_TOUCH_UP,
     LIBINPUT_EVENT_TOUCH_MOTION,
@@ -85,6 +89,10 @@ enum libinput_event_type {
     LIBINPUT_EVENT_TOUCHPAD_MOTION,
     LIBINPUT_EVENT_TOUCHPAD_ACTIVE = 580,
 
+    LIBINPUT_EVENT_TABLET_TOOL_AXIS = 600,
+    LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
+    LIBINPUT_EVENT_TABLET_TOOL_TIP,
+
     LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN = 800,
     LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE,
     LIBINPUT_EVENT_GESTURE_SWIPE_END,
@@ -92,9 +100,8 @@ enum libinput_event_type {
     LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
     LIBINPUT_EVENT_GESTURE_PINCH_END,
 
-    LIBINPUT_EVENT_TABLET_TOOL_AXIS,
-    LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
-    LIBINPUT_EVENT_TABLET_TOOL_TIP,
+    LIBINPUT_EVENT_SWITCH_TOGGLE = 900,
+    LIBINPUT_EVENT_MSDP = 1000,
 };
 
 enum libinput_key_state {
@@ -177,6 +184,17 @@ enum libinput_config_status {
     LIBINPUT_CONFIG_STATUS_INVALID,     /**< Invalid parameter range */
 };
 
+enum libinput_switch_state {
+    LIBINPUT_SWITCH_STATE_OFF = 0,
+    LIBINPUT_SWITCH_STATE_ON,
+};
+
+enum libinput_switch {
+    LIBINPUT_SWITCH_LID = 1,
+    LIBINPUT_SWITCH_TABLET_MODE,
+    LIBINPUT_SWITCH_PRIVACY,
+};
+
 struct udev_device;
 struct libinput_device;
 struct libinput_event;
@@ -187,6 +205,7 @@ struct libinput_event_tablet_tool;
 struct libinput_event_gesture;
 struct libinput_tablet_tool;
 struct libinput;
+struct libinput_event_switch;
 
 enum libinput_event_type libinput_event_get_type(struct libinput_event *event);
 
@@ -389,6 +408,10 @@ struct libinput_event_joystick_button* libinput_event_get_joystick_button_event(
 uint32_t libinput_event_joystick_button_get_key(struct libinput_event_joystick_button *event);
 
 enum libinput_button_state libinput_event_joystick_button_get_key_state(struct libinput_event_joystick_button *event);
+
+struct libinput_event_switch* libinput_event_get_switch_event(struct libinput_event *event);
+enum libinput_switch libinput_event_switch_get_switch(struct libinput_event_switch *event);
+enum libinput_switch_state libinput_event_switch_get_switch_state(struct libinput_event_switch *event);
 
 #ifdef __cplusplus
 }

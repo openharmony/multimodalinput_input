@@ -98,6 +98,10 @@ struct libinput_event_joystick_button {
     uint32_t type;
 };
 
+struct libinput_event_switch {
+    enum libinput_switch sw;
+};
+
 namespace OHOS {
 namespace MMI {
 
@@ -162,6 +166,13 @@ public:
         struct libinput_event_tablet_tool *event) = 0;
     virtual char* DeviceGetSysname(struct libinput_device *device) = 0;
     virtual udev_device* DeviceGetUdevDevice(struct libinput_device *device) = 0;
+    virtual int DeviceHasCapability(struct libinput_device *device, enum libinput_device_capability capability) = 0;
+    virtual int32_t DeviceHasKey(struct libinput_device* device, int32_t keyCode) = 0;
+    virtual int32_t DeviceGetAxisMin(struct libinput_device* device, int32_t code) = 0;
+    virtual int32_t DeviceGetAxisMax(struct libinput_device* device, int32_t code) = 0;
+    virtual int32_t DeviceGetAxisFuzz(struct libinput_device* device, int32_t code) = 0;
+    virtual int32_t DeviceGetAxisFlat(struct libinput_device* device, int32_t code) = 0;
+    virtual int32_t DeviceGetAxisResolution(struct libinput_device* device, int32_t code) = 0;
     virtual struct libinput_event_joystick_axis* JoystickGetAxisEvent(struct libinput_event *event) = 0;
     virtual int32_t JoystickAxisValueIsChanged(
         struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis) = 0;
@@ -170,6 +181,9 @@ public:
     virtual struct libinput_event_joystick_button* JoystickGetButtonEvent(struct libinput_event *event) = 0;
     virtual uint32_t JoystickButtonGetKey(struct libinput_event_joystick_button *event) = 0;
     virtual enum libinput_button_state JoystickButtonGetKeyState(struct libinput_event_joystick_button *event) = 0;
+    virtual struct libinput_event_switch* GetSwitchEvent(struct libinput_event *event) = 0;
+    virtual enum libinput_switch SwitchGetSwitch(struct libinput_event_switch *event) = 0;
+    virtual enum libinput_switch_state SwitchGetSwitchState(struct libinput_event_switch *event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
