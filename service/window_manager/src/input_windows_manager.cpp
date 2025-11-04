@@ -8111,15 +8111,15 @@ void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
     Matrix3f transform(window.transform);
+    UpdateCurrentDisplay(displayId);
+    windowArea.x = windowArea.x - currentDisplayXY_.first;
+    windowArea.y = windowArea.y - currentDisplayXY_.second;
     if (window.transform.size() == MATRIX3_SIZE && !transform.IsIdentity()) {
         double windowXMax = windowArea.width;
         double windowYMax = windowArea.height;
         Vector3f windowXYMax(windowXMax, windowYMax, 1.0);
         Matrix3f inverseTransform = transform.Inverse();
         Vector3f windowXYMaxResult = inverseTransform * windowXYMax;
-        UpdateCurrentDisplay(displayId);
-        windowArea.x = windowArea.x - currentDisplayXY_.first;
-        windowArea.y = windowArea.y - currentDisplayXY_.second;
         windowArea.width = static_cast<int32_t>(windowXYMaxResult[0] - windowArea.x);
         windowArea.height = static_cast<int32_t>(windowXYMaxResult[1] - windowArea.y);
         MMI_HILOGD("windowArea in transform, {X,Y}:{%{private}d,%{private}d}, {W,H}:{%{private}d,%{private}d}",
