@@ -222,6 +222,12 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
     CALL_INFO_TRACE;
     if (devStatus == "add") {
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
+        for (const auto &displayGroupInfo : displayGroupInfoMap_) {
+            if (!displayGroupInfo.second.displaysInfo.empty() &&
+                displayGroupInfo.second.userState == UserState::USER_ACTIVE) {
+                UpdateDisplayIdAndName(displayGroupInfo.second.groupId);
+            }
+        }
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
     }
@@ -1153,7 +1159,13 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInf
     const std::vector<int32_t> &deleteGroups)
 {
     CALL_DEBUG_ENTER;
-    DeleteInvalidWindowGroups(deleteGroups);
+    for (const auto &groupId : deleteGroups) {
+        auto group = windowsPerDisplayMap_.find(groupId);
+        if (group != windowsPerDisplayMap_.end()) {
+            MMI_HILOGI("windows delete group:%{public}d", groupId);
+            windowsPerDisplayMap_.erase(group);
+        }
+    }
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay;
     int32_t groupId = displayGroupInfo.groupId;
     for (const auto &window : displayGroupInfo.windowsInfo) {
@@ -1975,7 +1987,16 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         CleanInvalidPiexMap(groupId);
         HandleValidDisplayChange(displayGroupInfo);
         std::vector<int32_t> deleteGroups;
-        DeleteInvalidDisplayGroups(displayGroupInfo, deleteGroups);
+        for (auto it = displayGroupInfoMap_.begin(); it != displayGroupInfoMap_.end();) {
+            if (it->second.currentUserId == displayGroupInfo.currentUserId &&
+                it->first != displayGroupInfo.groupId) {
+                MMI_HILOGD("displays delete group:%{public}d", it->first);
+                deleteGroups.push_back(it->first);
+                it = displayGroupInfoMap_.erase(it);
+            } else {
+                ++it;
+            }
+        }
         displayGroupInfoMap_[groupId] = displayGroupInfo;
         displayGroupInfo_ = displayGroupInfo;
         UpdateWindowsInfoPerDisplay(displayGroupInfo, deleteGroups);
@@ -2022,36 +2043,6 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER
-}
-
-void InputWindowsManager::DeleteInvalidDisplayGroups(const OLD::DisplayGroupInfo &displayGroupInfo,
-    std::vector<int32_t> &deleteGroups)
-{
-    if (displayGroupInfo.type != GroupType::GROUP_DEFAULT) {
-        return;
-    }
-    for (auto it = displayGroupInfoMap_.begin(); it != displayGroupInfoMap_.end();) {
-        if (it->second.currentUserId == displayGroupInfo.currentUserId &&
-            it->second.type == GroupType::GROUP_DEFAULT &&
-            displayGroupInfo.type == GroupType::GROUP_DEFAULT &&
-            it->first != displayGroupInfo.groupId) {
-            MMI_HILOGI("displays delete group:%{public}d", it->first);
-            deleteGroups.push_back(it->first);
-            it = displayGroupInfoMap_.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-void InputWindowsManager::DeleteInvalidWindowGroups(const std::vector<int32_t> &deleteGroups)
-{
-    for (const auto &groupId : deleteGroups) {
-        auto group = windowsPerDisplayMap_.find(groupId);
-        if (group != windowsPerDisplayMap_.end()) {
-            MMI_HILOGI("windows delete group:%{public}d", groupId);
-            windowsPerDisplayMap_.erase(group);
-        }
-    }
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
