@@ -5742,7 +5742,7 @@ void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY
     MMI_HILOG_DISPATCHD("LastTouchWindowInfo:%{public}d, touchWindow:%{public}d",
         lastTouchWindowInfo_.id, touchWindow->id);
     if (lastTouchWindowInfo_.id != touchWindow->id) {
-        int32_t groupId = pointerEvent->GetTargetDisplayId();
+        int32_t groupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
         if (lastTouchWindowInfo_.id != -1) {
             DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW, groupId);
         }
