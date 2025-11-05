@@ -4869,7 +4869,8 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
     MMI_HILOGD("windowType:%{public}d, toolType:%{public}d", static_cast<int32_t>(windowType), toolType);
     if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
         windowType != WindowInputType::DUALTRIGGER_TOUCH &&
-        windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
+        windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE &&
+        windowType != WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
