@@ -49,8 +49,8 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
     if (processedCount_ == PRINT_INTERVAL_COUNT) {
         MMI_HILOGD("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
         processedCount_ = 0;
-        lastEventId_ = eventId;
     }
+    lastEventId_ = eventId;
     SendEvent(eventType, eventId);
 }
 
@@ -73,6 +73,30 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+}
+
+void ANRHandler::SetLastDispatchedEventId(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Dispatched event id:%{public}d", eventId);
+    lastDispatchedEventId_.store(eventId);
+}
+
+void ANRHandler::SetLastProcessEventId(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Dispatched event id:%{public}d", eventId);
+    lastProcessedEventId_.store(eventId);
+}
+
+void ANRHandler::GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId)
+{
+    CALL_DEBUG_ENTER;
+    markedId = lastEventId_;
+    processedId = lastProcessedEventId_.load();
+    dispatchedEventId = lastDispatchedEventId_.load();
+    MMI_HILOGD("Get eventIds, markedId:%{public}d processedId:%{public}d dispatchedEventId:%{public}d",
+        markedId, processedId, dispatchedEventId);
 }
 
 void ANRHandler::SendEvent(int32_t eventType, int32_t eventId)

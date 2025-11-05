@@ -652,9 +652,11 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         }
     }
     if (client->IsEventHandlerChanged()) {
+        MarkLastDispatched(pointerEvent->GetId());
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
         if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
-                return this->OnPointerEventTask(inputConsumer, pointerEvent);
+                this->OnPointerEventTask(inputConsumer, pointerEvent);
+                MarkLastProcessed(pointerEvent->GetId());
             },
             std::string("MMI::OnPointerEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
@@ -669,6 +671,20 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     }
     MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
         pointerEvent->GetPointerId());
+}
+
+int32_t InputManagerImpl::MarkLastDispatched(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    ANRHDL->SetLastDispatchedEventId(eventId);
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::MarkLastProcessed(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    ANRHDL->SetLastProcessEventId(eventId);
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -3077,6 +3093,12 @@ bool InputManagerImpl::IsPointerInit()
         return false;
     }
     return isInit;
+}
+
+void InputManagerImpl::GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId)
+{
+    CALL_DEBUG_ENTER;
+    ANRHDL->GetLastEventIds(markedId, processedId, dispatchedEventId);
 }
 } // namespace MMI
 } // namespace OHOS
