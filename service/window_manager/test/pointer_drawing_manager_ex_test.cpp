@@ -1836,7 +1836,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMou
     curPointerStyle.id = 0;
     std::string newIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
     ASSERT_EQ(iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath, newIconPath);
-    PreferencesManagerMock::ReleaseInstance();
 }
 
 /**
@@ -1856,7 +1855,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMou
     curPointerStyle.id = 0;
     std::string newIconPath = IMAGE_POINTER_DEFAULT_PATH + "Custom_Cursor_Circle.svg";
     ASSERT_EQ(iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath, newIconPath);
-    PreferencesManagerMock::ReleaseInstance();
 }
 
 /**
@@ -1881,7 +1879,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMou
     auto iconPath = pointerDrawingManager.GetMouseIconPath();
     auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
     ASSERT_EQ(it, iconPath.end());
-    PreferencesManagerMock::ReleaseInstance();
 }
 } // namespace MMI
 } // namespace OHOS
