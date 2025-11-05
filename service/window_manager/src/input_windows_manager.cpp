@@ -7956,14 +7956,24 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
         cursorPosMap_[groupId].cursorPos.y = windowArea.y + windowArea.height / 2;
         cursorIt = cursorPosMap_.find(groupId);
     }
+    PhysicalCoordinate coord {
+        .x = cursorIt->second.cursorPos.x,
+        .y = cursorIt->second.cursorPos.y,
+    };
+    auto displayInfo = GetPhysicalDisplay(cursorPosMap_[groupId].displayId);
+    CHKPV(displayInfo);
+    RotateDisplayScreen(*displayInfo, coord);
     UpdateCurrentDisplay(cursorPosMap_[groupId].displayId);
-    logicalX = mouseIt->second.physicalX + currentDisplayXY_.first;
-    logicalY = mouseIt->second.physicalY + currentDisplayXY_.second;
+    mouseIt->second.physicalX = static_cast<int32_t>(coord.x);
+    mouseIt->second.physicalY = static_cast<int32_t>(coord.y);
+    coord.x = coord.x + currentDisplayXY_.first;
+    coord.y = coord.y + currentDisplayXY_.second;
     bool fistLockedWindowId = focusWindow.id != pointerLockedWindow_.id ? true : false;
     pointerLockedWindow_ = focusWindow;
     MMI_HILOGD("mouse capture success, WindowId:%{public}d", pointerLockedWindow_.id);
-    if (IsInHotArea(logicalX, logicalY, focusWindow.pointerHotAreas, focusWindow) &&
-        !SelectPointerChangeArea(focusWindowId, logicalX, logicalY)) {
+    if (IsInHotArea(
+            static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), focusWindow.pointerHotAreas, focusWindow) &&
+        !SelectPointerChangeArea(focusWindowId, static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y))) {
         if (pointerLocked) {
             pointerLockedCursorPos_.x = cursorIt->second.cursorPos.x;
             pointerLockedCursorPos_.y = cursorIt->second.cursorPos.y;
