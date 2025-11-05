@@ -515,14 +515,17 @@ void KeyEventNormalize::ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent
             return;
         }
     }
+    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
+    if (g_keyEvent == nullptr) {
+        return;
+    }
+    g_keyEvent->RemoveReleasedKeyItems();
     if (HandleModifierKeyAction(keyEvent)) {
         int32_t keyAction = keyEvent->GetKeyAction();
         if (keyAction == KeyEvent::KEY_ACTION_DOWN && keyStatusRecordSwitch_
             && keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
             KeyEventAutoUp(keyEvent, keyStatusRecordTimeout_);
         }
-        auto g_keyEvent = KeyEventHdr->GetKeyEvent();
-        CHKPV(g_keyEvent);
         g_keyEvent->SetKeyCode(keyEvent->GetKeyCode());
         g_keyEvent->SetAction(keyEvent->GetKeyAction());
         g_keyEvent->SetKeyAction(keyEvent->GetKeyAction());
