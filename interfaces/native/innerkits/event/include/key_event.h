@@ -3561,6 +3561,7 @@ protected:
 public:
     void SetFourceMonitorFlag(bool fourceMonitorFlag);
     bool GetFourceMonitorFlag();
+    void RemoveReleasedKeyItems();
 
 private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
