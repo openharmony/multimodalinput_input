@@ -26,8 +26,8 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManagerEXTest"
 struct Input_CursorInfo {
-    bool visible { true };
-    Input_PointerStyle style;
+    bool visible { false };
+    Input_PointerStyle style { DEFAULT };
     int32_t sizeLevel { 0 };
     uint32_t color { 0 };
 };
