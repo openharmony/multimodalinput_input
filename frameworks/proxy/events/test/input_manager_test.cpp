@@ -6415,5 +6415,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_DispatchToNextHandler, TestSize.Leve
     auto ret = InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType);
     EXPECT_EQ(ret, RET_ERR);
 }
+/*
+ * @tc.name: InputManagerTest_GetLastEventIds
+ * @tc.desc: GetLastEventIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetLastEventIds, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t markedId = 0;
+    int32_t processedId = 0;
+    int32_t dispatchedEventId = 0;
+    InputManager::GetInstance()->GetLastEventIds(markedId, processedId, dispatchedEventId);
+    EXPECT_TRUE(markedId >= 0);
+    EXPECT_TRUE(processedId >= 0);
+    EXPECT_TRUE(dispatchedEventId >= 0);
+}
 } // namespace MMI
 } // namespace OHOS
