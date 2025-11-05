@@ -511,6 +511,14 @@ ohos_unittest("InputManagerImplTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+    blocklist = "./ipc_blocklist.txt"
+  }
+
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
     "${mmi_path}/frameworks/proxy:libmmi-client",

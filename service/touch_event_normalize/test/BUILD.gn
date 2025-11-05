@@ -35,6 +35,7 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   include_dirs = [
