@@ -35,9 +35,9 @@ constexpr int32_t MAX_LOG_SIZE = 1024;
 void KLogOpenLogDevice(void)
 {
 #ifdef _CLOEXEC_
-    int fd = open("/dev/kmsg", O_WRONLY | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
+    int fd = open("/dev/kmsg", O_WRONLY | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP);
 #else
-    int fd = open("/dev/kmsg", O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
+    int fd = open("/dev/kmsg", O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP);
 #endif
     if (fd >= 0) {
         g_fd = fd;
