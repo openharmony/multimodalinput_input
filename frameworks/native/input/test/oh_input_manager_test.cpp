@@ -141,7 +141,7 @@ public:
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_CreateKeyState
- * @tc.desc: Test the funcation OH_Input_CreateKeyState
+ * @tc.desc: Test the function OH_Input_CreateKeyState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -155,7 +155,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CreateKeyState, TestSiz
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyState
- * @tc.desc: Test the funcation OH_Input_GetKeyState
+ * @tc.desc: Test the function OH_Input_GetKeyState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -173,7 +173,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState, TestSize.L
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyState_001
- * @tc.desc: Test the funcation OH_Input_GetKeyState
+ * @tc.desc: Test the function OH_Input_GetKeyState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -187,7 +187,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState_001, TestSi
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectKeyEvent
- * @tc.desc: Test the funcation OH_Input_InjectKeyEvent
+ * @tc.desc: Test the function OH_Input_InjectKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -210,7 +210,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectKeyEvent, TestSiz
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent
- * @tc.desc: Test the funcation OH_Input_InjectMouseEvent
+ * @tc.desc: Test the function OH_Input_InjectMouseEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -265,7 +265,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -280,7 +280,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_001
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -296,7 +296,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_001, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_002
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -311,7 +311,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_002, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_003
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -326,7 +326,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_003, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_004
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -341,7 +341,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_004, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_005
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -358,7 +358,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_005, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_006
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -392,7 +392,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_006, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DestroyAxisEvent
- * @tc.desc: Test the funcation OH_Input_DestroyAxisEvent
+ * @tc.desc: Test the function OH_Input_DestroyAxisEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -407,7 +407,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_CreateMouseEvent
- * @tc.desc: Test the funcation OH_Input_CreateMouseEvent
+ * @tc.desc: Test the function OH_Input_CreateMouseEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -422,7 +422,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CreateMouseEvent, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DestroyAxisEvent_001
- * @tc.desc: Test the funcation OH_Input_DestroyAxisEvent
+ * @tc.desc: Test the function OH_Input_DestroyAxisEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -436,7 +436,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent_001, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_SetKeySwitch
- * @tc.desc: Test the funcation OH_Input_SetKeySwitch
+ * @tc.desc: Test the function OH_Input_SetKeySwitch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -453,7 +453,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeySwitch, TestSize.
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_SetKeyPressed
- * @tc.desc: Test the funcation OH_Input_SetKeyPressed
+ * @tc.desc: Test the function OH_Input_SetKeyPressed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -470,7 +470,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyPressed, TestSize
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventActionTime
- * @tc.desc: Test the funcation OH_Input_GetKeyEventActionTime
+ * @tc.desc: Test the function OH_Input_GetKeyEventActionTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -487,7 +487,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventActionTime, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventWindowId
- * @tc.desc: Test the funcation OH_Input_GetKeyEventWindowId
+ * @tc.desc: Test the function OH_Input_GetKeyEventWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -504,7 +504,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventWindowId, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventDisplayId
- * @tc.desc: Test the funcation OH_Input_GetKeyEventDisplayId
+ * @tc.desc: Test the function OH_Input_GetKeyEventDisplayId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -521,7 +521,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventDisplayId, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventKeyCode
- * @tc.desc: Test the funcation OH_Input_GetKeyEventKeyCode
+ * @tc.desc: Test the function OH_Input_GetKeyEventKeyCode
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -538,7 +538,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventKeyCode, Tes
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventAction
- * @tc.desc: Test the funcation OH_Input_GetMouseEventAction
+ * @tc.desc: Test the function OH_Input_GetMouseEventAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -555,7 +555,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventAction, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventDisplayX
- * @tc.desc: Test the funcation OH_Input_GetMouseEventDisplayX
+ * @tc.desc: Test the function OH_Input_GetMouseEventDisplayX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -572,7 +572,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventDisplayX, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventDisplayY
- * @tc.desc: Test the funcation OH_Input_GetMouseEventDisplayY
+ * @tc.desc: Test the function OH_Input_GetMouseEventDisplayY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -589,7 +589,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventDisplayY, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventButton
- * @tc.desc: Test the funcation OH_Input_GetMouseEventButton
+ * @tc.desc: Test the function OH_Input_GetMouseEventButton
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -606,7 +606,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventButton, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventWindowId
- * @tc.desc: Test the funcation OH_Input_GetMouseEventWindowId
+ * @tc.desc: Test the function OH_Input_GetMouseEventWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -623,7 +623,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventWindowId, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventDisplayId
- * @tc.desc: Test the funcation OH_Input_GetMouseEventDisplayId
+ * @tc.desc: Test the function OH_Input_GetMouseEventDisplayId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -640,7 +640,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventDisplayId,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventAxisType
- * @tc.desc: Test the funcation OH_Input_GetMouseEventAxisType
+ * @tc.desc: Test the function OH_Input_GetMouseEventAxisType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -657,7 +657,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventAxisType, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventActionTime
- * @tc.desc: Test the funcation OH_Input_GetMouseEventActionTime
+ * @tc.desc: Test the function OH_Input_GetMouseEventActionTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -674,7 +674,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventActionTime
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetMouseEventAxisValue
- * @tc.desc: Test the funcation OH_Input_GetMouseEventAxisValue
+ * @tc.desc: Test the function OH_Input_GetMouseEventAxisValue
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -691,7 +691,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventAxisValue,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventAction
- * @tc.desc: Test the funcation OH_Input_GetKeyEventAction
+ * @tc.desc: Test the function OH_Input_GetKeyEventAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -708,7 +708,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventAction, Test
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventFingerId
- * @tc.desc: Test the funcation OH_Input_GetTouchEventFingerId
+ * @tc.desc: Test the function OH_Input_GetTouchEventFingerId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -725,7 +725,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventFingerId, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventDisplayY
- * @tc.desc: Test the funcation OH_Input_GetTouchEventDisplayY
+ * @tc.desc: Test the function OH_Input_GetTouchEventDisplayY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -742,7 +742,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventDisplayY, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventWindowId
- * @tc.desc: Test the funcation OH_Input_GetTouchEventWindowId
+ * @tc.desc: Test the function OH_Input_GetTouchEventWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -759,7 +759,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventWindowId, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventAction
- * @tc.desc: Test the funcation OH_Input_GetAxisEventAction
+ * @tc.desc: Test the function OH_Input_GetAxisEventAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -779,7 +779,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventAction, Tes
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventAxisValue
- * @tc.desc: Test the funcation OH_Input_GetAxisEventAxisValue
+ * @tc.desc: Test the function OH_Input_GetAxisEventAxisValue
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -800,7 +800,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventAxisValue, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventActionTime
- * @tc.desc: Test the funcation OH_Input_GetAxisEventActionTime
+ * @tc.desc: Test the function OH_Input_GetAxisEventActionTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -821,7 +821,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventActionTime,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventType
- * @tc.desc: Test the funcation OH_Input_GetAxisEventType
+ * @tc.desc: Test the function OH_Input_GetAxisEventType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -842,7 +842,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventType, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventSourceType
- * @tc.desc: Test the funcation OH_Input_GetAxisEventSourceType
+ * @tc.desc: Test the function OH_Input_GetAxisEventSourceType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -863,7 +863,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventSourceType,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventWindowId
- * @tc.desc: Test the funcation OH_Input_GetAxisEventWindowId
+ * @tc.desc: Test the function OH_Input_GetAxisEventWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -884,7 +884,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventWindowId, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventDisplayId
- * @tc.desc: Test the funcation OH_Input_GetAxisEventDisplayId
+ * @tc.desc: Test the function OH_Input_GetAxisEventDisplayId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -905,7 +905,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventDisplayId, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventGlobalX
- * @tc.desc: Test the funcation OH_Input_GetAxisEventGlobalX
+ * @tc.desc: Test the function OH_Input_GetAxisEventGlobalX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -926,7 +926,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventGlobalX, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventGlobalY
- * @tc.desc: Test the funcation OH_Input_GetAxisEventGlobalY
+ * @tc.desc: Test the function OH_Input_GetAxisEventGlobalY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -947,7 +947,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventGlobalY, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetIntervalSinceLastInput
- * @tc.desc: Test the funcation OH_Input_GetIntervalSinceLastInput
+ * @tc.desc: Test the function OH_Input_GetIntervalSinceLastInput
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -961,7 +961,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetIntervalSinceLastInp
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_RemoveInputEventInterceptor
- * @tc.desc: Test the funcation OH_Input_RemoveInputEventInterceptor
+ * @tc.desc: Test the function OH_Input_RemoveInputEventInterceptor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -974,7 +974,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveInputEventInterce
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetRepeat
- * @tc.desc: Test the funcation OH_Input_GetRepeat
+ * @tc.desc: Test the function OH_Input_GetRepeat
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -992,7 +992,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetRepeat, TestSize.Lev
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAllSystemHotkeys
- * @tc.desc: Test the funcation OH_Input_GetAllSystemHotkeys
+ * @tc.desc: Test the function OH_Input_GetAllSystemHotkeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1013,7 +1013,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAllSystemHotkeys, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetFinalKey
- * @tc.desc: Test the funcation OH_Input_GetFinalKey
+ * @tc.desc: Test the function OH_Input_GetFinalKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1033,7 +1033,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFinalKey, TestSize.L
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventMonitor
- * @tc.desc: Test the funcation OH_Input_AddKeyEventMonitor
+ * @tc.desc: Test the function OH_Input_AddKeyEventMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1067,7 +1067,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventMonitor_001,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddAxisEventMonitor
- * @tc.desc: Test the funcation OH_Input_AddAxisEventMonitor
+ * @tc.desc: Test the function OH_Input_AddAxisEventMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1082,7 +1082,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddAxisEventMonitor, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventDisplayY
- * @tc.desc: Test the funcation OH_Input_GetAxisEventDisplayY
+ * @tc.desc: Test the function OH_Input_GetAxisEventDisplayY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1102,7 +1102,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventDisplayY, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventDisplayX
- * @tc.desc: Test the funcation OH_Input_GetAxisEventDisplayX
+ * @tc.desc: Test the function OH_Input_GetAxisEventDisplayX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1122,7 +1122,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventDisplayX, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventActionTime
- * @tc.desc: Test the funcation OH_Input_GetTouchEventActionTime
+ * @tc.desc: Test the function OH_Input_GetTouchEventActionTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1139,7 +1139,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventActionTime
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventDisplayId
- * @tc.desc: Test the funcation OH_Input_GetTouchEventDisplayId
+ * @tc.desc: Test the function OH_Input_GetTouchEventDisplayId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1156,7 +1156,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventDisplayId,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventDisplayX
- * @tc.desc: Test the funcation OH_Input_GetTouchEventDisplayX
+ * @tc.desc: Test the function OH_Input_GetTouchEventDisplayX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1173,7 +1173,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventDisplayX, 
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetTouchEventAction
- * @tc.desc: Test the funcation OH_Input_GetTouchEventAction
+ * @tc.desc: Test the function OH_Input_GetTouchEventAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1190,7 +1190,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetTouchEventAction, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_CreateAxisEvent
- * @tc.desc: Test the funcation OH_Input_CreateAxisEvent
+ * @tc.desc: Test the function OH_Input_CreateAxisEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1205,7 +1205,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CreateAxisEvent, TestSi
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_CreateKeyEvent
- * @tc.desc: Test the funcation OH_Input_CreateKeyEvent
+ * @tc.desc: Test the function OH_Input_CreateKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1220,7 +1220,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CreateKeyEvent, TestSiz
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_CreateTouchEvent
- * @tc.desc: Test the funcation OH_Input_CreateTouchEvent
+ * @tc.desc: Test the function OH_Input_CreateTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1235,7 +1235,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CreateTouchEvent, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal
- * @tc.desc: Test the funcation OH_Input_InjectTouchEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1265,7 +1265,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_SetKeyCode
- * @tc.desc: Test the funcation OH_Input_SetKeyCode
+ * @tc.desc: Test the function OH_Input_SetKeyCode
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1286,7 +1286,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode, TestSize.Le
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener
- * @tc.desc: Test the funcation OH_Input_RegisterDeviceListener
+ * @tc.desc: Test the function OH_Input_RegisterDeviceListener
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1323,7 +1323,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_UnregisterDeviceListeners
- * @tc.desc: Test the funcation OH_Input_UnregisterDeviceListeners
+ * @tc.desc: Test the function OH_Input_UnregisterDeviceListeners
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1359,7 +1359,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
 
 /*
  * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener_Error
- * @tc.desc: Test the funcation OH_Input_RegisterDeviceListener
+ * @tc.desc: Test the function OH_Input_RegisterDeviceListener
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1372,7 +1372,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
 
 /*
  * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener_Error
- * @tc.desc: Test the funcation OH_Input_RegisterDeviceListener
+ * @tc.desc: Test the function OH_Input_RegisterDeviceListener
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1388,7 +1388,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
 
 /*
  * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener_Error
- * @tc.desc: Test the funcation OH_Input_RegisterDeviceListener
+ * @tc.desc: Test the function OH_Input_RegisterDeviceListener
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1404,7 +1404,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
 
 /*
  * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener_Error
- * @tc.desc: Test the funcation OH_Input_RegisterDeviceListener
+ * @tc.desc: Test the function OH_Input_RegisterDeviceListener
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1420,7 +1420,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
- * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.desc: Test the function OH_Input_GetDeviceIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1435,7 +1435,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_001, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
- * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.desc: Test the function OH_Input_GetDeviceIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1451,7 +1451,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_002, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
- * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.desc: Test the function OH_Input_GetDeviceIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1466,7 +1466,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_003, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
- * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.desc: Test the function OH_Input_GetDeviceIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1481,7 +1481,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_004, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1496,7 +1496,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_001, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1510,7 +1510,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_002, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1524,7 +1524,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_003, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1543,7 +1543,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_004, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDevice
- * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.desc: Test the function OH_Input_GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1563,7 +1563,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_001, TestSize
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDevice
- * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.desc: Test the function OH_Input_GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1583,7 +1583,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_002, TestSize
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDevice
- * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.desc: Test the function OH_Input_GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1598,7 +1598,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_003, TestSize
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDevice
- * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.desc: Test the function OH_Input_GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1612,7 +1612,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_004, TestSize
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceName
- * @tc.desc: Test the funcation OH_Input_GetDeviceName
+ * @tc.desc: Test the function OH_Input_GetDeviceName
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1637,7 +1637,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceName_001, Test
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceName
- * @tc.desc: Test the funcation OH_Input_GetDeviceName
+ * @tc.desc: Test the function OH_Input_GetDeviceName
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1659,7 +1659,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceName_002, Test
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceName
- * @tc.desc: Test the funcation OH_Input_GetDeviceName
+ * @tc.desc: Test the function OH_Input_GetDeviceName
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1682,7 +1682,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceName_003, Test
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceName
- * @tc.desc: Test the funcation OH_Input_GetDeviceName
+ * @tc.desc: Test the function OH_Input_GetDeviceName
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1698,7 +1698,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceName_004, Test
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceAddress
- * @tc.desc: Test the funcation OH_Input_GetDeviceAddress
+ * @tc.desc: Test the function OH_Input_GetDeviceAddress
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1723,7 +1723,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_001, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceAddress
- * @tc.desc: Test the funcation OH_Input_GetDeviceAddress
+ * @tc.desc: Test the function OH_Input_GetDeviceAddress
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1746,7 +1746,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_002, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceAddress
- * @tc.desc: Test the funcation OH_Input_GetDeviceAddress
+ * @tc.desc: Test the function OH_Input_GetDeviceAddress
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1770,7 +1770,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_003, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceAddress
- * @tc.desc: Test the funcation OH_Input_GetDeviceAddress
+ * @tc.desc: Test the function OH_Input_GetDeviceAddress
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1786,7 +1786,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_004, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceId
- * @tc.desc: Test the funcation OH_Input_GetDeviceId
+ * @tc.desc: Test the function OH_Input_GetDeviceId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1812,7 +1812,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_001, TestSi
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceId
- * @tc.desc: Test the funcation OH_Input_GetDeviceId
+ * @tc.desc: Test the function OH_Input_GetDeviceId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1835,7 +1835,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_002, TestSi
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceId
- * @tc.desc: Test the funcation OH_Input_GetDeviceId
+ * @tc.desc: Test the function OH_Input_GetDeviceId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1859,7 +1859,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_003, TestSi
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceId
- * @tc.desc: Test the funcation OH_Input_GetDeviceId
+ * @tc.desc: Test the function OH_Input_GetDeviceId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1875,7 +1875,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceId_004, TestSi
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetCapabilities
- * @tc.desc: Test the funcation OH_Input_GetCapabilities
+ * @tc.desc: Test the function OH_Input_GetCapabilities
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1899,7 +1899,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetCapabilities_001, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetCapabilities
- * @tc.desc: Test the funcation OH_Input_GetCapabilities
+ * @tc.desc: Test the function OH_Input_GetCapabilities
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1922,7 +1922,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetCapabilities_002, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetCapabilities
- * @tc.desc: Test the funcation OH_Input_GetCapabilities
+ * @tc.desc: Test the function OH_Input_GetCapabilities
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1946,7 +1946,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetCapabilities_003, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetCapabilities
- * @tc.desc: Test the funcation OH_Input_GetCapabilities
+ * @tc.desc: Test the function OH_Input_GetCapabilities
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1962,7 +1962,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetCapabilities_004, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVersion
- * @tc.desc: Test the funcation OH_Input_GetDeviceVersion
+ * @tc.desc: Test the function OH_Input_GetDeviceVersion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1986,7 +1986,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_001, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVersion
- * @tc.desc: Test the funcation OH_Input_GetDeviceVersion
+ * @tc.desc: Test the function OH_Input_GetDeviceVersion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2009,7 +2009,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_002, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVersion
- * @tc.desc: Test the funcation OH_Input_GetDeviceVersion
+ * @tc.desc: Test the function OH_Input_GetDeviceVersion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2033,7 +2033,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_003, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVersion
- * @tc.desc: Test the funcation OH_Input_GetDeviceVersion
+ * @tc.desc: Test the function OH_Input_GetDeviceVersion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2049,7 +2049,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVersion_004, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceProduct
- * @tc.desc: Test the funcation OH_Input_GetDeviceProduct
+ * @tc.desc: Test the function OH_Input_GetDeviceProduct
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2073,7 +2073,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_001, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceProduct
- * @tc.desc: Test the funcation OH_Input_GetDeviceProduct
+ * @tc.desc: Test the function OH_Input_GetDeviceProduct
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2096,7 +2096,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_002, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceProduct
- * @tc.desc: Test the funcation OH_Input_GetDeviceProduct
+ * @tc.desc: Test the function OH_Input_GetDeviceProduct
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2120,7 +2120,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_003, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceProduct
- * @tc.desc: Test the funcation OH_Input_GetDeviceProduct
+ * @tc.desc: Test the function OH_Input_GetDeviceProduct
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2136,7 +2136,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceProduct_004, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVendor
- * @tc.desc: Test the funcation OH_Input_GetDeviceVendor
+ * @tc.desc: Test the function OH_Input_GetDeviceVendor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2160,7 +2160,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVendor_001, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVendor
- * @tc.desc: Test the funcation OH_Input_GetDeviceVendor
+ * @tc.desc: Test the function OH_Input_GetDeviceVendor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2183,7 +2183,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVendor_002, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVendor
- * @tc.desc: Test the funcation OH_Input_GetDeviceVendor
+ * @tc.desc: Test the function OH_Input_GetDeviceVendor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2207,7 +2207,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVendor_003, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceVendor
- * @tc.desc: Test the funcation OH_Input_GetDeviceVendor
+ * @tc.desc: Test the function OH_Input_GetDeviceVendor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2223,7 +2223,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceVendor_004, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_DestroyDeviceInfo
- * @tc.desc: Test the funcation OH_Input_DestroyDeviceInfo
+ * @tc.desc: Test the function OH_Input_DestroyDeviceInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2261,7 +2261,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_001, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_002
- * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.desc: Test the function OH_Input_GetFunctionKeyState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2282,7 +2282,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_002
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_007
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2299,7 +2299,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_007, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType_005
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2314,7 +2314,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_005, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDevice_005
- * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.desc: Test the function OH_Input_GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2329,7 +2329,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_005, TestSize
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds_005
- * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.desc: Test the function OH_Input_GetDeviceIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2346,7 +2346,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_005, TestS
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetPreKeys_001
- * @tc.desc: Test the funcation OH_Input_GetPreKeys
+ * @tc.desc: Test the function OH_Input_GetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2367,7 +2367,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPreKeys_001, TestSiz
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_SetPreKeys_001
- * @tc.desc: Test the funcation OH_Input_SetPreKeys
+ * @tc.desc: Test the function OH_Input_SetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2383,7 +2383,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPreKeys_001, TestSiz
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_CreateAllSystemHotkeys_001
- * @tc.desc: Test the funcation OH_Input_CreateAllSystemHotkeys
+ * @tc.desc: Test the function OH_Input_CreateAllSystemHotkeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2415,7 +2415,7 @@ static void TouchEventCallback(const struct Input_TouchEvent *touchEvent)
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal
- * @tc.desc: Test the funcation OH_Input_InjectMouseEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectMouseEventGlobal
  * @tc.type: FUNC
  * @tc.require:nhj
  */
@@ -2474,7 +2474,7 @@ static void AxisEventCallback(const struct Input_AxisEvent *axisEvent)
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_001
- * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.desc: Test the function OH_Input_AddInputEventInterceptor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2511,7 +2511,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_002
- * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.desc: Test the function OH_Input_AddInputEventInterceptor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2542,7 +2542,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_003
- * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.desc: Test the function OH_Input_AddInputEventInterceptor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2573,7 +2573,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
 
 /**
  * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_001
- * @tc.desc: Test the funcation PointerEventMonitorCallback
+ * @tc.desc: Test the function PointerEventMonitorCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2604,7 +2604,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_001,
 
 /**
  * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_002
- * @tc.desc: Test the funcation PointerEventMonitorCallback
+ * @tc.desc: Test the function PointerEventMonitorCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2632,7 +2632,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_002,
 
 /**
  * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_003
- * @tc.desc: Test the funcation PointerEventMonitorCallback
+ * @tc.desc: Test the function PointerEventMonitorCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2660,7 +2660,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_PointerEventMonitorCallback_003,
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent
- * @tc.desc: Test the funcation OH_Input_InjectMouseEvent
+ * @tc.desc: Test the function OH_Input_InjectMouseEvent
  * @tc.type: FUNC
  * @tc.require:nhj
  */
@@ -2687,7 +2687,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent001, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2703,7 +2703,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_008, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2723,7 +2723,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_009, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_005
- * @tc.desc: Test the funcation OH_Input_InjectTouchEvent
+ * @tc.desc: Test the function OH_Input_InjectTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2740,7 +2740,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_010, T
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventMonitor
- * @tc.desc: Test the funcation OH_Input_AddKeyEventMonitor
+ * @tc.desc: Test the function OH_Input_AddKeyEventMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2773,7 +2773,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventMonitor, Tes
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_003
- * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.desc: Test the function OH_Input_GetFunctionKeyState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2797,7 +2797,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_003
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState
- * @tc.desc: Test the funcation OH_Input_GetFunctionKeyState
+ * @tc.desc: Test the function OH_Input_GetFunctionKeyState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2815,7 +2815,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_001
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2830,7 +2830,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_006, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
- * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.desc: Test the function OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2844,7 +2844,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_007, Te
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
- * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.desc: Test the function OH_Input_GetDeviceIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2860,7 +2860,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_006, TestS
 
 /**
  * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_004
- * @tc.desc: Test the funcation OH_Input_AddMouseEventMonitor
+ * @tc.desc: Test the function OH_Input_AddMouseEventMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3053,7 +3053,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_RequestInjection_002, TestSize.L
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_001
- * @tc.desc: Test the funcation OH_Input_InjectTouchEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3065,7 +3065,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_002
- * @tc.desc: Test the funcation OH_Input_InjectTouchEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3086,7 +3086,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_003
- * @tc.desc: Test the funcation OH_Input_InjectTouchEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3104,7 +3104,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_004
- * @tc.desc: Test the funcation OH_Input_InjectTouchEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3122,7 +3122,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEventGlobal_005
- * @tc.desc: Test the funcation OH_Input_InjectTouchEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectTouchEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3140,7 +3140,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEventGlobal_
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_002
- * @tc.desc: Test the funcation OH_Input_InjectMouseEventGlobal
+ * @tc.desc: Test the function OH_Input_InjectMouseEventGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
