@@ -47,8 +47,8 @@ struct Input_KeyEvent {
 };
 
 struct Input_CursorInfo {
-    bool visible { true };
-    Input_PointerStyle style;
+    bool visible { false };
+    Input_PointerStyle style { DEFAULT };
     int32_t sizeLevel { 0 };
     uint32_t color { 0 };
 };
@@ -4278,7 +4278,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorInfo_Create_001, 
 {
     CALL_TEST_DEBUG;
     Input_CursorInfo* cursorInfo = OH_Input_CursorInfo_Create();
-    ASSERT_EQ(cursorInfo->visible, true);
+    ASSERT_EQ(cursorInfo->visible, false);
     ASSERT_EQ(cursorInfo->style, 0);
     ASSERT_EQ(cursorInfo->sizeLevel, 0);
     ASSERT_EQ(cursorInfo->color, 0);
