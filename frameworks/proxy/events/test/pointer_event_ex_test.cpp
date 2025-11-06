@@ -41,7 +41,7 @@ void PointerEventExTest::SetUpTestCase(void)
 }
 /**
  * @tc.name: PointerEventExTest_ToString_001
- * @tc.desc: Test the funcation ToString
+ * @tc.desc: Test the function ToString
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -75,7 +75,7 @@ HWTEST_F(PointerEventExTest, PointerEventExTest_ToString_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventExTest_DumpPointerAction_005
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -110,7 +110,7 @@ HWTEST_F(PointerEventExTest, PointerEventExTest_DumpPointerAction_005, TestSize.
 
 /**
  * @tc.name: PointerEventExTest_DumpPointerAction_006
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -144,7 +144,7 @@ HWTEST_F(PointerEventExTest, PointerEventExTest_DumpPointerAction_006, TestSize.
 
 /**
  * @tc.name: PointerEventExTest_DumpPointerAction_007
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -178,7 +178,7 @@ HWTEST_F(PointerEventExTest, PointerEventExTest_DumpPointerAction_007, TestSize.
 
 /**
  * @tc.name: PointerEventExTest_DumpPointerAction_008
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
