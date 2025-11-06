@@ -56,8 +56,8 @@ struct Input_KeyEvent {
 };
 
 struct Input_CursorInfo {
-    bool visible { true };
-    Input_PointerStyle style;
+    bool visible { false };
+    Input_PointerStyle style { DEFAULT };
     int32_t sizeLevel { 0 };
     uint32_t color { 0 };
 };
