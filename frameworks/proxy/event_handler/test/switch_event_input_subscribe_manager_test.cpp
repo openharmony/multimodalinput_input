@@ -230,7 +230,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
 
 /**
  * @tc.name: SwitchEventInputSubscribeManagerTest_SetPixelMapData_001
- * @tc.desc: Test the funcation SetPixelMapData
+ * @tc.desc: Test the function SetPixelMapData
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -248,7 +248,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
 
 /**
  * @tc.name: SwitchEventInputSubscribeManagerTest_ReAddInputEventFilter_002
- * @tc.desc: Test the funcation ReAddInputEventFilter
+ * @tc.desc: Test the function ReAddInputEventFilter
  * @tc.type: FUNC
  * @tc.require:
  */
