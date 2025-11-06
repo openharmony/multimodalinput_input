@@ -222,12 +222,6 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
     CALL_INFO_TRACE;
     if (devStatus == "add") {
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
-        for (const auto &displayGroupInfo : displayGroupInfoMap_) {
-            if (!displayGroupInfo.second.displaysInfo.empty() &&
-                displayGroupInfo.second.userState == UserState::USER_ACTIVE) {
-                UpdateDisplayIdAndName(displayGroupInfo.second.groupId);
-            }
-        }
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
     }
@@ -969,18 +963,26 @@ void InputWindowsManager::CheckZorderWindowChange(const std::vector<WindowInfo> 
         oldZorderFirstWindowPid, newZorderFirstWindowPid);
 }
 
-void InputWindowsManager::UpdateDisplayIdAndName(int32_t groupId)
+void InputWindowsManager::UpdateDisplayIdAndName()
 {
     CALL_DEBUG_ENTER;
     using IdNames = std::set<std::pair<uint64_t, std::string>>;
     IdNames newInfo;
-    auto &DisplaysInfo = GetDisplayInfoVector(groupId);
+    auto &DisplaysInfo = GetAllUsersDisplays();
     for (const auto &item : DisplaysInfo) {
         newInfo.insert(std::make_pair(item.rsId, item.uniq));
     }
     auto oldInfo = bindInfo_.GetDisplayIdNames();
     if (newInfo == oldInfo) {
         return;
+    }
+    for (auto it = oldInfo.begin(); it != oldInfo.end();) {
+        if (newInfo.find(*it) == newInfo.end()) {
+            bindInfo_.RemoveDisplay(it->first);
+            oldInfo.erase(it++);
+        } else {
+            ++it;
+        }
     }
     for (const auto &item : newInfo) {
         if (item.first >= HICAR_MIN_DISPLAY_ID) {
@@ -1155,17 +1157,9 @@ void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &w
     }
 }
 
-void InputWindowsManager::UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo,
-    const std::vector<int32_t> &deleteGroups)
+void InputWindowsManager::UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-    for (const auto &groupId : deleteGroups) {
-        auto group = windowsPerDisplayMap_.find(groupId);
-        if (group != windowsPerDisplayMap_.end()) {
-            MMI_HILOGI("windows delete group:%{public}d", groupId);
-            windowsPerDisplayMap_.erase(group);
-        }
-    }
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay;
     int32_t groupId = displayGroupInfo.groupId;
     for (const auto &window : displayGroupInfo.windowsInfo) {
@@ -1986,20 +1980,9 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         PrintChangedWindowBySync(displayGroupInfo);
         CleanInvalidPiexMap(groupId);
         HandleValidDisplayChange(displayGroupInfo);
-        std::vector<int32_t> deleteGroups;
-        for (auto it = displayGroupInfoMap_.begin(); it != displayGroupInfoMap_.end();) {
-            if (it->second.currentUserId == displayGroupInfo.currentUserId &&
-                it->first != displayGroupInfo.groupId) {
-                MMI_HILOGD("displays delete group:%{public}d", it->first);
-                deleteGroups.push_back(it->first);
-                it = displayGroupInfoMap_.erase(it);
-            } else {
-                ++it;
-            }
-        }
         displayGroupInfoMap_[groupId] = displayGroupInfo;
         displayGroupInfo_ = displayGroupInfo;
-        UpdateWindowsInfoPerDisplay(displayGroupInfo, deleteGroups);
+        UpdateWindowsInfoPerDisplay(displayGroupInfo);
         HandleWindowPositionChange(displayGroupInfo);
         EnterMouseCaptureMode(displayGroupInfo);
         const auto iter = displayGroupInfoMap_.find(groupId);
@@ -2008,9 +1991,8 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         }
     }
     PrintDisplayGroupInfo(displayGroupInfoTemp);
-    if (!displayGroupInfoTemp.displaysInfo.empty() &&
-        displayGroupInfo.userState == UserState::USER_ACTIVE) {
-        UpdateDisplayIdAndName(displayGroupInfo.groupId);
+    if (!displayGroupInfoTemp.displaysInfo.empty()) {
+        UpdateDisplayIdAndName();
     }
     UpdateDisplayMode(displayGroupInfo.groupId);
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -3292,6 +3274,16 @@ const std::vector<OLD::DisplayInfo>& InputWindowsManager::GetDisplayInfoVector(i
         return displaysInfo;
     }
     return displayGroupInfo_.displaysInfo;
+}
+
+const std::vector<OLD::DisplayInfo> InputWindowsManager::GetAllUsersDisplays() const
+{
+    std::vector<OLD::DisplayInfo> displayInfos;
+    for (auto &groupInfo : displayGroupInfoMap_) {
+        displayInfos.insert(displayInfos.end(), groupInfo.second.displaysInfo.begin(),
+        groupInfo.second.displaysInfo.end());
+    }
+    return displayInfos;
 }
 
 const std::vector<WindowInfo>& InputWindowsManager::GetWindowInfoVector(int32_t groupId) const
