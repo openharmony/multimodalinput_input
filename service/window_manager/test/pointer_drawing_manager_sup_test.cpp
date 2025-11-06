@@ -1318,11 +1318,13 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     pointerDrawingManager.screenPointers_[displaysInfo.rsId] = spMirror;
     pointerDrawingManager.displayId_ = 100;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y, align));
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorMove(x, y, align));
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.SoftwareCursorMove(pointerDrawingManager.displayId_, x, y, align));
     spMirror->mode_ = mode_t::SCREEN_EXTEND;
     pointerDrawingManager.displayId_ = 200;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y, align));
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorMoveAsync(x, y, align));
+    ASSERT_NO_FATAL_FAILURE(
+        pointerDrawingManager.SoftwareCursorMoveAsync(pointerDrawingManager.displayId_, x, y, align));
 }
 
 /**
