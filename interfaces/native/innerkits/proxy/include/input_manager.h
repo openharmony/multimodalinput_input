@@ -1328,6 +1328,15 @@ public:
     */
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
 
+    /*
+    * @brief Get event ids.
+    * @param markedId marked id.
+    * @param processedId processed id.
+    * @param dispatchedEventId dispatched id.
+    * @since 23
+    */
+    void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

@@ -268,6 +268,7 @@ public:
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
     bool IsPointerInit();
+    void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);
     int32_t PackDisplayGroupsInfo(NetPacket &pkt, const std::vector<DisplayGroupInfo> &displayGroups);
@@ -303,6 +304,8 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t MarkLastDispatched(int32_t eventId);
+    int32_t MarkLastProcessed(int32_t eventId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);

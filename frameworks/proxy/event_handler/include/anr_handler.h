@@ -15,6 +15,7 @@
 
 #ifndef ANR_HANDLER_H
 #define ANR_HANDLER_H
+#include <atomic>
 
 #include "singleton.h"
 
@@ -31,6 +32,9 @@ public:
     void SetLastProcessedEventId(int32_t eventType, int32_t eventId, int64_t actionTime);
     void MarkProcessed(int32_t eventType, int32_t eventId);
     void ResetAnrArray();
+    void SetLastDispatchedEventId(int32_t eventId);
+    void SetLastProcessEventId(int32_t eventId);
+    void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
 
 private:
     struct ANREvent {
@@ -44,6 +48,8 @@ private:
     std::vector<int32_t> idList_;
     void SendEvent(int32_t eventType, int32_t eventId);
     std::mutex mutex_;
+    std::atomic<int32_t> lastDispatchedEventId_ { 0 };
+    std::atomic<int32_t> lastProcessedEventId_ { 0 };
 };
 
 #define ANRHDL ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()

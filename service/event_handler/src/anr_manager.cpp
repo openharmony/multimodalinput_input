@@ -19,6 +19,7 @@
 #include "i_input_windows_manager.h"
 #include "timer_manager.h"
 #include "uds_session.h"
+#include "parameters.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_ANRDETECT
@@ -31,6 +32,7 @@ namespace {
 const char* FOUNDATION { "foundation" };
 constexpr int32_t MAX_TIMER_COUNT { 50 };
 constexpr int32_t TIME_CONVERT_RATIO { 1000 };
+static bool g_betaVersion = OHOS::system::GetParameter("const.logsystem.versiontype", "unknown") == "beta";
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -122,7 +124,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         MMI_HILOGD("Add timer failed, timer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
         return;
     }
-    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
+    int32_t timerId = TimerMgr->AddTimer(GetInputTimeout() / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
         CHKPV(sess);
         if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
@@ -195,7 +197,7 @@ void ANRManager::HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTi
     std::vector<UDSSession::EventTime> timeoutEvents;
     MMI_HILOGD("Event list size. Type:%{public}d, Count:%{public}zu", type, events.size());
 
-    const int64_t timeoutThreshold = INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO;
+    const int64_t timeoutThreshold = GetInputTimeout() / TIME_CONVERT_RATIO;
     for (const auto &event : events) {
         const int64_t elapsedTime = currentTime - event.eventTime;
         if (elapsedTime > timeoutThreshold) {
@@ -223,6 +225,15 @@ void ANRManager::HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTi
         MMI_HILOGD("Keep anr state. Last timeout event. Type:%{public}d, PID:%{public}d",
             type, sess->GetPid());
     }
+}
+
+int64_t ANRManager::GetInputTimeout()
+{
+    int64_t inputTimeout = INPUT_UI_TIMEOUT_TIME;
+    if (g_betaVersion) {
+        inputTimeout = BETA_INPUT_UI_TIMEOUT_TIME;
+    }
+    return inputTimeout;
 }
 } // namespace MMI
 } // namespace OHOS

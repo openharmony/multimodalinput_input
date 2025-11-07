@@ -1059,5 +1059,10 @@ bool InputManager::IsPointerInit()
 {
     return InputMgrImpl.IsPointerInit();
 }
+
+void InputManager::GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId)
+{
+    return InputMgrImpl.GetLastEventIds(markedId, processedId, dispatchedEventId);
+}
 } // namespace MMI
 } // namespace OHOS
