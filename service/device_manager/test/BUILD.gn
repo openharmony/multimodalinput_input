@@ -88,6 +88,7 @@ ohos_unittest("InputDeviceManagerTestWithMock") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "preferences:native_preferences",
+    "eventhandler:libeventhandler",
   ]
 }
 
