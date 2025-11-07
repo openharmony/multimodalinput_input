@@ -32,13 +32,6 @@ enum EtsErrorCode : int32_t {
     COMMON_USE_SYSAPI_ERROR = 202,
     COMMON_PARAMETER_ERROR = 401,
     INPUT_DEVICE_NOT_SUPPORTED = 801,
-    COMMON_DEVICE_NOT_EXIST = 3900001,
-    COMMON_KEYBOARD_DEVICE_NOT_EXIST = 3900002,
-    COMMON_NON_INPUT_APPLICATION = 3900003,
-    PRE_KEY_NOT_SUPPORTED = 4100001,
-    INPUT_OCCUPIED_BY_SYSTEM = 4200002,
-    INPUT_OCCUPIED_BY_OTHER = 4200003,
-    ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001,
 };
 using TaiheInfraredFrequency = ::ohos::multimodalInput::infraredEmitter::InfraredFrequency;
 static TaiheInfraredFrequency InfraredFrequencyToAni(OHOS::MMI::InfraredFrequency const & value)
@@ -49,42 +42,60 @@ static TaiheInfraredFrequency InfraredFrequencyToAni(OHOS::MMI::InfraredFrequenc
     return frequency;
 }
 
+std::string HandleError(int32_t ret, int32_t &errorCode)
+{
+    std::string result = "";
+    if (ret == RET_OK) {
+        errorCode = RET_OK;
+        return result;
+    }
+    errorCode = std::abs(ret);
+    switch (errorCode) {
+        case COMMON_USE_SYSAPI_ERROR:
+            result = "Permission denied. Non-system application called system api.";
+            break;
+        case COMMON_PERMISSION_CHECK_ERROR:
+            result = "Permission denied. Need ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
+            break;
+        case INPUT_DEVICE_NOT_SUPPORTED:
+            result = "Capability not supported. Failed to call the API due to limited device capabilities.";
+            break;
+        default:
+            result = "Parameter error.";
+            break;
+    }
+    return result;
+}
+
 void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
     std::vector<int64_t> vecPattern;
     if (infraredFrequency <= 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR,
-            "Parameter error.value of infraredFrequencymust be greater than 0");
+            "Parameter error.value of infraredFrequency must be greater than 0");
         return;
     }
     for (auto it = pattern.begin(); it != pattern.end(); ++it) {
         if (*it <= 0) {
-            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+            taihe::set_business_error(COMMON_PARAMETER_ERROR,
                 "Parameter error.The element of pattern must be positive.");
             return;
         }
         vecPattern.push_back(*it);
     }
-    if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
-        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
-            "Parameter error.The size of pattern must be less than or equal 50.");
+    if (vecPattern.size() <= 0 || vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR,
+            "Parameter error.The number of pattern elements is incorrect.");
         return;
     }
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->TransmitInfrared(infraredFrequency, vecPattern);
     if (ret != RET_OK) {
-        int32_t errorCode = std::abs(ret);
-        if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-            MMI_HILOGE("Non system applications use system API");
-            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-        } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-            MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
-            taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
-                "Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
-        } else {
-            MMI_HILOGE(
-                "TransmitInfrared returnCode:%{public}d", ret);
-        }
+        int32_t errCode = 0;
+        auto errMsg = HandleError(ret, errCode);
+        MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
+        taihe::set_business_error(errCode, errMsg);
+        return;
     }
 }
 
@@ -95,18 +106,10 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
     std::vector<TaiheInfraredFrequency> result;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetInfraredFrequencies(frequencies);
     if (ret != RET_OK) {
-        int32_t errorCode = std::abs(ret);
-        if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-            MMI_HILOGE("Non system applications use system API");
-            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-        } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-            MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
-            taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
-                "Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
-        } else {
-            MMI_HILOGE(
-                "GetInfraredFrequencies returnCode:%{public}d", ret);
-        }
+        int32_t errCode = 0;
+        auto errMsg = HandleError(ret, errCode);
+        MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
+        taihe::set_business_error(errCode, errMsg);
         return ::taihe::array<TaiheInfraredFrequency>(result);
     }
 

@@ -227,6 +227,9 @@
         },
         {
           "name": "//foundation/multimodalinput/input/frameworks/ets/pointer:pointer_taihe"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/ets/infrared_emitter:infrared_emitter_taihe"
         }
       ],
       "test": [
