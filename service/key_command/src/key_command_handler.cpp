@@ -2154,7 +2154,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     bool isLaunchAbility = false;
     for (auto iter = filterSequences_.begin(); iter != filterSequences_.end();) {
         if (!HandleSequence((*iter), isLaunchAbility)) {
-            filterSequences_.erase(iter);
+            iter = filterSequences_.erase(iter);
             continue;
         }
         ++iter;
