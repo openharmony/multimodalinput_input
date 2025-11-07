@@ -5394,10 +5394,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             MMI_HILOG_DISPATCHI("Pre search window %{public}d %{public}s", targetWindowId, oss.str().c_str());
         }
     }
+    std::map<int32_t, WindowInfoEX> tmpWindowInfo;
+    if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+        tmpWindowInfo = thpFeatureTouchDownInfos_;
+    } else {
+        tmpWindowInfo = touchItemDownInfos_;
+    }
     if (touchWindow == nullptr) {
-        auto it = touchItemDownInfos_.find(pointerId);
+        auto it = tmpWindowInfo.find(pointerId);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (it == touchItemDownInfos_.end() ||
+            if (it == tmpWindowInfo.end() ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                 int32_t originPointerAction = pointerEvent->GetPointerAction();
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -5420,6 +5426,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
             MMI_HILOG_DISPATCHI("Not found event down target window, maybe this window was untouchable,"
                 "need send cancel event, windowId:%{public}d pointerId:%{public}d", touchWindow->id, pointerId);
+        }
+        if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+            if (it->second.flag) {
+                thpFeatureTouchDownInfos_[pointerId].flag = false;
+            } else {
+                pointerItem.SetCanceled(true);
+            }
         }
     }
     winMap.clear();
@@ -5522,6 +5535,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            WindowInfoEX windowInfoEX;
+            windowInfoEX.window = *touchWindow;
+            windowInfoEX.flag = true;
+            thpFeatureTouchDownInfos_[pointerId] = windowInfoEX;
+        }
         return ERR_OK;
     }
     bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
