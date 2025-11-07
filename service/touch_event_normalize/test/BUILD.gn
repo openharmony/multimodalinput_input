@@ -1087,6 +1087,7 @@ ohos_unittest("TouchGestureAdapterTest") {
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "eventhandler:libeventhandler",
   ]
 
   if (enable_player_framework) {
@@ -1233,6 +1234,7 @@ ohos_unittest("TouchGestureManagerTestWithMock") {
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "eventhandler:libeventhandler",
   ]
 
   if (enable_player_framework) {
