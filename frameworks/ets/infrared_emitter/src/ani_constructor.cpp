@@ -13,29 +13,32 @@
  * limitations under the License.
  */
 
+#include "define_multimodal.h"
 #include "ohos.multimodalInput.infraredEmitter.ani.hpp"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "aniInputInfraredconstructor"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
-    ani_env *env;
-    if (vm == nullptr) {
-        std::cerr << "vm is nullptr" << std::endl;
+    if (!vm) {
+        MMI_HILOGE("vm is null");
         return ANI_ERROR;
     }
-    ani_status getEnvStatus = vm->GetEnv(ANI_VERSION_1, &env);
-    if (getEnvStatus != ANI_OK) {
-        std::cerr << "Error from vm->GetEnv: " << getEnvStatus << std::endl;
+    if (!result) {
+        MMI_HILOGE("result is null");
         return ANI_ERROR;
     }
-    ani_status status = ANI_OK;
-    if (ANI_OK != ohos::multimodalInput::infraredEmitter::ANIRegister(env)) {
-        std::cerr << "Error from ohos::multimodalInput::infraredEmitter::ANIRegister" << std::endl;
-        status = ANI_ERROR;
+    ani_env *env = nullptr;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        MMI_HILOGE("Failed to get ANI environment");
+        return ANI_ERROR;
     }
-    if (result == nullptr) {
-        std::cerr << "result is nullptr" << std::endl;
+    int32_t ret = ohos::multimodalInput::infraredEmitter::ANIRegister(env);
+    if (ret != ANI_OK) {
+        MMI_HILOGE("ANIRegister failed, error: %{public}d", ret);
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;
-    return status;
+    return ANI_OK;
 }
