@@ -537,6 +537,7 @@ private:
 
 
     std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
+    std::map<int32_t, WindowInfoEX> thpFeatureTouchDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
