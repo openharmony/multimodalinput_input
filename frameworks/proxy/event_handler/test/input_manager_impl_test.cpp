@@ -2335,5 +2335,24 @@ HWTEST_F(InputManagerImplTest, GetUserDefinedCursorPixelMap_001, TestSize.Level1
     int32_t ret = inputManagerImpl.GetUserDefinedCursorPixelMap(nullptr);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: GetLastEventIds_001
+ * @tc.desc: Test GetLastEventIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, GetLastEventIds_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    int32_t markedId = 0;
+    int32_t processedId = 0;
+    int32_t dispatchedEventId = 0;
+    inputManagerImpl.GetLastEventIds(markedId, processedId, dispatchedEventId);
+    EXPECT_TRUE(markedId >= 0);
+    EXPECT_TRUE(processedId >= 0);
+    EXPECT_TRUE(dispatchedEventId >= 0);
+}
 } // namespace MMI
 } // namespace OHOS

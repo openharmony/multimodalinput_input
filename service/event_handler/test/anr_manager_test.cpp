@@ -509,5 +509,17 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_005, TestSize.Level1)
     auto resultEvents = sess->GetEventsByType(type);
     ASSERT_EQ(resultEvents.size(), 0);
 }
+
+/**
+* @tc.name  : AnrManagerTest_GetInputTimeout_001
+* @tc.desc  : Test input timeout.
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(AnrManagerTest, AnrManagerTest_GetInputTimeout_001, TestSize.Level1)
+{
+    int64_t ret = ANRMgr->GetInputTimeout();
+    ASSERT_TRUE(ret >= 5 * 1000000);
+}
 } // namespace MMI
 } // namespace OHOS
