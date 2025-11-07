@@ -7961,7 +7961,11 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
         .y = cursorIt->second.cursorPos.y,
     };
     auto displayInfo = GetPhysicalDisplay(cursorPosMap_[groupId].displayId);
-    CHKPV(displayInfo);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("displayInfo is null", displayInfo);
+        ClearPointerLockedWindow();
+        return;
+    }
     RotateDisplayScreen(*displayInfo, coord);
     UpdateCurrentDisplay(cursorPosMap_[groupId].displayId);
     mouseIt->second.physicalX = static_cast<int32_t>(coord.x);
