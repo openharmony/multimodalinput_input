@@ -4437,6 +4437,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                     MMI_HILOGD("Turn the mouseDisplay from false to true");
                     CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             }
+            CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicalDisplayInfo);
             int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER) &&
