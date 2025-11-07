@@ -16,6 +16,7 @@
 #ifndef SWITCH_SUBSCRIBER_HANDLER_H
 #define SWITCH_SUBSCRIBER_HANDLER_H
 
+#include "event_handler.h"
 #include <unordered_map>
 #include "i_input_event_handler.h"
 #include "uds_server.h"
@@ -24,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class SwitchSubscriberHandler final : public IInputEventHandler {
 public:
-    SwitchSubscriberHandler() = default;
+    SwitchSubscriberHandler();
     DISALLOW_COPY_AND_MOVE(SwitchSubscriberHandler);
     ~SwitchSubscriberHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -39,6 +40,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent) override;
     bool PublishTabletEvent(const std::shared_ptr<SwitchEvent> switchEvent);
+    bool PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent);
+    void DumpLidState(int32_t fd, const std::vector<std::string> &args);
     const std::string COMMON_EVENT_TABLET_MODE_CHANGED = "usual.event.TABLET_MODE_CHANGED";
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
@@ -70,6 +73,8 @@ private:
     std::atomic_bool callbackInitialized_ { false };
     std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
     std::unordered_map<int32_t, int32_t> switchStateRecord_;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    inline static int32_t lidState_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -32,6 +32,13 @@
 
 namespace OHOS {
 namespace MMI {
+const std::string THREAD_NAME { "mmi_switch_subscriber_EventHdr" };
+const std::string COMMON_EVENT_LID_STATE_CHANGED = "usual.event.LID_STATE_CHANGED";
+SwitchSubscriberHandler::SwitchSubscriberHandler()
+{
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+}
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void SwitchSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -77,6 +84,32 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
     return ret;
 }
 
+bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent)
+{
+    CHKPF(switchEvent);
+    lidState_ = switchEvent->GetSwitchValue();
+    OHOS::AAFwk::Want want;
+    want.SetAction(COMMON_EVENT_LID_STATE_CHANGED);
+    want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_LID);
+    want.SetParam("eventState", switchEvent->GetSwitchValue());
+        
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetSticky(true);
+    bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
+    MMI_HILOGI("PublishCommonEvent: %{public}s %{public}d return %{public}d", "SWITCH_LID",
+        switchEvent->GetSwitchValue(), ret);
+    return ret;
+}
+
+void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "lid state information:\t");
+    mprintf(fd, "lid state=%d", lidState_);
+}
+
 #ifdef OHOS_BUILD_ENABLE_SWITCH
 void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
@@ -88,6 +121,8 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
         } else {
             MMI_HILOGI("The tablet commonEvent publish failed");
         }
+    } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
+        eventHandler_->PostTask([this, switchEvent] { this->PublishLidEvent(switchEvent); });
     }
     if (OnSubscribeSwitchEvent(switchEvent)) {
         MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
