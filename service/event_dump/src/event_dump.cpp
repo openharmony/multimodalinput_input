@@ -98,6 +98,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "cursor", no_argument, 0, 'c' },
         { "keycommand", no_argument, 0, 'k' },
         { "event", no_argument, 0, 'e' },
+        { "lidstate", no_argument, 0, 't' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -125,7 +126,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmcke", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmcket", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -244,6 +245,18 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 EventStatistic::Dump(fd, args);
                 break;
             }
+            case 't': {
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+                auto switchSubscriberHandler = InputHandler->GetSwitchSubscriberHandler();
+                if (switchSubscriberHandler == nullptr) {
+                    goto RELEASE_RES;
+                }
+                switchSubscriberHandler->DumpLidState(fd, args);
+#else
+                mprintf(fd, "Switch Subscriber function does not support");
+#endif // OHOS_BUILD_ENABLE_SWITCH
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -281,6 +294,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
     mprintf(fd, "      -k, --keycommand: dump the key command information\t");
     mprintf(fd, "      -e, --event: dump the libinput event information\t");
+    mprintf(fd, "      -t, --lidstate: dump the lid state information\t");
 }
 } // namespace MMI
 } // namespace OHOS
