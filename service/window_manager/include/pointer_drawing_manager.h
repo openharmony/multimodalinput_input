@@ -244,8 +244,8 @@ private:
     Direction CalculateRenderDirection(bool isHard, bool isWindowRotation);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
-    void SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
-    void SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align);
+    void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align);
+    void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align);
     void MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align);
     void ResetMoveRetryTimer();
     int32_t HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
