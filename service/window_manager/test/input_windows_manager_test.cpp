@@ -11882,5 +11882,432 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfoFlag_0
     flag = WindowInfo::FLAG_BIT_UNTOUCHABLE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_001
+ * @tc.desc: Test lastPointerEvent == nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_NE(createPointerEvent, nullptr);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_002
+ * @tc.desc: Test lastPointerEvent != nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_003
+ * @tc.desc: Test lastPointerEvent->GetPointerItem(lastPointerId, lastPointerItem)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(1);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_004
+ * @tc.desc: Test lastPointerEvent->GetPointerItem(lastPointerId, lastPointerItem)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_005
+ * @tc.desc: Test extraData_.appended
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_006
+ * @tc.desc: Test extraData_.appended
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_007
+ * @tc.desc: Test extraData_.sourceType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_008
+ * @tc.desc: Test extraData_.sourceType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_009
+ * @tc.desc: Test lastPointerItem.IsPressed()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(false);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_010
+ * @tc.desc: Test lastPointerItem.IsPressed()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CreatePointerByLastPointer_011
+ * @tc.desc: Test lastPointerItem.IsPressed()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CreatePointerByLastPointer_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    ASSERT_NE(inputWindowsManager->lastPointerEvent_, nullptr);
+    inputWindowsManager->lastPointerEvent_->SetDeviceId(1);
+    auto createPointerEvent = inputWindowsManager->CreatePointerByLastPointer(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(createPointerEvent->GetDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_LimitMouseLocaltionInEvent_001
+ * @tc.desc: Test displayDirection == DIRECTION0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    int32_t integerX = 3000;
+    int32_t integerY = 3000;
+    double x = 0;
+    double y = 0;
+    bool isRealData = true;
+    displayInfo.id = 1;
+    displayInfo.direction = Direction::DIRECTION0;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 2000;
+    displayInfo.validHeight = 1000;
+    inputWindowsManager->pointerLockedWindow_.area.x = 507;
+    inputWindowsManager->pointerLockedWindow_.area.y = 302;
+    inputWindowsManager->pointerLockedWindow_.area.width = 2090;
+    inputWindowsManager->pointerLockedWindow_.area.height = 1394;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y, isRealData);
+    EXPECT_EQ(integerX, displayInfo.validWidth - 1);
+    EXPECT_EQ(integerY, displayInfo.validHeight - 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_LimitMouseLocaltionInEvent_002
+ * @tc.desc: Test displayDirection == DIRECTION180
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    int32_t integerX = 3000;
+    int32_t integerY = 3000;
+    double x = 0;
+    double y = 0;
+    bool isRealData = true;
+    displayInfo.id = 1;
+    displayInfo.direction = Direction::DIRECTION180;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 2000;
+    displayInfo.validHeight = 1000;
+    inputWindowsManager->pointerLockedWindow_.area.x = 507;
+    inputWindowsManager->pointerLockedWindow_.area.y = 302;
+    inputWindowsManager->pointerLockedWindow_.area.width = 2090;
+    inputWindowsManager->pointerLockedWindow_.area.height = 1394;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y, isRealData);
+    EXPECT_EQ(integerX, displayInfo.validWidth - 1);
+    EXPECT_EQ(integerY, displayInfo.validHeight - 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_LimitMouseLocaltionInEvent_004
+ * @tc.desc: Test displayDirection == DIRECTION270 And !isRealData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    int32_t integerX = 3000;
+    int32_t integerY = 3000;
+    double x = 0;
+    double y = 0;
+    bool isRealData = false;
+    displayInfo.id = 1;
+    displayInfo.direction = Direction::DIRECTION270;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 2000;
+    displayInfo.validHeight = 1000;
+    inputWindowsManager->pointerLockedWindow_.area.x = 507;
+    inputWindowsManager->pointerLockedWindow_.area.y = 302;
+    inputWindowsManager->pointerLockedWindow_.area.width = 2090;
+    inputWindowsManager->pointerLockedWindow_.area.height = 1394;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y, isRealData);
+    EXPECT_EQ(integerX, displayInfo.validWidth - 1);
+    EXPECT_EQ(integerY, displayInfo.validHeight - 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_001
+ * @tc.desc: Test if (window.transform.size() == MATRIX3_SIZE && !transform.IsIdentity())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 0;
+    displayInfo.direction = Direction::DIRECTION0;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.width, focusWindow.area.width);
+    EXPECT_EQ(windowArea.height, focusWindow.area.height);
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0};
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.width, focusWindow.area.width);
+    EXPECT_EQ(windowArea.height, focusWindow.area.height);
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.width, focusWindow.area.width);
+    EXPECT_EQ(windowArea.height, focusWindow.area.height);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_002
+ * @tc.desc: Test switch (displayDirection)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 0;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 3000;
+    displayInfo.validHeight = 3000;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.width, focusWindow.area.height);
+    EXPECT_EQ(windowArea.height, focusWindow.area.width);
+}
 } // namespace MMI
 } // namespace OHOS
