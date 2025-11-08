@@ -2305,7 +2305,7 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig *cursorConf
  * @param windowId Window ID. The value is an integer greater than or equal to 0.
  * @param customCursor Pointer to an {@link Input_CustomCursor} object.
  * @param cursorConfig Pointer to an {@link cursorConfig} object.
- * @return OH_Input_SetCustomCursor function result code.s
+ * @return OH_Input_SetCustomCursor function result code.
  *         {@link INPUT_SUCCESS} if the operation is successful;
  *         {@link INPUT_PARAMETER_ERROR} if window ID is abnormal or customCursor is invalid;
  *         {@link INPUT_INVALID_WINDOWID} if window ID is invaild.
