@@ -25,6 +25,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "util_ex.h"
+#include "ffrt.h"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
@@ -32,13 +33,7 @@
 
 namespace OHOS {
 namespace MMI {
-const std::string THREAD_NAME { "mmi_switch_subscriber_EventHdr" };
 const std::string COMMON_EVENT_LID_STATE_CHANGED = "usual.event.LID_STATE_CHANGED";
-SwitchSubscriberHandler::SwitchSubscriberHandler()
-{
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-}
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void SwitchSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -98,7 +93,7 @@ bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent>
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetSticky(true);
     bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
-    MMI_HILOGI("PublishCommonEvent: %{public}s %{public}d return %{public}d", "SWITCH_LID",
+    MMI_HILOGI("PublishCommonEvent: SWITCH_LID %{public}d return %{public}d",
         switchEvent->GetSwitchValue(), ret);
     return ret;
 }
@@ -107,7 +102,7 @@ void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::st
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "lid state information:\t");
-    mprintf(fd, "lid state=%d", lidState_);
+    mprintf(fd, "lid state=%d", lidState_.load());
 }
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
@@ -122,7 +117,9 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
             MMI_HILOGI("The tablet commonEvent publish failed");
         }
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
-        eventHandler_->PostTask([this, switchEvent] { this->PublishLidEvent(switchEvent); });
+        ffrt::submit([this, switchEvent] {
+            this->PublishLidEvent(switchEvent);
+        });
     }
     if (OnSubscribeSwitchEvent(switchEvent)) {
         MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
