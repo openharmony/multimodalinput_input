@@ -33,6 +33,7 @@ inline constexpr int32_t ERROR_REPEAT_INTERCEPTOR { -1003 };
 inline constexpr int32_t ERROR_INVALID_PARAMETER { -1004 };
 inline constexpr int32_t ERROR_APP_NOT_FOCUSED { 3900009 };
 inline constexpr int32_t ERROR_DEVICE_NO_POINTER { 3900010 };
+inline constexpr int32_t ERROR_UNSUPPORTED_IR_EMITTER { 3900011 };
 
 enum class AUTHORIZE_QUERY_STATE : int32_t {
     OTHER_PID_IN_AUTHORIZATION_SELECTION = 0,

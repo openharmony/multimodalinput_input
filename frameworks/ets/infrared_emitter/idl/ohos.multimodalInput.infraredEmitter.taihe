@@ -25,3 +25,5 @@ struct InfraredFrequency {
 
 function TransmitInfrared(infraredFrequency: i64, pattern: Array<i64>): void;
 function GetInfraredFrequencies(): Array<InfraredFrequency>;
+@gen_promise("hasIrEmitter")
+function HasIrEmitterAsync(): bool;

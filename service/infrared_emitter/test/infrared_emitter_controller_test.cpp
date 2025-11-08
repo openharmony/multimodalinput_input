@@ -223,6 +223,10 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
         {
             return 0;
         }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
     };
 
     InfraredEmitterController controller;
@@ -250,6 +254,10 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
             return 0;
         }
         int32_t GetCarrierFreqs(bool&, std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            return 0;
+        }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
         {
             return 0;
         }
@@ -283,6 +291,10 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
         {
             return 0;
         }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
     };
 
     InfraredEmitterController controller;
@@ -310,12 +322,16 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
             ret = true;
             return -1;
         }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
     };
     InfraredEmitterController controller;
     controller.irInterface_ = new (std::nothrow) FakeAdapter();
     std::vector<InfraredFrequencyInfo> frequencyInfo;
-    bool result = controller.GetFrequencies(frequencyInfo);
-    ASSERT_FALSE(result);
+    int32_t result = controller.GetFrequencies(frequencyInfo);
+    ASSERT_TRUE(result != RET_OK);
 }
 
 /**
@@ -334,12 +350,16 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
             ret = false;
             return 0;
         }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
     };
     InfraredEmitterController controller;
     controller.irInterface_ = new (std::nothrow) FakeAdapter();
     std::vector<InfraredFrequencyInfo> frequencyInfo;
-    bool result = controller.GetFrequencies(frequencyInfo);
-    ASSERT_FALSE(result);
+    int32_t result = controller.GetFrequencies(frequencyInfo);
+    ASSERT_TRUE(result != RET_OK);
 }
 
 /**
@@ -362,17 +382,64 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
             };
             return 0;
         }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
     };
     InfraredEmitterController controller;
     controller.irInterface_ = new (std::nothrow) FakeAdapter();
     std::vector<InfraredFrequencyInfo> frequencyInfo;
-    bool result = controller.GetFrequencies(frequencyInfo);
-    ASSERT_TRUE(result);
+    int32_t result = controller.GetFrequencies(frequencyInfo);
+    ASSERT_TRUE(result == RET_OK);
     ASSERT_EQ(frequencyInfo.size(), 2);
     ASSERT_EQ(frequencyInfo[0].min_, 36000);
     ASSERT_EQ(frequencyInfo[0].max_, 40000);
     ASSERT_EQ(frequencyInfo[1].min_, 38000);
     ASSERT_EQ(frequencyInfo[1].max_, 42000);
+}
+
+/**
+ * @tc.name: InfraredEmitterControllerTest_HasIrEmitter_001
+ * @tc.desc: Test GetFrequencies with valid data returned
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_HasIrEmitter_001, TestSize.Level1)
+{
+    InfraredEmitterController controller;
+    const std::string irWrapperPath = "libmistouch_prevention.z.so";
+    controller.soIrHandle_ = dlopen(irWrapperPath.c_str(), RTLD_NOW);
+    bool hasIrEmitter = false;
+    controller.HasIrEmitter(hasIrEmitter);
+    ASSERT_TRUE(controller.soIrHandle_ == nullptr);
+}
+ 
+/**
+ * @tc.name: InfraredEmitterControllerTest_HasIrEmitter_002
+ * @tc.desc: Test GetFrequencies with valid data returned
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_HasIrEmitter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool&) override { return 0; }
+        int32_t GetCarrierFreqs(bool& ret, std::vector<HDI::Consumerir::V1_0::ConsumerIrFreqRange>& range) override
+        {
+            return 0;
+        }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
+    };
+    InfraredEmitterController controller;
+    controller.irInterface_ = new (std::nothrow) FakeAdapter();
+    bool hasIrEmitter = false;
+    bool result = controller.HasIrEmitter(hasIrEmitter);
+    ASSERT_TRUE(result);
 }
 #endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI
