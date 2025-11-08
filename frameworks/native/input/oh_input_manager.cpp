@@ -3486,7 +3486,14 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetCustomCursor(windowId, cursor, cursorOptions);
     if (ret != RET_OK) {
         MMI_HILOGE("SetCustomCursor fail, error:%{public}d", ret);
-        return ret == OHOS::MMI::ERROR_UNSUPPORT ? INPUT_DEVICE_NOT_SUPPORTED : INPUT_SERVICE_EXCEPTION;
+        switch (ret) {
+            case OHOS::MMI::ERROR_UNSUPPORT:
+                return INPUT_DEVICE_NOT_SUPPORTED;
+            case INPUT_INVALID_WINDOWID:
+                return INPUT_INVALID_WINDOWID;
+            default:
+                return INPUT_SERVICE_EXCEPTION;
+        }
     }
     return INPUT_SUCCESS;
 }
