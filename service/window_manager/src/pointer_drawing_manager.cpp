@@ -396,7 +396,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
             if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
                 // Change the coordinates issued by RS to asynchronous,
                 // without blocking the issuance of HardwareCursor coordinates.
-                SoftwareCursorMoveAsync(physicalX, physicalY, iconType);
+                SoftwareCursorMoveAsync(displayId_, physicalX, physicalY, iconType);
             }
         }
         if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
@@ -1191,7 +1191,8 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         }
         PostSoftCursorTask([this]() {
             SoftwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
-            SoftwareCursorMove(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
+            SoftwareCursorMove(displayId_, lastPhysicalX_, lastPhysicalY_,
+                MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
         });
         currentFrame_++;
         if (currentFrame_ == frameCount_) {
@@ -3693,9 +3694,9 @@ int32_t PointerDrawingManager::CheckHwcReady()
     return RET_OK;
 }
 
-void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
+void PointerDrawingManager::SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align)
 {
-    auto sp = GetScreenPointer(displayId_);
+    auto sp = GetScreenPointer(displayId);
     CHKPV(sp);
     sp->MoveSoft(x, y, align);
 
@@ -3706,10 +3707,10 @@ void PointerDrawingManager::SoftwareCursorMove(int32_t x, int32_t y, ICON_TYPE a
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void PointerDrawingManager::SoftwareCursorMoveAsync(int32_t x, int32_t y, ICON_TYPE align)
+void PointerDrawingManager::SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align)
 {
-    PostSoftCursorTask([this, x, y, align]() {
-        SoftwareCursorMove(x, y, align);
+    PostSoftCursorTask([this, displayId, x, y, align]() {
+        SoftwareCursorMove(displayId, x, y, align);
     });
 }
 
