@@ -181,7 +181,6 @@ public:
     ErrCode CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice) override;
     int32_t OnCreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    int32_t OnHasIrEmitter(bool &hasIrEmitter);
     ErrCode SetPixelMapData(int32_t infoId, const CursorPixelMap& curPixelMap) override;
     ErrCode SetCurrentUser(int32_t userId) override;
     ErrCode SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;

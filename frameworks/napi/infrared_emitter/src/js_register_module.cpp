@@ -14,6 +14,7 @@
  */
 
 #include "input_manager.h"
+#include "js_register_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
@@ -158,13 +159,7 @@ napi_value CreateInfraredFrequencyItem(napi_env env, const InfraredFrequency &in
 static napi_value HasIrEmitter(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    napi_value result = nullptr;
-    napi_status status = napi_get_boolean(env, true, &result);
-    if (status != napi_ok) {
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "boolean");
-        return nullptr;
-    }
-    return result;
+    return JS_REGISTER_MGR.JsHasIrEmitter(env);
 }
 
 static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
@@ -180,6 +175,18 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
             ThrowError(env, ret, "GetInfraredFrequencies");
         }
         MMI_HILOGE("Parse GetInfraredFrequencies requst error. returnCode:%{public}d", ret);
+        if (ret == ERROR_UNSUPPORTED_IR_EMITTER) {
+            InfraredFrequency frequencyItem;
+            napi_value item = CreateInfraredFrequencyItem(env, frequencyItem);
+            if (item == nullptr) {
+                MMI_HILOGE("CreateInfraredFrequencyItem error");
+                return nullptr;
+            }
+            if (napi_set_element(env, result, 0, item) != napi_ok) {
+                MMI_HILOGE("napi_set_element failed");
+                return nullptr;
+            }
+        }
         return result;
     }
     size_t size = requencys.size();

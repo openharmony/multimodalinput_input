@@ -32,6 +32,7 @@ enum EtsErrorCode : int32_t {
     COMMON_USE_SYSAPI_ERROR = 202,
     COMMON_PARAMETER_ERROR = 401,
     INPUT_DEVICE_NOT_SUPPORTED = 801,
+    COMMON_UNSUPPORTED_IR_EMITTER = 3900011,
 };
 using TaiheInfraredFrequency = ::ohos::multimodalInput::infraredEmitter::InfraredFrequency;
 static TaiheInfraredFrequency InfraredFrequencyToAni(OHOS::MMI::InfraredFrequency const & value)
@@ -105,7 +106,13 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
     std::vector<OHOS::MMI::InfraredFrequency> frequencies;
     std::vector<TaiheInfraredFrequency> result;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetInfraredFrequencies(frequencies);
-    if (ret != RET_OK) {
+    if (ret == COMMON_UNSUPPORTED_IR_EMITTER) {
+        TaiheInfraredFrequency frequency = {};
+        frequency.max = 0;
+        frequency.min = 0;
+        result.push_back(frequency);
+        return ::taihe::array<::TaiheInfraredFrequency>(result);
+    } else if (ret != RET_OK) {
         int32_t errCode = 0;
         auto errMsg = HandleError(ret, errCode);
         MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
@@ -119,10 +126,25 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
     }
     return ::taihe::array<::TaiheInfraredFrequency>(result);
 }
+
+bool HasIrEmitterAsync()
+{
+    bool hasIrEmitter = false;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
+    if (ret != RET_OK) {
+        int32_t errCode = 0;
+        auto errMsg = HandleError(ret, errCode);
+        MMI_HILOGE("errMsg:%{public}s,ret:%{public}d, errCode=%{public}d", errMsg.c_str(), ret, errCode);
+        taihe::set_business_error(errCode, errMsg);
+        return false;
+    }
+    return hasIrEmitter;
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_TransmitInfrared(TransmitInfrared);
 TH_EXPORT_CPP_API_GetInfraredFrequencies(GetInfraredFrequencies);
+TH_EXPORT_CPP_API_HasIrEmitterAsync(HasIrEmitterAsync);
 // NOLINTEND
