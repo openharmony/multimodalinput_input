@@ -73,6 +73,11 @@ void JsRegister::CallJsHasIrEmitterPromise(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check scope is nullptr");
         return;
     }
+    CallJsHasIrEmitterPromiseEx(cb, scope);
+}
+
+void JsRegister::CallJsHasIrEmitterPromiseEx(sptr<CallbackInfo> cb, napi_handle_scope scope)
+{
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {

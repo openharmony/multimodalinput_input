@@ -66,7 +66,7 @@ void JsRegisterManager::EmitHasIrEmitter(sptr<JsRegister::CallbackInfo> cb)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         MMI_HILOGE("Check work is nullptr");
-        return nullptr;
+        return;
     }
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
