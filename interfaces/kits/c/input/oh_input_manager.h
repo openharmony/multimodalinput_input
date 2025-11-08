@@ -305,12 +305,12 @@ typedef enum Input_Result {
      * @error The device has no pointer
      * @since 20
      */
-    INPUT_DEVICE_NO_POINTER = 3900010
+    INPUT_DEVICE_NO_POINTER = 3900010,
     /**
      * @error Invalid windowID
      * @since 22
      */
-    INPUT_INVALID_WINDOWID = 26500001,
+    INPUT_INVALID_WINDOWID = 26500001
 } Input_Result;
 
 /**

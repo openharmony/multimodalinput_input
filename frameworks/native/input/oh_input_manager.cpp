@@ -3451,7 +3451,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
     if (windowId < 0 ||customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
-        MMI_HILOGE("abnormal window Id or customCursor is invalid");
+        MMI_HILOGE("abnormal windowId or customCursor");
         return INPUT_PARAMETER_ERROR;
     }
     uint32_t byteCount = 0;
