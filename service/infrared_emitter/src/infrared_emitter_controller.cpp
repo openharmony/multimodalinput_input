@@ -17,6 +17,7 @@
 
 #include <dlfcn.h>
 
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -28,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const char* INFRARED_ADAPTER_PATH = "libinfrared_emitter_adapter.z.so";
+std::mutex mutex_;
 }
 using namespace OHOS::HDI::Consumerir::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
@@ -36,6 +38,7 @@ InfraredEmitterController::InfraredEmitterController() {}
 InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     if (soIrHandle_ != nullptr) {
         typedef void (*funDestroyPtr) (IInfraredEmitterAdapter*);
         funDestroyPtr fnDestroy = (funDestroyPtr)dlsym(soIrHandle_, "DestroyInstance");
@@ -50,6 +53,7 @@ InfraredEmitterController::~InfraredEmitterController()
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     return instance_;
 }
 
@@ -95,6 +99,7 @@ void InfraredEmitterController::InitInfraredEmitter()
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
@@ -121,26 +126,25 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
     return true;
 }
 
-bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo)
+int32_t InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     if (!irInterface_) {
-        MMI_HILOGE("Infrared emitter not init");
-        return false;
+        return ERROR_UNSUPPORTED_IR_EMITTER;
     }
     bool outRet = false;
     std::vector<ConsumerIrFreqRange> outRange;
-    MMI_HILOGI("irInterface_->GetCarrierFreqs");
     int32_t ret = irInterface_->GetCarrierFreqs(outRet, outRange);
     MMI_HILOGI("irInterface_->GetCarrierFreqs ret:%{public}d", ret);
-    if (ret < 0) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Infrared emitter GetCarrierFreqs failed:%{public}d", ret);
-        return false;
+        return ret;
     }
     if (!outRet) {
         MMI_HILOGE("Infrared emitter GetCarrierFreqs out false");
-        return false;
+        return RET_ERR;
     }
     std::string context = "size:" + std::to_string(outRange.size()) + ";";
     for (size_t i = 0; i < outRange.size(); i++) {
@@ -151,8 +155,20 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
         item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);
     }
+    return RET_OK;
+}
+
+bool InfraredEmitterController::HasIrEmitter(bool &hasIrEmitter)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    InitInfraredEmitter();
+    if (!irInterface_) {
+        hasIrEmitter = false;
+    } else {
+        irInterface_->HasIrEmitter(hasIrEmitter);
+    }
     return true;
 }
 } // namespace MMI
 } // namespace OHOS
-
