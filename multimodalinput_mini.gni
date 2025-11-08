@@ -106,6 +106,7 @@ declare_args() {
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/client_msg_handler.cpp",
     "event_handler/src/input_active_subscribe_manager.cpp",
+    "event_handler/src/input_device_consumer_proxy.cpp",
     "event_handler/src/input_device_impl.cpp",
     "event_handler/src/input_event_hook_handler.cpp",
     "event_handler/src/input_event_stager.cpp",
@@ -115,7 +116,6 @@ declare_args() {
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/pre_monitor_manager.cpp",
     "event_handler/src/scene_board_judgement.cpp",
-    "event_handler/src/input_device_consumer_proxy.cpp",
     "events/src/input_manager.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
@@ -143,6 +143,14 @@ declare_args() {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "event_handler/src/touchpad_settings_handler.cpp",
+    "event_hook/src/checker/dispatch_order_checker.cpp",
+    "event_hook/src/checker/expiration_checker.cpp",
+    "event_hook/src/checker/key_loop_closure_checker.cpp",
+    "event_hook/src/checker/pointer_loop_closure_checker.cpp",
+    "event_hook/src/hook/input_event_hook.cpp",
+    "event_hook/src/hook/key_event_hook.cpp",
+    "event_hook/src/hook/pointer_event_hook.cpp",
+    "event_hook/src/input_event_hook_manager.cpp",
     "key_command/src/setting_datashare.cpp",
     "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
@@ -155,8 +163,8 @@ declare_args() {
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
-    "module_loader/src/multimodal_input_preferences_manager.cpp",
     "module_loader/src/multimodal_input_plugin_manager.cpp",
+    "module_loader/src/multimodal_input_preferences_manager.cpp",
     "module_loader/src/uds_server.cpp",
     "module_loader/src/watchdog_task.cpp",
     "nap_process/src/nap_process.cpp",
@@ -165,14 +173,6 @@ declare_args() {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
-    "event_hook/src/input_event_hook_manager.cpp",
-    "event_hook/src/hook/input_event_hook.cpp",
-    "event_hook/src/hook/key_event_hook.cpp",
-    "event_hook/src/hook/pointer_event_hook.cpp",
-    "event_hook/src/checker/dispatch_order_checker.cpp",
-    "event_hook/src/checker/expiration_checker.cpp",
-    "event_hook/src/checker/key_loop_closure_checker.cpp",
-    "event_hook/src/checker/pointer_loop_closure_checker.cpp",
   ]
 
   infraredemitter_sources = [
@@ -333,7 +333,8 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
-print("input_ext_feature_keyboard_ext_flag = ${input_ext_feature_keyboard_ext_flag}")
+print(
+    "input_ext_feature_keyboard_ext_flag = ${input_ext_feature_keyboard_ext_flag}")
 print(
     "input_feature_one_hand_mode_enable = ${input_feature_one_hand_mode_enable}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
@@ -445,9 +446,8 @@ if (input_ext_feature_anco) {
 if (input_ext_feature_keyboard_ext_flag) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG" ]
 
-  libmmi_service_sources += [
-    "${mmi_ext_path}/keyboard_ext_flag/src/input_device_manager_ext.cpp",
-  ]
+  libmmi_service_sources +=
+      [ "${mmi_ext_path}/keyboard_ext_flag/src/input_device_manager_ext.cpp" ]
 }
 
 if (input_feature_product == "pc") {
@@ -459,9 +459,8 @@ if (input_feature_product == "pc") {
 
 if (input_feature_product == "watch") {
   input_default_defines += [ "OHOS_BUILD_ENABLE_WATCH" ]
-  libmmi_service_sources += [
-    "fingersense_wrapper/src/fingersense_wrapper.cpp",
-  ]
+  libmmi_service_sources +=
+      [ "fingersense_wrapper/src/fingersense_wrapper.cpp" ]
 } else {
   libmmi_service_sources += [
     "device_config/src/device_config_file_parser.cpp",
