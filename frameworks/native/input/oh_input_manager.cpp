@@ -3400,7 +3400,8 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig* cursorConf
     return INPUT_SUCCESS;
 }
 
-Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Media::InitializationOptions* options, uint32_t* byteCount)
+Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Media::InitializationOptions* options,
+                                         uint32_t* byteCount)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
@@ -3449,12 +3450,8 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     CALL_DEBUG_ENTER;
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
-    if (windowId < 0) {
-        MMI_HILOGE("abnormal windowId");
-        return INPUT_PARAMETER_ERROR;
-    }
-    if (customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
-        MMI_HILOGE("customCursor is invalid");
+    if (windowId < 0 ||customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
+        MMI_HILOGE("abnormal window Id or customCursor is invalid");
         return INPUT_PARAMETER_ERROR;
     }
     uint32_t byteCount = 0;
