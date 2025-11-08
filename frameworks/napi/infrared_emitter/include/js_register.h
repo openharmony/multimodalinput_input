@@ -45,6 +45,7 @@ public:
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     static void JsHasIrEmitterResolveDeferred(
         sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult);
+    static void CallJsHasIrEmitterPromiseEx(sptr<CallbackInfo> cb, napi_handle_scope scope);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
