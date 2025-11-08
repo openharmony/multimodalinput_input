@@ -3439,7 +3439,7 @@ HWTEST_F(MMIServerTest, MMIService_HasIrEmitter_001, TestSize.Level1)
     MMIService mmiService;
     bool hasIrEmitter = false;
     ErrCode ret = mmiService.HasIrEmitter(hasIrEmitter);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -3455,7 +3455,7 @@ HWTEST_F(MMIServerTest, MMIService_HasIrEmitter_002, TestSize.Level1)
     mmiService.state_ = ServiceRunningState::STATE_RUNNING;
     bool hasIrEmitter = false;
     ErrCode ret = mmiService.HasIrEmitter(hasIrEmitter);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -3569,22 +3569,6 @@ HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_002, TestSize.Level1)
         EXPECT_GE(freq.max_, freq.min_);
     }
 #endif
-}
-
-/**
- * @tc.name: MMIService_OnHasIrEmitter_001
- * @tc.desc: The service normally calls OnHasIrEmitter, expecting it to return false and succeed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_OnHasIrEmitter_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    bool hasIrEmitter = true;
-    int32_t ret = mmiService.OnHasIrEmitter(hasIrEmitter);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_FALSE(hasIrEmitter);
 }
 
 /**

@@ -4140,20 +4140,18 @@ int32_t MMIService::OnCancelInjection(int32_t callPid)
 ErrCode MMIService::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+    if (!PER_HELPER->CheckInfraredEmmit()) {
+        MMI_HILOGE("Infrared permission check failed");
+        return ERROR_NO_PERMISSION;
     }
     hasIrEmitter = false;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &hasIrEmitter] {
-            return this->OnHasIrEmitter(hasIrEmitter);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
-        return ret;
+#ifndef OHOS_BUILD_ENABLE_WATCH
+    MMI_HILOGI("Start has infrared Emitter");
+    if (!InfraredEmitterController::GetInstance()->HasIrEmitter(hasIrEmitter)) {
+        MMI_HILOGE("Failed to HasIrEmitter");
+        return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
 }
 
@@ -4197,9 +4195,10 @@ ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
 #ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
-    if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
+    int32_t ret = InfraredEmitterController::GetInstance()->GetFrequencies(infos);
+    if (ret == RET_ERR || ret == ERROR_UNSUPPORTED_IR_EMITTER) {
         MMI_HILOGE("Failed to get frequencies");
-        return RET_ERR;
+        return ret;
     }
     for (auto &item : infos) {
         InfraredFrequency info;
@@ -4348,14 +4347,6 @@ void MMIService::InitVKeyboardFuncHandler()
     }
 }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-
-int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
-{
-    // LCOV_EXCL_START
-    hasIrEmitter = false;
-    return RET_OK;
-    // LCOV_EXCL_STOP
-}
 
 int32_t MMIService::SetPixelMapDataInner(int32_t infoId, const CursorPixelMap& curPixelMap)
 {

@@ -175,7 +175,11 @@ declare_args() {
     "event_hook/src/checker/pointer_loop_closure_checker.cpp",
   ]
 
-  infraredemitter_sources = [ "src/js_register_module.cpp" ]
+  infraredemitter_sources = [
+    "src/js_register.cpp",
+    "src/js_register_manager.cpp",
+    "src/js_register_module.cpp",
+  ]
 
   inputdevice_sources = [
     "src/js_event_target.cpp",
