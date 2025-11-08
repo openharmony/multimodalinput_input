@@ -182,7 +182,10 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
                 MMI_HILOGE("CreateInfraredFrequencyItem error");
                 return nullptr;
             }
-            CHKRP(napi_set_element(env, result, 0, item), SET_ELEMENT);
+            if (napi_set_element(env, result, 0, item) != napi_ok) {
+                MMI_HILOGE("napi_set_element failed");
+                return nullptr;
+            }
         }
         return result;
     }
