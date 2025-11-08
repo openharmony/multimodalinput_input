@@ -34,7 +34,10 @@ napi_value JsRegisterManager::JsHasIrEmitter(napi_env env)
 {
     CALL_DEBUG_ENTER;
     sptr<JsRegister::CallbackInfo> cb = new (std::nothrow) JsRegister::CallbackInfo();
-    CHKPP(cb);
+    if (cb == nullptr) {
+        MMI_HILOGE("Check cb is nullptr");
+        return nullptr;
+    }
     cb->env = env;
     napi_value promise = nullptr;
     CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
@@ -45,15 +48,20 @@ napi_value JsRegisterManager::JsHasIrEmitter(napi_env env)
 void JsRegisterManager::EmitHasIrEmitter(sptr<JsRegister::CallbackInfo> cb)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(cb);
-    CHKPV(cb->env);
+    if (cb == nullptr || cb->env == nullptr) {
+        MMI_HILOGE("cb or env is nullptr");
+        return;
+    }
     bool hasIrEmitter = false;
     cb->data.hasIrEmitter = hasIrEmitter;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
+    if (work == nullptr) {
+        MMI_HILOGE("Check work is nullptr");
+        return nullptr;
+    }
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
     int32_t ret = -1;

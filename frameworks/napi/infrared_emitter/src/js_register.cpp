@@ -33,14 +33,15 @@ namespace {
 } // namespace
 void JsRegister::CallJsHasIrEmitterTask(uv_work_t *work)
 {
-    CHKPV(work);
-    if (work->data == nullptr) {
-        DeletePtr<uv_work_t *>(work);
-        MMI_HILOGE("Check data is nullptr");
-        return;
+    if (work == nullptr) {
+        MMI_HILOGE("Check work is nullptr");
+        return nullptr;
     }
-    sptr<CallbackInfo> cb(static_cast<CallbackInfo*>(work->data));
-    CHKPV(cb->env);
+    CallbackInfo* cb = static_cast<CallbackInfo*>(work->data);
+    if (cb == nullptr) {
+        MMI_HILOGE("Check cb is nullptr");
+        return nullptr;
+    }
     int32_t napiCode = InputManager::GetInstance()->HasIrEmitter(cb->data.hasIrEmitter);
     if (napiCode == ERROR_NO_PERMISSION) {
         napiCode = COMMON_PERMISSION_CHECK_ERROR;
@@ -51,19 +52,27 @@ void JsRegister::CallJsHasIrEmitterTask(uv_work_t *work)
 void JsRegister::CallJsHasIrEmitterPromise(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(work);
-    if (work->data == nullptr) {
-        DeletePtr<uv_work_t *>(work);
-        MMI_HILOGE("Check data is nullptr");
-        return;
+    if (work == nullptr) {
+        MMI_HILOGE("Check work is nullptr");
+        return nullptr;
     }
     sptr<CallbackInfo> cb(static_cast<CallbackInfo *>(work->data));
     DeletePtr<uv_work_t *>(work);
+    if (cb == nullptr) {
+        MMI_HILOGE("Check cb is nullptr");
+        return nullptr;
+    }
     cb->DecStrongRef(nullptr);
-    CHKPV(cb->env);
+    if (cb->env == nullptr) {
+        MMI_HILOGE("Check env is nullptr");
+        return nullptr;
+    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    CHKPV(scope);
+    if (scope == nullptr) {
+        MMI_HILOGE("Check scope is nullptr");
+        return nullptr;
+    }
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
