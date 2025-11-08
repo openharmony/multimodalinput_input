@@ -323,7 +323,6 @@ ohos_unittest("MouseEventNormalizeEXTest") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwsutils",
-    "eventhandler:libeventhandler",
   ]
 }
 

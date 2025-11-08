@@ -16,7 +16,7 @@
 #ifndef SWITCH_SUBSCRIBER_HANDLER_H
 #define SWITCH_SUBSCRIBER_HANDLER_H
 
-#include "event_handler.h"
+#include <atomic>
 #include <unordered_map>
 #include "i_input_event_handler.h"
 #include "uds_server.h"
@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 class SwitchSubscriberHandler final : public IInputEventHandler {
 public:
-    SwitchSubscriberHandler();
+    SwitchSubscriberHandler() = default;
     DISALLOW_COPY_AND_MOVE(SwitchSubscriberHandler);
     ~SwitchSubscriberHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -73,8 +73,7 @@ private:
     std::atomic_bool callbackInitialized_ { false };
     std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
     std::unordered_map<int32_t, int32_t> switchStateRecord_;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
-    inline static int32_t lidState_ = 0;
+    std::atomic<int32_t> lidState_{ 0 };
 };
 } // namespace MMI
 } // namespace OHOS
