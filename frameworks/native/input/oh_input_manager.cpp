@@ -3444,12 +3444,8 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     CALL_DEBUG_ENTER;
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
-    if (windowId < 0) {
-        MMI_HILOGE("Invalid windowId");
-        return INPUT_PARAMETER_ERROR;
-    }
-    if (customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
-        MMI_HILOGE("customCursor is invalid");
+    if (windowId < 0 || customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
+        MMI_HILOGE("abnormal windowId or customCursor is invalid");
         return INPUT_PARAMETER_ERROR;
     }
     OHOS::Media::InitializationOptions options;
