@@ -6422,8 +6422,11 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         }
         if (displayId != lastDisplayId) {
             displayInfo = GetPhysicalDisplay(displayId);
-            CHKPV(displayInfo);
         }
+    }
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("displayInfo is null");
+        return;
     }
     int32_t width = 0;
     int32_t height = 0;
@@ -7947,8 +7950,6 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
         ClearPointerLockedWindow();
         return;
     }
-    int32_t logicalX = 0;
-    int32_t logicalY = 0;
     Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
     RotateWindowArea(focusWindow.displayId, focusWindow, windowArea);
     auto mouseIt = mouseLocationMap_.find(groupId);
@@ -8117,7 +8118,10 @@ void InputWindowsManager::ClearPointerLockedWindow()
 void InputWindowsManager::RotateWindowArea(int32_t displayId, WindowInfo &window, Rect &windowArea)
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
-    CHKPV(displayInfo);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("displayInfo is null");
+        return;
+    }
     Matrix3f transform(window.transform);
     UpdateCurrentDisplay(displayId);
     windowArea.x = windowArea.x - currentDisplayXY_.first;
