@@ -7962,7 +7962,7 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     };
     auto displayInfo = GetPhysicalDisplay(cursorPosMap_[groupId].displayId);
     if (displayInfo == nullptr) {
-        MMI_HILOGE("displayInfo is null", displayInfo);
+        MMI_HILOGE("displayInfo is null");
         ClearPointerLockedWindow();
         return;
     }
