@@ -35,12 +35,12 @@ void JsRegister::CallJsHasIrEmitterTask(uv_work_t *work)
 {
     if (work == nullptr) {
         MMI_HILOGE("Check work is nullptr");
-        return nullptr;
+        return;
     }
     CallbackInfo* cb = static_cast<CallbackInfo*>(work->data);
     if (cb == nullptr) {
         MMI_HILOGE("Check cb is nullptr");
-        return nullptr;
+        return;
     }
     int32_t napiCode = InputManager::GetInstance()->HasIrEmitter(cb->data.hasIrEmitter);
     if (napiCode == ERROR_NO_PERMISSION) {
@@ -54,24 +54,24 @@ void JsRegister::CallJsHasIrEmitterPromise(uv_work_t *work, int32_t status)
     CALL_DEBUG_ENTER;
     if (work == nullptr) {
         MMI_HILOGE("Check work is nullptr");
-        return nullptr;
+        return;
     }
     sptr<CallbackInfo> cb(static_cast<CallbackInfo *>(work->data));
     DeletePtr<uv_work_t *>(work);
     if (cb == nullptr) {
         MMI_HILOGE("Check cb is nullptr");
-        return nullptr;
+        return;
     }
     cb->DecStrongRef(nullptr);
     if (cb->env == nullptr) {
         MMI_HILOGE("Check env is nullptr");
-        return nullptr;
+        return;
     }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
         MMI_HILOGE("Check scope is nullptr");
-        return nullptr;
+        return;
     }
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
@@ -92,7 +92,11 @@ void JsRegister::CallJsHasIrEmitterPromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("The callResult is nullptr");
             return;
         }
-        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
+        if (napi_reject_deferred(cb->env, cb->deferred, callResult) != napi_ok) {
+            MMI_HILOGE("napi_reject_deferred failed");
+            napi_close_handle_scope(cb->env, scope);
+            return;
+        }
     } else {
         JsHasIrEmitterResolveDeferred(cb, scope, callResult);
     }
@@ -102,8 +106,20 @@ void JsRegister::CallJsHasIrEmitterPromise(uv_work_t *work, int32_t status)
 void JsRegister::JsHasIrEmitterResolveDeferred(
     sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult)
 {
-    CHKRV_SCOPE(cb->env, napi_get_boolean(cb->env, cb->data.hasIrEmitter, &callResult), GET_BOOLEAN, scope);
-    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+    if (cb == nullptr) {
+        MMI_HILOGE("Check cb is nullptr");
+        return;
+    }
+    if (napi_get_boolean(cb->env, cb->data.hasIrEmitter, &callResult) != napi_ok) {
+        MMI_HILOGE("napi_get_boolean failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    if (napi_resolve_deferred(cb->env, cb->deferred, callResult) != napi_ok) {
+        MMI_HILOGE("napi_resolve_deferred failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
 }
 
 napi_value JsRegister::GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
@@ -112,10 +128,22 @@ napi_value JsRegister::GreateBusinessError(napi_env env, int32_t errCode, std::s
     napi_value result = nullptr;
     napi_value resultCode = nullptr;
     napi_value resultMessage = nullptr;
-    CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
-    CHKRP(napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_STRING_UTF8);
-    CHKRP(napi_create_error(env, nullptr, resultMessage, &result), CREATE_ERROR);
-    CHKRP(napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
+    if (napi_create_int32(env, errCode, &resultCode) != napi_ok) {
+        MMI_HILOGE("napi_create_int32 failed");
+        return nullptr;
+    }
+    if (napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage) != napi_ok) {
+        MMI_HILOGE("napi_create_string_utf8 failed");
+        return nullptr;
+    }
+    if (napi_create_error(env, nullptr, resultMessage, &result) != napi_ok) {
+        MMI_HILOGE("napi_create_error failed");
+        return nullptr;
+    }
+    if (napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode) != napi_ok) {
+        MMI_HILOGE("napi_set_named_property failed");
+        return nullptr;
+    }
     return result;
 }
 } // namespace MMI

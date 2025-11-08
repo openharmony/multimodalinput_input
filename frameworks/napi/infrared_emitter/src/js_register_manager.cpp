@@ -40,7 +40,10 @@ napi_value JsRegisterManager::JsHasIrEmitter(napi_env env)
     }
     cb->env = env;
     napi_value promise = nullptr;
-    CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+    if (napi_create_promise(env, &cb->deferred, &promise) != napi_ok) {
+        MMI_HILOGE("napi_create_promise failed");
+        return nullptr;
+    }
     EmitHasIrEmitter(cb);
     return promise;
 }
@@ -56,7 +59,10 @@ void JsRegisterManager::EmitHasIrEmitter(sptr<JsRegister::CallbackInfo> cb)
     cb->data.hasIrEmitter = hasIrEmitter;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    if (napi_get_uv_event_loop(cb->env, &loop) != napi_ok) {
+        MMI_HILOGE("napi_get_uv_event_loop failed");
+        return;
+    }
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         MMI_HILOGE("Check work is nullptr");
