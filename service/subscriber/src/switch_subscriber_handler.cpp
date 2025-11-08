@@ -81,7 +81,10 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
 
 bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
-    CHKPF(switchEvent);
+    if (switchEvent == nullptr) {
+        MMI_HILOGE("switchEvent is null");
+        return false;
+    }
     lidState_ = switchEvent->GetSwitchValue();
     OHOS::AAFwk::Want want;
     want.SetAction(COMMON_EVENT_LID_STATE_CHANGED);
