@@ -135,7 +135,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
 
 /**
  * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_002
- * @tc.desc: Test the funcation OnDispatchEventProcessed
+ * @tc.desc: Test the function OnDispatchEventProcessed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -513,7 +513,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsMatchGesture_001, Te
 
 /**
  * @tc.name: InputHandlerManagerTest_HasHandler_002
- * @tc.desc: Test the funcation HasHandler
+ * @tc.desc: Test the function HasHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -533,7 +533,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_HasHandler_002, TestSi
 
 /**
  * @tc.name: InputHandlerManagerTest_CheckInputDeviceSource_004
- * @tc.desc: Test the funcation CheckInputDeviceSource
+ * @tc.desc: Test the function CheckInputDeviceSource
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -556,7 +556,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
 
 /**
  * @tc.name: InputHandlerManagerTest_IsPinchType_001
- * @tc.desc: Test the funcation IsPinchType
+ * @tc.desc: Test the function IsPinchType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -598,7 +598,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsPinchType_001, TestS
 
 /**
  * @tc.name: InputHandlerManagerTest_IsRotateType_001
- * @tc.desc: Test the funcation IsRotateType
+ * @tc.desc: Test the function IsRotateType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -630,7 +630,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsRotateType_001, Test
 
 /**
  * @tc.name: InputHandlerManagerTest_IsThreeFingersSwipeType_001
- * @tc.desc: Test the funcation IsThreeFingersSwipeType
+ * @tc.desc: Test the function IsThreeFingersSwipeType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -663,7 +663,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsThreeFingersSwipeTyp
 
 /**
  * @tc.name: InputHandlerManagerTest_IsFourFingersSwipeType_001
- * @tc.desc: Test the funcation IsFourFingersSwipeType
+ * @tc.desc: Test the function IsFourFingersSwipeType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -696,7 +696,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsFourFingersSwipeType
 
 /**
  * @tc.name: InputHandlerManagerTest_IsThreeFingersTapType_001
- * @tc.desc: Test the funcation IsThreeFingersTapType
+ * @tc.desc: Test the function IsThreeFingersTapType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -724,7 +724,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsThreeFingersTapType_
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 /**
  * @tc.name: InputHandlerManagerTest_IsFingerprintType_001
- * @tc.desc: Test the funcation IsFingerprintType
+ * @tc.desc: Test the function IsFingerprintType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -765,7 +765,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsFingerprintType_001,
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 /**
  * @tc.name: InputHandlerManagerTest_IsXKeyType_001
- * @tc.desc: Test the funcation IsXKeyType
+ * @tc.desc: Test the function IsXKeyType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -785,7 +785,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsXKeyType_001, TestSi
 
 /**
  * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_001
- * @tc.desc: Test the funcation CheckIfNeedAddToConsumerInfos
+ * @tc.desc: Test the function CheckIfNeedAddToConsumerInfos
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -830,7 +830,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
 
 /**
  * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_002
- * @tc.desc: Test the funcation CheckIfNeedAddToConsumerInfos
+ * @tc.desc: Test the function CheckIfNeedAddToConsumerInfos
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -872,7 +872,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
 
 /**
  * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_003
- * @tc.desc: Test the funcation CheckIfNeedAddToConsumerInfos
+ * @tc.desc: Test the function CheckIfNeedAddToConsumerInfos
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -925,7 +925,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
 
 /**
  * @tc.name: InputHandlerManagerTest_RemoveGestureMonitor_001
- * @tc.desc: Test the funcation RemoveGestureMonitor
+ * @tc.desc: Test the function RemoveGestureMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -940,7 +940,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveGestureMonitor_0
 
 /**
  * @tc.name: InputHandlerManagerTest_AddGestureToLocal_001
- * @tc.desc: Test the funcation AddGestureToLocal
+ * @tc.desc: Test the function AddGestureToLocal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -963,7 +963,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureToLocal_001,
 
 /**
  * @tc.name: InputHandlerManagerTest_AddGestureToLocal_002
- * @tc.desc: Test the funcation AddGestureToLocal
+ * @tc.desc: Test the function AddGestureToLocal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -999,7 +999,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureToLocal_002,
 
 /**
  * @tc.name: InputHandlerManagerTest_AddLocal_001
- * @tc.desc: Test the funcation AddLocal
+ * @tc.desc: Test the function AddLocal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1022,7 +1022,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddLocal_001, TestSize
 
 /**
  * @tc.name: InputHandlerManagerTest_RemoveLocal_001
- * @tc.desc: Test the funcation RemoveLocal
+ * @tc.desc: Test the function RemoveLocal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1042,7 +1042,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveLocal_001, TestS
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 /**
  * @tc.name: InputHandlerManagerTest_OnInputEvent_001
- * @tc.desc: Test the funcation OnInputEvent
+ * @tc.desc: Test the function OnInputEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1062,7 +1062,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnInputEvent_001, Test
 
 /**
  * @tc.name: InputHandlerManagerTest_OnInputEvent_002
- * @tc.desc: Test the funcation OnInputEvent
+ * @tc.desc: Test the function OnInputEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1083,7 +1083,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnInputEvent_002, Test
 
 /**
  * @tc.name: InputHandlerManagerTest_GetConsumerInfos_001
- * @tc.desc: Test the funcation GetConsumerInfos
+ * @tc.desc: Test the function GetConsumerInfos
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1124,7 +1124,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_GetConsumerInfos_001, 
 
 /**
  * @tc.name: InputHandlerManagerTest_RegisterGestureMonitors_001
- * @tc.desc: Test the funcation RegisterGestureMonitors
+ * @tc.desc: Test the function RegisterGestureMonitors
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1147,7 +1147,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RegisterGestureMonitor
 
 /**
  * @tc.name: InputHandlerManagerTest_OnConnected_001
- * @tc.desc: Test the funcation OnConnected
+ * @tc.desc: Test the function OnConnected
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1165,7 +1165,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnConnected_001, TestS
 
 /**
  * @tc.name: InputHandlerManagerTest_monitorCallback_001
- * @tc.desc: Test the funcation monitorCallback_
+ * @tc.desc: Test the function monitorCallback_
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1180,7 +1180,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_monitorCallback_001, T
 
 /**
  * @tc.name: InputHandlerManagerTest_OnInputEvent_other
- * @tc.desc: Test the funcation OnInputEvent
+ * @tc.desc: Test the function OnInputEvent
  * @tc.type: FUNC
  * @tc.require:
  */
