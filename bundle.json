@@ -90,7 +90,6 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
-        "graphic_2d_ext",
         "hdf_core",
         "bounds_checking_function",
         "call_manager",
