@@ -568,7 +568,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_Reset, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_ToString
- * @tc.desc: Test the funcation ToString
+ * @tc.desc: Test the function ToString
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -582,7 +582,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_ToString, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_SetKeyItem_001
- * @tc.desc: Test the funcation SetKeyItem
+ * @tc.desc: Test the function SetKeyItem
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -597,7 +597,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetKeyItem_001, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_IsRepeatKey_001
- * @tc.desc: Test the funcation IsRepeatKey
+ * @tc.desc: Test the function IsRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -611,7 +611,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_IsRepeatKey_001, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_SetRepeatKey_001
- * @tc.desc: Test the funcation SetRepeatKey
+ * @tc.desc: Test the function SetRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -628,7 +628,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetRepeatKey_001, TestSize.Level1)
 
 /**
  * @tc.name: KeyEventTest_SetFourceMonitorFlag
- * @tc.desc: Test the funcation SetFourceMonitorFlag
+ * @tc.desc: Test the function SetFourceMonitorFlag
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -645,7 +645,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetFourceMonitorFlag, TestSize.Level1)
 
 /**
  * @tc.name: CloneTest
- * @tc.desc: Test the funcation Clone
+ * @tc.desc: Test the function Clone
  * @tc.type: FUNC
  * @tc.require:
  */

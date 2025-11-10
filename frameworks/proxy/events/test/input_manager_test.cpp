@@ -187,7 +187,7 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerTest::SetMouseIconTest(const 
 
 /**
  * @tc.name: InputManagerTest_SetTouchpadThreeFingersTapSwitch_001
- * @tc.desc: Test the funcation SetTouchpadThreeFingersTapSwitch
+ * @tc.desc: Test the function SetTouchpadThreeFingersTapSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -201,7 +201,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadThreeFingersTapSwitch_001
 
 /**
  * @tc.name: InputManagerTest_GetTouchpadThreeFingersTapSwitch_001
- * @tc.desc: Test the funcation GetTouchpadThreeFingersTapSwitch
+ * @tc.desc: Test the function GetTouchpadThreeFingersTapSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4798,7 +4798,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
 
 /**
  * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
- * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.desc: Test the function ConvertToCapiKeyAction
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
@@ -4875,7 +4875,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_003, TestSize.Level1)
 
 /**
 @tc.name: InputManagerTest_SubscribeHotkey_001
-@tc.desc: Test the funcation SubscribeHotkey
+@tc.desc: Test the function SubscribeHotkey
 @tc.type: FUNC
 @tc.require:
 */
@@ -4892,7 +4892,7 @@ EXPECT_TRUE(response < 0);
 
 /**
 @tc.name: InputManagerTest_UnsubscribeHotkey_001
-@tc.desc: Test the funcation UnsubscribeHotkey
+@tc.desc: Test the function UnsubscribeHotkey
 @tc.type: FUNC
 @tc.require:
 */
@@ -4980,7 +4980,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeHotkey_002, TestSize.Level1
 
 /*
  * @tc.name: InputManagerTest_SetTouchpadScrollRows_001
- * @tc.desc: Test the funcation SetTouchpadScrollRows
+ * @tc.desc: Test the function SetTouchpadScrollRows
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4994,7 +4994,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadScrollRows_001, TestSize.
 
 /*
  * @tc.name: InputManagerTest_GetTouchpadScrollRows_001
- * @tc.desc: Test the funcation GetTouchpadScrollRows
+ * @tc.desc: Test the function GetTouchpadScrollRows
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5068,7 +5068,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetInputDeviceEnable_003, TestSize.L
 
 /*
  * @tc.name: InputManagerTest_ShiftAppPointerEvent_001
- * @tc.desc: Test the funcation ShiftAppPointerEvent
+ * @tc.desc: Test the function ShiftAppPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5091,7 +5091,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_ShiftAppPointerEvent_001, TestSize.L
 
 /*
  * @tc.name: InputManagerTest_ShiftAppPointerEvent_002
- * @tc.desc: Test the funcation ShiftAppPointerEvent
+ * @tc.desc: Test the function ShiftAppPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5230,7 +5230,7 @@ std::shared_ptr<PointerEvent> CreatePointerEventTest()
 
 /*
  * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_001
- * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.desc: Test the function PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5251,7 +5251,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_001,
 
 /*
  * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_002
- * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.desc: Test the function PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5273,7 +5273,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_002,
 
 /*
  * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_003
- * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.desc: Test the function PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5295,7 +5295,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_003,
 
 /*
  * @tc.name: InputManagerTest_TransformMouseEventToTouchEvent_004
- * @tc.desc: Test the funcation PointerEventMouseToTouch, convert mouse events to touch events
+ * @tc.desc: Test the function PointerEventMouseToTouch, convert mouse events to touch events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5315,7 +5315,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformMouseEventToTouchEvent_004,
 
 /*
  * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_001
- * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.desc: Test the function PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5336,7 +5336,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_001,
 
 /*
  * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_002
- * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.desc: Test the function PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5358,7 +5358,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_002,
 
 /*
  * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_003
- * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.desc: Test the function PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5379,7 +5379,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransformTouchEventToMouseEvent_003,
 
 /*
  * @tc.name: InputManagerTest_TransformTouchEventToMouseEvent_004
- * @tc.desc: Test the funcation PointerEventTouchToMouse, convert touch events to mouse events
+ * @tc.desc: Test the function PointerEventTouchToMouse, convert touch events to mouse events
  * @tc.type: FUNC
  * @tc.require:
  */

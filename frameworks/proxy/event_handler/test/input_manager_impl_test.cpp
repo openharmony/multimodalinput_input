@@ -866,7 +866,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableInputDevice_01, TestSi
 
 /**
  * @tc.name: InputManagerImplTest_ConvertToCapiKeyAction_001
- * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.desc: Test the function ConvertToCapiKeyAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -885,7 +885,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_ConvertToCapiKeyAction_001, 
 
 /**
  * @tc.name: InputManagerImplTest_GetTouchpadThreeFingersTapSwitch_001
- * @tc.desc: Test the funcation GetTouchpadThreeFingersTapSwitch
+ * @tc.desc: Test the function GetTouchpadThreeFingersTapSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -902,7 +902,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadThreeFingersTapSw
 
 /**
  * @tc.name: InputManagerImplTest_SetTouchpadThreeFingersTapSwitch_001
- * @tc.desc: Test the funcation SetTouchpadThreeFingersTapSwitch
+ * @tc.desc: Test the function SetTouchpadThreeFingersTapSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -919,7 +919,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadThreeFingersTapSw
 
 /**
  * @tc.name: InputManagerImplTest_SetCurrentUser_001
- * @tc.desc: Test the funcation SetCurrentUser
+ * @tc.desc: Test the function SetCurrentUser
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -939,7 +939,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCurrentUser_001, TestSize
 
 /**
  * @tc.name: InputManagerImplTest_Authorize_001
- * @tc.desc: Test the funcation Authorize
+ * @tc.desc: Test the function Authorize
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1644,7 +1644,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_TestUpdateDisplayInfo_007, T
 
 /**
  * @tc.name: InputManagerImplTest_UpdateWindowInfo
- * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.desc: Test the function UpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1662,7 +1662,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo, TestSize.L
 
 /**
  * @tc.name: InputManagerImplTest_UpdateWindowInfo_001
- * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.desc: Test the function UpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1689,7 +1689,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_001, TestSi
 
 /**
  * @tc.name: InputManagerImplTest_UpdateWindowInfo_002
- * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.desc: Test the function UpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1711,7 +1711,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_002, TestSi
 
 /**
  * @tc.name: InputManagerImplTest_UpdateWindowInfo_003
- * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.desc: Test the function UpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1738,7 +1738,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_003, TestSi
 
 /**
  * @tc.name: InputManagerImplTest_UpdateWindowInfo_004
- * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.desc: Test the function UpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1764,7 +1764,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UpdateWindowInfo_004, TestSi
 
 /**
  * @tc.name: InputManagerImplTest_UpdateWindowInfo_005
- * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.desc: Test the function UpdateWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
