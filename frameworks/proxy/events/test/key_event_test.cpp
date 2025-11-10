@@ -807,5 +807,27 @@ HWTEST_F(KeyEventTest, KeyEventTest_IsKeyPressed, TestSize.Level1)
     auto ret = keyEvent->HasKeyItem(keyCode);
     ASSERT_FALSE(ret);
 }
+
+/**
+ * @tc.name: Test_RemoveReleasedKeyItems_WhenMixedStates_ExpectKeepPressed
+ * @tc.desc: Remove released key items when mixed states - expect pressed items to remain.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, Test_RemoveReleasedKeyItems_WhenMixedStates_ExpectKeepPressed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetPressed(true);
+    keyEvent->keys_.push_back(keyItem);
+    keyItem.SetPressed(false);
+    keyEvent->keys_.push_back(keyItem);
+    keyEvent->keys_.push_back(keyItem);
+    ASSERT_EQ(keyEvent->keys_.size(), 3);
+    EXPECT_NO_FATAL_FAILURE(keyEvent->RemoveReleasedKeyItems());
+    ASSERT_EQ(keyEvent->keys_.size(), 1);
+}
 } // namespace MMI
 } // namespace OHOS
