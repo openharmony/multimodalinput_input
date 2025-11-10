@@ -3317,8 +3317,7 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
         MMI_HILOGE("Invalid windowid");
         return INPUT_PARAMETER_ERROR;
     }
-    if ((pointerStyle < OHOS::MMI::DEFAULT && pointerStyle != OHOS::MMI::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
+    if (pointerStyle < OHOS::MMI::DEFAULT  || pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         return INPUT_PARAMETER_ERROR;
     }
