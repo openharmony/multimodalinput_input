@@ -77,7 +77,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     UDSServer udsServer;
-    ANRManager anrMgr;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = 123;
     int32_t eventType = 1;
@@ -216,7 +215,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     int32_t type = 1;
     int32_t id = 1001;
     int64_t currentTime = 123456789;
@@ -233,7 +231,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     int32_t type = -1;
     int32_t id = -2;
     int64_t currentTime = 123456789;
@@ -266,15 +263,14 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_001, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     UDSServer udsServer;
     int32_t pid = 10;
     int32_t eventType = 1;
     int32_t eventId = 100;
     udsServer.pid_ = 20;
-    anrMgr.pid_ = 10;
-    anrMgr.udsServer_ = &udsServer;
-    ASSERT_EQ(anrMgr.MarkProcessed(pid, eventType, eventId), RET_ERR);
+    ANRMgr->pid_ = 10;
+    ANRMgr->udsServer_ = &udsServer;
+    ASSERT_EQ(ANRMgr->MarkProcessed(pid, eventType, eventId), RET_ERR);
 }
 
 /**
@@ -287,17 +283,16 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_002, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     int32_t type = ANR_MONITOR;
     int32_t id = 1;
     int64_t currentTime = 100;
     std::string programName = "foundation";
     SessionPtr sess = std::make_shared<UDSSession>(programName, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     sess->SetTokenType(TokenType::TOKEN_NATIVE);
-    ASSERT_NO_FATAL_FAILURE(anrMgr.AddTimer(type, id, currentTime, sess));
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 
     sess->SetTokenType(TokenType::TOKEN_HAP);
-    ASSERT_NO_FATAL_FAILURE(anrMgr.AddTimer(type, id, currentTime, sess));
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 }
 
 /**
@@ -309,17 +304,16 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_003, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     int32_t type = ANR_MONITOR;
     int32_t id = 1;
     int64_t currentTime = 100;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     sess->SetTokenType(TokenType::TOKEN_HAP);
-    anrMgr.anrTimerCount_ = 51;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.AddTimer(type, id, currentTime, sess));
+    ANRMgr->anrTimerCount_ = 51;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 
-    anrMgr.anrTimerCount_ = 49;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.AddTimer(type, id, currentTime, sess));
+    ANRMgr->anrTimerCount_ = 49;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
 }
 
 /**
@@ -331,12 +325,11 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_004, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     std::vector<UDSSession::EventTime> events { { 0, 0, -1 }, { 1, 1, 10 } };
     sess->events_[ANR_DISPATCH] = events;
     sess->events_[ANR_MONITOR] = events;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.RemoveTimers(sess));
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimers(sess));
 }
 
 /**
@@ -348,15 +341,14 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_002, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     int32_t type = 5;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.RemoveTimersByType(sess, type));
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimersByType(sess, type));
 
     type = ANR_DISPATCH;
     std::vector<UDSSession::EventTime> events { { 0, 0, -1 }, { 1, 1, 10 } };
     sess->events_[ANR_MONITOR] = events;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.RemoveTimersByType(sess, type));
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimersByType(sess, type));
 }
 
 /**
@@ -368,28 +360,27 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_004, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     int32_t type = ANR_MONITOR;
     int64_t time = 1;
     std::string programName = "foundation";
     SessionPtr sess = std::make_shared<UDSSession>(programName, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     UDSServer udsServer;
-    anrMgr.udsServer_ = &udsServer;
+    ANRMgr->udsServer_ = &udsServer;
     sess->SetTokenType(TokenType::TOKEN_NATIVE);
-    EXPECT_FALSE(anrMgr.TriggerANR(type, time, sess));
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, time, sess));
 
     sess->SetTokenType(TokenType::TOKEN_HAP);
-    EXPECT_FALSE(anrMgr.TriggerANR(type, time, sess));
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, time, sess));
 
     bool status = true;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     session->SetTokenType(TokenType::TOKEN_HAP);
     session->SetAnrStatus(type, status);
-    EXPECT_TRUE(anrMgr.TriggerANR(type, time, session));
+    EXPECT_TRUE(ANRMgr->TriggerANR(type, time, session));
 
     type = ANR_DISPATCH;
     status = false;
-    EXPECT_FALSE(anrMgr.TriggerANR(type, time, session));
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, time, session));
 }
 
 /**
@@ -401,13 +392,12 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_002, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_OnSessionLost, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ANRManager anrMgr;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    anrMgr.anrNoticedPid_ = UDS_PID;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.OnSessionLost(sess));
+    ANRMgr->anrNoticedPid_ = UDS_PID;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->OnSessionLost(sess));
 
-    anrMgr.anrNoticedPid_ = 200;
-    ASSERT_NO_FATAL_FAILURE(anrMgr.OnSessionLost(sess));
+    ANRMgr->anrNoticedPid_ = 200;
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->OnSessionLost(sess));
 }
 
 /**
