@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,8 +39,8 @@ private:
     bool OnEventTouchCancel(struct libinput_event *event);
     int32_t GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchToolType(struct libinput_device *device);
-    void TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem);
-    void NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType);
+    void TransformTouchProperties(int32_t displayId, const PointerEvent::PointerItem &pointerItem, TouchType &rawTouch);
+    void NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem, int32_t &toolType);
     void UpdatePointerItemByTouchInfo(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
     bool DumpInner();
