@@ -1635,7 +1635,7 @@ void JsEventTarget::CallFunctionKeyState(uv_work_t *work, int32_t status)
     } else {
         if (cb->getFuncKeyType) {
             auto state = cb->uData.keys.back();
-            CHKRV_SCOPE(cb->env, napi_get_boolean(cb->env, state != 0, &callResult), CREATE_INT32, scope);
+            CHKRV_SCOPE(cb->env, napi_get_boolean(cb->env, state != 0, &callResult), GET_BOOLEAN, scope);
         } else {
             CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult), GET_UNDEFINED, scope);
         }
