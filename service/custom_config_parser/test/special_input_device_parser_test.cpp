@@ -49,10 +49,9 @@ public:
 HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(""));
-    int32_t result = parser.Init();
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -65,8 +64,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest001, TestSize
 HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
-    int32_t result = parser.Init();
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -79,10 +77,9 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest002, TestSize
 HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return("invalid json"));
-    int32_t result = parser.Init();
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -103,10 +100,9 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_004, TestSiz
             }
         ]
     })";
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
-    int32_t result = parser.Init();
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -123,10 +119,9 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_005, TestSiz
     std::string jsonStr = R"({
         "exactly_match": "exactly_match_code"
     })";
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
-    int32_t result = parser.Init();
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -144,10 +139,9 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_006, TestSiz
         "exactly_match": [{}, {}
         ]
     })";
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
-    int32_t result = parser.Init();
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -160,11 +154,10 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_006, TestSiz
 HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SpecialInputDeviceParser& parser = SpecialInputDeviceParser::GetInstance();
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return("OK"));
-    parser.isInitialized_.store(true);
-    int32_t result = parser.Init();
+    SPECIAL_INPUT_DEVICE_PARSER.isInitialized_.store(true);
+    int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_ERR);
 }
 

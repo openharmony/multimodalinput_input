@@ -43,8 +43,7 @@ public:
 HWTEST_F(InputDeviceManagerTestWithMock, InputDeviceManager_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager manager;
-    EXPECT_TRUE(manager.observers_.empty());
+    EXPECT_TRUE(INPUT_DEV_MGR->observers_.empty());
 }
 
 /**
@@ -57,9 +56,8 @@ HWTEST_F(InputDeviceManagerTestWithMock, Attach_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto observer = std::make_shared<InputDeviceObserver>();
-    InputDeviceManager manager;
-    EXPECT_NO_FATAL_FAILURE(manager.Attach(observer));
-    EXPECT_TRUE(std::any_of(manager.observers_.cbegin(), manager.observers_.cend(),
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->Attach(observer));
+    EXPECT_TRUE(std::any_of(INPUT_DEV_MGR->observers_.cbegin(), INPUT_DEV_MGR->observers_.cend(),
         [observer](const auto &item) {
             return (observer == item);
         }));
@@ -75,10 +73,9 @@ HWTEST_F(InputDeviceManagerTestWithMock, Detach_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto observer = std::make_shared<InputDeviceObserver>();
-    InputDeviceManager manager;
-    manager.Attach(observer);
-    EXPECT_NO_FATAL_FAILURE(manager.Detach(observer));
-    EXPECT_TRUE(std::none_of(manager.observers_.cbegin(), manager.observers_.cend(),
+    INPUT_DEV_MGR->Attach(observer);
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->Detach(observer));
+    EXPECT_TRUE(std::none_of(INPUT_DEV_MGR->observers_.cbegin(), INPUT_DEV_MGR->observers_.cend(),
         [observer](const auto &item) {
             return (observer == item);
         }));
@@ -95,10 +92,9 @@ HWTEST_F(InputDeviceManagerTestWithMock, NotifyDeviceAdded_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto observer = std::make_shared<InputDeviceObserver>();
     EXPECT_CALL(*observer, OnDeviceAdded).Times(testing::Exactly(1));
-    InputDeviceManager manager;
-    manager.Attach(observer);
+    INPUT_DEV_MGR->Attach(observer);
     int32_t deviceId { 1 };
-    EXPECT_NO_FATAL_FAILURE(manager.NotifyDeviceAdded(deviceId));
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceAdded(deviceId));
 }
 
 /**
@@ -112,10 +108,9 @@ HWTEST_F(InputDeviceManagerTestWithMock, NotifyDeviceRemoved_001, TestSize.Level
     CALL_TEST_DEBUG;
     auto observer = std::make_shared<InputDeviceObserver>();
     EXPECT_CALL(*observer, OnDeviceRemoved).Times(testing::Exactly(1));
-    InputDeviceManager manager;
-    manager.Attach(observer);
+    INPUT_DEV_MGR->Attach(observer);
     int32_t deviceId { 1 };
-    EXPECT_NO_FATAL_FAILURE(manager.NotifyDeviceRemoved(deviceId));
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceRemoved(deviceId));
 }
 } // namespace MMI
 } // namespace OHOS
