@@ -51,12 +51,11 @@ public:
 HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
     inDevice.inputDeviceOrigin = nullptr;
     inDevice.isTouchableDevice = true;
-    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDevCallback(deviceId, inDevice));
 }
 
 /**
@@ -68,7 +67,6 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
     struct libinput_device libDev {
@@ -83,7 +81,7 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_002, TestSize.Level1)
     inDevice.isTouchableDevice = true;
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("test")));
-    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDevCallback(deviceId, inDevice));
 }
 
 /**
@@ -95,17 +93,16 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_002, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     using InputDeviceCallback = std::function<void(int, std::string, std::string, std::string)>;
     InputDeviceCallback callback =
         [] (int status, std::string nodeName, const std::string& deviceName, const std::string& deviceId) {};
-    inputDevice.SetInputStatusChangeCallback(callback);
+    INPUT_DEV_MGR->SetInputStatusChangeCallback(callback);
 
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
     inDevice.inputDeviceOrigin = nullptr;
     inDevice.sysUid = "test";
-    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevRemoveCallback(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDevRemoveCallback(deviceId, inDevice));
 }
 
 /**
@@ -117,11 +114,10 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_001, TestSize.Leve
 HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     using InputDeviceCallback = std::function<void(int, std::string, std::string, std::string)>;
     InputDeviceCallback callback =
         [] (int status, std::string nodeName, const std::string& deviceName, const std::string& deviceId) {};
-    inputDevice.SetInputStatusChangeCallback(callback);
+    INPUT_DEV_MGR->SetInputStatusChangeCallback(callback);
 
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
@@ -137,7 +133,7 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_002, TestSize.Leve
     inDevice.sysUid = "test";
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("test")));
-    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevRemoveCallback(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDevRemoveCallback(deviceId, inDevice));
 }
 
 /**
@@ -149,9 +145,8 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevRemoveCallback_Test_002, TestSize.Leve
 HWTEST_F(InputDeviceManagerTest, IsPointerDevice_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     struct libinput_device *device = nullptr;
-    bool ret = inputDevice.IsPointerDevice(device);
+    bool ret = INPUT_DEV_MGR->IsPointerDevice(device);
     ASSERT_EQ(ret, false);
 }
 
@@ -164,7 +159,6 @@ HWTEST_F(InputDeviceManagerTest, IsPointerDevice_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceRemoved_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     POINTER_DEV_MGR.isInit = false;
     NiceMock<LibinputInterfaceMock> libinputMock;
 
@@ -198,15 +192,15 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceRemoved_Tes
     info3.inputDeviceOrigin = &libDev3;
     info3.isDeviceReportEvent = true;
     info3.isRemote = true;
-    inputDevice.inputDevice_.insert(std::make_pair(deviceId1, info1));
-    inputDevice.inputDevice_.insert(std::make_pair(deviceId2, info2));
-    inputDevice.inputDevice_.insert(std::make_pair(deviceId3, info3));
-    inputDevice.OnInputDeviceRemoved(&libDev1);
-    ASSERT_EQ(inputDevice.inputDevice_.count(deviceId1), 0);
-    inputDevice.OnInputDeviceRemoved(&libDev2);
-    ASSERT_EQ(inputDevice.inputDevice_.count(deviceId2), 0);
-    inputDevice.OnInputDeviceRemoved(&libDev3);
-    ASSERT_EQ(inputDevice.inputDevice_.count(deviceId3), 0);
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId1, info1));
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId2, info2));
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId3, info3));
+    INPUT_DEV_MGR->OnInputDeviceRemoved(&libDev1);
+    ASSERT_EQ(INPUT_DEV_MGR->inputDevice_.count(deviceId1), 0);
+    INPUT_DEV_MGR->OnInputDeviceRemoved(&libDev2);
+    ASSERT_EQ(INPUT_DEV_MGR->inputDevice_.count(deviceId2), 0);
+    INPUT_DEV_MGR->OnInputDeviceRemoved(&libDev3);
+    ASSERT_EQ(INPUT_DEV_MGR->inputDevice_.count(deviceId3), 0);
 }
 
 /**
@@ -239,18 +233,17 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetIsDeviceReportEvent_0
 HWTEST_F(InputDeviceManagerTest, NotifyDeviceAdded_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
     auto observer = std::make_shared<MockIDeviceObserver>();
-    inputDevice.Attach(observer);
+    INPUT_DEV_MGR->Attach(observer);
     std::shared_ptr<IDeviceObserver> observerNull = nullptr;
-    inputDevice.Attach(observerNull);
+    INPUT_DEV_MGR->Attach(observerNull);
 
     int32_t deviceId = 600;
     EXPECT_CALL(*observer, OnDeviceAdded(_)).Times(1);
-    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDeviceAdded(deviceId));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceAdded(deviceId));
 
     EXPECT_CALL(*observer, OnDeviceRemoved(_)).Times(1);
-    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDeviceRemoved(deviceId));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceRemoved(deviceId));
 }
 } // namespace MMI
 } // namespace OHOS

@@ -50,8 +50,7 @@ public:
 HWTEST_F(ProductTypeParserTest, ProductTypeParserTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ProductTypeParser& parser = ProductTypeParser::GetInstance();
-    int32_t result = parser.Init();
+    int32_t result = PRODUCT_TYPE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -64,11 +63,10 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest001, TestSize.Level1)
 HWTEST_F(ProductTypeParserTest, ProductTypeParserTest002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ProductTypeParser& parser = ProductTypeParser::GetInstance();
-    if (parser.Init() != RET_OK) {
+    if (PRODUCT_TYPE_PARSER.Init() != RET_OK) {
     }
     DeviceType deviceType;
-    int32_t result = parser.GetProductType("test_product", deviceType);
+    int32_t result = PRODUCT_TYPE_PARSER.GetProductType("test_product", deviceType);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -82,10 +80,9 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest002, TestSize.Level1)
 HWTEST_F(ProductTypeParserTest, ProductTypeParserTest003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ProductTypeParser& parser = ProductTypeParser::GetInstance();
     ProductTypeParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(""));
-    int32_t result = parser.Init();
+    int32_t result = PRODUCT_TYPE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -106,10 +103,9 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest004, TestSize.Level1)
             }
         ]
     })";
-    ProductTypeParser& parser = ProductTypeParser::GetInstance();
     ProductTypeParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
-    int32_t result = parser.Init();
+    int32_t result = PRODUCT_TYPE_PARSER.Init();
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -122,10 +118,9 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest004, TestSize.Level1)
 HWTEST_F(ProductTypeParserTest, ProductTypeParserTest005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ProductTypeParser& parser = ProductTypeParser::GetInstance();
-    parser.productTypes_.clear();
+    PRODUCT_TYPE_PARSER.productTypes_.clear();
     DeviceType deviceType;
-    int32_t result = parser.GetProductType("nonExistentProduct", deviceType);
+    int32_t result = PRODUCT_TYPE_PARSER.GetProductType("nonExistentProduct", deviceType);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -138,10 +133,9 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest005, TestSize.Level1)
 HWTEST_F(ProductTypeParserTest, ProductTypeParserTest006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ProductTypeParser& parser = ProductTypeParser::GetInstance();
-    parser.productTypes_["testProduct"] = "unknownType";
+    PRODUCT_TYPE_PARSER.productTypes_["testProduct"] = "unknownType";
     DeviceType deviceType;
-    int32_t result = parser.GetProductType("testProduct", deviceType);
+    int32_t result = PRODUCT_TYPE_PARSER.GetProductType("testProduct", deviceType);
     EXPECT_EQ(result, RET_ERR);
 }
 
