@@ -216,7 +216,8 @@ void CursorDrawingComponent::DeletePointerVisible(int32_t pid)
     pointerInstance_->DeletePointerVisible(pid);
 }
 
-int32_t CursorDrawingComponent::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
+int32_t CursorDrawingComponent::SetPointerVisible(
+    int32_t pid, bool visible, int32_t priority, bool isHap)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
     return pointerInstance_->SetPointerVisible(pid, visible, priority, isHap);
