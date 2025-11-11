@@ -48,9 +48,8 @@ public:
 HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasInit_ = true;
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.InitCommonEventSubscriber());
+    DEVICE_MONITOR->hasInit_ = true;
+    EXPECT_NO_FATAL_FAILURE(DEVICE_MONITOR->InitCommonEventSubscriber());
 }
 /**
  * @tc.name: InitCommonEventSubscriber_002
@@ -61,9 +60,8 @@ HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_001, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.InitCommonEventSubscriber());
+    DEVICE_MONITOR->hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(DEVICE_MONITOR->InitCommonEventSubscriber());
 }
 /**
  * @tc.name: SetCallState_001
@@ -74,23 +72,22 @@ HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_002, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetCallState_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     want.SetParam("state", 1);
     ced.SetWant(want);
-    deviceEventMonitor.hasHandleRingMute_ = true;
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, -1);
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, -1);
     want.SetParam("state", 4);
     ced.SetWant(want);
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.SetCallState(ced, 1));
+    EXPECT_NO_FATAL_FAILURE(DEVICE_MONITOR->SetCallState(ced, 1));
     want.SetParam("state", 6);
     ced.SetWant(want);
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.SetCallState(ced, 1));
-    deviceEventMonitor.hasHandleRingMute_ = false;
-    EXPECT_NO_FATAL_FAILURE(deviceEventMonitor.SetCallState(ced, 1));
+    EXPECT_NO_FATAL_FAILURE(DEVICE_MONITOR->SetCallState(ced, 1));
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
+    EXPECT_NO_FATAL_FAILURE(DEVICE_MONITOR->SetCallState(ced, 1));
 }
 
 /**
@@ -102,24 +99,23 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_001, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetCallState_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     want.SetParam("state", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, 1);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 1);
 
     want.SetParam("state", 5);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, 5);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 5);
     
     want.SetParam("state", 4);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, 4);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 4);
 }
 /**
  * @tc.name: SetCallState_005
@@ -130,18 +126,17 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_002, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetCallState_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
-    deviceEventMonitor.hasHandleRingMute_ = false;
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
     want.SetParam("state", 4);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, 4);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 4);
     want.SetParam("state", 5);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, 5);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 5);
 }
 
 /**
@@ -153,16 +148,15 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_005, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetCallState_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     want.SetParam("state", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, 1);
-    deviceEventMonitor.hasHandleRingMute_ = false;
-    deviceEventMonitor.SetCallState(ced, 1);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 1);
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
+    DEVICE_MONITOR->SetCallState(ced, 1);
 }
 /**
  * @tc.name: SetCallState_003
@@ -173,14 +167,13 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_006, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetCallState_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callState_, -1);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, -1);
 }
 
 /**
@@ -192,14 +185,13 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_003, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetCallState_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callType_, 0);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callType_, 0);
 }
 
 /**
@@ -211,25 +203,24 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_004, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     want.SetParam("state", 1);
     ced.SetWant(want);
-    deviceEventMonitor.hasHandleRingMute_ = true;
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 1);
 
     want.SetParam("state", 5);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 5);
     
     want.SetParam("state", 4);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 4);
 }
 
 /**
@@ -241,24 +232,23 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     want.SetParam("state", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 1);
 
     want.SetParam("state", 5);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 5);
     
     want.SetParam("state", 4);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 4);
 }
 /**
  * @tc.name: SetVoipCallState_005
@@ -269,18 +259,17 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_002, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
-    deviceEventMonitor.hasHandleRingMute_ = false;
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
     want.SetParam("state", 4);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 4);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 4);
     want.SetParam("state", 5);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 5);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 5);
 }
 
 /**
@@ -292,16 +281,15 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_005, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     want.SetParam("state", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, 1);
-    deviceEventMonitor.hasHandleRingMute_ = false;
-    deviceEventMonitor.SetVoipCallState(ced, 1);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 1);
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
 }
 
 /**
@@ -313,14 +301,13 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_006, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.voipCallState_, -1);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, -1);
 }
 
 /**
@@ -332,14 +319,13 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_003, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.callType_, 1);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->callType_, 1);
 }
 
 /**
@@ -351,14 +337,13 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_004, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, GetCallType_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.GetCallType(), 0);
+    DEVICE_MONITOR->SetCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallType(), 0);
 }
 
 /**
@@ -370,14 +355,13 @@ HWTEST_F(DeviceEventMonitorTest, GetCallType_001, TestSize.Level1)
 HWTEST_F(DeviceEventMonitorTest, GetCallType_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DeviceEventMonitor deviceEventMonitor;
-    deviceEventMonitor.hasHandleRingMute_ = true;
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
     EventFwk::CommonEventData ced;
     EventFwk::Want want;
     want.SetParam("slotId", 1);
     ced.SetWant(want);
-    deviceEventMonitor.SetVoipCallState(ced, 1);
-    ASSERT_EQ(deviceEventMonitor.GetCallType(), 1);
+    DEVICE_MONITOR->SetVoipCallState(ced, 1);
+    ASSERT_EQ(DEVICE_MONITOR->GetCallType(), 1);
 }
 } // namespace MMI
 } // namespace OHOS
