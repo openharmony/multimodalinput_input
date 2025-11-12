@@ -23,22 +23,18 @@ namespace MMI {
 
 inputConsumer::HotkeyOptions ConvertTaiheHotkeyOptions(std::shared_ptr<KeyOption> keyOption)
 {
+    inputConsumer::HotkeyOptions result{};
     if (keyOption == nullptr) {
         MMI_HILOGE("keyOption invalid");
-        return {
-            taihe::array<int32_t>(nullptr, 0),
-            0,
-            taihe::optional<bool>(std::nullopt)
-        };
+        return result;
     }
     std::set<int32_t> preKeysSet = keyOption->GetPreKeys();
     std::vector<int32_t> preKeysVec(preKeysSet.begin(), preKeysSet.end());
+    result.preKeys = taihe::array<int32_t>(preKeysVec);
+    result.finalKey = keyOption->GetFinalKey();
     bool isRepeatValue = keyOption->IsRepeat();
-    return {
-        taihe::array<int32_t>(preKeysVec),
-        keyOption->GetFinalKey(),
-        taihe::optional<bool>(&isRepeatValue)
-    };
+    result.isRepeat = taihe::optional<bool>(std::in_place, isRepeatValue);
+    return result;
 }
 } // namespace MMI
 } // namespace OHOS

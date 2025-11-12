@@ -26,6 +26,7 @@ const static std::map<int32_t, keyCode::KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_UNKNOWN_ETS,                   keyCode::KeyCode::key_t::KEYCODE_UNKNOWN },
     { KEYCODE_HOME_ETS,                      keyCode::KeyCode::key_t::KEYCODE_HOME },
     { KEYCODE_BACK_ETS,                      keyCode::KeyCode::key_t::KEYCODE_BACK },
+    { KEYCODE_HEADSETHOOK_ETS,               keyCode::KeyCode::key_t::KEYCODE_HEADSETHOOK },
     { KEYCODE_SEARCH_ETS,                    keyCode::KeyCode::key_t::KEYCODE_SEARCH },
     { KEYCODE_MEDIA_PLAY_PAUSE_ETS,          keyCode::KeyCode::key_t::KEYCODE_MEDIA_PLAY_PAUSE },
     { KEYCODE_MEDIA_STOP_ETS,                keyCode::KeyCode::key_t::KEYCODE_MEDIA_STOP },
@@ -371,7 +372,7 @@ const static std::map<int32_t, keyCode::KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_DIV_ETS,                       keyCode::KeyCode::key_t::KEYCODE_DIV }
 };
 
-keyCode::KeyCode ConvertEtsKeyCode(int32_t keyCode)
+keyCode::KeyCode TaiheKeyCodeConverter::ConvertEtsKeyCode(int32_t keyCode)
 {
     auto iter = KEY_CODE_TRANSFORMATION.find(keyCode);
     if (iter == KEY_CODE_TRANSFORMATION.end()) {
@@ -381,6 +382,20 @@ keyCode::KeyCode ConvertEtsKeyCode(int32_t keyCode)
     return iter->second;
 }
 
+KeyCodeEts TaiheKeyCodeConverter::GetKeyCodeByValue(keyCode::KeyCode code)
+{
+    static std::unordered_map<keyCode::KeyCode, int32_t> reverseMap;
+    if (reverseMap.empty()) {
+        for (const auto& [key, val] : KEY_CODE_TRANSFORMATION) {
+            reverseMap[val] = key;
+        }
+    }
+    auto it = reverseMap.find(code);
+    if (it != reverseMap.end()) {
+        return static_cast<KeyCodeEts>(it->second);
+    }
+    return KEYCODE_UNKNOWN_ETS;
+}
 } // namespace MMI
 } // namespace OHOS
 
