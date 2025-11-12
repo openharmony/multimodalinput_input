@@ -61,11 +61,11 @@ public:
  */
 HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_Init001, TestSize.Level0)
 {
-    KeyEventHookManager::GetInstance().isInitialized_ = true;
-    KeyEventHookManager::GetInstance().Init();
-    KeyEventHookManager::GetInstance().isInitialized_ = false;
-    KeyEventHookManager::GetInstance().Init();
-    EXPECT_TRUE(KeyEventHookManager::GetInstance().isInitialized_);
+    KEY_EVENT_HOOK_MGR.isInitialized_ = true;
+    KEY_EVENT_HOOK_MGR.Init();
+    KEY_EVENT_HOOK_MGR.isInitialized_ = false;
+    KEY_EVENT_HOOK_MGR.Init();
+    EXPECT_TRUE(KEY_EVENT_HOOK_MGR.isInitialized_);
 }
 
 /**
@@ -77,20 +77,20 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_Init001, TestSize.Leve
 HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_OnKeyEvent, TestSize.Level1)
 {
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KEY_EVENT_HOOK_MGR.GenerateHookId(), sess,
         [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+            return KEY_EVENT_HOOK_MGR.HookHandler(sess, hook, keyEvent);
         }
     );
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(-1);
-    bool result = KeyEventHookManager::GetInstance().IsValidKeyEvent(keyEvent);
-    KeyEventHookManager::GetInstance().OnKeyEvent(keyEvent);
+    bool result = KEY_EVENT_HOOK_MGR.IsValidKeyEvent(keyEvent);
+    KEY_EVENT_HOOK_MGR.OnKeyEvent(keyEvent);
     EXPECT_FALSE(result);
     keyEvent->SetKeyCode(1);
-    KeyEventHookManager::GetInstance().OnKeyEvent(keyEvent);
-    result = KeyEventHookManager::GetInstance().IsValidKeyEvent(keyEvent);
+    KEY_EVENT_HOOK_MGR.OnKeyEvent(keyEvent);
+    result = KEY_EVENT_HOOK_MGR.IsValidKeyEvent(keyEvent);
     EXPECT_TRUE(result);
 }
 
@@ -105,18 +105,18 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_RemoveKeyEventHook001,
     int32_t pid = 100;
     int32_t hookId = 200;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KEY_EVENT_HOOK_MGR.GenerateHookId(), sess,
         [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+            return KEY_EVENT_HOOK_MGR.HookHandler(sess, hook, keyEvent);
         }
     );
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    int32_t result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    int32_t result = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId);
     EXPECT_EQ(result, RET_OK);
     pid = 123;
     hookId = 456;
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    result = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -131,28 +131,28 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_RemoveKeyEventHook002,
     int32_t pid = UDS_PID;
     int32_t hookId = UDS_PID;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KEY_EVENT_HOOK_MGR.GenerateHookId(), sess,
         [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+            return KEY_EVENT_HOOK_MGR.HookHandler(sess, hook, keyEvent);
         }
     );
     hook->id = UDS_PID;
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    int32_t result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    int32_t result = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId);
     EXPECT_EQ(result, RET_OK);
 
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(hookId);
-    result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].insert(hookId);
+    result = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId);
     EXPECT_EQ(result, RET_OK);
 
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    result = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId);
     EXPECT_EQ(result, RET_OK);
 
-    EventDispatchOrderChecker::GetInstance().dispatchedEventIds_[hookId] = hookId;
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    result = KeyEventHookManager::GetInstance().RemoveKeyEventHook(pid, hookId);
+    EVENT_DISPATCH_ORDER_CHECKER.dispatchedEventIds_[hookId] = hookId;
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    result = KEY_EVENT_HOOK_MGR.RemoveKeyEventHook(pid, hookId);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -167,13 +167,13 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_DispatchToNextHandler0
     int32_t pid = 100;
     int32_t eventId = 456;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KEY_EVENT_HOOK_MGR.GenerateHookId(), sess,
         [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+            return KEY_EVENT_HOOK_MGR.HookHandler(sess, hook, keyEvent);
         }
     );
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    int32_t result = KeyEventHookManager::GetInstance().DispatchToNextHandler(pid, eventId);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    int32_t result = KEY_EVENT_HOOK_MGR.DispatchToNextHandler(pid, eventId);
     EXPECT_EQ(result, ERROR_INVALID_PARAMETER);
 }
 
@@ -187,23 +187,23 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_OnSessionLost001, Test
 {
     int32_t hookId = 123;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KEY_EVENT_HOOK_MGR.GenerateHookId(), sess,
         [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+            return KEY_EVENT_HOOK_MGR.HookHandler(sess, hook, keyEvent);
         }
     );
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(hookId);
-    KeyEventHookManager::GetInstance().OnSessionLost(sess);
-    EXPECT_FALSE(EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].empty());
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].insert(hookId);
+    KEY_EVENT_HOOK_MGR.OnSessionLost(sess);
+    EXPECT_FALSE(EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].empty());
 
-    EventDispatchOrderChecker::GetInstance().dispatchedEventIds_[hookId] = hookId;
-    KeyEventHookManager::GetInstance().OnSessionLost(sess);
-    EXPECT_FALSE(EventDispatchOrderChecker::GetInstance().dispatchedEventIds_.empty());
+    EVENT_DISPATCH_ORDER_CHECKER.dispatchedEventIds_[hookId] = hookId;
+    KEY_EVENT_HOOK_MGR.OnSessionLost(sess);
+    EXPECT_FALSE(EVENT_DISPATCH_ORDER_CHECKER.dispatchedEventIds_.empty());
 
-    KeyEventHookManager::GetInstance().RemoveHookById(hookId);
-    KeyEventHookManager::GetInstance().OnSessionLost(sess);
-    EXPECT_FALSE(KeyEventHookManager::GetInstance().hooks_.empty());
+    KEY_EVENT_HOOK_MGR.RemoveHookById(hookId);
+    KEY_EVENT_HOOK_MGR.OnSessionLost(sess);
+    EXPECT_FALSE(KEY_EVENT_HOOK_MGR.hooks_.empty());
 }
 
 /**
@@ -215,16 +215,16 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_OnSessionLost001, Test
 HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_GetNextHook001, TestSize.Level1)
 {
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    auto hook = std::make_shared<KeyEventHookManager::Hook>(KeyEventHookManager::GetInstance().GenerateHookId(), sess,
+    auto hook = std::make_shared<KeyEventHookManager::Hook>(KEY_EVENT_HOOK_MGR.GenerateHookId(), sess,
         [sess] (std::shared_ptr<KeyEventHookManager::Hook> hook, std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return KeyEventHookManager::GetInstance().HookHandler(sess, hook, keyEvent);
+            return KEY_EVENT_HOOK_MGR.HookHandler(sess, hook, keyEvent);
         }
     );
-    EXPECT_EQ(KeyEventHookManager::GetInstance().GetNextHook(hook), nullptr);
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    KeyEventHookManager::GetInstance().GetNextHook(hook);
-    KeyEventHookManager::GetInstance().hooks_.push_front(hook);
-    EXPECT_NE(KeyEventHookManager::GetInstance().GetNextHook(hook), nullptr);
+    EXPECT_EQ(KEY_EVENT_HOOK_MGR.GetNextHook(hook), nullptr);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    KEY_EVENT_HOOK_MGR.GetNextHook(hook);
+    KEY_EVENT_HOOK_MGR.hooks_.push_front(hook);
+    EXPECT_NE(KEY_EVENT_HOOK_MGR.GetNextHook(hook), nullptr);
 }
 
 /**
@@ -291,7 +291,7 @@ HWTEST_F(KeyEventHookManagerTest, KeyEventHookManagerTest_CheckAndUpdateEventLoo
     int32_t hookId = 1;
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(hookId);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].insert(hookId);
     KEY_EVENT_HOOK_MGR.AddKeyEventHook(pid, sess, hookId);
     keyEvent->SetId(100);
     keyEvent->SetKeyCode(1);

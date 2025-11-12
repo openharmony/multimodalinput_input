@@ -44,12 +44,12 @@ HWTEST_F(EventDispatchOrderCheckerTest, EventDispatchOrderCheckerTest_CheckDispa
 {
     int32_t hookId = 10;
     int32_t eventId = 1;
-    EventDispatchOrderChecker::GetInstance().dispatchedEventIds_[0] = 1;
-    EventDispatchOrderChecker::GetInstance().dispatchedEventIds_[1] = 1;
-    int32_t ret = EventDispatchOrderChecker::GetInstance().CheckDispatchOrder(hookId, eventId);
+    EVENT_DISPATCH_ORDER_CHECKER.dispatchedEventIds_[0] = 1;
+    EVENT_DISPATCH_ORDER_CHECKER.dispatchedEventIds_[1] = 1;
+    int32_t ret = EVENT_DISPATCH_ORDER_CHECKER.CheckDispatchOrder(hookId, eventId);
     EXPECT_EQ(ret, RET_OK);
     hookId = 1;
-    ret = EventDispatchOrderChecker::GetInstance().CheckDispatchOrder(hookId, eventId);
+    ret = EVENT_DISPATCH_ORDER_CHECKER.CheckDispatchOrder(hookId, eventId);
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
