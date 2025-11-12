@@ -246,7 +246,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
     pointerEvent->pointers_.push_back(item);
     pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    inputWindowsManager->lastPointerEventforGesture_ = pointerEvent;
+    inputWindowsManager->lastPointerEventForGesture_ = pointerEvent;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     inputWindowsManager->extraData_.pointerId = pointerId;
@@ -281,7 +281,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
     pointerEvent->pointers_.push_back(item);
     pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    inputWindowsManager->lastPointerEventforGesture_ = pointerEvent;
+    inputWindowsManager->lastPointerEventForGesture_ = pointerEvent;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     inputWindowsManager->extraData_.pointerId = pointerId + 1;
@@ -315,7 +315,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
     pointerEvent->pointers_.push_back(item);
     pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    inputWindowsManager->lastPointerEventforGesture_ = pointerEvent;
+    inputWindowsManager->lastPointerEventForGesture_ = pointerEvent;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     inputWindowsManager->extraData_.pointerId = pointerId + 1;
@@ -405,7 +405,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = true;
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     inputWindowsManager->transparentWins_.insert_or_assign(windowInfo.id, std::move(pixelMap));
@@ -446,7 +446,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -489,7 +489,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -533,7 +533,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -595,7 +595,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -640,7 +640,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = false;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -825,7 +825,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SkipPrivacyProte
     pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
     bool isSkip = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = false;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = false;
     inputWindowsManager->privacyProtection_.isOpen = true;
     EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
 
@@ -2339,12 +2339,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMouseHideFl
 }
 
 /**
- * @tc.name: InputWindowsManagerOneTest_SendBackCenterPointerEevent
+ * @tc.name: InputWindowsManagerOneTest_SendBackCenterPointerEvent
  * @tc.desc: Test BypassChainAndDispatchDirectly
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPointerEevent, TestSize.Level0)
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPointerEvent, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
@@ -2354,7 +2354,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPo
     CursorPosition currentPos;
     currentPos.cursorPos.x = 1;
     currentPos.cursorPos.y = 1;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendBackCenterPointerEevent(currentPos));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendBackCenterPointerEvent(currentPos));
 }
 
 /* *
@@ -2444,12 +2444,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ChangeWindowArea
 }
 
 /**
- * @tc.name: InputWindowsManagerOneTest_SendBackCenterPointerEevent_001
- * @tc.desc: Test SendBackCenterPointerEevent
+ * @tc.name: InputWindowsManagerOneTest_SendBackCenterPointerEvent_001
+ * @tc.desc: Test SendBackCenterPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPointerEevent_001, TestSize.Level0)
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPointerEvent_001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -2474,7 +2474,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPo
         it->second.windowsInfo.push_back(windowInfo);
     }
     inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
-    inputWindowsManager->isOpenPrivacyProtectionserver_ = true;
+    inputWindowsManager->isOpenPrivacyProtectionServer_ = true;
     inputWindowsManager->privacyProtection_.isOpen = false;
     inputWindowsManager->extraData_.appended = true;
     inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -2483,15 +2483,15 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPo
     CursorPosition currentPos;
     currentPos.cursorPos.x = 1;
     currentPos.cursorPos.y = 1;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEevent(currentPos));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEvent(currentPos));
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     inputWindowsManager->lastTouchEvent_ = pointerEvent;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEevent(currentPos));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEvent(currentPos));
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
     inputWindowsManager->lastTouchEvent_ = pointerEvent;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEevent(currentPos));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEvent(currentPos));
 }
 
 /**

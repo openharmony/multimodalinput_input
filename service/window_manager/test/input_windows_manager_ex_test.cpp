@@ -4421,7 +4421,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionW
     bool isSkip = true;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
     inputWindowsManager->privacyProtection_.isOpen = true;
-    EXPECT_TRUE(inputWindowsManager->isOpenPrivacyProtectionserver_);
+    EXPECT_TRUE(inputWindowsManager->isOpenPrivacyProtectionServer_);
     EXPECT_TRUE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
     isSkip = false;
     EXPECT_FALSE(inputWindowsManager->SkipPrivacyProtectionWindow(pointerEvent, isSkip));
@@ -5279,13 +5279,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenWin
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     int32_t pointerId = 100;
-    inputWindowsManager->lastPointerEventforWindowChange_ = PointerEvent::Create();
-    ASSERT_NE(inputWindowsManager->lastPointerEventforWindowChange_, nullptr);
+    inputWindowsManager->lastPointerEventForWindowChange_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager->lastPointerEventForWindowChange_, nullptr);
     PointerEvent::PointerItem pointerItem;
     pointerItem.pointerId_ = pointerId;
     pointerItem.canceled_ = true;
     pointerItem.pressed_ = true;
-    inputWindowsManager->lastPointerEventforWindowChange_->pointers_.push_back(pointerItem);
+    inputWindowsManager->lastPointerEventForWindowChange_->pointers_.push_back(pointerItem);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendCancelEventWhenWindowChange(pointerId));
 }
 
