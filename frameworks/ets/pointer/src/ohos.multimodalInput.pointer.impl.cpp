@@ -123,7 +123,6 @@ void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
 {
     OHOS::MMI::PointerStyle style;
     style.id = pointerStyle;
-    MMI_HILOGI("ztw SetPointerStyle windowId:%{public}d,style.id:%{public}d", windowId, style.id);
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
