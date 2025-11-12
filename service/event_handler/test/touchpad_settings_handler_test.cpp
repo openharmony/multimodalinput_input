@@ -64,9 +64,8 @@ void TouchpadSettingsHandlerTest::TearDown()
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_001, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
-    EXPECT_FALSE(observer.RegisterTpObserver(123));
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    EXPECT_FALSE(TOUCHPAD_MGR->RegisterTpObserver(123));
 }
 
 /**
@@ -77,8 +76,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_001, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_002, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    EXPECT_FALSE(observer.RegisterTpObserver(-1));
+    EXPECT_FALSE(TOUCHPAD_MGR->RegisterTpObserver(-1));
 }
 
 /**
@@ -89,9 +87,8 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_002, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_003, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.updateFunc_ = nullptr;
-    EXPECT_FALSE(observer.RegisterTpObserver(-1));
+    TOUCHPAD_MGR->updateFunc_ = nullptr;
+    EXPECT_FALSE(TOUCHPAD_MGR->RegisterTpObserver(-1));
 }
 
 /**
@@ -102,10 +99,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_003, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_001, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = false;
-    observer.currentAccountId_ = 1;
-    EXPECT_FALSE(observer.UnregisterTpObserver(2));
+    TOUCHPAD_MGR->hasRegistered_ = false;
+    TOUCHPAD_MGR->currentAccountId_ = 1;
+    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
 }
 
 /**
@@ -116,10 +112,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_001, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_002, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
-    observer.currentAccountId_ = 1;
-    EXPECT_FALSE(observer.UnregisterTpObserver(1));
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    TOUCHPAD_MGR->currentAccountId_ = 1;
+    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(1));
 }
 
 /**
@@ -130,10 +125,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_002, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_003, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
-    observer.currentAccountId_ = 1;
-    EXPECT_TRUE(observer.UnregisterTpObserver(2));
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    TOUCHPAD_MGR->currentAccountId_ = 1;
+    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
 }
 
 /**
@@ -144,16 +138,15 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_003, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_004, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
-    observer.currentAccountId_ = 1;
-    observer.volumeSwitchesObserver_ = nullptr;
-    observer.brightnessSwitchesObserver_ = nullptr;
-    observer.pressureObserver_ = nullptr;
-    observer.vibrationObserver_ = nullptr;
-    observer.touchpadSwitchesObserver_ = nullptr;
-    observer.knuckleSwitchesObserver_ = nullptr;
-    EXPECT_TRUE(observer.UnregisterTpObserver(2));
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    TOUCHPAD_MGR->currentAccountId_ = 1;
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->pressureObserver_ = nullptr;
+    TOUCHPAD_MGR->vibrationObserver_ = nullptr;
+    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
+    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
 }
 
 /**
@@ -164,9 +157,8 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_004, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterUpdateFunc_001, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.RegisterUpdateFunc();
-    EXPECT_NE(observer.updateFunc_, nullptr);
+    TOUCHPAD_MGR->RegisterUpdateFunc();
+    EXPECT_NE(TOUCHPAD_MGR->updateFunc_, nullptr);
 }
 
 /**
@@ -177,11 +169,10 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterUpdateFunc_001, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_001, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
-    observer.updateFunc_ = nullptr;
-    EXPECT_EQ(observer.updateFunc_, nullptr);
-    observer.SyncTouchpadSettingsData();
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    TOUCHPAD_MGR->updateFunc_ = nullptr;
+    EXPECT_EQ(TOUCHPAD_MGR->updateFunc_, nullptr);
+    TOUCHPAD_MGR->SyncTouchpadSettingsData();
 }
 
 /**
@@ -192,15 +183,14 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_001, TestSize.Lev
  */
 HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_003, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
+    TOUCHPAD_MGR->hasRegistered_ = true;
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    EXPECT_NE(observer.updateFunc_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    EXPECT_NE(TOUCHPAD_MGR->updateFunc_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
 }
 
 /**
@@ -211,16 +201,15 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_003, TestSize.Lev
  */
 HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_004, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
+    TOUCHPAD_MGR->hasRegistered_ = true;
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    observer.isCommonEventReady_.store(true);
-    EXPECT_NE(observer.updateFunc_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->isCommonEventReady_.store(true);
+    EXPECT_NE(TOUCHPAD_MGR->updateFunc_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
 }
 
 /**
@@ -231,29 +220,28 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_004, TestSize.Lev
  */
 HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = true;
-    observer.currentAccountId_ = 1;
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    TOUCHPAD_MGR->currentAccountId_ = 1;
     int32_t serviceId = 3101;
-    observer.volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_volumeSwitchesKey, observer.updateFunc_);
-    observer.brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_brightnessSwitchesKey, observer.updateFunc_);
-    observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_pressureKey, observer.updateFunc_);
-    observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_vibrationKey, observer.updateFunc_);
-    observer.touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadSwitchesKey, observer.updateFunc_);
-    observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
-    EXPECT_FALSE(observer.UnregisterTpObserver(2));
-    observer.volumeSwitchesObserver_ = nullptr;
-    observer.brightnessSwitchesObserver_ = nullptr;
-    observer.pressureObserver_ = nullptr;
-    observer.vibrationObserver_ = nullptr;
-    observer.touchpadSwitchesObserver_ = nullptr;
-    observer.knuckleSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_volumeSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_brightnessSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->pressureObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_pressureKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_touchpadSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->pressureObserver_ = nullptr;
+    TOUCHPAD_MGR->vibrationObserver_ = nullptr;
+    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
 }
 
 /**
@@ -264,23 +252,22 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_006, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.hasRegistered_ = false;
+    TOUCHPAD_MGR->hasRegistered_ = false;
     int32_t serviceId = 2;
-    observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_pressureKey, observer.updateFunc_);
-    observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_vibrationKey, observer.updateFunc_);
-    observer.touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadSwitchesKey, observer.updateFunc_);
-    observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
+    TOUCHPAD_MGR->pressureObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_pressureKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_touchpadSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->RegisterTpObserver(123));
 }
 
 /**
@@ -291,32 +278,31 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_006, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
     int32_t serviceId = 3101;
-    observer.volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_volumeSwitchesKey, observer.updateFunc_);
-    observer.brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_brightnessSwitchesKey, observer.updateFunc_);
-    observer.pressureObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_pressureKey, observer.updateFunc_);
-    observer.vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_vibrationKey, observer.updateFunc_);
-    observer.touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadSwitchesKey, observer.updateFunc_);
-    observer.knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_knuckleSwitchesKey, observer.updateFunc_);
-    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
-    observer.volumeSwitchesObserver_ = nullptr;
-    observer.brightnessSwitchesObserver_ = nullptr;
-    observer.pressureObserver_ = nullptr;
-    observer.vibrationObserver_ = nullptr;
-    observer.touchpadSwitchesObserver_ = nullptr;
-    observer.knuckleSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_volumeSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_brightnessSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->pressureObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_pressureKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_touchpadSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->RegisterTpObserver(123));
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->pressureObserver_ = nullptr;
+    TOUCHPAD_MGR->vibrationObserver_ = nullptr;
+    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
 }
 
 /**
@@ -327,16 +313,15 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_009, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    observer.isCommonEventReady_.store(true);
-    observer.hasRegistered_ = false;
-    observer.currentAccountId_ = 0;
-    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->isCommonEventReady_.store(true);
+    TOUCHPAD_MGR->hasRegistered_ = false;
+    TOUCHPAD_MGR->currentAccountId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->RegisterTpObserver(123));
 }
 
 /**
@@ -347,23 +332,22 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_009, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_0010, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
     int32_t serviceId = 3101;
-    observer.volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_volumeSwitchesKey, observer.updateFunc_);
-    observer.brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_brightnessSwitchesKey, observer.updateFunc_);
-    observer.isCommonEventReady_.store(true);
-    observer.hasRegistered_ = false;
-    observer.currentAccountId_ = 0;
-    ASSERT_NO_FATAL_FAILURE(observer.RegisterTpObserver(123));
-    observer.volumeSwitchesObserver_ = nullptr;
-    observer.brightnessSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_volumeSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
+            .CreateObserver(g_brightnessSwitchesKey, TOUCHPAD_MGR->updateFunc_);
+    TOUCHPAD_MGR->isCommonEventReady_.store(true);
+    TOUCHPAD_MGR->hasRegistered_ = false;
+    TOUCHPAD_MGR->currentAccountId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->RegisterTpObserver(123));
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
 }
 
 /**
@@ -400,15 +384,15 @@ HWTEST_F(TouchpadSettingsHandlerTest, GetInstance_002, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_001, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     std::string key = "";
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
-    EXPECT_EQ(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->datashareUri_ =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_EQ(TOUCHPAD_MGR->RegisterDatashareObserver(key, UpdateFunc), nullptr);
 }
 
 /**
@@ -419,15 +403,14 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_001, TestSiz
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_002, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     std::string key = "settings.trackpad.right_volume_switches";
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    observer.datashareUri_ = "";
-    EXPECT_EQ(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->datashareUri_ = "";
+    EXPECT_EQ(TOUCHPAD_MGR->RegisterDatashareObserver(key, UpdateFunc), nullptr);
 }
 
 /**
@@ -438,10 +421,10 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_002, TestSiz
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_003, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     std::string key = "settings.trackpad.right_volume_switches";
-    observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
-    EXPECT_EQ(observer.RegisterDatashareObserver(key, nullptr), nullptr);
+    TOUCHPAD_MGR->datashareUri_ =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_EQ(TOUCHPAD_MGR->RegisterDatashareObserver(key, nullptr), nullptr);
 }
 
 /**
@@ -452,16 +435,16 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_003, TestSiz
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_004, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
     std::string key = "settings.trackpad.right_volume_switches";
     bool ret = true;
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    observer.updateFunc_ = UpdateFunc;
-    observer.datashareUri_ = "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
-    EXPECT_EQ(observer.RegisterDatashareObserver(key, UpdateFunc), nullptr);
-    observer.volumeSwitchesObserver_ = nullptr;
+    TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
+    TOUCHPAD_MGR->datashareUri_ =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_EQ(TOUCHPAD_MGR->RegisterDatashareObserver(key, UpdateFunc), nullptr);
+    TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
 }
 
 /**
@@ -472,10 +455,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterDatashareObserverTest_004, TestSiz
  */
 HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_001, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.SetCommonEventReady();
-    observer.hasRegistered_ = false;
-    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+    TOUCHPAD_MGR->SetCommonEventReady();
+    TOUCHPAD_MGR->hasRegistered_ = false;
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
 }
 
 /**
@@ -486,10 +468,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_001, TestSize
  */
 HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_002, TestSize.Level1)
 {
-    TouchpadSettingsObserver observer;
-    observer.SetCommonEventReady();
-    observer.hasRegistered_ = true;
-    ASSERT_NO_FATAL_FAILURE(observer.SyncTouchpadSettingsData());
+    TOUCHPAD_MGR->SetCommonEventReady();
+    TOUCHPAD_MGR->hasRegistered_ = true;
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
 }
 }
 } // namespace OHOS::MMI
