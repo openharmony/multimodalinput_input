@@ -58,13 +58,12 @@ void DisplayEventMonitorTest::TearDownTestCase()
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.shieldModeBeforeSreenOff_ = 0;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
-    displayEventMonitor.shieldModeBeforeSreenOff_ = 1;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
-    displayEventMonitor.shieldModeBeforeSreenOff_ = -1;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = 0;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn());
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = 1;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn());
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = -1;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn());
 }
 
 /**
@@ -76,13 +75,12 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.shieldModeBeforeSreenOff_ = 10;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
-    displayEventMonitor.shieldModeBeforeSreenOff_ = 5;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
-    displayEventMonitor.shieldModeBeforeSreenOff_ = -1;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = 10;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff());
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = 5;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff());
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = -1;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff());
 }
 
 /**
@@ -94,9 +92,8 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.hasInit_ = true;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    DISPLAY_MONITOR->hasInit_ = true;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->InitCommonEventSubscriber());
 }
 
 /**
@@ -108,10 +105,9 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
-    ASSERT_TRUE(displayEventMonitor.hasInit_);
+    DISPLAY_MONITOR->hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->InitCommonEventSubscriber());
+    ASSERT_TRUE(DISPLAY_MONITOR->hasInit_);
 }
 
 /**
@@ -123,11 +119,10 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_IsCommonEventSubscriberInit_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.hasInit_ = true;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.IsCommonEventSubscriberInit());
-    displayEventMonitor.hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.IsCommonEventSubscriberInit());
+    DISPLAY_MONITOR->hasInit_ = true;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->IsCommonEventSubscriberInit());
+    DISPLAY_MONITOR->hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->IsCommonEventSubscriberInit());
 }
 
 /**
@@ -139,8 +134,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_IsCommonEventSubscribe
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_SendCancelEventWhenLock_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.SendCancelEventWhenLock());
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SendCancelEventWhenLock());
 }
 } // namespace MMI
 } // namespace OHOS

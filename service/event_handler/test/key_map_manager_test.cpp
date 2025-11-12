@@ -59,9 +59,8 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetProFilePath_001, TestSize.Level
     std::ofstream ofs("example.pro");
     EXPECT_TRUE(ofs.is_open());
     ofs << "KEY_BTN_1 123 1111\n" << std::endl;
-    KeyMapManager KeyMapManager;
     std::string testPathSuffix = "example";
-    std::string result = KeyMapManager.GetProFilePath(testPathSuffix);
+    std::string result = KeyMapMgr->GetProFilePath(testPathSuffix);
     std::string expectReutrn = "example.pro";
     EXPECT_STREQ(result.c_str(), expectReutrn.c_str());
 
@@ -97,16 +96,15 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetProFilePath_002, TestSize.Level
     std::ofstream ofs("example.pro");
     EXPECT_TRUE(ofs.is_open());
     ofs << "KEY_BRL_DOT10 506 3210 HOS_KEY_BRL_DOT10\n" << std::endl;
-    KeyMapManager KeyMapManager;
     std::string testPathSuffix = "example";
-    std::string result = KeyMapManager.GetProFilePath(testPathSuffix);
+    std::string result = KeyMapMgr->GetProFilePath(testPathSuffix);
     std::string expectReutrn = "/vendor/etc/keymap/example.pro";
     EXPECT_STREQ(result.c_str(), expectReutrn.c_str());
 
-    result = KeyMapManager.GetProFilePath(testPathSuffix);
+    result = KeyMapMgr->GetProFilePath(testPathSuffix);
     EXPECT_STREQ(result.c_str(), expectReutrn.c_str());
 
-    result = KeyMapManager.GetProFilePath(testPathSuffix);
+    result = KeyMapMgr->GetProFilePath(testPathSuffix);
     EXPECT_STREQ(result.c_str(), expectReutrn.c_str());
 
     if (std::remove(testFile) == 0) {
