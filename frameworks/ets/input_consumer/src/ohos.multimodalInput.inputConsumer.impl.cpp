@@ -484,6 +484,10 @@ using callbackType = std::variant<
 void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
 {
     CALL_DEBUG_ENTER;
+    if (!reportEvent || !reportEvent->keyOption) {
+        MMI_HILOGE("reportEvent or keyOption value is null");
+        return;
+    }
     CHKPV(reportEvent);
     CHKPV(reportEvent->keyOption);
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
@@ -731,8 +735,10 @@ void UnsubscribeHotkey(HotkeyOptions const& hotkeyOptions, optional_view<uintptr
 void EmitKeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(reportEvent);
-    CHKPV(reportEvent->keyOption);
+    if (!reportEvent || !reportEvent->keyOption) {
+        MMI_HILOGE("reportEvent or keyOption value is null");
+        return;
+    }
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[reportEvent->eventType];
     for (auto &cb : cbVec) {
