@@ -2327,13 +2327,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t fakeWindoId = 100;
+    int32_t fakeWindowId = 100;
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_TRUE(InputManager::GetInstance()->SetMouseIcon(fakeWindoId, (void *)pixelMap.get()) == RET_ERR);
+    ASSERT_TRUE(InputManager::GetInstance()->SetMouseIcon(fakeWindowId, (void *)pixelMap.get()) == RET_ERR);
     pixelMap = nullptr;
 }
 
@@ -2348,10 +2348,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot, TestSize.Level1)
     CALL_TEST_DEBUG;
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::CROSS;
-    int32_t fakeWindoId = 100;
+    int32_t fakeWindowId = 100;
     int32_t mouseIcon = 20;
     ASSERT_TRUE(
-        InputManager::GetInstance()->SetMouseHotSpot(fakeWindoId, mouseIcon, mouseIcon) == RET_ERR);
+        InputManager::GetInstance()->SetMouseHotSpot(fakeWindowId, mouseIcon, mouseIcon) == RET_ERR);
 }
 
 

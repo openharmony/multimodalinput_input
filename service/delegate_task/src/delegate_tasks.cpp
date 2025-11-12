@@ -117,8 +117,8 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     auto task = PostTask(callback, promise);
     CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
-    static constexpr int32_t timeout = 3000;
-    std::chrono::milliseconds span(timeout);
+    static constexpr int32_t TIMEOUT = 3000;
+    std::chrono::milliseconds span(TIMEOUT);
     auto res = future.wait_for(span);
     task->SetWaited();
     if (res == std::future_status::timeout) {
@@ -147,9 +147,9 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 
 void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
-    static constexpr int32_t onceProcessTaskLimit = 10;
+    static constexpr int32_t ONCE_PROCESS_TASK_LIMIT = 10;
     if (mux_.try_lock_for(std::chrono::milliseconds(TIMED_WAIT_MS))) {
-        for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
+        for (int32_t count = 0; count < ONCE_PROCESS_TASK_LIMIT; count++) {
             if (tasks_.empty()) {
                 break;
             }
@@ -171,11 +171,11 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, std::shar
     TaskPtr taskCopy = nullptr;
     {
         std::lock_guard<std::timed_mutex> guard(mux_);
-        MMI_HILOGD("tasks_ size:%{public}d", static_cast<int32_t>(tasks_.size()));
-        static constexpr int32_t maxTasksLimit = 1000;
         auto tsize = tasks_.size();
-        if (tsize > maxTasksLimit) {
-            MMI_HILOGE("The task queue is full. size:%{public}zu, maxTasksLimit:%{public}d", tsize, maxTasksLimit);
+        MMI_HILOGD("tasks_ size:%{public}zu", tsize);
+        static constexpr int32_t MAX_TASKS_LIMIT = 1000;
+        if (tsize > MAX_TASKS_LIMIT) {
+            MMI_HILOGE("The task queue is full. size:%{public}zu, MAX_TASKS_LIMIT:%{public}d", tsize, MAX_TASKS_LIMIT);
             return nullptr;
         }
         id_++;

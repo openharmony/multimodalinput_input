@@ -126,7 +126,7 @@ public:
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
         bool isUiExtension = false) const;
-    void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
+    void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindowId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate();
@@ -225,7 +225,7 @@ public:
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
 
-    void CleanInvalidPiexMap(int32_t groupId = DEFAULT_GROUP_ID);
+    void CleanInvalidPixelMap(int32_t groupId = DEFAULT_GROUP_ID);
     void HandleWindowPositionChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     void SendCancelEventWhenWindowChange(int32_t pointerId, int32_t groupId = DEFAULT_GROUP_ID);
     bool GetHardCursorEnabled();
@@ -239,7 +239,7 @@ public:
     void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventforGesture_; };
+    std::shared_ptr<PointerEvent> GetLastPointerEventForGesture() { return lastPointerEventForGesture_; };
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -456,7 +456,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     int32_t GetMainScreenDisplayInfo(const std::vector<OLD::DisplayInfo> &displaysInfo,
         OLD::DisplayInfo &mainScreenDisplayInfo) const;
     bool IsPointerOnCenter(const CursorPosition &currentPos, const OLD::DisplayInfo &currentDisplay);
-    void SendBackCenterPointerEevent(const CursorPosition &cursorPos);
+    void SendBackCenterPointerEvent(const CursorPosition &cursorPos);
     WINDOW_UPDATE_ACTION UpdateWindowInfo(OLD::DisplayGroupInfo &displayGroupInfo);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::optional<WindowInfo> GetWindowInfoById(int32_t windowId) const;
@@ -565,7 +565,7 @@ private:
         std::string switchName;
         bool isOpen { false };
     } privacyProtection_;
-    bool isOpenPrivacyProtectionserver_ { false };
+    bool isOpenPrivacyProtectionServer_ { false };
     bool mouseFlag_ {false};
     struct ActiveTouchWin {
         WindowInputType windowInputType{ WindowInputType::NORMAL };
@@ -579,8 +579,8 @@ private:
     std::map<int32_t, std::set<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
-    std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
-    std::map<int32_t, std::shared_ptr<PointerEvent>> lastPointerEventforWindowChangeMap_;
+    std::shared_ptr<PointerEvent> lastPointerEventForWindowChange_ { nullptr };
+    std::map<int32_t, std::shared_ptr<PointerEvent>> lastPointerEventForWindowChangeMap_;
     bool cancelTouchStatus_ { false };
     std::pair<int32_t, Direction> lastDirection_ { -1, static_cast<Direction>(-1) };
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
@@ -589,13 +589,13 @@ private:
     std::map<int32_t, int32_t> windowStateNotifyUserIdPid_;
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<PointerEvent> lastPointerEventforGesture_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEventForGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool IsFoldable_ { false };
     int32_t timerId_ { -1 };
     int32_t lastDpi_ { 0 };
     std::map<int32_t, int32_t> lastDpiMap_;
-    std::shared_ptr<PointerEvent> GetlastPointerEvent();
+    std::shared_ptr<PointerEvent> GetLastPointerEvent();
     void SetDragFlagByPointer(std::shared_ptr<PointerEvent> lastPointerEvent);
     std::mutex mtx_;
     std::atomic_bool isFoldPC_ { false };
