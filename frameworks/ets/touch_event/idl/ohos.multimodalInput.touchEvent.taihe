@@ -23,7 +23,10 @@ enum Action : i32 {
   CANCEL = 0,
   DOWN = 1,
   MOVE = 2,
-  UP = 3
+  UP = 3,
+  PULL_DOWN = 4,
+  PULL_MOVE = 5,
+  PULL_UP = 6
 }
 
 enum ToolType : i32 {
@@ -69,6 +72,8 @@ struct Touch {
   toolType: ToolType;
   fixedDisplayX: Optional<i32>;
   fixedDisplayY: Optional<i32>;
+  globalX: Optional<i32>;
+  globalY: Optional<i32>;
 }
 
 struct TouchEvent {
@@ -78,4 +83,5 @@ struct TouchEvent {
   touches: Array<Touch>;
   sourceType: SourceType;
   fixedMode: Optional<FixedMode>;
+  isInject: Optional<bool>;
 }

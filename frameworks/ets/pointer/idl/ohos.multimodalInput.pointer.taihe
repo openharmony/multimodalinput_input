@@ -89,9 +89,13 @@ struct CursorConfig {
 @gen_promise("setPointerStyle")
 function SetPointerStyleAsync(windowId: i32, pointerStyle: PointerStyle): void;
 
-function SetPointerVisibleSync(visible: bool): void;
-function GetPointerStyleSync(windowId: i32): PointerStyle;
-function SetPointerStyleSync(windowId: i32, pointerStyle: PointerStyle): void;
+@rename("setPointerVisibleSync")
+function SetPointerVisibleSyncImpl(visible: bool): void;
+@rename("getPointerStyleSync")
+function GetPointerStyleSyncImpl(windowId: i32): PointerStyle;
+
+@rename("setPointerStyleSync")
+function SetPointerStyleSyncImpl(windowId: i32, pointerStyle: PointerStyle): void;
 
 struct CustomCursor {
     pixelMap: @sts_type("image.PixelMap") Opaque;
@@ -127,17 +131,17 @@ function GetTouchpadDoubleTapAndDragStateAsync(): bool;
 @gen_promise("setTouchpadDoubleTapAndDragState")
 function SetTouchpadDoubleTapAndDragStateAsync(isOpen: bool): void;
 
-function SetCustomCursorSync(windowId: i32, pixelMap: @sts_type("image.PixelMap") Opaque, focusX: Optional<i32>, focusY: Optional<i32>): void;
+@rename("setCustomCursorSync")
+function SetCustomCursorSyncImpl(windowId: i32, pixelMap: @sts_type("image.PixelMap") Opaque, focusX: Optional<i32>, focusY: Optional<i32>): void;
 
 @gen_promise("setCustomCursor")
-@overload("setCustomCursorAsync")
 function SetCustomCursorPixelMapAsync(windowId: i32, pixelMap: @sts_type("image.PixelMap") Opaque, focusX: Optional<i32>, focusY: Optional<i32>): void;
 
 @gen_promise("setCustomCursor")
-@overload("setCustomCursorAsync")
 function SetCustomCursorAsync(windowId: i32, cursor: CustomCursor, config: CursorConfig): void;
 
-function GetPointerSpeedSync(): i32;
+@rename("getPointerSpeedSync")
+function GetPointerSpeedSyncImpl(): i32;
 
 @gen_async("getTouchpadRightClickType")
 @gen_promise("getTouchpadRightClickType")
@@ -223,7 +227,8 @@ function SetMousePrimaryButtonAsync(primary: PrimaryButton): void;
 @gen_promise("getPointerSize")
 function GetPointerSizeAsync(): i32;
 
-function SetPointerSizeSync(size: i32): void;
+@rename("setPointerSizeSync")
+function SetPointerSizeSyncImpl(size: i32): void;
 
 @gen_async("setPointerSize")
 @gen_promise("setPointerSize")
@@ -233,16 +238,21 @@ function SetPointerSizeAsync(size: i32): void;
 @gen_promise("getPointerColor")
 function GetPointerColorAsync(): i32;
 
-function SetPointerColorSync(color: i32): void;
+@rename("setPointerColorSync")
+function SetPointerColorSyncImpl(color: i32): void;
 
 @gen_async("setPointerColor")
 @gen_promise("setPointerColor")
 function SetPointerColorAsync(color: i32): void;
 
-function SetPointerSpeedSync(speed: i32): void;
+@rename("setPointerSpeedSync")
+function SetPointerSpeedSyncImpl(speed: i32): void;
 
-function IsPointerVisibleSync(): bool;
+@rename("isPointerVisibleSync")
+function IsPointerVisibleSyncImpl(): bool;
 
-function GetPointerColorSync(): i32;
+@rename("getPointerColorSync")
+function GetPointerColorSyncImpl(): i32;
 
-function GetPointerSizeSync(): i32;
+@rename("getPointerSizeSync")
+function GetPointerSizeSyncImpl(): i32;

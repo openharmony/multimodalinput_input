@@ -16,38 +16,16 @@
 #include "inputConsumer_keyPressed_impl.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "inputConsumer_keyPressed_impl"
+#define MMI_LOG_TAG "AniConsumerkeyPressed"
 
 namespace OHOS {
 namespace MMI {
 
 keyEvent::KeyEvent TaiheInvalidKeyPressed()
 {
-    return {
-        {
-            0,
-            0,
-            0,
-            0,
-            0
-        },
-        keyEvent::Action::key_t::CANCEL,
-        {
-            keyCode::KeyCode::key_t::KEYCODE_UNKNOWN,
-            0,
-            0
-        },
-        0,
-        ::taihe::array<keyEvent::Key>(nullptr, 0),
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-    };
+    return {.action = keyEvent::Action::key_t::CANCEL,
+            .key = {.code =  keyCode::KeyCode::key_t::KEYCODE_UNKNOWN, }
+        };
 }
 
 int32_t EtsKeyActionToKeyAction(int32_t action)
@@ -94,7 +72,7 @@ keyEvent::Action ConvertKeyAction(EtsKeyAction action)
 keyEvent::Key KeyItemEtsKey(const KeyEvent::KeyItem &keyItem)
 {
     return {
-        ConvertEtsKeyCode(keyItem.GetKeyCode()),
+        TaiheKeyCodeConverter::ConvertEtsKeyCode(keyItem.GetKeyCode()),
         keyItem.GetDownTime(),
         keyItem.GetDeviceId()
     };

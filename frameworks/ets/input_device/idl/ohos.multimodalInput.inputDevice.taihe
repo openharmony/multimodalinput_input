@@ -99,17 +99,72 @@ struct InputDeviceData {
 @gen_async("getDeviceList")
 @gen_promise("getDeviceList")
 function GetDeviceIdsAsync(): Array<i32>;
+
+@gen_async("getDevice")
+@gen_promise("getDevice")
+function GetDeviceAsync(deviceId: i32): InputDeviceData;
+
 @gen_async("getDeviceInfo")
 @gen_promise("getDeviceInfo")
 function GetDeviceInfoAsync(deviceId: i32): InputDeviceData;
 
+@gen_async("supportKeys")
+@gen_promise("supportKeys")
+function SupportKeysAsync(deviceId: i32, keys: Array<KeyCode>): Array<bool>;
+
+@gen_async("setKeyboardRepeatDelay")
+@gen_promise("setKeyboardRepeatDelay")
+function SetKeyboardRepeatDelayAsync(delay: i32): void;
+
+@gen_async("getKeyboardRepeatDelay")
+@gen_promise("getKeyboardRepeatDelay")
+function GetKeyboardRepeatDelayAsync(): i32;
+
+@gen_async("setKeyboardRepeatRate")
+@gen_promise("setKeyboardRepeatRate")
+function SetKeyboardRepeatRateAsync(rate: i32): void;
+
+@gen_async("getKeyboardRepeatRate")
+@gen_promise("getKeyboardRepeatRate")
+function GetKeyboardRepeatRateAsync(): i32;
+
+@gen_promise("getIntervalSinceLastInput")
+function GetIntervalSinceLastInputAsync(): i64;
+
+@gen_promise("setFunctionKeyEnabled")
+function SetFunctionKeyEnabledAsync(functionKey: FunctionKey, enabled: bool): void;
+
+@gen_promise("isFunctionKeyEnabled")
+function IsFunctionKeyEnabledAsync(functionKey: FunctionKey): bool;
+
+@rename("setInputDeviceEnabled")
+function SetInputDeviceEnablePromise(deviceId: i32, enabled: bool):@sts_type("Promise<void>") Opaque;
+
+function GetKeyboardTypeSync(deviceId: i32): KeyboardType;
+@gen_async("getKeyboardType")
+@gen_promise("getKeyboardType")
+function GetKeyboardTypeAsync(deviceId: i32): KeyboardType;
+
+function SupportKeysSync(deviceId: i32, keys: Array<KeyCode>): Array<bool>;
+
+function GetDeviceInfoSync(deviceId: i32): InputDeviceData;
+
 @!sts_inject("""
     function on(type: 'change', callback: (info: DeviceListener) => void) {
-        return onKey(callback, callback);
+        return onKeyImpl(callback, callback);
     }
     function off(type: 'change', callback?: (info: DeviceListener) => void) {
-        return offKey(callback);
+        return offKeyImpl(callback);
     }
 """)
-function onKey(f: (info: DeviceListener) => void, opq: Opaque);
-function offKey(opq: Optional<Opaque>);
+
+@!sts_inject("""
+    function onChange(callback: (info: DeviceListener) => void) {
+        return onKeyImpl(callback, callback);
+    }
+    function offChange(callback?: (info: DeviceListener) => void) {
+        return offKeyImpl(callback);
+    }
+""")
+function onKeyImpl(f: (info: DeviceListener) => void, opq: Opaque);
+function offKeyImpl(opq: Optional<Opaque>);

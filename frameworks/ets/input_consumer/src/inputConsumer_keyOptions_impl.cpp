@@ -16,7 +16,7 @@
 #include "inputConsumer_keyOptions_impl.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "inputConsumer_keyOptions_impl"
+#define MMI_LOG_TAG "AniConsumerkeyOps"
 
 namespace OHOS {
 namespace MMI {
@@ -45,26 +45,21 @@ std::string GenerateKeyOptionKey(const std::shared_ptr<KeyOption>& keyOption)
 
 inputConsumer::KeyOptions ConvertTaiheKeyOptions(std::shared_ptr<KeyOption> keyOption)
 {
+    CALL_DEBUG_ENTER;
+    inputConsumer::KeyOptions result {};
     if (keyOption == nullptr) {
         MMI_HILOGE("keyOption invalid");
-        return {
-            taihe::array<int32_t>({}),
-            0,
-            false,
-            0,
-            taihe::optional<bool>(std::nullopt)
-        };
+        return result;
     }
     std::set<int32_t> preKeysSet = keyOption->GetPreKeys();
     std::vector<int32_t> preKeysVec(preKeysSet.begin(), preKeysSet.end());
+    result.preKeys =  taihe::array<int32_t>(preKeysVec);
+    result.finalKey  = keyOption->GetFinalKey();
+    result.isFinalKeyDown = keyOption->IsFinalKeyDown();
+    result.finalKeyDownDuration = keyOption->GetFinalKeyDownDuration();
     bool isRepeatValue = keyOption->IsRepeat();
-    return {
-        taihe::array<int32_t>(preKeysVec),
-        keyOption->GetFinalKey(),
-        keyOption->IsFinalKeyDown(),
-        keyOption->GetFinalKeyDownDuration(),
-        taihe::optional<bool>(&isRepeatValue)
-    };
+    result.isRepeat = taihe::optional<bool>(std::in_place, isRepeatValue);
+    return result;
 }
 } // namespace MMI
 } // namespace OHOS

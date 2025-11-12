@@ -13,24 +13,8 @@
  * limitations under the License.
  */
 
-@!namespace("@ohos.multimodalInput.shortKey")
-@!sts_inject("""
-  { loadLibraryWithPermissionCheck("ShortKey.z", "@ohos.multimodalInput.shortKey") }
-""")
+@!namespace("@ohos.multimodalInput.shortKey", "shortKey")
 
-enum FingerprintAction : i32 {
-  DOWN = 0,
-  UP = 1,
-  SLIDE = 2,
-  RETOUCH = 3,
-  CLICK = 4,
-  CANCEL = 5,
-  HOLD = 6,
-  TOUCH = 7,
-}
-
-struct FingerprintEvent {
-  action: FingerprintAction;
-  distanceX: f64;
-  distanceY: f64;
-}
+@gen_async("setKeyDownDuration")
+@gen_promise("setKeyDownDuration")
+function SetKeyDownDurationAsync(businessKey: String, delay: i32): void;

@@ -16,16 +16,13 @@
 #ifndef TAIHE_INPUTDEVICE_UTILS_H
 #define TAIHE_INPUTDEVICE_UTILS_H
 
-#include <linux/input.h>
-#include <stdexcept>
-
-#include "ani_common.h"
-#include "define_multimodal.h"
-#include "input_device.h"
-#include "input_manager.h"
 #include "ohos.multimodalInput.inputDevice.proj.hpp"
 #include "ohos.multimodalInput.inputDevice.impl.hpp"
 #include "taihe/runtime.hpp"
+#include "taihe/callback.hpp"
+
+#include "input_device.h"
+#include <linux/input.h>
 
 namespace OHOS {
 namespace MMI {
@@ -43,13 +40,15 @@ struct DeviceType {
 
 class TaiheInputDeviceUtils {
 public:
-    static TaihesType ConverterSourceTypeValue(const std::string &sourceType);
-    static TaiheaType ConverterAxisTypeValue(const std::string &axisType);
+    static TaihesType ConverterSType(const std::string &sourceType);
+    static TaiheaType ConverterATxis(const std::string &axisType);
     static TaiheSType ConverterSourceType(const TaihesType &sType);
     static TaiheAType ConverterAxisType(const TaiheaType &aType);
     static TaiheAxisRange ConverterAxisRange(const InputDevice::AxisInfo &axisInfo,
         const std::string &sourceType, const std::string &axisType);
-    static TaiheInputDeviceData ConverterInputDevice(const std::shared_ptr<InputDevice> &device);
+    static TaiheInputDeviceData ConverterInputDevice(std::shared_ptr<InputDevice> &device);
+    static ani_object WrapBusinessError(ani_env* env, const std::string& msg);
+    static ani_ref CreateBusinessError(ani_env* env, ani_int code, const std::string& msg);
 };
 
 } // namespace MMI

@@ -47,35 +47,71 @@ struct InfraredFrequency {
     min: i32;
 }
 
+enum ShieldMode: i32 {
+    FACTORY_MODE = 0
+}
+
 @!sts_inject("""
     function on(type: 'key', keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
-        return onKey(keyOptions, callback, callback);
+        return onKeyImpl(keyOptions, callback, callback);
     }
     function off(type: 'key', keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
-        return offKey(keyOptions, callback);
+        return offKeyImpl(keyOptions, callback);
     }
 """)
 @!sts_inject("""
     function on(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
-        return onHotkeyChange(hotkeyOptions, callback, callback);
+        return onHotkeyChangeImpl(hotkeyOptions, callback, callback);
     }
     function off(type: 'hotkeyChange', hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
-        return offHotkeyChange(hotkeyOptions, callback);
+        return offHotkeyChangeImpl(hotkeyOptions, callback);
     }
 """)
 @!sts_inject("""
     function on(type: 'keyPressed', options: KeyPressedConfig,
         callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
-        return onKeyPressed(options, callback, callback);
+        return onKeyPressedImpl(options, callback, callback);
     }
     function off(type: 'keyPressed', callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
-        return offKeyPressed(callback);
+        return offKeyPressedImpl(callback);
     }
 """)
 
-function onKey(keyOptions: KeyOptions, f: (info: KeyOptions) => void, opq: Opaque);
-function offKey(keyOptions: KeyOptions, opq: Optional<Opaque>);
-function onHotkeyChange(hotkeyOptions: HotkeyOptions, f: (info: HotkeyOptions) => void, opq: Opaque);
-function offHotkeyChange(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
-function onKeyPressed(options: KeyPressedConfig, f: (info: KeyEvent) => void, opq: Opaque);
-function offKeyPressed(opq: Optional<Opaque>);
+@!sts_inject("""
+    function onKey(keyOptions: KeyOptions, callback: (info: KeyOptions) => void) {
+        return onKeyImpl(keyOptions, callback, callback);
+    }
+    function offKey(keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
+        return offKeyImpl(keyOptions, callback);
+    }
+""")
+@!sts_inject("""
+    function onHotkeyChange(hotkeyOptions: HotkeyOptions, callback: (info: HotkeyOptions) => void) {
+        return onHotkeyChangeImpl(hotkeyOptions, callback, callback);
+    }
+    function offHotkeyChange(hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
+        return offHotkeyChangeImpl(hotkeyOptions, callback);
+    }
+""")
+@!sts_inject("""
+    function onKeyPressed(options: KeyPressedConfig,
+        callback: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+        return onKeyPressedImpl(options, callback, callback);
+    }
+    function offKeyPressed(callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
+        return offKeyPressedImpl(callback);
+    }
+""")
+
+function onKeyImpl(keyOptions: KeyOptions, f: (info: KeyOptions) => void, opq: Opaque);
+function offKeyImpl(keyOptions: KeyOptions, opq: Optional<Opaque>);
+function onHotkeyChangeImpl(hotkeyOptions: HotkeyOptions, f: (info: HotkeyOptions) => void, opq: Opaque);
+function offHotkeyChangeImpl(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
+function onKeyPressedImpl(options: KeyPressedConfig, f: (info: KeyEvent) => void, opq: Opaque);
+function offKeyPressedImpl(opq: Optional<Opaque>);
+
+function SetShieldStatus(shieldMode: ShieldMode, isShield: bool): void;
+function GetShieldStatus(shieldMode: ShieldMode): bool;
+
+@gen_promise("getAllSystemHotkeys")
+function GetAllSystemHotkeysSync(): Array<HotkeyOptions>;
