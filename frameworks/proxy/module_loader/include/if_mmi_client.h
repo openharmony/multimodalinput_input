@@ -40,6 +40,7 @@ public:
     virtual void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
     virtual bool IsEventHandlerChanged() = 0;
     virtual EventHandlerPtr GetEventHandler() const = 0;
+    virtual void Stop() = 0;
 };
 } // namespace MMI
 } // namespace OHOS
