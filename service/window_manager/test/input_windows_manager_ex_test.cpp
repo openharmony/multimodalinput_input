@@ -5617,15 +5617,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     displayGroupInfo.windowsInfo.push_back(focusWindow);
     auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
     if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
-        mouseIt->second.physicalX = 508;
-        mouseIt->second.physicalY = 303;
+        mouseIt->second.physicalX = 506;
+        mouseIt->second.physicalY = 301;
     }
     auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
-        cursorIt->second.cursorPos.x = 508.0;
-        cursorIt->second.cursorPos.y = 303.0;
+        cursorIt->second.cursorPos.x = 506.0;
+        cursorIt->second.cursorPos.y = 301.0;
     }
-    inputWindowsManager->UpdatePointerChangeAreas(displayGroupInfo);
     inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
     EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.x, focusWindow.area.x + focusWindow.area.width / 2);
     EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.y, focusWindow.area.y + focusWindow.area.height / 2);
@@ -5669,15 +5668,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     displayGroupInfo.windowsInfo.push_back(focusWindow);
     auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
     if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
-        mouseIt->second.physicalX = 508;
-        mouseIt->second.physicalY = 303;
+        mouseIt->second.physicalX = 506;
+        mouseIt->second.physicalY = 301;
     }
     auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
-        cursorIt->second.cursorPos.x = 508.0;
-        cursorIt->second.cursorPos.y = 303.0;
+        cursorIt->second.cursorPos.x = 506.0;
+        cursorIt->second.cursorPos.y = 301.0;
     }
-    inputWindowsManager->UpdatePointerChangeAreas(displayGroupInfo);
     inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
     EXPECT_EQ(cursorIt->second.cursorPos.x, focusWindow.area.x + focusWindow.area.width / 2);
     EXPECT_EQ(cursorIt->second.cursorPos.y, focusWindow.area.y + focusWindow.area.height / 2);
