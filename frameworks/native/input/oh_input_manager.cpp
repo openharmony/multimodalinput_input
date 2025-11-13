@@ -3317,8 +3317,7 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
         MMI_HILOGE("Invalid windowid");
         return INPUT_PARAMETER_ERROR;
     }
-    if ((pointerStyle < OHOS::MMI::DEFAULT && pointerStyle != OHOS::MMI::DEVELOPER_DEFINED_ICON) ||
-        pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
+    if (pointerStyle < OHOS::MMI::DEFAULT || pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         return INPUT_PARAMETER_ERROR;
     }
@@ -3400,7 +3399,8 @@ Input_Result OH_Input_CursorConfig_IsFollowSystem(Input_CursorConfig* cursorConf
     return INPUT_SUCCESS;
 }
 
-Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Media::InitializationOptions* options)
+Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Media::InitializationOptions* options,
+                                         uint32_t* byteCount)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, INPUT_PARAMETER_ERROR);
@@ -3429,6 +3429,11 @@ Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Medi
     if (!ret) {
         return INPUT_PARAMETER_ERROR;
     }
+    imageResult = OH_PixelmapNative_GetByteCount(pixelMap, byteCount);
+    if (imageResult != IMAGE_SUCCESS) {
+        MMI_HILOGE("pixelMap is invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
     options->alphaType = static_cast<OHOS::Media::AlphaType>(alphaType);
     options->srcPixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
     options->pixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
@@ -3444,29 +3449,20 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     CALL_DEBUG_ENTER;
     CHKPR(customCursor, INPUT_PARAMETER_ERROR);
     CHKPR(cursorConfig, INPUT_PARAMETER_ERROR);
-    if (windowId < 0) {
-        MMI_HILOGE("Invalid windowId");
-        return INPUT_PARAMETER_ERROR;
-    }
-    if (customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
-        MMI_HILOGE("customCursor is invalid");
-        return INPUT_PARAMETER_ERROR;
-    }
-    OHOS::Media::InitializationOptions options;
-    Input_Result inputResult = OH_Input_GetPixelMapOptions(customCursor->pixelMap, &options);
-    if (inputResult != INPUT_SUCCESS) {
-        MMI_HILOGE("pixelMap is invalid");
+    if (windowId < 0 ||customCursor->anchorX < 0 || customCursor->anchorY < 0 || customCursor->pixelMap == nullptr) {
+        MMI_HILOGE("abnormal windowId or customCursor");
         return INPUT_PARAMETER_ERROR;
     }
     uint32_t byteCount = 0;
-    Image_ErrorCode imageResult = OH_PixelmapNative_GetByteCount(customCursor->pixelMap, &byteCount);
-    if (imageResult != IMAGE_SUCCESS) {
+    OHOS::Media::InitializationOptions options;
+    Input_Result inputResult = OH_Input_GetPixelMapOptions(customCursor->pixelMap, &options, &byteCount);
+    if (inputResult != INPUT_SUCCESS) {
         MMI_HILOGE("pixelMap is invalid");
         return INPUT_PARAMETER_ERROR;
     }
     size_t pixelBufferSize = static_cast<size_t>(byteCount);
     uint8_t *pixelBuffer = new uint8_t[pixelBufferSize]();
-    imageResult = OH_PixelmapNative_ReadPixels(customCursor->pixelMap, pixelBuffer, &pixelBufferSize);
+    Image_ErrorCode imageResult = OH_PixelmapNative_ReadPixels(customCursor->pixelMap, pixelBuffer, &pixelBufferSize);
     if (imageResult != IMAGE_SUCCESS) {
         MMI_HILOGE("pixelMap is invalid");
         delete[] pixelBuffer;
@@ -3486,7 +3482,14 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetCustomCursor(windowId, cursor, cursorOptions);
     if (ret != RET_OK) {
         MMI_HILOGE("SetCustomCursor fail, error:%{public}d", ret);
-        return ret == OHOS::MMI::ERROR_UNSUPPORT ? INPUT_DEVICE_NOT_SUPPORTED : INPUT_SERVICE_EXCEPTION;
+        switch (ret) {
+            case OHOS::MMI::ERROR_UNSUPPORT:
+                return INPUT_DEVICE_NOT_SUPPORTED;
+            case INPUT_INVALID_WINDOWID:
+                return INPUT_INVALID_WINDOWID;
+            default:
+                return INPUT_SERVICE_EXCEPTION;
+        }
     }
     return INPUT_SUCCESS;
 }
