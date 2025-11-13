@@ -17,6 +17,7 @@
 #include "touchpad_settings_handler.h"
 #include "mmi_log.h"
 #include "account_manager.h"
+#include "input_device_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchpadSettingsObserver"
@@ -35,10 +36,14 @@ const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_sw
 const std::string g_pressureKey {"settings.trackpad.press_level"};
 const std::string g_vibrationKey {"settings.trackpad.shock_level"};
 const std::string g_touchpadSwitchesKey {"settings.trackpad.touchpad_switches"};
+const std::string g_touchpadMasterSwitchesKey {"settings.trackpad.touchpad_master_switches"};
+const std::string g_keepTouchpadEnableSwitchesKey {"settings.trackpad.keep_touchpad_enable_switches"};
 const std::string g_knuckleSwitchesKey {"settings.trackpad.touchpad_switches"};
 const std::string g_datashareBaseUri =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_";
 const std::string g_libthpPath {"/system/lib64/libthp_extra_innerapi.z.so"};
+const std::string g_switchStateOpen { "1" };
+const std::string g_switchStateClose { "0" };
 const std::map<std::string, int> g_keyToCmd = {
     {g_volumeSwitchesKey, 111}, // right volume gesture cmd 111
     {g_brightnessSwitchesKey, 110}, // left brightness gesture cmd 110
@@ -129,6 +134,21 @@ void TouchpadSettingsObserver::RegisterUpdateFunc()
     return;
 }
 
+void TouchpadSettingsObserver::RegisterTouchpadSwitchUpdateFunc()
+{
+    updateTouchpadSwitchFunc_ = nullptr;
+    const std::string datashareUri = datashareUri_;
+
+    SettingObserver::UpdateFunc UpdateFunc = [datashareUri](const std::string& key) {
+        MMI_HILOGI("Touchpad switch settings change: %{public}s", key.c_str());
+        TOUCHPAD_MGR->UpdateTouchpadSwitchState();
+        TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    };
+    MMI_HILOGI("Update touchpad switch function register end");
+    updateTouchpadSwitchFunc_  = UpdateFunc;
+    return;
+}
+
 sptr<SettingObserver> TouchpadSettingsObserver::RegisterDatashareObserver(
     const std::string key, SettingObserver::UpdateFunc onUpdate)
 {
@@ -157,14 +177,14 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
 {
     if (!isCommonEventReady_.load() || hasRegistered_) { return false; }
     std::lock_guard<std::mutex> lock(lock_);
-    ErrCode ret = 0;
-
     currentAccountId_ = accountId;
     TP_CHECK_FALSE_RETURN(currentAccountId_ >= 0, false, "Get account info fail");
 
     datashareUri_ = g_datashareBaseUri + std::to_string(currentAccountId_) + "?Proxy=true";
     RegisterUpdateFunc();
     TP_CHECK_FALSE_RETURN(updateFunc_ != nullptr, false, "Update function is null");
+    RegisterTouchpadSwitchUpdateFunc();
+    TP_CHECK_FALSE_RETURN(updateTouchpadSwitchFunc_ != nullptr, false, "Update switch function is null");
 
     if (volumeSwitchesObserver_ == nullptr) {
         volumeSwitchesObserver_ = RegisterDatashareObserver(g_volumeSwitchesKey, updateFunc_);
@@ -181,11 +201,20 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
     if (touchpadSwitchesObserver_ == nullptr) {
         touchpadSwitchesObserver_ = RegisterDatashareObserver(g_touchpadSwitchesKey, updateFunc_);
     }
+    if (touchpadMasterSwitchesObserver_ == nullptr) {
+        touchpadMasterSwitchesObserver_ = RegisterDatashareObserver(g_touchpadMasterSwitchesKey,
+            updateTouchpadSwitchFunc_);
+    }
+    if (keepTouchpadEnableSwitchesObserver_ == nullptr) {
+        keepTouchpadEnableSwitchesObserver_ = RegisterDatashareObserver(g_keepTouchpadEnableSwitchesKey,
+            updateTouchpadSwitchFunc_);
+    }
     if (knuckleSwitchesObserver_ == nullptr) {
         knuckleSwitchesObserver_ = RegisterDatashareObserver(g_knuckleSwitchesKey, updateFunc_);
     }
     if (volumeSwitchesObserver_ == nullptr || brightnessSwitchesObserver_ == nullptr || pressureObserver_ == nullptr ||
-        vibrationObserver_ == nullptr ||touchpadSwitchesObserver_ == nullptr || knuckleSwitchesObserver_ == nullptr) {
+        vibrationObserver_ == nullptr ||touchpadSwitchesObserver_ == nullptr || knuckleSwitchesObserver_ == nullptr ||
+        touchpadMasterSwitchesObserver_ == nullptr || keepTouchpadEnableSwitchesObserver_ == nullptr) {
         MMI_HILOGE("Register setting observer fail");
         return false;
     }
@@ -228,6 +257,16 @@ bool TouchpadSettingsObserver::UnregisterTpObserver(const int32_t accountId)
         TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister touchpadSwitchesObserver fail");
         touchpadSwitchesObserver_ = nullptr;
     }
+    if (touchpadMasterSwitchesObserver_ != nullptr) {
+        ret = settingHelper.UnregisterObserver(touchpadMasterSwitchesObserver_, datashareUri_);
+        TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister touchpadMasterSwitchesObserver fail");
+        touchpadMasterSwitchesObserver_ = nullptr;
+    }
+    if (keepTouchpadEnableSwitchesObserver_ != nullptr) {
+        ret = settingHelper.UnregisterObserver(keepTouchpadEnableSwitchesObserver_, datashareUri_);
+        TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister keepTouchpadEnableSwitchesObserver fail");
+        keepTouchpadEnableSwitchesObserver_ = nullptr;
+    }
     if (knuckleSwitchesObserver_ != nullptr) {
         ret = settingHelper.UnregisterObserver(knuckleSwitchesObserver_, datashareUri_);
         TP_CHECK_FALSE_RETURN(ret == 0, false, "Unregister knuckleSwitchesObserver fail");
@@ -249,7 +288,7 @@ void TouchpadSettingsObserver::SyncTouchpadSettingsData()
         return;
     }
     std::lock_guard<std::mutex> lock { lock_ };
-    if (updateFunc_ == nullptr) {
+    if (updateFunc_ == nullptr || updateTouchpadSwitchFunc_ == nullptr) {
         return;
     }
     updateFunc_(g_volumeSwitchesKey);
@@ -258,6 +297,8 @@ void TouchpadSettingsObserver::SyncTouchpadSettingsData()
     updateFunc_(g_vibrationKey);
     updateFunc_(g_touchpadSwitchesKey);
     updateFunc_(g_knuckleSwitchesKey);
+    UpdateTouchpadSwitchState();
+    UpdateTouchpadSwitch();
     MMI_HILOGI("Sync touchpad settings end");
 }
 
@@ -269,6 +310,71 @@ void TouchpadSettingsObserver::SetCommonEventReady()
 bool TouchpadSettingsObserver::GetCommonEventStatus()
 {
     return isCommonEventReady_.load();
+}
+
+void TouchpadSettingsObserver::SetDefaultState(const std::string &key, std::string &value)
+{
+    if (key == g_keepTouchpadEnableSwitchesKey) {
+        value = g_switchStateOpen;
+    } else if (key == g_touchpadMasterSwitchesKey) {
+        auto &settingHelper = SettingDatashare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+        auto ret = settingHelper.GetStringValue(g_touchpadSwitchesKey, value, datashareUri_);
+        MMI_HILOGI("current switch key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), value.c_str());
+        if (ret != ERR_OK) {
+            value = g_switchStateOpen;
+        }
+    } else {
+        MMI_HILOGE("invalid key");
+    }
+    MMI_HILOGI("set default key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
+}
+
+void TouchpadSettingsObserver::UpdateTouchpadSwitchState()
+{
+    std::string key = g_touchpadMasterSwitchesKey;
+    std::string value;
+    auto &settingHelper = SettingDatashare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    auto ret = settingHelper.GetStringValue(key, value, datashareUri_);
+    MMI_HILOGI("get key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
+    if (ret != ERR_OK) {
+        SetDefaultState(key, value);
+    }
+    touchpadMasterSwitches_ = (vaule == g_switchStateOpen);
+    key = g_keepTouchpadEnableSwitchesKey;
+    ret = settingHelper.GetStringValue(key, value, datashareUri_);
+    MMI_HILOGI("get key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
+    if (ret != ERR_OK) {
+        SetDefaultState(key, value);
+    }
+    keepTouchpadEnableSwitches_ = (vaule == g_switchStateOpen);
+}
+
+void TouchpadSettingsObserver::UpdateTouchpadSwitch()
+{
+    bool status = true;
+    if (!touchpadMasterSwitches_) {                     // 总开关关闭，实际开关关闭
+        status = false;
+    } else if (keepTouchpadEnableSwitchesObserver_) {   // 总开关开启，子开关开启，实际开关开启
+        status = true;
+    } else {
+        status = !INPUT_DEV_MGR->HasMouseDevice();      // 总开关开启，子开关关闭，根据是否有鼠标决定
+    }
+    std::string value = (status ? g_switchStateOpen : g_switchStateClose);
+    auto &settingHelper = SettingDatashare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    auto ret = settingHelper.PutStringValue(g_touchpadSwitchesKey, value, true, datashareUri_);
+    MMI_HILOGI("put key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), value.c_str());
+    if (ret != ERR_OK) {
+        MMI_HILOGE("put switch value failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void TouchpadSettingsObserver::OnUpdateTouchpadSwitch()
+{
+    std::lock_guard<std::mutex> lock { lock_ };
+    UpdateTouchpadSwitchState();
+    UpdateTouchpadSwitch();
 }
 } // namespace MMI
 } // namespace OHOS
