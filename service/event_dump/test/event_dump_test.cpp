@@ -25,7 +25,6 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_manager.h"
-#include "input_manager_util.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
