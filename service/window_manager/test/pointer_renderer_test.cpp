@@ -16,7 +16,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-#include "input_manager_util.h"
+#include "image_source.h"
 #include "mmi_log.h"
 #include "pointer_renderer.h"
 
