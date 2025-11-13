@@ -62,7 +62,7 @@ public:
 HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_CheckIntention, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = new JoystickEventNormalize();
+    auto joystickEvent = std::make_shared<JoystickEventNormalize>();
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->SetDeviceId(2);
     std::shared_ptr<JoystickEventProcessor> proceSsor;
@@ -89,7 +89,7 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_CheckIntention, 
 HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetProcessor, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = new JoystickEventNormalize();
+    auto joystickEvent = std::make_shared<JoystickEventNormalize>();
     libinput_device libDev;
     ASSERT_NE(joystickEvent->GetProcessor(&libDev), nullptr);
 }
@@ -103,7 +103,7 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetProcessor, Te
 HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = new JoystickEventNormalize();
+    auto joystickEvent = std::make_shared<JoystickEventNormalize>();
     int32_t deviceId = 2;
     ASSERT_EQ(joystickEvent->FindProcessor(deviceId), nullptr);
 }
@@ -117,7 +117,7 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor, T
 HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = new JoystickEventNormalize();
+    auto joystickEvent = std::make_shared<JoystickEventNormalize>();
     int32_t deviceId = 2;
     struct libinput_device libDev {
         .udevDev { 2 },
