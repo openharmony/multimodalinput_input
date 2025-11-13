@@ -7987,9 +7987,11 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     bool fistLockedWindowId = focusWindow.id != pointerLockedWindow_.id ? true : false;
     pointerLockedWindow_ = focusWindow;
     MMI_HILOGD("mouse capture success, WindowId:%{public}d", pointerLockedWindow_.id);
+    std::vector<Rect> windowVisualArea = {
+        { currentDisplayXY_.first, currentDisplayXY_.second, focusWindow.area.width, focusWindow.area.height }};
     if (IsInHotArea(
             static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), focusWindow.pointerHotAreas, focusWindow) &&
-        !SelectPointerChangeArea(focusWindowId, static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y))) {
+        IsInHotArea(static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), windowVisualArea, focusWindow)) {
         if (pointerLocked) {
             pointerLockedCursorPos_.x = cursorIt->second.cursorPos.x;
             pointerLockedCursorPos_.y = cursorIt->second.cursorPos.y;
