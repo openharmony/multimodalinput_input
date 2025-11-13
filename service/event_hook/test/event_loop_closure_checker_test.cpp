@@ -44,13 +44,13 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_CheckLoopClosu
 {
     int32_t hookId = 1;
     int32_t keyCode = 101;
-    int32_t result = EventLoopClosureChecker::GetInstance().CheckLoopClosure(hookId, keyCode);
+    int32_t result = EVENT_LOOP_CLOSURE_CHECKER.CheckLoopClosure(hookId, keyCode);
     EXPECT_EQ(result, RET_ERR);
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId] = {{102, true}};
-    result = EventLoopClosureChecker::GetInstance().CheckLoopClosure(hookId, keyCode);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId] = {{102, true}};
+    result = EVENT_LOOP_CLOSURE_CHECKER.CheckLoopClosure(hookId, keyCode);
     EXPECT_EQ(result, RET_ERR);
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId] = {{keyCode, true}};
-    result = EventLoopClosureChecker::GetInstance().CheckLoopClosure(hookId, keyCode);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId] = {{keyCode, true}};
+    result = EVENT_LOOP_CLOSURE_CHECKER.CheckLoopClosure(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -64,13 +64,13 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_RemovePendingD
 {
     int32_t hookId = 1;
     int32_t keyCode = 101;
-    int32_t result = EventLoopClosureChecker::GetInstance().RemovePendingDownKeys(hookId, keyCode);
+    int32_t result = EVENT_LOOP_CLOSURE_CHECKER.RemovePendingDownKeys(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(keyCode);
-    result = EventLoopClosureChecker::GetInstance().RemovePendingDownKeys(hookId, keyCode);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].insert(keyCode);
+    result = EVENT_LOOP_CLOSURE_CHECKER.RemovePendingDownKeys(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(keyCode);
-    result = EventLoopClosureChecker::GetInstance().RemovePendingDownKeys(hookId, keyCode);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].insert(keyCode);
+    result = EVENT_LOOP_CLOSURE_CHECKER.RemovePendingDownKeys(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -84,12 +84,12 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_UpdatePendingD
 {
     int32_t hookId = 2;
     int32_t keyCode = 10;
-    EventLoopClosureChecker::GetInstance().UpdatePendingDownKeys(hookId, keyCode);
-    auto it = EventLoopClosureChecker::GetInstance().pendingDownKeys_.find(hookId);
-    EXPECT_NE(it, EventLoopClosureChecker::GetInstance().pendingDownKeys_.end());
+    EVENT_LOOP_CLOSURE_CHECKER.UpdatePendingDownKeys(hookId, keyCode);
+    auto it = EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_.find(hookId);
+    EXPECT_NE(it, EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_.end());
     EXPECT_TRUE(it->second.count(keyCode) > 0);
     hookId = 3;
-    int32_t result = EventLoopClosureChecker::GetInstance().UpdatePendingDownKeys(hookId, keyCode);
+    int32_t result = EVENT_LOOP_CLOSURE_CHECKER.UpdatePendingDownKeys(hookId, keyCode);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -102,12 +102,12 @@ HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_UpdatePendingD
 HWTEST_F(EventLoopClosureCheckerTest, EventLoopClosureCheckerTest_RemoveChecker001, TestSize.Level0)
 {
     int32_t hookId = 1;
-    EventLoopClosureChecker::GetInstance().pendingDownKeys_[hookId].insert(hookId);
-    int32_t result = EventLoopClosureChecker::GetInstance().RemoveChecker(hookId);
+    EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_[hookId].insert(hookId);
+    int32_t result = EVENT_LOOP_CLOSURE_CHECKER.RemoveChecker(hookId);
     EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(EventLoopClosureChecker::GetInstance().pendingDownKeys_.find(hookId),
-        EventLoopClosureChecker::GetInstance().pendingDownKeys_.end());
-    result = EventLoopClosureChecker::GetInstance().RemoveChecker(hookId);
+    EXPECT_EQ(EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_.find(hookId),
+        EVENT_LOOP_CLOSURE_CHECKER.pendingDownKeys_.end());
+    result = EVENT_LOOP_CLOSURE_CHECKER.RemoveChecker(hookId);
     EXPECT_EQ(result, RET_ERR);
 }
 }  // namespace MMI

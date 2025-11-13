@@ -46,15 +46,15 @@ HWTEST_F(EventExpirationCheckerTest, EventExpirationCheckerTest_CheckExpiration0
     int32_t eventId = 1;
     auto keyEvent = KeyEvent::Create();
     keyEvent->SetId(eventId);
-    int32_t result = EventExpirationChecker::GetInstance().CheckExpiration(hookId, eventId);
+    int32_t result = EVENT_EXPIRATION_CHECKER.CheckExpiration(hookId, eventId);
     EXPECT_EQ(result, RET_ERR);
-    result = EventExpirationChecker::GetInstance().UpdateStashEvent(hookId, keyEvent);
+    result = EVENT_EXPIRATION_CHECKER.UpdateStashEvent(hookId, keyEvent);
     EXPECT_EQ(result, RET_OK);
-    result = EventExpirationChecker::GetInstance().CheckExpiration(hookId, eventId);
+    result = EVENT_EXPIRATION_CHECKER.CheckExpiration(hookId, eventId);
     EXPECT_EQ(result, RET_OK);
-    result = EventExpirationChecker::GetInstance().RemoveChecker(hookId);
+    result = EVENT_EXPIRATION_CHECKER.RemoveChecker(hookId);
     EXPECT_EQ(result, RET_OK);
-    result = EventExpirationChecker::GetInstance().RemoveChecker(hookId);
+    result = EVENT_EXPIRATION_CHECKER.RemoveChecker(hookId);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -70,9 +70,9 @@ HWTEST_F(EventExpirationCheckerTest, EventExpirationCheckerTest_UpdateStashEvent
     int32_t eventId = 1;
     auto keyEvent = KeyEvent::Create();
     keyEvent->SetId(eventId);
-    int32_t result = EventExpirationChecker::GetInstance().UpdateStashEvent(hookId, keyEvent);
+    int32_t result = EVENT_EXPIRATION_CHECKER.UpdateStashEvent(hookId, keyEvent);
     EXPECT_EQ(result, RET_OK);
-    result = EventExpirationChecker::GetInstance().RemoveChecker(hookId);
+    result = EVENT_EXPIRATION_CHECKER.RemoveChecker(hookId);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -88,18 +88,18 @@ HWTEST_F(EventExpirationCheckerTest, EventExpirationCheckerTest_GetKeyEvent001, 
     int32_t eventId = 1;
     auto keyEvent = KeyEvent::Create();
     keyEvent->SetId(eventId);
-    auto key = EventExpirationChecker::GetInstance().GetKeyEvent(hookId, eventId);
+    auto key = EVENT_EXPIRATION_CHECKER.GetKeyEvent(hookId, eventId);
     EXPECT_EQ(key, nullptr);
-    int32_t result = EventExpirationChecker::GetInstance().UpdateStashEvent(hookId, keyEvent);
+    int32_t result = EVENT_EXPIRATION_CHECKER.UpdateStashEvent(hookId, keyEvent);
     EXPECT_EQ(result, RET_OK);
-    key = EventExpirationChecker::GetInstance().GetKeyEvent(hookId, 0);
+    key = EVENT_EXPIRATION_CHECKER.GetKeyEvent(hookId, 0);
     EXPECT_EQ(key, nullptr);
-    key = EventExpirationChecker::GetInstance().GetKeyEvent(hookId, eventId);
+    key = EVENT_EXPIRATION_CHECKER.GetKeyEvent(hookId, eventId);
     EXPECT_NE(key, nullptr);
-    EventExpirationChecker::GetInstance().RemoveExpiredStashEventLocked(hookId);
-    result = EventExpirationChecker::GetInstance().RemoveChecker(hookId);
+    EVENT_EXPIRATION_CHECKER.RemoveExpiredStashEventLocked(hookId);
+    result = EVENT_EXPIRATION_CHECKER.RemoveChecker(hookId);
     EXPECT_EQ(result, RET_OK);
-    EventExpirationChecker::GetInstance().RemoveExpiredStashEventLocked(hookId);
+    EVENT_EXPIRATION_CHECKER.RemoveExpiredStashEventLocked(hookId);
 }
 }  // namespace MMI
 }  // namespace OHOS
