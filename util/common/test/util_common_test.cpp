@@ -17,6 +17,29 @@
 
 #include "util.h"
 
+#include "accesstoken_kit.h"
+
+auto g_mockTokenTypeFlag = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_INVALID;
+std::string g_mockBundleName = "";
+int32_t g_mockHapTokenInfoResult = 0;
+
+namespace OHOS {
+namespace Security {
+namespace AccessToken {
+ATokenTypeEnum AccessTokenKit::GetTokenTypeFlag(AccessTokenID callerToken)
+{
+    return g_mockTokenTypeFlag;
+}
+
+int AccessTokenKit::GetHapTokenInfo(AccessTokenID callerToken, HapTokenInfo& hapTokenInfoRes)
+{
+    hapTokenInfoRes.bundleName = g_mockBundleName;
+    return g_mockHapTokenInfoResult;
+}
+} // namespace AccessToken
+} // namespace Security
+} // namespace OHOS
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -54,6 +77,51 @@ HWTEST_F(UtilCommonTest, IsInteger_001, TestSize.Level1)
     EXPECT_FALSE(IsInteger("1."));
     EXPECT_FALSE(IsInteger("1.0"));
     EXPECT_FALSE(IsInteger("-1.0"));
+}
+
+/**
+ * @tc.name: GetBundleName_001
+ * @tc.desc: Verify that GetBundleName returns an empty string for a invalid TokenType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, GetBundleName_001, TestSize.Level1)
+{
+    g_mockTokenTypeFlag = Security::AccessToken::ATokenTypeEnum::TOKEN_INVALID;
+    uint32_t tokenId = 1;
+    std::string ret = GetBundleName(tokenId);
+    EXPECT_TRUE(ret.empty());
+}
+
+/**
+ * @tc.name: GetBundleName_002
+ * @tc.desc: Verify that GetBundleName returns an empty string for a HAP token with an error result
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, GetBundleName_002, TestSize.Level1)
+{
+    g_mockTokenTypeFlag = Security::AccessToken::ATokenTypeEnum::TOKEN_HAP;
+    g_mockHapTokenInfoResult = RET_ERR;
+    uint32_t tokenId = 1;
+    std::string ret = GetBundleName(tokenId);
+    EXPECT_TRUE(ret.empty());
+}
+
+/**
+ * @tc.name: GetBundleName_003
+ * @tc.desc: Verify that GetBundleName returns the correct bundle name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilCommonTest, GetBundleName_003, TestSize.Level1)
+{
+    g_mockTokenTypeFlag = Security::AccessToken::ATokenTypeEnum::TOKEN_HAP;
+    g_mockHapTokenInfoResult = RET_OK;
+    g_mockBundleName = "TestBundleName";
+    uint32_t tokenId = 1;
+    std::string ret = GetBundleName(tokenId);
+    EXPECT_EQ(ret, g_mockBundleName);
 }
 } // namespace MMI
 } // namespace OHOS
