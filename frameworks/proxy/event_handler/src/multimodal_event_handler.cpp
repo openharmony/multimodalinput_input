@@ -85,7 +85,15 @@ void OnDisconnected(const IfMMIClient &client)
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
-MultimodalEventHandler::~MultimodalEventHandler() {}
+MultimodalEventHandler::~MultimodalEventHandler()
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (client_ != nullptr) {
+        client_->Stop();
+        client_ = nullptr;
+    }
+    MMI_HILOGE("MultimodalEventHandler is deleted.");
+}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MultimodalEventHandler::SubscribeKeyEvent(

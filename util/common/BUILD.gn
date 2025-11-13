@@ -42,7 +42,10 @@ ohos_unittest("UtilCommonTest") {
     "${mmi_path}/util/common/test/util_common_test.cpp",
   ]
 
-  deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_rust_key_config",
+  ]
 
   external_deps = [
     "c_utils:utils",
