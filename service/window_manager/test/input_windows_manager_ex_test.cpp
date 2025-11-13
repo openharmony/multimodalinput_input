@@ -5325,5 +5325,408 @@ HWTEST_F(InputWindowsManagerTest, IsWritePen_002, TestSize.Level1)
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
     EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_001
+ * @tc.desc: Test groupId != DEFAULT_GROUP_ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1000;
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_002
+ * @tc.desc: Test pos == displayGroupInfo.windowsInfo.end()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    focusWindow.id = 2;
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_003
+ * @tc.desc: Test pointerLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_004
+ * @tc.desc: Test pointerConfined
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_005
+ * @tc.desc: Test focusWindow.pointerHotAreas.empty()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    inputWindowsManager->cursorPosMap_[DEFAULT_GROUP_ID].displayId = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = 5;
+    pointerHotAreasRect.y = 5;
+    pointerHotAreasRect.width = 10;
+    pointerHotAreasRect.height = 10;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_006
+ * @tc.desc: Test mouseIt == mouseLocationMap_.end() && cursorIt == cursorPosMap_.end()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = 5;
+    pointerHotAreasRect.y = 5;
+    pointerHotAreasRect.width = 10;
+    pointerHotAreasRect.height = 10;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
+    if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
+        inputWindowsManager->mouseLocationMap_.erase(mouseIt);
+    }
+    auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
+        inputWindowsManager->cursorPosMap_.erase(cursorIt);
+    }
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->mouseLocationMap_[DEFAULT_GROUP_ID].physicalX,
+        focusWindow.area.x + focusWindow.area.width / 2);
+    EXPECT_EQ(inputWindowsManager->mouseLocationMap_[DEFAULT_GROUP_ID].physicalY,
+        focusWindow.area.y + focusWindow.area.height / 2);
+    EXPECT_EQ(inputWindowsManager->cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.x,
+        focusWindow.area.x + focusWindow.area.width / 2);
+    EXPECT_EQ(inputWindowsManager->cursorPosMap_[DEFAULT_GROUP_ID].cursorPos.y,
+        focusWindow.area.y + focusWindow.area.height / 2);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_007
+ * @tc.desc: Test IsInHotArea And pointerLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    inputWindowsManager->cursorPosMap_[DEFAULT_GROUP_ID].displayId = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    std::vector<int32_t> pointerChangeAreas = {30, 9, 30, 9, 30, 9, 30, 9};
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = -7;
+    pointerHotAreasRect.y = -7;
+    pointerHotAreasRect.width = 2104;
+    pointerHotAreasRect.height = 1408;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
+    if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
+        mouseIt->second.physicalX = 1601;
+        mouseIt->second.physicalY = 388;
+    }
+    auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
+        cursorIt->second.cursorPos.x = 1601.0;
+        cursorIt->second.cursorPos.y = 388.0;
+    }
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.x, cursorIt->second.cursorPos.x);
+    EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.y, cursorIt->second.cursorPos.y);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_008
+ * @tc.desc: Test IsInHotArea And pointerConfined 
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = -7;
+    pointerHotAreasRect.y = -7;
+    pointerHotAreasRect.width = 2104;
+    pointerHotAreasRect.height = 1408;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
+    if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
+        mouseIt->second.physicalX = 1601;
+        mouseIt->second.physicalY = 388;
+    }
+    auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
+        cursorIt->second.cursorPos.x = 1601.0;
+        cursorIt->second.cursorPos.y = 388.0;
+    }
+    inputWindowsManager->UpdatePointerChangeAreas(displayGroupInfo);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.x, 0.0);
+    EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.y, 0.0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_009
+ * @tc.desc: Test IsInHotArea And SelectPointerChangeArea And pointerLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    inputWindowsManager->cursorPosMap_[DEFAULT_GROUP_ID].displayId = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = -7;
+    pointerHotAreasRect.y = -7;
+    pointerHotAreasRect.width = 2104;
+    pointerHotAreasRect.height = 1408;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    focusWindow.pointerChangeAreas = {30, 9, 30, 9, 30, 9, 30, 9};
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
+    if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
+        mouseIt->second.physicalX = 508;
+        mouseIt->second.physicalY = 303;
+    }
+    auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
+        cursorIt->second.cursorPos.x = 508.0;
+        cursorIt->second.cursorPos.y = 303.0;
+    }
+    inputWindowsManager->UpdatePointerChangeAreas(displayGroupInfo);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.x, focusWindow.area.x + focusWindow.area.width / 2);
+    EXPECT_EQ(inputWindowsManager->pointerLockedCursorPos_.y, focusWindow.area.y + focusWindow.area.height / 2);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_010
+ * @tc.desc: Test if (pointerConfined && fistLockedWindowId)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    inputWindowsManager->cursorPosMap_[DEFAULT_GROUP_ID].displayId = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = -7;
+    pointerHotAreasRect.y = -7;
+    pointerHotAreasRect.width = 2104;
+    pointerHotAreasRect.height = 1408;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    focusWindow.pointerChangeAreas = {30, 9, 30, 9, 30, 9, 30, 9};
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
+    if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
+        mouseIt->second.physicalX = 508;
+        mouseIt->second.physicalY = 303;
+    }
+    auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
+        cursorIt->second.cursorPos.x = 508.0;
+        cursorIt->second.cursorPos.y = 303.0;
+    }
+    inputWindowsManager->UpdatePointerChangeAreas(displayGroupInfo);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_EQ(cursorIt->second.cursorPos.x, focusWindow.area.x + focusWindow.area.width / 2);
+    EXPECT_EQ(cursorIt->second.cursorPos.y, focusWindow.area.y + focusWindow.area.height / 2);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_EnterMouseCaptureMode_011
+ * @tc.desc: Test if (pointerConfined && fistLockedWindowId)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = DEFAULT_GROUP_ID;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo focusWindow;
+    Rect pointerHotAreasRect;
+    pointerHotAreasRect.x = -7;
+    pointerHotAreasRect.y = -7;
+    pointerHotAreasRect.width = 2104;
+    pointerHotAreasRect.height = 1408;
+    focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    focusWindow.pointerChangeAreas = {30, 9, 30, 9, 30, 9, 30, 9};
+    displayGroupInfo.windowsInfo.push_back(focusWindow);
+    auto mouseIt = inputWindowsManager->mouseLocationMap_.find(DEFAULT_GROUP_ID);
+    if (mouseIt != inputWindowsManager->mouseLocationMap_.end()) {
+        mouseIt->second.physicalX = 508;
+        mouseIt->second.physicalY = 303;
+    }
+    auto cursorIt = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
+    if (cursorIt != inputWindowsManager->cursorPosMap_.end()) {
+        cursorIt->second.cursorPos.x = 508.0;
+        cursorIt->second.cursorPos.y = 303.0;
+    }
+    inputWindowsManager->pointerLockedWindow_.id = 1;
+    inputWindowsManager->UpdatePointerChangeAreas(displayGroupInfo);
+    inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
+    EXPECT_NE(cursorIt->second.cursorPos.x, focusWindow.area.x + focusWindow.area.width / 2);
+    EXPECT_NE(cursorIt->second.cursorPos.y, focusWindow.area.y + focusWindow.area.height / 2);
+}
 } // namespace MMI
 } // namespace OHOS
