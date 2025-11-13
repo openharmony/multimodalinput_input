@@ -117,7 +117,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_004, TestSize.Level1)
     EXPECT_NE(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
     int32_t serviceId = 3101;
     TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadMasterSwitchesKey TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
+            .CreateObserver(g_touchpadMasterSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->isCommonEventReady_.store(true);
@@ -337,7 +337,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
     TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_touchpadMasterSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->uupdateTouchpadSwitchFunc_);
+            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
@@ -377,7 +377,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_006, TestSize.Level1)
     TOUCHPAD_MGR->currentAccountId_ = 1;
     TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->uupdateTouchpadSwitchFunc_);
+            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_= nullptr;
 }
@@ -657,23 +657,23 @@ HWTEST_F(TouchpadSettingsHandlerTest, UpdateTouchpadSwitchState_001, TestSize.Le
 HWTEST_F(TouchpadSettingsHandlerTest, UpdateTouchpadSwitch_001, TestSize.Level1)
 {
     TOUCHPAD_MGR->touchpadMasterSwitches_ = false;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches = false;
+    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = false;
     auto ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
     EXPECT_EQ(ret, RET_ERR);
     
     TOUCHPAD_MGR->touchpadMasterSwitches_ = true;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches = false;
-    auto ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = false;
+    ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
     EXPECT_EQ(ret, RET_ERR);
 
     TOUCHPAD_MGR->touchpadMasterSwitches_ = false;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches = true;
-    auto ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = true;
+    ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
     EXPECT_EQ(ret, RET_ERR);
 
     TOUCHPAD_MGR->touchpadMasterSwitches_ = true;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches = true;
-    auto ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = true;
+    ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
     EXPECT_EQ(ret, RET_ERR);
 }
 
