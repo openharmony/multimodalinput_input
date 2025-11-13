@@ -201,6 +201,9 @@ VKEYBOARD_ISINSIDEFULLKBD_TYPE vkeyboard_isInsideFullKbd_ = nullptr;
 #ifdef OHOS_BUILD_PC_PRIORITY
 constexpr int32_t PC_PRIORITY { 2 };
 #endif // OHOS_BUILD_PC_PRIORITY
+const std::vector<std::string> OBTAIN_DISPLAYXY_BUNDLENAMES = {
+    "BRID_NAME",
+};
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -5438,9 +5441,16 @@ ErrCode MMIService::QueryPointerRecord(int32_t count, std::vector<std::shared_pt
         MMI_HILOGE("Verify Request From Monitor failed");
         return ERROR_NO_PERMISSION;
     }
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    std::string bundleName = GetBundleName(tokenId);
+    bool inWhitelist = !bundleName.empty() &&
+                        std::any_of(OBTAIN_DISPLAYXY_BUNDLENAMES.begin(), OBTAIN_DISPLAYXY_BUNDLENAMES.end(),
+                                    [&](const std::string& item) {
+                                        return BUNDLE_NAME_PARSER.GetBundleName(item) == bundleName;
+                                    });
     int32_t ret = delegateTasks_.PostSyncTask(
-        [count, &pointerList] {
-            return EventStatistic::QueryPointerRecord(count, pointerList);
+        [count, &pointerList, inWhitelist] {
+            return EventStatistic::QueryPointerRecord(count, pointerList, inWhitelist);
         }
     );
     if (ret != RET_OK) {

@@ -768,6 +768,28 @@ HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_009, TestSize
 }
 
 /**
+ * @tc.name: EventStatisticTest_QueryPointerRecord_010
+ * @tc.desc: Verify QueryPointerRecord whem inWhitelist is set to true (should return RET_OK and not crash)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventStatisticTest, EventStatisticTest_QueryPointerRecord_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventStatistic eventStatistic;
+    std::vector<std::shared_ptr<PointerEvent>> pointerList;
+    auto pointerEvent = PointerEvent::Create();
+    for (int i = 0; i < 3; i++) {
+        PointerEvent::PointerItem item;
+        pointerEvent->AddPointerItem(item);
+    }
+    eventStatistic.PushPointerRecord(pointerEvent);
+    bool inWhitelist = true;
+    EXPECT_EQ(eventStatistic.QueryPointerRecord(3, pointerList, inWhitelist), RET_OK);
+    EXPECT_EQ(pointerList.size(), 3u);
+}
+
+/**
  * @tc.name: EventStatisticTest_PopEvent_001
  * @tc.desc: Verify PopEvent returns the correct event string when queue is not empty.
  * @tc.type: FUNC
