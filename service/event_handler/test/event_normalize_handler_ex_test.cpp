@@ -309,7 +309,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_OnEventDeviceA
     };
     event.device = &libDev;
     auto ret = handler.OnEventDeviceAdded(&event);
-    EXPECT_EQ(RET, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -334,7 +334,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_OnEventDeviceR
     };
     event.device = &libDev;
     auto ret = handler.OnEventDeviceRemoved(&event);
-    EXPECT_EQ(RET, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
