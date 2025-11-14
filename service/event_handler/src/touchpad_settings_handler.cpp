@@ -225,9 +225,7 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
 
 bool TouchpadSettingsObserver::UnregisterTpObserver(const int32_t accountId)
 {
-    if (!hasRegistered_ || accountId == currentAccountId_) {
-        return false;
-    }
+    if (!hasRegistered_ || accountId == currentAccountId_) { return false; }
     std::lock_guard<std::mutex> lock { lock_ };
     ErrCode ret = 0;
 
@@ -317,7 +315,7 @@ void TouchpadSettingsObserver::SetDefaultState(const std::string &key, std::stri
     if (key == g_keepTouchpadEnableSwitchesKey) {
         value = g_switchStateOpen;
     } else if (key == g_touchpadMasterSwitchesKey) {
-        auto &settingHelper = SettingDatashare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+        auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
         auto ret = settingHelper.GetStringValue(g_touchpadSwitchesKey, value, datashareUri_);
         MMI_HILOGI("current switch key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), value.c_str());
         if (ret != ERR_OK) {
@@ -333,23 +331,23 @@ void TouchpadSettingsObserver::UpdateTouchpadSwitchState()
 {
     std::string key = g_touchpadMasterSwitchesKey;
     std::string value;
-    auto &settingHelper = SettingDatashare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     auto ret = settingHelper.GetStringValue(key, value, datashareUri_);
     MMI_HILOGI("get key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
     if (ret != ERR_OK) {
         SetDefaultState(key, value);
     }
-    touchpadMasterSwitches_ = (vaule == g_switchStateOpen);
+    touchpadMasterSwitches_ = (value == g_switchStateOpen);
     key = g_keepTouchpadEnableSwitchesKey;
     ret = settingHelper.GetStringValue(key, value, datashareUri_);
     MMI_HILOGI("get key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
     if (ret != ERR_OK) {
         SetDefaultState(key, value);
     }
-    keepTouchpadEnableSwitches_ = (vaule == g_switchStateOpen);
+    keepTouchpadEnableSwitches_ = (value == g_switchStateOpen);
 }
 
-void TouchpadSettingsObserver::UpdateTouchpadSwitch()
+int32_t TouchpadSettingsObserver::UpdateTouchpadSwitch()
 {
     bool status = true;
     if (!touchpadMasterSwitches_) {                     // 总开关关闭，实际开关关闭
@@ -360,7 +358,7 @@ void TouchpadSettingsObserver::UpdateTouchpadSwitch()
         status = !INPUT_DEV_MGR->HasMouseDevice();      // 总开关开启，子开关关闭，根据是否有鼠标决定
     }
     std::string value = (status ? g_switchStateOpen : g_switchStateClose);
-    auto &settingHelper = SettingDatashare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     auto ret = settingHelper.PutStringValue(g_touchpadSwitchesKey, value, true, datashareUri_);
     MMI_HILOGI("put key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), value.c_str());
     if (ret != ERR_OK) {

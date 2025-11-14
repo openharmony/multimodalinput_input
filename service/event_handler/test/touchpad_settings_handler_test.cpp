@@ -214,7 +214,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTouchpadSwitchUpdateFunc_001, Test
 
 /**
  * @tc.name: SyncTouchpadSettingsData_001
- * @tc.desc: Test when the updateFunc_ and updateTouchpadSwitchFunc_ is null, SyncTouchpadSettingsData should return true
+ * @tc.desc: Test when two updateFunc is null, SyncTouchpadSettingsData should return true
  * @tc.type: FUNC
  * @tc.require:
  */

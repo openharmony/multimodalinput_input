@@ -40,7 +40,7 @@ private:
     void UpdateTouchpadSwitchState();
     int32_t UpdateTouchpadSwitch();
     bool touchpadMasterSwitches_ { false };
-    bool keepTouchpadEnableSwitches_ { false }
+    bool keepTouchpadEnableSwitches_ { false };
     static std::shared_ptr<TouchpadSettingsObserver> instance_;
     static std::mutex mutex_;
     std::mutex lock_;
