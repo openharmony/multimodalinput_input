@@ -68,14 +68,13 @@ constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
 constexpr int32_t USELIB_ABS_MT_POSITION_X { 0x35 };
 constexpr int32_t USELIB_ABS_MT_POSITION_Y { 0x36 };
 constexpr double SWIPE_INWARD_EDGE_X_THRE { 8.0 };
-constexpr int32_t SWIPE_INWARD_ANGLE_TOLERANCE { 8 };
 constexpr double SWIPE_INWARD_SPEED_THRE { 0.00004 };
 constexpr int32_t SWIPE_INWARD_TIME_THRE { 60000 };
 constexpr int32_t TABLET_PRODUCT_DEVICE_ID { 4274 };
 constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
-constexpr int32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
+constexpr uint32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
 const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
@@ -85,7 +84,6 @@ bool g_isSwipeInward {false};
 bool g_buttonPressed {false};
 bool g_isLeftEdgeSwipe {false};
 bool g_isRightEdgeSwipe {false};
-constexpr int32_t SWIPE_INWARD_ANGLE_JUDGE { 2 };
 int64_t g_lastKeyboardEventTime { 0 };
 constexpr int32_t MT_TOOL_PALM { 2 };
 [[ maybe_unused ]] constexpr double TOUCH_SLOP { 1.0 };
@@ -1140,8 +1138,9 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
-    static int32_t angleTolerance = 0;
-    static int32_t lastDirection = 0;
+    if (!TOUCHPAD_MGR->SupportSwipeInward()) {
+        return false;
+    }
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetFingerCount(SWIPE_INWARD_FINGER_ONE);
     if (g_isSwipeInward == false &&
@@ -1152,7 +1151,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         uint32_t touchPadDeviceId = libinput_device_get_id_product(touchPadDevice);
         if (touchPadDeviceId != TABLET_PRODUCT_DEVICE_ID && touchPadDeviceId != BLE_PRODUCT_DEVICE_ID &&
             touchPadDeviceId != PHONE_PRODUCT_DEVICE_ID &&
-            (std::stoi(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
+            (std::stoul(TOUCHPAD_TYPE) & TOUCHPAD_FEATURE_SWIPEINWARD) != TOUCHPAD_FEATURE_SWIPEINWARD) {
             return g_isSwipeInward;
         }
         // get touchpad physic size
@@ -1167,8 +1166,6 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         if (curPosX > SWIPE_INWARD_EDGE_X_THRE && curPosX < g_touchPadDeviceWidth - SWIPE_INWARD_EDGE_X_THRE) {
             return g_isSwipeInward;
         }
-        // -1:direction from right to lest, 1 left to right
-        lastDirection = (curPosX <= SWIPE_INWARD_EDGE_X_THRE) ? 1 : -1;
         // update start down x postion
         currentPointDownPosX_ = curPosX;
         currentPointDownTime_ = GetSysClockTime();
@@ -1180,8 +1177,7 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
     }
     // judge
     if (g_isSwipeInward == true) {
-        type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
-        SwipeInwardProcess(pointerEvent, type, event, &angleTolerance, lastDirection);
+        SwipeInwardProcess(pointerEvent, event);
         SwipeInwardButtonJudge(pointerEvent);
     }
     return g_isSwipeInward;
@@ -1213,11 +1209,9 @@ void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> 
     }
 }
 
-void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent,
-    enum libinput_event_type type, libinput_event* event, int32_t* angleTolerance, int32_t lastDirection)
+void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent, libinput_event* event)
 {
-    static int32_t lastPointerX;
-    static int32_t lastPointerY;
+    CHKPV(pointerEvent);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
@@ -1225,38 +1219,30 @@ void EventNormalizeHandler::SwipeInwardProcess(std::shared_ptr<PointerEvent> poi
         g_isSwipeInward = false;
         return;
     }
-    switch (static_cast<int32_t>(type)) {
-        case static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_DOWN):
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    switch (pointerAction) {
+        case PointerEvent::POINTER_ACTION_DOWN:
             pointerItem.SetDisplayX(g_touchPadDeviceAxisX);
             pointerItem.SetDisplayY(g_touchPadDeviceAxisY);
-            *angleTolerance = SWIPE_INWARD_ANGLE_TOLERANCE;
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
             return;
-        case static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_MOTION): {
+        case PointerEvent::POINTER_ACTION_MOVE: {
             auto touchpad = libinput_event_get_touchpad_event(event);
             pointerItem.SetDisplayX(static_cast<int32_t>(
                 (libinput_event_touchpad_get_x(touchpad) / g_touchPadDeviceWidth) * g_touchPadDeviceAxisX));
             pointerItem.SetDisplayY(static_cast<int32_t>(
                 (libinput_event_touchpad_get_y(touchpad) / g_touchPadDeviceHeight) * g_touchPadDeviceAxisY));
-            break;
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+            pointerItem.SetDisplayXPos(pointerItem.GetDisplayX());
+            pointerItem.SetDisplayYPos(pointerItem.GetDisplayY());
+            return;
         }
-        case static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_UP):
-            lastPointerX = 0;
+        case PointerEvent::POINTER_ACTION_UP:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
             return;
         default:
             return;
     }
-    pointerItem.SetDisplayXPos(pointerItem.GetDisplayX());
-    pointerItem.SetDisplayYPos(pointerItem.GetDisplayY());
-
-    // angle and direction judge
-    if ((std::abs(pointerItem.GetDisplayX() - lastPointerX) * SWIPE_INWARD_ANGLE_JUDGE <
-        std::abs(pointerItem.GetDisplayY() - lastPointerY) ||
-        (pointerItem.GetDisplayX() - lastPointerX) * lastDirection < 0) && lastPointerX) {
-        --(*angleTolerance); // angle judge have more weights than direction judge
-        --(*angleTolerance);
-    }
-    lastPointerX = pointerItem.GetDisplayX();
-    lastPointerY = pointerItem.GetDisplayY();
 }
 
 bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* event)

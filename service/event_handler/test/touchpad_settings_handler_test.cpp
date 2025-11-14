@@ -689,5 +689,62 @@ HWTEST_F(TouchpadSettingsHandlerTest, OnUpdateTouchpadSwitch_001, TestSize.Level
     EXPECT_TRUE(TOUCHPAD_MGR->touchpadMasterSwitches_);
     EXPECT_TRUE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
 }
+
+/**
+ * @tc.name: RegisterSwipeInwardObserver_001
+ * @tc.desc: Test RegisterSwipeInwardObserver, verify that the observer is created and registered successfully
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterSwipeInwardObserver_001, TestSize.Level1)
+{
+    TOUCHPAD_MGR->datashareUri_ =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    EXPECT_NE(TOUCHPAD_MGR->RegisterSwipeInwardObserver(), nullptr);
+}
+
+/**
+ * @tc.name: RegisterSwipeInwardObserver_002
+ * @tc.desc: Test RegisterSwipeInwardObserver, verify that when datashareUri is invalid, the observer creation fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, RegisterSwipeInwardObserver_002, TestSize.Level1)
+{
+    TOUCHPAD_MGR->datashareUri_ = "";  // Invalid URI
+    EXPECT_EQ(TOUCHPAD_MGR->RegisterSwipeInwardObserver(), nullptr);
+}
+
+/**
+ * @tc.name: UnregisterSingleObserver_001
+ * @tc.desc: Test when the single observer is not registered, UnregisterSingleObserver should return true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, UnregisterSingleObserver_001, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    sptr<SettingObserver> settingObserver = nullptr;
+    EXPECT_TRUE(observer.UnregisterSingleObserver(settingObserver, ""));
+}
+
+/**
+ * @tc.name: UnregisterSingleObserver_002
+ * @tc.desc: Test when datashareUri is invalid, the single observer unregister fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, UnregisterSingleObserver_002, TestSize.Level1)
+{
+    TouchpadSettingsObserver observer;
+    bool ret = true;
+    auto &settingHelper = SettingDataShare::GetInstance(3101);
+    SettingObserver::UpdateFunc updateFunc = [&ret](const std::string& key) {
+        std::cout << "Test UpdateFunc" << std::endl;
+    };
+    sptr<SettingObserver> settingObserver =
+        settingHelper.CreateObserver("settings.trackpad.go_back_switches", updateFunc);
+    EXPECT_FALSE(observer.UnregisterSingleObserver(settingObserver, ""));
+}
 }
 } // namespace OHOS::MMI
