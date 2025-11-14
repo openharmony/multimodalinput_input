@@ -636,44 +636,44 @@ HWTEST_F(TouchpadSettingsHandlerTest, SetDefaultState_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: UpdateTouchpadSwitchState_001
- * @tc.desc: Test UpdateTouchpadSwitchState
+ * @tc.name: LoadSwitchState_001
+ * @tc.desc: Test LoadSwitchState
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchpadSettingsHandlerTest, UpdateTouchpadSwitchState_001, TestSize.Level1)
+HWTEST_F(TouchpadSettingsHandlerTest, LoadSwitchState_001, TestSize.Level1)
 {
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->UpdateTouchpadSwitchState());
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->LoadSwitchState());
     EXPECT_TRUE(TOUCHPAD_MGR->touchpadMasterSwitches_);
     EXPECT_TRUE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
 }
 
 /**
- * @tc.name: UpdateTouchpadSwitch_001
- * @tc.desc: Test UpdateTouchpadSwitch
+ * @tc.name: SetTouchpadState_001
+ * @tc.desc: Test SetTouchpadState
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchpadSettingsHandlerTest, UpdateTouchpadSwitch_001, TestSize.Level1)
+HWTEST_F(TouchpadSettingsHandlerTest, SetTouchpadState_001, TestSize.Level1)
 {
     TOUCHPAD_MGR->touchpadMasterSwitches_ = false;
     TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = false;
-    auto ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    auto ret = TOUCHPAD_MGR->SetTouchpadState();
     EXPECT_EQ(ret, RET_ERR);
     
     TOUCHPAD_MGR->touchpadMasterSwitches_ = true;
     TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = false;
-    ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    ret = TOUCHPAD_MGR->SetTouchpadState();
     EXPECT_EQ(ret, RET_ERR);
 
     TOUCHPAD_MGR->touchpadMasterSwitches_ = false;
     TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = true;
-    ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    ret = TOUCHPAD_MGR->SetTouchpadState();
     EXPECT_EQ(ret, RET_ERR);
 
     TOUCHPAD_MGR->touchpadMasterSwitches_ = true;
     TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = true;
-    ret = TOUCHPAD_MGR->UpdateTouchpadSwitch();
+    ret = TOUCHPAD_MGR->SetTouchpadState();
     EXPECT_EQ(ret, RET_ERR);
 }
 

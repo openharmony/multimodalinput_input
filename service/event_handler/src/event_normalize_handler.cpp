@@ -157,7 +157,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
         if (!INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId)) {
             INPUT_DEV_MGR->SetIsDeviceReportEvent(deviceId, true);
-            if (INPUT_DEV_MGR->HasMouseDevice()) {
+            if (INPUT_DEV_MGR->HasLocalMouseDevice()) {
                 TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
             }
         }
@@ -307,7 +307,7 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     INPUT_DEV_MGR->OnInputDeviceAdded(device);
-    if (INPUT_DEV_MGR->HasMouseDevice()) {
+    if (INPUT_DEV_MGR->HasLocalMouseDevice()) {
         TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
     }
 #if OHOS_BUILD_ENABLE_POINTER
@@ -336,7 +336,7 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     INPUT_DEV_MGR->OnInputDeviceRemoved(device);
-    if (!INPUT_DEV_MGR->HasMouseDevice()) {
+    if (!INPUT_DEV_MGR->HasLocalMouseDevice()) {
         TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
     }
     return RET_OK;
