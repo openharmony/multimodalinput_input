@@ -369,11 +369,11 @@ export namespace inputDevice {
 
   function getDeviceList(callback: AsyncCallback<Array<number>>): void {
     let p1 = taskpool.execute(getDeviceListInner);
-    p1.then((data: NullishType) => {
+    p1.then((data: Any) => {
         let r =  data as Array<number>;
         let err : BusinessError<void>
         callback(err, r);
-    }).catch((error: NullishType) => {
+    }).catch((error: Any) => {
         let err =  error as BusinessError<void>;
         let data = new Array<number>;
         callback(err, data);
@@ -384,7 +384,7 @@ export namespace inputDevice {
     let p = new Promise<Array<number>>((resolve: (v: Array<number>) => void,
       reject: (error: Error) => void) => {
         let p1 = taskpool.execute(getDeviceListInner);
-        p1.then((e :NullishType)=>{
+        p1.then((e :Any)=>{
           let r =  e as Array<number>;
           resolve(r);
         }).catch((error: Error) : Array<number> => {
@@ -396,11 +396,11 @@ export namespace inputDevice {
 
   function getDeviceInfo(deviceId: number, callback: AsyncCallback<InputDeviceData>): void {
     let p1 = taskpool.execute(getDeviceInfoInner, deviceId);
-    p1.then((data: NullishType) => {
+    p1.then((data: Any) => {
         let r =  data as InputDeviceData;
         let err : BusinessError<void>
         callback(err, r);
-    }).catch((error: NullishType) => {
+    }).catch((error: Any) => {
         let err =  error as BusinessError<void>;
         let data = new InputDeviceDataImpl(0);
         callback(err, data);
@@ -410,7 +410,7 @@ export namespace inputDevice {
     let p = new Promise<InputDeviceData>((resolve: (v: InputDeviceData) => void,
       reject: (error: Error) => void) => {
         let p1 = taskpool.execute(getDeviceInfoInner, deviceId);
-        p1.then((e :NullishType)=>{
+        p1.then((e :Any)=>{
           let r =  e as InputDeviceData;
           resolve(r);
         }).catch((error: Error) : InputDeviceData => {
