@@ -28,6 +28,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr size_t FDS_SIZE = 2;
+} // namespace
 using DTaskCallback = std::function<int32_t()>;
 class DelegateTasks {
 public:
@@ -96,7 +99,7 @@ private:
 
 private:
     uint64_t workerThreadId_ { 0 };
-    int32_t fds_[2] = {};
+    int32_t fds_[FDS_SIZE] = {};
     std::timed_mutex mux_;
     std::queue<TaskPtr> tasks_;
     uint64_t id_ {0};

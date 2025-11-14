@@ -91,8 +91,8 @@ int32_t TaskScheduler::PostSyncTask(DTaskCallback cb)
     auto task = PostTask(cb, &promise);
     CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
-    static constexpr int32_t timeout = 3000;
-    std::chrono::milliseconds span(timeout);
+    static constexpr int32_t TIMEOUT = 3000;
+    std::chrono::milliseconds span(TIMEOUT);
     auto res = future.wait_for(span);
     task->SetWaited();
     if (res == std::future_status::timeout) {
@@ -115,9 +115,9 @@ int32_t TaskScheduler::PostAsyncTask(DTaskCallback callback)
 
 void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
-    static constexpr int32_t onceProcessTaskLimit = 10;
+    static constexpr int32_t ONCE_PROCESS_TASK_LIMIT = 10;
     std::lock_guard<std::mutex> guard(mux_);
-    for (int32_t i = 0; i < onceProcessTaskLimit; i++) {
+    for (int32_t i = 0; i < ONCE_PROCESS_TASK_LIMIT; i++) {
         if (tasks_.empty()) {
             break;
         }
@@ -132,11 +132,11 @@ void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 TaskScheduler::TaskPtr TaskScheduler::PostTask(DTaskCallback callback, Promise *promise)
 {
     FI_HILOGD("tasks_ size:%{public}zu", tasks_.size());
-    static constexpr int32_t maxTasksLimit = 1000;
+    static constexpr int32_t MAX_TASKS_LIMIT = 1000;
     std::lock_guard<std::mutex> guard(mux_);
     size_t tsize = tasks_.size();
-    if (tsize > maxTasksLimit) {
-        FI_HILOGE("The task queue is full, size:%{public}zu/%{public}d", tsize, maxTasksLimit);
+    if (tsize > MAX_TASKS_LIMIT) {
+        FI_HILOGE("The task queue is full, size:%{public}zu/%{public}d", tsize, MAX_TASKS_LIMIT);
         return nullptr;
     }
     int32_t id = GenerateId();

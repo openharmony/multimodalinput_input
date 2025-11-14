@@ -713,9 +713,9 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             TimerMgr->ResetTimer(timerId_);
             MMI_HILOGD("Axis update");
         } else {
-            static constexpr int32_t timeout = 100;
+            static constexpr int32_t TIMEOUT = 100;
             std::weak_ptr<MouseTransformProcessor> weakPtr = shared_from_this();
-            timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
+            timerId_ = TimerMgr->AddTimer(TIMEOUT, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;
                 auto sharedPtr = weakPtr.lock();
                 CHKPV(sharedPtr);
