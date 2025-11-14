@@ -127,9 +127,6 @@ void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
         MMI_HILOGE("failed to get default SetPointerStyle!");
-    } else if (ret != RET_OK) {
-        MMI_HILOGE("SetPointerStyleAsync failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
 }
 
@@ -174,9 +171,6 @@ void SetPointerStyleSyncImpl(int32_t windowId, TaihePointerStyle pointerStyle)
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
         MMI_HILOGE("failed to get default SetPointerStyle!");
-    } else if (ret != RET_OK) {
-        MMI_HILOGE("SetPointerStyle failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
 }
 
