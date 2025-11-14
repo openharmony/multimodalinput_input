@@ -141,8 +141,8 @@ void TouchpadSettingsObserver::RegisterTouchpadSwitchUpdateFunc()
 
     SettingObserver::UpdateFunc UpdateFunc = [datashareUri](const std::string& key) {
         MMI_HILOGI("Touchpad switch settings change: %{public}s", key.c_str());
-        TOUCHPAD_MGR->UpdateTouchpadSwitchState();
-        TOUCHPAD_MGR->UpdateTouchpadSwitch();
+        TOUCHPAD_MGR->LoadSwitchState();
+        TOUCHPAD_MGR->SetTouchpadState();
     };
     MMI_HILOGI("Update touchpad switch function register end");
     updateTouchpadSwitchFunc_  = UpdateFunc;
@@ -295,8 +295,8 @@ void TouchpadSettingsObserver::SyncTouchpadSettingsData()
     updateFunc_(g_vibrationKey);
     updateFunc_(g_touchpadSwitchesKey);
     updateFunc_(g_knuckleSwitchesKey);
-    UpdateTouchpadSwitchState();
-    UpdateTouchpadSwitch();
+    LoadSwitchState();
+    SetTouchpadState();
     MMI_HILOGI("Sync touchpad settings end");
 }
 
@@ -327,7 +327,7 @@ void TouchpadSettingsObserver::SetDefaultState(const std::string &key, std::stri
     MMI_HILOGI("set default key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
 }
 
-void TouchpadSettingsObserver::UpdateTouchpadSwitchState()
+void TouchpadSettingsObserver::LoadSwitchState()
 {
     std::string key = g_touchpadMasterSwitchesKey;
     std::string value;
@@ -347,15 +347,15 @@ void TouchpadSettingsObserver::UpdateTouchpadSwitchState()
     keepTouchpadEnableSwitches_ = (value == g_switchStateOpen);
 }
 
-int32_t TouchpadSettingsObserver::UpdateTouchpadSwitch()
+int32_t TouchpadSettingsObserver::SetTouchpadState()
 {
     bool status = true;
-    if (!touchpadMasterSwitches_) {                     // 总开关关闭，实际开关关闭
+    if (!touchpadMasterSwitches_) {                         // 总开关关闭，实际开关关闭
         status = false;
-    } else if (keepTouchpadEnableSwitchesObserver_) {   // 总开关开启，子开关开启，实际开关开启
+    } else if (keepTouchpadEnableSwitchesObserver_) {       // 总开关开启，子开关开启，实际开关开启
         status = true;
     } else {
-        status = !INPUT_DEV_MGR->HasMouseDevice();      // 总开关开启，子开关关闭，根据是否有鼠标决定
+        status = !INPUT_DEV_MGR->HasLocalMouseDevice();     // 总开关开启，子开关关闭，根据是否有鼠标决定
     }
     std::string value = (status ? g_switchStateOpen : g_switchStateClose);
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
@@ -371,8 +371,8 @@ int32_t TouchpadSettingsObserver::UpdateTouchpadSwitch()
 void TouchpadSettingsObserver::OnUpdateTouchpadSwitch()
 {
     std::lock_guard<std::mutex> lock { lock_ };
-    UpdateTouchpadSwitchState();
-    UpdateTouchpadSwitch();
+    LoadSwitchState();
+    SetTouchpadState();
 }
 } // namespace MMI
 } // namespace OHOS

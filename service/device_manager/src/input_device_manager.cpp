@@ -379,7 +379,7 @@ bool InputDeviceManager::HasTouchDevice()
     // LCOV_EXCL_STOP
 }
 
-bool InputDeviceManager::HasMouseDevice()
+bool InputDeviceManager::HasLocalMouseDevice()
 {
     // LCOV_EXCL_START
     CALL_DEBUG_ENTER;

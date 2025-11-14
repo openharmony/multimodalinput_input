@@ -37,8 +37,8 @@ static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
 private:
     sptr<SettingObserver> RegisterDatashareObserver(const std::string key, SettingObserver::UpdateFunc onUpdate);
     void SetDefaultState(const std::string &key, std::string &value);
-    void UpdateTouchpadSwitchState();
-    int32_t UpdateTouchpadSwitch();
+    void LoadSwitchState();
+    int32_t SetTouchpadState();
     bool touchpadMasterSwitches_ { false };
     bool keepTouchpadEnableSwitches_ { false };
     static std::shared_ptr<TouchpadSettingsObserver> instance_;
