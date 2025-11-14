@@ -34,7 +34,11 @@ static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
     void SetCommonEventReady();
     bool GetCommonEventStatus();
     void OnUpdateTouchpadSwitch();
+    bool SupportSwipeInward();
+    void SetSupportSwipeInward(int32_t value);
 private:
+    bool UnregisterSingleObserver(sptr<SettingObserver>& observer, const std::string& observerName);
+    sptr<SettingObserver> RegisterSwipeInwardObserver();
     sptr<SettingObserver> RegisterDatashareObserver(const std::string key, SettingObserver::UpdateFunc onUpdate);
     void SetDefaultState(const std::string &key, std::string &value);
     void LoadSwitchState();
@@ -47,6 +51,7 @@ private:
     SettingObserver::UpdateFunc updateFunc_ = nullptr;
     SettingObserver::UpdateFunc updateTouchpadSwitchFunc_ = nullptr;
     bool hasRegistered_ = false;
+    bool supportSwipeInward_ {false};
     std::atomic<bool> isCommonEventReady_ {false};
     int32_t currentAccountId_ = -1;
     sptr<SettingObserver> volumeSwitchesObserver_ {nullptr};
@@ -57,6 +62,7 @@ private:
     sptr<SettingObserver> touchpadMasterSwitchesObserver_ {nullptr};
     sptr<SettingObserver> keepTouchpadEnableSwitchesObserver_ {nullptr};
     sptr<SettingObserver> knuckleSwitchesObserver_ {nullptr};
+    sptr<SettingObserver> swipeInwardSwitchesObserver_ {nullptr};
     std::string datashareUri_ = "";
 };
 #define TOUCHPAD_MGR ::OHOS::MMI::TouchpadSettingsObserver::GetInstance()
