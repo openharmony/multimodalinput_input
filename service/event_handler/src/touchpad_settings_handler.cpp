@@ -353,7 +353,7 @@ int32_t TouchpadSettingsObserver::SetTouchpadState()
     bool status = true;
     if (!touchpadMasterSwitches_) {                         // 总开关关闭，实际开关关闭
         status = false;
-    } else if (keepTouchpadEnableSwitchesObserver_) {       // 总开关开启，子开关开启，实际开关开启
+    } else if (keepTouchpadEnableSwitches_) {               // 总开关开启，子开关开启，实际开关开启
         status = true;
     } else {
         status = !INPUT_DEV_MGR->HasLocalMouseDevice();     // 总开关开启，子开关关闭，根据是否有鼠标决定
