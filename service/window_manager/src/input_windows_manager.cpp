@@ -2270,7 +2270,14 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
                 coord.y = cursorPosy;
                 RotateDisplayScreen(*displayInfo, coord);
             }
-            windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
+            if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) ==
+                    WindowInfo::FLAG_BIT_POINTER_LOCKED ||
+                (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) ==
+                    WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+                windowInfo = std::make_optional(pointerLockedWindow_);
+            } else {
+                windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
+            }
         } else {
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
         }
