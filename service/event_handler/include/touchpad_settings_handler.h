@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <atomic>
 #include "setting_observer.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace MMI {
@@ -44,6 +45,7 @@ private:
     static std::shared_ptr<TouchpadSettingsObserver> instance_;
     static std::mutex mutex_;
     std::mutex lock_;
+    ffrt::mutex ffrtMtx_;
     SettingObserver::UpdateFunc updateFunc_ = nullptr;
     SettingObserver::UpdateFunc updateTouchpadSwitchFunc_ = nullptr;
     bool hasRegistered_ = false;
