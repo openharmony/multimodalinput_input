@@ -566,7 +566,7 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
-    "events/src/input_manager_util.cpp",
+    "events/test/input_manager_util.cpp",
     "events/test/input_manager_simulate_test.cpp",
     "events/test/input_manager_test.cpp",
     "events/test/input_manager_update_display_info_test.cpp",
@@ -629,7 +629,7 @@ ohos_unittest("InputManagerInjectTest") {
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
-    "events/src/input_manager_util.cpp",
+    "events/test/input_manager_util.cpp",
     "events/test/input_manager_inject_test.cpp",
   ]
 
