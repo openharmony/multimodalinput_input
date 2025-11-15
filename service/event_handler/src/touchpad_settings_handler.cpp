@@ -141,8 +141,7 @@ void TouchpadSettingsObserver::RegisterTouchpadSwitchUpdateFunc()
 
     SettingObserver::UpdateFunc UpdateFunc = [datashareUri](const std::string& key) {
         MMI_HILOGI("Touchpad switch settings change: %{public}s", key.c_str());
-        TOUCHPAD_MGR->LoadSwitchState();
-        TOUCHPAD_MGR->SetTouchpadState();
+        TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
     };
     MMI_HILOGI("Update touchpad switch function register end");
     updateTouchpadSwitchFunc_  = UpdateFunc;
@@ -370,9 +369,11 @@ int32_t TouchpadSettingsObserver::SetTouchpadState()
 
 void TouchpadSettingsObserver::OnUpdateTouchpadSwitch()
 {
-    std::lock_guard<std::mutex> lock { lock_ };
-    LoadSwitchState();
-    SetTouchpadState();
+    ffrt::submit([this] {
+        std::lock_guard<ffrt::mutex> lock(ffrtMtx_);
+        LoadSwitchState();
+        SetTouchpadState();
+    });
 }
 } // namespace MMI
 } // namespace OHOS
