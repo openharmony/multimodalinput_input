@@ -94,6 +94,7 @@ public:
         bool isVirtualPointerDev = false);
     void NotifyRemovePointerDevice(bool removePointerDevice);
     bool HasTouchDevice();
+    bool HasLocalMouseDevice();
     const std::string& GetScreenId(int32_t deviceId) const;
     using inputDeviceCallback =
         std::function<void(int32_t deviceId, std::string nodeName, std::string devName, std::string devStatus)>;

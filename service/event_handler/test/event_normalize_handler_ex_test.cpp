@@ -43,6 +43,40 @@ struct libinput_event {
 };
 
 extern "C" {
+unsigned int libinput_device_get_id_version(struct libinput_device *device)
+{
+    return (device != nullptr ? device->version : 0);
+}
+
+unsigned int libinput_device_get_id_product(struct libinput_device *device)
+{
+    return (device != nullptr ? device->product : 0);
+}
+
+unsigned int libinput_device_get_id_vendor(struct libinput_device *device)
+{
+    return (device != nullptr ? device->vendor : 0);
+}
+
+int libinput_has_event_led_type(struct libinput_device *device)
+{
+    return 0;
+}
+
+struct udev_device* libinput_device_get_udev_device(struct libinput_device *device)
+{
+    return nullptr;
+}
+
+enum evdev_device_udev_tags libinput_device_get_tags(struct libinput_device* device)
+{
+    if (device == nullptr) {
+        return EVDEV_UDEV_TAG_INPUT;
+    }
+    enum evdev_device_udev_tags tag = static_cast<enum evdev_device_udev_tags>(device->udevDev.tags);
+    return tag;
+}
+
 const char *libinput_device_get_name(struct libinput_device *device)
 {
     const char* pName = device->name;
@@ -251,6 +285,56 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePointerE
     pointerEvent->SetPointerId(0);
     handler.HandlePointerEvent(pointerEvent);
     EXPECT_EQ(pointerEvent->GetPointerId(), 0);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_OnEventDeviceAdded_001
+ * @tc.desc: Test the function OnEventDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_OnEventDeviceAdded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event;
+    event.type = LIBINPUT_EVENT_DEVICE_ADDED;
+    struct libinput_device libDev {
+        .udevDev { 3 },
+        .busType = 3,
+        .version = 1,
+        .product = 1,
+        .vendor = 1,
+        .name = "test",
+    };
+    event.device = &libDev;
+    auto ret = handler.OnEventDeviceAdded(&event);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_OnEventDeviceRemoved_001
+ * @tc.desc: Test the function OnEventDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_OnEventDeviceRemoved_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event;
+    event.type = LIBINPUT_EVENT_DEVICE_REMOVED;
+    struct libinput_device libDev {
+        .udevDev { 3 },
+        .busType = 3,
+        .version = 1,
+        .product = 1,
+        .vendor = 1,
+        .name = "test",
+    };
+    event.device = &libDev;
+    auto ret = handler.OnEventDeviceRemoved(&event);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

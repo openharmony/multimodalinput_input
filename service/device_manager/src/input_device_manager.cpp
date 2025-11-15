@@ -379,6 +379,27 @@ bool InputDeviceManager::HasTouchDevice()
     // LCOV_EXCL_STOP
 }
 
+bool InputDeviceManager::HasLocalMouseDevice()
+{
+    // LCOV_EXCL_START
+    CALL_DEBUG_ENTER;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (inputDevice == nullptr) {
+            continue;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
+        auto bus = libinput_device_get_id_bustype(inputDevice);
+        if (item.second.isPointerDevice && (udevTags & EVDEV_UDEV_TAG_MOUSE) != 0 &&
+            (bus == BUS_BLUETOOTH || bus == BUS_USB) && item.second.isDeviceReportEvent) {
+            MMI_HILOGI("device:%{public}d is a reportevent mouse", item.first);
+            return true;
+        }
+    }
+    return false;
+    // LCOV_EXCL_STOP
+}
+
 std::string InputDeviceManager::GetInputIdentification(struct libinput_device *inputDevice)
 {
     // LCOV_EXCL_START
