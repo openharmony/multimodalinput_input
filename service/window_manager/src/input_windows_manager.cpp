@@ -2270,7 +2270,14 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
                 coord.y = cursorPosy;
                 RotateDisplayScreen(*displayInfo, coord);
             }
-            windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
+            if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) ==
+                    WindowInfo::FLAG_BIT_POINTER_LOCKED ||
+                (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) ==
+                    WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+                windowInfo = std::make_optional(pointerLockedWindow_);
+            } else {
+                windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
+            }
         } else {
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
         }
@@ -2720,7 +2727,13 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
         }
         windowInfo = GetWindowInfo(pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), groupId);
     } else {
-        windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, groupId);
+        if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
+            (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) ==
+                WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+            windowInfo = std::make_optional(pointerLockedWindow_);
+        } else {
+            windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, groupId);
+        }
     }
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
@@ -3877,6 +3890,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
+        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+        return std::make_optional(pointerLockedWindow_);
+    }
     int32_t action = pointerEvent->GetPointerAction();
     bool checkFlag = (firstBtnDownWindowInfo_.first == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() <= 1)) ||
@@ -4414,13 +4431,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         ClearTargetWindowId(pointerId, pointerEvent->GetDeviceId());
     }
-    std::optional<WindowInfo> touchWindow;
-    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
-        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
-        touchWindow = std::make_optional(pointerLockedWindow_);
-    } else {
-        touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
-    }
+    auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
         axisBeginWindowInfo_ = touchWindow;
     }
