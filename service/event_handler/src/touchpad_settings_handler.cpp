@@ -18,6 +18,7 @@
 #include "mmi_log.h"
 #include "account_manager.h"
 #include "input_device_manager.h"
+#include "ffrt.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchpadSettingsObserver"
@@ -44,6 +45,7 @@ const std::string g_datashareBaseUri =
 const std::string g_libthpPath {"/system/lib64/libthp_extra_innerapi.z.so"};
 const std::string g_switchStateOpen { "1" };
 const std::string g_switchStateClose { "0" };
+ffrt::mutex g_ffrt_mtx;
 const std::map<std::string, int> g_keyToCmd = {
     {g_volumeSwitchesKey, 111}, // right volume gesture cmd 111
     {g_brightnessSwitchesKey, 110}, // left brightness gesture cmd 110
@@ -370,7 +372,7 @@ int32_t TouchpadSettingsObserver::SetTouchpadState()
 void TouchpadSettingsObserver::OnUpdateTouchpadSwitch()
 {
     ffrt::submit([this] {
-        std::lock_guard<ffrt::mutex> lock(ffrtMtx_);
+        std::lock_guard<ffrt::mutex> lock(g_ffrt_mtx);
         LoadSwitchState();
         SetTouchpadState();
     });
