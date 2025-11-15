@@ -22,7 +22,6 @@
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_manager_util.h"
 #include "input_windows_manager.h"
 #include "libinput_interface.h"
 #include "mmi_log.h"
