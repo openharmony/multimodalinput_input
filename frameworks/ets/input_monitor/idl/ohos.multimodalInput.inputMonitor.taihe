@@ -16,10 +16,174 @@
 @!namespace("@ohos.multimodalInput.inputMonitor", "inputMonitor")
 from ohos.multimodalInput.touchEvent use TouchEvent;
 from ohos.multimodalInput.mouseEvent use MouseEvent;
+from ohos.multimodalInput.gestureEvent use Rotate, Pinch, ThreeFingersSwipe, FourFingersSwipe, SwipeInward;
+from ohos.multimodalInput.gestureEvent use ThreeFingersTap, TouchGestureEvent;
+from ohos.multimodalInput.shortKey use FingerprintEvent;
+from ohos.multimodalInput.keyEvent use KeyEvent;
+from ohos.multimodalInput.keyCode use KeyCode;
+
+@!sts_inject_into_module("
+    import { TouchEvent } from './@ohos.multimodalInput.touchEvent';
+    import { MouseEvent } from './@ohos.multimodalInput.mouseEvent';
+    import { Rotate } from './@ohos.multimodalInput.gestureEvent';
+    import { Pinch } from './@ohos.multimodalInput.gestureEvent';
+    import { ThreeFingersSwipe } from './@ohos.multimodalInput.gestureEvent';
+    import { FourFingersSwipe } from './@ohos.multimodalInput.gestureEvent';
+    import { SwipeInward } from './@ohos.multimodalInput.gestureEvent';
+    import { ThreeFingersTap } from './@ohos.multimodalInput.gestureEvent';
+    import { TouchGestureEvent } from './@ohos.multimodalInput.gestureEvent';
+    import { ThreeFingersTap  } from './@ohos.multimodalInput.gestureEvent';
+    import { KeyEvent } from './@ohos.multimodalInput.keyEvent';
+    import { KeyCode } from './@ohos.multimodalInput.keyCode';
+    import  { FingerprintEvent } from './@ohos.multimodalInput.shortKey';
+    import display from '@ohos.display';
+")
+
 @!sts_inject("""
 static { loadLibraryWithPermissionCheck("InputMonitor.z", "@ohos.multimodalInput.inputMonitor") }
 """)
 
-struct TouchEventReceiver {
-    filter: (touchEvent: TouchEvent) => bool;
-}
+@gen_promise("queryTouchEvents")
+function QueryTouchEventsSync(count: i32) : Array<TouchEvent>;
+
+@!sts_inject("""
+    function onTouch(receiver: (touchEvent: TouchEvent) => boolean): void {
+        return onTouchImpl(receiver, receiver);
+    }
+    function onMouse(receiver: (info: MouseEvent) => void): void {
+        return onMouseImpl(receiver, receiver);
+    }
+    function onMouse(rect: Array<display.Rect>, receiver: (arg_0: MouseEvent) => void): void {
+        return onMouseForDisplayRect(rect, receiver, receiver);
+    }
+    function onPinch(receiver: (info: Pinch) => void): void {
+        return onPinchImpl(receiver, receiver);
+    }
+    function onPinch(fingers: int, receiver: (info: Pinch) => void): void {
+        return onPinchByNumber(fingers, receiver, receiver);
+    }
+    function onRotate(fingers: int, receiver: (info: Rotate) => void): void {
+        return onRotateByNumber(fingers, receiver, receiver);
+    }
+    function onThreeFingersSwipe(receiver: (info: ThreeFingersSwipe) => void): void {
+        return onThreeFingersSwipeImpl(receiver, receiver);
+    }
+    function onFourFingersSwipe(receiver: (info: FourFingersSwipe) => void): void {
+        return onFourFingersSwipeImpl(receiver, receiver);
+    }
+    function onThreeFingersTap(receiver: (info: ThreeFingersTap) => void): void {
+        return onThreeFingersTapImpl(receiver, receiver);
+    }
+
+    function onFingerprint(receiver: (info: FingerprintEvent) => void): void {
+        return onFingerprintImpl(receiver, receiver);
+    }
+    function onSwipeInward(receiver: (info: SwipeInward) => void): void {
+        return onSwipeInwardImpl(receiver, receiver);
+    }
+    function onTouchscreenSwipe(fingers: int, receiver: (info: TouchGestureEvent) => void): void {
+        return onTouchscreenSwipeByNumber(fingers, receiver, receiver);
+    }
+    function onTouchscreenPinch(fingers: int, receiver: (info: TouchGestureEvent) => void): void {
+        return onTouchscreenPinchImpl(fingers, receiver, receiver);
+    }
+    function onKeyPressed(keys: Array<KeyCode>, receiver: (arg_0: KeyEvent) => void): void {
+        return onKeyPressedImpl(keys, receiver, receiver);
+    }
+
+    function offTouch(receiver?: (info: TouchEvent) => boolean): void {
+        return offTouchImpl(receiver);
+    }
+
+    function offMouse(receiver?: (info: MouseEvent) => void): void {
+        return offMouseImpl(receiver);
+    }
+    function offPinch(receiver?: (info: Pinch) => void): void {
+        return offPinchImpl(receiver);
+    }
+    function offPinch(fingers: int, receiver?: (info: Pinch) => void): void {
+        return offPinchByNumber(fingers, receiver);
+    }
+    function offRotate(fingers: int, receiver?: (info: Rotate) => void): void {
+        return offRotateByNumber(fingers, receiver);
+    }
+    function offThreeFingersSwipe(receiver?: (info: ThreeFingersSwipe) => void): void {
+        return offThreeFingersSwipeImpl(receiver);
+    }
+    function offFourFingersSwipe(receiver?: (info: FourFingersSwipe) => void): void {
+        return offFourFingersSwipeImpl(receiver);
+    }
+    function offThreeFingersTap(receiver?: (info: ThreeFingersTap) => void): void {
+        return offThreeFingersTapImpl(receiver);
+    }
+    function offFingerprint(receiver?: (info: FingerprintEvent) => void): void {
+        return offFingerprintImpl(receiver);
+    }
+    function offSwipeInward(receiver?:(info: SwipeInward) => void): void {
+        return offSwipeInwardImpl(receiver);
+    }
+    function offTouchscreenSwipe(fingers: int, receiver?: (info: TouchGestureEvent) => void): void {
+        return offTouchscreenSwipeImpl(fingers, receiver);
+    }
+    function offTouchscreenPinch(fingers: int, receiver?: (info: TouchGestureEvent) => void): void {
+        return offTouchscreenPinchImpl(fingers, receiver);
+    }
+    function offKeyPressed(receiver?:(info: KeyEvent) => void): void {
+        return offKeyPressedImpl(receiver);
+    }
+""")
+
+function onTouchImpl(receiver: (touchEvent: TouchEvent) => bool, opq: Opaque): void;
+
+function onMouseImpl(receiver: (info: MouseEvent) => void, opq: Opaque): void;
+
+function onMouseForDisplayRect(rect: @sts_type("Array<display.Rect>") Opaque, receiver: (info: MouseEvent) => void, opq: Opaque): void;
+
+function onPinchImpl(receiver: (info: Pinch) => void, opq: Opaque): void;
+
+function onPinchByNumber(fingers: i32, receiver: (info: Pinch) => void, opq: Opaque): void;
+
+function onRotateByNumber(fingers: i32, receiver: (info: Rotate) => void, opq: Opaque): void;
+
+function onThreeFingersSwipeImpl(receiver: (info: ThreeFingersSwipe) => void, opq: Opaque): void;
+
+function onFourFingersSwipeImpl(receiver: (info: FourFingersSwipe) => void, opq: Opaque): void;
+
+function onThreeFingersTapImpl(receiver: (info: ThreeFingersTap) => void, opq: Opaque): void;
+
+function onFingerprintImpl(receiver: (info: FingerprintEvent) => void, opq: Opaque): void;
+
+function onSwipeInwardImpl(receiver: (info: SwipeInward) => void, opq: Opaque): void;
+
+function onTouchscreenSwipeByNumber(fingers: i32, receiver: (info: TouchGestureEvent) => void, opq: Opaque): void;
+
+function onTouchscreenPinchImpl(fingers: i32, receiver: (info: TouchGestureEvent) => void, opq: Opaque): void;
+
+function onKeyPressedImpl(keys: Array<KeyCode>, receiver: (info: KeyEvent) => void, opq: Opaque): void;
+
+
+function offTouchImpl(receiver: Optional<Opaque>): void;
+
+function offMouseImpl(receiver: Optional<Opaque>): void;
+
+function offPinchImpl(receiver: Optional<Opaque>): void;
+
+function offPinchByNumber(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offRotateByNumber(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offThreeFingersSwipeImpl(receiver: Optional<Opaque>): void;
+
+function offFourFingersSwipeImpl(receiver: Optional<Opaque>): void;
+
+function offThreeFingersTapImpl(receiver: Optional<Opaque>): void;
+
+function offFingerprintImpl(receiver: Optional<Opaque>): void;
+
+function offSwipeInwardImpl(receiver: Optional<Opaque>): void;
+
+function offTouchscreenSwipeImpl(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offTouchscreenPinchImpl(fingers: i32, receiver: Optional<Opaque>): void;
+
+function offKeyPressedImpl(receiver: Optional<Opaque>): void;

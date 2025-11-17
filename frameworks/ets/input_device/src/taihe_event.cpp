@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 #include "taihe_event.h"
 
 #undef MMI_LOG_TAG

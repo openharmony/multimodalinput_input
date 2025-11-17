@@ -101,7 +101,18 @@ int32_t TaiheMonitorConverter::TouchActionToTaihe(int32_t action, TaiheTouchActi
             out = TaiheTouchAction::key_t::UP;
             break;
         }
-        // 0702 The value corresponding to pull_down pull_move pull_up is not defined in the code
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
+            out = TaiheTouchAction::key_t::PULL_DOWN;
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
+            out = TaiheTouchAction::key_t::PULL_MOVE;
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
+            out = TaiheTouchAction::key_t::PULL_UP;
+            break;
+        }
         default: {
             ret = RET_ERR;
             break;
@@ -133,21 +144,7 @@ int32_t TaiheMonitorConverter::SourceTypeToTaihe(int32_t sourceType, TaiheSource
 int32_t TaiheMonitorConverter::FixedModeToTaihe(PointerEvent::FixedMode fixedMode, TaiheFixedMode &out)
 {
     auto ret = RET_OK;
-    switch (fixedMode) {
-        case PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN: {
-            out = TaiheFixedMode::key_t::NONE;
-            break;
-        }
-        case PointerEvent::FixedMode::AUTO: {
-            out = TaiheFixedMode::key_t::AUTO;
-            break;
-        }
-        // 0702 The value of the corresponding TaiheTouchAction::key_t::PEN is not implemented in the code
-        default: {
-            ret = RET_ERR;
-            break;
-        }
-    }
+    out = TaiheFixedMode::from_value(static_cast<int32_t>(fixedMode));
     return ret;
 }
 
@@ -157,7 +154,8 @@ int32_t TaiheMonitorConverter::TouchToTaihe(const PointerEvent::PointerItem &ite
     out.pressedTime = item.GetDownTime();
     out.screenX =  item.GetDisplayX();
     out.screenY = item.GetDisplayY();
-    // 0702 The interface does not define globalX and globalY
+    out.globalX = taihe::optional<int32_t>(std::in_place, static_cast<int32_t>(item.GetGlobalX()));
+    out.globalY = taihe::optional<int32_t>(std::in_place, static_cast<int32_t>(item.GetGlobalY()));
     out.windowX = item.GetWindowX();
     out.windowY = item.GetWindowY();
     out.pressure = item.GetPressure();
@@ -487,8 +485,18 @@ int32_t TaiheMonitorConverter::FingerprintActionToTaihe(int32_t action, TaiheFin
             out = TaiheFingerprintAction::key_t::CLICK;
             break;
         }
-        // 0702 The interface definition is not found POINTER_ACTION_FINGERPRINT_CANCEL,
-        // POINTER_ACTION_FINGERPRINT_HOLD,POINTER_ACTION_FINGERPRINT_TOUCH
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL: {
+            out = TaiheFingerprintAction::key_t::CANCEL;
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD: {
+            out = TaiheFingerprintAction::key_t::HOLD;
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_TOUCH: {
+            out = TaiheFingerprintAction::key_t::TOUCH;
+            break;
+        }
         default: {
             MMI_HILOGE("Wrong action is %{public}d", action);
             ret = RET_ERR;
@@ -604,9 +612,8 @@ int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent> po
     mouseEvent.windowY = item.GetWindowY();
     mouseEvent.rawDeltaX = item.GetRawDx();
     mouseEvent.rawDeltaY = item.GetRawDy();
-    // 0702 The interface is not defined globalX, globalY
-    // 0702  No implementation found in the code pressedKeys,ctrlKey,
-    // altKey,shiftKey,logoKey,fnKey,capsLock,numLock,scrollLock,toolType
+    mouseEvent.globalX = taihe::optional<int32_t>(std::in_place, static_cast<int32_t>(item.GetGlobalX()));
+    mouseEvent.globalY = taihe::optional<int32_t>(std::in_place, static_cast<int32_t>(item.GetGlobalY()));
     return ret;
 }
 
@@ -725,7 +732,6 @@ int32_t TaiheMonitorConverter::MouseActionToTaihe(int32_t action, TaiheMouseActi
             ret = RET_ERR;
             break;
         }
-        // 0702 The translation lacks the interface layer Action_down, Action_up,
     }
     return ret;
 }

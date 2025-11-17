@@ -20,6 +20,7 @@
 
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "key_event.h"
 #include "ohos.multimodalInput.inputConsumer.proj.hpp"
 #include "ohos.multimodalInput.inputConsumer.impl.hpp"
 #include "ohos.multimodalInput.keyCode.impl.h"
