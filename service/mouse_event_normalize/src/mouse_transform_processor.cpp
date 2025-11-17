@@ -386,34 +386,40 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "MOUSE_CONNECT_TYPE", connectType,
         "MOVING_TOTAL", total,
-        "1ms", curMap.find(1)->second / total,
-        "2ms", curMap.find(2)->second / total,
-        "3ms", curMap.find(3)->second / total,
-        "4ms", curMap.find(4)->second / total,
-        "5ms", curMap.find(5)->second / total,
-        "6ms", curMap.find(6)->second / total,
-        "7ms", curMap.find(7)->second / total,
-        "8ms", curMap.find(8)->second / total,
-        "9ms", curMap.find(9)->second / total,
-        "10ms", curMap.find(10)->second / total,
-        "11ms", curMap.find(11)->second / total,
-        "12ms", curMap.find(12)->second / total,
-        "13ms", curMap.find(13)->second / total,
-        "14ms", curMap.find(14)->second / total,
-        "15ms", curMap.find(15)->second / total,
-        "16ms", curMap.find(16)->second / total,
-        "17ms", curMap.find(17)->second / total,
-        "18ms", curMap.find(18)->second / total,
-        "19ms", curMap.find(19)->second / total,
-        "20ms", curMap.find(FINE_CALCULATE)->second / total,
-        "25ms", curMap.find(25)->second / total,
-        "30ms", curMap.find(30)->second / total,
-        "35ms", curMap.find(35)->second / total,
-        "40ms", curMap.find(STEP_CALCULATE)->second / total,
+        "1ms", CalculateProportion(1, total, curMap),
+        "2ms", CalculateProportion(2, total, curMap),
+        "3ms", CalculateProportion(3, total, curMap),
+        "4ms", CalculateProportion(4, total, curMap),
+        "5ms", CalculateProportion(5, total, curMap),
+        "6ms", CalculateProportion(6, total, curMap),
+        "7ms", CalculateProportion(7, total, curMap),
+        "8ms", CalculateProportion(8, total, curMap),
+        "9ms", CalculateProportion(9, total, curMap),
+        "10ms", CalculateProportion(10, total, curMap),
+        "11ms", CalculateProportion(11, total, curMap),
+        "12ms", CalculateProportion(12, total, curMap),
+        "13ms", CalculateProportion(13, total, curMap),
+        "14ms", CalculateProportion(14, total, curMap),
+        "15ms", CalculateProportion(15, total, curMap),
+        "16ms", CalculateProportion(16, total, curMap),
+        "17ms", CalculateProportion(17, total, curMap),
+        "18ms", CalculateProportion(18, total, curMap),
+        "19ms", CalculateProportion(19, total, curMap),
+        "20ms", CalculateProportion(FINE_CALCULATE, total, curMap),
+        "25ms", CalculateProportion(25, total, curMap),
+        "30ms", CalculateProportion(30, total, curMap),
+        "35ms", CalculateProportion(35, total, curMap),
+        "40ms", CalculateProportion(STEP_CALCULATE, total, curMap),
         "MSG", "collectiong mouse response time probability");
     if (ret != RET_OK) {
         MMI_HILOGE("Mouse write failed , ret:%{public}d", ret);
     }
+}
+
+double MouseTransformProcessor::CalculateProportion(long long key, long &total, std::map<long long, int32_t> &curMap)
+{
+    bool isUsed = (curMap.find(key) != curMap.end()) && (total != 0);
+    return isUsed ? (1.0 * curMap.find(1)->second / total) : 0;
 }
 
 bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayInfo)
