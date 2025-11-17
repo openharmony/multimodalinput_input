@@ -55,7 +55,7 @@ enum ShieldMode: i32 {
         return onKey(keyOptions, callback, callback);
     }
     function offKey(keyOptions: KeyOptions, callback?: (info: KeyOptions) => void) {
-        return offKey(keyOptions, callback);
+        return offKeyImpl(keyOptions, callback);
     }
 """)
 @!sts_inject("""
@@ -63,7 +63,7 @@ enum ShieldMode: i32 {
         return onHotkeyChange(hotkeyOptions, callback, callback);
     }
     function offHotkeyChange(hotkeyOptions: HotkeyOptions, callback?: (info: HotkeyOptions) => void) {
-        return offHotkeyChange(hotkeyOptions, callback);
+        return offHotkeyChangeImpl(hotkeyOptions, callback);
     }
 """)
 @!sts_inject("""
@@ -72,16 +72,16 @@ enum ShieldMode: i32 {
         return onKeyPressed(options, callback, callback);
     }
     function offKeyPressed(callback?: (info: ohos_multimodalInput_keyEvent.KeyEvent) => void) {
-        return offKeyPressed(callback);
+        return offKeyPressedImpl(callback);
     }
 """)
 
 function onKey(keyOptions: KeyOptions, f: (info: KeyOptions) => void, opq: Opaque);
-function offKey(keyOptions: KeyOptions, opq: Optional<Opaque>);
+function offKeyImpl(keyOptions: KeyOptions, opq: Optional<Opaque>);
 function onHotkeyChange(hotkeyOptions: HotkeyOptions, f: (info: HotkeyOptions) => void, opq: Opaque);
-function offHotkeyChange(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
+function offHotkeyChangeImpl(hotkeyOptions: HotkeyOptions, opq: Optional<Opaque>);
 function onKeyPressed(options: KeyPressedConfig, f: (info: KeyEvent) => void, opq: Opaque);
-function offKeyPressed(opq: Optional<Opaque>);
+function offKeyPressedImpl(opq: Optional<Opaque>);
 
 function SetShieldStatus(shieldMode: ShieldMode, isShield: bool): void;
 function GetShieldStatus(shieldMode: ShieldMode): bool;
