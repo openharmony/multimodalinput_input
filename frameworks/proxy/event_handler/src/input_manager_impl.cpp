@@ -585,10 +585,13 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
+    MarkLastDispatched(keyEvent->GetId());
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(keyEvent);
         if (!eventHandler->PostTask([this, inputConsumer, keyEvent] {
-                return this->OnKeyEventTask(inputConsumer, keyEvent);
+                this->OnKeyEventTask(inputConsumer, keyEvent);
+                MarkLastProcessed(keyEvent->GetId());
+                return;
             },
             std::string("MMI::OnKeyEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
@@ -597,9 +600,11 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         }
         BytraceAdapter::StopPostTaskEvent();
     } else {
+        MarkLastDispatched(keyEvent->GetId());
         BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
         BytraceAdapter::StopConsumer();
+        MarkLastProcessed(keyEvent->GetId());
         MMI_HILOG_DISPATCHD("Key event report keyCode:%{private}d", keyEvent->GetKeyCode());
     }
     MMI_HILOG_DISPATCHD("Key event keyCode:%{private}d", keyEvent->GetKeyCode());
@@ -651,8 +656,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             MMI_HILOG_FREEZEI("recv");
         }
     }
+    MarkLastDispatched(pointerEvent->GetId());
     if (client->IsEventHandlerChanged()) {
-        MarkLastDispatched(pointerEvent->GetId());
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
         if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
                 this->OnPointerEventTask(inputConsumer, pointerEvent);
@@ -665,28 +670,27 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         }
         BytraceAdapter::StopPostTaskEvent();
     } else {
+        MarkLastDispatched(pointerEvent->GetId());
         BytraceAdapter::StartConsumer(pointerEvent);
         inputConsumer->OnInputEvent(pointerEvent);
         BytraceAdapter::StopConsumer();
+        MarkLastProcessed(pointerEvent->GetId());
     }
-    MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
-        pointerEvent->GetPointerId());
+    MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InputManagerImpl::MarkLastDispatched(int32_t eventId)
+void InputManagerImpl::MarkLastDispatched(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     ANRHDL->SetLastDispatchedEventId(eventId);
-    return RET_OK;
 }
 
-int32_t InputManagerImpl::MarkLastProcessed(int32_t eventId)
+void InputManagerImpl::MarkLastProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     ANRHDL->SetLastProcessEventId(eventId);
-    return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt, const UserScreenInfo &userScreenInfo)
 {

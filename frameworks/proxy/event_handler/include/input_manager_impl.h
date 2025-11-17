@@ -304,12 +304,12 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t MarkLastDispatched(int32_t eventId);
-    int32_t MarkLastProcessed(int32_t eventId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
+    void MarkLastDispatched(int32_t eventId);
+    void MarkLastProcessed(int32_t eventId);
 
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
