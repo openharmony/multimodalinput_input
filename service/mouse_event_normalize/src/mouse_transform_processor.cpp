@@ -419,7 +419,7 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
 double MouseTransformProcessor::CalculateProportion(long long key, long &total, std::map<long long, int32_t> &curMap)
 {
     bool isUsed = (curMap.find(key) != curMap.end()) && (total != 0);
-    return isUsed ? (1.0 * curMap.find(1)->second / total) : 0;
+    return isUsed ? (1.0 * curMap.find(key)->second / total) : 0;
 }
 
 bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayInfo)
