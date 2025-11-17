@@ -904,6 +904,53 @@ public:
         double GetGlobalY() const;
 
         /**
+         * @brief Set Predicted global X coordinate. Used in client only. IPC not allowed.
+         * @param windowXPredict Indicates the Predicted Window X coordinate to set.
+         * @return void
+         * @since 20
+         */
+        void SetWindowXPredict(double windowXPredict);
+
+         /**
+         * @brief Get Predicted Window X coordinate. Used in client only. IPC not allowed.
+         * Returns the Predicted Window X coordinate.
+         * @return double
+         * @since 20
+         */
+        double GetWindowXPredict() const;
+    
+        /**
+         * @brief Set Predicted Window Y coordinate. Used in client only. IPC not allowed.
+         * @param windowYPredict Indicates the Predicted Window Y coordinate to set.
+         * @return void
+         * @since 20
+         */
+        void SetWindowYPredict(double windowYPredict);
+
+        /**
+         * @brief Get Predicted Window X coordinate. Used in client only. IPC not allowed.
+         * Returns the Predicted Window Y coordinate.
+         * @return double
+         * @since 20
+         */
+        double GetWindowYPredict() const;
+
+        /**
+         * @brief Set whether predict coords exists. Used in client only. IPC not allowed.
+         * @param predictExist Indicates whether predict coords exists;
+         * @return void
+         * @since 20
+         */
+        void SetPredictExist(bool predictExist);
+
+        /**
+         * @brief Get whether predict coords exist. Used in client only. IPC not allowed.
+         * @return bool
+         * @since 20
+         */
+        bool GetPredictExist() const;
+
+        /**
          * @brief Whether the global coordinates are valid.
          * @return bool
          * @since 20
@@ -1423,6 +1470,9 @@ public:
         double displayYPos_ {};
         double windowXPos_ {};
         double windowYPos_ {};
+        double windowXPredict_ {};
+        double windowYPredict_ {};
+        bool predictExist_ { false };
         int32_t width_ {};
         int32_t height_ {};
         double tiltX_ {};

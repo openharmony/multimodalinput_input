@@ -294,6 +294,36 @@ double PointerEvent::PointerItem::GetGlobalY() const
     return globalY_;
 }
 
+void PointerEvent::PointerItem::SetWindowXPredict(double windowXPredict)
+{
+    windowXPredict_ = windowXPredict;
+}
+
+double PointerEvent::PointerItem::GetWindowXPredict() const
+{
+    return windowXPredict_;
+}
+
+void PointerEvent::PointerItem::SetWindowYPredict(double windowYPredict)
+{
+    windowYPredict_ = windowYPredict;
+}
+
+double PointerEvent::PointerItem::GetWindowYPredict() const
+{
+    return windowYPredict_;
+}
+
+void PointerEvent::PointerItem::SetPredictExist(bool predictExist)
+{
+    predictExist_ = predictExist;
+}
+
+bool PointerEvent::PointerItem::GetPredictExist() const
+{
+    return predictExist_;
+}
+
 bool PointerEvent::PointerItem::IsValidGlobalXY() const
 {
     return globalX_ > DBL_MIN && globalX_ < DBL_MAX &&
@@ -557,6 +587,9 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
         out.WriteDouble(windowYPos_) &&
+        out.WriteBool(predictExist_) &&
+        out.WriteDouble(windowXPredict_) &&
+        out.WriteDouble(windowYPredict_) &&
         out.WriteInt32(blobId_) &&
         out.WriteInt32(twist_) &&
         out.WriteDouble(fixedDisplayX_) &&
@@ -603,6 +636,9 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
         in.ReadDouble(windowYPos_) &&
+        in.ReadBool(predictExist_) &&
+        in.ReadDouble(windowXPredict_) &&
+        in.ReadDouble(windowYPredict_) &&
         in.ReadInt32(blobId_) &&
         in.ReadInt32(twist_) &&
         in.ReadDouble(fixedDisplayX_) &&
