@@ -18,13 +18,14 @@
 #include "inputConsumer_keyPressed_impl.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "ohos.multimodalInput.inputConsumer"
+#define MMI_LOG_TAG "AniConsumerImpl"
 
 using namespace taihe;
 using namespace ohos::multimodalInput::inputConsumer;
 using namespace OHOS::MMI;
 
 namespace {
+using HotkeyOptions_t = ::ohos::multimodalInput::inputConsumer::HotkeyOptions;
 static constexpr size_t PRE_KEYS_SIZE { 4 };
 static constexpr int32_t INVALID_SUBSCRIBER_ID { -1 };
 static constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
@@ -80,11 +81,16 @@ using callbackType = std::variant<
 struct CallbackObject {
     CallbackObject(callbackType cb, ani_ref ref) : callback(cb), ref(ref)
     {
+        CALL_DEBUG_ENTER;
     }
     ~CallbackObject()
     {
+        CALL_DEBUG_ENTER;
         if (auto *env = taihe::get_env()) {
-            env->GlobalReference_Delete(ref);
+            if (ref) {
+                env->GlobalReference_Delete(ref);
+                ref = nullptr;
+            }
         }
     }
     callbackType callback;
@@ -132,6 +138,22 @@ std::mutex jsCbMapMutex;
 std::atomic<size_t> g_baseId { 0 };
 
 KeyEventMonitorInfo::~KeyEventMonitorInfo() {}
+
+void HandleCommonErrors(int32_t ret)
+{
+    int32_t errorCode = std::abs(ret);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+    } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
+        MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
+            "Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+    } else if (errorCode != RET_OK) {
+        MMI_HILOGE("Dispatch control failed");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+    }
+}
 
 int32_t RegisterListener(std::string const &type, callbackType &&cb, uintptr_t opq)
 {
@@ -462,7 +484,12 @@ using callbackType = std::variant<
 void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
 {
     CALL_DEBUG_ENTER;
+    if (!reportEvent || !reportEvent->keyOption) {
+        MMI_HILOGE("reportEvent or keyOption value is null");
+        return;
+    }
     CHKPV(reportEvent);
+    CHKPV(reportEvent->keyOption);
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[reportEvent->eventType];
     for (auto &cb : cbVec) {
@@ -708,7 +735,10 @@ void UnsubscribeHotkey(HotkeyOptions const& hotkeyOptions, optional_view<uintptr
 void EmitKeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(reportEvent);
+    if (!reportEvent || !reportEvent->keyOption) {
+        MMI_HILOGE("reportEvent or keyOption value is null");
+        return;
+    }
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[reportEvent->eventType];
     for (auto &cb : cbVec) {
@@ -843,10 +873,12 @@ void SubscribeKey(KeyOptions const& keyOptions, callback_view<void(KeyOptions co
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(keyCallbacks, event);
     if (preSubscribeId < 0) {
+        CALL_DEBUG_ENTER;
         MMI_HILOGD("EventType:%{private}s", event->eventType.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
             [keyOption](std::shared_ptr<KeyEvent> keyEvent) {
+                CALL_DEBUG_ENTER;
                 std::string keyOptionKey = GenerateKeyOptionKey(keyOption);
                 SubKeyEventCallback(keyEvent, keyOptionKey);
             });
@@ -885,33 +917,33 @@ void UnsubscribeKey(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
 }
 
-void onKey(KeyOptions const& keyOptions, callback_view<void(KeyOptions const&)> f, uintptr_t opq)
+void onKeyImpl(KeyOptions const& keyOptions, callback_view<void(KeyOptions const&)> f, uintptr_t opq)
 {
     SubscribeKey(keyOptions, f, opq);
 }
 
-void offKey(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
+void offKeyImpl(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
 {
     UnsubscribeKey(keyOptions, opq);
 }
 
-void onHotkeyChange(HotkeyOptions const& hotkeyOptions, callback_view<void(HotkeyOptions const&)> f, uintptr_t opq)
+void onHotkeyChangeImpl(HotkeyOptions const& hotkeyOptions, callback_view<void(HotkeyOptions const&)> f, uintptr_t opq)
 {
     SubscribeHotkey(hotkeyOptions, f, opq);
 }
 
-void offHotkeyChange(HotkeyOptions const& hotkeyOptions, optional_view<uintptr_t> opq)
+void offHotkeyChangeImpl(HotkeyOptions const& hotkeyOptions, optional_view<uintptr_t> opq)
 {
     UnsubscribeHotkey(hotkeyOptions, opq);
 }
 
-void onKeyPressed(KeyPressedConfig const& options,
+void onKeyPressedImpl(KeyPressedConfig const& options,
     callback_view<void(ohos::multimodalInput::keyEvent::KeyEvent const&)> f, uintptr_t opq)
 {
     SubscribeKeyMonitor(options, f, opq);
 }
 
-void offKeyPressed(optional_view<uintptr_t> opq)
+void offKeyPressedImpl(optional_view<uintptr_t> opq)
 {
     if (opq.has_value()) {
         MMI_HILOGI("[ETS] Unsubscribe key monitor");
@@ -920,14 +952,72 @@ void offKeyPressed(optional_view<uintptr_t> opq)
         UnsubscribeKeyMonitors();
     }
 }
+
+void SetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMode, bool isShield)
+{
+    OHOS::MMI::SHIELD_MODE mode = static_cast<OHOS::MMI::SHIELD_MODE>(shieldMode.get_value());
+    if (mode < FACTORY_MODE || mode > OOBE_MODE) {
+        MMI_HILOGE("Undefined shield mode");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        return;
+    }
+    int32_t ret = InputManager::GetInstance()->SetShieldStatus(shieldMode, isShield);
+    HandleCommonErrors(ret);
+}
+
+bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMode)
+{
+    bool isShield { false };
+    OHOS::MMI::SHIELD_MODE mode = static_cast<OHOS::MMI::SHIELD_MODE>(shieldMode.get_value());
+    if (mode < FACTORY_MODE || mode > OOBE_MODE) {
+        MMI_HILOGE("Undefined shield mode");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        return isShield;
+    }
+
+    auto ret = InputManager::GetInstance()->GetShieldStatus(shieldMode, isShield);
+    HandleCommonErrors(ret);
+    return true;
+}
+
+::taihe::array<inputConsumer::HotkeyOptions> GetAllSystemHotkeysSync()
+{
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t count = 0;
+    std::vector<inputConsumer::HotkeyOptions> result;
+    auto ret = InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
+    if (ret != RET_OK) {
+        int32_t errorCode = std::abs(ret);
+        if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+            MMI_HILOGE("Non system applications use system API");
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+                "Permission denied, non-system application called system api.");
+        } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
+            MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+            taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
+                "Permission denied,forbidden by permission");
+        } else {
+            taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+        }
+        return taihe::array<inputConsumer::HotkeyOptions>(result);
+    }
+    for (auto &iter : keyOptions) {
+        auto tmpOpts = ConvertTaiheHotkeyOptions(std::move(iter));
+        result.push_back(tmpOpts);
+    }
+    return  taihe::array<inputConsumer::HotkeyOptions>(result);
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_onKey(onKey);
-TH_EXPORT_CPP_API_offKey(offKey);
-TH_EXPORT_CPP_API_onHotkeyChange(onHotkeyChange);
-TH_EXPORT_CPP_API_offHotkeyChange(offHotkeyChange);
-TH_EXPORT_CPP_API_onKeyPressed(onKeyPressed);
-TH_EXPORT_CPP_API_offKeyPressed(offKeyPressed);
+TH_EXPORT_CPP_API_onKeyImpl(onKeyImpl);
+TH_EXPORT_CPP_API_offKeyImpl(offKeyImpl);
+TH_EXPORT_CPP_API_onHotkeyChangeImpl(onHotkeyChangeImpl);
+TH_EXPORT_CPP_API_offHotkeyChangeImpl(offHotkeyChangeImpl);
+TH_EXPORT_CPP_API_onKeyPressedImpl(onKeyPressedImpl);
+TH_EXPORT_CPP_API_offKeyPressedImpl(offKeyPressedImpl);
+TH_EXPORT_CPP_API_SetShieldStatus(SetShieldStatus);
+TH_EXPORT_CPP_API_GetShieldStatus(GetShieldStatus);
+TH_EXPORT_CPP_API_GetAllSystemHotkeysSync(GetAllSystemHotkeysSync);
 // NOLINTEND

@@ -83,4 +83,6 @@ struct MouseEvent {
   numLock: bool;
   scrollLock: bool;
   toolType: ToolType;
+  globalX: Optional<i32>;
+  globalY: Optional<i32>;
 }

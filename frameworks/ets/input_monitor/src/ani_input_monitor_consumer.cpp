@@ -908,7 +908,7 @@ void AniInputMonitorConsumer::OnXkeyCallback(std::shared_ptr<PointerEvent> point
         MMI_HILOGE("Not Xkey.");
         return;
     }
-    // 0702 The definition is not found in the interface.
+    // [static] The definition is not found in the interface.
 }
 #endif // OHOS_BUILD_ENABLE_X_KEY
 
@@ -985,7 +985,7 @@ void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> po
            break;
     }
     pointerEvent->MarkProcessed();
-    // 0702: It feels like something other than a mouse
+    // [static]: It feels like something other than a mouse
     std::string typeName = GetTypeName();
     bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
         typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
@@ -998,7 +998,7 @@ void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> po
             MMI_HILOGI("PointerId:%{public}d, PointerAction:%{public}s", pointerEvent->GetPointerId(),
                 pointerEvent->DumpPointerAction());
         }
-        // 0702: The function for obtaining callback success needs to be modified.
+        // [static]: The function for obtaining callback success needs to be modified.
         if (funType_ == MONITORFUNTYPE::ON_TOUCH_BOOL) {
             CheckConsumed(retValue, pointerEvent);
         }

@@ -127,13 +127,10 @@ void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
         MMI_HILOGE("failed to get default SetPointerStyle!");
-    } else if (ret != RET_OK) {
-        MMI_HILOGE("SetPointerStyleAsync failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
 }
 
-void SetPointerVisibleSync(bool visible)
+void SetPointerVisibleSyncImpl(bool visible)
 {
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(visible);
     if (ret == COMMON_PARAMETER_ERROR) {
@@ -145,7 +142,7 @@ void SetPointerVisibleSync(bool visible)
     }
 }
 
-TaihePointerStyle GetPointerStyleSync(int32_t windowId)
+TaihePointerStyle GetPointerStyleSyncImpl(int32_t windowId)
 {
     OHOS::MMI::PointerStyle pointerStyle;
     if (windowId < 0 && windowId != OHOS::MMI::GLOBAL_WINDOW_ID) {
@@ -166,7 +163,7 @@ TaihePointerStyle GetPointerStyleSync(int32_t windowId)
     return ConvertPointerStyle(pointerStyle.id);
 }
 
-void SetPointerStyleSync(int32_t windowId, TaihePointerStyle pointerStyle)
+void SetPointerStyleSyncImpl(int32_t windowId, TaihePointerStyle pointerStyle)
 {
     OHOS::MMI::PointerStyle style;
     style.id = pointerStyle;
@@ -174,9 +171,6 @@ void SetPointerStyleSync(int32_t windowId, TaihePointerStyle pointerStyle)
     if (ret == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
         MMI_HILOGE("failed to get default SetPointerStyle!");
-    } else if (ret != RET_OK) {
-        MMI_HILOGE("SetPointerStyle failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
 }
 
@@ -284,7 +278,7 @@ void SetTouchpadDoubleTapAndDragStateAsync(bool isOpen)
     }
 }
 
-void SetCustomCursorSync(int32_t windowId, uintptr_t pixelMap,
+void SetCustomCursorSyncImpl(int32_t windowId, uintptr_t pixelMap,
     ::taihe::optional_view<int32_t> focusX, ::taihe::optional_view<int32_t> focusY)
 {
     CALL_DEBUG_ENTER;
@@ -374,7 +368,7 @@ void SetCustomCursorAsync(int32_t windowId, ::ohos::multimodalInput::pointer::Cu
     }
 }
 
-int32_t GetPointerSpeedSync()
+int32_t GetPointerSpeedSyncImpl()
 {
     CALL_DEBUG_ENTER;
     int32_t pointerSpeed = 0;
@@ -693,7 +687,7 @@ int32_t GetPointerSizeAsync()
     return size;
 }
 
-void SetPointerSizeSync(int32_t size)
+void SetPointerSizeSyncImpl(int32_t size)
 {
     CALL_DEBUG_ENTER;
     if (size < MIN_POINTER_SIZE) {
@@ -744,7 +738,7 @@ int32_t GetPointerColorAsync()
     return color;
 }
 
-void SetPointerColorSync(int32_t color)
+void SetPointerColorSyncImpl(int32_t color)
 {
     CALL_DEBUG_ENTER;
     auto errorCode = InputManager::GetInstance()->SetPointerColor(color);
@@ -770,7 +764,7 @@ void SetPointerColorAsync(int32_t color)
     }
 }
 
-void SetPointerSpeedSync(int32_t speed)
+void SetPointerSpeedSyncImpl(int32_t speed)
 {
     CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
@@ -789,14 +783,14 @@ void SetPointerSpeedSync(int32_t speed)
     }
 }
 
-bool IsPointerVisibleSync()
+bool IsPointerVisibleSyncImpl()
 {
     CALL_DEBUG_ENTER;
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     return visible;
 }
 
-int32_t GetPointerColorSync()
+int32_t GetPointerColorSyncImpl()
 {
     CALL_DEBUG_ENTER;
     int32_t color = 1;
@@ -811,7 +805,7 @@ int32_t GetPointerColorSync()
     return color;
 }
 
-int32_t GetPointerSizeSync()
+int32_t GetPointerSizeSyncImpl()
 {
     CALL_DEBUG_ENTER;
     int32_t size = 1;
@@ -830,9 +824,9 @@ int32_t GetPointerSizeSync()
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_SetPointerStyleAsync(SetPointerStyleAsync);
-TH_EXPORT_CPP_API_SetPointerVisibleSync(SetPointerVisibleSync);
-TH_EXPORT_CPP_API_GetPointerStyleSync(GetPointerStyleSync);
-TH_EXPORT_CPP_API_SetPointerStyleSync(SetPointerStyleSync);
+TH_EXPORT_CPP_API_SetPointerVisibleSyncImpl(SetPointerVisibleSyncImpl);
+TH_EXPORT_CPP_API_GetPointerStyleSyncImpl(GetPointerStyleSyncImpl);
+TH_EXPORT_CPP_API_SetPointerStyleSyncImpl(SetPointerStyleSyncImpl);
 TH_EXPORT_CPP_API_SetPointerVisibleAsync(SetPointerVisibleAsync);
 TH_EXPORT_CPP_API_SetPointerSpeedAsync(SetPointerSpeedAsync);
 TH_EXPORT_CPP_API_GetPointerSpeedAsync(GetPointerSpeedAsync);
@@ -840,10 +834,10 @@ TH_EXPORT_CPP_API_IsPointerVisibleAsync(IsPointerVisibleAsync);
 TH_EXPORT_CPP_API_GetPointerStyleAsync(GetPointerStyleAsync);
 TH_EXPORT_CPP_API_GetTouchpadDoubleTapAndDragStateAsync(GetTouchpadDoubleTapAndDragStateAsync);
 TH_EXPORT_CPP_API_SetTouchpadDoubleTapAndDragStateAsync(SetTouchpadDoubleTapAndDragStateAsync);
-TH_EXPORT_CPP_API_SetCustomCursorSync(SetCustomCursorSync);
+TH_EXPORT_CPP_API_SetCustomCursorSyncImpl(SetCustomCursorSyncImpl);
 TH_EXPORT_CPP_API_SetCustomCursorPixelMapAsync(SetCustomCursorPixelMapAsync);
 TH_EXPORT_CPP_API_SetCustomCursorAsync(SetCustomCursorAsync);
-TH_EXPORT_CPP_API_GetPointerSpeedSync(GetPointerSpeedSync);
+TH_EXPORT_CPP_API_GetPointerSpeedSyncImpl(GetPointerSpeedSyncImpl);
 TH_EXPORT_CPP_API_GetTouchpadRightClickTypeAsync(GetTouchpadRightClickTypeAsync);
 TH_EXPORT_CPP_API_SetTouchpadRightClickTypeAsync(SetTouchpadRightClickTypeAsync);
 TH_EXPORT_CPP_API_GetTouchpadSwipeSwitchAsync(GetTouchpadSwipeSwitchAsync);
@@ -865,13 +859,13 @@ TH_EXPORT_CPP_API_SetHoverScrollStateAsync(SetHoverScrollStateAsync);
 TH_EXPORT_CPP_API_GetMousePrimaryButtonAsync(GetMousePrimaryButtonAsync);
 TH_EXPORT_CPP_API_SetMousePrimaryButtonAsync(SetMousePrimaryButtonAsync);
 TH_EXPORT_CPP_API_GetPointerSizeAsync(GetPointerSizeAsync);
-TH_EXPORT_CPP_API_SetPointerSizeSync(SetPointerSizeSync);
+TH_EXPORT_CPP_API_SetPointerSizeSyncImpl(SetPointerSizeSyncImpl);
 TH_EXPORT_CPP_API_SetPointerSizeAsync(SetPointerSizeAsync);
 TH_EXPORT_CPP_API_GetPointerColorAsync(GetPointerColorAsync);
-TH_EXPORT_CPP_API_SetPointerColorSync(SetPointerColorSync);
+TH_EXPORT_CPP_API_SetPointerColorSyncImpl(SetPointerColorSyncImpl);
 TH_EXPORT_CPP_API_SetPointerColorAsync(SetPointerColorAsync);
-TH_EXPORT_CPP_API_SetPointerSpeedSync(SetPointerSpeedSync);
-TH_EXPORT_CPP_API_IsPointerVisibleSync(IsPointerVisibleSync);
-TH_EXPORT_CPP_API_GetPointerColorSync(GetPointerColorSync);
-TH_EXPORT_CPP_API_GetPointerSizeSync(GetPointerSizeSync);
+TH_EXPORT_CPP_API_SetPointerSpeedSyncImpl(SetPointerSpeedSyncImpl);
+TH_EXPORT_CPP_API_IsPointerVisibleSyncImpl(IsPointerVisibleSyncImpl);
+TH_EXPORT_CPP_API_GetPointerColorSyncImpl(GetPointerColorSyncImpl);
+TH_EXPORT_CPP_API_GetPointerSizeSyncImpl(GetPointerSizeSyncImpl);
 // NOLINTEND

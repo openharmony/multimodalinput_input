@@ -59,14 +59,7 @@ TaiheTouchEventArray AniInputMonitorManager::QueryTouchEvents(int32_t count)
     CALL_DEBUG_ENTER;
     std::vector<std::shared_ptr<PointerEvent>> touchEventList;
     TaiheTouchEventArray result{};
-#ifdef CODE_BOTH_SIZDES_SAME
     int32_t ret = InputManager::GetInstance()->QueryPointerRecord(count, touchEventList);
-#else
-    int32_t ret = ERROR_UNSUPPORT;
-    taihe::set_business_error(-ret, "The function is not implemented!");
-    return result;
-#endif
-         
     if (ret < 0) {
         if (ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(-ret, "Permission denied.");
