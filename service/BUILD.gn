@@ -2166,12 +2166,12 @@ ohos_unittest("ModuleLoaderTest") {
 
   sources = [
     "module_loader/src/input_screen_capture_agent.cpp",
-    "module_loader/test/input_screen_capture_agent_test.cpp",
     "module_loader/test/mmi_service_test.cpp",
     "module_loader/test/multimodal_input_plugin_manager_test.cpp",
     "module_loader/test/multimodal_input_preferences_manager_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
+    "module_loader/test/input_screen_capture_agent_test.cpp",
   ]
 
   deps = [

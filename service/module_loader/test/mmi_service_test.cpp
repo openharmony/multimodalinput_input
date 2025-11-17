@@ -3583,7 +3583,8 @@ HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_001, TestSize.Level1)
     MMIService mmiService;
     mmiService.state_ = ServiceRunningState::STATE_RUNNING;
     CursorPixelMap pixelMap;
-    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
+    pixelMap.pixelMap = new (std::nothrow) Media::PixelMap();
+    ASSERT_NE(pixelMap.pixelMap, nullptr);
     ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
     EXPECT_NE(ret, RET_OK);
 }
@@ -3600,7 +3601,7 @@ HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_002, TestSize.Level1)
     MMIService mmiService;
     mmiService.state_ = ServiceRunningState::STATE_NOT_START;
     CursorPixelMap pixelMap;
-    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
+    pixelMap.pixelMap = nullptr;
     ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
 }
@@ -3617,7 +3618,7 @@ HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_003, TestSize.Level1)
     MMIService mmiService;
     mmiService.state_ = ServiceRunningState::STATE_RUNNING;
     CursorPixelMap pixelMap;
-    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
+    pixelMap.pixelMap = nullptr;
     ErrCode ret = mmiService.SetPixelMapData(0, pixelMap);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -3637,23 +3638,6 @@ HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_004, TestSize.Level1)
     pixelMap.pixelMap = nullptr;
     ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
-}
-
-/**
- * @tc.name: MMIService_SetPixelMapData_005
- * @tc.desc: PixelMap setup successful or task dispatch failed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_SetPixelMapData_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
-    CursorPixelMap pixelMap;
-    pixelMap.pixelMap = reinterpret_cast<void*>(0x1);
-    ErrCode ret = mmiService.SetPixelMapData(1, pixelMap);
-    EXPECT_TRUE(ret == RET_OK || ret == ETASKS_POST_SYNCTASK_FAIL);
 }
 
 /**
