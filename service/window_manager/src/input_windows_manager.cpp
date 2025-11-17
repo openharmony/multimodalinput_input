@@ -4458,15 +4458,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
             }
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-                if (GetHardCursorEnabled()) {
-                    std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
-                    CHKFR((cursorPos.size() >= CURSOR_POSITION_EXPECTED_SIZE), RET_ERR, "cursorPos is invalid");
-                    CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
-                        cursorPos[0], cursorPos[1]);
-                } else {
-                    CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
-                        physicalX, physicalY);
-                }
+                std::vector<int32_t> cursorPos = HandleHardwareCursor(physicalDisplayInfo, physicalX, physicalY);
+                CHKFR((cursorPos.size() >= CURSOR_POSITION_EXPECTED_SIZE), RET_ERR, "cursorPos is invalid");
+                CursorDrawingComponent::GetInstance().DrawMovePointer(physicalDisplayInfo->rsId,
+                    cursorPos[0], cursorPos[1]);
             }
             CursorDrawingComponent::GetInstance().UpdatePointerItemCursorInfo(pointerItem);
             pointerEvent->UpdatePointerItem(pointerId, pointerItem);
