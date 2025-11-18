@@ -115,6 +115,7 @@ ohos_unittest("ut-event-injection-out") {
 
   sources = [
     "test/device_base_test.cpp",
+    "test/input_parse_test.cpp",
     "test/get_device_node_test.cpp",
     "test/get_device_object_test.cpp",
     "test/injection_tools_help_func_test.cpp",
