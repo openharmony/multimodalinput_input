@@ -85,6 +85,8 @@ std::string StringPrintf(const char *format, ...);
 
 std::string GetProcessName(uint32_t tokenId, int32_t pid);
 
+std::string GetBundleName(uint32_t tokenId);
+
 inline void RemoveSpace(std::string &str)
 {
     str.erase(remove_if(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c);}), str.end());

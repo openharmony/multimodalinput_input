@@ -695,6 +695,23 @@ std::string GetProcessName(uint32_t tokenId, int32_t pid)
     return processName;
 }
 
+std::string GetBundleName(uint32_t tokenId)
+{
+    CALL_INFO_TRACE;
+    std::string bundleName = "";
+    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        Security::AccessToken::HapTokenInfo hapInfo;
+        if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) == RET_OK) {
+            bundleName = hapInfo.bundleName;
+            MMI_HILOGD("BundleName:%{public}s", bundleName.c_str());
+        } else {
+            MMI_HILOGW("Get hap token info failed");
+        }
+    }
+    return bundleName;
+}
+
 void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const std::string &extraRecord)
 {
     constexpr uint32_t milliSecondWidth = 3;
