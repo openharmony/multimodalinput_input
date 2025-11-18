@@ -128,6 +128,7 @@ private:
     void CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset);
     bool IsWindowRotation(const OLD::DisplayInfo* displayInfo);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
+    double CalculateProportion(long long key, long &total, std::map<long long, int32_t> &curMap);
     void HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap);
     void CalculateMouseResponseTimeProbability(struct libinput_event *event);
     std::map<std::string, std::map<long long, int32_t>> mouseResponseMap = {};
