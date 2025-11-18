@@ -24,6 +24,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     void OnScreenCaptureStarted(int32_t pid);
     void OnScreenCaptureFinished(int32_t pid);
+    void OnScreenCaptureDied();
 
 public:
     void SetScreenCaptureCallback(ScreenCaptureCallback callback);
