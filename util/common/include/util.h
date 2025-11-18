@@ -83,6 +83,8 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
 
 std::string StringPrintf(const char *format, ...);
 
+void SetAccessTokenReady();
+
 std::string GetProcessName(uint32_t tokenId, int32_t pid);
 
 std::string GetBundleName(uint32_t tokenId);
