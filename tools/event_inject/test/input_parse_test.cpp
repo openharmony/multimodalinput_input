@@ -275,10 +275,10 @@ HWTEST_F(InputParseTest, ParseEventsObj_001, TestSize.Level1)
 {
     const char* jsonStr = R"({
         "eventType": "touch",
-        "event": [1,2,3],
+        "event": [1, 2, 3],
         "keyValue": 65,
         "blockTime": 100,
-        "ringEvents": [4,5,6],
+        "ringEvents": [4, 5, 6],
         "direction": 1,
         "distance": 50,
         "xPos": 100,
@@ -338,8 +338,8 @@ HWTEST_F(InputParseTest, ParseEventsObj_InvalidJson_001, TestSize.Level1)
 HWTEST_F(InputParseTest, ParseData_Array_001, TestSize.Level1)
 {
     const char* jsonStr = R"([
-        [[100,200],[300,400]],
-        [[500,600]]
+        [[100, 200], [300, 400]],
+        [[500, 600]]
     ])";
     cJSON* events = cJSON_Parse(jsonStr);
     ASSERT_NE(events, nullptr);
@@ -427,7 +427,7 @@ HWTEST_F(InputParseTest, Pos_ToString_001, TestSize.Level1)
     pos.xPos = 100;
     pos.yPos = 200;
     std::string str = pos.ToString();
-    EXPECT_EQ(str, "pos(100,200)");
+    EXPECT_EQ(str, "pos(100, 200)");
 }
 
 /**
@@ -499,7 +499,7 @@ HWTEST_F(InputParseTest, DataInit_ValidData_001, TestSize.Level1)
             "deviceName": "touch_screen",
             "deviceIndex": 1,
             "events": [
-                [[100,200],[300,400]],
+                [[100, 200], [300, 400]],
                 {"eventType": "touch", "xPos": 150}
             ]
         }
