@@ -41,6 +41,11 @@ void InputScreenCaptureMonitorListener::SetScreenCaptureCallback(ScreenCaptureCa
 {
     callback_ = callback;
 }
+
+void InputScreenCaptureMonitorListener::OnScreenCaptureDied()
+{
+    MMI_HILOGI("The screen capture service died.");
+}
 #endif
 }
 }
