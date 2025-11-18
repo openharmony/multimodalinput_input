@@ -61,6 +61,7 @@ constexpr int32_t COLOR_FIXEX_WIDTH { 6 };
 const std::string COLOR_PREFIX = "#";
 const char COLOR_FILL = '0';
 constexpr int64_t TIME_ROUND_UP { 999 };
+std::atomic<bool> g_isAccessTokenReady { false };
 } // namespace
 
 int64_t GetSysClockTime()
@@ -656,9 +657,19 @@ bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::
     }
 }
 
+void SetAccessTokenReady()
+{
+    g_isAccessTokenReady.store(true);
+    MMI_HILOGI("access token is ready");
+}
+
 std::string GetProcessName(uint32_t tokenId, int32_t pid)
 {
     CALL_INFO_TRACE;
+    if (!g_isAccessTokenReady.load()) {
+        MMI_HILOGW("access token is not ready");
+        return "";
+    }
     std::string processName = "";
     int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     switch (tokenType) {

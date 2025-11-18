@@ -501,6 +501,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     AddSystemAbilityListener(SENSOR_SERVICE_ABILITY_ID);
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+    AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -550,6 +551,7 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+    RemoveSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -2443,6 +2445,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
     }
 #endif
+    if (systemAbilityId == ACCESS_TOKEN_MANAGER_SERVICE_ID) {
+        SetAccessTokenReady();
+    }
 }
 
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
