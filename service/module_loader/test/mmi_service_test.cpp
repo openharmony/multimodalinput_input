@@ -3530,33 +3530,11 @@ HWTEST_F(MMIServerTest, MMIService_QueryAuthorizedStatus_002, TestSize.Level1)
 
 /**
  * @tc.name: MMIService_GetInfraredFrequencies_001
- * @tc.desc: CheckInfraredEmmit permission denied, expect ERROR_NO_PERMISSION
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    std::vector<InfraredFrequency> frequencies;
-    ErrCode ret = mmiService.GetInfraredFrequencies(frequencies);
-    EXPECT_TRUE(ret == RET_OK);
-    if (ret == RET_OK) {
-#ifndef OHOS_BUILD_ENABLE_WATCH
-        EXPECT_GE(frequencies.size(), 0);
-#endif
-    } else {
-        EXPECT_EQ(frequencies.size(), 0);
-    }
-}
-
-/**
- * @tc.name: MMIService_GetInfraredFrequencies_002
  * @tc.desc: Normal case, verify return value and content
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_002, TestSize.Level1)
+HWTEST_F(MMIServerTest, MMIService_GetInfraredFrequencies_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     MMIService mmiService;
