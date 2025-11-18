@@ -112,7 +112,7 @@ public:
     std::shared_ptr<PointerEvent> CreatePointerByLastPointer(int32_t pointerAction);
     void EnterMouseCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo);
     void LimitMouseLocaltionInEvent(const OLD::DisplayInfo *displayInfo, int32_t &integerX, int32_t &integerY,
-        double &x, double &y, bool isRealData);
+        double &x, double &y);
     void ClearPointerLockedWindow();
     void RotateWindowArea(int32_t displayId, WindowInfo &window, Rect &windowArea);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -291,8 +291,7 @@ private:
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
-    void GetWidthAndHeight(const OLD::DisplayInfo* displayInfo, int32_t &width, int32_t &height,
-        bool isRealData = true);
+    void GetWidthAndHeight(const OLD::DisplayInfo* displayInfo, int32_t &width, int32_t &height);
     void UpdateCurrentDisplay(int32_t displayId) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
