@@ -35,7 +35,8 @@ public:
     static void PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr);
     static void PushSwitchEvent(std::shared_ptr<SwitchEvent> eventPtr);
     static void PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr);
-    static int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList);
+    static int32_t QueryPointerRecord(int32_t count, std::vector<std::shared_ptr<PointerEvent>> &pointerList,
+                                      bool inWhitelist = false);
     static std::string PopEvent();
     static void WriteEventFile();
     static void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -57,11 +58,14 @@ private:
         std::vector<double> pressures;
         std::vector<double> tiltXs;
         std::vector<double> tiltYs;
+        std::vector<int32_t> displayXs;
+        std::vector<int32_t> displayYs;
         PointerEventRecord(int64_t actionTime, int32_t sourceType, int32_t pointerId, bool isInject,
             std::vector<int32_t> pointerIds, std::vector<double> pressures, std::vector<double> tiltXs,
-            std::vector<double> tiltYs)
+            std::vector<double> tiltYs, std::vector<int32_t> displayXs, std::vector<int32_t> displayYs)
             : actionTime(actionTime), sourceType(sourceType), pointerId(pointerId), isInject(isInject),
-              pointerIds(pointerIds), pressures(pressures), tiltXs(tiltXs), tiltYs(tiltYs)
+              pointerIds(pointerIds), pressures(pressures), tiltXs(tiltXs), tiltYs(tiltYs),
+              displayXs(displayXs), displayYs(displayYs)
         {}
     };
     static std::queue<std::string> eventQueue_;
