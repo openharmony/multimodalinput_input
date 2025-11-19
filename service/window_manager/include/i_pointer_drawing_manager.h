@@ -188,7 +188,7 @@ public:
         return false;
     }
 #ifndef OHOS_BUILD_ENABLE_WATCH
-    virtual void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt) {}
+    virtual void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType) {}
 #endif // OHOS_BUILD_ENABLE_WATCH
     virtual int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle)
     {

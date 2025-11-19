@@ -511,10 +511,10 @@ int32_t CursorDrawingComponent::GetPointerSnapshot(void *pixelMapPtr)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #ifndef OHOS_BUILD_ENABLE_WATCH
-void CursorDrawingComponent::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt)
+void CursorDrawingComponent::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType)
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->NotifyPointerEventToRS(pointAction, pointCnt);
+    pointerInstance_->NotifyPointerEventToRS(pointAction, pointCnt, sourceType);
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
 
