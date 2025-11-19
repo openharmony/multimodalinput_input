@@ -866,15 +866,15 @@ int32_t JsInputMonitor::TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> 
     }
     int32_t actionTypeTemp = actionValue;
     switch (actionTypeTemp) {
-        case PointerEvent::POINTER_ACTION_DOWN: {
+        case PointerEvent::POINTER_ACTION_SWIPE_BEGIN: {
             actionValue = GESTURE_BEGIN;
             break;
         }
-        case PointerEvent::POINTER_ACTION_MOVE: {
+        case PointerEvent::POINTER_ACTION_SWIPE_UPDATE: {
             actionValue = GESTURE_UPDATE;
             break;
         }
-        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_SWIPE_END:
         case PointerEvent::POINTER_ACTION_CANCEL: {
             actionValue = GESTURE_END;
             break;
@@ -1941,9 +1941,9 @@ bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
     } else if (pointerEvent->GetFingerCount() != ONE_FINGERS) {
         MMI_HILOGE("Failed to do swipe inward, more than one finger");
         return false;
-    } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP &&
+    } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
         MMI_HILOGE("Failed to do swipe inward, wrong action");
         return false;
