@@ -65,7 +65,6 @@ CursorDrawingComponent& CursorDrawingComponent::GetInstance()
 {
     static CursorDrawingComponent instance;
     instance.Load();
-    instance.lastCallTime_.store(std::chrono::steady_clock::now());
     return instance;
 }
 
@@ -85,6 +84,7 @@ void CursorDrawingComponent::Load()
 {
     {
         std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
+        lastCallTime_ = std::chrono::steady_clock::now();
         if (isLoaded_ && (soHandle_ != nullptr)) {
             return;
         }
@@ -99,7 +99,7 @@ void CursorDrawingComponent::Load()
     }
     timerId_ = TimerMgr->AddLongTimer(CHECK_INTERVAL_MS, CHECK_COUNT, [this] {
         auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - lastCallTime_.load()).count();
+            std::chrono::steady_clock::now() - lastCallTime_).count();
         if ((idleTime >= UNLOAD_TIME_MS) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
             this->UnLoad();
         }
