@@ -187,6 +187,14 @@ ohos_shared_library("libmmi-client") {
     public_external_deps = [ "eventhandler:libeventhandler" ]
   }
 
+  if (is_ohos && is_clang && target_cpu == "arm64") {
+    ldflags = [ 
+      "-Wl,--emit-relocs",
+      "-Wl,--no-relax", 
+      "-mno-fix-cortex-a53-843419" 
+    ]
+  }
+
   if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
