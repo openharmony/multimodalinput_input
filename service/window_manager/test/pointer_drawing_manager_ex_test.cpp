@@ -1623,7 +1623,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpo
 
 /**
  * @tc.name: PointerDrawingManagerExTest_AttachToDisplay_001
- * @tc.desc: Test the funcation AttachToDisplay
+ * @tc.desc: Test the function AttachToDisplay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1645,7 +1645,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AttachToDispla
 
 /**
  * @tc.name: PointerDrawingManagerExTest_AttachToDisplay_002
- * @tc.desc: Test the funcation AttachToDisplay
+ * @tc.desc: Test the function AttachToDisplay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1667,7 +1667,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AttachToDispla
 
 /**
  * @tc.name: PointerDrawingManagerExTest_SkipPointerLayer_001
- * @tc.desc: Test the funcation SkipPointerLayer
+ * @tc.desc: Test the function SkipPointerLayer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1688,7 +1688,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SkipPointerLay
 
 /**
  * @tc.name: PointerDrawingManagerExTest_SkipPointerLayer_002
- * @tc.desc: Test the funcation SkipPointerLayer
+ * @tc.desc: Test the function SkipPointerLayer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1709,7 +1709,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SkipPointerLay
 
 /**
 @tc.name: PointerDrawingManagerExTest_PixelFormatToColorType_001
-@tc.desc: Test the funcation PixelFormatToColorType
+@tc.desc: Test the function PixelFormatToColorType
 @tc.type: FUNC
 @tc.require:
 */
@@ -1760,7 +1760,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_PixelFormatToC
 
 /**
 @tc.name: PointerDrawingManagerExTest_AlphaTypeToAlphaType_001
-@tc.desc: Test the funcation AlphaTypeToAlphaType
+@tc.desc: Test the function AlphaTypeToAlphaType
 @tc.type: FUNC
 @tc.require:
 */
@@ -1788,7 +1788,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_AlphaTypeToAlp
 
 /**
 @tc.name: PointerDrawingManagerExTest_ClearWindowPointerStyle_001
-@tc.desc: Test the funcation ClearWindowPointerStyle
+@tc.desc: Test the function ClearWindowPointerStyle
 @tc.type: FUNC
 @tc.require:
 */
@@ -1803,7 +1803,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ClearWindowPoi
 
 /**
  * @tc.name: PointerDrawingManagerExTest_IsWindowRotation_001
- * @tc.desc: Test the funcation IsWindowRotation
+ * @tc.desc: Test the function IsWindowRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1821,7 +1821,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_IsWindowRotati
 
 /**
  * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_001
- * @tc.desc: Test the funcation InitDefaultMouseIconPath
+ * @tc.desc: Test the function InitDefaultMouseIconPath
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1840,7 +1840,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMou
 
 /**
  * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_002
- * @tc.desc: Test the funcation InitDefaultMouseIconPath
+ * @tc.desc: Test the function InitDefaultMouseIconPath
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1859,7 +1859,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMou
 
 /**
  * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_003
- * @tc.desc: Test the funcation InitDefaultMouseIconPath
+ * @tc.desc: Test the function InitDefaultMouseIconPath
  * @tc.type: FUNC
  * @tc.require:
  */

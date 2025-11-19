@@ -482,7 +482,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_GetToo
 
 /**
  * @tc.name: TabletToolTranformProcessorTest_OnEvent_002
- * @tc.desc: Test the funcation OnEvent
+ * @tc.desc: Test the function OnEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -501,7 +501,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
 
 /**
  * @tc.name: DrawTouchGraphicDrawing_006
- * @tc.desc: Test the funcation DrawTouchGraphicDrawing
+ * @tc.desc: Test the function DrawTouchGraphicDrawing
  * @tc.type: FUNC
  * @tc.require:
  */

@@ -47,7 +47,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE
 /* *
  * @tc.name  : CrownTransformProcessorTest_SaveTouchInfo_001
- * @tc.desc: Test the funcation SaveTouchInfo
+ * @tc.desc: Test the function SaveTouchInfo
  * @tc.type: Function
  * @tc.require:
  */
@@ -66,7 +66,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_SaveTouchInfo_001, 
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_SaveTouchInfo_002
- * @tc.desc: Test the funcation SaveTouchInfo
+ * @tc.desc: Test the function SaveTouchInfo
  * @tc.type: Function
  * @tc.require:
  */
@@ -92,7 +92,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_SaveTouchInfo_002, 
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_SaveTouchInfo_003
- * @tc.desc: Test the funcation SaveTouchInfo
+ * @tc.desc: Test the function SaveTouchInfo
  * @tc.type: Function
  * @tc.require:
  */
@@ -118,7 +118,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_SaveTouchInfo_003, 
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_IsEqual_001
- * @tc.desc: Test the funcation IsEqual
+ * @tc.desc: Test the function IsEqual
  * @tc.type: Function
  * @tc.require:
  */
@@ -134,7 +134,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_IsEqual_001, TestSi
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_IsEqual_002
- * @tc.desc: Test the funcation IsEqual
+ * @tc.desc: Test the function IsEqual
  * @tc.type: Function
  * @tc.require:
  */
@@ -150,7 +150,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_IsEqual_002, TestSi
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_CheckKnuckleEvent_001
- * @tc.desc: Test the funcation CheckKnuckleEvent
+ * @tc.desc: Test the function CheckKnuckleEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -167,7 +167,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_CheckKnuckleEvent_0
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_CheckKnuckleEvent_002
- * @tc.desc: Test the funcation CheckKnuckleEvent
+ * @tc.desc: Test the function CheckKnuckleEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -190,7 +190,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_CheckKnuckleEvent_0
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_CheckKnuckleEvent_003
- * @tc.desc: Test the funcation CheckKnuckleEvent
+ * @tc.desc: Test the function CheckKnuckleEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -213,7 +213,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_CheckKnuckleEvent_0
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_CheckKnuckleEvent_004
- * @tc.desc: Test the funcation CheckKnuckleEvent
+ * @tc.desc: Test the function CheckKnuckleEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -236,7 +236,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_CheckKnuckleEvent_0
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_CheckKnuckleEvent_005
- * @tc.desc: Test the funcation CheckKnuckleEvent
+ * @tc.desc: Test the function CheckKnuckleEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -259,7 +259,7 @@ HWTEST_F(FingersenseWrapperTest, CrownTransformProcessorTest_CheckKnuckleEvent_0
 
 /* *
  * @tc.name  : CrownTransformProcessorTest_CheckKnuckleEvent_006
- * @tc.desc: Test the funcation CheckKnuckleEvent
+ * @tc.desc: Test the function CheckKnuckleEvent
  * @tc.type: Function
  * @tc.require:
  */

@@ -51,7 +51,7 @@ void DisplayEventMonitorTest::TearDownTestCase()
 
 /**
  * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn_001
- * @tc.desc: Test the funcation UpdateShieldStatusOnScreenOn
+ * @tc.desc: Test the function UpdateShieldStatusOnScreenOn
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -68,7 +68,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 
 /**
  * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001
- * @tc.desc: Test the funcation UpdateShieldStatusOnScreenOff
+ * @tc.desc: Test the function UpdateShieldStatusOnScreenOff
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -85,7 +85,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 
 /**
  * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_001
- * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.desc: Test the function InitCommonEventSubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -98,7 +98,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
 
 /**
  * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_002
- * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.desc: Test the function InitCommonEventSubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -112,7 +112,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
 
 /**
  * @tc.name: DisplayEventMonitorTest_IsCommonEventSubscriberInit_001
- * @tc.desc: Test the funcation IsCommonEventSubscriberInit
+ * @tc.desc: Test the function IsCommonEventSubscriberInit
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -127,7 +127,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_IsCommonEventSubscribe
 
 /**
  * @tc.name: DisplayEventMonitorTest_SendCancelEventWhenLock_001
- * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.desc: Test the function InitCommonEventSubscriber
  * @tc.type: FUNC
  * @tc.require:
  */

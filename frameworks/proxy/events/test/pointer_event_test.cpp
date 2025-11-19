@@ -1340,7 +1340,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level2
 
 /**
  * @tc.name: PointerEventTest_GetAxisValue_001
- * @tc.desc: Test the funcation GetAxisValue
+ * @tc.desc: Test the function GetAxisValue
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1359,7 +1359,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetAxisValue_001
- * @tc.desc: Test the funcation SetAxisValue
+ * @tc.desc: Test the function SetAxisValue
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1379,7 +1379,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_HasAxis_001
- * @tc.desc: Test the funcation HasAxis
+ * @tc.desc: Test the function HasAxis
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1402,7 +1402,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetPressure_001
- * @tc.desc: Test the funcation SetPressure
+ * @tc.desc: Test the function SetPressure
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1418,7 +1418,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetMoveFlag_001
- * @tc.desc: Test the funcation SetMoveFlag
+ * @tc.desc: Test the function SetMoveFlag
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1434,7 +1434,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetMoveFlag_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_ActionToShortStr_003
- * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.desc: Test the function ActionToShortStr
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1477,7 +1477,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level
 
 /**
  * @tc.name: PointerEventTest_ActionToShortStr_004
- * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.desc: Test the function ActionToShortStr
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1520,7 +1520,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level
 
 /**
  * @tc.name: PointerEventTest_ActionToShortStr_005
- * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.desc: Test the function ActionToShortStr
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1536,7 +1536,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_005, TestSize.Level
 
 /**
  * @tc.name: PointerEventTest_SetTiltX_001
- * @tc.desc: Test the funcation SetTiltX and GetTiltX
+ * @tc.desc: Test the function SetTiltX and GetTiltX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1551,7 +1551,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetTiltX_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetTiltY_001
- * @tc.desc: Test the funcation SetTiltY and GetTiltY
+ * @tc.desc: Test the function SetTiltY and GetTiltY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1600,7 +1600,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayY_001, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_EventTypeToString_001
- * @tc.desc: Test the funcation EventTypeToString
+ * @tc.desc: Test the function EventTypeToString
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1631,7 +1631,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_EventTypeToString_001, TestSize.Leve
 
 /**
  * @tc.name: PointerEventTest_MarkProcessed_002
- * @tc.desc: Test the funcation MarkProcessed
+ * @tc.desc: Test the function MarkProcessed
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1731,7 +1731,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_003, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_ToString
- * @tc.desc: Test the funcation ToString
+ * @tc.desc: Test the function ToString
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1749,7 +1749,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ToString, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_ReadFromParcel
- * @tc.desc: Test the funcation ReadFromParcel
+ * @tc.desc: Test the function ReadFromParcel
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1765,7 +1765,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_ClearAxisStatus
- * @tc.desc: Test the funcation ClearAxisStatus
+ * @tc.desc: Test the function ClearAxisStatus
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1780,7 +1780,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_from
- * @tc.desc: Verify the funcation from
+ * @tc.desc: Verify the function from
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1795,7 +1795,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_from, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_GetBlobId
- * @tc.desc: Verify the funcation GetBlobId
+ * @tc.desc: Verify the function GetBlobId
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1813,7 +1813,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetBlobId, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetBlobId
- * @tc.desc: Verify the funcation SetBlobId
+ * @tc.desc: Verify the function SetBlobId
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1830,7 +1830,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetBlobId, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_IsCanceled
- * @tc.desc: Verify the funcation IsCanceled
+ * @tc.desc: Verify the function IsCanceled
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1845,7 +1845,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsCanceled, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_GetFixedDisplayX
- * @tc.desc: Verify the funcation FixedDisplayX
+ * @tc.desc: Verify the function FixedDisplayX
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1861,7 +1861,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayX, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_GetFixedDisplayXPosTouchScreen
- * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosTouchScreen
+ * @tc.desc: Verify the function PointerEventTest_GetFixedDisplayXPosTouchScreen
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1908,7 +1908,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosTouchScreen, Test
 
 /**
  * @tc.name: PointerEventTest_GetFixedDisplayXPosMouse
- * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosMouse
+ * @tc.desc: Verify the function PointerEventTest_GetFixedDisplayXPosMouse
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1940,7 +1940,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosMouse, TestSize.L
 
 /**
  * @tc.name: PointerEventTest_GetFixedDisplayXPosPen
- * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosPen
+ * @tc.desc: Verify the function PointerEventTest_GetFixedDisplayXPosPen
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -1972,7 +1972,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosPen, TestSize.Lev
 
 /**
  * @tc.name: PointerEventTest_GetFixedDisplayXPosJoystick
- * @tc.desc: Verify the funcation PointerEventTest_GetFixedDisplayXPosJoystick
+ * @tc.desc: Verify the function PointerEventTest_GetFixedDisplayXPosJoystick
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2002,7 +2002,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayXPosJoystick, TestSiz
 
 /**
  * @tc.name: PointerEventTest_GetFixedDisplayY
- * @tc.desc: Verify the funcation FixedDisplayY
+ * @tc.desc: Verify the function FixedDisplayY
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2018,7 +2018,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedDisplayY, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_ClearAxisStatus_01
- * @tc.desc: Verify the funcation ClearAxisStatus
+ * @tc.desc: Verify the function ClearAxisStatus
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2034,7 +2034,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisStatus_01, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetVelocity
- * @tc.desc: Verify the funcation SetVelocity
+ * @tc.desc: Verify the function SetVelocity
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2050,7 +2050,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetVelocity, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetHandOption
- * @tc.desc: Verify the funcation SetHandOption
+ * @tc.desc: Verify the function SetHandOption
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2066,7 +2066,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetHandOption, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetOriginPointerAction
- * @tc.desc: Verify the funcation SetOriginPointerAction
+ * @tc.desc: Verify the function SetOriginPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2082,7 +2082,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerAction, TestSize.Lev
 
 /**
  * @tc.name: PointerEventTest_SetPullId
- * @tc.desc: Verify the funcation SetPullId
+ * @tc.desc: Verify the function SetPullId
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2098,7 +2098,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetPullId, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetScrollRows
- * @tc.desc: Verify the funcation SetScrollRows
+ * @tc.desc: Verify the function SetScrollRows
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2114,7 +2114,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetScrollRows, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetFixedMode
- * @tc.desc: Verify the funcation SetFixedMode
+ * @tc.desc: Verify the function SetFixedMode
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2130,7 +2130,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetFixedMode, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_GetFixedModeStr
- * @tc.desc: Verify the funcation GetFixedModeStr
+ * @tc.desc: Verify the function GetFixedModeStr
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2152,7 +2152,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFixedModeStr, TestSize.Level2)
 
 /**
  * @tc.name: PointerEventTest_SetProcessedCallback
- * @tc.desc: Verify the funcation SetProcessedCallback
+ * @tc.desc: Verify the function SetProcessedCallback
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2166,7 +2166,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetProcessedCallback, TestSize.Level
 
 /**
  * @tc.name: PointerEventTest_DumpPointerAction_001
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2193,7 +2193,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_001, TestSize.Leve
 
 /**
  * @tc.name: PointerEventTest_DumpPointerAction_002
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2220,7 +2220,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_002, TestSize.Leve
 
 /**
  * @tc.name: PointerEventTest_DumpPointerAction_003
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
@@ -2247,7 +2247,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DumpPointerAction_003, TestSize.Leve
 
 /**
  * @tc.name: PointerEventTest_DumpPointerAction_004
- * @tc.desc: Verify the funcation DumpPointerAction
+ * @tc.desc: Verify the function DumpPointerAction
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:

@@ -38,7 +38,7 @@ public:
 
 /**
  * @tc.name: TouchGestureAdapterTest_SetGestureEnable_001
- * @tc.desc: Test the funcation SetGestureEnable
+ * @tc.desc: Test the function SetGestureEnable
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -55,7 +55,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_SetGestureEnable_001, 
 
 /**
  * @tc.name: TouchGestureAdapterTest_process_001
- * @tc.desc: Test the funcation process
+ * @tc.desc: Test the function process
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -133,7 +133,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_004, TestSize.
 
 /**
  * @tc.name: TouchGestureAdapterTest_Init_001
- * @tc.desc: Test the funcation Init
+ * @tc.desc: Test the function Init
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -154,7 +154,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_Init_001, TestSize.Lev
 
 /**
  * @tc.name: TouchGestureAdapterTest_GetGestureFactory_001
- * @tc.desc: Test the funcation GetGestureFactory
+ * @tc.desc: Test the function GetGestureFactory
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -169,7 +169,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_GetGestureFactory_001,
 
 /**
  * @tc.name: TouchGestureAdapterTest_OnTouchEvent_001
- * @tc.desc: Test the funcation OnTouchEvent
+ * @tc.desc: Test the function OnTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -214,7 +214,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_001, Test
 
 /**
  * @tc.name: TouchGestureAdapterTest_OnTouchEvent_002
- * @tc.desc: Test the funcation OnTouchEvent
+ * @tc.desc: Test the function OnTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -251,7 +251,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_002, Test
 
 /**
  * @tc.name: TouchGestureAdapterTest_OnSwipeGesture_001
- * @tc.desc: Test the funcation OnSwipeGesture
+ * @tc.desc: Test the function OnSwipeGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -272,7 +272,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnSwipeGesture_001, Te
 
 /**
  * @tc.name: TouchGestureAdapterTest_OnPinchGesture_001
- * @tc.desc: Test the funcation OnPinchGesture
+ * @tc.desc: Test the function OnPinchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -293,7 +293,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnPinchGesture_001, Te
 
 /**
  * @tc.name: TouchGestureAdapterTest_OnGestureEvent_001
- * @tc.desc: Test the funcation OnGestureEvent
+ * @tc.desc: Test the function OnGestureEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -330,7 +330,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureEvent_001, Te
 
 /**
  * @tc.name: TouchGestureAdapterTest_SetGestureEnable_002
- * @tc.desc: Test the funcation SetGestureEnable
+ * @tc.desc: Test the function SetGestureEnable
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -360,7 +360,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_SetGestureEnable_002, 
 
 /**
  * @tc.name: TouchGestureAdapterTest_OnTouchEvent_003
- * @tc.desc: Test the funcation OnTouchEvent
+ * @tc.desc: Test the function OnTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
