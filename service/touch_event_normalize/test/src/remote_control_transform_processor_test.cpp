@@ -89,7 +89,7 @@ void RemoteControlTransformProcessorTest::TearDown()
 
 /**
  * @tc.name: Remote_ControlTransformProcessorTest_InitToolTypes_001
- * @tc.desc: Test the funcation InitToolTypes
+ * @tc.desc: Test the function InitToolTypes
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -171,7 +171,7 @@ HWTEST_F(RemoteControlTransformProcessorTest, Remote_ControlTransformProcessorTe
 
 /**
  * @tc.name: Remote_ControlTransformProcessorTest_OnEventTouchMotion_001
- * @tc.desc: Test the funcation OnEventTouchMotion
+ * @tc.desc: Test the function OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -187,7 +187,7 @@ HWTEST_F(RemoteControlTransformProcessorTest, Remote_ControlTransformProcessorTe
 
 /**
  * @tc.name: Remote_ControlTransformProcessorTest_OnEventTouchMotion_002
- * @tc.desc: Test the funcation OnEventTouchMotion
+ * @tc.desc: Test the function OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
  */

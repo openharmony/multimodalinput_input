@@ -59,7 +59,7 @@ void CrownTransformProcessorTest::TearDown() {}
 
 /* *
  * @tc.name: CrownTransformProcessorTest_GetPointerEvent_001
- * @tc.desc: Test the funcation GetPointerEvent
+ * @tc.desc: Test the function GetPointerEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -73,7 +73,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_GetPointerEven
 
 /* *
  * @tc.name: CrownTransformProcessorTest_IsCrownEvent_001
- * @tc.desc: Test the funcation IsCrownEvent
+ * @tc.desc: Test the function IsCrownEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -88,7 +88,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
 
 /* *
  * @tc.name: CrownTransformProcessorTest_IsCrownEvent_004
- * @tc.desc: Test the funcation IsCrownEvent
+ * @tc.desc: Test the function IsCrownEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -109,7 +109,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
 
 /* *
  * @tc.name: CrownTransformProcessorTest_IsCrownEvent_005
- * @tc.desc: Test the funcation IsCrownEvent
+ * @tc.desc: Test the function IsCrownEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -129,7 +129,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
 
 /* *
  * @tc.name: CrownTransformProcessorTest_NormalizeRotateEvent_001
- * @tc.desc: Test the funcation NormalizeRotateEvent
+ * @tc.desc: Test the function NormalizeRotateEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -144,7 +144,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
 
 /* *
  * @tc.name: CrownTransformProcessorTest_NormalizeRotateEvent_002
- * @tc.desc: Test the funcation NormalizeRotateEvent
+ * @tc.desc: Test the function NormalizeRotateEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -162,7 +162,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
 
 /* *
  * @tc.name: CrownTransformProcessorTest_NormalizeRotateEvent_003
- * @tc.desc: Test the funcation NormalizeRotateEvent
+ * @tc.desc: Test the function NormalizeRotateEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -181,7 +181,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
 
 /* *
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotateBegin_001
- * @tc.desc: Test the funcation HandleCrownRotateBegin
+ * @tc.desc: Test the function HandleCrownRotateBegin
  * @tc.type: Function
  * @tc.require:
  */
@@ -196,7 +196,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 
 /* *
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotateUpdate_001
- * @tc.desc: Test the funcation HandleCrownRotateUpdate
+ * @tc.desc: Test the function HandleCrownRotateUpdate
  * @tc.type: Function
  * @tc.require:
  */
@@ -211,7 +211,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 
 /* *
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotateEnd_001
- * @tc.desc: Test the funcation HandleCrownRotateEnd
+ * @tc.desc: Test the function HandleCrownRotateEnd
  * @tc.type: Function
  * @tc.require:
  */
@@ -225,7 +225,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 
 /* *
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotateBeginAndUpdate_001
- * @tc.desc: Test the funcation HandleCrownRotateBeginAndUpdate
+ * @tc.desc: Test the function HandleCrownRotateBeginAndUpdate
  * @tc.type: Function
  * @tc.require:
  */
@@ -241,7 +241,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 
 /* *
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotateBeginAndUpdate_002
- * @tc.desc: Test the funcation HandleCrownRotateBeginAndUpdate
+ * @tc.desc: Test the function HandleCrownRotateBeginAndUpdate
  * @tc.type: Function
  * @tc.require:
  */
@@ -257,7 +257,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 
 /* *
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotatePostInner_001
- * @tc.desc: Test the funcation HandleCrownRotatePostInner
+ * @tc.desc: Test the function HandleCrownRotatePostInner
  * @tc.type: Function
  * @tc.require:
  */
@@ -274,7 +274,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
 
 /* *
  * @tc.name: CrownTransformProcessorTest_Dump_001
- * @tc.desc: Test the funcation Dump
+ * @tc.desc: Test the function Dump
  * @tc.type: Function
  * @tc.require:
  */

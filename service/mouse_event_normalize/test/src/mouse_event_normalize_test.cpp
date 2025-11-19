@@ -583,7 +583,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEve
 
 /**
  * @tc.name: MouseEventNormalizeTest_GetPointerEvent01
- * @tc.desc: Test the funcation GetPointerEvent
+ * @tc.desc: Test the function GetPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -598,7 +598,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent01, Tes
 
 /**
  * @tc.name: MouseEventNormalizeTest_GetPointerEvent02
- * @tc.desc: Test the funcation GetPointerEvent
+ * @tc.desc: Test the function GetPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */

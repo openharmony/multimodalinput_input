@@ -342,7 +342,7 @@ HWTEST_F(InputActiveSubscriberHandlerTest, InputActiveSubscriberHandlerTest_OnSe
 
 /**
  * @tc.name: InputActiveSubscriberHandlerTest
- * @tc.desc: Test the funcation ResetTimer
+ * @tc.desc: Test the function ResetTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -358,7 +358,7 @@ HWTEST_F(InputActiveSubscriberHandlerTest, KeyGestureManagerTest_ResetTimer, Tes
 
 /**
  * @tc.name: KeyGestureManagerTest_Trigger
- * @tc.desc: Test the funcation Trigger
+ * @tc.desc: Test the function Trigger
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -375,7 +375,7 @@ HWTEST_F(InputActiveSubscriberHandlerTest, KeyGestureManagerTest_Trigger, TestSi
 
 /**
  * @tc.name: KeyGestureManagerTest_Run
- * @tc.desc: Test the funcation Run
+ * @tc.desc: Test the function Run
  * @tc.type: FUNC
  * @tc.require:
  */

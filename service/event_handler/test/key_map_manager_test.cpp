@@ -44,7 +44,7 @@ public:
 
 /**
  * @tc.name: KeyMapManagerTest_GetProFilePath_001
- * @tc.desc: Test the funcation GetProFilePath
+ * @tc.desc: Test the function GetProFilePath
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -73,7 +73,7 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetProFilePath_001, TestSize.Level
 
 /**
  * @tc.name: KeyMapManagerTest_GetProFilePath_002
- * @tc.desc: Test the funcation GetProFilePath
+ * @tc.desc: Test the function GetProFilePath
  * @tc.type: FUNC
  * @tc.require:
  */

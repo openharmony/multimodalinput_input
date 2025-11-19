@@ -72,7 +72,7 @@ public:
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_002
- * @tc.desc: Test the funcation Intercept
+ * @tc.desc: Test the function Intercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -95,7 +95,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_002, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_TriggerHandlers_01
- * @tc.desc: Test the funcation TriggerHandlers
+ * @tc.desc: Test the function TriggerHandlers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -122,7 +122,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_TriggerHandlers_01, TestSi
 
 /**
  * @tc.name: LongPressSingleKey_Dump_01
- * @tc.desc: Test the funcation LongPressSingleKey_Dump
+ * @tc.desc: Test the function LongPressSingleKey_Dump
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -148,7 +148,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Dump_01, TestSize.Level1)
 
 /**
  * @tc.name: LongPressCombinationKey_Dump_01
- * @tc.desc: Test the funcation LongPressCombinationKey_Dump
+ * @tc.desc: Test the function LongPressCombinationKey_Dump
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -175,7 +175,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Dump_01, TestSize.Level1
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_01
- * @tc.desc: Test the funcation Intercept
+ * @tc.desc: Test the function Intercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -191,7 +191,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_01, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_RemoveKeyGesture_01
- * @tc.desc: Test the funcation RemoveKeyGesture
+ * @tc.desc: Test the function RemoveKeyGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -205,7 +205,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RemoveKeyGesture_01, TestS
 
 /**
  * @tc.name: KeyGestureManagerTest_RemoveKeyGesture_02
- * @tc.desc: Test the funcation RemoveKeyGesture
+ * @tc.desc: Test the function RemoveKeyGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -219,7 +219,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RemoveKeyGesture_02, TestS
 
 /**
  * @tc.name: KeyGestureManagerTest_AddKeyGesture_01
- * @tc.desc: Test the funcation AddKeyGesture
+ * @tc.desc: Test the function AddKeyGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -236,7 +236,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_AddKeyGesture_01, TestSize
 
 /**
  * @tc.name: KeyGestureManagerTest_ShouldIntercept_01
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -251,7 +251,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_ShouldIntercept_01, TestSi
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_02
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -278,7 +278,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_02, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_03
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -298,7 +298,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_03, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_04
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -318,7 +318,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_04, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_05
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -338,7 +338,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_05, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_06
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -365,7 +365,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_06, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_IsWorking_01
- * @tc.desc: Test the funcation ShouldIntercept
+ * @tc.desc: Test the function ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -380,7 +380,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_01, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_RecognizeGesture_01
- * @tc.desc: Test the funcation RecognizeGesture
+ * @tc.desc: Test the function RecognizeGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -400,7 +400,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RecognizeGesture_01, TestS
 
 /**
  * @tc.name: KeyGestureManagerTest_RecognizeGesture_02
- * @tc.desc: Test the funcation RecognizeGesture
+ * @tc.desc: Test the function RecognizeGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -420,7 +420,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RecognizeGesture_02, TestS
 
 /**
  * @tc.name: KeyGestureManagerTest_TriggerAll_01
- * @tc.desc: Test the funcation TriggerAll
+ * @tc.desc: Test the function TriggerAll
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -436,7 +436,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_TriggerAll_01, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_RunPending_01
- * @tc.desc: Test the funcation RunPending
+ * @tc.desc: Test the function RunPending
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -452,7 +452,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RunPending_01, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_RunPending_02
- * @tc.desc: Test the funcation RunPending
+ * @tc.desc: Test the function RunPending
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -469,7 +469,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RunPending_02, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_ResetTimer_01
- * @tc.desc: Test the funcation ResetTimer
+ * @tc.desc: Test the function ResetTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -484,7 +484,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_ResetTimer_01, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_ResetTimer_02
- * @tc.desc: Test the funcation ResetTimer
+ * @tc.desc: Test the function ResetTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -499,7 +499,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_ResetTimer_02, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_RunPendingHandlers_01
- * @tc.desc: Test the funcation RunPendingHandlers
+ * @tc.desc: Test the function RunPendingHandlers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -527,7 +527,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RunPendingHandlers_01, Tes
 
 /**
  * @tc.name: KeyGestureManagerTest_RunHandler_01
- * @tc.desc: Test the funcation RunHandler
+ * @tc.desc: Test the function RunHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -555,7 +555,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RunHandler_01, TestSize.Le
 
 /**
  * @tc.name: LongPressCombinationKey_Intercept_01
- * @tc.desc: Test the funcation RecognizeGesture
+ * @tc.desc: Test the function RecognizeGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -593,7 +593,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_01, TestSize.L
 
 /**
  * @tc.name: LongPressCombinationKey_Intercept_02
- * @tc.desc: Test the funcation RecognizeGesture
+ * @tc.desc: Test the function RecognizeGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -621,7 +621,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_02, TestSize.L
 
 /**
  * @tc.name: KeyGestureManagerTest_NotifyHandlers_01
- * @tc.desc: Test the funcation NotifyHandlers
+ * @tc.desc: Test the function NotifyHandlers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -648,7 +648,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_NotifyHandlers_01, TestSiz
 
 /**
  * @tc.name: KeyGestureManagerTest_AddHandler
- * @tc.desc: Test the funcation AddHandler
+ * @tc.desc: Test the function AddHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -668,7 +668,7 @@ HWTEST_F(KeyGestureManagerTest, AddHandler_Success, TestSize.Level1)
 
 /**
  * @tc.name: KeyGestureManagerTest_RemoveHandler
- * @tc.desc: Test the funcation RemoveHandler
+ * @tc.desc: Test the function RemoveHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -695,7 +695,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_RemoveHandler, TestSize.Le
 
 /**
  * @tc.name: KeyGestureManagerTest_ResetTimers
- * @tc.desc: Test the funcation KeyGestureManager::KeyGesture::ResetTimers
+ * @tc.desc: Test the function KeyGestureManager::KeyGesture::ResetTimers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -719,7 +719,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_KeyGesture_ResetTimers, Te
 
 /**
  * @tc.name: KeyGestureManagerTest_KeyGesture_IsWorking
- * @tc.desc: Test the funcation KeyGestureManager::KeyGesture::IsWorking
+ * @tc.desc: Test the function KeyGestureManager::KeyGesture::IsWorking
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -732,7 +732,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_KeyGesture_IsWorking, Test
 
 /**
  * @tc.name: KeyGestureManagerTest_KeyGesture_GetForegroundPids
- * @tc.desc: Test the funcation KeyGestureManager::KeyGesture::GetForegroundPids
+ * @tc.desc: Test the function KeyGestureManager::KeyGesture::GetForegroundPids
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -746,7 +746,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_KeyGesture_GetForegroundPi
 
 /**
  * @tc.name: KeyGestureManagerTest_KeyGesture_HaveForegroundHandler
- * @tc.desc: Test the funcation KeyGestureManager::KeyGesture::HaveForegroundHandler
+ * @tc.desc: Test the function KeyGestureManager::KeyGesture::HaveForegroundHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -760,7 +760,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGesture_HaveForegroundHandler, TestSize.Level
 
 /**
  * @tc.name: KeyGestureManagerTest_KeyGesture_ShowHandlers
- * @tc.desc: Test the funcation KeyGestureManager::KeyGesture::_ShowHandlers
+ * @tc.desc: Test the function KeyGestureManager::KeyGesture::_ShowHandlers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -778,7 +778,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_KeyGesture_ShowHandlers, T
 
 /**
  * @tc.name: KeyGestureManagerTest_LongPressSingleKey_ShouldIntercept
- * @tc.desc: Test the funcation LongPressSingleKey::ShouldIntercept
+ * @tc.desc: Test the function LongPressSingleKey::ShouldIntercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -796,7 +796,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_ShouldIntercept, TestSize.Lev
 
 /**
  * @tc.name: KeyGestureManagerTest_LongPressSingleKey_Dump
- * @tc.desc: Test the funcation LongPressSingleKey::Dump
+ * @tc.desc: Test the function LongPressSingleKey::Dump
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -811,7 +811,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Dump, TestSize.Level1)
 
 /**
  * @tc.name: LongPressCombinationKey_Intercept
- * @tc.desc: Test the funcation LongPressCombinationKey::Intercept
+ * @tc.desc: Test the function LongPressCombinationKey::Intercept
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -829,7 +829,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept, TestSize.Leve
 
 /**
  * @tc.name: LongPressCombinationKey_Dump
- * @tc.desc: Test the funcation LongPressCombinationKey::Dump
+ * @tc.desc: Test the function LongPressCombinationKey::Dump
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -845,7 +845,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Dump, TestSize.Level1)
 
 /**
  * @tc.name: LongPressCombinationKey_RecognizeGesture
- * @tc.desc: Test the funcation LongPressCombinationKey::RecognizeGesture
+ * @tc.desc: Test the function LongPressCombinationKey::RecognizeGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -863,7 +863,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_RecognizeGesture, TestSi
 
 /**
  * @tc.name: LongPressCombinationKey_TriggerAll
- * @tc.desc: Test the funcation LongPressCombinationKey::TriggerAll
+ * @tc.desc: Test the function LongPressCombinationKey::TriggerAll
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -881,7 +881,7 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_TriggerAll, TestSize.Lev
 
 /**
  * @tc.name: PullUpAccessibility_AddHandler
- * @tc.desc: Test the funcation PullUpAccessibility::AddHandler
+ * @tc.desc: Test the function PullUpAccessibility::AddHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -896,7 +896,7 @@ HWTEST_F(KeyGestureManagerTest, PullUpAccessibility_AddHandler, TestSize.Level1)
 
 /**
  * @tc.name: PullUpAccessibility_OnTriggerAll
- * @tc.desc: Test the funcation PullUpAccessibility::OnTriggerAll
+ * @tc.desc: Test the function PullUpAccessibility::OnTriggerAll
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -911,7 +911,7 @@ HWTEST_F(KeyGestureManagerTest, PullUpAccessibility_OnTriggerAll, TestSize.Level
 
 /**
  * @tc.name: KeyGestureManager_Dump
- * @tc.desc: Test the funcation KeyGestureManager::Dump
+ * @tc.desc: Test the function KeyGestureManager::Dump
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -924,7 +924,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManager_Dump, TestSize.Level1)
 
 /**
  * @tc.name: KeyGestureManager_KeyMonitorIntercept
- * @tc.desc: Test the funcation KeyGestureManager::KeyMonitorIntercept
+ * @tc.desc: Test the function KeyGestureManager::KeyMonitorIntercept
  * @tc.type: FUNC
  * @tc.require:
  */

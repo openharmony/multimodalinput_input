@@ -70,7 +70,7 @@ void InputEventHandlerTest::TearDown(void) {}
 
 /**
  * @tc.name: InputEventHandler_OnEvent_001
- * @tc.desc: Test the funcation OnEvent
+ * @tc.desc: Test the function OnEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -86,7 +86,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_001, TestSize.Level1)
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtRecord_001
- * @tc.desc: Test the funcation UpdateDwtRecord
+ * @tc.desc: Test the function UpdateDwtRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -103,7 +103,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_001, TestSize.
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtRecord_002
- * @tc.desc: Test the funcation UpdateDwtRecord
+ * @tc.desc: Test the function UpdateDwtRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -120,7 +120,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_002, TestSize.
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtRecord_003
- * @tc.desc: Test the funcation UpdateDwtRecord
+ * @tc.desc: Test the function UpdateDwtRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -137,7 +137,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_003, TestSize.
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtRecord_004
- * @tc.desc: Test the funcation UpdateDwtRecord
+ * @tc.desc: Test the function UpdateDwtRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -153,7 +153,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtRecord_004, TestSize.
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_001
- * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.desc: Test the function UpdateDwtTouchpadRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -174,7 +174,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_001, T
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_002
- * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.desc: Test the function UpdateDwtTouchpadRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -204,7 +204,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_002, T
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_003
- * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.desc: Test the function UpdateDwtTouchpadRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -234,7 +234,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_003, T
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_004
- * @tc.desc: Test the funcation UpdateDwtTouchpadRecord
+ * @tc.desc: Test the function UpdateDwtTouchpadRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -255,7 +255,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_004, T
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_001
- * @tc.desc: Test the funcation UpdateDwtKeyboardRecord
+ * @tc.desc: Test the function UpdateDwtKeyboardRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -273,7 +273,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_001, T
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_002
- * @tc.desc: Test the funcation UpdateDwtKeyboardRecord
+ * @tc.desc: Test the function UpdateDwtKeyboardRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -295,7 +295,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_002, T
 
 /**
  * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_003
- * @tc.desc: Test the funcation UpdateDwtKeyboardRecord
+ * @tc.desc: Test the function UpdateDwtKeyboardRecord
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -331,7 +331,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_003, T
 
 /**
  * @tc.name: InputEventHandler_IsStandaloneFunctionKey_001
- * @tc.desc: Test the funcation IsStandaloneFunctionKey
+ * @tc.desc: Test the function IsStandaloneFunctionKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -345,7 +345,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsStandaloneFunctionKey_001, T
 
 /**
  * @tc.name: InputEventHandler_IsStandaloneFunctionKey_002
- * @tc.desc: Test the funcation IsStandaloneFunctionKey
+ * @tc.desc: Test the function IsStandaloneFunctionKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -359,7 +359,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsStandaloneFunctionKey_002, T
 
 /**
  * @tc.name: InputEventHandler_IsTouchpadMistouch_001
- * @tc.desc: Test the funcation IsTouchpadMistouch
+ * @tc.desc: Test the function IsTouchpadMistouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -394,7 +394,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMistouch_001, TestSi
 
 /**
  * @tc.name: InputEventHandler_IsTouchpadButtonMistouch_001
- * @tc.desc: Test the funcation IsTouchpadButtonMistouch
+ * @tc.desc: Test the function IsTouchpadButtonMistouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -431,7 +431,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadButtonMistouch_001, 
 
 /**
  * @tc.name: InputEventHandler_IsTouchpadTapMistouch_001
- * @tc.desc: Test the funcation IsTouchpadTapMistouch
+ * @tc.desc: Test the function IsTouchpadTapMistouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -468,7 +468,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadTapMistouch_001, Tes
 
 /**
  * @tc.name: InputEventHandler_IsTouchpadMotionMistouch_001
- * @tc.desc: Test the funcation IsTouchpadMotionMistouch
+ * @tc.desc: Test the function IsTouchpadMotionMistouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -504,7 +504,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMotionMistouch_001, 
 
 /**
  * @tc.name: InputEventHandler_IsTouchpadPointerMotionMistouch_001
- * @tc.desc: Test the funcation IsTouchpadPointerMotionMistouch
+ * @tc.desc: Test the function IsTouchpadPointerMotionMistouch
  * @tc.type: FUNC
  * @tc.require:
  */

@@ -51,7 +51,7 @@ void TouchPadGestureTest::TearDown()
 
 /**
  * @tc.name: TouchPadGestureTest_OnEventTouchPadSwipeBegin_001
- * @tc.desc: Test the funcation OnEventTouchPadSwipeBegin
+ * @tc.desc: Test the function OnEventTouchPadSwipeBegin
  * @tc.type: FUNC
  * @tc.require:
  */

@@ -31,7 +31,7 @@ public:
 
 /**
  * @tc.name:CircleStreamBufferTest_CopyDataToBegin_001
- * @tc.desc:Test the funcation CopyDataToBegin
+ * @tc.desc:Test the function CopyDataToBegin
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -51,7 +51,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CopyDataToBegin_001, Tes
 
 /**
  * @tc.name:CircleStreamBufferTest_CheckWrite_001
- * @tc.desc:Test the funcation CheckWrite
+ * @tc.desc:Test the function CheckWrite
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -74,7 +74,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CheckWrite_001, TestSize
 
 /**
  * @tc.name:CircleStreamBufferTest_Write_001
- * @tc.desc:Test the funcation Write
+ * @tc.desc:Test the function Write
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -98,7 +98,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_Write_001, TestSize.Leve
 
 /**
  * @tc.name:CircleStreamBufferTest_CreateKeyEvent_001
- * @tc.desc:Test the funcation CreateKeyEvent
+ * @tc.desc:Test the function CreateKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -115,7 +115,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CreateKeyEvent_001, Test
 
 /**
  * @tc.name:CircleStreamBufferTest_GetKeyEvent_001
- * @tc.desc:Test the funcation GetKeyEvent
+ * @tc.desc:Test the function GetKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -132,7 +132,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_GetKeyEvent_001, TestSiz
 
 /**
  * @tc.name:CircleStreamBufferTest_CreateKeyItem_001
- * @tc.desc:Test the funcation CreateKeyItem
+ * @tc.desc:Test the function CreateKeyItem
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -152,7 +152,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CreateKeyItem_001, TestS
 
 /**
  * @tc.name:CircleStreamBufferTest_GetKeyItem_001
- * @tc.desc:Test the funcation GetKeyItem
+ * @tc.desc:Test the function GetKeyItem
  * @tc.type: FUNC
  * @tc.require:
  */
