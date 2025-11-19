@@ -37,7 +37,7 @@ public:
     void InitInfraredEmitter();
     bool Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern);
     int32_t GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo);
-    bool HasIrEmitter(bool &hasIrEmitter);
+    int32_t HasIrEmitter(bool &hasIrEmitter);
 
 private:
     InfraredEmitterController();
