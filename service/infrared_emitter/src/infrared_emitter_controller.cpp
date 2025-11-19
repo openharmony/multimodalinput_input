@@ -158,7 +158,7 @@ int32_t InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyI
     return RET_OK;
 }
 
-bool InfraredEmitterController::HasIrEmitter(bool &hasIrEmitter)
+int32_t InfraredEmitterController::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -168,7 +168,7 @@ bool InfraredEmitterController::HasIrEmitter(bool &hasIrEmitter)
     } else {
         irInterface_->HasIrEmitter(hasIrEmitter);
     }
-    return true;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

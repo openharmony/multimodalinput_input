@@ -4168,7 +4168,7 @@ ErrCode MMIService::HasIrEmitter(bool &hasIrEmitter)
     hasIrEmitter = false;
 #ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGI("Start has infrared Emitter");
-    if (!InfraredEmitterController::GetInstance()->HasIrEmitter(hasIrEmitter)) {
+    if (InfraredEmitterController::GetInstance()->HasIrEmitter(hasIrEmitter) != RET_OK) {
         MMI_HILOGE("Failed to HasIrEmitter");
         return RET_ERR;
     }
@@ -4217,7 +4217,7 @@ ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
     MMI_HILOGI("Start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     int32_t ret = InfraredEmitterController::GetInstance()->GetFrequencies(infos);
-    if (ret == RET_ERR || ret == ERROR_UNSUPPORTED_IR_EMITTER) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Failed to get frequencies");
         return ret;
     }
