@@ -12204,6 +12204,66 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_LimitMouseLocaltionInEvent_003
+ * @tc.desc: Test displayDirection == DIRECTION0 And integerX <= windowArea.x
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    int32_t integerX = 506;
+    int32_t integerY = 301;
+    double x = 0;
+    double y = 0;
+    displayInfo.id = 1;
+    displayInfo.direction = Direction::DIRECTION0;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 2000;
+    displayInfo.validHeight = 1000;
+    inputWindowsManager->pointerLockedWindow_.area.x = 507;
+    inputWindowsManager->pointerLockedWindow_.area.y = 302;
+    inputWindowsManager->pointerLockedWindow_.area.width = 2090;
+    inputWindowsManager->pointerLockedWindow_.area.height = 1394;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
+    EXPECT_EQ(integerX, inputWindowsManager->pointerLockedWindow_.area.x + 1);
+    EXPECT_EQ(integerY, inputWindowsManager->pointerLockedWindow_.area.y + 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_LimitMouseLocaltionInEvent_004
+ * @tc.desc: Test displayDirection == DIRECTION0 And FLAG_BIT_POINTER_LOCKED
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    int32_t integerX = 3000;
+    int32_t integerY = 3000;
+    double x = 0;
+    double y = 0;
+    displayInfo.id = 1;
+    displayInfo.direction = Direction::DIRECTION0;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 2000;
+    displayInfo.validHeight = 1000;
+    inputWindowsManager->pointerLockedWindow_.area.x = 507;
+    inputWindowsManager->pointerLockedWindow_.area.y = 302;
+    inputWindowsManager->pointerLockedWindow_.area.width = 2090;
+    inputWindowsManager->pointerLockedWindow_.area.height = 1394;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
+    EXPECT_EQ(integerX, 0);
+    EXPECT_EQ(integerY, 0);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_RotateWindowArea_001
  * @tc.desc: Test if (window.transform.size() == MATRIX3_SIZE && !transform.IsIdentity())
  * @tc.type: FUNC
