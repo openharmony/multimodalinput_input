@@ -437,9 +437,10 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_HasIrEmitt
     };
     InfraredEmitterController controller;
     controller.irInterface_ = new (std::nothrow) FakeAdapter();
+    ASSERT_NE(controller.irInterface_, nullptr);
     bool hasIrEmitter = false;
-    bool result = controller.HasIrEmitter(hasIrEmitter);
-    ASSERT_TRUE(result);
+    int32_t result = controller.HasIrEmitter(hasIrEmitter);
+    ASSERT_TRUE(result == RET_OK);
 }
 #endif // OHOS_BUILD_PC_UNIT_TEST
 } // namespace MMI

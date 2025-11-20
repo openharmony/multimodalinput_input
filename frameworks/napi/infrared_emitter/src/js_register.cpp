@@ -91,7 +91,7 @@ void JsRegister::CallJsHasIrEmitterPromiseEx(sptr<CallbackInfo> cb, napi_handle_
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
+        callResult = CreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         if (callResult == nullptr) {
             napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("The callResult is nullptr");
@@ -117,17 +117,15 @@ void JsRegister::JsHasIrEmitterResolveDeferred(
     }
     if (napi_get_boolean(cb->env, cb->data.hasIrEmitter, &callResult) != napi_ok) {
         MMI_HILOGE("napi_get_boolean failed");
-        napi_close_handle_scope(cb->env, scope);
         return;
     }
     if (napi_resolve_deferred(cb->env, cb->deferred, callResult) != napi_ok) {
         MMI_HILOGE("napi_resolve_deferred failed");
-        napi_close_handle_scope(cb->env, scope);
         return;
     }
 }
 
-napi_value JsRegister::GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
+napi_value JsRegister::CreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
 {
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
