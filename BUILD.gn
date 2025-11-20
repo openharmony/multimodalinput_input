@@ -91,6 +91,7 @@ group("multimodalinput_mmi_frameworks") {
 group("multimodalinput_mmi_service") {
   deps = [
     "common/property_name_mapper:mmi_property_name_mapper",
+    "etc/joystick:input_joystick_etc",
     "service:libcursor_drawing_adapter",
     "service:libmmi-knuckle",
     "service:libmmi-server",

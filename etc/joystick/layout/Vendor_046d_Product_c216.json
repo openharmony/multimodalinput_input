@@ -1,0 +1,55 @@
+{
+	"KEYS":	[{
+			"RAWCODE":	298,
+			"KEYCODE":	"BUTTON_THUMBL"
+		}, {
+			"RAWCODE":	297,
+			"KEYCODE":	"BUTTON_START"
+		}, {
+			"RAWCODE":	295,
+			"KEYCODE":	"BUTTON_R2"
+		}, {
+			"RAWCODE":	294,
+			"KEYCODE":	"BUTTON_L2"
+		}, {
+			"RAWCODE":	293,
+			"KEYCODE":	"BUTTON_R1"
+		}, {
+			"RAWCODE":	292,
+			"KEYCODE":	"BUTTON_L1"
+		}, {
+			"RAWCODE":	291,
+			"KEYCODE":	"BUTTON_Y"
+		}, {
+			"RAWCODE":	299,
+			"KEYCODE":	"BUTTON_THUMBR"
+		}, {
+			"RAWCODE":	288,
+			"KEYCODE":	"BUTTON_X"
+		}, {
+			"RAWCODE":	290,
+			"KEYCODE":	"BUTTON_B"
+		}, {
+			"RAWCODE":	289,
+			"KEYCODE":	"BUTTON_A"
+		}],
+	"AXES":	[{
+			"RAWCODE":	17,
+			"AXIS":	"HAT0Y"
+		}, {
+			"RAWCODE":	2,
+			"AXIS":	"Z"
+		}, {
+			"RAWCODE":	5,
+			"AXIS":	"RZ"
+		}, {
+			"RAWCODE":	16,
+			"AXIS":	"HAT0X"
+		}, {
+			"RAWCODE":	1,
+			"AXIS":	"Y"
+		}, {
+			"RAWCODE":	0,
+			"AXIS":	"X"
+		}]
+}
