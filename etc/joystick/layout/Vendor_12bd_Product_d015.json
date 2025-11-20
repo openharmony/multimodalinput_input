@@ -1,0 +1,34 @@
+{
+	"KEYS":	[{
+			"RAWCODE":	312,
+			"KEYCODE":	"BUTTON_SELECT"
+		}, {
+			"RAWCODE":	313,
+			"KEYCODE":	"BUTTON_START"
+		}, {
+			"RAWCODE":	309,
+			"KEYCODE":	"BUTTON_R1"
+		}, {
+			"RAWCODE":	308,
+			"KEYCODE":	"BUTTON_L1"
+		}, {
+			"RAWCODE":	304,
+			"KEYCODE":	"BUTTON_Y"
+		}, {
+			"RAWCODE":	307,
+			"KEYCODE":	"BUTTON_X"
+		}, {
+			"RAWCODE":	305,
+			"KEYCODE":	"BUTTON_B"
+		}, {
+			"RAWCODE":	306,
+			"KEYCODE":	"BUTTON_A"
+		}],
+	"AXES":	[{
+			"RAWCODE":	1,
+			"AXIS":	"HAT0Y"
+		}, {
+			"RAWCODE":	0,
+			"AXIS":	"HAT0X"
+		}]
+}
