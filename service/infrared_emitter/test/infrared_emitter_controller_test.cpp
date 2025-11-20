@@ -38,7 +38,7 @@ public:
 
 /**
  * @tc.name: InfraredEmitterControllerTest_GetInstance_001
- * @tc.desc: Test the funcation GetInstance
+ * @tc.desc: Test the function GetInstance
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -54,7 +54,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetInstanc
 
 /**
  * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_001
- * @tc.desc: Test the funcation InitInfraredEmitter
+ * @tc.desc: Test the function InitInfraredEmitter
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -71,7 +71,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 
 /**
  * @tc.name: InfraredEmitterControllerTest_Transmit_001
- * @tc.desc: Test the funcation Transmit
+ * @tc.desc: Test the function Transmit
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -86,7 +86,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_0
 
 /**
  * @tc.name: InfraredEmitterControllerTest_GetFrequencies_001
- * @tc.desc: Test the funcation GetFrequencies
+ * @tc.desc: Test the function GetFrequencies
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -102,7 +102,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_GetFrequen
 
 /**
  * @tc.name: InfraredEmitterControllerTest_InfraredEmitterController_001
- * @tc.desc: Test the funcation GetFrequencies
+ * @tc.desc: Test the function GetFrequencies
  * @tc.type: FUNC
  * @tc.require:
  */

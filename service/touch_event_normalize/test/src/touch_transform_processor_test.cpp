@@ -112,7 +112,7 @@ void TouchTransformProcessorTest::TearDown()
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchDown_001
- * @tc.desc: Test the funcation OnEventTouchDown
+ * @tc.desc: Test the function OnEventTouchDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -127,7 +127,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchDown_001, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_UpdatePointerItemProperties_001
- * @tc.desc: Test the funcation UpdatePointerItemByTouchInfo
+ * @tc.desc: Test the function UpdatePointerItemByTouchInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -160,7 +160,7 @@ HWTEST_F(TouchTransformProcessorTest, UpdatePointerItemProperties_001, TestSize.
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchMotion_001
- * @tc.desc: Test the funcation OnEventTouchMotion
+ * @tc.desc: Test the function OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -175,7 +175,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchMotion_001, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchUp_001
- * @tc.desc: Test the funcation OnEventTouchUp
+ * @tc.desc: Test the function OnEventTouchUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -190,7 +190,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchUp_001, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_GetTouchToolType_001
- * @tc.desc: Test the funcation GetTouchToolType
+ * @tc.desc: Test the function GetTouchToolType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -205,7 +205,7 @@ HWTEST_F(TouchTransformProcessorTest, GetTouchToolType_001, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_InitToolTypes_001
- * @tc.desc: Test the funcation InitToolTypes
+ * @tc.desc: Test the function InitToolTypes
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -235,7 +235,7 @@ HWTEST_F(TouchTransformProcessorTest, InitToolTypes_001, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchDown_002
- * @tc.desc: Test the funcation OnEventTouchDown
+ * @tc.desc: Test the function OnEventTouchDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -272,7 +272,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchDown_002, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_NotifyFingersenseProcess_001
- * @tc.desc: Test the funcation NotifyFingersenseProcess
+ * @tc.desc: Test the function NotifyFingersenseProcess
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -288,7 +288,7 @@ HWTEST_F(TouchTransformProcessorTest, NotifyFingersenseProcess_001, TestSize.Lev
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchMotion_002
- * @tc.desc: Test the funcation OnEventTouchMotion
+ * @tc.desc: Test the function OnEventTouchMotion
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -321,7 +321,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchMotion_002, TestSize.Level1)
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchUp_002
- * @tc.desc: Test the funcation OnEventTouchUp
+ * @tc.desc: Test the function OnEventTouchUp
  * @tc.type: FUNC
  * @tc.require:
  */

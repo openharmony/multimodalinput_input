@@ -87,7 +87,7 @@ void TouchTransformProcessorTestWithMock::CloseTouchscreen()
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchDown_001
- * @tc.desc: Test the funcation OnEventTouchDown
+ * @tc.desc: Test the function OnEventTouchDown
  * @tc.type: FUNC
  * @tc.require:
  */

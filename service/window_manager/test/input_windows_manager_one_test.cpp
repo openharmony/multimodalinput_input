@@ -105,7 +105,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 /* *
  * @tc.name: InputWindowsManagerOneTest_ScreenRotateAdjustDisplayXY_001
- * @tc.desc: Test the funcation ScreenRotateAdjustDisplayXY
+ * @tc.desc: Test the function ScreenRotateAdjustDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -148,7 +148,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdju
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_RotateScreen_001
- * @tc.desc: Test the funcation RotateScreen
+ * @tc.desc: Test the function RotateScreen
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -191,7 +191,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_001
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_RotateScreen_002
- * @tc.desc: Test the funcation RotateScreen
+ * @tc.desc: Test the function RotateScreen
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -224,7 +224,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_RotateScreen_002
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_TriggerTouchUpOnInvalidAreaEntry_001
- * @tc.desc: Test the funcation TriggerTouchUpOnInvalidAreaEntry
+ * @tc.desc: Test the function TriggerTouchUpOnInvalidAreaEntry
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -259,7 +259,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_TriggerTouchUpOnInvalidAreaEntry_002
- * @tc.desc: Test the funcation TriggerTouchUpOnInvalidAreaEntry
+ * @tc.desc: Test the function TriggerTouchUpOnInvalidAreaEntry
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -293,7 +293,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_TriggerTouchUpOnInvalidAreaEntry_003
- * @tc.desc: Test the funcation TriggerTouchUpOnInvalidAreaEntry
+ * @tc.desc: Test the function TriggerTouchUpOnInvalidAreaEntry
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -328,7 +328,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TriggerTouchUpOn
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_TouchPointToDisplayPoint_001
- * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.desc: Test the function TouchPointToDisplayPoint
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -347,7 +347,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchPointToDisp
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_001
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -379,7 +379,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_002
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -415,7 +415,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_003
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -458,7 +458,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_004
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -501,7 +501,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_005
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -562,7 +562,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_006
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -607,7 +607,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_007
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -652,7 +652,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_008
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -689,7 +689,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_009
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -727,7 +727,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SelectWindowInfo_010
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -772,7 +772,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
 #ifdef OHOS_BUILD_ENABLE_POINTER
 /* *
  * @tc.name: InputWindowsManagerOneTest_GetPositionDisplayDirection_001
- * @tc.desc: Test the funcation GetPositionDisplayDirection
+ * @tc.desc: Test the function GetPositionDisplayDirection
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -787,7 +787,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPositionDispl
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateCustomStyle_001
- * @tc.desc: Test the funcation UpdateCustomStyle
+ * @tc.desc: Test the function UpdateCustomStyle
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -812,7 +812,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateCustomStyl
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SkipPrivacyProtectionWindow_001
- * @tc.desc: Test the funcation SkipPrivacyProtectionWindow
+ * @tc.desc: Test the function SkipPrivacyProtectionWindow
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -839,7 +839,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SkipPrivacyProte
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /* *
  * @tc.name: InputWindowsManagerOneTest_HandleOneHandMode_001
- * @tc.desc: Test the funcation HandleOneHandMode
+ * @tc.desc: Test the function HandleOneHandMode
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -863,7 +863,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_HandleOneHandMod
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdatePointerItemInOneHandMode_001
- * @tc.desc: Test the funcation UpdatePointerItemInOneHandMode
+ * @tc.desc: Test the function UpdatePointerItemInOneHandMode
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -888,7 +888,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdatePointerIte
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdatePointerItemInOneHandMode_002
- * @tc.desc: Test the funcation UpdatePointerItemInOneHandMode
+ * @tc.desc: Test the function UpdatePointerItemInOneHandMode
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -917,7 +917,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdatePointerIte
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTransformDisplayXY_001
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -945,7 +945,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTransformDisplayXY_002
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -975,7 +975,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTransformDisplayXY_003
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1005,7 +1005,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTransformDisplayXY_004
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1035,7 +1035,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTransformDisplayXY_005
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1075,7 +1075,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTransformDisplayXY_006
- * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.desc: Test the function UpdateTransformDisplayXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1116,7 +1116,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_DispatchTouch_001
- * @tc.desc: Test the funcation DispatchTouch
+ * @tc.desc: Test the function DispatchTouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1143,7 +1143,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_CalculateAcrossDirection_001
- * @tc.desc: Test the funcation CalculateAcrossDirection
+ * @tc.desc: Test the function CalculateAcrossDirection
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1164,7 +1164,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CalculateAcrossD
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_AcrossDisplay_001
- * @tc.desc: Test the funcation AcrossDisplay
+ * @tc.desc: Test the function AcrossDisplay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1200,7 +1200,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AcrossDisplay_00
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_FindPhysicalDisplay_001
- * @tc.desc: Test the funcation FindPhysicalDisplay
+ * @tc.desc: Test the function FindPhysicalDisplay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1235,7 +1235,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindPhysicalDisp
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ReverseRotateDisplayScreen_001
- * @tc.desc: Test the funcation ReverseRotateDisplayScreen
+ * @tc.desc: Test the function ReverseRotateDisplayScreen
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1258,7 +1258,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReverseRotateDis
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ReverseRotateDisplayScreen_002
- * @tc.desc: Test the funcation ReverseRotateDisplayScreen
+ * @tc.desc: Test the function ReverseRotateDisplayScreen
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1281,7 +1281,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ReverseRotateDis
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_001
- * @tc.desc: Test the funcation ShiftAppMousePointerEvent
+ * @tc.desc: Test the function ShiftAppMousePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1300,7 +1300,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePoi
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_AppendExtraData_001
- * @tc.desc: Test the funcation AppendExtraData
+ * @tc.desc: Test the function AppendExtraData
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1318,7 +1318,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AppendExtraData_
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_AppendExtraData_002
- * @tc.desc: Test the funcation AppendExtraData
+ * @tc.desc: Test the function AppendExtraData
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1336,7 +1336,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AppendExtraData_
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_AppendExtraData_003
- * @tc.desc: Test the funcation AppendExtraData
+ * @tc.desc: Test the function AppendExtraData
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1360,7 +1360,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AppendExtraData_
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ParseJson_001
- * @tc.desc: Test the funcation ParseJson
+ * @tc.desc: Test the function ParseJson
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1387,7 +1387,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ParseJson_001, T
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_GetPidByDisplayIdAndWindowId_001
- * @tc.desc: Test the funcation GetPidByDisplayIdAndWindowId
+ * @tc.desc: Test the function GetPidByDisplayIdAndWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1415,7 +1415,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetPidByDisplayI
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_GetAgentPidByDisplayIdAndWindowId_001
- * @tc.desc: Test the funcation GetAgentPidByDisplayIdAndWindowId
+ * @tc.desc: Test the function GetAgentPidByDisplayIdAndWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1444,7 +1444,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetAgentPidByDis
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /* *
  * @tc.name: InputWindowsManagerOneTest_CancelTouch_001
- * @tc.desc: Test the funcation CancelTouch
+ * @tc.desc: Test the function CancelTouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1466,7 +1466,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelTouch_001,
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_CancelAllTouches_001
- * @tc.desc: Test the funcation CancelAllTouches
+ * @tc.desc: Test the function CancelAllTouches
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1494,7 +1494,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelAllTouches
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_CancelAllTouches_002
- * @tc.desc: Test the funcation CancelAllTouches
+ * @tc.desc: Test the function CancelAllTouches
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1529,7 +1529,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelAllTouches
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_CalcDrawCoordinate_001
- * @tc.desc: Test the funcation CalcDrawCoordinate
+ * @tc.desc: Test the function CalcDrawCoordinate
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1549,7 +1549,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CalcDrawCoordina
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_GetWindowGroupInfoByDisplayIdCopy
- * @tc.desc: Test the funcation GetWindowGroupInfoByDisplayIdCopy
+ * @tc.desc: Test the function GetWindowGroupInfoByDisplayIdCopy
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1569,7 +1569,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowGroupIn
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_FindTargetDisplayGroupInfo
- * @tc.desc: Test the funcation FindTargetDisplayGroupInfo
+ * @tc.desc: Test the function FindTargetDisplayGroupInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1595,7 +1595,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDispla
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_SetDragFlagByPointer001
- * @tc.desc: Test the funcation SetDragFlagByPointer
+ * @tc.desc: Test the function SetDragFlagByPointer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1615,7 +1615,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SetDragFlagByPoi
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ShiftAppTouchPointerEvent001
- * @tc.desc: Test the funcation ShiftAppTouchPointerEvent
+ * @tc.desc: Test the function ShiftAppTouchPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1633,7 +1633,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPoi
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_PrintHighZorder_001
- * @tc.desc: Test the funcation PrintHighZorder
+ * @tc.desc: Test the function PrintHighZorder
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1662,7 +1662,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintHighZorder_
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_PrintHighZorder_002
- * @tc.desc: Test the funcation PrintHighZorder
+ * @tc.desc: Test the function PrintHighZorder
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1688,7 +1688,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintHighZorder_
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_FindTargetDisplayGroupInfo_001
- * @tc.desc: Test the funcation FindTargetDisplayGroupInfo
+ * @tc.desc: Test the function FindTargetDisplayGroupInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1710,7 +1710,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDispla
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_IsPointerOnCenter_001
- * @tc.desc: Test the funcation IsPointerOnCenter
+ * @tc.desc: Test the function IsPointerOnCenter
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1735,7 +1735,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPointerOnCente
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_002
- * @tc.desc: Test the funcation ShiftAppMousePointerEvent
+ * @tc.desc: Test the function ShiftAppMousePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1763,7 +1763,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePoi
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ShiftAppTouchPointerEvent002
- * @tc.desc: Test the funcation ShiftAppTouchPointerEvent
+ * @tc.desc: Test the function ShiftAppTouchPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1987,7 +1987,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsPositionOutVal
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ProcessTouchTracking
- * @tc.desc: Test the funcation ProcessTouchTracking
+ * @tc.desc: Test the function ProcessTouchTracking
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2020,7 +2020,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTrac
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ClearMouseHideFlag
- * @tc.desc: Test the funcation ClearMouseHideFlag
+ * @tc.desc: Test the function ClearMouseHideFlag
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2042,7 +2042,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMouseHideFl
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_IsAccessibilityEventWithZorderInjected
- * @tc.desc: Test the funcation IsAccessibilityEventWithZorderInjected
+ * @tc.desc: Test the function IsAccessibilityEventWithZorderInjected
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2068,7 +2068,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_IsAccessibilityE
 
 /**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock
- * @tc.desc: Test the funcation SendCancelEventWhenLock
+ * @tc.desc: Test the function SendCancelEventWhenLock
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2102,7 +2102,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerTest_SendCancelEventWhen
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ProcessInjectEventGlobalXY
- * @tc.desc: Test the funcation ProcessInjectEventGlobalXY
+ * @tc.desc: Test the function ProcessInjectEventGlobalXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2232,7 +2232,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ResetPointerPosi
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_GetWindowGroupInfoByDisplayIdCopy1
- * @tc.desc: Test the funcation GetWindowGroupInfoByDisplayIdCopy
+ * @tc.desc: Test the function GetWindowGroupInfoByDisplayIdCopy
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2300,7 +2300,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowGroupIn
 
 /**
  * @tc.name: InputWindowsManagerOneTest_GetCancelEventFlag1
- * @tc.desc: Test the funcation GetCancelEventFlag
+ * @tc.desc: Test the function GetCancelEventFlag
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2358,7 +2358,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPo
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_DispatchTouch_002
- * @tc.desc: Test the funcation DispatchTouch
+ * @tc.desc: Test the function DispatchTouch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2406,7 +2406,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ChangeWindowArea
- * @tc.desc: Test the funcation ChangeWindowArea
+ * @tc.desc: Test the function ChangeWindowArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2543,7 +2543,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_HandleWindowPosi
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_PrintZorderInfo
- * @tc.desc: Test the funcation PrintZorderInfo
+ * @tc.desc: Test the function PrintZorderInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2582,7 +2582,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintZorderInfo,
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_PrintWindowGroupInfo
- * @tc.desc: Test the funcation PrintWindowGroupInfo
+ * @tc.desc: Test the function PrintWindowGroupInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2700,7 +2700,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_Dump, TestSize.L
 
 /**
  * @tc.name: InputWindowsManagerOneTest_UpdateKeyEventDisplayId
- * @tc.desc: Test the funcation UpdateKeyEventDisplayId
+ * @tc.desc: Test the function UpdateKeyEventDisplayId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2912,7 +2912,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AddActiveWindow,
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_UpdateTargetTouchWinIds_001
- * @tc.desc: Test the funcation UpdateTargetTouchWinIds
+ * @tc.desc: Test the function UpdateTargetTouchWinIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2937,7 +2937,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTargetTouc
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_ShiftAppSimulateTouchPointerEvent
- * @tc.desc: Test the funcation ShiftAppSimulateTouchPointerEvent
+ * @tc.desc: Test the function ShiftAppSimulateTouchPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2973,7 +2973,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppSimulate
 #ifdef OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /* *
  * @tc.name: InputWindowsManagerOneTest_TouchEnterLeaveEvent
- * @tc.desc: Test the funcation TouchEnterLeaveEvent
+ * @tc.desc: Test the function TouchEnterLeaveEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3023,7 +3023,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchEnterLeaveE
 
 /**
  * @tc.name: InputWindowsManagerOneTest_AdjustDisplayRotation_001
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3101,7 +3101,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FoldScreenRotati
 
 /**
  * @tc.name: InputWindowsManagerOneTest_HandleHardWareCursorTest002
- * @tc.desc: Test the funcation HandleHardWareCursor
+ * @tc.desc: Test the function HandleHardWareCursor
  * @tc.type: FUNC
  * @tc.require:
  */

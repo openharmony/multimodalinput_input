@@ -394,7 +394,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCount
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_002
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -430,7 +430,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_002, Test
 
 /**
  * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickProcess_01
- * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickProcess
+ * @tc.desc: Test the function TouchPadKnuckleDoubleClickProcess
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -461,7 +461,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClick
 
 /**
  * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickHandle_01
- * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickHandle
+ * @tc.desc: Test the function TouchPadKnuckleDoubleClickHandle
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -484,7 +484,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClick
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_001
- * @tc.desc: Test the funcation HandleRepeatKeyOwnCount
+ * @tc.desc: Test the function HandleRepeatKeyOwnCount
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -498,7 +498,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyOwnCount_002
- * @tc.desc: Test the funcation HandleRepeatKeyOwnCount
+ * @tc.desc: Test the function HandleRepeatKeyOwnCount
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -515,7 +515,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyOwnCount_00
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendKeyEvent_01
- * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.desc: Test the function SendKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -534,7 +534,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_01, TestSize.
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendKeyEvent_02
- * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.desc: Test the function SendKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -553,7 +553,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_02, TestSize.
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_01
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -579,7 +579,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_01, T
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_02
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -622,7 +622,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_02, T
 
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_01
- * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.desc: Test the function ConvertVPToPX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -643,7 +643,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_01, TestSize
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_01
- * @tc.desc: Test the funcation HandleKnuckleGestureEvent
+ * @tc.desc: Test the function HandleKnuckleGestureEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -659,7 +659,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_01
- * @tc.desc: Test the funcation HandleKnuckleGestureTouchMove
+ * @tc.desc: Test the function HandleKnuckleGestureTouchMove
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -691,7 +691,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_04
- * @tc.desc: Test the funcation HandleKnuckleGestureTouchUp
+ * @tc.desc: Test the function HandleKnuckleGestureTouchUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -744,7 +744,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_001, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_01
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -781,7 +781,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_01, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKeys_01
- * @tc.desc: Test the funcation MatchShortcutKeys
+ * @tc.desc: Test the function MatchShortcutKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -910,7 +910,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_005
 
 /**
  * @tc.name: KeyCommandHandlerTest_OnHandleEvent_002
- * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.desc: Test the function OnHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -935,7 +935,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_002, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_006
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -992,7 +992,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_006, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandlePointerEvent_002
- * @tc.desc: Test the funcation HandlePointerEvent
+ * @tc.desc: Test the function HandlePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1021,7 +1021,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerEvent_002, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_003
- * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.desc: Test the function StartTwoFingerGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1048,7 +1048,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_003,
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_006
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1097,7 +1097,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_007
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1145,7 +1145,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_008
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1218,7 +1218,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_IsKeyMatch_01
- * @tc.desc: Test the funcation IsKeyMatch
+ * @tc.desc: Test the function IsKeyMatch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1247,7 +1247,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsKeyMatch_01, TestSize.Le
 
 /**
  * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_01
- * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.desc: Test the function StartTwoFingerGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1262,7 +1262,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_01, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_02
- * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.desc: Test the function StartTwoFingerGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1277,7 +1277,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_02, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_004
- * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.desc: Test the function ConvertVPToPX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1304,7 +1304,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_004, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_004
- * @tc.desc: Test the funcation HandleKnuckleGestureEvent
+ * @tc.desc: Test the function HandleKnuckleGestureEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3458,7 +3458,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsValidAction, TestSize.Le
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendNotSupportMsg_001
- * @tc.desc: Test the funcation SendNotSupportMsg
+ * @tc.desc: Test the function SendNotSupportMsg
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3471,7 +3471,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendNotSupportMsg_001, Tes
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendNotSupportMsg_002
- * @tc.desc: Test the funcation SendNotSupportMsg
+ * @tc.desc: Test the function SendNotSupportMsg
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3489,7 +3489,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendNotSupportMsg_002, Tes
 
 /**
  * @tc.name: KeyCommandHandlerTest_ReportRegionGesture
- * @tc.desc: Test the funcation ReportRegionGesture
+ * @tc.desc: Test the function ReportRegionGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3502,7 +3502,7 @@ HWTEST_F(KeyCommandHandlerTest, ReportRegionGesture, TestSize.Level1)
 
 /**
  * @tc.name: KeyCommandHandlerTest_ReportLetterGesture
- * @tc.desc: Test the funcation ReportLetterGesture
+ * @tc.desc: Test the function ReportLetterGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3516,7 +3516,7 @@ HWTEST_F(KeyCommandHandlerTest, ReportLetterGesture, TestSize.Level1)
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_001
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3551,7 +3551,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_001, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_002
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3584,7 +3584,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_002, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_003
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3617,7 +3617,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_003, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_04
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3660,7 +3660,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_04, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_AddSequenceKey_001
- * @tc.desc: Test the funcation AddSequenceKey
+ * @tc.desc: Test the function AddSequenceKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3682,7 +3682,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_001, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_AddSequenceKey_002
- * @tc.desc: Test the funcation AddSequenceKey
+ * @tc.desc: Test the function AddSequenceKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3704,7 +3704,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_002, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_AddSequenceKey_003
- * @tc.desc: Test the funcation AddSequenceKey
+ * @tc.desc: Test the function AddSequenceKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3729,7 +3729,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_003, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleNormalSequence_001
- * @tc.desc: Test the funcation HandleNormalSequence
+ * @tc.desc: Test the function HandleNormalSequence
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3753,7 +3753,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleNormalSequence_001, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleMatchedSequence_001
- * @tc.desc: Test the funcation HandleMatchedSequence
+ * @tc.desc: Test the function HandleMatchedSequence
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3784,7 +3784,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMatchedSequence_001,
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleSequence_001
- * @tc.desc: Test the funcation HandleSequence
+ * @tc.desc: Test the function HandleSequence
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3811,7 +3811,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequence_001, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertKeyActionToString_001
- * @tc.desc: Test the funcation ConvertKeyActionToString
+ * @tc.desc: Test the function ConvertKeyActionToString
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3838,7 +3838,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertKeyActionToString_0
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_001
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3858,7 +3858,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_001, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandlePointerEvent_001
- * @tc.desc: Test the funcation HandlePointerEvent
+ * @tc.desc: Test the function HandlePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3880,7 +3880,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerEvent_001, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleTouchEventTest_005
- * @tc.desc: Test the funcation HandleTouchEvent
+ * @tc.desc: Test the function HandleTouchEvent
  * @tc.require:
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleTouchEventTest_005, TestSize.Level1)
@@ -3906,7 +3906,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleTouchEventTest_005, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_001
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3932,7 +3932,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_002
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3955,7 +3955,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_001
- * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.desc: Test the function ConvertVPToPX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3971,7 +3971,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_001, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_002
- * @tc.desc: Test the funcation HandleKnuckleGestureTouchMove
+ * @tc.desc: Test the function HandleKnuckleGestureTouchMove
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4001,7 +4001,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
 
 /**
  * @tc.name: KeyCommandHandlerTest_ReportIfNeed_001
- * @tc.desc: Test the funcation ReportIfNeed
+ * @tc.desc: Test the function ReportIfNeed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4019,7 +4019,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportIfNeed_001, TestSize
 
 /**
  * @tc.name: KeyCommandHandlerTest_ReportGestureInfo_001
- * @tc.desc: Test the funcation ReportGestureInfo
+ * @tc.desc: Test the function ReportGestureInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4069,7 +4069,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_004
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4096,7 +4096,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_004, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_005
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4145,7 +4145,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_005, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleMatchedSequence_002
- * @tc.desc: Test the funcation HandleMatchedSequence
+ * @tc.desc: Test the function HandleMatchedSequence
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4212,7 +4212,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerVisibleKeys_0
 
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_002
- * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.desc: Test the function ConvertVPToPX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4242,7 +4242,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_002, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_003
- * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.desc: Test the function ConvertVPToPX
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4269,7 +4269,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_003, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_003
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4304,7 +4304,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_004
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4339,7 +4339,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_005
- * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.desc: Test the function CheckTwoFingerGestureAction
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4374,7 +4374,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 
 /**
  * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_002
- * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.desc: Test the function StartTwoFingerGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4397,7 +4397,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_002,
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_005
- * @tc.desc: Test the funcation HandleKnuckleGestureTouchUp
+ * @tc.desc: Test the function HandleKnuckleGestureTouchUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4482,7 +4482,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseJson_001
- * @tc.desc: Test the funcation ParseJson
+ * @tc.desc: Test the function ParseJson
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4513,7 +4513,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_001, TestSize.Le
 
 /**
  * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_003
- * @tc.desc: Test the funcation IsEnableCombineKey
+ * @tc.desc: Test the function IsEnableCombineKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4547,7 +4547,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_003, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_004
- * @tc.desc: Test the funcation IsEnableCombineKey
+ * @tc.desc: Test the function IsEnableCombineKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4584,7 +4584,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_004, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleEvent_001
- * @tc.desc: Test the funcation HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4634,7 +4634,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_001, TestSize.
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleEvent_002
- * @tc.desc: Test the funcation HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4682,7 +4682,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_002, TestSize.
 
 /**
  * @tc.name: KeyCommandHandlerTest_OnHandleEvent_001
- * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.desc: Test the function OnHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4712,7 +4712,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_001, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_OnHandleEvent_003
- * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.desc: Test the function OnHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4730,7 +4730,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_003, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_OnHandleEvent_004
- * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.desc: Test the function OnHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4746,7 +4746,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_004, TestSiz
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_001
- * @tc.desc: Test the funcation HandleRepeatKey
+ * @tc.desc: Test the function HandleRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4769,7 +4769,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_002
- * @tc.desc: Test the funcation HandleRepeatKey
+ * @tc.desc: Test the function HandleRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4838,7 +4838,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_001
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4865,7 +4865,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_001, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_002
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4889,7 +4889,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_002, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_003
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4913,7 +4913,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_003, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_004
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4939,7 +4939,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_004, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendKeyEvent_001
- * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.desc: Test the function SendKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4955,7 +4955,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_001, TestSize
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendKeyEvent_002
- * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.desc: Test the function SendKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4971,7 +4971,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_002, TestSize
 
 /**
  * @tc.name: KeyCommandHandlerTest_SendKeyEvent_003
- * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.desc: Test the function SendKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4987,7 +4987,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_003, TestSize
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_001
- * @tc.desc: Test the funcation CheckAndUpdateTappingCountAtDown
+ * @tc.desc: Test the function CheckAndUpdateTappingCountAtDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5009,7 +5009,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCount
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_002
- * @tc.desc: Test the funcation CheckAndUpdateTappingCountAtDown
+ * @tc.desc: Test the function CheckAndUpdateTappingCountAtDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5034,7 +5034,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCount
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_005
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5093,7 +5093,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_001, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleConsumedKeyEvent_001
- * @tc.desc: Test the funcation HandleConsumedKeyEvent
+ * @tc.desc: Test the function HandleConsumedKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5154,7 +5154,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleScreenLocked_001, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_001
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5190,7 +5190,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_001, Test
 
 /**
  * @tc.name: KeyCommandHandlerTest_PreHandleEvent_001
- * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.desc: Test the function PreHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5231,7 +5231,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_001, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_PreHandleEvent_002
- * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.desc: Test the function PreHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5247,7 +5247,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_002, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_006
- * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.desc: Test the function CheckInputMethodArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5299,7 +5299,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_006, 
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleSequences_004
- * @tc.desc: Test the funcation HandleSequences
+ * @tc.desc: Test the function HandleSequences
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5338,7 +5338,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_004, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_003
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5384,7 +5384,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_003, Test
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_004
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5422,7 +5422,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_004, Test
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleShortKeys_01
- * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.desc: Test the function HandleShortKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5527,7 +5527,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickProcess
- * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickProcess
+ * @tc.desc: Test the function TouchPadKnuckleDoubleClickProcess
  * @tc.type: Function
  * @tc.require:
  */
@@ -5549,7 +5549,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClick
 
 /**
  * @tc.name: KeyCommandHandlerTest_TouchPadKnuckleDoubleClickHandle
- * @tc.desc: Test the funcation TouchPadKnuckleDoubleClickHandle
+ * @tc.desc: Test the function TouchPadKnuckleDoubleClickHandle
  * @tc.type: Function
  * @tc.require:
  */
@@ -5572,7 +5572,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchPadKnuckleDoubleClick
 
 /**
  * @tc.name: KeyCommandHandlerTest_IsMatchedAbility_001
- * @tc.desc: Test the funcation IsMatchedAbility
+ * @tc.desc: Test the function IsMatchedAbility
  * @tc.type: Function
  * @tc.require:
  */
@@ -5596,7 +5596,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMatchedAbility_001, Test
 
 /**
  * @tc.name: KeyCommandHandlerTest_InitKeyObserver
- * @tc.desc: Test the funcation InitKeyObserver
+ * @tc.desc: Test the function InitKeyObserver
  * @tc.type: Function
  * @tc.require:
  */
@@ -5618,7 +5618,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_InitKeyObserver, TestSize.
 
 /**
  * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey_001
- * @tc.desc: Test the funcation SetIsFreezePowerKey
+ * @tc.desc: Test the function SetIsFreezePowerKey
  * @tc.type: Function
  * @tc.require:
  */
@@ -5642,7 +5642,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey_001, T
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseStatusConfigObserver_001
- * @tc.desc: Test the funcation ParseStatusConfigObserver
+ * @tc.desc: Test the function ParseStatusConfigObserver
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5666,7 +5666,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseStatusConfigObserver_002
- * @tc.desc: Test the funcation ParseStatusConfigObserver
+ * @tc.desc: Test the function ParseStatusConfigObserver
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5699,7 +5699,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseStatusConfigObserver_003
- * @tc.desc: Test the funcation ParseStatusConfigObserver
+ * @tc.desc: Test the function ParseStatusConfigObserver
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5718,7 +5718,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseStatusConfigObserver_
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_03
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: Function
  * @tc.require:
  */
@@ -5747,7 +5747,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_03, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_02
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.desc: Test the function MatchShortcutKey
  * @tc.type: Function
  * @tc.require:
  */
@@ -5776,7 +5776,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_02, TestS
 
 /**
  * @tc.name: KeyCommandHandlerTest_PreHandleEvent_02
- * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.desc: Test the function PreHandleEvent
  * @tc.type: Function
  * @tc.require:
  */
@@ -6350,7 +6350,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseJson_002
- * @tc.desc: Test the funcation ParseJson
+ * @tc.desc: Test the function ParseJson
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6364,7 +6364,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_002, TestSize.Le
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseExcludeJson
- * @tc.desc: Test the funcation ParseExcludeJson
+ * @tc.desc: Test the function ParseExcludeJson
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6378,7 +6378,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseExcludeJson, TestSize
 
 /**
  * @tc.name: KeyCommandHandlerTest_ParseJson_003
- * @tc.desc: Test the funcation ParseJson
+ * @tc.desc: Test the function ParseJson
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6392,7 +6392,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_003, TestSize.Le
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleEvent_003
- * @tc.desc: Test the funcation HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6754,7 +6754,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAiScreenAbility_001,
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_002
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6768,7 +6768,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_002, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_003
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6790,7 +6790,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_003, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_004
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6812,7 +6812,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_004, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_005
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6834,7 +6834,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_005, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_006
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6854,7 +6854,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_006, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_007
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6874,7 +6874,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_007, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_008
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6894,7 +6894,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_008, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_009
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6918,7 +6918,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyEvent_009, TestSi
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKeyEvent_010
- * @tc.desc: Test the funcation HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */

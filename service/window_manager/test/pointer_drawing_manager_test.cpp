@@ -498,7 +498,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDi
 
 /**
  * @tc.name: InputWindowsManagerTest_DrawMovePointer_001
- * @tc.desc: Test the funcation DrawMovePointer
+ * @tc.desc: Test the function DrawMovePointer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -525,7 +525,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_001,
 
 /**
  * @tc.name: InputWindowsManagerTest_DrawCursor_002
- * @tc.desc: Test the funcation DrawCursor
+ * @tc.desc: Test the function DrawCursor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2696,7 +2696,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
 
 /**
  * @tc.name: InputWindowsManagerTest_DrawMovePointer_002
- * @tc.desc: Test the funcation DrawMovePointer
+ * @tc.desc: Test the function DrawMovePointer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3195,7 +3195,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseLayer, Te
 
 /**
  * @tc.name: PointerDrawingManagerExTest_UpdateMirrorScreens_001
- * @tc.desc: Test the funcation UpdateMirrorScreens
+ * @tc.desc: Test the function UpdateMirrorScreens
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3441,7 +3441,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerWindowF
 
 /**
  * @tc.name: InputWindowsManagerTest_DrawMovePointer_003
- * @tc.desc: Test the funcation DrawMovePointer
+ * @tc.desc: Test the function DrawMovePointer
  * @tc.type: FUNC
  * @tc.require:
  */

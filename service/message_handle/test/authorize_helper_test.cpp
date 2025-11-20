@@ -80,7 +80,7 @@ HWTEST_F(AuthorizeHelperTest, AuthorizeHelperTest_AuthorizeProcessExit_001, Test
 
 /**
  * @tc.name: AuthorizeHelperTest_AddAuthorizeProcess_001
- * @tc.desc: Test the funcation AddAuthorizeProcess
+ * @tc.desc: Test the function AddAuthorizeProcess
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -119,7 +119,7 @@ HWTEST_F(AuthorizeHelperTest, AuthorizeHelperTest_AddAuthorizeProcess_001, TestS
 
 /**
  * @tc.name: AuthorizeHelperTest_CancelAuthorize_001
- * @tc.desc: Test the funcation CancelAuthorize
+ * @tc.desc: Test the function CancelAuthorize
  * @tc.type: FUNC
  * @tc.require:
  */

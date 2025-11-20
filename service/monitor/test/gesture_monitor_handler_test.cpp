@@ -37,7 +37,7 @@ public:
 
 /**
  * @tc.name: EventMonitorHandlerTest_CheckMonitorValid_001
- * @tc.desc: Test the funcation CheckMonitorValid
+ * @tc.desc: Test the function CheckMonitorValid
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -66,7 +66,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_00
 
 /**
  * @tc.name: EventMonitorHandlerTest_CheckMonitorValid_002
- * @tc.desc: Test the funcation CheckMonitorValid
+ * @tc.desc: Test the function CheckMonitorValid
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -103,7 +103,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_CheckMonitorValid_00
 
 /**
  * @tc.name: EventMonitorHandlerTest_IsTouchGestureEvent_001
- * @tc.desc: Test the funcation IsTouchGestureEvent
+ * @tc.desc: Test the function IsTouchGestureEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -139,7 +139,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsTouchGestureEvent_
 
 /**
  * @tc.name: EventMonitorHandlerTest_IsMatchGesture_002
- * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.desc: Test the function IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -176,7 +176,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_002, 
 
 /**
  * @tc.name: EventMonitorHandlerTest_IsMatchGesture_003
- * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.desc: Test the function IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -196,7 +196,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_003, 
 
 /**
  * @tc.name: EventMonitorHandlerTest_IsMatchGesture_004
- * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.desc: Test the function IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -237,7 +237,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_004, 
 
 /**
  * @tc.name: EventMonitorHandlerTest_IsMatchGesture_005
- * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.desc: Test the function IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -265,7 +265,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_005, 
 
 /**
  * @tc.name: EventMonitorHandlerTest_IsMatchGesture_006
- * @tc.desc: Test the funcation IsMatchGesture
+ * @tc.desc: Test the function IsMatchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -288,7 +288,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_IsMatchGesture_006, 
 
 /**
  * @tc.name: EventMonitorHandlerTest_AddGestureMonitor
- * @tc.desc: Test the funcation AddGestureMonitor
+ * @tc.desc: Test the function AddGestureMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -308,7 +308,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_AddGestureMonitor, T
 
 /**
  * @tc.name: EventMonitorHandlerTest_AddGestureMonitor_001
- * @tc.desc: Test the funcation AddGestureMonitor
+ * @tc.desc: Test the function AddGestureMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -328,7 +328,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_AddGestureMonitor_00
 
 /**
  * @tc.name: EventMonitorHandlerTest_RemoveGestureMonitor_001
- * @tc.desc: Test the funcation RemoveGestureMonitor
+ * @tc.desc: Test the function RemoveGestureMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -347,7 +347,7 @@ HWTEST_F(GestureMonitorHandlerTest, EventMonitorHandlerTest_RemoveGestureMonitor
 
 /**
  * @tc.name: EventMonitorHandlerTest_RemoveGestureMonitor_002
- * @tc.desc: Test the funcation RemoveGestureMonitor
+ * @tc.desc: Test the function RemoveGestureMonitor
  * @tc.type: FUNC
  * @tc.require:
  */

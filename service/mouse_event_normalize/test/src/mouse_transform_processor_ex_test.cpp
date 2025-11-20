@@ -62,7 +62,7 @@ void MouseTransformProcessorExTest::TearDown() {}
 
 /**
  * @tc.name: MouseTransformProcessorExTest_GetDisplayDirection_001
- * @tc.desc: Test the funcation GetDisplayDirection
+ * @tc.desc: Test the function GetDisplayDirection
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -91,7 +91,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetDisplayDi
 #ifndef OHOS_BUILD_ENABLE_WATCH
 /**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadLeftButton_001
- * @tc.desc: Test the funcation HandleTouchpadRightButton
+ * @tc.desc: Test the function HandleTouchpadRightButton
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -111,7 +111,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
 
 /**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadLeftButton_002
- * @tc.desc: Test the funcation HandleTouchpadRightButton
+ * @tc.desc: Test the function HandleTouchpadRightButton
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -132,7 +132,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
 
 /**
  * @tc.name: MouseTransformProcessorTest_GetPointerLocation_001
- * @tc.desc: Test the funcation GetPointerLocation
+ * @tc.desc: Test the function GetPointerLocation
  * @tc.type: FUNC
  * @tc.require:
  */

@@ -41,7 +41,7 @@ public:
 
 /**
  * @tc.name: KeyAutoRepeatTest_AddDeviceConfig_001
- * @tc.desc: Test the funcation AddDeviceConfig
+ * @tc.desc: Test the function AddDeviceConfig
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -56,7 +56,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_AddDeviceConfig_001, TestSize.Leve
 
 /**
  * @tc.name: KeyAutoRepeatTest_SelectAutoRepeat_001
- * @tc.desc: Test the funcation SelectAutoRepeat
+ * @tc.desc: Test the function SelectAutoRepeat
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -79,7 +79,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SelectAutoRepeat_001, TestSize.Lev
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetTomlFilePath_001
- * @tc.desc: Test the funcation GetTomlFilePath
+ * @tc.desc: Test the function GetTomlFilePath
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -97,7 +97,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetTomlFilePath_001, TestSize.Leve
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetIntervalTime_001
- * @tc.desc: Test the funcation GetIntervalTime
+ * @tc.desc: Test the function GetIntervalTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -114,7 +114,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetIntervalTime_001, TestSize.Leve
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetDelayTime_001
- * @tc.desc: Test the funcation GetDelayTime
+ * @tc.desc: Test the function GetDelayTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -128,7 +128,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetDelayTime_001, TestSize.Level1)
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetKeyboardRepeatTime_001
- * @tc.desc: Test the funcation GetKeyboardRepeatTime
+ * @tc.desc: Test the function GetKeyboardRepeatTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -149,7 +149,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatTime_001, TestSiz
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetAutoSwitch_001
- * @tc.desc: Test the funcation GetAutoSwitch
+ * @tc.desc: Test the function GetAutoSwitch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -166,7 +166,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetAutoSwitch_001, TestSize.Level1
 
 /**
  * @tc.name: KeyAutoRepeatTest_SetKeyboardRepeatDelay_001
- * @tc.desc: Test the funcation SetKeyboardRepeatDelay
+ * @tc.desc: Test the function SetKeyboardRepeatDelay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -188,7 +188,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatDelay_001, TestSi
 
 /**
  * @tc.name: KeyAutoRepeatTest_SetKeyboardRepeatRate_001
- * @tc.desc: Test the funcation SetKeyboardRepeatRate
+ * @tc.desc: Test the function SetKeyboardRepeatRate
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -213,7 +213,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatRate_001, TestSiz
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetKeyboardRepeatDelay_001
- * @tc.desc: Test the funcation GetKeyboardRepeatDelay
+ * @tc.desc: Test the function GetKeyboardRepeatDelay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -232,7 +232,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatDelay_001, TestSi
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetKeyboardRepeatRate_001
- * @tc.desc: Test the funcation GetKeyboardRepeatRate
+ * @tc.desc: Test the function GetKeyboardRepeatRate
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -254,7 +254,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatRate_001, TestSiz
 
 /**
  * @tc.name: KeyAutoRepeatTest_PutConfigDataToDatabase_001
- * @tc.desc: Test the funcation PutConfigDataToDatabase
+ * @tc.desc: Test the function PutConfigDataToDatabase
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -271,7 +271,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
 
 /**
  * @tc.name: KeyAutoRepeatTest_GetConfigDataFromDatabase_001
- * @tc.desc: Test the funcation GetConfigDataFromDatabase
+ * @tc.desc: Test the function GetConfigDataFromDatabase
  * @tc.type: FUNC
  * @tc.require:
  */
