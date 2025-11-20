@@ -6291,8 +6291,7 @@ Direction InputWindowsManager::GetDisplayDirection(const OLD::DisplayInfo *displ
     return displayDirection;
 }
 
-void InputWindowsManager::GetWidthAndHeight(const OLD::DisplayInfo* displayInfo, int32_t &width, int32_t &height,
-    bool isRealData)
+void InputWindowsManager::GetWidthAndHeight(const OLD::DisplayInfo* displayInfo, int32_t &width, int32_t &height)
 {
     if (displayInfo == nullptr) {
         MMI_HILOGE("DisplayInfo is null");
@@ -6305,11 +6304,6 @@ void InputWindowsManager::GetWidthAndHeight(const OLD::DisplayInfo* displayInfo,
         width = displayInfo->validWidth;
         height = displayInfo->validHeight;
     } else {
-        if (!isRealData) {
-            width = displayInfo->validWidth;
-            height = displayInfo->validHeight;
-            return;
-        }
         height = displayInfo->validWidth;
         width = displayInfo->validHeight;
     }
@@ -6414,6 +6408,13 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     int32_t groupId = FindDisplayGroupId(displayId);
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
+    if (!isRealData) {
+        Coordinate2D cursorPos = { 0.0f, 0.0f };
+        ReverseRotateDisplayScreen(*displayInfo, x, y, cursorPos);
+        isRealData = true;
+        x = cursorPos.x;
+        y = cursorPos.y;
+    }
     double oldX = x;
     double oldY = y;
     int32_t lastDisplayId = displayId;
@@ -6437,7 +6438,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     int32_t width = 0;
     int32_t height = 0;
-    GetWidthAndHeight(displayInfo, width, height, isRealData);
+    GetWidthAndHeight(displayInfo, width, height);
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -6450,62 +6451,29 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
-    LimitMouseLocaltionInEvent(displayInfo, integerX, integerY, x, y, isRealData);
+    LimitMouseLocaltionInEvent(displayInfo, integerX, integerY, x, y);
+
+    PhysicalCoordinate coord {
+        .x = integerX,
+        .y = integerY,
+    };
+    RotateDisplayScreen(*displayInfo, coord);
     const auto iter = mouseLocationMap_.find(groupId);
     if (iter != mouseLocationMap_.end()) {
         mouseLocationMap_[groupId].displayId = displayId;
+        mouseLocationMap_[groupId].physicalX = coord.x;
+        mouseLocationMap_[groupId].physicalY = coord.y;
     }
     const auto it = cursorPosMap_.find(groupId);
     if (it != cursorPosMap_.end()) {
         cursorPosMap_[groupId].displayId = displayId;
-    }
-    if (isRealData) {
-        PhysicalCoordinate coord {
-            .x = integerX,
-            .y = integerY,
-        };
-        RotateDisplayScreen(*displayInfo, coord);
-        const auto iter = mouseLocationMap_.find(groupId);
-        if (iter != mouseLocationMap_.end()) {
-            mouseLocationMap_[groupId].physicalX = coord.x;
-            mouseLocationMap_[groupId].physicalY = coord.y;
-        }
-        const auto it = cursorPosMap_.find(groupId);
-        if (it != cursorPosMap_.end()) {
-            cursorPosMap_[groupId].cursorPos.x = x;
-            cursorPosMap_[groupId].cursorPos.y = y;
-        }
-    } else {
-        const auto iter = mouseLocationMap_.find(groupId);
-        if (iter != mouseLocationMap_.end()) {
-            mouseLocationMap_[groupId].physicalX = integerX;
-            mouseLocationMap_[groupId].physicalY = integerY;
-        }
-        CursorPosition cursorPosCur = {};
-
-        const auto it = cursorPosMap_.find(groupId);
-        if (it != cursorPosMap_.end()) {
-            cursorPosCur = it->second;
-        }
-        ReverseRotateDisplayScreen(*displayInfo, x, y, cursorPosCur.cursorPos);
-        cursorPosMap_[groupId] = cursorPosCur;
-    }
-    MouseLocation mouseLocationTmp;
-    double physicalX = 0.0;
-    double physicalY = 0.0;
-    const auto& locationMap = mouseLocationMap_.find(groupId);
-    if (locationMap != mouseLocationMap_.end()) {
-        mouseLocationTmp = locationMap->second;
-    }
-    const auto& posMap = cursorPosMap_.find(groupId);
-    if (posMap != cursorPosMap_.end()) {
-        physicalX = posMap->second.cursorPos.x;
-        physicalY = posMap->second.cursorPos.y;
+        cursorPosMap_[groupId].cursorPos.x = x;
+        cursorPosMap_[groupId].cursorPos.y = y;
     }
     MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{private}d, %{private}d}, "
         "cursorPosXY: {%{private}.2f, %{private}.2f} -> {%{private}.2f %{private}.2f}",
-        static_cast<int32_t>(isRealData), displayId, mouseLocationTmp.physicalX,
-        mouseLocationTmp.physicalY, oldX, oldY, physicalX, physicalY);
+        static_cast<int32_t>(isRealData), displayId, static_cast<int32_t>(coord.x),
+        static_cast<int32_t>(coord.y), oldX, oldY, x, y);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
@@ -8044,22 +8012,17 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
 }
 
 void InputWindowsManager::LimitMouseLocaltionInEvent(
-    const OLD::DisplayInfo *displayInfo, int32_t &integerX, int32_t &integerY, double &x, double &y, bool isRealData)
+    const OLD::DisplayInfo *displayInfo, int32_t &integerX, int32_t &integerY, double &x, double &y)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("mouse capture mode before mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
-        integerX,
-        integerY,
-        x,
-        y);
+        integerX, integerY, x, y);
     if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
         int32_t width = 0;
         int32_t height = 0;
         Direction displayDirection = WIN_MGR->GetDisplayDirection(displayInfo);
-        Rect windowArea = { pointerLockedWindow_.area.x,
-            pointerLockedWindow_.area.y,
-            pointerLockedWindow_.area.width,
-            pointerLockedWindow_.area.height };
+        Rect windowArea = { pointerLockedWindow_.area.x, pointerLockedWindow_.area.y,
+            pointerLockedWindow_.area.width, pointerLockedWindow_.area.height };
         RotateWindowArea(displayInfo->id, pointerLockedWindow_, windowArea);
         width = windowArea.x + windowArea.width;
         height = windowArea.y + windowArea.height;
@@ -8067,13 +8030,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
             width = std::min(width, displayInfo->validWidth);
             height = std::min(height, displayInfo->validHeight);
         } else {
-            if (!isRealData) {
-                width = std::min(width, displayInfo->validWidth);
-                height = std::min(height, displayInfo->validHeight);
-            } else {
-                height = std::min(height, displayInfo->validWidth);
-                width = std::min(width, displayInfo->validHeight);
-            }
+            height = std::min(height, displayInfo->validWidth);
+            width = std::min(width, displayInfo->validHeight);
         }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
         if (IsPointerActiveRectValid(*displayInfo)) {
@@ -8098,10 +8056,7 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
         y = static_cast<double>(integerY) + (y - floor(y));
         MMI_HILOGD(
             "mouse capture mode limit mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
-            integerX,
-            integerY,
-            x,
-            y);
+            integerX, integerY, x, y);
     }
     if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED) {
         x = pointerLockedCursorPos_.x;
@@ -8110,10 +8065,7 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
         integerY = static_cast<int32_t>(y);
         MMI_HILOGD(
             "mouse capture mode limit mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
-            integerX,
-            integerY,
-            x,
-            y);
+            integerX, integerY, x, y);
     }
 }
 
