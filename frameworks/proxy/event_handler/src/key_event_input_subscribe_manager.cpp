@@ -359,7 +359,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyMonitor(int32_t subscriberI
             if (ret != RET_OK) {
                 MMI_HILOGE("UnsubscribeKeyMonitor fail, error:%{public}d", ret);
             }
-            monitors_.erase(iter);
+            iter = monitors_.erase(iter);
         }
         return ret;
     }
