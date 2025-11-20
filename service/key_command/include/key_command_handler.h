@@ -143,6 +143,7 @@ struct RepeatKey {
     std::string statusConfig;
     bool statusConfigValue { true };
     Ability ability;
+    Ability preNotifyAbility;
 };
 
 struct MultiFingersTap {
@@ -229,6 +230,7 @@ private:
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
     void LaunchRepeatKeyAbility(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    void PreNotify(const RepeatKey &item);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool IsRepeatKeyEvent(const SequenceKey &sequenceKey);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
