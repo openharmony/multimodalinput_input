@@ -1,0 +1,19 @@
+{
+	"KEYS":	[{
+			"RAWCODE":	96,
+			"KEYCODE":	"DPAD_CENTER"
+		}, {
+			"RAWCODE":	106,
+			"KEYCODE":	"DPAD_RIGHT"
+		}, {
+			"RAWCODE":	105,
+			"KEYCODE":	"DPAD_LEFT"
+		}, {
+			"RAWCODE":	108,
+			"KEYCODE":	"DPAD_DOWN"
+		}, {
+			"RAWCODE":	103,
+			"KEYCODE":	"DPAD_UP"
+		}],
+	"AXES":	[]
+}
