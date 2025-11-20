@@ -15,7 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include "bundle_name_parser.h"
 #include "error_multimodal.h"
+#include "key_auto_repeat.h"
 #include "key_monitor_manager.h"
 #include "mmi_log.h"
 #include "input_windows_manager.h"
@@ -86,7 +88,7 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_AddMonitor_01, TestSize.Le
     KeyMonitorManager::Monitor monitor1{
         .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_UP, .isRepeat_ = true};
     int32_t ret = keyMonitorManager->AddMonitor(monitor1, name);
-    EXPECT_EQ(ret, -PARAM_INPUT_INVALID);
+    EXPECT_EQ(ret, RET_OK);
 
     KeyMonitorManager::Monitor monitor2{
         .session_ = 1, .key_ = KeyEvent::KEYCODE_VOLUME_UP, .action_ = KeyEvent::KEY_ACTION_DOWN, .isRepeat_ = true};
@@ -219,7 +221,7 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_01, TestSize.Level1)
     EXPECT_FALSE(ret);
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     ret = monitorT.Want(keyEventT);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
     ret = monitorT.Want(keyEventT);
@@ -247,6 +249,412 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_02, TestSize.Level1)
     keyEventT->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     bool ret = monitorT.Want(keyEventT);
     EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_LessThanOperator_02
+ * @tc.desc: Verify the less-than operator in Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_LessThanOperator_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor11 {
+        .session_ = 0,
+        .key_ = KeyEvent::KEYCODE_B,
+        .action_ = KeyEvent::KEY_ACTION_UNKNOWN,
+        .isRepeat_ = false,
+    };
+    KeyMonitorManager::Monitor monitor12 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_A,
+        .action_ = KeyEvent::KEY_ACTION_UNKNOWN,
+        .isRepeat_ = false,
+    };
+    EXPECT_TRUE(monitor11 < monitor12);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_LessThanOperator_03
+ * @tc.desc: Verify the less-than operator in Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_LessThanOperator_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_C,
+        .action_ = KeyEvent::KEY_ACTION_CANCEL,
+        .isRepeat_ = false,
+    };
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_C,
+        .action_ = KeyEvent::KEY_ACTION_CANCEL,
+        .isRepeat_ = true,
+    };
+    EXPECT_TRUE(monitor1 < monitor2);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_LessThanOperator_04
+ * @tc.desc: Verify the less-than operator in Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_LessThanOperator_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor13 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_A,
+        .action_ = KeyEvent::KEY_ACTION_DOWN,
+        .isRepeat_ = false,
+    };
+
+    KeyMonitorManager::Monitor monitor14 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_B,
+        .action_ = KeyEvent::KEY_ACTION_UNKNOWN,
+        .isRepeat_ = false,
+    };
+    EXPECT_TRUE(monitor13 < monitor14);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_LessThanOperator_05
+ * @tc.desc: Verify the less-than operator in Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_LessThanOperator_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor15 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_C,
+        .action_ = KeyEvent::KEY_ACTION_UNKNOWN,
+        .isRepeat_ = true,
+    };
+    KeyMonitorManager::Monitor monitor16 {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_C,
+        .action_ = KeyEvent::KEY_ACTION_CANCEL,
+        .isRepeat_ = false,
+    };
+    EXPECT_TRUE(monitor15 < monitor16);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_Dump
+ * @tc.desc: Verify the Monitor Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_Dump, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 1001,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyEvent::KEY_ACTION_DOWN,
+        .isRepeat_ = false,
+    };
+    auto result = monitor.Dump();
+    EXPECT_EQ(result, "Session:1001,Key:17,Action:2,IsRepeat:false");
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Monitor_Dump
+ * @tc.desc: Verify the Monitor Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Monitor_Dump_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 500,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = 999,
+        .isRepeat_ = true,
+    };
+    auto result = monitor.Dump();
+    EXPECT_EQ(result, "Session:500,Key:16,Action:999,IsRepeat:true");
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Want_03
+ * @tc.desc: Verify the Want function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyEvent::KEY_ACTION_DOWN,
+        .isRepeat_ = true,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    bool result = monitor.Want(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Want_04
+ * @tc.desc: Verify the Want function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    bool result = monitor.Want(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Want_05
+ * @tc.desc: Verify the Want function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    bool result = monitor.Want(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Want_06
+ * @tc.desc: Verify the Want function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int32_t repeatCode = KeyRepeat->GetRepeatKeyCode();
+    
+    bool result = monitor.Want(keyEvent);
+    EXPECT_NE(repeatCode, KeyEvent::KEYCODE_VOLUME_DOWN);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Want_07
+ * @tc.desc: Verify the Want function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Want_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 1,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(999);
+    
+    bool result = monitor.Want(keyEvent);
+    EXPECT_FALSE(result);
+
+    KeyMonitorManager::Monitor monitor1 {
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = 999,
+        .isRepeat_ = false,
+    };
+    std::shared_ptr<KeyEvent> keyEvent1 = KeyEvent::Create();
+    keyEvent1->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    result = monitor1.Want(keyEvent1);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_AddMonitor_02
+ * @tc.desc: Verify the AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_AddMonitor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_HOME,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::string name = "test.name";
+    int32_t ret = keyMonitorManager->AddMonitor(monitor, name);
+    EXPECT_EQ(ret, -PARAM_INPUT_INVALID);
+
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = 999,
+        .isRepeat_ = false,
+    };
+    ret = keyMonitorManager->AddMonitor(monitor1, name);
+    EXPECT_EQ(ret, -PARAM_INPUT_INVALID);
+
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    ret = keyMonitorManager->AddMonitor(monitor2, name);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_AddMonitor_03
+ * @tc.desc: Verify the AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_AddMonitor_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = true,
+    };
+    std::string bundleName = "com.test.app";
+    int32_t result1 = keyMonitorManager->AddMonitor(monitor, bundleName);
+    EXPECT_EQ(result1, RET_OK);
+    int32_t result2 = keyMonitorManager->AddMonitor(monitor, bundleName);
+    EXPECT_EQ(result2, RET_OK);
+    size_t count = keyMonitorManager->monitors_.count(monitor);
+    EXPECT_EQ(count, 1);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_AddMonitor_04
+ * @tc.desc: Verify the AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_AddMonitor_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 300,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::string bundleName = BUNDLE_NAME_PARSER.GetBundleName("MEETIME_DTOD_NAME");
+    int32_t result = keyMonitorManager->AddMonitor(monitor, bundleName);
+    EXPECT_EQ(result, RET_OK);
+
+    auto it = keyMonitorManager->meeTimeMonitor_.find(bundleName);
+    EXPECT_NE(it, keyMonitorManager->meeTimeMonitor_.end());
+    EXPECT_EQ(it->second, monitor.session_);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_RemoveMonitor_02
+ * @tc.desc: Verify the AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RemoveMonitor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    std::string bundleName = "com.test.app";
+    keyMonitorManager->RemoveMonitor(monitor, bundleName);
+    
+    auto it = keyMonitorManager->meeTimeMonitor_.find(bundleName);
+    EXPECT_EQ(it, keyMonitorManager->meeTimeMonitor_.end());
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_RemoveMonitor_03
+ * @tc.desc: Verify the AddMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RemoveMonitor_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = true,
+    };
+    std::string bundleName = "com.test.app";
+    int32_t addResult = keyMonitorManager->AddMonitor(monitor, bundleName);
+    EXPECT_EQ(addResult, RET_OK);
+    
+    auto findIt = keyMonitorManager->monitors_.find(monitor);
+    EXPECT_NE(findIt, keyMonitorManager->monitors_.end());
+
+    keyMonitorManager->RemoveMonitor(monitor, bundleName);
+
+    findIt = keyMonitorManager->monitors_.find(monitor);
+    EXPECT_EQ(findIt, keyMonitorManager->monitors_.end());
+
+    auto meeTimeIt = keyMonitorManager->meeTimeMonitor_.find(bundleName);
+    EXPECT_EQ(meeTimeIt, keyMonitorManager->meeTimeMonitor_.end());
 }
 } // namespace MMI
 } // namespace OHOS
