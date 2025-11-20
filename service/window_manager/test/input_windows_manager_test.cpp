@@ -12158,7 +12158,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     int32_t integerY = 3000;
     double x = 0;
     double y = 0;
-    bool isRealData = true;
     displayInfo.id = 1;
     displayInfo.direction = Direction::DIRECTION0;
     displayInfo.displayDirection = Direction::DIRECTION0;
@@ -12169,7 +12168,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     inputWindowsManager->pointerLockedWindow_.area.width = 2090;
     inputWindowsManager->pointerLockedWindow_.area.height = 1394;
     inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
-    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y, isRealData);
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
     EXPECT_EQ(integerX, displayInfo.validWidth - 1);
     EXPECT_EQ(integerY, displayInfo.validHeight - 1);
 }
@@ -12189,7 +12188,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     int32_t integerY = 3000;
     double x = 0;
     double y = 0;
-    bool isRealData = true;
     displayInfo.id = 1;
     displayInfo.direction = Direction::DIRECTION180;
     displayInfo.displayDirection = Direction::DIRECTION0;
@@ -12200,38 +12198,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     inputWindowsManager->pointerLockedWindow_.area.width = 2090;
     inputWindowsManager->pointerLockedWindow_.area.height = 1394;
     inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
-    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y, isRealData);
-    EXPECT_EQ(integerX, displayInfo.validWidth - 1);
-    EXPECT_EQ(integerY, displayInfo.validHeight - 1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_LimitMouseLocaltionInEvent_004
- * @tc.desc: Test displayDirection == DIRECTION270 And !isRealData
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    OLD::DisplayInfo displayInfo;
-    int32_t integerX = 3000;
-    int32_t integerY = 3000;
-    double x = 0;
-    double y = 0;
-    bool isRealData = false;
-    displayInfo.id = 1;
-    displayInfo.direction = Direction::DIRECTION270;
-    displayInfo.displayDirection = Direction::DIRECTION0;
-    displayInfo.validWidth = 2000;
-    displayInfo.validHeight = 1000;
-    inputWindowsManager->pointerLockedWindow_.area.x = 507;
-    inputWindowsManager->pointerLockedWindow_.area.y = 302;
-    inputWindowsManager->pointerLockedWindow_.area.width = 2090;
-    inputWindowsManager->pointerLockedWindow_.area.height = 1394;
-    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
-    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y, isRealData);
+    inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
     EXPECT_EQ(integerX, displayInfo.validWidth - 1);
     EXPECT_EQ(integerY, displayInfo.validHeight - 1);
 }
