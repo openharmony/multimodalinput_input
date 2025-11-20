@@ -1590,7 +1590,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInne
 
 /**
  * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_00
- * @tc.desc: Test the funcation SetPointerSpeed
+ * @tc.desc: Test the function SetPointerSpeed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1609,7 +1609,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
 
 /**
  * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_002
- * @tc.desc: Test the funcation HandleAxisBeginEndInner
+ * @tc.desc: Test the function HandleAxisBeginEndInner
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1642,7 +1642,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBegi
 
 /**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadRightButton_001
- * @tc.desc: Test the funcation HandleTouchpadRightButton
+ * @tc.desc: Test the function HandleTouchpadRightButton
  * @tc.type: FUNC
  * @tc.require:
  */

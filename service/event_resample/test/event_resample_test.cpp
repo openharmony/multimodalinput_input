@@ -627,7 +627,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY, TestSize.
 
 /**
  * @tc.name: EventResampleTest_UpdatePointerEvent_001
- * @tc.desc: Test the funcation UpdatePointerEvent
+ * @tc.desc: Test the function UpdatePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -654,7 +654,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_UpdatePointerEvent_001, TestSize.L
 
 /**
  * @tc.name: EventResampleTest_UpdatePointerEvent_002
- * @tc.desc: Test the funcation UpdatePointerEvent
+ * @tc.desc: Test the function UpdatePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -677,7 +677,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_UpdatePointerEvent_002, TestSize.L
 
 /**
  * @tc.name: EventResampleTest_TransformSampleWindowXY_001
- * @tc.desc: Test the funcation TransformSampleWindowXY
+ * @tc.desc: Test the function TransformSampleWindowXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -716,7 +716,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY_001, TestS
 
 /**
  * @tc.name: EventResampleTest_TransformSampleWindowXY_002
- * @tc.desc: Test the funcation TransformSampleWindowXY
+ * @tc.desc: Test the function TransformSampleWindowXY
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -750,7 +750,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY_002, TestS
 
 /**
  * @tc.name: EventResampleTest_ConsumeBatch_001
- * @tc.desc: Test the funcation ConsumeBatch
+ * @tc.desc: Test the function ConsumeBatch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -766,7 +766,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_ConsumeBatch_001, TestSize.Level1)
 
 /**
  * @tc.name: EventResampleTest_ResampleTouchState_001
- * @tc.desc: Test the funcation ResampleTouchState
+ * @tc.desc: Test the function ResampleTouchState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -798,7 +798,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_ResampleTouchState_001, TestSize.L
 
 /**
  * @tc.name: EventResampleTest_ResampleTouchState_002
- * @tc.desc: Test the funcation ResampleTouchState
+ * @tc.desc: Test the function ResampleTouchState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -834,7 +834,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_ResampleTouchState_002, TestSize.L
 
 /**
  * @tc.name: EventResampleTest_ResampleCoordinates_001
- * @tc.desc: Test the funcation ResampleCoordinates
+ * @tc.desc: Test the function ResampleCoordinates
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -865,7 +865,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_ResampleCoordinates_001, TestSize.
 
 /**
  * @tc.name: EventResampleTest_ResampleCoordinates_002
- * @tc.desc: Test the funcation ResampleCoordinates
+ * @tc.desc: Test the function ResampleCoordinates
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -896,7 +896,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_ResampleCoordinates_002, TestSize.
 
 /**
  * @tc.name: EventResampleTest_FindBatch_001
- * @tc.desc: Test the funcation FindBatch
+ * @tc.desc: Test the function FindBatch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -920,7 +920,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_FindBatch_001, TestSize.Level1)
 
 /**
  * @tc.name: EventResampleTest_FindTouchState_001
- * @tc.desc: Test the funcation FindTouchState
+ * @tc.desc: Test the function FindTouchState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -944,7 +944,7 @@ HWTEST_F(EventResampleTest, EventResampleTest_FindTouchState_001, TestSize.Level
 
 /**
  * @tc.name: EventResampleTest_RewriteMessage_001
- * @tc.desc: Test the funcation RewriteMessage
+ * @tc.desc: Test the function RewriteMessage
  * @tc.type: FUNC
  * @tc.require:
  */

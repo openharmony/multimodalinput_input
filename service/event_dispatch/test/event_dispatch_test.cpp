@@ -1869,7 +1869,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_006, TestSize.
 
 /**
  * @tc.name: DispatchPointerEventInner_06
- * @tc.desc: Test the funcation DispatchKeyEvent
+ * @tc.desc: Test the function DispatchKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1915,7 +1915,7 @@ HWTEST_F(EventDispatchTest, DispatchPointerEventInner_06, TestSize.Level1)
 
 /**
  * @tc.name: EventDispatchTest_DispatchKeyEvent_001
- * @tc.desc: Test the funcation DispatchKeyEvent
+ * @tc.desc: Test the function DispatchKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2020,7 +2020,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_008,
 
 /**
  * @tc.name: EventDispatchTest_DispatchKeyEvent_002
- * @tc.desc: Test the funcation DispatchKeyEvent
+ * @tc.desc: Test the function DispatchKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2150,7 +2150,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_UpdateDisplayXY_005, TestSize.Leve
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
 /**
  * @tc.name: EventDispatchTest_SendWindowStateError_001
- * @tc.desc: Test the funcation SendWindowStateError
+ * @tc.desc: Test the function SendWindowStateError
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2169,7 +2169,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_001, TestSize
 
 /**
  * @tc.name: EventDispatchTest_GetClientFd_001
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2184,7 +2184,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_001, TestSize.Level1)
 }
 /**
  * @tc.name: EventDispatchTest_GetClientFd_002
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2199,7 +2199,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_002, TestSize.Level1)
 }
 /**
  * @tc.name: EventDispatchTest_GetClientFd_003
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2214,7 +2214,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_003, TestSize.Level1)
 
 /**
  * @tc.name: EventDispatchTest_GetClientFd_004
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2229,7 +2229,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_004, TestSize.Level1)
 }
 /**
  * @tc.name: EventDispatchTest_GetClientFd_005
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2245,7 +2245,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_GetClientFd_005, TestSize.Level1)
 
 /**
  * @tc.name: EventDispatchTest_GetClientFd_006
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */

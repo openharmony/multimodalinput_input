@@ -82,7 +82,7 @@ void InfraredEmitterControllerTest::TearDown() {}
 
 /**
  * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_001
- * @tc.desc: Test the funcation InitInfraredEmitter
+ * @tc.desc: Test the function InitInfraredEmitter
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -97,7 +97,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 
 /**
  * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_002
- * @tc.desc: Test the funcation InitInfraredEmitter
+ * @tc.desc: Test the function InitInfraredEmitter
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -112,7 +112,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 
 /**
  * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_003
- * @tc.desc: Test the funcation InitInfraredEmitter
+ * @tc.desc: Test the function InitInfraredEmitter
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -130,7 +130,7 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 
 /**
  * @tc.name: InfraredEmitterControllerTest_InitInfraredEmitter_004
- * @tc.desc: Test the funcation InitInfraredEmitter
+ * @tc.desc: Test the function InitInfraredEmitter
  * @tc.type: FUNC
  * @tc.require:
  */

@@ -1518,7 +1518,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsRepeatedKeyEvent, 
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_010
- * @tc.desc: Test the funcation HandleRingMute
+ * @tc.desc: Test the function HandleRingMute
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1555,7 +1555,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_010, 
 
 /**
  * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent_002
- * @tc.desc: Test the funcation OnSubscribeKeyEvent
+ * @tc.desc: Test the function OnSubscribeKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1581,7 +1581,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent_
 
 /**
  * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent_003
- * @tc.desc: Test the funcation OnSubscribeKeyEvent
+ * @tc.desc: Test the function OnSubscribeKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1602,7 +1602,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent_
 
 /**
  * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_002
- * @tc.desc: Test the funcation NotifySubscriber
+ * @tc.desc: Test the function NotifySubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1624,7 +1624,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_002
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddTimer_001
- * @tc.desc: Test the funcation AddTimer
+ * @tc.desc: Test the function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1653,7 +1653,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_001, TestSi
 
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_002
- * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.desc: Test the function HandleKeyDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1696,7 +1696,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_002, T
 
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUp_002
- * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.desc: Test the function HandleKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1750,7 +1750,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_002, Tes
 
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUp_003
- * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.desc: Test the function HandleKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1807,7 +1807,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_003, Tes
 
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUp_004
- * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.desc: Test the function HandleKeyUp
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1831,7 +1831,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_004, Tes
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_01
- * @tc.desc: Test the funcation HandleRingMute
+ * @tc.desc: Test the function HandleRingMute
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2274,7 +2274,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_02,
 
 /**
  * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent_004
- * @tc.desc: Test the funcation OnSubscribeKeyEvent
+ * @tc.desc: Test the function OnSubscribeKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2312,7 +2312,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent_
 
 /**
  * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_003
- * @tc.desc: Test the funcation NotifySubscriber
+ * @tc.desc: Test the function NotifySubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2386,7 +2386,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005
 
 /**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_003
- * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.desc: Test the function HandleKeyDown
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2421,7 +2421,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_003, T
 
 /**
  * @tc.name: KeySubscriberHandlerTest_SubscriberNotifyNap_002
- * @tc.desc: Test the funcation SubscriberNotifyNap
+ * @tc.desc: Test the function SubscriberNotifyNap
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2443,7 +2443,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_
 
 /**
  * @tc.name: KeySubscriberHandlerTest_SubscriberNotifyNap_003
- * @tc.desc: Test the funcation SubscriberNotifyNap
+ * @tc.desc: Test the function SubscriberNotifyNap
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3318,7 +3318,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ProcessKeyEvent_02, 
 
 /**
  * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_006
- * @tc.desc: Test the funcation NotifySubscriber
+ * @tc.desc: Test the function NotifySubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3344,7 +3344,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_006
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddTimer_002
- * @tc.desc: Test the funcation AddTimer
+ * @tc.desc: Test the function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3373,7 +3373,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_002, TestSi
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddTimer_003
- * @tc.desc: Test the funcation AddTimer
+ * @tc.desc: Test the function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3395,7 +3395,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_003, TestSi
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddTimer_004
- * @tc.desc: Test the funcation AddTimer
+ * @tc.desc: Test the function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3417,7 +3417,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_004, TestSi
 
 /**
  * @tc.name: KeySubscriberHandlerTest_AddTimer_005
- * @tc.desc: Test the funcation AddTimer
+ * @tc.desc: Test the function AddTimer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3439,7 +3439,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_005, TestSi
 
 /**
  * @tc.name: TabletSubscriberHandlerTest_SubscribeTabletProximity
- * @tc.desc: Test the funcation AboutSubscribeTabletProximity
+ * @tc.desc: Test the function AboutSubscribeTabletProximity
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3460,7 +3460,7 @@ HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_SubscribeTabletPr
 
 /**
  * @tc.name: TabletSubscriberHandlerTest_OnSubscribeTabletProximity
- * @tc.desc: Test the funcation OnSubscribeTabletProximity
+ * @tc.desc: Test the function OnSubscribeTabletProximity
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3480,7 +3480,7 @@ HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_OnSubscribeTablet
 
 /**
  * @tc.name: TabletSubscriberHandlerTest_OnSessionDelete
- * @tc.desc: Test the funcation OnSessionDelete
+ * @tc.desc: Test the function OnSessionDelete
  * @tc.type: FUNC
  * @tc.require:
  */

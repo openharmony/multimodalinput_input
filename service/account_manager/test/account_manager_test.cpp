@@ -52,7 +52,7 @@ public:
 
 /**
  * @tc.name: AccountManagerTest_GetInstance_01
- * @tc.desc: Test the funcation GetInstance
+ * @tc.desc: Test the function GetInstance
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -65,7 +65,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_GetInstance_01, TestSize.Level1)
 
 /**
  * @tc.name: AccountManagerTest_SubscribeCommonEvent_01
- * @tc.desc: Test the funcation SubscribeCommonEvent
+ * @tc.desc: Test the function SubscribeCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -79,7 +79,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_SubscribeCommonEvent_01, TestSiz
 
 /**
  * @tc.name: AccountManagerTest_UnsubscribeCommonEvent_01
- * @tc.desc: Test the funcation UnsubscribeCommonEvent
+ * @tc.desc: Test the function UnsubscribeCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -93,7 +93,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_UnsubscribeCommonEvent_01, TestS
 
 /**
  * @tc.name: AccountManagerTest_SubscribeCommonEvent_02
- * @tc.desc: Test the funcation SubscribeCommonEvent
+ * @tc.desc: Test the function SubscribeCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -107,7 +107,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_SubscribeCommonEvent_02, TestSiz
 
 /**
  * @tc.name: AccountManagerTest_OnAddUser_01
- * @tc.desc: Test the funcation OnAddUser
+ * @tc.desc: Test the function OnAddUser
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -126,7 +126,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnAddUser_01, TestSize.Level1)
 
 /**
  * @tc.name: AccountManagerTest_OnRemoveUser_01
- * @tc.desc: Test the funcation OnRemoveUser
+ * @tc.desc: Test the function OnRemoveUser
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -142,7 +142,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnRemoveUser_01, TestSize.Level1
 
 /**
  * @tc.name: AccountManagerTest_OnCommonEvent_01
- * @tc.desc: Test the funcation OnCommonEvent
+ * @tc.desc: Test the function OnCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -155,7 +155,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_01, TestSize.Level
 
 /**
  * @tc.name: AccountManagerTest_OnCommonEvent_02
- * @tc.desc: Test the funcation OnCommonEvent
+ * @tc.desc: Test the function OnCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -210,7 +210,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_02, TestSize.Level1
 
 /**
  * @tc.name: AccountManagerTest_GetCurrentAccountSetting
- * @tc.desc: Test the funcation GetCurrentAccountSetting
+ * @tc.desc: Test the function GetCurrentAccountSetting
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -224,7 +224,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting_001, Te
 
 /**
  * @tc.name: AccountManagerTest_GetCurrentAccountSetting_002
- * @tc.desc: Test the funcation GetCurrentAccountSetting
+ * @tc.desc: Test the function GetCurrentAccountSetting
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -242,7 +242,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountSetting_002, Te
 
 /**
  * @tc.name: AccountManagerTest_InitializeSetting_01
- * @tc.desc: Test the funcation InitializeSetting
+ * @tc.desc: Test the function InitializeSetting
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -261,7 +261,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_01, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_InitializeSetting_02
- * @tc.desc: Test the funcation InitializeSetting
+ * @tc.desc: Test the function InitializeSetting
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -280,7 +280,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_02, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_InitializeSetting_03
- * @tc.desc: Test the funcation InitializeSetting
+ * @tc.desc: Test the function InitializeSetting
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -299,7 +299,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_03, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_ReadSwitchStatus_01
- * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.desc: Test the function ReadSwitchStatus
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -321,7 +321,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_01, TestSize.Le
 
 /**
  * @tc.name: AccountManagerTest_ReadSwitchStatus_02
- * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.desc: Test the function ReadSwitchStatus
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -346,7 +346,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_02, TestSize.Le
 
 /**
  * @tc.name: AccountManagerTest_ReadLongPressTime_01
- * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.desc: Test the function ReadLongPressTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -365,7 +365,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_01, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_ReadLongPressTime_02
- * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.desc: Test the function ReadLongPressTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -387,7 +387,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_02, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_AccShortcutTimeout_01
- * @tc.desc: Test the funcation AccShortcutTimeout
+ * @tc.desc: Test the function AccShortcutTimeout
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -408,7 +408,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_01, TestSize.
 
 /**
  * @tc.name: AccountManagerTest_AccShortcutTimeout_02
- * @tc.desc: Test the funcation AccShortcutTimeout
+ * @tc.desc: Test the function AccShortcutTimeout
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -428,7 +428,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutTimeout_02, TestSize.
 
 /**
  * @tc.name: AccountManagerTest_AccShortcutEnabled_01
- * @tc.desc: Test the funcation AccShortcutEnabled
+ * @tc.desc: Test the function AccShortcutEnabled
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -449,7 +449,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_01, TestSize.
 
 /**
  * @tc.name: AccountManagerTest_AccShortcutEnabled_02
- * @tc.desc: Test the funcation AccShortcutEnabled
+ * @tc.desc: Test the function AccShortcutEnabled
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -469,7 +469,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabled_02, TestSize.
 
 /**
  * @tc.name: AccountManagerTest_AccShortcutEnabledOnScreenLocked_01
- * @tc.desc: Test the funcation AccShortcutEnabledOnScreenLocked
+ * @tc.desc: Test the function AccShortcutEnabledOnScreenLocked
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -490,7 +490,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked
 
 /**
  * @tc.name: AccountManagerTest_AccShortcutEnabledOnScreenLocked_02
- * @tc.desc: Test the funcation AccShortcutEnabledOnScreenLocked
+ * @tc.desc: Test the function AccShortcutEnabledOnScreenLocked
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -510,7 +510,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_AccShortcutEnabledOnScreenLocked
 
 /**
  * @tc.name: AccountManagerTest_ReadSwitchStatus_03
- * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.desc: Test the function ReadSwitchStatus
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -531,7 +531,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_03, TestSize.Le
 
 /**
  * @tc.name: AccountManagerTest_ReadSwitchStatus_04
- * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.desc: Test the function ReadSwitchStatus
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -555,7 +555,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_04, TestSize.Le
 
 /**
  * @tc.name: AccountManagerTest_ReadLongPressTime_03
- * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.desc: Test the function ReadLongPressTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -573,7 +573,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_03, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_ReadLongPressTime_04
- * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.desc: Test the function ReadLongPressTime
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -594,7 +594,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_04, TestSize.L
 
 /**
  * @tc.name: AccountManagerTest_OnReceiveEvent
- * @tc.desc: Test the funcation OnReceiveEvent
+ * @tc.desc: Test the function OnReceiveEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -609,7 +609,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnReceiveEvent, TestSize.Level1)
 
 /**
  * @tc.name: AccountManagerTest_Operator
- * @tc.desc: Test the funcation operator=
+ * @tc.desc: Test the function operator=
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -631,7 +631,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_Operator, TestSize.Level1)
 
 /**
  * @tc.name: AccountManagerTest_SetupMainAccount
- * @tc.desc: Test the funcation SetupMainAccount
+ * @tc.desc: Test the function SetupMainAccount
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -652,7 +652,7 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_SetupMainAccount, TestSize.Level
 
 /**
  * @tc.name: AccountManagerTest_GetCurrentAccountId_01
- * @tc.desc: Test the funcation GetCurrentAccountId
+ * @tc.desc: Test the function GetCurrentAccountId
  * @tc.type: FUNC
  * @tc.require:
  */

@@ -41,7 +41,7 @@ public:
 
 /**
  * @tc.name: InitCommonEventSubscriber_001
- * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.desc: Test the function InitCommonEventSubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -53,7 +53,7 @@ HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_001, TestSize.Level1)
 }
 /**
  * @tc.name: InitCommonEventSubscriber_002
- * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.desc: Test the function InitCommonEventSubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -65,7 +65,7 @@ HWTEST_F(DeviceEventMonitorTest, InitCommonEventSubscriber_002, TestSize.Level1)
 }
 /**
  * @tc.name: SetCallState_001
- * @tc.desc: Test the funcation SetCallState
+ * @tc.desc: Test the function SetCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -92,7 +92,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_001, TestSize.Level1)
 
 /**
  * @tc.name: SetCallState_002
- * @tc.desc: Test the funcation SetCallState
+ * @tc.desc: Test the function SetCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -119,7 +119,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_002, TestSize.Level1)
 }
 /**
  * @tc.name: SetCallState_005
- * @tc.desc: Test the funcation SetCallState
+ * @tc.desc: Test the function SetCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -141,7 +141,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_005, TestSize.Level1)
 
 /**
  * @tc.name: SetCallState_006
- * @tc.desc: Test the funcation SetCallState
+ * @tc.desc: Test the function SetCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -160,7 +160,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_006, TestSize.Level1)
 }
 /**
  * @tc.name: SetCallState_003
- * @tc.desc: Test the funcation SetCallState
+ * @tc.desc: Test the function SetCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -178,7 +178,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_003, TestSize.Level1)
 
 /**
  * @tc.name: SetCallState_004
- * @tc.desc: Test the funcation SetCallState
+ * @tc.desc: Test the function SetCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -196,7 +196,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_004, TestSize.Level1)
 
 /**
  * @tc.name: SetVoipCallState_001
- * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.desc: Test the function SetVoipCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -225,7 +225,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
 
 /**
  * @tc.name: SetVoipCallState_002
- * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.desc: Test the function SetVoipCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -252,7 +252,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_002, TestSize.Level1)
 }
 /**
  * @tc.name: SetVoipCallState_005
- * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.desc: Test the function SetVoipCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -274,7 +274,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_005, TestSize.Level1)
 
 /**
  * @tc.name: SetVoipCallState_006
- * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.desc: Test the function SetVoipCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -294,7 +294,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_006, TestSize.Level1)
 
 /**
  * @tc.name: SetVoipCallState_003
- * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.desc: Test the function SetVoipCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -312,7 +312,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_003, TestSize.Level1)
 
 /**
  * @tc.name: SetVoipCallState_004
- * @tc.desc: Test the funcation SetVoipCallState
+ * @tc.desc: Test the function SetVoipCallState
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -330,7 +330,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_004, TestSize.Level1)
 
 /**
  * @tc.name: GetCallType_001
- * @tc.desc: Test the funcation GetCallType
+ * @tc.desc: Test the function GetCallType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -348,7 +348,7 @@ HWTEST_F(DeviceEventMonitorTest, GetCallType_001, TestSize.Level1)
 
 /**
  * @tc.name: GetCallType_002
- * @tc.desc: Test the funcation GetCallType
+ * @tc.desc: Test the function GetCallType
  * @tc.type: FUNC
  * @tc.require:
  */

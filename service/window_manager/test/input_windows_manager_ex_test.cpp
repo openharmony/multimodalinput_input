@@ -2657,7 +2657,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
 
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_001
- * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.desc: Test the function SendUIExtentionPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2691,7 +2691,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
 
 /**
  * @tc.name: InputWindowsManagerTest_DispatchUIExtentionPointerEvent_001
- * @tc.desc: Test the funcation DispatchUIExtentionPointerEvent
+ * @tc.desc: Test the function DispatchUIExtentionPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2722,7 +2722,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchUIExtentionPoi
 
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_001
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2772,7 +2772,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_001, 
 
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_002
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2816,7 +2816,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, 
 
 /**
  * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint
- * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.desc: Test the function TouchPointToDisplayPoint
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3696,7 +3696,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_009
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3725,7 +3725,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation,
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_001
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3754,7 +3754,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_002
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3768,7 +3768,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_003
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3797,7 +3797,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_004
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3829,7 +3829,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 
 /**
  * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_001
- * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.desc: Test the function TouchPointToDisplayPoint
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3856,7 +3856,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
 
 /**
  * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_002
- * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.desc: Test the function TouchPointToDisplayPoint
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3884,7 +3884,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
 
 /**
  * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_003
- * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.desc: Test the function TouchPointToDisplayPoint
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3914,7 +3914,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo
- * @tc.desc: Test the funcation UpdateDisplayInfo
+ * @tc.desc: Test the function UpdateDisplayInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3938,7 +3938,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo, Tes
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_001
- * @tc.desc: Test the funcation UpdateDisplayInfo
+ * @tc.desc: Test the function UpdateDisplayInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3962,7 +3962,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_001,
 
 /**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle
- * @tc.desc: Test the funcation SetPointerStyle
+ * @tc.desc: Test the function SetPointerStyle
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3980,7 +3980,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_IsInHotArea
- * @tc.desc: Test the funcation IsInHotArea
+ * @tc.desc: Test the function IsInHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3997,7 +3997,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea, TestSize.
 
 /**
  * @tc.name: InputWindowsManagerTest_IsInHotArea_001
- * @tc.desc: Test the funcation IsInHotArea
+ * @tc.desc: Test the function IsInHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4014,7 +4014,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_001, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_IsInHotArea_002
- * @tc.desc: Test the funcation IsInHotArea
+ * @tc.desc: Test the function IsInHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4031,7 +4031,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_002, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_IsInHotArea_003
- * @tc.desc: Test the funcation IsInHotArea
+ * @tc.desc: Test the function IsInHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4048,7 +4048,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_003, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4065,7 +4065,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea, TestSi
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_001
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4082,7 +4082,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_001, Te
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_002
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4099,7 +4099,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_002, Te
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_003
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4116,7 +4116,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_003, Te
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdatePointerChangeAreas
- * @tc.desc: Test the funcation UpdatePointerChangeAreas
+ * @tc.desc: Test the function UpdatePointerChangeAreas
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4134,7 +4134,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerChangeAre
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdatePointerChangeAreas_001
- * @tc.desc: Test the funcation UpdatePointerChangeAreas
+ * @tc.desc: Test the function UpdatePointerChangeAreas
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4148,7 +4148,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerChangeAre
 
 /**
  * @tc.name: InputWindowsManagerTest_GetWidthAndHeight
- * @tc.desc: Test the funcation GetWidthAndHeight
+ * @tc.desc: Test the function GetWidthAndHeight
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4167,7 +4167,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWidthAndHeight, Tes
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_004
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4183,7 +4183,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_004, Te
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_005
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4199,7 +4199,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_005, Te
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_006
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4215,7 +4215,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_006, Te
 
 /**
  * @tc.name: InputWindowsManagerTest_InWhichHotArea_007
- * @tc.desc: Test the funcation InWhichHotArea
+ * @tc.desc: Test the function InWhichHotArea
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4280,7 +4280,7 @@ HWTEST_F(InputWindowsManagerTest, SetWindowStateNotifyPid_001, TestSize.Level1)
 
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_002
- * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.desc: Test the function SendUIExtentionPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4324,7 +4324,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
 
 /**
  * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_003
- * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.desc: Test the function SendUIExtentionPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4368,7 +4368,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
 
 /**
  * @tc.name: InputWindowsManagerTest_SelectWindowInfo_003
- * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.desc: Test the function SelectWindowInfo
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4402,7 +4402,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, 
 
 /**
  * @tc.name: InputWindowsManagerTest_SkipPrivacyProtectionWindow
- * @tc.desc: Test the funcation SkipPrivacyProtectionWindow
+ * @tc.desc: Test the function SkipPrivacyProtectionWindow
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4429,7 +4429,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipPrivacyProtectionW
 
 /**
  * @tc.name: InputWindowsManagerTest_GetActiveWindowTypeById
- * @tc.desc: Test the funcation GetActiveWindowTypeById
+ * @tc.desc: Test the function GetActiveWindowTypeById
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4914,7 +4914,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_019, TestSize.Level1)
 
 /**
  * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_006
- * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.desc: Test the function AdjustDisplayRotation
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5028,7 +5028,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_012
 
 /**
  * @tc.name: InputWindowsManagerTest_HandleHardWareCursorTest003
- * @tc.desc: Test the funcation HandleHardWareCursor
+ * @tc.desc: Test the function HandleHardWareCursor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5043,7 +5043,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleHardWareCursorTe
 
 /* *
  * @tc.name: InputWindowsManagerTest_UpdateTargetTouchWinIds_001
- * @tc.desc: Test the funcation UpdateTargetTouchWinIds
+ * @tc.desc: Test the function UpdateTargetTouchWinIds
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5067,7 +5067,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NeedTouchTracking_001,
 
 /* *
  * @tc.name: InputWindowsManagerTest_ShiftAppSimulateTouchPointerEvent001
- * @tc.desc: Test the funcation ShiftAppSimulateTouchPointerEvent
+ * @tc.desc: Test the function ShiftAppSimulateTouchPointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5102,7 +5102,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppSimulateTouchP
 
 /* *
  * @tc.name: InputWindowsManagerTest_TouchEnterLeaveEvent
- * @tc.desc: Test the funcation TouchEnterLeaveEvent
+ * @tc.desc: Test the function TouchEnterLeaveEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5147,7 +5147,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchEnterLeaveEvent, 
 
 /**
  * @tc.name: InputWindowsManagerTest_GetClientFd_005
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5179,7 +5179,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_005, TestS
 
 /**
  * @tc.name: InputWindowsManagerTest_GetClientFd_006
- * @tc.desc: Test the funcation GetClientFd
+ * @tc.desc: Test the function GetClientFd
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5270,7 +5270,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetOriginPointerItem, 
 
 /**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenWindowChange_001
- * @tc.desc: Test the funcation SendCancelEventWhenWindowChange
+ * @tc.desc: Test the function SendCancelEventWhenWindowChange
  * @tc.type: FUNC
  * @tc.require:
  */
