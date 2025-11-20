@@ -4242,6 +4242,49 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_001, Te
     EXPECT_EQ(res, INPUT_SUCCESS);
 }
 
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetCustomCursor_002
+ * @tc.desc: Test OH_Input_SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative* pixelmap = nullptr;
+    OH_Pixelmap_InitializationOptions *options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    EXPECT_NE(options, nullptr);
+    OH_PixelmapInitializationOptions_SetWidth(options, 1);
+    OH_PixelmapInitializationOptions_SetHeight(options, 1);
+    OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap);
+    EXPECT_NE(pixelmap, nullptr);
+    int32_t anchorX = -1;
+    int32_t anchorY = 0;
+    Input_CustomCursor* customCursor = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
+    EXPECT_NE(customCursor, nullptr);
+    anchorX = 32;
+    anchorY = 32;
+    Input_CustomCursor* customCursor2 = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
+    EXPECT_NE(customCursor2, nullptr);
+    bool isfollowSystem = true;
+    Input_CursorConfig* cursorConfig = OH_Input_CursorConfig_Create(isfollowSystem);
+    EXPECT_NE(cursorConfig, nullptr);
+    int32_t windowId = -1;
+    Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
+    windowId = 0;
+    res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
+    res = OH_Input_SetCustomCursor(windowId, customCursor2, cursorConfig);
+    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    OH_Input_CustomCursor_Destroy(&customCursor2);
+    OH_Input_CursorConfig_Destroy(&cursorConfig);
+    OH_PixelmapInitializationOptions_Release(options);
+    OH_PixelmapNative_Release(pixelmap);
+}
+
 /*
  * @tc.name: OHInputManagerTest_SetCursorInfo_001
  * @tc.desc: Test SetCursorInfo
