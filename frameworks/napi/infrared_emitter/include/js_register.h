@@ -42,7 +42,7 @@ public:
 
     static void CallJsHasIrEmitterTask(uv_work_t *work);
     static void CallJsHasIrEmitterPromise(uv_work_t *work, int32_t status);
-    static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
+    static napi_value CreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     static void JsHasIrEmitterResolveDeferred(
         sptr<CallbackInfo> cb, napi_handle_scope scope, napi_value callResult);
     static void CallJsHasIrEmitterPromiseEx(sptr<CallbackInfo> cb, napi_handle_scope scope);
