@@ -607,6 +607,13 @@ bool ConvertToKeyRepeat(const cJSON* jsonData, RepeatKey &repeatKey)
         MMI_HILOGE("Package ability failed");
         return false;
     }
+
+    cJSON *preNotifyAbility = cJSON_GetObjectItemCaseSensitive(jsonData, "preNotifyAbility");
+    if (preNotifyAbility != nullptr) {
+        if (!PackageAbility(preNotifyAbility, repeatKey.preNotifyAbility)) {
+            return false;
+        }
+    }
     return true;
 }
 

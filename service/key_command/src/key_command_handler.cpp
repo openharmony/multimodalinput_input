@@ -1744,10 +1744,19 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, const std::shared
     return true;
 }
 
+void KeyCommandHandler::PreNotify(const RepeatKey &item)
+{
+    if (!item.preNotifyAbility.bundleName.empty()) {
+        MMI_HILOGI("PreNotify config bundleName:%{public}s", item.preNotifyAbility.bundleName.c_str());
+        LaunchAbility(item.preNotifyAbility);
+    }
+}
+
 bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item,
     const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes)
 {
     if (!isMaxTimes) {
+        PreNotify(item);
         int64_t delaytime = intervalTime_ - (downActionTime_ - upActionTime_);
         int32_t timerId = TimerMgr->AddTimer(
             delaytime / SECONDS_SYSTEM, 1, [this, item, keyEvent] () {
