@@ -1795,6 +1795,75 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ParseMultiFingersT
 }
 
 /**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToKeyRepeat_001
+ * @tc.desc: Test for preNotifyAbility is null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToKeyRepeat_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyCode", 1);
+    cJSON_AddNumberToObject(jsonData, "times", 2);
+    cJSON_AddNumberToObject(jsonData, "delay", 3);
+    cJSON_AddStringToObject(jsonData, "statusConfig", "test");
+    cJSON *ability = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "ability", ability);
+    RepeatKey repeatKey;
+    bool result = OHOS::MMI::ConvertToKeyRepeat(jsonData, repeatKey);
+    EXPECT_TRUE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToKeyRepeat_002
+ * @tc.desc: Test for preNotifyAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToKeyRepeat_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyCode", 1);
+    cJSON_AddNumberToObject(jsonData, "times", 2);
+    cJSON_AddNumberToObject(jsonData, "delay", 3);
+    cJSON_AddStringToObject(jsonData, "statusConfig", "test");
+    cJSON *ability = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "ability", ability);
+    cJSON_AddItemToObject(jsonData, "preNotifyAbility", cJSON_CreateString("test"));
+    RepeatKey repeatKey;
+    bool result = OHOS::MMI::ConvertToKeyRepeat(jsonData, repeatKey);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToKeyRepeat_003
+ * @tc.desc: Test for normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToKeyRepeat_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyCode", 1);
+    cJSON_AddNumberToObject(jsonData, "times", 2);
+    cJSON_AddNumberToObject(jsonData, "delay", 3);
+    cJSON_AddStringToObject(jsonData, "statusConfig", "test");
+    cJSON *ability = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "ability", ability);
+    cJSON *preNotifyAbility = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "preNotifyAbility", preNotifyAbility);
+    RepeatKey repeatKey;
+    bool result = OHOS::MMI::ConvertToKeyRepeat(jsonData, repeatKey);
+    EXPECT_TRUE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
  * @tc.name: KeyCommandHandlerUtilTest_IsParseKnuckleGesture_001
  * @tc.desc: Tests when jsonData is not an object
  * @tc.type: FUNC

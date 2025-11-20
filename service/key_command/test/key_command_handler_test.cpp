@@ -226,6 +226,25 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupDoubleKnuckleDownEvent
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyAbility_006
+ * @tc.desc: HandleRepeatKeyAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.ability.bundleName = "bundleName";
+    repeatKey.preNotifyAbility.bundleName = "preBundleName";
+    ASSERT_TRUE(handler.HandleRepeatKeyAbility(repeatKey, keyEvent, false));
+}
+
 std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupThreeFingerTapEvent()
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
