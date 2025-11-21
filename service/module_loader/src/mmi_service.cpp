@@ -1571,7 +1571,9 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> i
     inputDevice->SetUniq(tmpDevice->GetUniq());
     inputDevice->SetCapabilities(tmpDevice->GetCapabilities());
     inputDevice->SetAxisInfo(tmpDevice->GetAxisInfo());
-
+    inputDevice->SetVirtual(tmpDevice->IsVirtual());
+    inputDevice->SetLocal(tmpDevice->IsLocal());
+    
     return RET_OK;
 }
 
