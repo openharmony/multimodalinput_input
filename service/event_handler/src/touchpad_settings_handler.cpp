@@ -33,7 +33,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string DEFAULT_SWITCH_VALUE {"0"};
+const std::string DEFAULT_SWITCH_VALUE {"1"};
 const std::string g_volumeSwitchesKey {"settings.trackpad.right_volume_switches"};
 const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_switches"};
 const std::string g_pressureKey {"settings.trackpad.press_level"};
