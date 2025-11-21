@@ -41,6 +41,7 @@ public:
     virtual bool IsSceneBoardEnabled() = 0;
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
     virtual std::string ReadJsonFile(const std::string &filePath) = 0;
+    virtual bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) = 0;
 };
 
 class MockInputWindowsManager : public InputWindowsManagerInterface {
@@ -57,6 +58,7 @@ public:
     MOCK_METHOD(bool, IsSceneBoardEnabled, ());
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
     MOCK_METHOD(std::string, ReadJsonFile, (const std::string &));
+    MOCK_METHOD(bool, IsInAncoWindow, (const WindowInfo &window, int32_t x, int32_t y));
 };
 } // namespace MMI
 } // namespace OHOS
