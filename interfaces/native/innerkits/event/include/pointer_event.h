@@ -183,15 +183,6 @@ public:
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 34;
 
     /**
-     * Indicates extra fingerprint action.
-     *
-     * @since 16
-     */
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_HOLD = 38;
-
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_TOUCH = 39;
-
-    /**
      * Indicates that the pen proximity action.
      *
      * @since 12
@@ -202,9 +193,39 @@ public:
 
     static constexpr int32_t POINTER_ACTION_PULL_CANCEL = 37;
 
+    /**
+     * Indicates extra fingerprint action.
+     *
+     * @since 16
+     */
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_HOLD = 38;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_TOUCH = 39;
+
     static constexpr int32_t POINTER_ACTION_PULL_THROW = 40;
 
     static constexpr int32_t POINTER_ACTION_TOUCHPAD_ACTIVE = 50;
+
+    /**
+     * Indicates that the cursor appears to levitate above the window.
+     *
+     * @since 23
+     */
+    static constexpr int32_t POINTER_ACTION_LEVITATE_MOVE = 51;
+ 
+    /**
+     * Indicates that the cursor appears to levitate into the window.
+     *
+     * @since 23
+     */
+    static constexpr int32_t POINTER_ACTION_LEVITATE_IN_WINDOW = 52;
+ 
+    /**
+     * Indicates that the cursor appears to levitate out of the window.
+     *
+     * @since 23
+     */
+    static constexpr int32_t POINTER_ACTION_LEVITATE_OUT_WINDOW = 53;
 
     /**
      * 表示触屏手势动作
