@@ -1720,10 +1720,20 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:FC:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL:
             return "P:FCA:";
+        case PointerEvent::POINTER_ACTION_PROXIMITY_IN:
+            return "P:PRXI:";
+        case PointerEvent::POINTER_ACTION_PROXIMITY_OUT:
+            return "P:PRXO:";
         case PointerEvent::POINTER_ACTION_UNKNOWN:
             return "P:UK:";
         case PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE:
             return "P:TA:";
+        case PointerEvent::POINTER_ACTION_LEVITATE_MOVE:
+            return "P:LM:";
+        case PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW:
+            return "P:LI:";
+        case PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW:
+            return "P:LO:";
         default:
             return "P:?:";
     }
