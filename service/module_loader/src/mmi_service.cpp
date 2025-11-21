@@ -143,6 +143,7 @@ constexpr int32_t MAX_DEVICE_NUM { 10 };
 constexpr int32_t GAME_UID { 7011 };
 constexpr int32_t PENGLAI_UID { 7655 };
 constexpr int32_t SYNERGY_UID { 5521 };
+constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
@@ -3107,6 +3108,9 @@ void MMIService::OnThread()
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
+        if (libinputAdapter_.HasPendingEvents()) {
+            timeout = MIN_TIMEOUT_DELAY;
+        }
         MMI_HILOGD("timeout:%{public}d", timeout);
         int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
@@ -3132,6 +3136,9 @@ void MMIService::OnThread()
             }
         }
         TimerMgr->ProcessTimers();
+        if (count == 0 && libinputAdapter_.HasPendingEvents()) {
+            libinputAdapter_.HandlePendingEvents();
+        }
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
         }
