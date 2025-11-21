@@ -177,15 +177,17 @@ void InputEventHookHandler::OnConnected()
         return;
     }
     uint32_t hookEventType { 0 };
-    std::shared_lock<std::shared_mutex> lock(rwMutex_);
-    if (CheckHookStatsBit(HOOK_EVENT_TYPE_KEY) && hookConsumer_.keyHookCallback_) {
-        hookEventType |= HOOK_EVENT_TYPE_KEY;
-    }
-    if (CheckHookStatsBit(HOOK_EVENT_TYPE_TOUCH) && hookConsumer_.touchHookCallback_) {
-        hookEventType |= HOOK_EVENT_TYPE_TOUCH;
-    }
-    if (CheckHookStatsBit(HOOK_EVENT_TYPE_MOUSE) && hookConsumer_.mouseHookCallback_) {
-        hookEventType |= HOOK_EVENT_TYPE_MOUSE;
+    {
+        std::shared_lock<std::shared_mutex> lock(rwMutex_);
+        if (CheckHookStatsBit(HOOK_EVENT_TYPE_KEY) && hookConsumer_.keyHookCallback_) {
+            hookEventType |= HOOK_EVENT_TYPE_KEY;
+        }
+        if (CheckHookStatsBit(HOOK_EVENT_TYPE_TOUCH) && hookConsumer_.touchHookCallback_) {
+            hookEventType |= HOOK_EVENT_TYPE_TOUCH;
+        }
+        if (CheckHookStatsBit(HOOK_EVENT_TYPE_MOUSE) && hookConsumer_.mouseHookCallback_) {
+            hookEventType |= HOOK_EVENT_TYPE_MOUSE;
+        }
     }
     AddInputEventHookToServer(hookEventType);
 }
@@ -251,6 +253,7 @@ void InputEventHookHandler::ClearHookStatsBit(HookEventType hookEventType)
 
 bool InputEventHookHandler::IsHookExisted(HookEventType hookEventType)
 {
+    std::shared_lock<std::shared_mutex> lock(rwMutex_);
     if (bool flag = ((hookEventType & HOOK_EVENT_TYPE_KEY) != 0) &&
         CheckHookStatsBit(HOOK_EVENT_TYPE_KEY) && hookConsumer_.keyHookCallback_; flag) {
         return true;
