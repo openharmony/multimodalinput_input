@@ -51,7 +51,7 @@ private:
     SettingObserver::UpdateFunc updateFunc_ = nullptr;
     SettingObserver::UpdateFunc updateTouchpadSwitchFunc_ = nullptr;
     bool hasRegistered_ = false;
-    bool supportSwipeInward_ {false};
+    bool supportSwipeInward_ {true};
     std::atomic<bool> isCommonEventReady_ {false};
     int32_t currentAccountId_ = -1;
     sptr<SettingObserver> volumeSwitchesObserver_ {nullptr};
