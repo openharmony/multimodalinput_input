@@ -82,6 +82,10 @@ public:
     void AddCapability(InputDeviceCapability cap);
     bool HasCapability(InputDeviceCapability cap) const;
     bool HasCapability(uint32_t deviceTags) const;
+    void SetVirtual(bool isVirtual);
+    void SetLocal(bool isLocal);
+    bool IsVirtual() const;
+    bool IsLocal() const;
 
     unsigned long GetCapabilities() const;
     void SetCapabilities(unsigned long caps);
@@ -185,7 +189,9 @@ public:
             in.ReadInt32(product_) &&
             in.ReadInt32(vendor_) &&
             in.ReadString(phys_) &&
-            in.ReadString(uniq_)
+            in.ReadString(uniq_) &&
+            in.ReadBool(isVirtual_) &&
+            in.ReadBool(isLocal_)
         );
         uint64_t capabilities = 0;
         if (!result || !in.ReadUint64(capabilities)) {
@@ -223,6 +229,12 @@ public:
         if (!out.WriteString(uniq_)) {
             return false;
         }
+        if (!out.WriteBool(isVirtual_)) {
+            return false;
+        }
+        if (!out.WriteBool(isLocal_)) {
+            return false;
+        }
         if (!out.WriteUint64(capabilities_.to_ulong())) {
             return false;
         }
@@ -258,6 +270,8 @@ private:
     std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
     std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
+    bool isVirtual_ {false};
+    bool isLocal_ {false};
 };
 
 inline unsigned long InputDevice::GetCapabilities() const

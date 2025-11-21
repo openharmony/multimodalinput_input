@@ -1832,6 +1832,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputDeviceInterface_001, TestSize.L
     ASSERT_STREQ(inputDevice->GetPhys().c_str(), "phys");
     inputDevice->SetUniq("uniq");
     ASSERT_STREQ(inputDevice->GetUniq().c_str(), "uniq");
+    inputDevice->SetLocal(true);
+    ASSERT_TRUE(inputDevice->IsLocal());
+    inputDevice->SetVirtual(true);
+    ASSERT_TRUE(inputDevice->IsVirtual());
 }
 
 /**

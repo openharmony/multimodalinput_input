@@ -109,6 +109,24 @@ napi_value JsUtil::GetDeviceInfo(sptr<CallbackInfo> cb)
     CHKRP(napi_create_string_utf8(cb->env, (cb->data.device->GetPhys()).c_str(),
         NAPI_AUTO_LENGTH, &phys), CREATE_STRING_UTF8);
     CHKRP(napi_set_named_property(cb->env, object, "phys", phys), SET_NAMED_PROPERTY);
+    napi_value isVirtual = nullptr;
+    if (napi_get_boolean(cb->env, cb->data.device->IsVirtual(), &isVirtual) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(GET_BOOLEAN).c_str());
+        return nullptr;
+    }
+    if (napi_set_named_property(cb->env, object, "isVirtual", isVirtual) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(SET_NAMED_PROPERTY).c_str());
+        return nullptr;
+    }
+    napi_value isLocal = nullptr;
+    if (napi_get_boolean(cb->env, cb->data.device->IsLocal(), &isLocal) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(GET_BOOLEAN).c_str());
+        return nullptr;
+    }
+    if (napi_set_named_property(cb->env, object, "isLocal", isLocal) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(SET_NAMED_PROPERTY).c_str());
+        return nullptr;
+    }
 
     if (!GetDeviceSourceType(cb, object)) {
         MMI_HILOGE("Get device source type failed");
