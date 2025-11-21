@@ -51,6 +51,7 @@ public:
 private:
     struct PointerEventRecord {
         int64_t actionTime;
+        int32_t actionType;
         int32_t sourceType;
         int32_t pointerId;
         bool isInject;
@@ -60,10 +61,11 @@ private:
         std::vector<double> tiltYs;
         std::vector<int32_t> displayXs;
         std::vector<int32_t> displayYs;
-        PointerEventRecord(int64_t actionTime, int32_t sourceType, int32_t pointerId, bool isInject,
+        PointerEventRecord(int64_t actionTime, int32_t actionType, int32_t sourceType, int32_t pointerId, bool isInject,
             std::vector<int32_t> pointerIds, std::vector<double> pressures, std::vector<double> tiltXs,
             std::vector<double> tiltYs, std::vector<int32_t> displayXs, std::vector<int32_t> displayYs)
-            : actionTime(actionTime), sourceType(sourceType), pointerId(pointerId), isInject(isInject),
+            : actionTime(actionTime), actionType(actionType), sourceType(sourceType), pointerId(pointerId),
+              isInject(isInject),
               pointerIds(pointerIds), pressures(pressures), tiltXs(tiltXs), tiltYs(tiltYs),
               displayXs(displayXs), displayYs(displayYs)
         {}
