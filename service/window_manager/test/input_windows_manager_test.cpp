@@ -4341,6 +4341,70 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTarget_004
+ * @tc.desc: Test UpdateMouseTarget to verify that the isInAnco branch is covered when the pointer is in an ANCO window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
+    EXPECT_CALL(mockInputWindowsManager, IsInAncoWindow).WillRepeatedly(Return(true));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    displayInfo.displayDirection = DIRECTION180;
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(150);
+    item.SetDisplayY(300);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = 10;
+    windowInfo.pid = 50;
+    windowInfo.agentWindowId = 60;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    auto iter = inputWindowsManager.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (iter != inputWindowsManager.windowsPerDisplayMap_.end()) {
+        iter->second.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
+    }
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
+    inputWindowsManager.mouseDownInfo_.id = -1;
+    inputWindowsManager.SetHoverScrollState(true);
+    std::map<int32_t, PointerStyle> styleMap;
+    PointerStyle pointerStyle;
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    styleMap.insert(std::make_pair(windowInfo.id, pointerStyle));
+    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(windowInfo.pid, styleMap));
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+    inputWindowsManager.SetUiExtensionInfo(false, 50, 10);
+    inputWindowsManager.isDragBorder_ = false;
+    inputWindowsManager.dragFlag_ = true;
+    inputWindowsManager.captureModeInfo_.isCaptureMode = false;
+    inputWindowsManager.captureModeInfo_.windowId = 10;
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.mouseDownInfo_.id = 1;
+    EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_OK);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget
  * @tc.desc: Test UpdateTouchScreenTarget
  * @tc.type: FUNC
