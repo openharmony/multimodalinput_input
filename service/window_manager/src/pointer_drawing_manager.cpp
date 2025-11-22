@@ -2569,9 +2569,11 @@ void PointerDrawingManager::DrawManager()
         Direction direction = GetDisplayDirection(&displayInfo_);
         lastDrawPointerStyle_ = pointerStyle;
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayInfo_.rsId, displayInfo_.validWidth / CALCULATE_MIDDLE,
-                displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
-            MMI_HILOGI("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
+            if (displayInfo_.validWidth > 0 && displayInfo_.validHeight > 0) {
+                DrawPointer(displayInfo_.rsId, displayInfo_.validWidth / CALCULATE_MIDDLE,
+                    displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
+                MMI_HILOGI("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
+            }
             return;
         }
         DrawPointer(displayInfo_.rsId, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
@@ -3024,9 +3026,11 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
         }
         Direction direction = GetDisplayDirection(&displayInfo_);
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayInfo_.rsId, displayInfo_.validWidth / CALCULATE_MIDDLE,
-                displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
-            MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
+            if (displayInfo_.validWidth > 0 && displayInfo_.validHeight > 0) {
+                DrawPointer(displayInfo_.rsId, displayInfo_.validWidth / CALCULATE_MIDDLE,
+                    displayInfo_.validHeight / CALCULATE_MIDDLE, pointerStyle, direction);
+                MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
+            }
             return;
         }
 
@@ -3421,7 +3425,9 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         IPointerDrawingManager::GetInstance()->GetDelegateProxy();
     CHKPV(delegateProxy);
     delegateProxy->OnPostSyncTask([this] {
-        this->UpdateDisplayInfo(displayInfo_);
+        if (this->hasDisplay_) {
+            this->UpdateDisplayInfo(displayInfo_);
+        }
         this->UpdatePointerVisible();
         return RET_OK;
     });
