@@ -33,7 +33,6 @@
 
 namespace OHOS {
 namespace MMI {
-const std::string COMMON_EVENT_LID_STATE_CHANGED = "usual.event.LID_STATE_CHANGED";
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void SwitchSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -63,9 +62,13 @@ void SwitchSubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 
 bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
-    CHKPF(switchEvent);
+    if (switchEvent == nullptr) {
+        MMI_HILOGE("switchEvent is null");
+        return false;
+    }
+    tabletStandState_ = switchEvent->GetSwitchValue();
     OHOS::AAFwk::Want want;
-    want.SetAction(COMMON_EVENT_TABLET_MODE_CHANGED);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TABLET_MODE_CHANGED);
     want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_TABLET);
     want.SetParam("eventState", switchEvent->GetSwitchValue());
         
@@ -79,6 +82,13 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
     return ret;
 }
 
+void SwitchSubscriberHandler::DumpTabletStandState(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "tablet stand state information:\t");
+    mprintf(fd, "tablet stand state=%d", tabletStandState_.load());
+}
+
 bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
     if (switchEvent == nullptr) {
@@ -87,7 +97,7 @@ bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent>
     }
     lidState_ = switchEvent->GetSwitchValue();
     OHOS::AAFwk::Want want;
-    want.SetAction(COMMON_EVENT_LID_STATE_CHANGED);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LID_STATE_CHANGED);
     want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_LID);
     want.SetParam("eventState", switchEvent->GetSwitchValue());
         
@@ -114,11 +124,9 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     CHKPV(switchEvent);
     UpdateSwitchState(switchEvent);
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
-        if (PublishTabletEvent(switchEvent)) {
-            MMI_HILOGI("The tablet commonEvent publish success");
-        } else {
-            MMI_HILOGI("The tablet commonEvent publish failed");
-        }
+        ffrt::submit([this, switchEvent] {
+            this->PublishTabletEvent(switchEvent);
+        });
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         ffrt::submit([this, switchEvent] {
             this->PublishLidEvent(switchEvent);
