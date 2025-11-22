@@ -34,6 +34,7 @@ private:
         bool isTouchableDevice { false };
         bool isDeviceReportEvent { false };
         bool enable { false };
+        bool isLocal { false };
         std::string dhid;
         std::string sysUid;
         VendorConfig vendorConfig;
@@ -143,6 +144,7 @@ private:
     void PointerDeviceInit();
     void NotifyDeviceAdded(int32_t deviceId) const;
     void NotifyDeviceRemoved(int32_t deviceId) const;
+    void SetSpecialVirtualDevice(std::shared_ptr<InputDevice> inputDevice) const;
 
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;

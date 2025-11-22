@@ -245,5 +245,67 @@ HWTEST_F(InputDeviceManagerTest, NotifyDeviceAdded_Test_001, TestSize.Level1)
     EXPECT_CALL(*observer, OnDeviceRemoved(_)).Times(1);
     ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceRemoved(deviceId));
 }
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetSpecialVirtualDevice_001
+ * @tc.desc: Test SetSpecialVirtualDevice with nullptr input
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    std::shared_ptr<InputDevice> device = nullptr;
+    ASSERT_NO_FATAL_FAILURE(inputDeviceManager.SetSpecialVirtualDevice(device));
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_SetSpecialVirtualDevice_002
+ * @tc.desc: Test SetSpecialVirtualDevice with VirtualKeyboard on fold PC
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto device = std::make_shared<InputDevice>();
+    device->SetName("VirtualKeyboard");
+    inputDeviceManager.SetSpecialVirtualDevice(device);
+    EXPECT_EQ(device->IsVirtual(), true);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_SetSpecialVirtualDevice_003
+ * @tc.desc: Test SetSpecialVirtualDevice with VirtualTrackpad on fold PC
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto device = std::make_shared<InputDevice>();
+    device->SetName("VirtualTrackpad");
+    inputDeviceManager.SetSpecialVirtualDevice(device);
+    EXPECT_EQ(device->IsVirtual(), true);
+}
+ 
+/**
+ * @tc.name: InputDeviceManagerTest_SetSpecialVirtualDevice_004
+ * @tc.desc: Test SetSpecialVirtualDevice with other virtual device name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDeviceManager;
+    auto device = std::make_shared<InputDevice>();
+    device->SetName("OtherDevice");
+    inputDeviceManager.SetSpecialVirtualDevice(device);
+    EXPECT_EQ(device->IsVirtual(), true);
+}
 } // namespace MMI
 } // namespace OHOS
