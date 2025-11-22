@@ -24,6 +24,7 @@
 #include "dfx_hisysevent_device.h"
 #include "cursor_drawing_component.h"
 #include "parameters.h"
+#include "product_name_definition.h"
 #include "pointer_device_manager.h"
 #include "special_input_device_parser.h"
 
@@ -41,6 +42,8 @@ const char* INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
 constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
 constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM { 128 };
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
+static const std::string VIRTUAL_KEYBOARD = "VirtualKeyboard";
+static const std::string VIRTUAL_TRACKPAD = "VirtualTrackpad";
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
@@ -98,6 +101,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId
     }
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     inputDevice->SetId(iter->first);
+    inputDevice->SetLocal(iter->second.isLocal);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
     FillInputDevice(inputDevice, inputDeviceOrigin);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -497,6 +501,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
+    info.isLocal = true;
     AddPhysicalInputDeviceInner(deviceId, info);
     int32_t keyboardType = 0;
     GetKeyboardType(deviceId, keyboardType);
@@ -770,10 +775,10 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         CHKPV(inputDevice);
         mprintf(fd,
             "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
-            "| product:%d | vendor:%d | phys:%s\t",
+            "| product:%d | vendor:%d | phys:%s | isVirtual:%d | isLocal:%d\t",
             inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
             inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
-            inputDevice->GetPhys().c_str());
+            inputDevice->GetPhys().c_str(), inputDevice->IsVirtual(), inputDevice->IsLocal());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
         mprintf(fd, "axis: count=%zu", axisinfo.size());
         for (const auto &axis : axisinfo) {
@@ -798,9 +803,11 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
         CHKPV(inputDevice);
         int32_t deviceId = inputDevice->GetId();
-        mprintf(fd, "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+        mprintf(fd, "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d "
+            "| vendor:%d | isVirtual:%d | isLocal:%d\t",
             deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
-            inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
+            inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
+            inputDevice->IsVirtual(), inputDevice->IsLocal());
     }
 }
 
@@ -966,6 +973,7 @@ void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const str
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
 {
     // LCOV_EXCL_START
+    SetSpecialVirtualDevice(inputDevice);
     virtualInputDevices_[deviceId] = inputDevice;
     if (IsKeyboardDevice(inputDevice)) {
         // mark true if vkbd has ever connected before; (does not set to false during disconnection)
@@ -1457,6 +1465,20 @@ void InputDeviceManager::NotifyDeviceRemoved(int32_t deviceId) const
             observer->OnDeviceRemoved(deviceId);
         }
     }
+}
+
+void InputDeviceManager::SetSpecialVirtualDevice(std::shared_ptr<InputDevice> inputDevice) const
+{
+    if (inputDevice == nullptr) {
+        MMI_HILOGE("Check inputDevice is nullptr");
+        return;
+    }
+    if ((OHOS::system::GetParameter("const.build.product", "HYM") == DEVICE_TYPE_FOLD_PC)) {
+        if ((inputDevice->GetName() == VIRTUAL_KEYBOARD || inputDevice->GetName() == VIRTUAL_TRACKPAD)) {
+            inputDevice->SetLocal(true);
+        }
+    }
+    inputDevice->SetVirtual(true);
 }
 } // namespace MMI
 } // namespace OHOS

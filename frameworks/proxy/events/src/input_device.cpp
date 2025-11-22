@@ -220,5 +220,25 @@ int32_t InputDevice::AxisInfo::GetResolution() const
 {
     return resolution_;
 }
+
+void InputDevice::SetVirtual(bool isVirtual)
+{
+    isVirtual_ = isVirtual;
+}
+ 
+void InputDevice::SetLocal(bool isLocal)
+{
+    isLocal_ = isLocal;
+}
+ 
+bool InputDevice::IsVirtual() const
+{
+    return isVirtual_;
+}
+ 
+bool InputDevice::IsLocal() const
+{
+    return isLocal_;
+}
 } // namespace MMI
 } // namespace OHOS
