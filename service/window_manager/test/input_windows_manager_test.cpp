@@ -4363,9 +4363,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     displayInfo.width = 100;
     displayInfo.height = 100;
     displayInfo.displayDirection = DIRECTION180;
-    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        it->second.displaysInfo.push_back(displayInfo);
+    auto groupIt = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (groupIt != inputWindowsManager.displayGroupInfoMap_.end()) {
+        groupIt->second.displaysInfo.push_back(displayInfo);
     }
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
@@ -4380,9 +4380,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     windowInfo.pid = 50;
     windowInfo.agentWindowId = 60;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    auto iter = inputWindowsManager.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
-    if (iter != inputWindowsManager.windowsPerDisplayMap_.end()) {
-        iter->second.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
+    auto windowIt = inputWindowsManager.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowIt != inputWindowsManager.windowsPerDisplayMap_.end()) {
+        windowIt->second.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
     }
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
     inputWindowsManager.mouseDownInfo_.id = -1;
