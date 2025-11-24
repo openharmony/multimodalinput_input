@@ -4673,7 +4673,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
+    static bool isInAnco = false;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    }
+
+    if (isInAnco) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         pointerEvent->SetAncoDeal(true);
         SimulatePointerExt(pointerEvent);
@@ -5453,7 +5458,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    static bool isInAnco = false;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN && pointerId == 0) {
+        isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    }
+
     if (isInAnco) {
         MMI_HILOG_DISPATCHD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         std::set<int32_t> windowIds;
