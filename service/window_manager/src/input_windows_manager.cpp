@@ -313,6 +313,7 @@ void InputWindowsManager::InitMouseDownInfo()
 {
     mouseDownInfo_.id = -1;
     mouseDownInfo_.pid = -1;
+    mouseDownInfo_.agentPid = -1;
     mouseDownInfo_.defaultHotAreas.clear();
     mouseDownInfo_.pointerHotAreas.clear();
 }
