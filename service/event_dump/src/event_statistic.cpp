@@ -253,6 +253,7 @@ void EventStatistic::PushPointerRecord(std::shared_ptr<PointerEvent> eventPtr)
         displayYs.push_back(it->GetDisplayY());
     }
     pointerRecordDeque_.emplace_back(eventPtr->GetActionTime(),
+        eventPtr->GetPointerAction(),
         eventPtr->GetSourceType(),
         eventPtr->GetPointerId(),
         eventPtr->HasFlag(InputEvent::EVENT_FLAG_SIMULATE),
@@ -278,6 +279,7 @@ int32_t EventStatistic::QueryPointerRecord(int32_t count, std::vector<std::share
     for (auto it = pointerRecordDeque_.end() - count; it != pointerRecordDeque_.end(); ++it) {
         auto pointerEvent = PointerEvent::Create();
         pointerEvent->SetActionTime(it->actionTime);
+        pointerEvent->SetPointerAction(it->actionType);
         pointerEvent->SetSourceType(it->sourceType);
         pointerEvent->SetPointerId(it->pointerId);
         if (it->isInject) {
