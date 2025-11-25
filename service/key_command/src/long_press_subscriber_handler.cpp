@@ -80,7 +80,7 @@ int32_t LongPressSubscriberHandler::UnsubscribeLongPressEvent(SessionPtr sess, i
                 auto fingerCount = it->first.first;
                 auto duration = it->first.second;
                 if (subscribers.empty()) {
-                    subscriberInfos_.erase(it);
+                    it = subscriberInfos_.erase(it);
                 }
                 RemoveDurationTimer(fingerCount, duration);
                 RemoveSessSubscriber(sess, subscribeId);
