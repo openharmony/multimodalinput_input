@@ -6304,8 +6304,6 @@ void InputWindowsManager::GetWidthAndHeight(const OLD::DisplayInfo* displayInfo,
 {
     if (displayInfo == nullptr) {
         MMI_HILOGE("DisplayInfo is null");
-        width = 0;
-        height = 0;
         return;
     }
     auto displayDirection = GetDisplayDirection(displayInfo);
