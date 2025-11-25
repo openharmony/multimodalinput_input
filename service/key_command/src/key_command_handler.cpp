@@ -75,7 +75,7 @@ const std::string SECURE_SETTING_URI_PROXY {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
 constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
 constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
-const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 struct SensorUser g_user = {.name = {0}, .callback = nullptr, .userData = nullptr};
 std::atomic<int32_t> g_distance { 0 };
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
@@ -185,7 +185,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
     InitializeLongPressConfigurations();
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_PULL_MOVE:
-            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+            if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullMoveEvent(touchEvent);
             }
             break;
@@ -197,7 +197,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         case PointerEvent::POINTER_ACTION_MOVE: {
             HandlePointerActionMoveEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
-            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+            if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
             }
             break;
@@ -249,7 +249,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             if (CheckBundleName(touchEvent)) {
                 LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
-            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+            if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
             break;
@@ -312,7 +312,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
-            if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+            if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
             }
             break;
@@ -1086,7 +1086,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
         !IsMusicActivate()) {
         if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-            MMI_HILOGD("lzc 0, PRODUCT_TYPE:%{public}s", PRODUCT_TYPE.c_str());
+            MMI_HILOGD("lzc 0, SYS_PRODUCT_TYPE:%{public}s", SYS_PRODUCT_TYPE.c_str());
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
             CallMistouchPrevention();
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
