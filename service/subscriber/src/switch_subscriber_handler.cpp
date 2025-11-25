@@ -85,6 +85,10 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
 void SwitchSubscriberHandler::DumpTabletStandState(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    if (switchType_ != SwitchEvent::SwitchType::SWITCH_TABLET) {
+        mprintf(fd, "current device not support\t");
+        return;
+    }
     mprintf(fd, "tablet stand state information:\t");
     mprintf(fd, "tablet stand state=%d", tabletStandState_.load());
 }
@@ -114,6 +118,10 @@ bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent>
 void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    if (switchType_ != SwitchEvent::SwitchType::SWITCH_LID) {
+        mprintf(fd, "current device not support\t");
+        return;
+    }
     mprintf(fd, "lid state information:\t");
     mprintf(fd, "lid state=%d", lidState_.load());
 }
@@ -123,6 +131,7 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
 {
     CHKPV(switchEvent);
     UpdateSwitchState(switchEvent);
+    switchType_ = switchEvent->GetSwitchType();
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
         ffrt::submit([this, switchEvent] {
             this->PublishTabletEvent(switchEvent);
