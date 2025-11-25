@@ -601,7 +601,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_RequestBuffer_002, TestSize.Level1
         .dpi = screenpointer->GetDPI() * screenpointer->GetScale(),
         .isHard = true,
     };
-    if (OHOS::system::GetParameter("const.build.product", "HYM") == DEVICE_TYPE_FOLD_PC) {
+    if (OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM) == DEVICE_TYPE_FOLD_PC) {
         defaultCursorCfg.size = 2;
     }
     bool isCommoBuffer;

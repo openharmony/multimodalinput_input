@@ -91,7 +91,7 @@ const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
-const std::string PRODUCT_TYPE_HYM = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const std::string PRODUCT_TYPE_PC = "2in1";
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
@@ -1609,7 +1609,7 @@ bool InputWindowsManager::IsKeyEventFromVKeyboard(std::shared_ptr<KeyEvent> keyE
         MMI_HILOGE("Failed to get inputDevice by deviceId: %{public}d", keyEvent->GetDeviceId());
         return false;
     }
-    return PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC && device->GetName() == "input_mt_wrapper";
+    return SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && device->GetName() == "input_mt_wrapper";
 }
 
 bool InputWindowsManager::IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const {
@@ -5590,7 +5590,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
 #endif // OHOS_BUILD_ENABLE_ONE_HAND_MODE
-    isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+    isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
     if (isFoldPC_ && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         PULL_THROW_EVENT_HANDLER->HandleFingerGesturePullUpEvent(pointerEvent);
     }

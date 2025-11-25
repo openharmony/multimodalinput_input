@@ -75,7 +75,7 @@ constexpr int32_t TWO_ARGC = 2;
 constexpr int32_t THREE_ARGC = 3;
 constexpr int32_t FOUR_ARGC = 4;
 constexpr int32_t THIRD_PARTY_CURSOR_ID = -100;
-const std::string PRODUCT_TYPE_HYM = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
@@ -1208,7 +1208,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+                                isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                 if (isFoldPC_) {
                                     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
                                 }
@@ -1253,7 +1253,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     pointerEvent->SetPointerId(pointerId);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                    isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+                                    isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                     if (isFoldPC_) {
                                         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
                                     }
@@ -1280,7 +1280,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerId(pointerId);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+                                isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                 if (isFoldPC_) {
                                     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
                                 }
@@ -1310,7 +1310,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         pointerEvent->SetPointerId(pointerId);
                                         pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                        isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+                                        isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                         if (isFoldPC_) {
                                             pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
                                         }
@@ -1335,7 +1335,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                isFoldPC_ = PRODUCT_TYPE_HYM == DEVICE_TYPE_FOLD_PC;
+                                isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
                                 if (isFoldPC_) {
                                     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_DISABLE_PULL_THROW);
                                 }

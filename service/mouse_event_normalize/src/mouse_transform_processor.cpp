@@ -58,7 +58,7 @@ constexpr int32_t SOFT_PC_PRO_DEVICE_HEIGHT { 2080 };
 constexpr int32_t TABLET_DEVICE_WIDTH { 2880 };
 constexpr int32_t TABLET_DEVICE_HEIGHT { 1920 };
 
-const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
@@ -287,7 +287,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
         return ret;
-    } else if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
+    } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
@@ -802,7 +802,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
     DeviceType deviceType = DeviceType::DEVICE_PC;
-    std::string productType = PRODUCT_TYPE;
+    std::string productType = SYS_PRODUCT_TYPE;
     if (PRODUCT_TYPE_PARSER.GetProductType(productType, deviceType) != RET_OK) {
         MMI_HILOGW("GetProductType failed, productTYpe:%{public}s", productType.c_str());
     }
@@ -1172,7 +1172,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
 {
     CALL_DEBUG_ENTER;
     DeviceType ret = DeviceType::DEVICE_PC;
-    if (PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
+    if (SYS_PRODUCT_TYPE == DEVICE_TYPE_PC_PRO) {
         if (width == HARD_PC_PRO_DEVICE_WIDTH && height == HARD_PC_PRO_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_HARD_PC_PRO;
         } else if (width == SOFT_PC_PRO_DEVICE_WIDTH && height == SOFT_PC_PRO_DEVICE_HEIGHT) {
@@ -1182,12 +1182,12 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         }
         MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
+    if (SYS_PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
         if (width == TABLET_DEVICE_WIDTH && height == TABLET_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_TABLET;
         }
     }
-    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+    if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
         ret = DeviceType::DEVICE_FOLD_PC;
     }
     return ret;
@@ -1676,7 +1676,7 @@ bool MouseTransformProcessor::IsEventFromVirtualSource(struct libinput_event* ev
     CHKPF(device);
     const std::string devName = libinput_device_get_name(device);
     // virtual touchpad's event is generated from the touchscreen on a foldable PC.
-    return (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper");
+    return (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper");
 }
 
 void MouseTransformProcessor::GetVirtualTouchpadTapSwitch(bool &switchFlag)

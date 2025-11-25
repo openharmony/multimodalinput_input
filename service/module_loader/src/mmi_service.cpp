@@ -67,6 +67,7 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "permission_helper.h"
 #include "pointer_device_manager.h"
+#include "product_name_definition.h"
 #include "cursor_drawing_component.h"
 #include "touch_event_normalize.h"
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -164,7 +165,7 @@ const std::set<int32_t> g_keyCodeValueSet = {
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t DEFAULT_USER_ID { 100 };
 #endif // OHOS_BUILD_ENABLE_ANCO
-const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
+const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 // Define vkeyboard functions from vendor
 const std::string VKEYBOARD_PATH { "libvkeyboard_device.z.so" };
@@ -4275,7 +4276,7 @@ ErrCode MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
         return ERROR_NO_PERMISSION;
     }
     vkeyboardDevice = nullptr;
-    isFoldPC_ = PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
+    isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
     if (!isFoldPC_) {
         MMI_HILOGE("Failed to create vkeyboard device, feature not support");
         return RET_ERR;
