@@ -5967,20 +5967,19 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     defined(OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER)
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
     CHKPV(InputHandler->GetKeyCommandHandler());
-    auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
-    if (isInMethodWindow) {
-        int32_t pointerId = pointerEvent->GetPointerId();
-        PointerEvent::PointerItem item;
-        if (!pointerEvent->GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
-            return;
-        }
-        if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-            item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-            pointerEvent->UpdatePointerItem(pointerId, item);
-        }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerId, item)) {
+        MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
+        return;
     }
-    if (!isInMethodWindow) {
+    auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
+    // The input method window blocks knuckle event
+    if (isInMethodWindow && item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+        item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+        pointerEvent->UpdatePointerItem(pointerId, item);
+    }
+    if (!isInMethodWindow && item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
         KnuckleDrawingComponent::GetInstance().Draw(*physicDisplayInfo, pointerEvent);
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
