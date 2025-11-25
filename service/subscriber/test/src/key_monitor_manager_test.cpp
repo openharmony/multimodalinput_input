@@ -922,7 +922,7 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_03, TestSize
     std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
     std::string name = BUNDLE_NAME_PARSER.GetBundleName("MEETIME_DTOD_NAME");
     keyMonitorManager->meeTimeMonitor_.clear();
-    keyMonitorManager->meeTimeMonitor_.emplace(name, 500); 
+    keyMonitorManager->meeTimeMonitor_.emplace(name, 500);
     KeyMonitorManager::Monitor monitor1 {
         .session_ = 100,
         .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
