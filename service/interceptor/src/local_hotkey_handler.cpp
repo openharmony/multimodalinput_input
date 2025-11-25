@@ -485,6 +485,13 @@ void LocalHotKeySteward::Dump(int32_t fd, const std::vector<std::string> &args) 
 
 LocalHotKeySteward LocalHotKeyHandler::steward_;
 
+bool LocalHotKeyHandler::IsFirstPressed(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CHKPF(keyEvent);
+    return ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) &&
+            (consumedKeys_.find(keyEvent->GetKeyCode()) == consumedKeys_.cend()));
+}
+
 bool LocalHotKeyHandler::HandleEvent(std::shared_ptr<KeyEvent> keyEvent,
     std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
@@ -523,9 +530,21 @@ void LocalHotKeyHandler::MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, Local
     }
 }
 
+void LocalHotKeyHandler::RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action)
+{
+    CHKPV(keyEvent);
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        return;
+    }
+    consumedKeys_.insert_or_assign(keyEvent->GetKeyCode(), action);
+}
+
 void LocalHotKeyHandler::HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, IInputEventHandler &handler)
 {
     CHKPV(keyEvent);
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        return;
+    }
     auto event = KeyEvent::Create();
     CHKPV(event);
     std::vector<KeyEvent::KeyItem> pressedKeys;
@@ -566,6 +585,7 @@ void LocalHotKeyHandler::Dump(int32_t fd, const std::vector<std::string> &args) 
 bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
     std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
+    CHKPF(keyEvent);
     auto hotKeyOpt = KeyEvent2LocalHotKey(keyEvent);
     if (!hotKeyOpt) {
         return false;

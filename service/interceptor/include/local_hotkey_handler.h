@@ -67,9 +67,11 @@ public:
     ~LocalHotKeyHandler() = default;
     DISALLOW_COPY_AND_MOVE(LocalHotKeyHandler);
 
+    bool IsFirstPressed(std::shared_ptr<KeyEvent> keyEvent) const;
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent,
         std::function<bool(std::shared_ptr<KeyEvent>)> intercept);
     void MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action);
+    void RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action);
     void HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, IInputEventHandler &handler);
     void Dump(int32_t fd, const std::vector<std::string> &args) const;
 
