@@ -656,5 +656,407 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_RemoveMonitor_03, TestSize
     auto meeTimeIt = keyMonitorManager->meeTimeMonitor_.find(bundleName);
     EXPECT_EQ(meeTimeIt, keyMonitorManager->meeTimeMonitor_.end());
 }
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_03
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->AddFlag(InputEvent::EVENT_MEETIME);
+    keyMonitorManager->SetMeeTimeSubcriber(true, "Test");
+    keyMonitorManager->NotifyMeeTimeMonitor(keyEvent);
+
+    bool result = keyMonitorManager->Intercept(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_04
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    bool result = keyMonitorManager->Intercept(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_05
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 400,
+        .key_ = KeyEvent::KEYCODE_MEDIA_NEXT,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 400,
+        .key_ = KeyEvent::KEYCODE_MEDIA_PREVIOUS,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor1);
+    keyMonitorManager->monitors_.emplace(monitor2);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MEDIA_NEXT);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    bool result = keyMonitorManager->Intercept(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_06
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    int32_t delay = -50;
+    bool result = keyMonitorManager->Intercept(keyEvent, delay);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_07
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    int32_t delay = 100;
+    bool result = keyMonitorManager->Intercept(keyEvent, delay);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_08
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor);
+    keyMonitorManager->SetMeeTimeSubcriber(true, "Test");
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddFlag(InputEvent::EVENT_MEETIME);
+    int32_t delay = 100;
+    
+    bool result = keyMonitorManager->Intercept(keyEvent, delay);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_09
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor {
+        .session_ = 300,
+        .key_ = KeyEvent::KEYCODE_MEDIA_NEXT,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MEDIA_NEXT);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int32_t delay = 100;
+    
+    bool result = keyMonitorManager->Intercept(keyEvent, delay);
+    EXPECT_FALSE(result);
+    EXPECT_GE(keyMonitorManager->pending_.size(), 0);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_Intercept_010
+ * @tc.desc: Verify the Intercept function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 400,
+        .key_ = KeyEvent::KEYCODE_MEDIA_NEXT,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 400,
+        .key_ = KeyEvent::KEYCODE_MEDIA_PREVIOUS,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor1);
+    keyMonitorManager->monitors_.emplace(monitor2);
+
+    std::shared_ptr<KeyEvent> keyEvent1 = KeyEvent::Create();
+    keyEvent1->SetKeyCode(KeyEvent::KEYCODE_MEDIA_NEXT);
+    keyEvent1->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int32_t delay = 100;
+    bool result1 = keyMonitorManager->Intercept(keyEvent1, delay);
+    EXPECT_FALSE(result1);
+
+    std::shared_ptr<KeyEvent> keyEvent2 = KeyEvent::Create();
+    keyEvent2->SetKeyCode(KeyEvent::KEYCODE_MEDIA_PREVIOUS);
+    keyEvent2->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    bool result2 = keyMonitorManager->Intercept(keyEvent2, delay);
+    EXPECT_FALSE(result2);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_OnSessionLost_02
+ * @tc.desc: Verify the OnSessionLost function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::string name = BUNDLE_NAME_PARSER.GetBundleName("MEETIME_DTOD_NAME");
+    keyMonitorManager->meeTimeMonitor_.clear();
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = true,
+    };
+    keyMonitorManager->monitors_.emplace(monitor1);
+    keyMonitorManager->monitors_.emplace(monitor2);
+    
+    int32_t session = 999;
+    keyMonitorManager->OnSessionLost(session);
+    EXPECT_EQ(keyMonitorManager->monitors_.size(), 2);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_OnSessionLost_03
+ * @tc.desc: Verify the OnSessionLost function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::string name = BUNDLE_NAME_PARSER.GetBundleName("MEETIME_DTOD_NAME");
+    keyMonitorManager->meeTimeMonitor_.clear();
+    keyMonitorManager->meeTimeMonitor_.emplace(name, 500);
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor1);
+
+    int32_t session = 100;
+    keyMonitorManager->OnSessionLost(session);
+    auto it = keyMonitorManager->meeTimeMonitor_.find(name);
+    EXPECT_NE(it, keyMonitorManager->meeTimeMonitor_.cend());
+    EXPECT_EQ(it->second, 500);
+    EXPECT_EQ(keyMonitorManager->monitors_.size(), 0);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_OnSessionLost_04
+ * @tc.desc: Verify the OnSessionLost function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::string name = BUNDLE_NAME_PARSER.GetBundleName("MEETIME_DTOD_NAME");
+    int32_t session = 300;
+    keyMonitorManager->meeTimeMonitor_.clear();
+    keyMonitorManager->meeTimeMonitor_.emplace(name, session);
+    
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = session,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 400,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = true,
+    };
+    keyMonitorManager->monitors_.emplace(monitor1);
+    keyMonitorManager->monitors_.emplace(monitor2);
+    keyMonitorManager->OnSessionLost(session);
+    auto it = keyMonitorManager->meeTimeMonitor_.find(name);
+    EXPECT_EQ(it, keyMonitorManager->meeTimeMonitor_.cend());
+    EXPECT_EQ(keyMonitorManager->monitors_.size(), 1);
+
+    auto remainingMonitor = keyMonitorManager->monitors_.begin();
+    EXPECT_EQ(remainingMonitor->session_, 400);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_OnSessionLost_05
+ * @tc.desc: Verify the OnSessionLost function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    keyMonitorManager->meeTimeMonitor_.clear();
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = true,
+    };
+
+    KeyMonitorManager::Monitor monitor3 {
+        .session_ = 200,
+        .key_ = KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    keyMonitorManager->monitors_.emplace(monitor1);
+    keyMonitorManager->monitors_.emplace(monitor2);
+    keyMonitorManager->monitors_.emplace(monitor3);
+    int32_t session = 100;
+    keyMonitorManager->OnSessionLost(session);
+    EXPECT_EQ(keyMonitorManager->monitors_.size(), 1);
+
+    auto remainingMonitor = keyMonitorManager->monitors_.begin();
+    EXPECT_EQ(remainingMonitor->session_, 200);
+    EXPECT_EQ(remainingMonitor->key_, KeyEvent::KEYCODE_MEDIA_PLAY_PAUSE);
+}
+
+/**
+ * @tc.name: KeyMonitorManagerTest_OnSessionLost_06
+ * @tc.desc: Verify the OnSessionLost function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_OnSessionLost_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyMonitorManager> keyMonitorManager = std::make_shared<KeyMonitorManager>();
+    std::string name = BUNDLE_NAME_PARSER.GetBundleName("MEETIME_DTOD_NAME");
+    keyMonitorManager->meeTimeMonitor_.clear();
+    keyMonitorManager->meeTimeMonitor_.emplace(name, 500);
+    KeyMonitorManager::Monitor monitor1 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_DOWN,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_ONLY_DOWN,
+        .isRepeat_ = false,
+    };
+    
+    KeyMonitorManager::Monitor monitor2 {
+        .session_ = 100,
+        .key_ = KeyEvent::KEYCODE_VOLUME_UP,
+        .action_ = KeyMonitorManager::MonitorType::MONITOR_ACTION_DOWN_AND_UP,
+        .isRepeat_ = true,
+    };
+
+    keyMonitorManager->monitors_.emplace(monitor1);
+    keyMonitorManager->monitors_.emplace(monitor2);
+    int32_t session = 999;
+    keyMonitorManager->OnSessionLost(session);
+    EXPECT_EQ(keyMonitorManager->monitors_.size(), 2);
+
+    auto it = keyMonitorManager->meeTimeMonitor_.find(name);
+    EXPECT_NE(it, keyMonitorManager->meeTimeMonitor_.cend());
+    EXPECT_EQ(it->second, 500);
+}
 } // namespace MMI
 } // namespace OHOS
