@@ -307,8 +307,8 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
     mprintf(fd, "      -k, --keycommand: dump the key command information\t");
     mprintf(fd, "      -e, --event: dump the libinput event information\t");
-    mprintf(fd, "      -t, --lidstate: dump the lid state information\t");
-    mprintf(fd, "      -b, --tabletStandState: dump the tablet stand state information\t");
+    mprintf(fd, "      -t, --lidstate: dump the status of the laptop cover\t");
+    mprintf(fd, "      -b, --tabletStandState: dump the status of the tablet stand\t");
 }
 } // namespace MMI
 } // namespace OHOS
