@@ -86,11 +86,12 @@ void SwitchSubscriberHandler::DumpTabletStandState(int32_t fd, const std::vector
 {
     CALL_DEBUG_ENTER;
     if (switchType_ != SwitchEvent::SwitchType::SWITCH_TABLET) {
-        mprintf(fd, "current device not support\t");
+        mprintf(fd, "the current device do not support dump this information\t");
         return;
     }
-    mprintf(fd, "tablet stand state information:\t");
-    mprintf(fd, "tablet stand state=%d", tabletStandState_.load());
+    mprintf(fd, "status of the tablet stand:\t");
+    mprintf(fd, "The value of the tablet stand status is %d,
+        0 means it is open, and 1 means it is closed", tabletStandState_.load());
 }
 
 bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent)
@@ -119,11 +120,12 @@ void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::st
 {
     CALL_DEBUG_ENTER;
     if (switchType_ != SwitchEvent::SwitchType::SWITCH_LID) {
-        mprintf(fd, "current device not support\t");
+        mprintf(fd, "the current device do not support dump this information\t");
         return;
     }
-    mprintf(fd, "lid state information:\t");
-    mprintf(fd, "lid state=%d", lidState_.load());
+    mprintf(fd, "status of the laptop cover:\t");
+    mprintf(fd, "The value of the laptop cover status is %d,
+        0 means it is open, and 1 means it is closed", lidState_.load());
 }
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
