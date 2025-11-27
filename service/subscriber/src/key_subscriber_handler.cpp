@@ -766,7 +766,6 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
                 keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
                 auto option = subscriber->keyOption_;
                 if (option == nullptr) {
-                    MMI_HILOGW("option is null, skip then break");
                     ++inner;
                     continue;
                 }
