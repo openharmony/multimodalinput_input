@@ -537,7 +537,7 @@ void LocalHotKeyHandler::RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, Lo
 {
     if ((keyEvent) == nullptr) {
         MMI_HILOGE("keyEvent is null");
-        return false;
+        return;
     }
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
         return;
