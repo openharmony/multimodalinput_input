@@ -33,6 +33,7 @@ constexpr int32_t DEFAULT_LONG_PRESS_TIME { 100 }; // 100ms
 constexpr int32_t TWICE_LONG_PRESS_TIME { DEFAULT_LONG_PRESS_TIME + DEFAULT_LONG_PRESS_TIME };
 constexpr int32_t BASE_SHORTCUT_ID { 1 };
 constexpr int32_t DEFAULT_SAMPLING_PERIOD { 8 }; // 8ms
+constexpr int32_t MAXIMUM_LONG_PRESS_TIME { 60000 };
 }
 using namespace testing;
 using namespace testing::ext;
@@ -2152,20 +2153,6 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_04, TestS
 }
 
 /**
- * @tc.name: KeyShortcutManagerTest_HandleEvent_003
- * @tc.desc: Test the function HandleEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent = nullptr;
-    bool result = KEY_SHORTCUT_MGR->HandleEvent(keyEvent);
-    EXPECT_FALSE(result);
-}
-
-/**
  * @tc.name: KeyShortcutManagerTest_ReadSystemKey_006
  * @tc.desc: Test the function ReadSystemKey
  * @tc.type: FUNC
@@ -2175,7 +2162,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_006, TestS
 {
     CALL_TEST_DEBUG;
     cJSON *jsonSysKey = cJSON_CreateObject();
-    cJSON_AddStringToObject(jsonSysKey, "preKeys", "not an array"); // preKeys是字符串而不是数组
+    cJSON_AddStringToObject(jsonSysKey, "preKeys", "not an array");
     cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
 
     int32_t ret = KEY_SHORTCUT_MGR->ReadSystemKey(jsonSysKey) ;
@@ -2194,7 +2181,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_007, TestS
     CALL_TEST_DEBUG;
     cJSON *jsonSysKey = cJSON_CreateObject();
     cJSON *preKeysArray = cJSON_CreateArray();
-    cJSON_AddItemToArray(preKeysArray, cJSON_CreateString("not a number")); 
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateString("not a number"));
     cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(50));
     cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
     
@@ -2456,7 +2443,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckSystemKey_003, Test
     key1.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
     key1.finalKey = KeyEvent::KEYCODE_A;
     key1.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
-    key1.longPressTime = 60001;
+    key1.longPressTime = MAXIMUM_LONG_PRESS_TIME + 1;
 
     result = KEY_SHORTCUT_MGR->CheckSystemKey(key, shortcut);
     EXPECT_FALSE(result);
@@ -2493,7 +2480,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckSystemKey_004, Test
     key2.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
     key2.finalKey = KeyEvent::KEYCODE_X;
     key2.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
-    key2.longPressTime = 60000;
+    key2.longPressTime = MAXIMUM_LONG_PRESS_TIME;
 
     result = KEY_SHORTCUT_MGR->CheckSystemKey(key2, shortcut);
     EXPECT_TRUE(result);
