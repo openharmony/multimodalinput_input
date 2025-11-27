@@ -90,6 +90,13 @@ struct libinput_event_gesture {
     struct device_coords coords[N_GESTURE_DEVICE_COORDS];
 };
 
+struct libinput_event_joystick_axis {
+    uint32_t type;
+};
+
+struct libinput_event_joystick_button {
+    uint32_t type;
+};
 
 namespace OHOS {
 namespace MMI {
@@ -155,6 +162,14 @@ public:
         struct libinput_event_tablet_tool *event) = 0;
     virtual char* DeviceGetSysname(struct libinput_device *device) = 0;
     virtual udev_device* DeviceGetUdevDevice(struct libinput_device *device) = 0;
+    virtual struct libinput_event_joystick_axis* JoystickGetAxisEvent(struct libinput_event *event) = 0;
+    virtual int32_t JoystickAxisValueIsChanged(
+        struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis) = 0;
+    virtual struct libinput_event_joystick_axis_abs_info* JoystickAxisGetAbsInfo(
+        struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis) = 0;
+    virtual struct libinput_event_joystick_button* JoystickGetButtonEvent(struct libinput_event *event) = 0;
+    virtual uint32_t JoystickButtonGetKey(struct libinput_event_joystick_button *event) = 0;
+    virtual enum libinput_button_state JoystickButtonGetKeyState(struct libinput_event_joystick_button *event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

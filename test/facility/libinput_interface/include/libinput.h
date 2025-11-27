@@ -376,6 +376,20 @@ double libinput_touchpad_device_get_hypot_size(struct libinput_device *device);
 
 int32_t libinput_touchpad_device_get_frequency(struct libinput_device *device);
 
+struct libinput_event_joystick_axis* libinput_event_get_joystick_axis_event(struct libinput_event *event);
+
+int32_t libinput_event_get_joystick_axis_value_is_changed(
+    struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis);
+
+struct libinput_event_joystick_axis_abs_info* libinput_event_get_joystick_axis_abs_info(
+    struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis);
+
+struct libinput_event_joystick_button* libinput_event_get_joystick_button_event(struct libinput_event *event);
+
+uint32_t libinput_event_joystick_button_get_key(struct libinput_event_joystick_button *event);
+
+enum libinput_button_state libinput_event_joystick_button_get_key_state(struct libinput_event_joystick_button *event);
+
 #ifdef __cplusplus
 }
 #endif
