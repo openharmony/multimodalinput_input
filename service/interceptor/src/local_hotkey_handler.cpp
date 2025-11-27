@@ -583,7 +583,6 @@ void LocalHotKeyHandler::Dump(int32_t fd, const std::vector<std::string> &args) 
 bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
     std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
-    CHKPF(keyEvent);
     auto hotKeyOpt = KeyEvent2LocalHotKey(keyEvent);
     if (!hotKeyOpt) {
         return false;
