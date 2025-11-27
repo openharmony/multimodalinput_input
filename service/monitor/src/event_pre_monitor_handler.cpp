@@ -194,7 +194,6 @@ void EventPreMonitorHandler::MonitorCollection::RemoveMonitor(SessionPtr sess, i
         auto &sessionHandlers = iter->second;
         for (auto it = sessionHandlers.begin(); it != sessionHandlers.end();) {
             if (*it == nullptr) {
-                MMI_HILOGW("it is null, skip then break");
                 ++it;
                 continue;
             }
