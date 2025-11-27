@@ -1085,6 +1085,51 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level2)
 }
 
 /**
+ * @tc.name: PointerEventTest_SetWindowXPredict_001
+ * @tc.desc: Sets the predictedx coordinate of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowXPredict_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    double x = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetWindowXPredict(x));
+    ASSERT_EQ(item.GetWindowXPredict(), x);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetWindowYPredict_001
+ * @tc.desc: Sets the predicted y coordinate of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPredict_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    double y = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetWindowYPredict(y));
+    ASSERT_EQ(item.GetWindowYPredict(), y);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetPredictExist_001
+ * @tc.desc: Sets the predicte coordinate flag of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetPredictExist_001, TestSize.Level2)
+{
+    CALL_TEST_DEBUG;
+    bool exist = true;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetPredictExist(exist));
+    ASSERT_EQ(item.GetPredictExist(), exist);
+}
+
+/**
  * @tc.name: PointerEventTest_ActionToShortStr_001
  * @tc.desc: Verify ActionToShortStr
  * @tc.type: FUNC
