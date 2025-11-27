@@ -487,6 +487,12 @@ LocalHotKeySteward LocalHotKeyHandler::steward_;
 
 bool LocalHotKeyHandler::IsFirstPressed(std::shared_ptr<KeyEvent> keyEvent) const
 {
+    do {
+        if ((keyEvent) == nullptr) {
+            MMI_HILOGE("CHKPF(%{public}s) is null", "keyEvent");
+            return false;
+        }
+    } while (0);
     return ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) &&
             (consumedKeys_.find(keyEvent->GetKeyCode()) == consumedKeys_.cend()));
 }
@@ -531,6 +537,13 @@ void LocalHotKeyHandler::MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, Local
 
 void LocalHotKeyHandler::RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action)
 {
+    do {
+        if ((keyEvent) == nullptr) {
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPV(%{public}s) is null",
+                __FILE__, __LINE__, "keyEvent");
+            return;
+        }
+    } while (0);
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
         return;
     }
@@ -583,6 +596,12 @@ void LocalHotKeyHandler::Dump(int32_t fd, const std::vector<std::string> &args) 
 bool LocalHotKeyHandler::HandleKeyDown(std::shared_ptr<KeyEvent> keyEvent,
     std::function<bool(std::shared_ptr<KeyEvent>)> intercept)
 {
+    do {
+        if ((keyEvent) == nullptr) {
+            MMI_HILOGE("CHKPF(%{public}s) is null", "keyEvent");
+            return false;
+        }
+    } while (0);
     auto hotKeyOpt = KeyEvent2LocalHotKey(keyEvent);
     if (!hotKeyOpt) {
         return false;
