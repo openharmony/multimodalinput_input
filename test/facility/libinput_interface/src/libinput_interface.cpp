@@ -511,4 +511,36 @@ enum libinput_tablet_tool_proximity_state libinput_event_tablet_tool_get_proximi
 {
     return g_instance->TabletToolGetProximityState(event);
 }
+
+struct libinput_event_joystick_axis* libinput_event_get_joystick_axis_event(struct libinput_event *event)
+{
+    return g_instance->JoystickGetAxisEvent(event);
+}
+
+int32_t libinput_event_get_joystick_axis_value_is_changed(
+    struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis)
+{
+    return g_instance->JoystickAxisValueIsChanged(event, axis);
+}
+
+struct libinput_event_joystick_axis_abs_info* libinput_event_get_joystick_axis_abs_info(
+    struct libinput_event_joystick_axis *event, enum libinput_joystick_axis_source axis)
+{
+    return g_instance->JoystickAxisGetAbsInfo(event, axis);
+}
+
+struct libinput_event_joystick_button* libinput_event_get_joystick_button_event(struct libinput_event *event)
+{
+    return g_instance->JoystickGetButtonEvent(event);
+}
+
+uint32_t libinput_event_joystick_button_get_key(struct libinput_event_joystick_button *event)
+{
+    return g_instance->JoystickButtonGetKey(event);
+}
+
+enum libinput_button_state libinput_event_joystick_button_get_key_state(struct libinput_event_joystick_button *event)
+{
+    return g_instance->JoystickButtonGetKeyState(event);
+}
 } // extern "C"
