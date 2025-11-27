@@ -194,7 +194,6 @@ void EventManager::OnClientDied(const ClientDiedEvent &event)
     for (auto iter = listeners_.begin(); iter != listeners_.end();) {
         std::shared_ptr<EventInfo> listener = *iter;
         if (listener == nullptr) {
-            MMI_HILOGW("listener is null, skip then break");
             ++iter;
             continue;
         }
