@@ -18,6 +18,7 @@
 #include <linux/input.h>
 
 #include "input_windows_manager.h"
+#include "knuckle_drawing_component.h"
 #include "mmi_matrix3.h"
 #include "mock.h"
 
@@ -4254,6 +4255,114 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_004, TestSize.Level1)
     }
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_005
+ * @tc.desc: This test verifies branch where calling PointerItem fails.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto &knuckleDrawingComponent = KnuckleDrawingComponent::GetInstance();
+
+    int32_t displayId = 0;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    OLD::DisplayGroupInfo groupInfo;
+    OLD::DisplayInfo info;
+    info.id = displayId;
+    groupInfo.displaysInfo.push_back(info);
+    inputWindowsManager->displayGroupInfoMap_[displayId] = groupInfo;
+
+    ASSERT_NE(InputHandler, nullptr);
+    InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
+    ASSERT_NE(InputHandler->GetKeyCommandHandler(), nullptr);
+
+    auto callTime = std::chrono::steady_clock::now();
+    inputWindowsManager->DrawTouchGraphic(pointerEvent);
+
+    ASSERT_FALSE(knuckleDrawingComponent.lastCallTime_ >= callTime);
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_006
+ * @tc.desc: This test verifies branch where the PointerEvent is TOOL_TYPE_FINGER
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto &knuckleDrawingComponent = KnuckleDrawingComponent::GetInstance();
+
+    int32_t displayId = 0;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    PointerEvent::PointerItem item;
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+
+    OLD::DisplayGroupInfo groupInfo;
+    OLD::DisplayInfo info;
+    info.id = displayId;
+    groupInfo.displaysInfo.push_back(info);
+    inputWindowsManager->displayGroupInfoMap_[displayId] = groupInfo;
+
+    ASSERT_NE(InputHandler, nullptr);
+    InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
+    ASSERT_NE(InputHandler->GetKeyCommandHandler(), nullptr);
+
+    auto callTime = std::chrono::steady_clock::now();
+    inputWindowsManager->DrawTouchGraphic(pointerEvent);
+    ASSERT_FALSE(knuckleDrawingComponent.lastCallTime_ >= callTime);
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_007
+ * @tc.desc: This test verifies branch where the PointerEvent is TOOL_TYPE_KNUCKLE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto &knuckleDrawingComponent = KnuckleDrawingComponent::GetInstance();
+
+    int32_t displayId = 0;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    PointerEvent::PointerItem item;
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+
+    OLD::DisplayGroupInfo groupInfo;
+    OLD::DisplayInfo info;
+    info.id = displayId;
+    groupInfo.displaysInfo.push_back(info);
+    inputWindowsManager->displayGroupInfoMap_[displayId] = groupInfo;
+
+    ASSERT_NE(InputHandler, nullptr);
+    InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
+    ASSERT_NE(InputHandler->GetKeyCommandHandler(), nullptr);
+
+    auto callTime = std::chrono::steady_clock::now();
+    inputWindowsManager->DrawTouchGraphic(pointerEvent);
+    ASSERT_TRUE(knuckleDrawingComponent.lastCallTime_ >= callTime);
 }
 
 /**
