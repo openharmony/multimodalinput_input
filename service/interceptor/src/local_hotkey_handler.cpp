@@ -487,7 +487,6 @@ LocalHotKeySteward LocalHotKeyHandler::steward_;
 
 bool LocalHotKeyHandler::IsFirstPressed(std::shared_ptr<KeyEvent> keyEvent) const
 {
-    CHKPF(keyEvent);
     return ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) &&
             (consumedKeys_.find(keyEvent->GetKeyCode()) == consumedKeys_.cend()));
 }
@@ -532,7 +531,6 @@ void LocalHotKeyHandler::MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, Local
 
 void LocalHotKeyHandler::RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action)
 {
-    CHKPV(keyEvent);
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
         return;
     }
