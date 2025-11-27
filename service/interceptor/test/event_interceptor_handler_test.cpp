@@ -113,6 +113,280 @@ HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: HandleKeyEvent_002
+ * @tc.desc: Test LocalHotKeyHandler::IsFirstPressed with various scenarios
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LocalHotKeyHandler handler;
+
+    EXPECT_FALSE(handler.IsFirstPressed(nullptr));
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_F);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    EXPECT_TRUE(handler.IsFirstPressed(event));
+
+    handler.consumedKeys_.insert_or_assign(KeyEvent::KEYCODE_F, LocalHotKeyAction::INTERCEPT);
+    EXPECT_FALSE(handler.IsFirstPressed(event));
+
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_FALSE(handler.IsFirstPressed(event));
+}
+
+/**
+ * @tc.name: HandleKeyEvent_003
+ * @tc.desc: Test LocalHotKeyHandler::RectifyProcessed with various scenarios
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LocalHotKeyHandler handler;
+
+    handler.RectifyProcessed(nullptr, LocalHotKeyAction::INTERCEPT);
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_F);
+
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.RectifyProcessed(event, LocalHotKeyAction::INTERCEPT);
+    auto iter = handler.consumedKeys_.find(KeyEvent::KEYCODE_F);
+    EXPECT_EQ(iter, handler.consumedKeys_.end());
+
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.RectifyProcessed(event, LocalHotKeyAction::COPY);
+    iter = handler.consumedKeys_.find(KeyEvent::KEYCODE_F);
+    EXPECT_NE(iter, handler.consumedKeys_.end());
+    EXPECT_EQ(iter->second, LocalHotKeyAction::COPY);
+
+    handler.RectifyProcessed(event, LocalHotKeyAction::OVER);
+    iter = handler.consumedKeys_.find(KeyEvent::KEYCODE_F);
+    EXPECT_NE(iter, handler.consumedKeys_.end());
+    EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+}
+
+/**
+ * @tc.name: HandleKeyEvent_004
+ * @tc.desc: Test EventInterceptorHandler::HandleKeyEvent when key is first pressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler eventHandler;
+    auto mockHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(mockHandler);
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_G);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetKeyCode(KeyEvent::KEYCODE_G);
+    keyItem.SetPressed(true);
+    event->AddPressedKeyItems(keyItem);
+
+    EXPECT_TRUE(eventHandler.localHotKeyHandler_.IsFirstPressed(event));
+
+    LocalHotKeyHandler::steward_.localHotKeys_.clear();
+
+    eventHandler.HandleKeyEvent(event);
+
+    auto iter = eventHandler.localHotKeyHandler_.consumedKeys_.find(KeyEvent::KEYCODE_G);
+    EXPECT_NE(iter, eventHandler.localHotKeyHandler_.consumedKeys_.end());
+    EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+}
+
+/**
+ * @tc.name: HandleKeyEvent_005
+ * @tc.desc: Test EventInterceptorHandler::HandleKeyEvent when key is not first pressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler eventHandler;
+    auto mockHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(mockHandler);
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_H);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetKeyCode(KeyEvent::KEYCODE_H);
+    keyItem.SetPressed(true);
+    event->AddPressedKeyItems(keyItem);
+
+    eventHandler.localHotKeyHandler_.consumedKeys_.insert_or_assign(KeyEvent::KEYCODE_H, LocalHotKeyAction::INTERCEPT);
+    EXPECT_FALSE(eventHandler.localHotKeyHandler_.IsFirstPressed(event));
+
+    LocalHotKeyHandler::steward_.localHotKeys_.clear();
+
+    eventHandler.HandleKeyEvent(event);
+
+    auto iter = eventHandler.localHotKeyHandler_.consumedKeys_.find(KeyEvent::KEYCODE_H);
+    EXPECT_NE(iter, eventHandler.localHotKeyHandler_.consumedKeys_.end());
+    EXPECT_NE(iter->second, LocalHotKeyAction::OVER);
+}
+
+/**
+ * @tc.name: HandleKeyEvent_006
+ * @tc.desc: Test HandleKeyEvent_003::RectifyProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LocalHotKeyHandler handler;
+
+    handler.RectifyProcessed(nullptr, LocalHotKeyAction::INTERCEPT);
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_E);
+
+    event->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.RectifyProcessed(event, LocalHotKeyAction::INTERCEPT);
+
+    auto iter = handler.consumedKeys_.find(KeyEvent::KEYCODE_E);
+    EXPECT_EQ(iter, handler.consumedKeys_.end());
+}
+
+/**
+ * @tc.name: HandleKeyEvent_007
+ * @tc.desc: Test EventInterceptorHandler::HandleKeyEvent when local hotkey not matched but isFirstPressed,
+ *           verify RectifyProcessed is called with LocalHotKeyAction::OVER
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    LocalHotKeyHandler::steward_.localHotKeys_.clear();
+    LocalHotKeyHandler::steward_.localHotKeys_.emplace(
+        LocalHotKey {
+            .keyCode_ = KeyEvent::KEYCODE_TAB,
+            .modifiers_ = KeyShortcutManager::SHORTCUT_MODIFIER_ALT,
+        }, LocalHotKeyAction::INTERCEPT);
+        
+    LocalHotKeyHandler::steward_.localHotKeys_.emplace(
+        LocalHotKey {
+            .keyCode_ = KeyEvent::KEYCODE_DEL,
+            .modifiers_ = KeyShortcutManager::SHORTCUT_MODIFIER_CTRL | KeyShortcutManager::SHORTCUT_MODIFIER_ALT,
+        }, LocalHotKeyAction::INTERCEPT);
+
+    auto event = KeyEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetKeyCode(KeyEvent::KEYCODE_A);
+    event->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyEvent::KeyItem keyItem {};
+    keyItem.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyItem.SetPressed(true);
+    event->AddPressedKeyItems(keyItem);
+
+    auto eventHandler = std::make_shared<InputEventHandlerMock>();
+    EventInterceptorHandler handler;
+    handler.SetNext(eventHandler);
+
+    handler.HandleKeyEvent(event);
+
+    auto iter = handler.localHotKeyHandler_.consumedKeys_.find(KeyEvent::KEYCODE_A);
+    EXPECT_NE(iter, handler.localHotKeyHandler_.consumedKeys_.end());
+    if (iter != handler.localHotKeyHandler_.consumedKeys_.end()) {
+        EXPECT_EQ(iter->second, LocalHotKeyAction::OVER);
+    }
+
+    EXPECT_FALSE(eventHandler->events_.empty());
+}
+
+/**
+ * @tc.name: HandleKeyEvent_008
+ * @tc.desc: Test EventInterceptorHandler::HandleKeyEvent when key event is intercepted,
+ *           then re-inject the same key to verify down/up matching in interceptor and local handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, HandleKeyEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    LocalHotKeyHandler::steward_.localHotKeys_.clear();
+
+    LocalHotKeyHandler::steward_.localHotKeys_.emplace(
+        LocalHotKey {
+            .keyCode_ = KeyEvent::KEYCODE_TAB,
+            .modifiers_ = KeyShortcutManager::SHORTCUT_MODIFIER_ALT,
+        }, LocalHotKeyAction::INTERCEPT);
+
+    LocalHotKeyHandler::steward_.localHotKeys_.emplace(
+        LocalHotKey {
+            .keyCode_ = KeyEvent::KEYCODE_DEL,
+            .modifiers_ = KeyShortcutManager::SHORTCUT_MODIFIER_CTRL | KeyShortcutManager::SHORTCUT_MODIFIER_ALT,
+        }, LocalHotKeyAction::INTERCEPT);
+
+    auto eventHandler = std::make_shared<InputEventHandlerMock>();
+    EventInterceptorHandler handler;
+    handler.SetNext(eventHandler);
+
+    auto altTabDownEvent = KeyEvent::Create();
+    ASSERT_NE(altTabDownEvent, nullptr);
+    altTabDownEvent->SetKeyCode(KeyEvent::KEYCODE_TAB);
+    altTabDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyEvent::KeyItem altKeyItem {};
+    altKeyItem.SetKeyCode(KeyEvent::KEYCODE_ALT_LEFT);
+    altKeyItem.SetPressed(true);
+    altTabDownEvent->AddPressedKeyItems(altKeyItem);
+    
+    KeyEvent::KeyItem tabKeyItem {};
+    tabKeyItem.SetKeyCode(KeyEvent::KEYCODE_TAB);
+    tabKeyItem.SetPressed(true);
+    altTabDownEvent->AddPressedKeyItems(tabKeyItem);
+
+    handler.HandleKeyEvent(altTabDownEvent);
+
+    auto iterTab = handler.localHotKeyHandler_.consumedKeys_.find(KeyEvent::KEYCODE_TAB);
+    EXPECT_NE(iterTab, handler.localHotKeyHandler_.consumedKeys_.end());
+    if (iterTab != handler.localHotKeyHandler_.consumedKeys_.end()) {
+        EXPECT_EQ(iterTab->second, LocalHotKeyAction::OVER);
+    }
+
+    auto altTabUpEvent = KeyEvent::Create();
+    ASSERT_NE(altTabUpEvent, nullptr);
+    altTabUpEvent->SetKeyCode(KeyEvent::KEYCODE_TAB);
+    altTabUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    KeyEvent::KeyItem altKeyUpItem {};
+    altKeyUpItem.SetKeyCode(KeyEvent::KEYCODE_ALT_LEFT);
+    altKeyUpItem.SetPressed(false);
+    altTabUpEvent->AddPressedKeyItems(altKeyUpItem);
+
+    KeyEvent::KeyItem tabKeyUpItem {};
+    tabKeyUpItem.SetKeyCode(KeyEvent::KEYCODE_TAB);
+    tabKeyUpItem.SetPressed(false);
+    altTabUpEvent->AddPressedKeyItems(tabKeyUpItem);
+
+    handler.HandleKeyEvent(altTabUpEvent);
+
+    iterTab = handler.localHotKeyHandler_.consumedKeys_.find(KeyEvent::KEYCODE_TAB);
+    EXPECT_EQ(iterTab, handler.localHotKeyHandler_.consumedKeys_.end());
+}
+
+/**
  * @tc.name: EventInterceptorHandler_Test_001
  * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC

@@ -46,6 +46,7 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
         return;
     }
+    auto isFirstPressed = localHotKeyHandler_.IsFirstPressed(keyEvent);
     auto isOver = localHotKeyHandler_.HandleEvent(keyEvent,
         [this](std::shared_ptr<KeyEvent> keyEvent) -> bool {
             return OnHandleEvent(keyEvent);
@@ -59,6 +60,8 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         DfxHisysevent::ReportKeyEvent("intercept");
         return;
+    } else if (isFirstPressed) {
+        localHotKeyHandler_.RectifyProcessed(keyEvent, LocalHotKeyAction::OVER);
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
