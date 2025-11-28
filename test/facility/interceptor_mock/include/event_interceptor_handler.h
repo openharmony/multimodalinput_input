@@ -15,14 +15,17 @@
 
 #ifndef MMI_EVENT_INTERCEPTOR_HANDLER_MOCK_H
 #define MMI_EVENT_INTERCEPTOR_HANDLER_MOCK_H
+
 #include <cstdint>
-#include <gmock/gmock.h>
+
+#include "gmock/gmock.h"
+#include "i_input_event_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IEventInterceptorHandler {
+class IEventInterceptorHandler : public IInputEventHandler {
 public:
     IEventInterceptorHandler() = default;
     virtual ~IEventInterceptorHandler() = default;
@@ -38,6 +41,9 @@ public:
     EventInterceptorHandler() = default;
     virtual ~EventInterceptorHandler() override = default;
 
+    MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, AddInputHandler, (InputHandlerType, HandleEventType, int32_t, uint32_t, SessionPtr));
     MOCK_METHOD(void, RemoveInputHandler, (InputHandlerType, HandleEventType, int32_t, uint32_t, SessionPtr));
 };
