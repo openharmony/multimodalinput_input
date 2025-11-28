@@ -2098,5 +2098,330 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatModifiers, TestSiz
     auto ret = KEY_SHORTCUT_MGR->FormatModifiers(modifiers) ;
     EXPECT_EQ(ret, "2045,2046,2048,2054,...");
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_004
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 100;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_005
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 200;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_006
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.finalKey = KeyEvent::KEYCODE_B;
+    shortcut.session = 100;
+    shortcut.modifiers = 0;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_007
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 100;
+    shortcut.modifiers = 0;
+    shortcut.longPressTime = 0;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_008
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut1;
+    shortcut1.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut1.finalKey = KeyEvent::KEYCODE_A;
+    shortcut1.session = 100;
+    shortcut1.modifiers = 0;
+    shortcut1.longPressTime = 0;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut1;
+
+    KeyShortcutManager::KeyShortcut shortcut2;
+    shortcut2.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut2.finalKey = KeyEvent::KEYCODE_A;
+    shortcut2.session = 100;
+    shortcut2.modifiers = 0;
+    shortcut2.longPressTime = 0;
+    KEY_SHORTCUT_MGR->shortcuts_[2] = shortcut2;
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_009
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut1;
+    shortcut1.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut1.finalKey = KeyEvent::KEYCODE_A;
+    shortcut1.session = 100;
+    shortcut1.modifiers = 0;
+    shortcut1.longPressTime = 1000;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut1;
+
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(KEY_SHORTCUT_MGR->triggering_.size(), 1);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_010
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 100;
+    shortcut.modifiers = 0;
+    shortcut.longPressTime = 1000;
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+
+    bool result1 = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result1);
+    EXPECT_EQ(KEY_SHORTCUT_MGR->triggering_.size(), 1);
+
+    bool result2 = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result2);
+    EXPECT_EQ(KEY_SHORTCUT_MGR->triggering_.size(), 1);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_004
+ * @tc.desc: Test the function HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::KeyShortcut shortcut = {};
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 1000;
+    shortcut.modifiers = 0;
+    shortcut.longPressTime = 1000;
+    bool callbackCalled = false;
+    shortcut.callback = [&callbackCalled](std::shared_ptr<KeyEvent>) {
+        callbackCalled = true;
+    };
+
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(500000);
+
+    KeyEvent::KeyItem keyItem;
+    keyItem.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyItem.SetDownTime(100000);
+    keyItem.SetPressed(false);
+    keyEvent->AddKeyItem(keyItem);
+
+
+    bool result = KEY_SHORTCUT_MGR->HandleKeyUp(keyEvent);
+    EXPECT_TRUE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_005
+ * @tc.desc: Test the function HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::KeyShortcut shortcut = {};
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 1000;
+    shortcut.modifiers = 0;
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    bool result = KEY_SHORTCUT_MGR->HandleKeyUp(keyEvent);
+    EXPECT_TRUE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_006
+ * @tc.desc: Test the function HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::KeyShortcut shortcut = {};
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.finalKey = KeyEvent::KEYCODE_B;
+    shortcut.session = 1000;
+    shortcut.modifiers = 0;
+    
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+    
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    bool result = KEY_SHORTCUT_MGR->HandleKeyUp(keyEvent);
+    EXPECT_FALSE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_007
+ * @tc.desc: Test the function HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::KeyShortcut shortcut = {};
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 2000;
+    
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    bool result = KEY_SHORTCUT_MGR->HandleKeyUp(keyEvent);
+    EXPECT_TRUE(result);
+
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_008
+ * @tc.desc: Test the function HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::KeyShortcut shortcut = {};
+    shortcut.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.finalKey = KeyEvent::KEYCODE_A;
+    shortcut.session = 1000;
+    
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+    KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
+    
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    bool result = KEY_SHORTCUT_MGR->HandleKeyUp(keyEvent);
+
+    EXPECT_FALSE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
+}
 } // namespace MMI
 } // namespace OHOS
