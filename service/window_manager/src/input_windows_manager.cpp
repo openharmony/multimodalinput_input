@@ -5575,6 +5575,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerEvent->SetBuffer(extraData_.buffer);
         pointerEvent->SetPullId(extraData_.pullId);
         UpdatePointerAction(pointerEvent);
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL &&
+            pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_LEFT_RIGHT_ANTI_AXIS_MOVE)) {
+            MMI_HILOG_DISPATCHW("zhf@@@ flag is EVENT_FLAG_SIMULATE_LEFT_RIGHT_ANTI_AXIS_MOVE");
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
+        }
         if (pointerAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW &&
             pointerAction != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
             PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
