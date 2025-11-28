@@ -5577,7 +5577,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         UpdatePointerAction(pointerEvent);
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL &&
             pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_LEFT_RIGHT_ANTI_AXIS_MOVE)) {
-            MMI_HILOG_DISPATCHW("zhf@@@ flag is EVENT_FLAG_SIMULATE_LEFT_RIGHT_ANTI_AXIS_MOVE");
+            MMI_HILOG_DISPATCHI("The cancel injected by the gesture window is converted to pull-cancel.");
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_CANCEL);
         }
         if (pointerAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW &&
