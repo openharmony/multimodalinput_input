@@ -73,9 +73,9 @@ private:
     std::atomic_bool callbackInitialized_ { false };
     std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
     std::unordered_map<int32_t, int32_t> switchStateRecord_;
-    std::atomic<int32_t> lidState_{ 0 };
-    std::atomic<int32_t> tabletStandState_{ 0 };
-    int switchType_ { 0 };
+    std::atomic<int32_t> lidState_ { 0 };
+    std::atomic<int32_t> tabletStandState_ { 0 };
+    std::atomic<int32_t> switchEventType_ {0};
 };
 } // namespace MMI
 } // namespace OHOS
