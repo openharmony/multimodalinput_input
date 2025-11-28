@@ -1473,7 +1473,7 @@ void InputDeviceManager::SetSpecialVirtualDevice(std::shared_ptr<InputDevice> in
         MMI_HILOGE("Check inputDevice is nullptr");
         return;
     }
-    if ((OHOS::system::GetParameter("const.build.product", "HYM") == DEVICE_TYPE_FOLD_PC)) {
+    if ((OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM) == DEVICE_TYPE_FOLD_PC)) {
         if ((inputDevice->GetName() == VIRTUAL_KEYBOARD || inputDevice->GetName() == VIRTUAL_TRACKPAD)) {
             inputDevice->SetLocal(true);
         }

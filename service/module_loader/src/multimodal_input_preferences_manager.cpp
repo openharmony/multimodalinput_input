@@ -41,8 +41,8 @@ constexpr int32_t POINTER_SIZE_FOLD_PC { 2 };
 
 int32_t GetPointSize()
 {
-    const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-    if (PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
+    const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
+    if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
         return POINTER_SIZE_FOLD_PC;
     }
     return POINTER_SIZE_DEFAULT;
