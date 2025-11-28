@@ -2459,6 +2459,7 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
     currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
     currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
     currentPointerItem.SetPointerId(0);
+    currentPointerItem.SetToolType(lastPointerItem.GetToolType());
     pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
     SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(id);
