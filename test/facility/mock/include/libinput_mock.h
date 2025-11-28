@@ -83,6 +83,13 @@ public:
         (struct libinput_event_tablet_tool *));
     MOCK_METHOD(char*, DeviceGetSysname, (struct libinput_device *));
     MOCK_METHOD(udev_device*, DeviceGetUdevDevice, (struct libinput_device *));
+    MOCK_METHOD(int, DeviceHasCapability, (struct libinput_device *, enum libinput_device_capability));
+    MOCK_METHOD(int32_t, DeviceHasKey, (struct libinput_device*, int32_t));
+    MOCK_METHOD(int32_t, DeviceGetAxisMin, (struct libinput_device*, int32_t));
+    MOCK_METHOD(int32_t, DeviceGetAxisMax, (struct libinput_device*, int32_t));
+    MOCK_METHOD(int32_t, DeviceGetAxisFuzz, (struct libinput_device*, int32_t));
+    MOCK_METHOD(int32_t, DeviceGetAxisFlat, (struct libinput_device*, int32_t));
+    MOCK_METHOD(int32_t, DeviceGetAxisResolution, (struct libinput_device*, int32_t));
     MOCK_METHOD(struct libinput_event_joystick_axis*, JoystickGetAxisEvent, (struct libinput_event *));
     MOCK_METHOD(int32_t, JoystickAxisValueIsChanged,
         (struct libinput_event_joystick_axis *, enum libinput_joystick_axis_source));
@@ -91,6 +98,9 @@ public:
     MOCK_METHOD(struct libinput_event_joystick_button*, JoystickGetButtonEvent, (struct libinput_event *));
     MOCK_METHOD(uint32_t, JoystickButtonGetKey, (struct libinput_event_joystick_button *));
     MOCK_METHOD(enum libinput_button_state, JoystickButtonGetKeyState, (struct libinput_event_joystick_button *));
+    MOCK_METHOD(struct libinput_event_switch*, GetSwitchEvent, (struct libinput_event*));
+    MOCK_METHOD(enum libinput_switch, SwitchGetSwitch, (struct libinput_event_switch*));
+    MOCK_METHOD(enum libinput_switch_state, SwitchGetSwitchState, (struct libinput_event_switch*));
 };
 } // namespace MMI
 } // namespace OHOS

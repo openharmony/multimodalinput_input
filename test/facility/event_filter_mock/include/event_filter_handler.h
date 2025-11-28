@@ -16,12 +16,14 @@
 #ifndef MMI_EVENT_FILTER_HANDLER_MOCK_H
 #define MMI_EVENT_FILTER_HANDLER_MOCK_H
 #include <cstdint>
-#include <gmock/gmock.h>
+
+#include "gmock/gmock.h"
+#include "i_input_event_handler.h"
 #include "ievent_filter.h"
 
 namespace OHOS {
 namespace MMI {
-class IEventFilterHandler {
+class IEventFilterHandler : public IInputEventHandler {
 public:
     IEventFilterHandler() = default;
     virtual ~IEventFilterHandler() = default;
@@ -36,6 +38,9 @@ public:
     EventFilterHandler() = default;
     ~EventFilterHandler() override = default;
 
+    MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, AddInputEventFilter, (sptr<IEventFilter>, int32_t, int32_t, uint32_t, int32_t));
     MOCK_METHOD(int32_t, RemoveInputEventFilter, (int32_t, int32_t));
 };

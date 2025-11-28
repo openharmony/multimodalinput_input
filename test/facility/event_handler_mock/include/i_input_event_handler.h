@@ -37,23 +37,21 @@ public:
     IInputEventHandler() = default;
     virtual ~IInputEventHandler() = default;
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) = 0;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_POINTER
     virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
-#endif // OHOS_BUILD_ENABLE_POINTER
-#ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_SWITCH
+
     virtual void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
     {
         if (nextHandler_ != nullptr) {
             nextHandler_->HandleSwitchEvent(switchEvent);
         }
     }
-#endif // OHOS_BUILD_ENABLE_SWITCH
+
+    virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
+    {
+        nextHandler_ = nextHandler;
+    }
 
 protected:
     std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };

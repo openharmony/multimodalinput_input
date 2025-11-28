@@ -33,11 +33,13 @@ ohos_source_set("event_handler_mock") {
   include_dirs = [
     "include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/util/common/include",
   ]
 
   sources = [
     "src/anr_manager.cpp",
     "src/input_event_handler.cpp",
+    "src/key_auto_repeat.cpp",
     "src/key_event_value_transformation.cpp",
     "src/key_map_manager.cpp",
   ]

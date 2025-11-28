@@ -15,14 +15,17 @@
 
 #ifndef MMI_KEY_SUBSCRIBER_HANDLER_MOCK_H
 #define MMI_KEY_SUBSCRIBER_HANDLER_MOCK_H
+
 #include <cstdint>
-#include <gmock/gmock.h>
+
+#include "gmock/gmock.h"
+#include "i_input_event_handler.h"
 #include "key_option.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IKeySubscriberHandler {
+class IKeySubscriberHandler : public IInputEventHandler {
 public:
     IKeySubscriberHandler() = default;
     virtual ~IKeySubscriberHandler() = default;
@@ -36,6 +39,9 @@ public:
     KeySubscriberHandler() = default;
     virtual ~KeySubscriberHandler() override = default;
 
+    MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, SubscribeKeyEvent, (SessionPtr, int32_t, const std::shared_ptr<KeyOption>));
     MOCK_METHOD(int32_t, UnsubscribeKeyEvent, (SessionPtr, int32_t));
 };

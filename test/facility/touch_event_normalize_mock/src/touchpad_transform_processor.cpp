@@ -13,14 +13,23 @@
  * limitations under the License.
  */
 
-#include "cursor_drawing_component_mock.h"
+#include "touchpad_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
-CursorDrawingComponent& CursorDrawingComponent::GetInstance()
+std::shared_ptr<MultiFingersTapHandler> MultiFingersTapHandler::instance_ = nullptr;
+
+std::shared_ptr<MultiFingersTapHandler> MultiFingersTapHandler::GetInstance()
 {
-    static CursorDrawingComponent instance;
-    return instance;
+    if (instance_ == nullptr) {
+        instance_ = std::make_shared<MultiFingersTapHandler>();
+    }
+    return instance_;
+}
+
+void MultiFingersTapHandler::ReleaseInstance()
+{
+    instance_.reset();
 }
 } // namespace MMI
 } // namespace OHOS
