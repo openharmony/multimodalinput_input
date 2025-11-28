@@ -129,7 +129,7 @@ bool ScreenPointer::Init(PointerRenderer &render)
         .dpi = this->GetDPI() * this->GetScale(),
         .isHard = true,
     };
-    if (OHOS::system::GetParameter("const.build.product", "HYM") == DEVICE_TYPE_FOLD_PC) {
+    if (OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM) == DEVICE_TYPE_FOLD_PC) {
         defaultCursorCfg.size = POINTER_SIZE_FOLD_PC;
     }
     defaultCursorCfg_ = defaultCursorCfg;
