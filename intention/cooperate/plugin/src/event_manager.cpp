@@ -193,7 +193,10 @@ void EventManager::OnClientDied(const ClientDiedEvent &event)
     FI_HILOGI("Remove client died listener, pid:%{public}d", event.pid);
     for (auto iter = listeners_.begin(); iter != listeners_.end();) {
         std::shared_ptr<EventInfo> listener = *iter;
-        CHKPC(listener);
+        if (listener == nullptr) {
+            ++iter;
+            continue;
+        }
         if (event.pid == listener->pid) {
             iter = listeners_.erase(iter);
             break;

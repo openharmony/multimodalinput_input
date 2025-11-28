@@ -193,7 +193,10 @@ void EventPreMonitorHandler::MonitorCollection::RemoveMonitor(SessionPtr sess, i
     for (auto iter = sessionHandlers_.begin(); iter != sessionHandlers_.end();) {
         auto &sessionHandlers = iter->second;
         for (auto it = sessionHandlers.begin(); it != sessionHandlers.end();) {
-            CHKPC(*it);
+            if (*it == nullptr) {
+                ++it;
+                continue;
+            }
             if ((*it)->handlerId_ == handlerId && (*it)->session_ == sess) {
                 it = sessionHandlers.erase(it);
             } else {
