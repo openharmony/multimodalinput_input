@@ -765,7 +765,10 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
                     subscriber->timerId_, sess->GetPid());
                 keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
                 auto option = subscriber->keyOption_;
-                CHKPC(option);
+                if (option == nullptr) {
+                    ++inner;
+                    continue;
+                }
                 MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{private}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscriber->id_, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
