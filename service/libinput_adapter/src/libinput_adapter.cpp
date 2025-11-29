@@ -45,6 +45,7 @@ constexpr int32_t MAX_RETRY_COUNT { 5 };
 constexpr int32_t MIN_RIGHT_BTN_AREA_PERCENT { 0 };
 constexpr int32_t MAX_RIGHT_BTN_AREA_PERCENT { 100 };
 constexpr int32_t INVALID_RIGHT_BTN_AREA { -1 };
+constexpr int32_t MAX_EVENT_INTERVAL_TIME { 4000 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 constexpr uint32_t VKEY_TP_LB_ID { 272 };
 constexpr uint32_t VKEY_TP_SEAT_BTN_COUNT_NONE { 0 };
@@ -970,6 +971,7 @@ void LibinputAdapter::OnEventHandler()
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
     int64_t frameTime = GetSysClockTime();
+    hasPendingEvents_ = false;
     while ((event = libinput_get_event(input_))) {
         libinput_event_type eventType = libinput_event_get_type(event);
         std::string msg = "OnEventHandler, eventType is: " + std::to_string(eventType);
@@ -1013,10 +1015,19 @@ void LibinputAdapter::OnEventHandler()
         funInputEvent_(event, frameTime);
         libinput_event_destroy(event);
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+        if (libinput_next_event_type(input_) == LIBINPUT_EVENT_KEYBOARD_KEY) {
+            int64_t currentTime = GetSysClockTime();
+            if (currentTime - frameTime > MAX_EVENT_INTERVAL_TIME) {
+                MMI_HILOGW("KeyEvent read time exceeds 4 milliseconds");
+                break;
+            }
+        }
         BytraceAdapter::MMIServiceTraceStop();
     }
     if (event == nullptr) {
         funInputEvent_(nullptr, 0);
+    } else {
+        hasPendingEvents_ = true;
     }
 }
 
@@ -1026,6 +1037,16 @@ void LibinputAdapter::ReloadDevice()
     CHKPV(input_);
     libinput_suspend(input_);
     libinput_resume(input_);
+}
+
+bool LibinputAdapter::HasPendingEvents()
+{
+    return hasPendingEvents_;
+}
+
+void LibinputAdapter::HandlePendingEvents()
+{
+    OnEventHandler();
 }
 
 void LibinputAdapter::OnDeviceAdded(std::string path)
