@@ -94,8 +94,8 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void UnsubscribeKeyEvent([in] int subscribeId);
     void SubscribeHotkey([in] int subscribeId, [in] KeyOption keyOption);
     void UnsubscribeHotkey([in] int subscribeId);
-    void SubscribeKeyMonitor([in] KeyMonitorOption keyOption);
-    void UnsubscribeKeyMonitor([in] KeyMonitorOption keyOption);
+    [macrodef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER] void SubscribeKeyMonitor([in] KeyMonitorOption keyOption);
+    [macrodef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER] void UnsubscribeKeyMonitor([in] KeyMonitorOption keyOption);
     void SubscribeSwitchEvent([in] int subscribeId, [in] int switchType);
     void UnsubscribeSwitchEvent([in] int subscribeId);
     void SubscribeTabletProximity([in] int subscribeId);
