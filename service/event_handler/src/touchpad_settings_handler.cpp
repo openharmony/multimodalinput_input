@@ -279,9 +279,9 @@ bool TouchpadSettingsObserver::UnregisterSingleObserver(
         auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
         if (settingHelper.UnregisterObserver(observer, datashareUri_) != 0) {
             MMI_HILOGE("Unregister %{public}s fail", observerName.c_str());
-            observer = nullptr;
             return false;
         }
+        observer = nullptr;
     }
     return true;
 }
