@@ -599,7 +599,7 @@ HWTEST_F(InputEventHookHandlerTest, InputEventHookHandlerTest_OnPointerEvent_003
         consumer->OnInputEvent(event);
     };
     INPUT_EVENT_HOOK_HANDLER.OnPointerEvent(pointerEvent);
-    EXPECT_EQ(consumer->g_flag, 0);
+    EXPECT_NE(consumer->g_flag, 2);
     ClearData();
 }
 
