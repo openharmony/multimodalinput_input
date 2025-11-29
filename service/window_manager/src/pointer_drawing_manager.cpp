@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -3350,84 +3350,125 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
     lastDisplayId_ = rsId;
 }
 
+bool PointerDrawingManager::ShouldSkipScreen(const sptr<OHOS::Rosen::ScreenInfo> &screen)
+{
+    if (screen == nullptr) {
+        MMI_HILOGW("Screen is null");
+        return true;
+    }
+    if (screen->GetType() == OHOS::Rosen::ScreenType::UNDEFINED) {
+        return true;
+    }
+    if (screen->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+        screen->GetSourceMode() != OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+        return true;
+    }
+    return false;
+}
+
+sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindMainScreenInfo(
+    const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
+{
+    sptr<OHOS::Rosen::ScreenInfo> mainScreen = nullptr;
+    std::set<uint64_t> screenIds;
+    // Update or construct ScreenPointer for new ScreenInfo
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (const auto &screen : screens) {
+        if (ShouldSkipScreen(screen)) {
+            continue;
+        }
+        uint64_t sid = screen->GetRsId();
+        screenIds.insert(sid);
+        // Find main screenInfo
+        if (screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
+            mainScreen = screen;
+        }
+        auto [iter, insertOk] = screenPointers_.try_emplace(sid, nullptr);
+        if (!insertOk && iter->second != nullptr) {
+            // Update ScreenPointer when it already exist
+            iter->second->UpdateScreenInfo(screen);
+            MMI_HILOGI("Update ScreenPointer, screenId=%{public}" PRIu64, sid);
+        } else {
+            // Create and init ScreenPointer when it does not exist
+            auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, screen);
+            if (sp == nullptr || !sp->Init(pointerRenderer_)) {
+                MMI_HILOGE("Failed to init ScreenPointer, screenId=%{public}" PRIu64, sid);
+                screenPointers_.erase(iter);
+                continue;
+            }
+            iter->second = sp;
+            MMI_HILOGI("Create ScreenPointer, screenId=%{public}" PRIu64, sid);
+        }
+        if (screen->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
+            screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            iter->second->SetVirtualExtend(true);
+        }
+    }
+    // Delete ScreenPointers that disappeared
+    for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
+        if (screenIds.count(it->first) == 0) {
+            MMI_HILOGI("OnScreenModeChange, delete screen %{public}" PRIu64, it->first);
+            it = screenPointers_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    // Return main screenInfo
+    return mainScreen;
+}
+
+void PointerDrawingManager::UpdateScreenScalesAndPadding(const sptr<OHOS::Rosen::ScreenInfo> &mainScreen)
+{
+    if (mainScreen == nullptr) {
+        MMI_HILOGE("MainScreen is null");
+        return;
+    }
+
+    uint32_t mainWidth = GetScreenInfoWidth(mainScreen);
+    uint32_t mainHeight = GetScreenInfoHeight(mainScreen);
+    rotation_t mainRotation = static_cast<rotation_t>(mainScreen->GetRotation());
+    float mainDPI = mainScreen->GetVirtualPixelRatio();
+    // Update screen scale and padding
+    std::lock_guard<std::mutex> lock(mtx_);
+    for (auto& [sid, sp] : screenPointers_) {
+        if (sp == nullptr) {
+            MMI_HILOGE("ScreenPointer is null, screenId=%{public}" PRIu64, sid);
+            continue;
+        }
+        if (sp->IsMirror()) {
+            // Update ScreenPointer on the mirror screen
+            sp->SetRotation(mainRotation);
+            sp->UpdatePadding(mainWidth, mainHeight);
+            if (hasDisplay_ && displayInfo_.displaySourceMode == DisplaySourceMode::SCREEN_MAIN) {
+                sp->SetIsWindowRotation(IsWindowRotation(&displayInfo_));
+                sp->SetDisplayDirection(displayInfo_.displayDirection);
+            }
+            sp->SetDPI(mainDPI);
+        }
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+        if (sp->IsMirror() || sp->IsMain()) {
+            mainWidth = sp->GetMirrorWidth() == 0 ? mainWidth : sp->GetMirrorWidth();
+            mainHeight = sp->GetMirrorHeight() == 0 ? mainHeight : sp->GetMirrorHeight();
+            sp->UpdatePadding(mainWidth, mainHeight);
+        }
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
+    }
+}
+
 void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
 {
     MMI_HILOGI("OnScreenModeChange enter, screen size:%{public}zu", screens.size());
-    std::set<uint64_t> sids;
-    uint32_t mainWidth = 0;
-    uint32_t mainHeight = 0;
-    rotation_t mainRotation = static_cast<rotation_t>(DIRECTION0);
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        // construct ScreenPointers for new screens
-        for (auto si : screens) {
-            CHKPC(si);
-            if (si->GetType() != OHOS::Rosen::ScreenType::REAL && !(si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND)) {
-                continue;
-            }
-            uint64_t sid = si->GetRsId();
-            sids.insert(sid);
-
-            if (si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
-                mainWidth = GetScreenInfoWidth(si);
-                mainHeight = GetScreenInfoHeight(si);
-                mainRotation = static_cast<rotation_t>(si->GetRotation());
-            }
-
-            auto it = screenPointers_.find(sid);
-            if (it != screenPointers_.end()) {
-                // ScreenPointer already exist
-                MMI_HILOGI("OnScreenModeChange screen %{public}" PRIu64 " info update", sid);
-                it->second->UpdateScreenInfo(si);
-            } else {
-                // Create & Init ScreenPointer
-                MMI_HILOGI("OnScreenModeChange got new screen %{public}" PRIu64, sid);
-                auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, si);
-                screenPointers_[sid] = sp;
-                if (!sp->Init(pointerRenderer_)) {
-                    MMI_HILOGE("ScreenPointer::Init failed, screenId=%{public}" PRIu64, sid);
-                }
-            }
-            if (si->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-                si->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
-                screenPointers_[sid]->SetVirtualExtend(true);
-            }
-        }
-
-        // delete ScreenPointers that disappeared
-        for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
-            if (!sids.count(it->first)) {
-                MMI_HILOGI("OnScreenModeChange, delete screen %{public}" PRIu64, it->first);
-                it = screenPointers_.erase(it);
-            } else {
-                it++;
-            }
-        }
-
-        // update screen scale and padding
-        for (auto sp : screenPointers_) {
-            CHKPC(sp.second);
-            if (sp.second->IsMirror()) {
-                sp.second->SetRotation(mainRotation);
-                sp.second->UpdatePadding(mainWidth, mainHeight);
-            }
-#ifdef OHOS_BUILD_EXTERNAL_SCREEN
-            if (sp.second->IsMirror() || sp.second->IsMain()) {
-                mainWidth = sp.second->GetMirrorWidth() == 0 ? mainWidth : sp.second->GetMirrorWidth();
-                mainHeight = sp.second->GetMirrorHeight() == 0 ? mainHeight : sp.second->GetMirrorHeight();
-                sp.second->UpdatePadding(mainWidth, mainHeight);
-            }
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
-        }
+    if (screens.empty()) {
+        return;
     }
-    std::shared_ptr<DelegateInterface> delegateProxy =
-        IPointerDrawingManager::GetInstance()->GetDelegateProxy();
-    CHKPV(delegateProxy);
-    delegateProxy->OnPostSyncTask([this] {
-        if (this->hasDisplay_) {
-            this->UpdateDisplayInfo(displayInfo_);
-        }
+    std::shared_ptr<DelegateInterface> delegateProxy = IPointerDrawingManager::GetInstance()->GetDelegateProxy();
+    if (delegateProxy == nullptr) {
+        MMI_HILOGE("delegateProxy is nullptr");
+        return;
+    }
+    delegateProxy->OnPostSyncTask([this, screens] {
+        auto mainScreen = this->UpdateScreenPointerAndFindMainScreenInfo(screens);
+        this->UpdateScreenScalesAndPadding(mainScreen);
         this->UpdatePointerVisible();
         return RET_OK;
     });

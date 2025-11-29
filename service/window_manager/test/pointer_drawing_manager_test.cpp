@@ -3662,5 +3662,260 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdatePointerItemC
     pointerDrawingManager.UpdatePointerItemCursorInfo(pointerItem);
     ASSERT_EQ(pointerItem.GetVisible(), visible);
 }
+
+/**
+ * @tc.name: ShouldSkipScreen
+ * @tc.desc: Test all branches of ShouldSkipScreen function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, ShouldSkipScreen, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(nullptr));
+
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+
+    screen->SetType(OHOS::Rosen::ScreenType::UNDEFINED);
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+
+    screen->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    EXPECT_TRUE(pointerDrawingManager.ShouldSkipScreen(screen));
+
+    screen->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    EXPECT_FALSE(pointerDrawingManager.ShouldSkipScreen(screen));
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_001
+ * @tc.desc: Test branches that UpdateScreenPointerAndFindMainScreenInfo's parameter screens is empty
+ * and screenPointers_ is empty.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    screens.push_back(nullptr);
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, nullptr);
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_002
+ * @tc.desc: Test branches that UpdateScreenPointerAndFindMainScreenInfo's parameter screens is empty and
+ * and screenPointers_ is not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp});
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, nullptr);
+    EXPECT_TRUE(pointerDrawingManager.screenPointers_.empty());
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_003
+ * @tc.desc: Test branches that the parameter screen contains main screenInfo and
+ * and screenPointers_ is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(0);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screens.push_back(screen);
+
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, screen);
+    EXPECT_FALSE(pointerDrawingManager.screenPointers_.empty());
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_004
+ * @tc.desc: Test branches that calling UpdateScreenInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(0);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screens.push_back(screen);
+
+    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp});
+
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, screen);
+    EXPECT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_005
+ * @tc.desc: Test branches that calling SetVirtualExtend
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen1 = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen1, nullptr);
+    screen1->SetRsId(0);
+    screen1->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen1->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screens.push_back(screen1);
+
+    sptr<OHOS::Rosen::ScreenInfo> screen2 = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen2, nullptr);
+    screen2->SetRsId(1);
+    screen2->SetType(OHOS::Rosen::ScreenType::VIRTUAL);
+    screen2->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND);
+    screens.push_back(screen2);
+
+    auto sp1 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp1, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp1});
+
+    auto sp2 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp2, nullptr);
+    sp2->SetVirtualExtend(false);
+    pointerDrawingManager.screenPointers_.insert({1, sp2});
+    size_t spCount = pointerDrawingManager.screenPointers_.size();
+
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, screen1);
+    EXPECT_EQ(pointerDrawingManager.screenPointers_.size(), spCount);
+    EXPECT_TRUE(sp2->isVirtualExtend_);
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_006
+ * @tc.desc: Test branches that calling SetVirtualExtend
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(0);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screens.push_back(screen);
+
+    auto sp1 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp1, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp1});
+
+    auto sp2 = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp2, nullptr);
+    pointerDrawingManager.screenPointers_.insert({1, sp2});
+    size_t spCount = pointerDrawingManager.screenPointers_.size();
+
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, screen);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size() + 1, spCount);
+}
+
+/**
+ * @tc.name: UpdateScreenScalesAndPadding_001
+ * @tc.desc: Test branches that the parameter mainScreen is null or screenPointers_ is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenScalesAndPadding_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.UpdateScreenScalesAndPadding(nullptr);
+
+    pointerDrawingManager.screenPointers_.insert({0, nullptr});
+    sptr<OHOS::Rosen::ScreenInfo> mainScreen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(mainScreen, nullptr);
+    mainScreen->SetRsId(0);
+    mainScreen->SetType(OHOS::Rosen::ScreenType::REAL);
+    mainScreen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    pointerDrawingManager.UpdateScreenScalesAndPadding(mainScreen);
+    EXPECT_GT(pointerDrawingManager.screenPointers_.size(), 0);
+}
+
+/**
+ * @tc.name: UpdateScreenScalesAndPadding_002
+ * @tc.desc: Test branches that the pointer on the mirror screen updates.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenScalesAndPadding_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    sptr<OHOS::Rosen::ScreenInfo> mainScreen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(mainScreen, nullptr);
+    mainScreen->SetRsId(0);
+    mainScreen->SetType(OHOS::Rosen::ScreenType::REAL);
+    mainScreen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    mainScreen->SetRotation(OHOS::Rosen::Rotation::ROTATION_0);
+    mainScreen->SetVirtualPixelRatio(1.0);
+
+    auto mainSp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(mainSp, nullptr);
+    mainSp->mode_ = mode_t::SCREEN_MAIN;
+    mainSp->SetDPI(1.0);
+    mainSp->SetRotation(OHOS::Rosen::Rotation::ROTATION_0);
+    pointerDrawingManager.screenPointers_.insert({0, mainSp});
+
+    auto mirrorSp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(mirrorSp, nullptr);
+    mirrorSp->mode_ = mode_t::SCREEN_MIRROR;
+    mirrorSp->SetDPI(2.0);
+    mirrorSp->SetRotation(OHOS::Rosen::Rotation::ROTATION_90);
+    pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
+
+    pointerDrawingManager.UpdateScreenScalesAndPadding(mainScreen);
+    EXPECT_EQ(mainSp->GetRotation(), OHOS::Rosen::Rotation::ROTATION_0);
+    EXPECT_EQ(mainSp->GetDPI(), 1.0);
+    EXPECT_EQ(mirrorSp->GetRotation(), mainScreen->GetRotation());
+    EXPECT_EQ(mirrorSp->GetDPI(), mainScreen->GetVirtualPixelRatio());
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1287,6 +1287,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwm",
+    "window_manager:libwmutil",
     "window_manager:libwsutils",
   ]
 }
