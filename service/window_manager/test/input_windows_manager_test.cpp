@@ -6266,6 +6266,73 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_016
+ * @tc.desc: Test UpdateTouchScreenTarget to verify the branch isInAnco be assigned
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_016, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    OLD::DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t windowId = 1;
+    displayInfo.id = displayId;
+    displayInfo.x = 300;
+    displayInfo.y = 500;
+    displayInfo.width = 100;
+    displayInfo.height = 100;
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(windowId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressure(1.0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.id = windowId;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = windowId;
+    displayGroupInfo.windowsInfo.push_back(winInfo);
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = pointerId;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    auto displayGroupIter = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (displayGroupIter != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        displayGroupIter->second.displaysInfo.push_back(displayInfo);
+    }
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    auto windowsPerDisplayIter = inputWindowsMgr.windowsPerDisplayMap_.find(DEFAULT_GROUP_ID);
+    if (windowsPerDisplayIter != inputWindowsMgr.windowsPerDisplayMap_.end()) {
+        windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
+    }
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_001
  * @tc.desc: Test the function SendCancelEventWhenLock
  * @tc.type: FUNC
