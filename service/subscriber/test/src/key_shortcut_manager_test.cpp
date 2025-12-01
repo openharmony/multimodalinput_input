@@ -2119,6 +2119,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_004, TestS
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
     bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_FALSE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
@@ -2141,6 +2142,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_005, TestS
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
     bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_TRUE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
@@ -2164,6 +2166,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_006, TestS
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
     bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_FALSE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
@@ -2188,6 +2191,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_007, TestS
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
     bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_TRUE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
@@ -2220,6 +2224,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_008, TestS
     KEY_SHORTCUT_MGR->shortcuts_[2] = shortcut2;
     bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_TRUE(result);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
@@ -2246,6 +2251,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_009, TestS
     bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_TRUE(result);
     EXPECT_EQ(KEY_SHORTCUT_MGR->triggering_.size(), 1);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
@@ -2276,6 +2282,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_010, TestS
     bool result2 = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
     EXPECT_TRUE(result2);
     EXPECT_EQ(KEY_SHORTCUT_MGR->triggering_.size(), 1);
+    KEY_SHORTCUT_MGR->shortcuts_.clear();
 }
 
 /**
