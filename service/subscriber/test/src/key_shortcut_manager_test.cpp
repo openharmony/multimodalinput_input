@@ -2300,10 +2300,6 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_004, TestSiz
     shortcut.session = 1000;
     shortcut.modifiers = 0;
     shortcut.longPressTime = 1000;
-    bool callbackCalled = false;
-    shortcut.callback = [&callbackCalled](std::shared_ptr<KeyEvent>) {
-        callbackCalled = true;
-    };
 
     KEY_SHORTCUT_MGR->shortcuts_.clear();
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
