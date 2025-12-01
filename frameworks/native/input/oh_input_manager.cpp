@@ -3317,7 +3317,7 @@ Input_Result OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
         MMI_HILOGE("Invalid windowid");
         return INPUT_PARAMETER_ERROR;
     }
-    if (pointerStyle < OHOS::MMI::DEFAULT || pointerStyle > OHOS::MMI::LASER_CURSOR_DOT_RED) {
+    if (pointerStyle < OHOS::MMI::DEFAULT || pointerStyle > OHOS::MMI::SCREENRECORDER_CURSOR) {
         MMI_HILOGE("Undefined pointer style");
         return INPUT_PARAMETER_ERROR;
     }
@@ -3488,7 +3488,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
             case INPUT_INVALID_WINDOWID:
                 return INPUT_INVALID_WINDOWID;
             default:
-                return INPUT_SERVICE_EXCEPTION;
+                return INPUT_PARAMETER_ERROR;
         }
     }
     return INPUT_SUCCESS;

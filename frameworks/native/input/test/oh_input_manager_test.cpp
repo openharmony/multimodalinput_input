@@ -4277,7 +4277,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_002, Te
     res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     res = OH_Input_SetCustomCursor(windowId, customCursor2, cursorConfig);
-    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     OH_Input_CustomCursor_Destroy(&customCursor);
     OH_Input_CustomCursor_Destroy(&customCursor2);
     OH_Input_CursorConfig_Destroy(&cursorConfig);
