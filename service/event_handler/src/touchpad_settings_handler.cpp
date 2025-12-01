@@ -347,7 +347,7 @@ void TouchpadSettingsObserver::SetSwitchDefaultState(int32_t master, int32_t ena
         enableValue = g_switchStateOpen;
         auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
         auto ret = settingHelper.GetStringValue(g_touchpadSwitchesKey, masterValue, datashareUri_);
-        MMI_HILOGI("current switch key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), masterValue.c_str());
+        MMI_HILOGI("current key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), masterValue.c_str());
         if (ret != ERR_OK) {
             masterValue = g_switchStateOpen;
         }
