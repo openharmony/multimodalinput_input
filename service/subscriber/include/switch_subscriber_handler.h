@@ -41,8 +41,8 @@ public:
     void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent) override;
     bool PublishTabletEvent(const std::shared_ptr<SwitchEvent> switchEvent);
     bool PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent);
+    void DumpTabletStandState(int32_t fd, const std::vector<std::string> &args);
     void DumpLidState(int32_t fd, const std::vector<std::string> &args);
-    const std::string COMMON_EVENT_TABLET_MODE_CHANGED = "usual.event.TABLET_MODE_CHANGED";
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
@@ -73,7 +73,9 @@ private:
     std::atomic_bool callbackInitialized_ { false };
     std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
     std::unordered_map<int32_t, int32_t> switchStateRecord_;
-    std::atomic<int32_t> lidState_{ 0 };
+    std::atomic<int32_t> lidState_ { 0 };
+    std::atomic<int32_t> tabletStandState_ { 0 };
+    std::atomic<int32_t> switchEventType_ {0};
 };
 } // namespace MMI
 } // namespace OHOS
