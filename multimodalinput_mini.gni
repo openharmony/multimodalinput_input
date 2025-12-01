@@ -529,6 +529,10 @@ if (input_feature_touch_drawing) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH_DRAWING" ]
 }
 
+if (!input_feature_keyboard) {
+  input_feature_key_pressed_handler = false
+}
+
 if (input_feature_key_pressed_handler) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER" ]
 }
