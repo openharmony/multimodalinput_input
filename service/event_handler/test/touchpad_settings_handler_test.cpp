@@ -612,27 +612,52 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_002, TestSize
 }
 
 /**
- * @tc.name: SetDefaultState_001
- * @tc.desc: Test input different key to SetDefaultState Func
+ * @tc.name: SetSwitchDefaultState_001
+ * @tc.desc: (master != ERR_OK && enable != ERR_OK) || (master == ERR_OK && enable != ERR_OK)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchpadSettingsHandlerTest, SetDefaultState_001, TestSize.Level1)
+HWTEST_F(TouchpadSettingsHandlerTest, SetSwitchDefaultState_001, TestSize.Level1)
 {
-    std::string key = g_touchpadMasterSwitchesKey;
-    std::string value;
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetDefaultState(key, value));
-    EXPECT_TRUE(value == "1");
+    int32_t master = ERR_INVALID_VALUE;
+    int32_t enable = ERR_INVALID_VALUE;
+    std::string masterValue = "";
+    std::string enableValue = "";
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
+    EXPECT_TRUE(enableValue == "1");
 
-    key = g_keepTouchpadEnableSwitchesKey;
-    value = "";
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetDefaultState(key, value));
-    EXPECT_TRUE(value == "1");
+    master = ERR_OK;
+    enable = ERR_INVALID_VALUE;
+    masterValue = "1";
+    enableValue = "";
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
+    EXPECT_TRUE(enableValue == "1");
+    EXPECT_TRUE(masterValue == "1");
+}
 
-    key = "TEST_KEY";
-    value = "TEST_VALUE";
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetDefaultState(key, value));
-    EXPECT_TRUE(value == "TEST_VALUE");
+/**
+ * @tc.name: SetSwitchDefaultState_002
+ * @tc.desc: (master != ERR_OK && enable == ERR_OK) || (master == ERR_OK && enable == ERR_OK)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchpadSettingsHandlerTest, SetSwitchDefaultState_002, TestSize.Level1)
+{
+    int32_t master = ERR_INVALID_VALUE;
+    int32_t enable = ERR_OK;
+    std::string masterValue = "";
+    std::string enableValue = "1";
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
+    EXPECT_TRUE(enableValue == "1");
+    EXPECT_TRUE(masterValue == "1");
+
+    master = ERR_OK;
+    enable = ERR_OK;
+    masterValue = "1";
+    enableValue = "1";
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
+    EXPECT_TRUE(enableValue == "1");
+    EXPECT_TRUE(masterValue == "1");
 }
 
 /**

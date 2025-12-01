@@ -40,7 +40,7 @@ private:
     bool UnregisterSingleObserver(sptr<SettingObserver>& observer, const std::string& observerName);
     sptr<SettingObserver> RegisterSwipeInwardObserver();
     sptr<SettingObserver> RegisterDatashareObserver(const std::string key, SettingObserver::UpdateFunc onUpdate);
-    void SetDefaultState(const std::string &key, std::string &value);
+    void SetSwitchDefaultState(int32_t master, int32_t enable, std::string &masterValue, std::string &enableValue);
     void LoadSwitchState();
     int32_t SetTouchpadState();
     bool touchpadMasterSwitches_ { false };
