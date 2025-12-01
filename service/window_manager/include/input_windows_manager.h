@@ -207,6 +207,7 @@ public:
         int32_t deviceId);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId, int32_t deviceId);
     void ClearTargetDeviceWindowId(int32_t deviceId);
+    void ClearFirstTouchWindowInfos(int32_t deviceId);
     void ClearTargetWindowId(int32_t pointerId, int32_t deviceId);
     bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
@@ -498,6 +499,13 @@ private:
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
+    const WindowInfo* ProcessFirstTouchHitPolicy(std::shared_ptr<PointerEvent> pointerEvent,
+        PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
+    bool IsFirstTouchHitWindow(int32_t deviceId);
+    const WindowInfo* ProcessFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
+        const WindowInfo* touchWindow);
+    void ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
+        PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -549,7 +557,7 @@ private:
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
-
+    std::map<int32_t, WindowInfo> firstTouchWindowInfos_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
         int32_t windowId { -1 };

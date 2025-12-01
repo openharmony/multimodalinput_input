@@ -93,6 +93,7 @@ public:
     virtual const std::vector<WindowInfo> GetWindowGroupInfoByDisplayIdCopy(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetDeviceWindowId(int32_t deviceId) = 0;
+    virtual void ClearFirstTouchWindowInfos(int32_t deviceId) = 0;
     virtual void ClearTargetWindowId(int32_t pointerId, int32_t deviceId) = 0;
     virtual std::pair<double, double> TransformDisplayXY(const OLD::DisplayInfo &info,
         double logicX, double logicY) const = 0;

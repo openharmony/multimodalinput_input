@@ -1168,8 +1168,10 @@ void ServerMsgHandler::Printf(const UserScreenInfo& userScreenInfo)
         }
         for (const auto &itemWindow : item.windowsInfo) {
             MMI_HILOGD(
-                "windows,id:%{public}d,pid:%{public}d,agentPid:%{public}d,displayId:%{public}d,groupId:%{public}d",
-                itemWindow.id, itemWindow.pid, itemWindow.agentPid, itemWindow.displayId, itemWindow.groupId);
+                "windows,id:%{public}d,pid:%{public}d,agentPid:%{public}d,displayId:%{public}d,groupId:%{public}d,"
+                "windowType:%{public}d,windowInputType:%{public}d,flags:%{public}d",
+                itemWindow.id, itemWindow.pid, itemWindow.agentPid, itemWindow.displayId, itemWindow.groupId,
+                itemWindow.windowType, static_cast<int32_t>(itemWindow.windowInputType), itemWindow.flags);
         }
         num++;
     }
