@@ -2109,6 +2109,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_004, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2132,6 +2133,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_005, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2155,6 +2157,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_006, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2179,6 +2182,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_007, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2204,6 +2208,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_008, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2237,6 +2242,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_009, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2264,6 +2270,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_010, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
@@ -2305,6 +2312,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_004, TestSiz
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     keyEvent->SetActionTime(500000);
@@ -2339,6 +2347,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_005, TestSiz
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 
@@ -2366,6 +2375,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_006, TestSiz
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
     
     auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     bool result = KEY_SHORTCUT_MGR->HandleKeyUp(keyEvent);
@@ -2391,6 +2401,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_007, TestSiz
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
 
     auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     
@@ -2418,6 +2429,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_008, TestSiz
     KEY_SHORTCUT_MGR->shortcuts_[1] = shortcut;
     
     auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     
