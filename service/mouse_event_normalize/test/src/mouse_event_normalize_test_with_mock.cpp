@@ -156,7 +156,7 @@ HWTEST_F(MouseEventNormalizeTestWithMock, OnDeviceRemoved_001, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(norm.OnDeviceRemoved(deviceId1));
     auto iter1 = norm.processors_.find(deviceId);
     if (iter1 != norm.processors_.end()) {
-        EXPECT_EQ(iter->second, processor);
+        EXPECT_EQ(iter1->second, processor);
     }
     EXPECT_TRUE(iter1 != norm.processors_.end());
 
