@@ -3943,7 +3943,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
-                    if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
+                    if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) == WindowInputPolicy::FLAG_DRAG_DISABLED) {
                         winId2ZorderMap.insert({item.id, item.zOrder});
                         continue;
                     }
@@ -5303,7 +5303,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
             if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
                 item.defaultHotAreas, item)) {
-                if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
+                if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) ==
+                    WindowInputPolicy::FLAG_DRAG_DISABLED) {
                     continue;
                 }
                 UpdateTargetTouchWinIds(item, pointerItem, pointerEvent, pointerId, displayId,
@@ -5795,7 +5796,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
                 continue;
             }
-            if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
+            if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) == WindowInputPolicy::FLAG_DRAG_DISABLED) {
                 continue;
             }
             if (IsInHotArea(lastTouchLogicX_, lastTouchLogicY_, item.defaultHotAreas, item)) {

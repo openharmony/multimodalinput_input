@@ -433,7 +433,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.pointerHotAreas = {
         {0, 0, 30, 40}
     };
@@ -520,7 +521,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.pointerHotAreas = {
         {0, 0, 30, 40}
     };
@@ -669,7 +671,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo info;
     info.id = 1;
     info.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
-
+    info.flags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     WindowInfo windowInfo;
     windowInfo.id = 1;
     info.uiExtentionWindowInfo.push_back(windowInfo);
@@ -706,7 +708,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo info;
     info.id = 0;
     info.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
-
+    info.flags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     WindowInfo windowInfo;
     windowInfo.id = 0;
     info.uiExtentionWindowInfo.push_back(windowInfo);
@@ -744,7 +746,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo info;
     info.id = 0;
     info.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
-
+    info.flags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     WindowInfo windowInfo;
     windowInfo.id = -1;
     info.uiExtentionWindowInfo.push_back(windowInfo);
@@ -1132,7 +1134,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     inputWindowsManager->lastTouchEvent_ = pointerEvent;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -2378,7 +2381,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     pointerItem.SetGlobalY(DBL_MAX);
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -3006,6 +3010,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchEnterLeaveE
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    touchWindow.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     inputWindowsManager->lastTouchWindowInfo_.id = 5;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 

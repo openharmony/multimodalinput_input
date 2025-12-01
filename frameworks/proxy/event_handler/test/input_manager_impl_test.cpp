@@ -2354,5 +2354,126 @@ HWTEST_F(InputManagerImplTest, GetLastEventIds_001, TestSize.Level1)
     EXPECT_TRUE(processedId >= 0);
     EXPECT_TRUE(dispatchedEventId >= 0);
 }
+
+/**
+ * @tc.name: WindowInputTypeToFlag_001
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::NORMAL;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), window.flags);
+}
+
+/**
+ * @tc.name: WindowInputTypeToFlag_002
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
+    uint32_t resultWindowFlags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
+}
+
+/**
+ * @tc.name: WindowInputTypeToFlag_003
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    uint32_t resultWindowFlags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
+}
+
+/**
+ * @tc.name: WindowInputTypeToFlag_004
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
+    uint32_t resultWindowFlags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL |
+                           WindowInputPolicy::FLAG_DRAG_DISABLED;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
+}
+
+/**
+ * @tc.name: WindowInputTypeToFlag_005
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    uint32_t resultWindowFlags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                            WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
+}
+
+/**
+ * @tc.name: WindowInputTypeToFlag_006
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::TRANSMIT_ALL;
+    uint32_t resultWindowFlags = WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL | WindowInputPolicy::FLAG_DRAG_DISABLED;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
+}
+
+/**
+ * @tc.name: WindowInputTypeToFlag_007
+ * @tc.desc: Test WindowInputTypeToFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    WindowInfo window;
+    window.flags = 0;
+    window.windowInputType = WindowInputType::SLID_TOUCH_WINDOW;
+    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), window.flags);
+}
 } // namespace MMI
 } // namespace OHOS
