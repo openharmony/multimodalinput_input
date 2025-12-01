@@ -190,6 +190,20 @@ enum class WindowInputType : uint8_t {
     DUALTRIGGER_TOUCH = 60
 };
 
+enum WindowInputPolicy : uint32_t {
+    FLAG_UNTOUCHABLE = 1 << 0,
+    FLAG_HANDWRITING = 1 << 1,
+    FLAG_DISABLE_USER_ACTION = 1 << 2,
+    FLAG_POINTER_LOCKED = 1 << 3,
+    FLAG_POINTER_CONFINED = 1 << 4,
+    FLAG_FIRST_TOUCH_HIT = 1 << 5,
+    FLAG_MOUSE_UNHITTABLE = 1 << 6,
+    FLAG_MOUSE_LEFT_BUTTON_LOCK = 1 << 7,
+    FLAG_STYLUS_ANTI_MISTAKE = 1 << 8,
+    FLAG_EVENT_TRANSMIT_ALL = 1 << 9,
+    FLAG_DRAG_DISABLED = 1 << 10,
+};
+
 struct WindowInfo {
     /**
      * Maximum number of hot areas
