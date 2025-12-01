@@ -278,8 +278,8 @@ static ani_object StringArrayToObject(ani_env *env, const std::vector<std::strin
 {
     ani_object arrayObj = nullptr;
     ani_class arrayCls = nullptr;
-    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
-        MMI_HILOGE("FindClass Lescompat/Array; Failed");
+    if (ANI_OK != env->FindClass("std.core.Array", &arrayCls)) {
+        MMI_HILOGE("FindClass Lstd/core/Array; Failed");
     }
 
     ani_method arrayCtor;
@@ -366,8 +366,8 @@ static std::string EmptyAxisRangesSource(ani_env *env, ani_object obj, std::shar
         MMI_HILOGD("SourceType not found");
         ani_object arrayObj = nullptr;
         ani_class arrayCls = nullptr;
-        if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
-            MMI_HILOGE("FindClass Lescompat/Array; Failed");
+        if (ANI_OK != env->FindClass("std.core.Array", &arrayCls)) {
+            MMI_HILOGE("FindClass Lstd/core/Array; Failed");
         }
 
         ani_method arrayCtor;
@@ -538,8 +538,8 @@ static ani_object SetCreateArrayAxisRangesObj(ani_env *env, std::shared_ptr<Inpu
 {
     ani_object arrayAxisRangesObj = nullptr;
     ani_class arrayCls = nullptr;
-    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
-        MMI_HILOGE("FindClass Lescompat/Array; Failed");
+    if (ANI_OK != env->FindClass("std.core.Array", &arrayCls)) {
+        MMI_HILOGE("FindClass Lstd/core/Array; Failed");
     }
 
     ani_method arrayCtor;
@@ -639,8 +639,8 @@ static ani_object DoubleArrayToObject(ani_env *env, const std::shared_ptr<std::v
 {
     ani_object arrayObj = nullptr;
     ani_class arrayCls = nullptr;
-    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
-        MMI_HILOGE("FindClass Lescompat/Array; Failed");
+    if (ANI_OK != env->FindClass("std.core.Array", &arrayCls)) {
+        MMI_HILOGE("FindClass Lstd/core/Array; Failed");
         return arrayObj;
     }
 
