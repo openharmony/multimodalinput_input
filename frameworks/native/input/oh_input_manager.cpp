@@ -3488,7 +3488,7 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
             case INPUT_INVALID_WINDOWID:
                 return INPUT_INVALID_WINDOWID;
             default:
-                return INPUT_PARAMETER_ERROR;
+                return INPUT_SERVICE_EXCEPTION;
         }
     }
     return INPUT_SUCCESS;
