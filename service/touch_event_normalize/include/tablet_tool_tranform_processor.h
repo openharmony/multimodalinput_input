@@ -36,6 +36,7 @@ private:
     bool OnTipDown(struct libinput_event_tablet_tool* event);
     bool OnTipMotion(struct libinput_event* event);
     bool OnTipUp(struct libinput_event_tablet_tool* event);
+    bool IsTouching(struct libinput_event_tablet_tool* tabletEvent);
     void DrawTouchGraphic();
     void DrawTouchGraphicIdle();
     void DrawTouchGraphicDrawing();
