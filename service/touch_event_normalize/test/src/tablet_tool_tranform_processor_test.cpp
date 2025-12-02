@@ -221,6 +221,29 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipM
 }
 
 /**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_004
+ * @tc.desc: Test the function OnTipMotion in TabletToolTranformProcessorTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CalculateTipPoint).WillOnce(Return(true));
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event event = {};
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_tablet_tool eventTabletTool = {};
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&eventTabletTool));
+    EXPECT_CALL(libinputMock, TabletToolGetTipState).WillOnce(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
+    EXPECT_TRUE(processor.OnTipMotion(&event));
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
  * @tc.name: TabletToolTranformProcessorTest_OnTipProximity_001
  * @tc.desc: Test the function TabletToolTranformProcessorTest_OnTipProximity_001
  * @tc.type: FUNC
@@ -234,6 +257,26 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipP
     libinput_event *event = nullptr;
     bool ret = processor.OnTipProximity(event);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DrawTouchGraphicIdle_005
+ * @tc.desc: Test the function TabletToolTransformProcessor::DrawTouchGraphicIdle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, DrawTouchGraphicIdle_005, TestSize.Level1)
+{
+    EXPECT_CALL(*WIN_MGR_MOCK, DrawTouchGraphic).Times(Exactly(1));
+ 
+    int32_t deviceId { 2 };
+    TabletToolTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicIdle());
+    EXPECT_EQ(processor.pointerEvent_->GetPointerAction(), PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    InputWindowsManagerMock::ReleaseInstance();
 }
 
 /**
@@ -523,6 +566,26 @@ HWTEST_F(TabletToolTranformProcessorTest, DrawTouchGraphicDrawing_006, TestSize.
     processor.pointerevent_->UpdatePointerItem(pointerId, item);
     EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicDrawing());
     EXPECT_EQ(processor.pointerevent_->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
+    InputWindowsManagerMock::ReleaseInstance();
+}
+
+/**
+ * @tc.name: DrawTouchGraphicDrawing_007
+ * @tc.desc: Test the function TabletToolTransformProcessor::DrawTouchGraphicDrawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, DrawTouchGraphicDrawing_007, TestSize.Level1)
+{
+    EXPECT_CALL(*WIN_MGR_MOCK, DrawTouchGraphic).Times(Exactly(1));
+ 
+    int32_t deviceId { 2 };
+    TabletToolTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicDrawing());
+    EXPECT_EQ(processor.pointerEvent_->GetPointerAction(), PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
     InputWindowsManagerMock::ReleaseInstance();
 }
 } // namespace MMI
