@@ -363,7 +363,6 @@ group("test") {
     "stubhandledownduration_fuzzer:fuzztest",
     "stubsetmousecapturemode_fuzzer:fuzztest",
     "stubsetmousehotspot_fuzzer:fuzztest",
-    "stubsetmouseicon_fuzzer:fuzztest",
     "stubsetmouseprimarybutton_fuzzer:fuzztest",
     "stubsetmousescrollrows_fuzzer:fuzztest",
     "stubsetnapstatus_fuzzer:fuzztest",
