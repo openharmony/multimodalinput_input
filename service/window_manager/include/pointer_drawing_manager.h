@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -233,6 +233,10 @@ private:
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
     void UpdateBindDisplayId(uint64_t rsId) override;
+    bool ShouldSkipScreen(const sptr<OHOS::Rosen::ScreenInfo> &screen);
+    sptr<OHOS::Rosen::ScreenInfo> UpdateScreenPointerAndFindMainScreenInfo(
+        const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
+    void UpdateScreenScalesAndPadding(const sptr<OHOS::Rosen::ScreenInfo> &mainScreen);
     void PostTaskRSLocation(int32_t physicalX, int32_t physicalY, std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode);
     int32_t InitVsync(MOUSE_ICON mouseStyle);
     void DumpScreenInfo(std::ostringstream& oss);
