@@ -2459,6 +2459,7 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
     currentPointerItem.SetDisplayXPos(lastPointerItem.GetDisplayXPos());
     currentPointerItem.SetDisplayYPos(lastPointerItem.GetDisplayYPos());
     currentPointerItem.SetPointerId(0);
+    currentPointerItem.SetToolType(lastPointerItem.GetToolType());
     pointerEvent->SetTargetDisplayId(lastPointerEventCopy->GetTargetDisplayId());
     SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(id);
@@ -5973,14 +5974,15 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
         MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
         return;
     }
-    auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
-    // The input method window blocks knuckle event
-    if (isInMethodWindow && item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-        item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-        pointerEvent->UpdatePointerItem(pointerId, item);
-    }
-    if (!isInMethodWindow && item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-        KnuckleDrawingComponent::GetInstance().Draw(*physicDisplayInfo, pointerEvent);
+    if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+        auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
+        if (isInMethodWindow) {
+            // The input method window blocks knuckle event
+            item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+            pointerEvent->UpdatePointerItem(pointerId, item);
+        } else {
+            KnuckleDrawingComponent::GetInstance().Draw(*physicDisplayInfo, pointerEvent);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 

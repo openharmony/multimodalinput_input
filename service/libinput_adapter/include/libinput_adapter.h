@@ -81,6 +81,8 @@ public:
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();
+    bool HasPendingEvents();
+    void HandlePendingEvents();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static void SetBootCompleted();
     void RegisterBootStatusReceiver();
@@ -173,6 +175,7 @@ private:
 
     HotplugDetector hotplugDetector_;
     std::unordered_map<std::string, libinput_device*> devices_;
+    bool hasPendingEvents_ = false;
 };
 } // namespace MMI
 } // namespace OHOS
