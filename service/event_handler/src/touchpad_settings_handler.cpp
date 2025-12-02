@@ -340,41 +340,39 @@ bool TouchpadSettingsObserver::GetCommonEventStatus()
     return isCommonEventReady_.load();
 }
 
-void TouchpadSettingsObserver::SetDefaultState(const std::string &key, std::string &value)
+void TouchpadSettingsObserver::SetSwitchDefaultState(int32_t master, int32_t enable, std::string &masterValue,
+    std::string &enableValue)
 {
-    if (key == g_keepTouchpadEnableSwitchesKey) {
-        value = g_switchStateOpen;
-    } else if (key == g_touchpadMasterSwitchesKey) {
+    if (master != ERR_OK && enable != ERR_OK) {
+        enableValue = g_switchStateOpen;
         auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-        auto ret = settingHelper.GetStringValue(g_touchpadSwitchesKey, value, datashareUri_);
-        MMI_HILOGI("current switch key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), value.c_str());
+        auto ret = settingHelper.GetStringValue(g_touchpadSwitchesKey, masterValue, datashareUri_);
+        MMI_HILOGI("current key:%{public}s, value:%{public}s", g_touchpadSwitchesKey.c_str(), masterValue.c_str());
         if (ret != ERR_OK) {
-            value = g_switchStateOpen;
+            masterValue = g_switchStateOpen;
         }
-    } else {
-        MMI_HILOGE("invalid key");
+    } else if (master != ERR_OK) {
+        masterValue = g_switchStateOpen;
+    } else if (enable != ERR_OK) {
+        enableValue = g_switchStateOpen;
     }
-    MMI_HILOGI("set default key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
 }
 
 void TouchpadSettingsObserver::LoadSwitchState()
 {
-    std::string key = g_touchpadMasterSwitchesKey;
-    std::string value;
+    std::string masterValue;
+    std::string enableValue;
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-    auto ret = settingHelper.GetStringValue(key, value, datashareUri_);
-    MMI_HILOGI("get key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
-    if (ret != ERR_OK) {
-        SetDefaultState(key, value);
-    }
-    touchpadMasterSwitches_ = (value == g_switchStateOpen);
-    key = g_keepTouchpadEnableSwitchesKey;
-    ret = settingHelper.GetStringValue(key, value, datashareUri_);
-    MMI_HILOGI("get key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
-    if (ret != ERR_OK) {
-        SetDefaultState(key, value);
-    }
-    keepTouchpadEnableSwitches_ = (value == g_switchStateOpen);
+    auto masterRet = settingHelper.GetStringValue(g_touchpadMasterSwitchesKey, masterValue, datashareUri_);
+    MMI_HILOGI("get key:%{public}s, value:%{public}s", g_touchpadMasterSwitchesKey.c_str(), masterValue.c_str());
+    auto enableRet = settingHelper.GetStringValue(g_keepTouchpadEnableSwitchesKey, enableValue, datashareUri_);
+    MMI_HILOGI("get key:%{public}s, value:%{public}s", g_keepTouchpadEnableSwitchesKey.c_str(), enableValue.c_str());
+
+    SetSwitchDefaultState(masterRet, enableRet, masterValue, enableValue);
+    MMI_HILOGI("final touchpad masterswitches:%{public}s, enableswitches:%{public}s",
+        masterValue.c_str(), enableValue.c_str());
+    touchpadMasterSwitches_ = (masterValue == g_switchStateOpen);
+    keepTouchpadEnableSwitches_ = (enableValue == g_switchStateOpen);
 }
 
 int32_t TouchpadSettingsObserver::SetTouchpadState()
