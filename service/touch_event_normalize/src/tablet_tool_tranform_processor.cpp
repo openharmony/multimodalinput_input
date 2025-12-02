@@ -207,8 +207,11 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     CHKPF(tabletEvent);
     uint64_t time = libinput_event_tablet_tool_get_time_usec(tabletEvent);
     pointerEvent_->SetActionTime(time);
-    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-
+    if (IsTouching(tabletEvent)) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    } else {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    }
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
@@ -324,6 +327,12 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
     return true;
 }
 
+bool TabletToolTransformProcessor::IsTouching(struct libinput_event_tablet_tool* tabletEvent)
+{
+    return tabletEvent != nullptr &&
+        libinput_event_tablet_tool_get_tip_state(tabletEvent) == LIBINPUT_TABLET_TOOL_TIP_DOWN;
+}
+
 void TabletToolTransformProcessor::DrawTouchGraphic()
 {
     CHKPV(current_);
@@ -337,7 +346,8 @@ void TabletToolTransformProcessor::DrawTouchGraphicIdle()
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_PROXIMITY_IN:
         case PointerEvent::POINTER_ACTION_DOWN:
-        case PointerEvent::POINTER_ACTION_MOVE: {
+        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_LEVITATE_MOVE: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
             current_ = [this]() {
                 DrawTouchGraphicDrawing();
@@ -360,7 +370,8 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
     bool isPointerItemExist = pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     auto pointerAction = pointerEvent_->GetPointerAction();
     switch (pointerAction) {
-        case PointerEvent::POINTER_ACTION_MOVE: {
+        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_LEVITATE_MOVE: {
             if (isPointerItemExist) {
                 originalPressedStatus = pointerItem.IsPressed();
                 pointerItem.SetPressed(true);
