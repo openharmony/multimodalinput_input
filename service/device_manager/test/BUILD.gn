@@ -45,7 +45,6 @@ ohos_unittest("InputDeviceManagerTestWithMock") {
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/dfx/include",
     "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/joystick/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
@@ -60,10 +59,13 @@ ohos_unittest("InputDeviceManagerTestWithMock") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/util/common/include",
   ]
 
   sources = [
+    "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
     "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
+    "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
     "src/input_device_manager_test_with_mock.cpp",
   ]
 
@@ -74,6 +76,7 @@ ohos_unittest("InputDeviceManagerTestWithMock") {
     "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
+    "${mmi_path}/test/facility/window_manager_mock:window_manager_mock",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/util:mmi_json_parser",
   ]
