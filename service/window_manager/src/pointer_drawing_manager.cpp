@@ -30,6 +30,7 @@
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #include "bytrace_adapter.h"
+#include "cursor_drawing_component.h"
 #include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
@@ -3466,6 +3467,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
         MMI_HILOGE("delegateProxy is nullptr");
         return;
     }
+    CursorDrawingComponent::GetInstance();
     delegateProxy->OnPostSyncTask([this, screens] {
         auto mainScreen = this->UpdateScreenPointerAndFindMainScreenInfo(screens);
         this->UpdateScreenScalesAndPadding(mainScreen);
