@@ -7632,8 +7632,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_004, 
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     windowInfo.id = 150;
     windowInfo.displayId = 300;
-    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
-                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
+    windowInfo.flags = 0;
     windowInfo.pointerHotAreas.push_back(rect);
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager.extraData_.appended = true;
@@ -7679,8 +7678,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_005, 
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     windowInfo.id = 150;
     windowInfo.displayId = 300;
-    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
-                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
+    windowInfo.flags = 0;
     windowInfo.pointerHotAreas.push_back(rect);
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager.extraData_.appended = false;
