@@ -24,6 +24,45 @@
 
 namespace OHOS {
 namespace MMI {
+std::shared_ptr<IJoystickEventNormalize> IJoystickEventNormalize::GetInstance()
+{
+    return JoystickEventNormalize::GetInstance();
+}
+
+JoystickEventNormalize::InputDeviceObserver::InputDeviceObserver(std::shared_ptr<JoystickEventNormalize> parent)
+    : parent_(parent) {}
+
+void JoystickEventNormalize::InputDeviceObserver::OnDeviceAdded(int32_t deviceId)
+{
+    if (auto parent = parent_.lock(); parent != nullptr) {
+        parent->OnDeviceAdded(deviceId);
+    }
+}
+
+void JoystickEventNormalize::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
+{
+    if (auto parent = parent_.lock(); parent != nullptr) {
+        parent->OnDeviceRemoved(deviceId);
+    }
+}
+
+std::shared_ptr<JoystickEventNormalize> JoystickEventNormalize::GetInstance()
+{
+    static std::once_flag flag;
+    static std::shared_ptr<JoystickEventNormalize> instance_;
+
+    std::call_once(flag, []() {
+        instance_ = std::make_shared<JoystickEventNormalize>();
+        instance_->SetUpDeviceObserver(instance_);
+    });
+    return instance_;
+}
+
+JoystickEventNormalize::~JoystickEventNormalize()
+{
+    TearDownDeviceObserver();
+}
+
 std::shared_ptr<KeyEvent> JoystickEventNormalize::OnButtonEvent(struct libinput_event *event)
 {
     CHKPP(event);
@@ -53,6 +92,48 @@ void JoystickEventNormalize::CheckIntention(std::shared_ptr<PointerEvent> pointe
         return;
     }
     processor->CheckIntention(pointerEvent, handler);
+}
+
+void JoystickEventNormalize::SetUpDeviceObserver(std::shared_ptr<JoystickEventNormalize> self)
+{
+    if (inputDevObserver_ == nullptr) {
+        inputDevObserver_ = std::make_shared<InputDeviceObserver>(self);
+        INPUT_DEV_MGR->Attach(inputDevObserver_);
+    }
+}
+
+void JoystickEventNormalize::TearDownDeviceObserver()
+{
+    if (inputDevObserver_ != nullptr) {
+        INPUT_DEV_MGR->Detach(inputDevObserver_);
+        inputDevObserver_ = nullptr;
+    }
+}
+
+void JoystickEventNormalize::OnDeviceAdded(int32_t deviceId)
+{
+    auto inputDev = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
+    if (inputDev == nullptr) {
+        MMI_HILOGW("No libinput-device attached to device(%{public}d)", deviceId);
+        return;
+    }
+    if (auto iter = processors_.find(inputDev); iter != processors_.end()) {
+        MMI_HILOGW("Dirty processor attached to device(%{public}d)", deviceId);
+        return;
+    }
+    processors_.emplace(inputDev, std::make_shared<JoystickEventProcessor>(deviceId));
+}
+
+void JoystickEventNormalize::OnDeviceRemoved(int32_t deviceId)
+{
+    auto iter = std::find_if(processors_.cbegin(), processors_.cend(),
+        [deviceId](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetDeviceId() == deviceId));
+        });
+    if (iter != processors_.end()) {
+        MMI_HILOGI("Clear processor attached to device(%{public}d)", deviceId);
+        processors_.erase(iter);
+    }
 }
 
 std::shared_ptr<JoystickEventProcessor> JoystickEventNormalize::GetProcessor(struct libinput_device *inputDev)

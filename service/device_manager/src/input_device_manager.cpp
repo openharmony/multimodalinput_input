@@ -18,8 +18,11 @@
 #include <linux/input.h>
 #include <regex>
 
+#include "i_input_windows_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
+#include "key_map_manager.h"
+#include "libinput.h"
 #include "util_ex.h"
 #include "dfx_hisysevent_device.h"
 #include "cursor_drawing_component.h"
@@ -129,6 +132,14 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
+}
+
+struct libinput_device* InputDeviceManager::GetLibinputDevice(int32_t deviceId) const
+{
+    if (auto iter = inputDevice_.find(deviceId); iter != inputDevice_.cend()) {
+        return iter->second.inputDeviceOrigin;
+    }
+    return nullptr;
 }
 
 void InputDeviceManager::FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const

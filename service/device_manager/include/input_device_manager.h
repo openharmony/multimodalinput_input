@@ -51,6 +51,7 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const;
+    struct libinput_device* GetLibinputDevice(int32_t deviceId) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);

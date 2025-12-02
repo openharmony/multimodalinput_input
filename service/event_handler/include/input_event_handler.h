@@ -16,6 +16,8 @@
 #ifndef INPUT_EVENT_HANDLER_H
 #define INPUT_EVENT_HANDLER_H
 
+#include "singleton.h"
+
 #include "event_dispatch_handler.h"
 #include "event_filter_handler.h"
 #include "event_interceptor_handler.h"
@@ -32,6 +34,7 @@
 #include "switch_subscriber_handler.h"
 // #endif // OHOS_BUILD_ENABLE_SWITCH
 #include "event_pre_monitor_handler.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {

@@ -356,6 +356,17 @@ public:
          */
         AXIS_TYPE_ABS_THROTTLE,
 
+        AXIS_TYPE_ABS_RX,
+        AXIS_TYPE_ABS_RY,
+        AXIS_TYPE_ABS_RUDDER,
+        AXIS_TYPE_ABS_WHEEL,
+        AXIS_TYPE_ABS_HAT1X,
+        AXIS_TYPE_ABS_HAT1Y,
+        AXIS_TYPE_ABS_HAT2X,
+        AXIS_TYPE_ABS_HAT2Y,
+        AXIS_TYPE_ABS_HAT3X,
+        AXIS_TYPE_ABS_HAT3Y,
+
         /**
          * Indicates the maximum number of defined axis types.
          *

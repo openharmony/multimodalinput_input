@@ -16,9 +16,7 @@
 #ifndef EVENT_NORMALIZE_HANDLER_H
 #define EVENT_NORMALIZE_HANDLER_H
 
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
-#include "joystick_event_normalize.h"
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
+#include "i_input_event_handler.h"
 #include "key_event_normalize.h"
 #include "plugin_stage.h"
 
@@ -97,9 +95,6 @@ private:
     bool moveEventFilterFlag_ { false };
     std::list<PointerEvent::PointerItem> lastTouchDownItems_;
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
-    JoystickEventNormalize joystick_;
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #ifdef OHOS_BUILD_ENABLE_POINTER
     static int32_t tpRegisterTryCount_;
 #endif // OHOS_BUILD_ENABLE_POINTER
