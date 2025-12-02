@@ -33,6 +33,7 @@ constexpr int32_t DEFAULT_LONG_PRESS_TIME { 100 }; // 100ms
 constexpr int32_t TWICE_LONG_PRESS_TIME { DEFAULT_LONG_PRESS_TIME + DEFAULT_LONG_PRESS_TIME };
 constexpr int32_t BASE_SHORTCUT_ID { 1 };
 constexpr int32_t DEFAULT_SAMPLING_PERIOD { 8 }; // 8ms
+constexpr int32_t MAXIMUM_LONG_PRESS_TIME { 60000 };
 }
 using namespace testing;
 using namespace testing::ext;
@@ -2097,6 +2098,623 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatModifiers, TestSiz
     modifiers.insert(KeyEvent::KEYCODE_ALT_RIGHT);
     auto ret = KEY_SHORTCUT_MGR->FormatModifiers(modifiers) ;
     EXPECT_EQ(ret, "2045,2046,2048,2054,...");
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RegisterHotKey_03
+ * @tc.desc: Test the function RegisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey hotKey1 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_T,
+        .session = 100,
+    };
+    int32_t id1 = KEY_SHORTCUT_MGR->RegisterHotKey(hotKey1);
+    EXPECT_GT(id1, 0);
+
+    KeyShortcutManager::HotKey hotKey2 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_T,
+        .session = 100,
+    };
+    int32_t result = KEY_SHORTCUT_MGR->RegisterHotKey(hotKey2);
+    EXPECT_GT(result, 0);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RegisterHotKey_04
+ * @tc.desc: Test the function RegisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RegisterHotKey_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey hotKey1 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_A,
+        .session = 100,
+    };
+    int32_t id1 = KEY_SHORTCUT_MGR->RegisterHotKey(hotKey1);
+    EXPECT_GT(id1, 0);
+
+    KeyShortcutManager::HotKey hotKey2 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_A,
+        .session = 200,
+    };
+    int32_t result = KEY_SHORTCUT_MGR->RegisterHotKey(hotKey2);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_TAKEN);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_006
+ * @tc.desc: Test the function ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonSysKey, "preKeys", "not an array");
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
+
+    int32_t ret = KEY_SHORTCUT_MGR->ReadSystemKey(jsonSysKey) ;
+    EXPECT_EQ(ret, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_007
+ * @tc.desc: Test the function ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateString("not a number"));
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(50));
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadSystemKey(jsonSysKey);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadSystemKey_008
+ * @tc.desc: Test the function ReadSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadSystemKey_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(KeyEvent::KEYCODE_CTRL_LEFT));
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(KeyEvent::KEYCODE_ALT_LEFT));
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", KeyEvent::KEYCODE_S);
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadSystemKey(jsonSysKey);
+    EXPECT_TRUE(result == RET_OK || result == KEY_SHORTCUT_ERROR_COMBINATION_KEY);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_007
+ * @tc.desc: Test the function ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateString("not a number"));
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(50));
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
+    cJSON_AddNumberToObject(jsonSysKey, "longPressTime", 1000);
+    cJSON_AddStringToObject(jsonSysKey, "triggerType", "down");
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadExceptionalSystemKey(jsonSysKey);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_008
+ * @tc.desc: Test the function ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(KeyEvent::KEYCODE_CTRL_LEFT));
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(KeyEvent::KEYCODE_ALT_LEFT));
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", KeyEvent::KEYCODE_Z);
+    cJSON_AddNumberToObject(jsonSysKey, "longPressTime", 3000);
+    cJSON_AddStringToObject(jsonSysKey, "triggerType", "down");
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadExceptionalSystemKey(jsonSysKey);
+    EXPECT_EQ(result, RET_OK);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_009
+ * @tc.desc: Test the function ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(50));
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
+    cJSON_AddNumberToObject(jsonSysKey, "longPressTime", 1000);
+    cJSON_AddStringToObject(jsonSysKey, "triggerType", "invalid");
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadExceptionalSystemKey(jsonSysKey);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_010
+ * @tc.desc: Test the function ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateString("not a number")); // 添加非数字元素
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(50)); // 添加数字元素
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
+    cJSON_AddNumberToObject(jsonSysKey, "longPressTime", 1000);
+    cJSON_AddStringToObject(jsonSysKey, "triggerType", "down");
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadExceptionalSystemKey(jsonSysKey);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ReadExceptionalSystemKey_011
+ * @tc.desc: Test the function ReadExceptionalSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ReadExceptionalSystemKey_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonSysKey = cJSON_CreateObject();
+    cJSON *preKeysArray = cJSON_CreateArray();
+    cJSON_AddItemToArray(preKeysArray, cJSON_CreateNumber(50));
+    cJSON_AddItemToObject(jsonSysKey, "preKeys", preKeysArray);
+    
+    cJSON_AddNumberToObject(jsonSysKey, "finalKey", 65);
+    cJSON_AddNumberToObject(jsonSysKey, "longPressTime", 1000);
+    cJSON_AddNullToObject(jsonSysKey, "triggerType");
+    
+    int32_t result = KEY_SHORTCUT_MGR->ReadExceptionalSystemKey(jsonSysKey);
+    EXPECT_EQ(result, KEY_SHORTCUT_ERROR_CONFIG);
+    cJSON_Delete(jsonSysKey);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_FormatModifiers_001
+ * @tc.desc: Test the function FormatModifiers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatModifiers_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> modifiers = { 10, 20, 30, 40, 50, 60, 70, 80, 90 };
+    std::string result = KEY_SHORTCUT_MGR->FormatModifiers(modifiers);
+    EXPECT_EQ(result, "10,20,30,40,...");
+
+    std::set<int32_t> modifiers1 = { 90, 10, 50, 30, 70 };
+    result = KEY_SHORTCUT_MGR->FormatModifiers(modifiers1);
+    EXPECT_EQ(result, "10,30,50,70,...");
+
+    std::set<int32_t> modifiers2;
+    result = KEY_SHORTCUT_MGR->FormatModifiers(modifiers2);
+    EXPECT_EQ(result, "");
+
+    std::set<int32_t> modifiers3 = { 50, 60 };
+    result = KEY_SHORTCUT_MGR->FormatModifiers(modifiers3);
+    EXPECT_EQ(result, "50,60");
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckSystemKey_001
+ * @tc.desc: Test the function CheckSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckSystemKey_001, TestSize.Level1)
+{
+    KeyShortcutManager::SystemShortcutKey key;
+    key.modifiers = { KeyEvent::KEYCODE_A };
+    KeyShortcutManager::KeyShortcut shortcut;
+    
+    bool result = KEY_SHORTCUT_MGR->CheckSystemKey(key, shortcut);
+    EXPECT_FALSE(result);
+
+    KeyShortcutManager::SystemShortcutKey key1;
+    key1.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
+    key1.finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS;
+    key1.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    key1.longPressTime = 1000;
+    
+    result = KEY_SHORTCUT_MGR->CheckSystemKey(key1, shortcut);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckSystemKey_002
+ * @tc.desc: Test the function CheckSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckSystemKey_002, TestSize.Level1)
+{
+    KeyShortcutManager::SystemShortcutKey key1;
+    KeyShortcutManager::KeyShortcut shortcut;
+    
+    key1.modifiers = { KeyEvent::KEYCODE_META_LEFT  };
+    key1.finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS;
+    key1.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    key1.longPressTime = 1000;
+    
+    auto result = KEY_SHORTCUT_MGR->CheckSystemKey(key1, shortcut);
+    EXPECT_TRUE(result);
+
+    KeyShortcutManager::SystemShortcutKey key2;
+    key2.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
+    key2.finalKey = KeyEvent::KEYCODE_A;
+    key2.triggerType = static_cast<KeyShortcutManager::ShortcutTriggerType>(999);
+    key2.longPressTime = 1000;
+    
+    result = KEY_SHORTCUT_MGR->CheckSystemKey(key2, shortcut);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckSystemKey_003
+ * @tc.desc: Test the function CheckSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckSystemKey_003, TestSize.Level1)
+{
+    KeyShortcutManager::KeyShortcut shortcut;
+    KeyShortcutManager::SystemShortcutKey key;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    key.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
+    key.finalKey = KeyEvent::KEYCODE_A;
+    key.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    key.longPressTime = -1;
+    
+    auto result = KEY_SHORTCUT_MGR->CheckSystemKey(key, shortcut);
+    EXPECT_FALSE(result);
+
+    KeyShortcutManager::SystemShortcutKey key1;
+    key1.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
+    key1.finalKey = KeyEvent::KEYCODE_A;
+    key1.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    key1.longPressTime = MAXIMUM_LONG_PRESS_TIME + 1;
+
+    result = KEY_SHORTCUT_MGR->CheckSystemKey(key, shortcut);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckSystemKey_004
+ * @tc.desc: Test the function CheckSystemKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckSystemKey_004, TestSize.Level1)
+{
+    KeyShortcutManager::KeyShortcut shortcut;
+    KeyShortcutManager::SystemShortcutKey key;
+    key.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
+    key.finalKey = KeyEvent::KEYCODE_S;
+    key.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    key.longPressTime = 1000;
+    
+    auto result = KEY_SHORTCUT_MGR->CheckSystemKey(key, shortcut);
+    EXPECT_TRUE(result);
+
+    KeyShortcutManager::SystemShortcutKey key1;
+    key1.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
+    key1.finalKey = KeyEvent::KEYCODE_C;
+    key1.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP;
+    key1.longPressTime = 0;
+
+    result = KEY_SHORTCUT_MGR->CheckSystemKey(key1, shortcut);
+    EXPECT_TRUE(result);
+
+    KeyShortcutManager::SystemShortcutKey key2;
+    key2.modifiers = { KeyEvent::KEYCODE_CTRL_LEFT };
+    key2.finalKey = KeyEvent::KEYCODE_X;
+    key2.triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN;
+    key2.longPressTime = MAXIMUM_LONG_PRESS_TIME;
+
+    result = KEY_SHORTCUT_MGR->CheckSystemKey(key2, shortcut);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckGlobalKey_002
+ * @tc.desc: Test the function CheckGlobalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckGlobalKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey globalKey {
+        .modifiers = { KeyEvent::KEYCODE_A },
+        .finalKey = KeyEvent::KEYCODE_M,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 200;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 100;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    bool ret = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey, shortcut);
+    EXPECT_FALSE(ret);
+
+    KeyShortcutManager::HotKey globalKey1 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS,
+    };
+    ret = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey1, shortcut);
+    EXPECT_FALSE(ret);
+
+    KeyShortcutManager::HotKey globalKey2 {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_ALT_LEFT,
+    };
+    ret = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey2, shortcut);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckGlobalKey_003
+ * @tc.desc: Test the function CheckGlobalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckGlobalKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey globalKey {
+        .modifiers = { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_S,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 200;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 100;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+
+    bool ret = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey, shortcut);
+    EXPECT_FALSE(ret);
+
+    KeyShortcutManager::HotKey globalKey1 {
+        .modifiers = { KeyEvent::KEYCODE_META_RIGHT },
+        .finalKey = KeyEvent::KEYCODE_K,
+    };
+    ret = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey1, shortcut);
+    EXPECT_FALSE(ret);
+
+    KeyShortcutManager::HotKey globalKey2 {
+        .finalKey = KeyEvent::KEYCODE_Z,
+    };
+    ret = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey2, shortcut);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckGlobalKey_004
+ * @tc.desc: Test the function CheckGlobalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckGlobalKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey globalKey {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT },
+        .finalKey = KeyEvent::KEYCODE_C,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 200;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 100;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    bool result = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey, shortcut);
+    EXPECT_TRUE(result);
+    
+    EXPECT_EQ(shortcut.modifiers, KeyShortcutManager::SHORTCUT_MODIFIER_CTRL);
+    EXPECT_EQ(shortcut.finalKey, KeyEvent::KEYCODE_C);
+    EXPECT_EQ(shortcut.triggerType, KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_CheckGlobalKey_005
+ * @tc.desc: Test the function CheckGlobalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_CheckGlobalKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager::HotKey globalKey {
+        .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT },
+        .finalKey = KeyEvent::KEYCODE_X,
+    };
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 200;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 400;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    bool result = KEY_SHORTCUT_MGR->CheckGlobalKey(globalKey, shortcut);
+    EXPECT_TRUE(result);
+    
+    EXPECT_EQ(shortcut.modifiers, KeyShortcutManager::SHORTCUT_MODIFIER_CTRL);
+    EXPECT_EQ(shortcut.finalKey, KeyEvent::KEYCODE_X);
+    EXPECT_EQ(shortcut.triggerType, KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_FormatPressedKeys_002
+ * @tc.desc: Test the function FormatPressedKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatPressedKeys_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    
+    std::string ret = KEY_SHORTCUT_MGR->FormatPressedKeys(keyEvent);
+    EXPECT_EQ(ret, "");
+
+    int64_t downTime = 2;
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetPressed(true);
+    item1.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item1);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    item2.SetPressed(true);
+    item2.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item2);
+    
+    ret = KEY_SHORTCUT_MGR->FormatPressedKeys(keyEvent);
+    EXPECT_EQ(ret, "2017,2072");
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_FormatPressedKeys_003
+ * @tc.desc: Test the function FormatPressedKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_FormatPressedKeys_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    int64_t downTime = 2;
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(KeyEvent::KEYCODE_CTRL_LEFT);
+    item1.SetPressed(true);
+    item1.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item1);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(KeyEvent::KEYCODE_ALT_LEFT);
+    item2.SetPressed(true);
+    item2.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item2);
+    KeyEvent::KeyItem item3;
+    item3.SetKeyCode(KeyEvent::KEYCODE_C);
+    item3.SetPressed(true);
+    item3.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item3);
+    std::string ret = KEY_SHORTCUT_MGR->FormatPressedKeys(keyEvent);
+    EXPECT_EQ(ret, "2072,2045,2019");
+    KeyEvent::KeyItem item4;
+    item4.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
+    item4.SetPressed(true);
+    item4.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item4);
+    ret = KEY_SHORTCUT_MGR->FormatPressedKeys(keyEvent);
+    EXPECT_EQ(ret, "2072,2045,2019,2047");
+    KeyEvent::KeyItem item5;
+    item5.SetKeyCode(KeyEvent::KEYCODE_A);
+    item5.SetPressed(true);
+    item4.SetDownTime(downTime);
+    keyEvent->AddPressedKeyItems(item5);
+    ret = KEY_SHORTCUT_MGR->FormatPressedKeys(keyEvent);
+    EXPECT_EQ(ret, "2072,2045,2019,2047,...");
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyDown_003
+ * @tc.desc: Test the function HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyDown_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    bool result = KEY_SHORTCUT_MGR->HandleKeyDown(keyEvent);
+    EXPECT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS
