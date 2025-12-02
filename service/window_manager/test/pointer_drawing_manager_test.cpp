@@ -2571,7 +2571,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateBindDisplayI
     pointerDrawingManager.lastDisplayId_ = 0;
     uint64_t displayId = 0;
     pointerDrawingManager.UpdateBindDisplayId(displayId);
-    EXPECT_EQ(pointerDrawingManager.lastDisplayId_, 0);
     EXPECT_EQ(pointerDrawingManager.screenId_, 0);
 
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;

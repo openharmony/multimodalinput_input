@@ -1252,10 +1252,6 @@ int32_t ServerMsgHandler::OnUnsubscribeHotkey(IUdsServer *server, int32_t pid, i
 int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
     const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
-        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
-        return -CAPABILITY_NOT_SUPPORTED;
-    }
     KeyMonitorManager::Monitor monitor {
         .session_ = session,
         .key_ = keyOption.GetKey(),
@@ -1268,10 +1264,6 @@ int32_t ServerMsgHandler::SubscribeKeyMonitor(int32_t session,
 int32_t ServerMsgHandler::UnsubscribeKeyMonitor(int32_t session,
     const KeyMonitorOption &keyOption, const std::string &bundleName)
 {
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
-        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
-        return -CAPABILITY_NOT_SUPPORTED;
-    }
     KeyMonitorManager::Monitor monitor {
         .session_ = session,
         .key_ = keyOption.GetKey(),

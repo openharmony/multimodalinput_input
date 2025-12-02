@@ -442,10 +442,6 @@ int32_t InputManagerImpl::SubscribeKeyMonitor(const KeyMonitorOption &keyOption,
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
-        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
-        return -CAPABILITY_NOT_SUPPORTED;
-    }
     CHKPR(callback, RET_ERR);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -465,10 +461,6 @@ int32_t InputManagerImpl::UnsubscribeKeyMonitor(int32_t subscriberId)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    if ((PRODUCT_TYPE != "phone") && (PRODUCT_TYPE != "tablet") && (PRODUCT_TYPE != "2in1")) {
-        MMI_HILOGW("Does not support subscription of key monitor on %{public}s", PRODUCT_TYPE.c_str());
-        return -CAPABILITY_NOT_SUPPORTED;
-    }
     return KeyEventInputSubscribeMgr.UnsubscribeKeyMonitor(subscriberId);
 #else
     MMI_HILOGW("Does not support subscription of key monitor");
