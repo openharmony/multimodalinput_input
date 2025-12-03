@@ -259,14 +259,14 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 }
 
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
-    uint32_t pid, int32_t pointCnt)
+    uint32_t pid, int32_t pointCnt, int32_t sourceType)
 {
     (void)programName;
     (void)pid;
 #ifndef OHOS_BUILD_ENABLE_WATCH
     auto begin = std::chrono::high_resolution_clock::now();
     if (POINTER_DEV_MGR.isInit) {
-        CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt);
+        CursorDrawingComponent::GetInstance().NotifyPointerEventToRS(pointAction, pointCnt, sourceType);
     }
     [[maybe_unused]] auto durationMS = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - begin).count();
@@ -475,7 +475,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t pointerAc = pointerEvent->GetPointerAction();
     NotifyPointerEventToRS(pointerAc, sess->GetProgramName(),
-        static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount());
+        static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount(), pointerEvent->GetSourceType());
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
