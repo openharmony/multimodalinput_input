@@ -4025,9 +4025,9 @@ bool PointerDrawingManager::GetHardCursorEnabled()
 }
 
 #ifndef OHOS_BUILD_ENABLE_WATCH
-void PointerDrawingManager::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt)
+void PointerDrawingManager::NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType)
 {
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt, sourceType);
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
 

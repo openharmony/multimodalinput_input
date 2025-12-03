@@ -48,7 +48,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
-    void NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid, int32_t pointCnt);
+    void NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid, int32_t pointCnt,
+        int32_t sourceType);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     std::chrono::time_point<std::chrono::high_resolution_clock> LasteventBeginTime_ =
     std::chrono::high_resolution_clock::now();

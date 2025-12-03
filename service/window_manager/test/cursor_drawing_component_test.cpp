@@ -697,10 +697,11 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_NotifyPointerEve
     instance_->isLoaded_ = false;
     int32_t pointAction = 1;
     int32_t pointCnt = 0;
-    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt));
+    int32_t sourceType = 1;
+    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt, sourceType));
 
     instance_->isLoaded_ = true;
-    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt));
+    EXPECT_NO_FATAL_FAILURE(instance_->NotifyPointerEventToRS(pointAction, pointCnt, sourceType));
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
 
