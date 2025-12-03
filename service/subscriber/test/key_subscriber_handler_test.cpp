@@ -3809,7 +3809,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch_002, 
     bool result = handler.IsPreKeysMatch(preKeys, pressedKeys);
     EXPECT_TRUE(result);
     preKeys = {1, 2};
-    result = handler.IsPreKeysMatch(preKeys, pressedKeys);  
+    result = handler.IsPreKeysMatch(preKeys, pressedKeys);
     EXPECT_FALSE(result);
     preKeys = {1, 2, 3};
     pressedKeys = {1, 2, 4};
@@ -3826,7 +3826,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch_002, 
     pressedKeys = {3, 1, 2};
     preKeys = {2, 3, 1};
     result = handler.IsPreKeysMatch(preKeys, pressedKeys);
-    EXPECT_TRUE(result); 
+    EXPECT_TRUE(result);
 }
 
 /**
@@ -4097,7 +4097,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_GetHighestPrioritySu
     auto validSubscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, session, keyOption);
     auto invalidSubscriber = std::make_shared<KeySubscriberHandler::Subscriber>(2, session, nullptr);
     std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers = {
-        invalidSubscriber, 
+        invalidSubscriber,
         validSubscriber
     };
     
@@ -4183,8 +4183,8 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNo
     auto session1 = std::make_shared<UDSSession>("test1", 1, 1, 100, 1001);
     std::shared_ptr<KeyOption> keyOption1 = std::make_shared<KeyOption>();
     keyOption1->SetPriority(10);
-     std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
-    subscribers.push_back(nullptr); 
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(nullptr);
     
     handler.NotifyKeyDownRightNow(keyEvent, subscribers, false, handled);
     EXPECT_FALSE(handled);
