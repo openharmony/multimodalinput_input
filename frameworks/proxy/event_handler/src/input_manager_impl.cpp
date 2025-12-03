@@ -714,9 +714,10 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
     uint32_t num = static_cast<uint32_t>(windowGroupInfo_.windowsInfo.size());
     pkt << num;
     for (const auto &item : windowGroupInfo_.windowsInfo) {
+        uint32_t resultFlags = WindowInputTypeToFlag(item);
         pkt << item.id << item.pid << item.uid << item.area
             << item.defaultHotAreas << item.pointerHotAreas
-            << item.agentWindowId << item.flags << item.action
+            << item.agentWindowId << resultFlags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen << item.windowNameType << item.agentPid;
@@ -757,9 +758,10 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
 {
     CALL_DEBUG_ENTER;
     for (const auto &item : windowsInfo) {
+        uint32_t resultFlags = WindowInputTypeToFlag(item);
         pkt << item.id << item.pid << item.uid << item.area
             << item.defaultHotAreas << item.pointerHotAreas
-            << item.agentWindowId << item.flags << item.action
+            << item.agentWindowId << resultFlags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode
             << item.windowType << item.privacyUIFlag << item.rectChangeBySystem
@@ -837,9 +839,10 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt,
     uint32_t num = static_cast<uint32_t>(windowsInfo.size());
     pkt << num;
     for (const auto &item : windowsInfo) {
+        uint32_t resultFlags = WindowInputTypeToFlag(item);
         int32_t byteCount = 0;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
-            << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
+            << item.pointerHotAreas << item.agentWindowId << resultFlags << item.action
             << item.displayId << item.groupId << item.zOrder << item.pointerChangeAreas << item.transform
             << item.windowInputType << item.privacyMode << item.windowType << item.isSkipSelfWhenShowOnVirtualScreen
             << item.windowNameType << item.agentPid;
@@ -904,6 +907,7 @@ void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInf
         return;
     }
     for (const auto &item : windowsInfo) {
+        uint32_t resultFlags = WindowInputTypeToFlag(item);
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,agentPid:%{public}d,uid:%{public}d,"
             "area.x:%{private}d,area.y:%{private}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
@@ -911,7 +915,7 @@ void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInf
             "groupId:%{public}d,zOrder:%{public}f,privacyMode:%{public}d",
             item.id, item.pid, item.agentPid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder, item.privacyMode);
+            item.agentWindowId, resultFlags, item.action, item.displayId, item.groupId, item.zOrder, item.privacyMode);
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
@@ -3102,6 +3106,40 @@ void InputManagerImpl::GetLastEventIds(int32_t &markedId, int32_t &processedId, 
 {
     CALL_DEBUG_ENTER;
     ANRHDL->GetLastEventIds(markedId, processedId, dispatchedEventId);
+}
+
+uint32_t InputManagerImpl::WindowInputTypeToFlag(const WindowInfo &window)
+{
+    uint32_t resultFlags = window.flags;
+    switch (window.windowInputType) {
+        case WindowInputType::NORMAL:
+            break;
+        case WindowInputType::TRANSMIT_ANTI_AXIS_MOVE:
+            resultFlags |= WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
+            break;
+        case WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE:
+            resultFlags |= WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
+            break;
+        case WindowInputType::DUALTRIGGER_TOUCH:
+            resultFlags |= WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL |
+                           WindowInputPolicy::FLAG_DRAG_DISABLED;
+            break;
+        case WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE:
+            resultFlags |= WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
+            break;
+        case WindowInputType::TRANSMIT_ALL:
+            resultFlags |= WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL | WindowInputPolicy::FLAG_DRAG_DISABLED;
+            break;
+        default:
+            MMI_HILOGD("windowInputType not find");
+            break;
+    }
+    MMI_HILOGD("WindowInputTypeToFlag {windowInputType,flag}={%{private}d,%{private}u}",
+        static_cast<int32_t>(window.windowInputType),
+        resultFlags);
+    return resultFlags;
 }
 } // namespace MMI
 } // namespace OHOS

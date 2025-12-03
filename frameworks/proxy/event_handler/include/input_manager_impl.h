@@ -310,6 +310,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_ANCO
     void MarkLastDispatched(int32_t eventId);
     void MarkLastProcessed(int32_t eventId);
+    uint32_t WindowInputTypeToFlag(const WindowInfo &windowInfo);
 
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;

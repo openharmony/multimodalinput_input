@@ -4856,6 +4856,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, 
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
     windowInfo.pointerHotAreas.push_back({150, 250, 300, 500});
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    windowInfo.flags |= WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
     inputWindowsManager.extraData_.appended = false;
     inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
