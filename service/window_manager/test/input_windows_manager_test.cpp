@@ -12635,5 +12635,260 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_007, 
     EXPECT_TRUE(windowArea.width > 0);
     EXPECT_TRUE(windowArea.height > 0);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsEnterWindowTriggered_001
+ * @tc.desc: Test IsEnterWindowTriggered with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsEnterWindowTriggered_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    EXPECT_FALSE(inputWindowsManager->IsEnterWindowTriggered(nullptr, nullptr));
+    WindowInfo touchWindow;
+    touchWindow.id = 1;
+    EXPECT_FALSE(inputWindowsManager->IsEnterWindowTriggered(nullptr, &touchWindow));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_IsEnterWindowTriggered_002
+ * @tc.desc: Test IsEnterWindowTriggered with null windowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsEnterWindowTriggered_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    EXPECT_FALSE(inputWindowsManager->IsEnterWindowTriggered(pointerEvent, nullptr));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_IsEnterWindowTriggered_003
+ * @tc.desc: Test IsEnterWindowTriggered with valid inputs - different windows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsEnterWindowTriggered_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo touchWindow;
+    WindowInfo lastTouchWindowInfo;
+    touchWindow.id = 1;
+    lastTouchWindowInfo.id = 2;
+    inputWindowsManager->lastTouchWindowInfo_ = lastTouchWindowInfo;
+    EXPECT_TRUE(inputWindowsManager->IsEnterWindowTriggered(pointerEvent, &touchWindow));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_IsLeaveWindowTriggered_001
+ * @tc.desc: Test IsLeaveWindowTriggered with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsLeaveWindowTriggered_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    EXPECT_FALSE(inputWindowsManager->IsLeaveWindowTriggered(nullptr, nullptr));
+    WindowInfo touchWindow;
+    touchWindow.id = 1;
+    EXPECT_FALSE(inputWindowsManager->IsLeaveWindowTriggered(nullptr, &touchWindow));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_IsLeaveWindowTriggered_002
+ * @tc.desc: Test IsLeaveWindowTriggered with null windowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsLeaveWindowTriggered_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    EXPECT_FALSE(inputWindowsManager->IsLeaveWindowTriggered(pointerEvent, nullptr));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_IsLeaveWindowTriggered_003
+ * @tc.desc: Test IsLeaveWindowTriggered with valid inputs - different windows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsLeaveWindowTriggered_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo touchWindow;
+    WindowInfo lastTouchWindowInfo;
+    touchWindow.id = 1;
+    lastTouchWindowInfo.id = 2;
+    inputWindowsManager->lastTouchWindowInfo_ = lastTouchWindowInfo;
+    EXPECT_TRUE(inputWindowsManager->IsLeaveWindowTriggered(pointerEvent, &touchWindow));
+}
+ 
+ /**
+ * @tc.name: InputWindowsManagerTest_HandleLevitateInOutEvent_001
+ * @tc.desc: Test POINTER_ACTION_MOVE with leave window triggered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetTargetDisplayId(1);
+    WindowInfo touchWindow;
+    touchWindow.id = 100;
+    touchWindow.pid = 200;
+    int32_t logicalX = 50;
+    int32_t logicalY = 50;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+}
+
+ /**
+ * @tc.name: InputWindowsManagerTest_HandleLevitateInOutEvent_002
+ * @tc.desc: Test POINTER_ACTION_LEVITATE_MOVE with leave window triggered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->lastTouchWindowInfo_.id = 100;
+    inputWindowsManager->lastTouchWindowInfo_.pid = 200;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    pointerEvent->SetTargetDisplayId(1);
+    WindowInfo touchWindow;
+    touchWindow.id = 200;
+    touchWindow.pid = 300;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+}
+ 
+ /**
+ * @tc.name: InputWindowsManagerTest_HandleLevitateInOutEvent_003
+ * @tc.desc: Test POINTER_ACTION_LEVITATE_MOVE with leave window triggered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->lastTouchWindowInfo_.id = -1;
+    inputWindowsManager->lastTouchWindowInfo_.pid = -1;
+    int32_t logicalX = 150;
+    int32_t logicalY = 150;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    pointerEvent->SetTargetDisplayId(1);
+    WindowInfo touchWindow;
+    touchWindow.id = 100;
+    touchWindow.pid = 200;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+}
+ 
+ /**
+ * @tc.name: InputWindowsManagerTest_HandleLevitateInOutEvent_004
+ * @tc.desc: Test POINTER_ACTION_LEVITATE_MOVE with leave window triggered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->lastTouchWindowInfo_.id = 50;
+    inputWindowsManager->lastTouchWindowInfo_.pid = 100;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    pointerEvent->SetTargetDisplayId(1);
+    WindowInfo touchWindow;
+    touchWindow.id = 300;
+    touchWindow.pid = 400;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+}
+ 
+ /**
+ * @tc.name: InputWindowsManagerTest_HandleLevitateInOutEvent_005
+ * @tc.desc: Test POINTER_ACTION_LEVITATE_MOVE with leave window triggered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    inputWindowsManager->lastTouchWindowInfo_.id = 100;
+    inputWindowsManager->lastTouchWindowInfo_.pid = 200;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
+    pointerEvent->SetTargetDisplayId(1);
+    WindowInfo touchWindow;
+    touchWindow.id = 100;
+    touchWindow.pid = 200;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+}
+
+ /**
+ * @tc.name: InputWindowsManagerTest_HandleLevitateInOutEvent_006
+ * @tc.desc: Test other pointerAction with leave window triggered  
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo touchWindow;
+    touchWindow.id = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleLevitateInOutEvent(
+        logicalX, logicalY, pointerEvent, &touchWindow));
+}
 } // namespace MMI
 } // namespace OHOS
