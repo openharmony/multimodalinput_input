@@ -128,6 +128,42 @@ void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::st
         "0 means it is open, and 1 means it is closed", lidState_.load());
 }
 
+void SwitchSubscriberHandler::SyncSwitchLidState(struct libinput_device *inputDevice)
+{
+    if (libinput_device_switch_has_switch(inputDevice, LIBINPUT_SWITCH_LID) <= 0) {
+        return;
+    }
+    int switchState = 0;
+    MMI_HILOGI("zs libinput_device_switch_has_switch LIBINPUT_SWITCH_LID enter");
+    switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_LID);
+    MMI_HILOGI("zs switchState is %d", switchState);
+    auto switchEvent = std::make_shared<SwitchEvent>(switchState);
+    switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_LID);
+    auto eventNormalizeHandler_ = InputHandler->GetEventNormalizeHandler();
+    if (eventNormalizeHandler_ != nullptr) {
+        eventNormalizeHandler_->HandleSwitchEvent(switchEvent);
+        MMI_HILOGI("zs send event finish");
+    }
+}
+
+void SwitchSubscriberHandler::SyncSwitchTabletState(struct libinput_device *inputDevice)
+{
+    if (libinput_device_switch_has_switch(inputDevice, LIBINPUT_SWITCH_TABLET_MODE) <= 0) {
+        return;
+    }
+    int switchState = 0;
+    MMI_HILOGI("zs libinput_device_switch_has_switch LIBINPUT_SWITCH_TABLET_MODE enter");
+    switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_TABLET_MODE);
+    MMI_HILOGI("zs switchState is %d", switchState);
+    auto switchEvent = std::make_shared<SwitchEvent>(switchState);
+    switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_TABLET);
+    auto eventNormalizeHandler_ = InputHandler->GetEventNormalizeHandler();
+    if (eventNormalizeHandler_ != nullptr) {
+        eventNormalizeHandler_->HandleSwitchEvent(switchEvent);
+        MMI_HILOGI("zs send event finish");
+    }
+}
+
 #ifdef OHOS_BUILD_ENABLE_SWITCH
 void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
