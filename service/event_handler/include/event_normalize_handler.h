@@ -38,6 +38,7 @@ public:
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent) override;
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddHandleTimer(int32_t timeout = 300);
