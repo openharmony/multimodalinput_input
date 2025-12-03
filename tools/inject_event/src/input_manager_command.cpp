@@ -1036,6 +1036,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
+                            time = time + taktTime * TIME_TRANSITION;
                             break;
                         }
                         case 't': {
