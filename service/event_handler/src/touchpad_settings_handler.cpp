@@ -33,7 +33,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string DEFAULT_SWITCH_VALUE {"1"};
+const std::string DEFAULT_SWIPE_INWARD_SWITCH_VALUE {"1"};
 const std::string g_volumeSwitchesKey {"settings.trackpad.right_volume_switches"};
 const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_switches"};
 const std::string g_pressureKey {"settings.trackpad.press_level"};
@@ -191,10 +191,11 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterSwipeInwardObserver()
 {
     const std::string datashareUri = datashareUri_;
     SettingObserver::UpdateFunc updateFunc = [this, datashareUri](const std::string& key) {
-        std::string value = DEFAULT_SWITCH_VALUE;
+        std::string value = DEFAULT_SWIPE_INWARD_SWITCH_VALUE;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetStringValue(key, value, datashareUri);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from settings db failed, ret:%{public}d", ret);
+            this->SetSupportSwipeInward(std::stoi(DEFAULT_SWIPE_INWARD_SWITCH_VALUE));
             return;
         }
         MMI_HILOGI("Config changed, key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
