@@ -3888,8 +3888,10 @@ void PointerDrawingManager::SetSurfaceNodeBounds()
     if (GetHardCursorEnabled()) {
         return;
     }
-    if (canvasWidth_ < cursorWidth_ && canvasHeight_ < cursorHeight_) {
+    if (canvasWidth_ < cursorWidth_) {
         canvasWidth_ = (cursorWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    }
+    if (canvasHeight_ < cursorHeight_) {
         canvasHeight_ = (cursorHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     }
     auto surfaceNodePtr = GetSurfaceNode();
