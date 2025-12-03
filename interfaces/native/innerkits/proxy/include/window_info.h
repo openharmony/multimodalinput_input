@@ -190,6 +190,75 @@ enum class WindowInputType : uint8_t {
     DUALTRIGGER_TOUCH = 60
 };
 
+enum WindowInputPolicy : uint32_t {
+    /**
+     * Untouchable. If set to untouchable, other flags do not take effect.
+     *
+     * @since 23
+     */
+    FLAG_UNTOUCHABLE = 1 << 0,
+    /**
+     * Only handwriting
+     *
+     * @since 23
+     */
+    FLAG_HANDWRITING = 1 << 1,
+    /**
+     * Disable user action
+     *
+     * @since 23
+     */
+    FLAG_DISABLE_USER_ACTION = 1 << 2,
+    /**
+     * Pointer locked
+     *
+     * @since 23
+     */
+    FLAG_POINTER_LOCKED = 1 << 3,
+    /**
+     * Pointer confined
+     *
+     * @since 23
+     */
+    FLAG_POINTER_CONFINED = 1 << 4,
+    /**
+     * First touch hit
+     *
+     * @since 23
+     */
+    FLAG_FIRST_TOUCH_HIT = 1 << 5,
+    /**
+     * Mouse unhittable
+     *
+     * @since 23
+     */
+    FLAG_MOUSE_UNHITTABLE = 1 << 6,
+    /**
+     * Mouse left button lock
+     *
+     * @since 23
+     */
+    FLAG_MOUSE_LEFT_BUTTON_LOCK = 1 << 7,
+    /**
+     * Stylus anti mistake
+     *
+     * @since 23
+     */
+    FLAG_STYLUS_ANTI_MISTAKE = 1 << 8,
+    /**
+     * Event transmit all. If set to transmit all, do not receive drag events.
+     *
+     * @since 23
+     */
+    FLAG_EVENT_TRANSMIT_ALL = 1 << 9,
+    /**
+     * Drag disabled
+     *
+     * @since 23
+     */
+    FLAG_DRAG_DISABLED = 1 << 10,
+};
+
 struct WindowInfo {
     /**
      * Maximum number of hot areas
