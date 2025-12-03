@@ -26,6 +26,14 @@ struct ShortcutKey {
     int32_t finalKey { -1 };
 };
 
+struct SequenceKey {
+    int32_t keyCode { -1 };
+};
+
+struct Sequence {
+    std::vector<SequenceKey> sequenceKeys;
+};
+
 class IKeyCommandHandler {
 public:
     IKeyCommandHandler() = default;

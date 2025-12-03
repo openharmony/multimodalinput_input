@@ -37,6 +37,7 @@
 #include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
 #include "timer_manager.h"
+#include "multimodal_input_plugin_manager.h"
 #include <dlfcn.h>
 #include <iostream>
 
@@ -2610,12 +2611,20 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 {
     CALL_INFO_TRACE;
+    auto manager = InputPluginManager::GetInstance();
+    if (manager != nullptr && manager->HandleShortcutKey(key)) {
+        return;
+    }
     LaunchAbility(key.ability, key.keyDownDuration);
 }
 
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
     CALL_INFO_TRACE;
+    auto manager = InputPluginManager::GetInstance();
+    if (manager != nullptr && manager->HandleSequenceKeys(sequence)) {
+        return;
+    }
     LaunchAbility(sequence.ability, sequence.abilityStartDelay);
 }
 
