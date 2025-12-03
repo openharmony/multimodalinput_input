@@ -38,6 +38,7 @@
 #include "util_ex.h"
 #include "want.h"
 #include "tablet_subscriber_handler.h"
+#include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -975,6 +976,13 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CALL_INFO_TRACE;
     CHKPV(keyEvent);
     CHKPV(subscriber);
+    if (subscriber->keyOption_ == nullptr) {
+        return;
+    }
+    auto manager = InputPluginManager::GetInstance();
+    if (manager != nullptr && manager->HandleShortcutKey(*subscriber->keyOption_)) {
+        return;
+    }
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
         CHKPV(subscriber->keyOption_);
