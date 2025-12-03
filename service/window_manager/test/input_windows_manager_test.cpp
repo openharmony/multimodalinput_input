@@ -12469,5 +12469,171 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_002, 
     EXPECT_EQ(windowArea.width, focusWindow.area.height);
     EXPECT_EQ(windowArea.height, focusWindow.area.width);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_003
+ * @tc.desc: Test DIRECTION180 rotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 0;
+    displayInfo.direction = Direction::DIRECTION180;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 3000;
+    displayInfo.validHeight = 3000;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.width, focusWindow.area.width);
+    EXPECT_EQ(windowArea.height, focusWindow.area.height);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_004
+ * @tc.desc: Test DIRECTION270 rotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 0;
+    displayInfo.direction = Direction::DIRECTION270;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 3000;
+    displayInfo.validHeight = 3000;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.width, focusWindow.area.height);
+    EXPECT_EQ(windowArea.height, focusWindow.area.width);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_005
+ * @tc.desc: Test when displayInfo is not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 999;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_EQ(windowArea.x, focusWindow.area.x);
+    EXPECT_EQ(windowArea.y, focusWindow.area.y);
+    EXPECT_EQ(windowArea.width, focusWindow.area.width);
+    EXPECT_EQ(windowArea.height, focusWindow.area.height);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_006
+ * @tc.desc: Test when FLAG_BIT_POINTER_LOCKED is not set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 0;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 3000;
+    displayInfo.validHeight = 3000;
+    focusWindow.id = 1;
+    focusWindow.flags = 0;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, -507.0, -302.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_TRUE(windowArea.width > 0);
+    EXPECT_TRUE(windowArea.height > 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateWindowArea_007
+ * @tc.desc: Test with invalid transform matrix size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    OLD::DisplayInfo displayInfo;
+    WindowInfo focusWindow;
+    displayInfo.id = 0;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    displayInfo.validWidth = 3000;
+    displayInfo.validHeight = 3000;
+    focusWindow.id = 1;
+    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.area.x = 507;
+    focusWindow.area.y = 302;
+    focusWindow.area.width = 2090;
+    focusWindow.area.height = 1394;
+    focusWindow.transform = {1.0, 0.0, 0.0, 0.0, 1.0};
+    Rect windowArea = { focusWindow.area.x, focusWindow.area.y, focusWindow.area.width, focusWindow.area.height };
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+    inputWindowsManager->RotateWindowArea(displayInfo.id, focusWindow, windowArea);
+    EXPECT_TRUE(windowArea.width > 0);
+    EXPECT_TRUE(windowArea.height > 0);
+}
 } // namespace MMI
 } // namespace OHOS
