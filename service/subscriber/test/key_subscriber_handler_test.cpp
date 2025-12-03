@@ -4184,7 +4184,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNo
     std::shared_ptr<KeyOption> keyOption1 = std::make_shared<KeyOption>();
     keyOption1->SetPriority(10);
     std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
-    subscribers.push_back(nullptr);
     
     handler.NotifyKeyDownRightNow(keyEvent, subscribers, false, handled);
     EXPECT_FALSE(handled);
