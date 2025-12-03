@@ -134,15 +134,13 @@ void SwitchSubscriberHandler::SyncSwitchLidState(struct libinput_device *inputDe
         return;
     }
     int switchState = 0;
-    MMI_HILOGI("zs libinput_device_switch_has_switch LIBINPUT_SWITCH_LID enter");
     switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_LID);
-    MMI_HILOGI("zs switchState is %d", switchState);
     auto switchEvent = std::make_shared<SwitchEvent>(switchState);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_LID);
     auto eventNormalizeHandler_ = InputHandler->GetEventNormalizeHandler();
     if (eventNormalizeHandler_ != nullptr) {
         eventNormalizeHandler_->HandleSwitchEvent(switchEvent);
-        MMI_HILOGI("zs send event finish");
+        MMI_HILOGI("SyncSwitchLidState success. switchValue:%{public}d", switchEvent->GetSwitchValue());
     }
 }
 
@@ -152,15 +150,13 @@ void SwitchSubscriberHandler::SyncSwitchTabletState(struct libinput_device *inpu
         return;
     }
     int switchState = 0;
-    MMI_HILOGI("zs libinput_device_switch_has_switch LIBINPUT_SWITCH_TABLET_MODE enter");
     switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_TABLET_MODE);
-    MMI_HILOGI("zs switchState is %d", switchState);
     auto switchEvent = std::make_shared<SwitchEvent>(switchState);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_TABLET);
     auto eventNormalizeHandler_ = InputHandler->GetEventNormalizeHandler();
     if (eventNormalizeHandler_ != nullptr) {
         eventNormalizeHandler_->HandleSwitchEvent(switchEvent);
-        MMI_HILOGI("zs send event finish");
+        MMI_HILOGI("SyncSwitchTabletState success. switchValue:%{public}d", switchEvent->GetSwitchValue());
     }
 }
 
