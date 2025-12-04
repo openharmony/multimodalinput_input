@@ -105,7 +105,7 @@ bool InputEnableKeyStatusCommand::CheckTimeout(const std::string &timeout)
     return false;
     }
     if (IsNumeric(timeout)) {
-        int32_t numberCode;
+        int32_t numberCode = 0;
         auto [ptr, ec] = std::from_chars(timeout.data(), timeout.data() + timeout.size(), numberCode);
         if (ec != std::errc()) {
             std::cout << "Invalid timeout value, timeout:" << timeout.c_str() << std::endl;
@@ -128,7 +128,7 @@ int32_t InputEnableKeyStatusCommand::RunEnableKeyStatus()
     }
     int32_t timeout = MAX_TIMEOUT_MS;
     if (injectArgvs_.size() > MIN_ARGV_COUNTS) {
-        int32_t parsedTimeout;
+        int32_t parsedTimeout = 0;
         auto [ptr, ec] = std::from_chars(injectArgvs_[TIMEOUT_INDEX].data(),
             injectArgvs_[TIMEOUT_INDEX].data() + injectArgvs_[TIMEOUT_INDEX].size(), parsedTimeout);
         if (ec == std::errc()) {
