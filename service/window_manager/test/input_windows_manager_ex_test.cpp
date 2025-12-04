@@ -5247,7 +5247,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchEnterLeaveEvent, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
-    window.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+    touchWindow.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
                            WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     inputWindowsManager->lastTouchWindowInfo_.id = 5;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
