@@ -376,7 +376,7 @@ keyCode::KeyCode TaiheKeyCodeConverter::ConvertEtsKeyCode(int32_t keyCode)
 {
     auto iter = KEY_CODE_TRANSFORMATION.find(keyCode);
     if (iter == KEY_CODE_TRANSFORMATION.end()) {
-        MMI_HILOGE("Find failed, keyCode:%{public}d", keyCode);
+        MMI_HILOGE("Find failed, keyCode:%{private}d", keyCode);
         return keyCode::KeyCode::key_t::KEYCODE_UNKNOWN;
     }
     return iter->second;

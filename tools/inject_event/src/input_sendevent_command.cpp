@@ -16,6 +16,7 @@
 #include "input_sendevent_command.h"
 
 #include <cctype>
+#include <charconv>
 #include <cstdio>
 #include <fcntl.h>
 #include <iostream>
@@ -102,10 +103,11 @@ bool InputSendeventCommand::CheckValue(const std::string &inputValue)
     if ((inputValue.length()) > INPUT_VALUE_LENGTH) {
         return false;
     }
-    bool isValueNumber = regex_match(inputValue, std::regex("-?(\\d+)"));
+    bool isValueNumber = std::regex_match(inputValue, std::regex("-?(\\d+)"));
     if (isValueNumber) {
-        auto numberValue = stoll(inputValue);
-        if ((numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
+        int64_t numberValue;
+        auto [ptr, ec] = std::from_chars(inputValue.data(), inputValue.data() + inputValue.size(), numberValue);
+        if (ec == std::errc() && (numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
             return true;
         }
     }
@@ -117,10 +119,11 @@ bool InputSendeventCommand::CheckCode(const std::string &inputCode)
     if ((inputCode.length()) > INPUT_CODE_LENGTH) {
         return false;
     }
-    bool isCodeNumber = regex_match(inputCode, std::regex("\\d+"));
+    bool isCodeNumber = std::regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        int32_t numberCode = stoi(inputCode);
-        if (numberCode <= UINT16_MAX) {
+        int32_t numberCode;
+        auto [ptr, ec] = std::from_chars(inputCode.data(), inputCode.data() + inputCode.size(), numberCode);
+        if (ec == std::errc() && numberCode <= UINT16_MAX) {
             return true;
         }
     }
@@ -132,10 +135,11 @@ bool InputSendeventCommand::CheckType(const std::string &inputType)
     if ((inputType.length()) > INPUT_TYPE_LENGTH) {
         return false;
     }
-    bool isTypeNumber = regex_match(inputType, std::regex("\\d+"));
+    bool isTypeNumber = std::regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        int32_t numberType = stoi(inputType);
-        if (numberType <= UINT16_MAX) {
+        int32_t numberType;
+        auto [ptr, ec] = std::from_chars(inputType.data(), inputType.data() + inputType.size(), numberType);
+        if (ec == std::errc() && numberType <= UINT16_MAX) {
             return true;
         }
     }
@@ -180,9 +184,33 @@ int32_t InputSendeventCommand::RunSendEvent()
     struct input_event event = {};
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
-    event.type = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_TYPE_INDEX]));
-    event.code = static_cast<uint16_t>(std::stoi(injectArgvs_[SEND_EVENT_CODE_INDEX]));
-    event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
+    uint16_t type;
+    auto [ptr1, ec1] = std::from_chars(injectArgvs_[SEND_EVENT_TYPE_INDEX].data(), 
+        injectArgvs_[SEND_EVENT_TYPE_INDEX].data() + injectArgvs_[SEND_EVENT_TYPE_INDEX].size(), type);
+    if (ec1 != std::errc()) {
+        std::cerr << "Invalid type value: " << injectArgvs_[SEND_EVENT_TYPE_INDEX] << std::endl;
+        close(fd);
+        return RET_ERR;
+    }
+    event.type = type;
+    uint16_t code;
+    auto [ptr2, ec2] = std::from_chars(injectArgvs_[SEND_EVENT_CODE_INDEX].data(), 
+        injectArgvs_[SEND_EVENT_CODE_INDEX].data() + injectArgvs_[SEND_EVENT_CODE_INDEX].size(), code);
+    if (ec2 != std::errc()) {
+        std::cerr << "Invalid code value: " << injectArgvs_[SEND_EVENT_CODE_INDEX] << std::endl;
+        close(fd);
+        return RET_ERR;
+    }
+    event.code = code;
+    int32_t value;
+    auto [ptr3, ec3] = std::from_chars(injectArgvs_[SEND_EVENT_VALUE_INDEX].data(), 
+        injectArgvs_[SEND_EVENT_VALUE_INDEX].data() + injectArgvs_[SEND_EVENT_VALUE_INDEX].size(), value);
+    if (ec3 != std::errc()) {
+        std::cerr << "Invalid value: " << injectArgvs_[SEND_EVENT_VALUE_INDEX] << std::endl;
+        close(fd);
+        return RET_ERR;
+    }
+    event.value = value;
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
         std::cerr << "Send event to device node failed" << std::endl;

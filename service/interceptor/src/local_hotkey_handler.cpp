@@ -15,6 +15,7 @@
 
 #include "local_hotkey_handler.h"
 
+#include <filesystem>
 #include <fstream>
 #include "cJSON.h"
 #include "config_policy_utils.h"
@@ -294,7 +295,8 @@ void LocalHotKeySteward::LoadLocalHotKeys()
         MMI_HILOGE("Unexpected size of local_hot_keys config");
         return;
     }
-    std::ifstream ifs(realPath.get());
+    std::filesystem::path normalizedPath = std::filesystem::canonical(realPath.get());
+    std::ifstream ifs(normalizedPath);
     if (!ifs.is_open()) {
         MMI_HILOGE("Can not open local_hot_keys config");
         return;
