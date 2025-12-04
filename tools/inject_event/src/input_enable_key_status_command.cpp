@@ -52,7 +52,7 @@ int32_t InputEnableKeyStatusCommand::HandleEnableKeyStatusCommand(int32_t argc, 
 {
     InputEnableKeyStatusCommand command;
     if (!command.EnableKeyStatusOption(argc, argv)) {
-        std::cout << "please use 'uinput enable_key_status '" << std::endl;
+        std::cout << "please use 'uinput enable_key_status <enable> [timeout]'" << std::endl;
         return RET_ERR;
     };
     int32_t ret = command.RunEnableKeyStatus();
@@ -64,7 +64,7 @@ bool InputEnableKeyStatusCommand::EnableKeyStatusOption(int32_t argc, char** arg
     CALL_DEBUG_ENTER;
     if (argc < MIN_ARGC || argc > MAX_ARGC) {
         std::cout << "Wrong number of input parameters" << std::endl;
-    return false;
+        return false;
     }
     injectArgvs_.clear();
     injectArgvs_.push_back(argv[optind++]);
@@ -93,7 +93,7 @@ bool InputEnableKeyStatusCommand::CheckEnable(const std::string &enable)
 {
     if ((enable.length()) > ENABLE_LENGTH) {
         std::cout << "The value entered is out of range, enable:" << enable.c_str() << std::endl;
-    return false;
+        return false;
     }
     return enable == "0" || enable == "1";
 }
@@ -104,7 +104,7 @@ bool InputEnableKeyStatusCommand::CheckTimeout(const std::string &timeout)
         std::cout << "The value entered is out of range, timeout:" << timeout.c_str() << std::endl;
     return false;
     }
-    if (IsNumeric(timeout)) {
+    if (IsInteger(timeout.c_str())) {
         int32_t numberCode = 0;
         auto [ptr, ec] = std::from_chars(timeout.data(), timeout.data() + timeout.size(), numberCode);
         if (ec != std::errc()) {
@@ -118,7 +118,7 @@ bool InputEnableKeyStatusCommand::CheckTimeout(const std::string &timeout)
             return false;
         }
     }
-    return IsNumeric(timeout);
+    return IsInteger(timeout.c_str());
 }
 
 int32_t InputEnableKeyStatusCommand::RunEnableKeyStatus()

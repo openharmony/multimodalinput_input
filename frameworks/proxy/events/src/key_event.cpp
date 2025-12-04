@@ -1108,6 +1108,12 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
     }
 }
 
+void KeyEvent::AddReleasedKeyItems(const KeyItem& keyItem)
+{
+    RemoveReleasedKeyItems(keyItem);
+    AddPressedKeyItems(keyItem);
+}
+
 void KeyEvent::RemoveReleasedKeyItems()
 {
     keys_.erase(std::remove_if(keys_.begin(), keys_.end(), [](const auto& key) {

@@ -48,8 +48,10 @@ public:
     void SetCurrentShieldMode(int32_t shieldMode);
     int32_t GetCurrentShieldMode();
     bool IsScreenFold();
-    void ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent>& keyEvent);
+    void SimulatedModiferKeyEventNormalize(const std::shared_ptr<KeyEvent>& keyEvent);
     void SetKeyStatusRecord(bool enable, int32_t timeout);
+    void CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent);
+    void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent);
 
 private:
     void ReadProductConfig(InputProductConfig &config) const;
@@ -57,11 +59,14 @@ private:
     void CheckProductParam(InputProductConfig &productConfig) const;
     int32_t TransformVolumeKey(struct libinput_device *dev, int32_t keyCode, int32_t keyAction) const;
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
-    bool HandleModifierKeyAction(const std::shared_ptr<KeyEvent>& keyEvent);
-    bool HandleModifierKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);
-    bool HandleModifierKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
-    void SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent>& keyEvent, int32_t funckey);
-    int32_t KeyEventAutoUp(const std::shared_ptr<KeyEvent>& keyEvent, int32_t timeout);
+    bool CheckSimulatedModifierKeyEventFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
+    void HandleSimulatedModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent);
+    void HandleSimulatedModifierKeyActionFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
+    void HandleSimulatedModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &item);
+    void HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &item);
+    void SyncSimulatedModifierKeyEventState(const std::shared_ptr<KeyEvent> &keyEvent);
+    void SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode);
+    void KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout);
 
 private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
@@ -73,6 +78,7 @@ private:
     std::mutex mtx_;
     bool keyStatusRecordSwitch_ { false };
     int32_t keyStatusRecordTimeout_ { 10000 };
+    int32_t keyEventAutoUpTimerId { -1 };
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI
