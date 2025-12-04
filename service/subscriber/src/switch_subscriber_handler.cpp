@@ -133,8 +133,7 @@ void SwitchSubscriberHandler::SyncSwitchLidState(struct libinput_device *inputDe
     if (libinput_device_switch_has_switch(inputDevice, LIBINPUT_SWITCH_LID) <= 0) {
         return;
     }
-    int switchState = 0;
-    switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_LID);
+    int switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_LID);
     auto switchEvent = std::make_shared<SwitchEvent>(switchState);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_LID);
     auto eventNormalizeHandler_ = InputHandler->GetEventNormalizeHandler();
@@ -149,8 +148,7 @@ void SwitchSubscriberHandler::SyncSwitchTabletState(struct libinput_device *inpu
     if (libinput_device_switch_has_switch(inputDevice, LIBINPUT_SWITCH_TABLET_MODE) <= 0) {
         return;
     }
-    int switchState = 0;
-    switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_TABLET_MODE);
+    int switchState = libinput_device_get_switch_state(inputDevice, LIBINPUT_SWITCH_TABLET_MODE);
     auto switchEvent = std::make_shared<SwitchEvent>(switchState);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_TABLET);
     auto eventNormalizeHandler_ = InputHandler->GetEventNormalizeHandler();
