@@ -105,7 +105,7 @@ bool InputSendeventCommand::CheckValue(const std::string &inputValue)
     }
     bool isValueNumber = std::regex_match(inputValue, std::regex("-?(\\d+)"));
     if (isValueNumber) {
-        int64_t numberValue;
+        int64_t numberValue = 0;
         auto [ptr, ec] = std::from_chars(inputValue.data(), inputValue.data() + inputValue.size(), numberValue);
         if (ec == std::errc() && (numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
             return true;
@@ -121,7 +121,7 @@ bool InputSendeventCommand::CheckCode(const std::string &inputCode)
     }
     bool isCodeNumber = std::regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        int32_t numberCode;
+        int32_t numberCode = 0;
         auto [ptr, ec] = std::from_chars(inputCode.data(), inputCode.data() + inputCode.size(), numberCode);
         if (ec == std::errc() && numberCode <= UINT16_MAX) {
             return true;
@@ -137,7 +137,7 @@ bool InputSendeventCommand::CheckType(const std::string &inputType)
     }
     bool isTypeNumber = std::regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        int32_t numberType;
+        int32_t numberType = 0;
         auto [ptr, ec] = std::from_chars(inputType.data(), inputType.data() + inputType.size(), numberType);
         if (ec == std::errc() && numberType <= UINT16_MAX) {
             return true;
@@ -184,7 +184,7 @@ int32_t InputSendeventCommand::RunSendEvent()
     struct input_event event = {};
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
-    uint16_t type;
+    uint16_t type = 0;
     auto [ptr1, ec1] = std::from_chars(injectArgvs_[SEND_EVENT_TYPE_INDEX].data(),
         injectArgvs_[SEND_EVENT_TYPE_INDEX].data() + injectArgvs_[SEND_EVENT_TYPE_INDEX].size(), type);
     if (ec1 != std::errc()) {
@@ -193,7 +193,7 @@ int32_t InputSendeventCommand::RunSendEvent()
         return RET_ERR;
     }
     event.type = type;
-    uint16_t code;
+    uint16_t code = 0;
     auto [ptr2, ec2] = std::from_chars(injectArgvs_[SEND_EVENT_CODE_INDEX].data(),
         injectArgvs_[SEND_EVENT_CODE_INDEX].data() + injectArgvs_[SEND_EVENT_CODE_INDEX].size(), code);
     if (ec2 != std::errc()) {
@@ -202,7 +202,7 @@ int32_t InputSendeventCommand::RunSendEvent()
         return RET_ERR;
     }
     event.code = code;
-    int32_t value;
+    int32_t value = 0;
     auto [ptr3, ec3] = std::from_chars(injectArgvs_[SEND_EVENT_VALUE_INDEX].data(),
         injectArgvs_[SEND_EVENT_VALUE_INDEX].data() + injectArgvs_[SEND_EVENT_VALUE_INDEX].size(), value);
     if (ec3 != std::errc()) {
