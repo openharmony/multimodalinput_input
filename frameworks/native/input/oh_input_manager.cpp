@@ -3437,7 +3437,7 @@ Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Medi
     options->alphaType = static_cast<OHOS::Media::AlphaType>(alphaType);
     options->srcPixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
     options->pixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
-    options->srcRowStride = rowStride;
+    options->srcRowStride = static_cast<int32_t>(rowStride);
     options->size.height = static_cast<int32_t>(height);
     options->size.width = static_cast<int32_t>(width);
     return INPUT_SUCCESS;
@@ -3590,7 +3590,7 @@ Input_Result OH_Input_GetCursorInfo(Input_CursorInfo* cursorInfo, OH_PixelmapNat
     }
     info.style = static_cast<Input_PointerStyle>(pointerStyle.id);
     info.sizeLevel = pointerStyle.size;
-    info.color = pointerStyle.color;
+    info.color = static_cast<decltype(info.color)>(pointerStyle.color);
     *cursorInfo = info;
     CHKPR(pixelmap, INPUT_SUCCESS);
     if (info.style == DEVELOPER_DEFINED_ICON) {

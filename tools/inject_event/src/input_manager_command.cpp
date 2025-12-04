@@ -1845,8 +1845,8 @@ int32_t InputManagerCommand::SavePixelMapToFile(const char *filePath)
         g_mappedAddr = nullptr;
         return RET_ERR;
     }
-    uint64_t ret = write(g_fd, g_mappedAddr, g_bufferSize);
-    if (ret < g_bufferSize) {
+    ssize_t ret = write(g_fd, g_mappedAddr, g_bufferSize);
+    if (ret < static_cast<ssize_t>(g_bufferSize)) {
         std::cerr << "Save file failed" << std::endl;
         close(g_fd);
         free(g_mappedAddr);

@@ -16,6 +16,7 @@
 #include "input_enable_key_status_command.h"
 
 #include <cctype>
+#include <charconv>
 #include <cstdio>
 #include <fcntl.h>
 #include <iostream>
@@ -104,7 +105,12 @@ bool InputEnableKeyStatusCommand::CheckTimeout(const std::string &timeout)
     return false;
     }
     if (IsNumeric(timeout)) {
-        int32_t numberCode = stoi(timeout);
+        int32_t numberCode;
+        auto [ptr, ec] = std::from_chars(timeout.data(), timeout.data() + timeout.size(), numberCode);
+        if (ec != std::errc()) {
+            std::cout << "Invalid timeout value, timeout:" << timeout.c_str() << std::endl;
+            return false;
+        }
         if (numberCode <= 0) {
             return false;
         }
@@ -122,7 +128,14 @@ int32_t InputEnableKeyStatusCommand::RunEnableKeyStatus()
     }
     int32_t timeout = MAX_TIMEOUT_MS;
     if (injectArgvs_.size() > MIN_ARGV_COUNTS) {
-        timeout = stoi(injectArgvs_[TIMEOUT_INDEX]) * S_TO_MS;
+        int32_t parsedTimeout;
+        auto [ptr, ec] = std::from_chars(injectArgvs_[TIMEOUT_INDEX].data(),
+            injectArgvs_[TIMEOUT_INDEX].data() + injectArgvs_[TIMEOUT_INDEX].size(), parsedTimeout);
+        if (ec == std::errc()) {
+            timeout = parsedTimeout * S_TO_MS;
+        } else {
+            return RET_ERR;
+        }
     }
     bool enable = injectArgvs_[ENABLE_INDEX] == "1";
 
