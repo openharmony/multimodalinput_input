@@ -42,7 +42,7 @@ namespace MMI {
 using namespace testing;
 using namespace testing::ext;
 extern bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_ptr<PointerEvent>& pointerEvent,
-    const std::optional<WindowInfo>& touchWindow, const InputWindowsManager &inputWindowsManager);
+    const std::optional<WindowInfo> &touchWindow, const InputWindowsManager &inputWindowsManager);
 namespace {
 InputWindowsManager *g_instance;
 constexpr uint32_t DEFAULT_ICON_COLOR {0xFF};
