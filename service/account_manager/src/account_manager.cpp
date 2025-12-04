@@ -473,7 +473,7 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
     std::string displayId = data.GetWant().GetStringParam("displayId");
     uint64_t currentDisplayId = MAIN_DISPLAY_ID;
     if (displayId.size() <= MAX_DISPLAYID_SIZE && IsNumeric(displayId)) {
-        uint64_t num;
+        uint64_t num = 0;
         auto [ptr, ec] = std::from_chars(displayId.data(), displayId.data() + displayId.size(), num);
     if (ec == std::errc() && num <= UINT64_MAX) {
         currentDisplayId = num;
