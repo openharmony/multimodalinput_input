@@ -3504,7 +3504,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMismatchTyp
 
 /**
  * @tc.name: InputWindowsManagerOneTest_ClearMismatchTypeWinIds_003
- * @tc.desc: Test windowInfo && 
+ * @tc.desc: Test windowInfo &&
  * @tc.type: FUNC
  * @tc.require:
  */
