@@ -5287,6 +5287,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
+        if (ShouldIgnoreLevitateEvent(pointerItem, item.windowInputType)) {
+            winMap.insert({item.id, item});
+            continue;
+        }
 
         bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
@@ -5879,6 +5883,17 @@ void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY
         DispatchTouch(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW, groupId);
         return;
     }
+    UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
+}
+
+bool InputWindowsManager::ShouldIgnoreLevitateEvent(const PointerEvent::PointerItem &pointerItem,
+    WindowInputType windowType)
+{
+    if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN && MMI_LE(pointerItem.GetPressure(), 0.0f)) {
+        return (windowType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) ||
+               (windowType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE);
+    }
+    return false;
 }
 
 bool InputWindowsManager::IsTabletToolEvent(const PointerEvent::PointerItem &pointerItem)
@@ -5918,6 +5933,10 @@ void InputWindowsManager::DispatchLevitateOutEvent(const std::shared_ptr<Pointer
 void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow)
 {
+    if (pointerEvent == nullptr) {
+        MMI_HILOG_DISPATCHE("PointerEvent is nullptr");
+        return;
+    }
     if (auto pointerAction = pointerEvent->GetPointerAction();
         pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_MOVE) {
         if (IsLeaveWindowTriggered(pointerEvent, touchWindow)) {
@@ -5964,6 +5983,12 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
     CHKPV(lastTouchEvent_);
+    PointerEvent::PointerItem lastPointerItem;
+    int32_t lastPointerId = lastTouchEvent_->GetPointerId();
+    if (!lastTouchEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
+        return;
+    }
     if (pointerAction == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
         pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW) {
         WindowInfo touchWindow;
@@ -5976,6 +6001,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
                 continue;
             }
             if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) == WindowInputPolicy::FLAG_DRAG_DISABLED) {
+                continue;
+            }
+            if (ShouldIgnoreLevitateEvent(lastPointerItem, item.windowInputType)) {
                 continue;
             }
             if (IsInHotArea(lastTouchLogicX_, lastTouchLogicY_, item.defaultHotAreas, item)) {
@@ -5994,12 +6022,6 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     }
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
-    PointerEvent::PointerItem lastPointerItem;
-    int32_t lastPointerId = lastTouchEvent_->GetPointerId();
-    if (!lastTouchEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
-        MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
-        return;
-    }
     PointerEvent::PointerItem currentPointerItem;
     bool isOneHand = lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO;
     double windowX = isOneHand ? lastWinX_ : (lastTouchLogicX_ - lastTouchWindowInfo_.area.x);
@@ -7874,7 +7896,6 @@ void InputWindowsManager::TouchEnterLeaveEvent(int32_t logicalX, int32_t logical
         pointerItem.SetWindowYPos(windowY);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     }
-    UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
     if (lastTouchWindowInfo_.id != touchWindow->id) {
         if (lastTouchWindowInfo_.id != -1 &&
             lastTouchWindowInfo_.windowInputType == WindowInputType::SLID_TOUCH_WINDOW) {
