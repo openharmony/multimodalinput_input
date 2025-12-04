@@ -24,6 +24,8 @@
 #include "uds_server.h"
 #include "net_packet.h"
 #include "input_event_data_transformation.h"
+#include "key_command_handler.h"
+#include "key_option.h"
 
 namespace OHOS {
 namespace MMI {
@@ -98,12 +100,17 @@ public:
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
     UDSServer *GetUdsServer();
     void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType);
+    bool HandleShortcutKey(const ShortcutKey &key);
+    bool HandleShortcutKey(const KeyOption &option);
+    bool HandleSequenceKeys(const Sequence &sequence);
 
 private:
     explicit InputPluginManager(const std::string& directory) : directory_(directory) {};
     ~InputPluginManager();
     bool IntermediateEndEvent(PluginEventType pluginEvent);
     bool LoadPlugin(const std::string &path);
+    bool ProcessShortcutKey(const IShortcutKey &shortcutKey);
+    bool ProcessSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys);
 
     UDSServer* udsServer_ {nullptr};
     std::string directory_;

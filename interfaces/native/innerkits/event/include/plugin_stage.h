@@ -85,6 +85,24 @@ struct IPluginData {
     LibInputEventData libInputEventData;
 };
 
+struct IShortcutKey {
+    std::set<int32_t> preKeys;
+    int32_t finalKey { -1 };
+    int32_t keyDownDuration { 0 };
+    int32_t triggerType { KeyEvent::KEY_ACTION_DOWN };
+};
+
+struct ISequenceKey {
+    int32_t keyCode { -1 };
+    int32_t keyAction { 0 };
+    int64_t actionTime { 0 };
+    int64_t delay { 0 };
+    bool operator!=(const ISequenceKey &sequenceKey)
+    {
+        return (keyCode != sequenceKey.keyCode) || (keyAction != sequenceKey.keyAction);
+    }
+};
+
 struct IInputPlugin {
     virtual int32_t GetPriority() const = 0;
     virtual const std::string GetVersion() const = 0;
@@ -102,6 +120,8 @@ struct IInputPlugin {
         std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) const = 0;
     virtual sptr<IRemoteObject> GetExternalObject() { return nullptr;}
     virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) const = 0;
+    virtual bool HandleShortcutKey(const IShortcutKey &shortcutKey) { return false; }
+    virtual bool HandleSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys) { return false; }
 };
 
 struct IPluginContext {
