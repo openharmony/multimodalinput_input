@@ -4216,5 +4216,364 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_0
     handler.NotifyKeyDownDelay(keyEvent, subs, handled);
     EXPECT_TRUE(handled);
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay_003
+ * @tc.desc: Test Notify Key Down Right Now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+
+    bool handled = false;
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 200);
+    std::shared_ptr<KeyOption> keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetPriority(1);
+    std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetPriority(2);
+
+    auto subscriber1 = std::make_shared<KeySubscriberHandler::Subscriber>(1, session1, keyOption1);
+    auto subscriber2 = std::make_shared<KeySubscriberHandler::Subscriber>(2, session2, keyOption2);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(subscriber1);
+    subscribers.push_back(subscriber2);
+
+    handler.isForegroundExits_ = true;
+    handler.foregroundPids_ = {100, 300};
+    
+    handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
+    EXPECT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay_004
+ * @tc.desc: Test Notify Key Down Right Now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_B);
+
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 200);
+    auto keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetPriority(1);
+    auto keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetPriority(2);
+    
+    auto subscriber1 = std::make_shared<KeySubscriberHandler::Subscriber>(1, session1, keyOption1);
+    auto subscriber2 = std::make_shared<KeySubscriberHandler::Subscriber>(2, session2, keyOption2);
+    
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(subscriber1);
+    subscribers.push_back(subscriber2);
+    handler.isForegroundExits_ = true;
+    handler.foregroundPids_ = {300, 400};
+    
+    bool handled = false;
+    handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
+    handler.NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
+    EXPECT_FALSE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay_005
+ * @tc.desc: Test Notify Key Down Right Now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 200);
+    
+    auto keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetPriority(1);
+    auto keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetPriority(1);
+    
+    auto subscriber1 = std::make_shared<KeySubscriberHandler::Subscriber>(1, session1, keyOption1);
+    auto subscriber2 = std::make_shared<KeySubscriberHandler::Subscriber>(2, session2, keyOption2);
+    
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(subscriber1);
+    subscribers.push_back(subscriber2);
+    
+    handler.isForegroundExits_ = false;
+    handler.foregroundPids_ = {}; 
+    
+    bool handled = false;
+    handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
+    EXPECT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay_006
+ * @tc.desc: Test Notify Key Down Right Now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_C);
+    
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
+    handler.isForegroundExits_ = true;
+    handler.foregroundPids_ = {100};
+    
+    bool handled = false;
+    handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
+    handler.NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
+    EXPECT_FALSE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay_007
+ * @tc.desc: Test Notify Key Down Right Now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_007, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_D);
+
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 200);
+    SessionPtr session3 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 300);
+    
+    auto keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetPriority(1);
+    auto keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetPriority(3);
+    auto keyOption3 = std::make_shared<KeyOption>();
+    keyOption3->SetPriority(3);
+
+    auto subscriber1 = std::make_shared<KeySubscriberHandler::Subscriber>(1, session1, keyOption1);
+    auto subscriber2 = std::make_shared<KeySubscriberHandler::Subscriber>(2, session2, keyOption2);
+    auto subscriber3 = std::make_shared<KeySubscriberHandler::Subscriber>(3, session3, keyOption3);
+    
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscribers;
+    subscribers.push_back(subscriber1);
+    subscribers.push_back(subscriber2);
+    subscribers.push_back(subscriber3);
+    
+    handler.isForegroundExits_ = true;
+    handler.foregroundPids_ = {100, 200, 300};
+    bool handled = false;
+    handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
+    handler.NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
+    EXPECT_TRUE(handled);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_004
+ * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyDown(false);
+
+    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, session, keyOption);
+    handler.subscriberMap_[keyOption] = {subscriber};
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+
+    bool result = handler.HandleKeyDown(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_005
+ * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    keyOption->SetFinalKeyDownDuration(0);
+
+    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, session, keyOption);
+    handler.subscriberMap_[keyOption] = {subscriber};
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+
+    bool result = handler.HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_006
+ * @tc.desc: Test the funcation HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 101);
+    
+    auto keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetFinalKeyDown(true);
+    keyOption1->SetFinalKey(KeyEvent::KEYCODE_A);
+    keyOption1->SetFinalKeyDownDuration(0);
+    keyOption1->SetPriority(1);
+
+    auto keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetFinalKeyDown(true);
+    keyOption2->SetFinalKey(KeyEvent::KEYCODE_A);
+    keyOption2->SetFinalKeyDownDuration(0);
+    keyOption2->SetPriority(10);
+
+    auto subscriber1 = std::make_shared<KeySubscriberHandler::Subscriber>(1, session1, keyOption1);
+    auto subscriber2 = std::make_shared<KeySubscriberHandler::Subscriber>(2, session2, keyOption2);
+    handler.subscriberMap_[keyOption1] = {subscriber1};
+    handler.subscriberMap_[keyOption2] = {subscriber2};
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+
+    bool result = handler.HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeySubscriberHandler_HandleKeyDown_007
+ * @tc.desc: Test HandleKeyDown with non-matching key code
+ * @tc.type: FUNC
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandler_HandleKeyDown_007, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_B);
+
+    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, session, keyOption);
+    handler.subscriberMap_[keyOption] = {subscriber};
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+
+    bool result = handler.HandleKeyDown(keyEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeySubscriberHandler_HandleKeyDown_008
+ * @tc.desc: Test HandleKeyDown with non-matching key code
+ * @tc.type: FUNC
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandler_HandleKeyDown_008, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+
+    auto subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(1, session, keyOption);
+    handler.subscriberMap_[keyOption] = {subscriber};
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+
+    bool result = handler.HandleKeyDown(keyEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUp_005
+ * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+
+    SessionPtr session1 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 100);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, 101);
+
+    auto keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetFinalKeyDown(false);
+    keyOption1->SetFinalKey(KeyEvent::KEYCODE_A);
+    keyOption1->SetFinalKeyDownDuration(0);
+    keyOption1->SetPriority(1);
+
+    auto keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetFinalKeyDown(false);
+    keyOption2->SetFinalKey(KeyEvent::KEYCODE_A);
+    keyOption2->SetFinalKeyDownDuration(0);
+    keyOption2->SetPriority(10);
+
+    auto subscriber1 = std::make_shared<KeySubscriberHandler::Subscriber>(1, session1, keyOption1);
+    auto subscriber2 = std::make_shared<KeySubscriberHandler::Subscriber>(2, session2, keyOption2);
+    handler.subscriberMap_[keyOption1] = {subscriber1};
+    handler.subscriberMap_[keyOption2] = {subscriber2};
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    bool result = handler.HandleKeyUp(keyEvent);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS
