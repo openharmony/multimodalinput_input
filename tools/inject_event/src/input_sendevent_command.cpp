@@ -185,7 +185,7 @@ int32_t InputSendeventCommand::RunSendEvent()
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
     uint16_t type;
-    auto [ptr1, ec1] = std::from_chars(injectArgvs_[SEND_EVENT_TYPE_INDEX].data(), 
+    auto [ptr1, ec1] = std::from_chars(injectArgvs_[SEND_EVENT_TYPE_INDEX].data(),
         injectArgvs_[SEND_EVENT_TYPE_INDEX].data() + injectArgvs_[SEND_EVENT_TYPE_INDEX].size(), type);
     if (ec1 != std::errc()) {
         std::cerr << "Invalid type value: " << injectArgvs_[SEND_EVENT_TYPE_INDEX] << std::endl;
@@ -203,7 +203,7 @@ int32_t InputSendeventCommand::RunSendEvent()
     }
     event.code = code;
     int32_t value;
-    auto [ptr3, ec3] = std::from_chars(injectArgvs_[SEND_EVENT_VALUE_INDEX].data(), 
+    auto [ptr3, ec3] = std::from_chars(injectArgvs_[SEND_EVENT_VALUE_INDEX].data(),
         injectArgvs_[SEND_EVENT_VALUE_INDEX].data() + injectArgvs_[SEND_EVENT_VALUE_INDEX].size(), value);
     if (ec3 != std::errc()) {
         std::cerr << "Invalid value: " << injectArgvs_[SEND_EVENT_VALUE_INDEX] << std::endl;
