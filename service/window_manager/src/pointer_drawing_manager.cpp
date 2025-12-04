@@ -191,7 +191,8 @@ public:
 
 static bool IsSingleDisplayFoldDevice()
 {
-    return (!FOLD_SCREEN_FLAG.empty() && (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4'));
+    return (!FOLD_SCREEN_FLAG.empty() &&
+        (FOLD_SCREEN_FLAG[0] == '1' || FOLD_SCREEN_FLAG[0] == '4' || FOLD_SCREEN_FLAG[0] == '7'));
 }
 
 void PointerDrawingManager::RsRemoteDiedCallback()
