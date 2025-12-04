@@ -475,12 +475,12 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
     if (displayId.size() <= MAX_DISPLAYID_SIZE && IsNumeric(displayId)) {
         uint64_t num;
         auto [ptr, ec] = std::from_chars(displayId.data(), displayId.data() + displayId.size(), num);
-        if (ec == std::errc()) {
-            currentDisplayId = num;
-            MMI_HILOGI("Switch to {%{public}" PRIu64 ":%d}", currentDisplayId, accountId);
-        } else {
-            MMI_HILOGE("Failed to convert displayId to uint64_t");
-        }
+    if (ec == std::errc() && num <= UINT64_MAX) {
+        currentDisplayId = num;
+        MMI_HILOGI("Switch to {%{public}" PRIu64 ":%d}", currentDisplayId, accountId);
+    } else {
+        MMI_HILOGE("Failed to convert or invalid displayId value");
+    }
     }
     if (currentDisplayId == MAIN_DISPLAY_ID && currentAccountId_ != accountId) {
         if (auto iter = accounts_.find(accountId); iter == accounts_.end()) {
