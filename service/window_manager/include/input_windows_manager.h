@@ -384,7 +384,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
-    bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
+    bool SkipNavigationWindow(uint32_t flag, int32_t toolType);
     void HandleGestureInjection(bool gestureInject);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
