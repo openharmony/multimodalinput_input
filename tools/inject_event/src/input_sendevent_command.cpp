@@ -194,7 +194,7 @@ int32_t InputSendeventCommand::RunSendEvent()
     }
     event.type = type;
     uint16_t code;
-    auto [ptr2, ec2] = std::from_chars(injectArgvs_[SEND_EVENT_CODE_INDEX].data(), 
+    auto [ptr2, ec2] = std::from_chars(injectArgvs_[SEND_EVENT_CODE_INDEX].data(),
         injectArgvs_[SEND_EVENT_CODE_INDEX].data() + injectArgvs_[SEND_EVENT_CODE_INDEX].size(), code);
     if (ec2 != std::errc()) {
         std::cerr << "Invalid code value: " << injectArgvs_[SEND_EVENT_CODE_INDEX] << std::endl;
