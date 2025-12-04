@@ -363,6 +363,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
     WindowInfo windowInfo;
     windowInfo.id = 1;
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
     windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);

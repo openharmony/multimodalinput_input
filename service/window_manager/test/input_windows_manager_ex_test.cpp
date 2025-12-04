@@ -2637,6 +2637,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
     item.pointerId_ = 1;
     pointerEvent->pointers_.push_back(item);
     WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
                            WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     item.SetDisplayX(10);
