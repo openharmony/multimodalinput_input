@@ -3438,7 +3438,7 @@ Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Medi
     options->srcPixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
     options->pixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
     if (rowStride > INT32_MAX) {
-    return INPUT_PARAMETER_ERROR;
+        return INPUT_PARAMETER_ERROR;
     }
     options->srcRowStride = static_cast<int32_t>(rowStride);
     options->size.height = static_cast<int32_t>(height);
