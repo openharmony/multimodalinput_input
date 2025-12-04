@@ -4399,7 +4399,7 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::Displa
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_ptr<PointerEvent>& pointerEvent,
-    const std::optional<WindowInfo>& touchWindow, const InputWindowsManager &inputWindowsManager)
+    const std::optional<WindowInfo> &touchWindow, const InputWindowsManager &inputWindowsManager)
 {
     static bool isInAnco = false;
     PointerEvent::PointerItem pointerItem;
@@ -4421,7 +4421,7 @@ bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_p
         return isInAnco;
     }
 
-    return InputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    return inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 
