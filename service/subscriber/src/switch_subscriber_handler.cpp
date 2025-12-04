@@ -128,6 +128,7 @@ void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::st
         "0 means it is open, and 1 means it is closed", lidState_.load());
 }
 
+#ifdef OHOS_BUILD_ENABLE_SWITCH
 void SwitchSubscriberHandler::SyncSwitchLidState(struct libinput_device *inputDevice)
 {
     if (libinput_device_switch_has_switch(inputDevice, LIBINPUT_SWITCH_LID) <= 0) {
@@ -158,7 +159,6 @@ void SwitchSubscriberHandler::SyncSwitchTabletState(struct libinput_device *inpu
     }
 }
 
-#ifdef OHOS_BUILD_ENABLE_SWITCH
 void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
 {
     CHKPV(switchEvent);
