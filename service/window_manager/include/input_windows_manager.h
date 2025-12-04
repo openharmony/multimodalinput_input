@@ -403,6 +403,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    bool ShouldIgnoreLevitateEvent(const PointerEvent::PointerItem &pointerItem, WindowInputType windowType);
     bool IsTabletToolEvent(const PointerEvent::PointerItem &pointerItem);
     bool IsEnterWindowTriggered(const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     bool IsLeaveWindowTriggered(const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
