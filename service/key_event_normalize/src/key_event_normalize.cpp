@@ -464,7 +464,8 @@ void KeyEventNormalize::InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEve
     bool isInterrupt = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (repeatKeyCode != keyCode) :
                        ((keyAction == KeyEvent::KEY_ACTION_UP) ? (repeatKeyCode == keyCode) : false);
 
-    MMI_HILOGI("repeatKeyCode:%{public}d, keyCode:%{public}d, isInterrupt:%{public}d", repeatKeyCode, keyCode, isInterrupt);
+    MMI_HILOGI("repeatKeyCode:%{public}d, keyCode:%{public}d, isInterrupt:%{public}d",
+        repeatKeyCode, keyCode, isInterrupt);
     if (isInterrupt) {
         MMI_HILOGI("Interrupt auto repeat key event");
         KeyRepeat->RemoveTimer();
