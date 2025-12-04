@@ -602,6 +602,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     bool isDeviceReportEvent = false;
     RemovePhysicalInputDeviceInner(inputDevice, deviceId, enable, isDeviceReportEvent);
     WIN_MGR->ClearTargetDeviceWindowId(deviceId);
+    WIN_MGR->ClearFirstTouchWindowInfos(deviceId);
     std::string sysUid = GetInputIdentification(inputDevice);
     if (!sysUid.empty()) {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG

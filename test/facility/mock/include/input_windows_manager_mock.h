@@ -58,6 +58,7 @@ public:
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
     MOCK_METHOD((std::pair<double, double>), TransformDisplayXY, (const OLD::DisplayInfo&, double, double), (const));
     void ClearTargetDeviceWindowId(int32_t deviceId) override {}
+    void ClearFirstTouchWindowInfos(int32_t deviceId) override {}
     void ClearTargetWindowId(int32_t pointerId, int32_t deviceId) override {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
