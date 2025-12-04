@@ -3460,6 +3460,10 @@ Input_Result OH_Input_SetCustomCursor(int32_t windowId, Input_CustomCursor* cust
         MMI_HILOGE("pixelMap is invalid");
         return INPUT_PARAMETER_ERROR;
     }
+    if (customCursor->anchorX > options.size.width || customCursor->anchorY > options.size.height) {
+        MMI_HILOGE("anchorX or anchorY is invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
     size_t pixelBufferSize = static_cast<size_t>(byteCount);
     uint8_t *pixelBuffer = new uint8_t[pixelBufferSize]();
     Image_ErrorCode imageResult = OH_PixelmapNative_ReadPixels(customCursor->pixelMap, pixelBuffer, &pixelBufferSize);
