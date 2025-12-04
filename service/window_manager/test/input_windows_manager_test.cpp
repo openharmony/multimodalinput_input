@@ -4407,6 +4407,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_OK);
 }
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
 /**
  * @tc.name: InputWindowsManagerTest_MouseTargetIsInAnco_001
  * @tc.desc: Test MouseTargetIsInAnco to verify that the isInAnco branch is covered when the pointerItem is nullptr.
@@ -4469,11 +4470,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_MouseTargetIsInAnco_00
     pointerItem.SetPressed(true);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(pointerItem);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     bool ret = OHOS::MMI::MouseTargetIsInAnco(logicalX, logicalY, pointerEvent,
         std::make_optional(windowInfo), inputWindowsManager);
     EXPECT_EQ(ret, false);
 }
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget
