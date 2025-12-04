@@ -428,42 +428,27 @@ void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEven
     return;
 }
 
-void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode)
+void KeyEventNormalize::SyncSimulatedModifierKeyEventState(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    if (keyEvent == nullptr) {
+    if (keyEvent == nullptr || keyEvent_ == nullptr) {
         MMI_HILOGE("KeyEvent is null");
         return;
     }
 
-    int32_t functionKey = keyEvent->TransitionFunctionKey(funcKeyCode);
-    if (functionKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
-        MMI_HILOGD("The function key is unknown");
-        return;
+    int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t keyAction = keyEvent->GetKeyAction();
+    int64_t actionTime = keyEvent->GetActionTime();
+    keyEvent_->SetKeyCode(keyCode);
+    keyEvent_->SetAction(keyAction);
+    keyEvent_->SetKeyAction(keyAction);
+    keyEvent_->SetActionTime(actionTime);
+    keyEvent_->SetDeviceId(keyEvent->GetDeviceId());
+    keyEvent_->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
+    if (keyEvent_->GetPressedKeys().empty()) {
+        keyEvent_->SetActionStartTime(actionTime);
     }
-
-    std::vector<struct libinput_device*> input_devices;
-    int32_t deviceId = -1;
-    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_devices);
-    if (input_devices.empty()) {
-        MMI_HILOGW("No keyboard device is currently available");
-        return;
-    }
-
-    bool preState = keyEvent->GetFunctionKey(functionKey);
-    for (auto& device : input_devices) {
-        deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
-        if (LibinputAdapter::DeviceLedUpdate(device, functionKey, !preState) != RET_OK) {
-            MMI_HILOGW("Failed to set the keyboard led, device id %{public}d", deviceId);
-            continue;
-        }
-        int32_t state = libinput_get_funckey_state(device, functionKey);
-        if (state == preState) {
-            MMI_HILOGW("Failed to enable the function key, device id %{public}d", deviceId);
-        }
-    }
-
-    keyEvent->SetFunctionKey(functionKey, !preState);
-    return;
+    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent_->GetKeyItems());
+    keyEvent_->SetKeyIntention(keyIntention);
 }
 
 void KeyEventNormalize::InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent)

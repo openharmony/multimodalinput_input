@@ -48,9 +48,9 @@ public:
     void SetCurrentShieldMode(int32_t shieldMode);
     int32_t GetCurrentShieldMode();
     bool IsScreenFold();
-    void SimulatedModiferKeyEventNormalize(const std::shared_ptr<KeyEvent>& keyEvent);
+    void SimulatedModifierKeyEventNormalize(const std::shared_ptr<KeyEvent> &keyEvent);
     void SetKeyStatusRecord(bool enable, int32_t timeout);
-    void CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent);
+    bool CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
     void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent);
 
 private:
@@ -62,8 +62,8 @@ private:
     bool CheckSimulatedModifierKeyEventFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyActionFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
-    void HandleSimulatedModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &item);
-    void HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &item);
+    void HandleSimulatedModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &keyItem);
+    void HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &keyItem);
     void SyncSimulatedModifierKeyEventState(const std::shared_ptr<KeyEvent> &keyEvent);
     void SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode);
     void KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout);
@@ -78,7 +78,7 @@ private:
     std::mutex mtx_;
     bool keyStatusRecordSwitch_ { false };
     int32_t keyStatusRecordTimeout_ { 10000 };
-    int32_t keyEventAutoUpTimerId { -1 };
+    int32_t keyEventAutoUpTimerId_ { -1 };
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI
