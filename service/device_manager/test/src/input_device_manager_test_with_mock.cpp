@@ -19,15 +19,11 @@
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"
 #include "libinput_mock.h"
-#include "switch_subscriber_handler.h"
 
 namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
-
-void SwitchSubscriberHandler::SyncSwitchLidState(struct libinput_device *inputDevice) {}
-void SwitchSubscriberHandler::SyncSwitchTabletState(struct libinput_device *inputDevice) {}
 
 class InputDeviceManagerTestWithMock : public testing::Test {
 public:
