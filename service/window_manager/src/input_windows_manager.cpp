@@ -4414,7 +4414,7 @@ bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_p
     }
 
     if (pointerItem.IsPressed() && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        isInAnco = inputWindowsManager.IsInAncoArea(*touchWindow, logicalX, logicalY);
+        isInAnco = inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
     }
 
     if (pointerItem.IsPressed() || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
