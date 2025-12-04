@@ -369,6 +369,94 @@ void InputPluginManager::HandleMonitorStatus(bool monitorStatus, const std::stri
     }
 }
 
+bool InputPluginManager::HandleShortcutKey(const ShortcutKey &key)
+{
+    CALL_INFO_TRACE;
+    IShortcutKey shortcutKey {
+        .preKeys = key.preKeys,
+        .finalKey = key.finalKey,
+        .keyDownDuration = key.keyDownDuration,
+        .triggerType = key.triggerType,
+    };
+    return ProcessShortcutKey(shortcutKey);
+}
+
+bool InputPluginManager::HandleShortcutKey(const KeyOption &option)
+{
+    CALL_INFO_TRACE;
+    IShortcutKey shortcutKey {
+        .preKeys = option.GetPreKeys(),
+        .finalKey = option.GetFinalKey(),
+        .keyDownDuration = option.GetFinalKeyDownDuration(),
+        .triggerType = (option.IsFinalKeyDown() ? KeyEvent::KEY_ACTION_DOWN : KeyEvent::KEY_ACTION_UP),
+    };
+    return ProcessShortcutKey(shortcutKey);
+}
+
+bool InputPluginManager::ProcessShortcutKey(const IShortcutKey &shortcutKey)
+{
+    CALL_INFO_TRACE;
+    for (const auto &[pluginStage, inputPluginList] : plugins_) {
+        bool isConsumed = std::any_of(inputPluginList.begin(), inputPluginList.end(),
+            [&shortcutKey](const std::shared_ptr<IPluginContext> &pluginContext) {
+                if (pluginContext == nullptr) {
+                    return false;
+                }
+                const auto &plugin = pluginContext->GetPlugin();
+                if (plugin == nullptr) {
+                    return false;
+                }
+                return plugin->HandleShortcutKey(shortcutKey);
+            });
+        if (isConsumed) {
+            MMI_HILOGI("ShortcutKey is consumed by plugin");
+            return true;
+        }
+    }
+    MMI_HILOGD("ShortcutKey is not consumed by plugin");
+    return false;
+}
+
+bool InputPluginManager::HandleSequenceKeys(const Sequence &sequence)
+{
+    CALL_INFO_TRACE;
+    std::vector<ISequenceKey> sequenceKeys;
+    sequenceKeys.reserve(sequence.sequenceKeys.size());
+    for (const auto &key : sequence.sequenceKeys) {
+        sequenceKeys.push_back({
+            .keyCode = key.keyCode,
+            .keyAction = key.keyAction,
+            .actionTime = key.actionTime,
+            .delay = key.delay,
+        });
+    }
+    return ProcessSequenceKeys(sequenceKeys);
+}
+
+bool InputPluginManager::ProcessSequenceKeys(const std::vector<ISequenceKey> &sequenceKeys)
+{
+    CALL_INFO_TRACE;
+    for (const auto &[pluginStage, inputPluginList] : plugins_) {
+        bool isConsumed = std::any_of(inputPluginList.begin(), inputPluginList.end(),
+            [&sequenceKeys](const std::shared_ptr<IPluginContext> &pluginContext) {
+                if (pluginContext == nullptr) {
+                    return false;
+                }
+                const auto &plugin = pluginContext->GetPlugin();
+                if (plugin == nullptr) {
+                    return false;
+                }
+                return plugin->HandleSequenceKeys(sequenceKeys);
+            });
+        if (isConsumed) {
+            MMI_HILOGI("SequenceKeys is consumed by plugin");
+            return true;
+        }
+    }
+    MMI_HILOGD("SequenceKeys is not consumed by plugin");
+    return false;
+}
+
 int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
 {
     name_ = pin->GetName();
