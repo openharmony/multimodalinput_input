@@ -567,18 +567,18 @@ HWTEST_F(InputWindowsManagerTest, SkipNavigationWindow_001, TestSize.Level1)
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    WindowInputType windowType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    WindowInputPolicy windowTypePolicy = WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     int32_t toolType = PointerEvent::TOOL_TYPE_FINGER;
-    EXPECT_FALSE(inputWindowsManager->SkipNavigationWindow(windowType, toolType));
+    EXPECT_FALSE(inputWindowsManager->SkipNavigationWindow(windowTypePolicy, toolType));
 
     toolType = PointerEvent::TOOL_TYPE_PEN;
     inputWindowsManager->isOpenAntiMisTakeObserver_ = false;
     inputWindowsManager->antiMistake_.isOpen = true;
-    EXPECT_TRUE(inputWindowsManager->SkipNavigationWindow(windowType, toolType));
+    EXPECT_TRUE(inputWindowsManager->SkipNavigationWindow(windowTypePolicy, toolType));
 
     inputWindowsManager->isOpenAntiMisTakeObserver_ = true;
     inputWindowsManager->antiMistake_.isOpen = false;
-    EXPECT_FALSE(inputWindowsManager->SkipNavigationWindow(windowType, toolType));
+    EXPECT_FALSE(inputWindowsManager->SkipNavigationWindow(windowTypePolicy, toolType));
     inputWindowsManager->isOpenAntiMisTakeObserver_ = false;
 }
 
@@ -2637,7 +2637,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
     item.pointerId_ = 1;
     pointerEvent->pointers_.push_back(item);
     WindowInfo windowInfo;
-    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     item.SetDisplayX(10);
     item.SetDisplayY(20);
     Rect rect = {0, 0, 30, 40};
@@ -5245,6 +5246,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchEnterLeaveEvent, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    window.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     inputWindowsManager->lastTouchWindowInfo_.id = 5;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
@@ -5488,7 +5491,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     displayGroupInfo.focusWindowId = 1;
     WindowInfo focusWindow;
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
     displayGroupInfo.windowsInfo.push_back(focusWindow);
     inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
     EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, -1);
@@ -5509,7 +5512,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     displayGroupInfo.focusWindowId = 1;
     WindowInfo focusWindow;
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     displayGroupInfo.windowsInfo.push_back(focusWindow);
     inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
     EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, -1);
@@ -5543,7 +5546,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 10;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     displayGroupInfo.windowsInfo.push_back(focusWindow);
     inputWindowsManager->EnterMouseCaptureMode(displayGroupInfo);
     EXPECT_EQ(inputWindowsManager->pointerLockedWindow_.id, 1);
@@ -5570,7 +5573,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 10;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
@@ -5623,7 +5626,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 1408;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
@@ -5673,7 +5676,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 1408;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
@@ -5723,7 +5726,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 1408;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
@@ -5774,7 +5777,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 1408;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
@@ -5818,7 +5821,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     pointerHotAreasRect.height = 1408;
     focusWindow.pointerHotAreas.push_back(pointerHotAreasRect);
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;

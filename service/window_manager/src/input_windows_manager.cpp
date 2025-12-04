@@ -460,7 +460,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         if (checkUIExtentionWindow) {
             break;
         }
-        bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+        bool checkWindow = (item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
@@ -492,8 +492,8 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             if (checkUIExtentionWindow) {
                 break;
             }
-            bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
-                !IsValidZorderWindow(item, pointerEvent);
+            bool checkWindow = (item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) ==
+                WindowInputPolicy::FLAG_UNTOUCHABLE || !IsValidZorderWindow(item, pointerEvent);
             if (checkWindow) {
                 MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
@@ -808,7 +808,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         if (checkUIExtentionWindow) {
             break;
         }
-        bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+        bool checkWindow = (item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
@@ -2271,10 +2271,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
                 coord.y = cursorPosy;
                 RotateDisplayScreen(*displayInfo, coord);
             }
-            if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) ==
-                    WindowInfo::FLAG_BIT_POINTER_LOCKED ||
-                (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) ==
-                    WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+            if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
+                    WindowInputPolicy::FLAG_POINTER_LOCKED ||
+                (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
+                    WindowInputPolicy::FLAG_POINTER_CONFINED) {
                 windowInfo = std::make_optional(pointerLockedWindow_);
             } else {
                 windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
@@ -2729,9 +2729,10 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
         }
         windowInfo = GetWindowInfo(pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), groupId);
     } else {
-        if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
-            (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) ==
-                WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+        if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
+                WindowInputPolicy::FLAG_POINTER_LOCKED ||
+            (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
+                WindowInputPolicy::FLAG_POINTER_CONFINED) {
             windowInfo = std::make_optional(pointerLockedWindow_);
         } else {
             windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_, groupId);
@@ -3892,8 +3893,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
-        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+    if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
+            WindowInputPolicy::FLAG_POINTER_LOCKED ||
+        (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
+            WindowInputPolicy::FLAG_POINTER_CONFINED) {
         return std::make_optional(pointerLockedWindow_);
     }
     int32_t action = pointerEvent->GetPointerAction();
@@ -3921,16 +3924,17 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             }
-            if (item.windowInputType == WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) {
-                MMI_HILOG_DISPATCHD("Pointer enents do not respond to the window, window:%{public}d, "
-                    "windowInputType%{public}d", item.id, static_cast<int32_t>(item.windowInputType));
+            if ((item.flags & WindowInputPolicy::FLAG_MOUSE_UNHITTABLE) ==
+                WindowInputPolicy::FLAG_MOUSE_UNHITTABLE) {
+                MMI_HILOG_DISPATCHD(
+                    "Pointer events do not respond to the window, windowInputPolicy%{public}u", item.flags);
                 continue;
             }
             if (SkipPrivacyProtectionWindow(pointerEvent, item.isSkipSelfWhenShowOnVirtualScreen)) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
                 continue;
             }
-            if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+            if ((item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
                 MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching, "
@@ -3957,9 +3961,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
-                if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE ||
-                    item.windowInputType == WindowInputType::DUALTRIGGER_TOUCH ||
-                    item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) &&
+                if ((item.flags & WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK) ==
+                    WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK &&
                     ((pointerEvent->GetPressedButtons().empty()) ||
                     (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
@@ -4067,7 +4070,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
     CALL_DEBUG_ENTER;
     auto &WindowsInfo = GetWindowInfoVector(groupId);
     for (const auto& item : WindowsInfo) {
-        if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+        if ((item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
@@ -4866,17 +4869,15 @@ bool InputWindowsManager::SkipPrivacyProtectionWindow(const std::shared_ptr<Poin
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 {
-    return ((flag & WindowInfo::FLAG_BIT_HANDWRITING) == WindowInfo::FLAG_BIT_HANDWRITING &&
+    return ((flag & WindowInputPolicy::FLAG_HANDWRITING) == WindowInputPolicy::FLAG_HANDWRITING &&
             toolType == PointerEvent::TOOL_TYPE_FINGER);
 }
 
-bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
+bool InputWindowsManager::SkipNavigationWindow(uint32_t flag, int32_t toolType)
 {
-    MMI_HILOGD("windowType:%{public}d, toolType:%{public}d", static_cast<int32_t>(windowType), toolType);
-    if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
-        windowType != WindowInputType::DUALTRIGGER_TOUCH &&
-        windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE &&
-        windowType != WindowInputType::TRANSMIT_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
+    MMI_HILOGD("windowflags:%{public}u, toolType:%{public}d", flag, toolType);
+    if ((flag & WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE) !=
+        WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
@@ -5258,7 +5259,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     for (auto &item : windowsInfo) {
-        bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+        bool checkWindow = (item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
@@ -5274,7 +5275,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
-        if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
+        if (SkipNavigationWindow(item.flags, pointerItem.GetToolType())) {
             winMap.insert({item.id, item});
             continue;
         }
@@ -5689,7 +5690,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
 void InputWindowsManager::UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
     std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId, int32_t deviceId) {
-    if (item.windowInputType != WindowInputType::TRANSMIT_ALL) {
+    if ((item.flags & WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL) != WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL) {
         if (targetTouchWinIds_.find(deviceId) == targetTouchWinIds_.end()) {
             return;
         }
@@ -5713,7 +5714,8 @@ void InputWindowsManager::ClearMismatchTypeWinIds(int32_t pointerId, int32_t dis
     for (auto iter = windowIds.begin(); iter != windowIds.end();) {
         int32_t windowId = *iter;
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, displayId);
-        if (windowInfo && (windowInfo->windowInputType != WindowInputType::TRANSMIT_ALL)) {
+        if (windowInfo && ((windowInfo->flags & WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL) !=
+                              WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL)) {
             iter = windowIds.erase(iter);
         } else {
             ++iter;
@@ -5863,7 +5865,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
         bool isChanged { false };
         auto &WindowsInfo = GetWindowInfoVector(groupId);
         for (const auto &item : WindowsInfo) {
-            if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+            if ((item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
                 continue;
@@ -6504,8 +6506,10 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     double oldX = x;
     double oldY = y;
     int32_t lastDisplayId = displayId;
-    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED ||
-        (pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+    if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
+            WindowInputPolicy::FLAG_POINTER_LOCKED ||
+        (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
+            WindowInputPolicy::FLAG_POINTER_CONFINED) {
         displayInfo = GetPhysicalDisplay(pointerLockedWindow_.displayId);
         displayId = pointerLockedWindow_.displayId;
     } else {
@@ -7475,7 +7479,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfoById(int32_t windowI
             }
             for (const auto& item : iter->second.windowsInfo) {
                 CHKCC(item.id == windowId &&
-                    (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) != WindowInfo::FLAG_BIT_UNTOUCHABLE &&
+                    (item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) != WindowInputPolicy::FLAG_UNTOUCHABLE &&
                     transparentWins_.find(item.id) == transparentWins_.end());
                 return std::make_optional(item);
             }
@@ -7937,8 +7941,8 @@ void InputWindowsManager::UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<In
 {
     CHKPV(event);
     MMI_HILOGD("UpdateWindowInfoFlag :flag %{public}d", flag);
-    if ((flag & WindowInfo::FLAG_BIT_DISABLE_USER_ACTION)
-        == WindowInfo::FLAG_BIT_DISABLE_USER_ACTION) {
+    if ((flag & WindowInputPolicy::FLAG_DISABLE_USER_ACTION)
+        == WindowInputPolicy::FLAG_DISABLE_USER_ACTION) {
         event->AddFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION);
     } else {
         event->ClearFlag(InputEvent::EVENT_FLAG_DISABLE_USER_ACTION);
@@ -7998,9 +8002,9 @@ void InputWindowsManager::EnterMouseCaptureMode(const OLD::DisplayGroupInfo &dis
     }
     focusWindow = *pos;
     bool pointerLocked =
-        (focusWindow.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED;
+        (focusWindow.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) == WindowInputPolicy::FLAG_POINTER_LOCKED;
     bool pointerConfined =
-        (focusWindow.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED;
+        (focusWindow.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) == WindowInputPolicy::FLAG_POINTER_CONFINED;
     if ((!pointerLocked && !pointerConfined) || focusWindow.pointerHotAreas.empty()) {
         MMI_HILOGD("failed to find mouse capture flag");
         ClearPointerLockedWindow();
@@ -8098,7 +8102,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
     CALL_DEBUG_ENTER;
     MMI_HILOGD("mouse capture mode before mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
         integerX, integerY, x, y);
-    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_CONFINED) == WindowInfo::FLAG_BIT_POINTER_CONFINED) {
+    if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
+        WindowInputPolicy::FLAG_POINTER_CONFINED) {
         int32_t width = 0;
         int32_t height = 0;
         Direction displayDirection = WIN_MGR->GetDisplayDirection(displayInfo);
@@ -8139,7 +8144,8 @@ void InputWindowsManager::LimitMouseLocaltionInEvent(
             "mouse capture mode limit mouseLocation:{%{private}d,%{private}d}, cursorPos:{%{private}f,%{private}f}",
             integerX, integerY, x, y);
     }
-    if ((pointerLockedWindow_.flags & WindowInfo::FLAG_BIT_POINTER_LOCKED) == WindowInfo::FLAG_BIT_POINTER_LOCKED) {
+    if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
+        WindowInputPolicy::FLAG_POINTER_LOCKED) {
         x = pointerLockedCursorPos_.x;
         y = pointerLockedCursorPos_.y;
         integerX = static_cast<int32_t>(x);
