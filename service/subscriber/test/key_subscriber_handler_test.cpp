@@ -4318,7 +4318,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_0
     subscribers.push_back(subscriber2);
     
     handler.isForegroundExits_ = false;
-    handler.foregroundPids_ = {}; 
+    handler.foregroundPids_ = {};
     
     bool handled = false;
     handler.NotifyKeyDownDelay(keyEvent, subscribers, handled);
