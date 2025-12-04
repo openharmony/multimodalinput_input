@@ -352,8 +352,11 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    KeyEventHdr->ModifierkeyEventNormalize(keyEvent);
+    KeyEventHdr->SimulatedModiferKeyEventNormalize(keyEvent);
     UpdateKeyEventHandlerChain(keyEvent);
+    if (KeyEventHdr->CheckSimulatedModifierKeyEvent(keyEvent)) {
+        KeyEventHdr->InterruptAutoRepeatKeyEvent(keyEvent);
+    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         KeyRepeat->SetRepeatKeyCode(keyEvent->GetKeyCode());
         MMI_HILOGD("keyCode:%{private}d, keyAction:%{private}d, IsRepeat:%{public}d",

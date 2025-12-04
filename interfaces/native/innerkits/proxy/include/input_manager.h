@@ -216,7 +216,7 @@ public:
      * @since 16
      */
     void UnsubscribeLongPressEvent(int32_t subscriberId);
-    
+
     /**
      * @brief Adds an input event monitor. After such a monitor is added,
      * an input event is copied and distributed to the monitor while being distributed to the original target.

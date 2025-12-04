@@ -390,9 +390,12 @@ bool KeyEventNormalize::IsScreenFold()
     return g_foldStatusCallback->GetFoldStatus() == Rosen::FoldStatus::FOLDED;
 }
 
-void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t functionKey)
+void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode)
 {
-    CHKPV(keyEvent);
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
     if (functionKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
         return;
     }
