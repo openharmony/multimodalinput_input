@@ -396,11 +396,12 @@ void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEven
         MMI_HILOGE("KeyEvent is null");
         return;
     }
+
+    int32_t functionKey = keyEvent->TransitionFunctionKey(funcKeyCode);
     if (functionKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
+        MMI_HILOGD("The function key is unknown");
         return;
     }
-    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPV(g_keyEvent);
 
     std::vector<struct libinput_device*> input_devices;
     int32_t deviceId = -1;
@@ -409,7 +410,8 @@ void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEven
         MMI_HILOGW("No keyboard device is currently available");
         return;
     }
-    bool preState = g_keyEvent->GetFunctionKey(functionKey);
+
+    bool preState = keyEvent->GetFunctionKey(functionKey);
     for (auto& device : input_devices) {
         deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
         if (LibinputAdapter::DeviceLedUpdate(device, functionKey, !preState) != RET_OK) {
@@ -417,151 +419,253 @@ void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEven
             continue;
         }
         int32_t state = libinput_get_funckey_state(device, functionKey);
-        if (state != !preState) {
+        if (state == preState) {
             MMI_HILOGW("Failed to enable the function key, device id %{public}d", deviceId);
         }
     }
+
     keyEvent->SetFunctionKey(functionKey, !preState);
-    g_keyEvent->SetFunctionKey(functionKey, !preState);
     return;
 }
 
-bool KeyEventNormalize::HandleModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
+void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode)
 {
-    CHKPF(keyEvent);
-    auto keyItem = keyEvent->GetKeyItem();
-    CHK_KEY_ITEM(keyItem);
-    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPF(g_keyEvent);
-
-    int32_t keyCode = keyEvent->GetKeyCode();
-    int32_t repeatKeyCode = KeyRepeat->GetRepeatKeyCode();
-    auto g_preKeyItem = g_keyEvent->GetKeyItem(keyCode);
-
-    keyItem->SetPressed(true);
-    if (repeatKeyCode != keyCode) {
-        KeyRepeat->RemoveTimer();
-        KeyRepeat->SetRepeatKeyCode(keyCode);
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
     }
-    if (g_preKeyItem) {
-        if (g_preKeyItem->IsPressed()) {
-            g_preKeyItem->SetDownTime(keyItem->GetDownTime());
-            return true;
+
+    int32_t functionKey = keyEvent->TransitionFunctionKey(funcKeyCode);
+    if (functionKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
+        MMI_HILOGD("The function key is unknown");
+        return;
+    }
+
+    std::vector<struct libinput_device*> input_devices;
+    int32_t deviceId = -1;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_devices);
+    if (input_devices.empty()) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return;
+    }
+
+    bool preState = keyEvent->GetFunctionKey(functionKey);
+    for (auto& device : input_devices) {
+        deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+        if (LibinputAdapter::DeviceLedUpdate(device, functionKey, !preState) != RET_OK) {
+            MMI_HILOGW("Failed to set the keyboard led, device id %{public}d", deviceId);
+            continue;
         }
-        g_keyEvent->RemoveReleasedKeyItems(*g_preKeyItem);
+        int32_t state = libinput_get_funckey_state(device, functionKey);
+        if (state == preState) {
+            MMI_HILOGW("Failed to enable the function key, device id %{public}d", deviceId);
+        }
     }
-    int32_t functionKey = g_keyEvent->TransitionFunctionKey(keyCode);
-    if (functionKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
-        SyncSwitchFunctionKeyState(keyEvent, functionKey);
-    }
-    g_keyEvent->AddPressedKeyItems(*keyItem);
-    return true;
+
+    keyEvent->SetFunctionKey(functionKey, !preState);
+    return;
 }
 
-bool KeyEventNormalize::HandleModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
+void KeyEventNormalize::InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    CHKPF(keyEvent);
-    auto keyItem = keyEvent->GetKeyItem();
-    CHK_KEY_ITEM(keyItem);
-    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
-    CHKPF(g_keyEvent);
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
 
     int32_t keyCode = keyEvent->GetKeyCode();
+    int32_t keyAction = keyEvent->GetKeyAction();
     int32_t repeatKeyCode = KeyRepeat->GetRepeatKeyCode();
-    auto g_preKeyItem = g_keyEvent->GetKeyItem(keyCode);
+    bool isInterrupt = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (repeatKeyCode != keyCode) :
+                       ((keyAction == KeyEvent::KEY_ACTION_UP) ? (repeatKeyCode == keyCode) : false);
 
-    keyItem->SetPressed(false);
-    if (!g_preKeyItem) {
-        return false;
-    }
-    if (!g_preKeyItem->IsPressed()) {
-        return false;
-    }
-    g_keyEvent->RemoveReleasedKeyItems(*keyItem);
-    g_keyEvent->AddPressedKeyItems(*keyItem);
-    if (repeatKeyCode == keyCode) {
+    MMI_HILOGI("repeatKeyCode:%{public}d, keyCode:%{public}d, isInterrupt:%{public}d", repeatKeyCode, keyCode, isInterrupt);
+    if (isInterrupt) {
+        MMI_HILOGI("Interrupt auto repeat key event");
         KeyRepeat->RemoveTimer();
         KeyRepeat->SetRepeatKeyCode(keyCode);
     }
-    g_keyEvent->AddPressedKeyItems(*keyItem);
-    return true;
 }
 
-bool KeyEventNormalize::HandleModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent)
+void KeyEventNormalize::HandleSimulatedModifierKeyActionFromShell(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    CHKPF(keyEvent);
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+
+    int32_t keyAction = keyEvent->GetKeyAction();
+    bool isShell = keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL);
+    bool isKeyDown = keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN;
+    bool isAutoUp = isShell && isKeyDown && keyStatusRecordSwitch_;
+
+    if (isAutoUp) {
+        MMI_HILOGI("Handle simulate modifier key from shell auto up");
+        KeyEventAutoUp(keyEvent, keyStatusRecordTimeout_);
+    }
+}
+
+void KeyEventNormalize::HandleSimulatedModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent,
+    KeyEvent::KeyItem &keyItem)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+
+    int32_t keyCode = keyItem.GetKeyCode();
+    auto pressedKeyItem = keyEvent->GetKeyItem(keyCode);
+    if (pressedKeyItem.has_value()) {
+        MMI_HILOGI("The modifier key is repeat down");
+    } else {
+        MMI_HILOGI("The modifier key is first down");
+        SyncSwitchFunctionKeyState(keyEvent, keyCode);
+    }
+
+    MMI_HILOGI("The modifier key state: ?->down");
+    keyEvent->AddPressedKeyItems(keyItem);
+}
+
+void KeyEventNormalize::HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent,
+    KeyEvent::KeyItem &keyItem)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+
+    int32_t keyCode = keyItem.GetKeyCode();
+    auto pressedKeyItem = keyEvent->GetKeyItem(keyCode);
+    if (pressedKeyItem.has_value()) {
+        keyItem.SetDownTime(pressedKeyItem->GetDownTime());
+    } else {
+        MMI_HILOGE("Find pressed key failed");
+    }
+
+    MMI_HILOGI("The modifier key state: ?->up");
+    keyEvent->AddReleasedKeyItems(keyItem);
+}
+
+void KeyEventNormalize::HandleSimulatedModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    if (keyEvent_ == nullptr || keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+
+    auto keyItem = keyEvent->GetKeyItem();
+    if (!keyItem.has_value()) {
+        MMI_HILOGE("keyItem is null");
+        return;
+    }
+
+    keyEvent_->RemoveReleasedKeyItems();
+
     int32_t keyAction = keyEvent->GetKeyAction();
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        return HandleModifierKeyDown(keyEvent);
+        HandleSimulatedModifierKeyDown(keyEvent_, *keyItem);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        return HandleModifierKeyUp(keyEvent);
+        HandleSimulatedModifierKeyUp(keyEvent_, *keyItem);
     }
-    return false;
+
+    SyncSimulatedModifierKeyEventState(keyEvent);
 }
 
-void KeyEventNormalize::ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent> &keyEvent)
+bool KeyEventNormalize::CheckSimulatedModifierKeyEventFromShell(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    CHKPV(keyEvent);
-    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-        return;
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return false;
     }
-    auto it = find(g_ModifierKeys.begin(), g_ModifierKeys.end(), keyEvent->GetKeyCode());
-    if (it == g_ModifierKeys.end()) {
-        return;
+
+    if (!keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
+        MMI_HILOGI("The simulated modifier key event is not from shell");
+        return true;
     }
-    if (keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
-        if (!keyStatusRecordSwitch_) {
-            return;
-        }
-        int32_t funcKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
-        if (funcKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
-            return;
-        }
+
+    if (!keyStatusRecordSwitch_) {
+        MMI_HILOGW("The simulated modifier key status record switch is not enabled");
+        return false;
     }
-    auto g_keyEvent = KeyEventHdr->GetKeyEvent();
-    if (g_keyEvent == nullptr) {
-        return;
+
+    const int32_t funcKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
+    if (funcKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
+        MMI_HILOGW("The shell simulate a function key");
+        return false;
     }
-    g_keyEvent->RemoveReleasedKeyItems();
-    if (HandleModifierKeyAction(keyEvent)) {
-        int32_t keyAction = keyEvent->GetKeyAction();
-        if (keyAction == KeyEvent::KEY_ACTION_DOWN && keyStatusRecordSwitch_
-            && keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
-            KeyEventAutoUp(keyEvent, keyStatusRecordTimeout_);
-        }
-        g_keyEvent->SetKeyCode(keyEvent->GetKeyCode());
-        g_keyEvent->SetAction(keyEvent->GetKeyAction());
-        g_keyEvent->SetKeyAction(keyEvent->GetKeyAction());
-        g_keyEvent->SetDeviceId(keyEvent->GetDeviceId());
-        g_keyEvent->SetActionTime(keyEvent->GetActionTime());
-        g_keyEvent->SetSourceType(InputEvent::SOURCE_TYPE_UNKNOWN);
-    }
+
+    return true;
 }
 
-int32_t KeyEventNormalize::KeyEventAutoUp(const std::shared_ptr<KeyEvent>& keyEvent, int32_t timeout)
+bool KeyEventNormalize::CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return false;
+    }
+
+    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        MMI_HILOGE("The key event is not simulated");
+        return false;
+    }
+
+    auto it = g_ModifierKeys.find(keyEvent->GetKeyCode());
+    if (it == g_ModifierKeys.end()) {
+        MMI_HILOGW("The key event is not modifier key");
+        return false;
+    }
+
+    if (!CheckSimulatedModifierKeyEventFromShell(keyEvent)) {
+        return false;
+    }
+
+    return true;
+}
+
+void KeyEventNormalize::SimulatedModifierKeyEventNormalize(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+    if (!CheckSimulatedModifierKeyEvent(keyEvent)) {
+        return;
+    }
+    HandleSimulatedModifierKeyAction(keyEvent);
+    HandleSimulatedModifierKeyActionFromShell(keyEvent);
+}
+
+void KeyEventNormalize::KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout)
 {
     if (timeout <= 0 || timeout > MAX_TIMEOUT_MS) {
         timeout = MAX_TIMEOUT_MS;
     }
-    int32_t timerId = TimerMgr->AddTimer(timeout, 1, [keyEvent]() {
-        CHKPV(keyEvent);
+
+    if (TimerMgr->IsExist(keyEventAutoUpTimerId_)) {
+        MMI_HILOGI("Update keyEventAutoUpTimerId");
+        TimerMgr->RemoveTimer(keyEventAutoUpTimerId_);
+        keyEventAutoUpTimerId_ = -1;
+    }
+
+    keyEventAutoUpTimerId_ = TimerMgr->AddTimer(timeout, 1, [this, keyEvent]() {
+        keyEventAutoUpTimerId_ = -1;
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-        CHKPV(inputEventNormalizeHandler);
-        int64_t time = GetSysClockTime();
+        if (keyEvent == nullptr || inputEventNormalizeHandler == nullptr) {
+            MMI_HILOGE("keyEvent or inputEventNormalizeHandler is null");
+            return;
+        }
         auto keyItem = keyEvent->GetKeyItem();
         if (keyItem.has_value()) {
             keyItem->SetPressed(false);
-            keyItem->SetDownTime(time);
+            keyEvent->AddReleasedKeyItems(*keyItem);
         }
-        keyEvent->RemoveReleasedKeyItems(*keyItem);
-        keyEvent->AddPressedKeyItems(*keyItem);
+        int64_t time = GetSysClockTime();
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
         keyEvent->SetActionTime(time);
+        keyEvent->UpdateId();
         LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
         inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
-        keyEvent->UpdateId();
     }, "KeyEventAutoUp");
-    return timerId;
 }
 
 void KeyEventNormalize::SetKeyStatusRecord(bool enable, int32_t timeout)
