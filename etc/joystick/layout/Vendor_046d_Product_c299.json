@@ -1,0 +1,45 @@
+{
+	"KEYS":	[{
+			"RAWCODE":	292,
+			"KEYCODE":	"BUTTON_R2"
+		}, {
+			"RAWCODE":	293,
+			"KEYCODE":	"BUTTON_L2"
+		}, {
+			"RAWCODE":	294,
+			"KEYCODE":	"BUTTON_R1"
+		}, {
+			"RAWCODE":	295,
+			"KEYCODE":	"BUTTON_L1"
+		}, {
+			"RAWCODE":	290,
+			"KEYCODE":	"BUTTON_Y"
+		}, {
+			"RAWCODE":	288,
+			"KEYCODE":	"BUTTON_X"
+		}, {
+			"RAWCODE":	291,
+			"KEYCODE":	"BUTTON_B"
+		}, {
+			"RAWCODE":	289,
+			"KEYCODE":	"BUTTON_A"
+		}],
+	"AXES":	[{
+			"MODE":	"INVERT",
+			"RAWCODE":	5,
+			"AXIS":	"BRAKE"
+		}, {
+			"RAWCODE":	0,
+			"AXIS":	"WHEEL"
+		}, {
+			"MODE":	"INVERT",
+			"RAWCODE":	2,
+			"AXIS":	"GAS"
+		}, {
+			"RAWCODE":	17,
+			"AXIS":	"HAT0Y"
+		}, {
+			"RAWCODE":	16,
+			"AXIS":	"HAT0X"
+		}]
+}
