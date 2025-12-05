@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include "i_input_event_handler.h"
 #include "uds_server.h"
+#include "libinput.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,6 +44,8 @@ public:
     bool PublishLidEvent(const std::shared_ptr<SwitchEvent> switchEvent);
     void DumpTabletStandState(int32_t fd, const std::vector<std::string> &args);
     void DumpLidState(int32_t fd, const std::vector<std::string> &args);
+    void SyncSwitchLidState(struct libinput_device *inputDevice);
+    void SyncSwitchTabletState(struct libinput_device *inputDevice);
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);

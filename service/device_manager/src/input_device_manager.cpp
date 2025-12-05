@@ -30,6 +30,7 @@
 #include "product_name_definition.h"
 #include "pointer_device_manager.h"
 #include "special_input_device_parser.h"
+#include "switch_subscriber_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -541,6 +542,14 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
     DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device added successfully");
 #endif
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    auto switchSubscriberHandler = InputHandler->GetSwitchSubscriberHandler();
+    if (switchSubscriberHandler == nullptr) {
+        return;
+    }
+    switchSubscriberHandler->SyncSwitchLidState(inputDevice);
+    switchSubscriberHandler->SyncSwitchTabletState(inputDevice);
+#endif // OHOS_BUILD_ENABLE_SWITCH
     // LCOV_EXCL_STOP
 }
 
