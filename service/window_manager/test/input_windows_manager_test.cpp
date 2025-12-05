@@ -1643,7 +1643,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, 
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    WindowInfo windowInfo1 = {1, WindowInfo::FLAG_BIT_UNTOUCHABLE, {}};
+    WindowInfo windowInfo1 = {1, WindowInputPolicy::FLAG_UNTOUCHABLE, {}};
     WindowInfo windowInfo2 = {2, 0, {}};
     WIN_MGR->displayGroupInfo_.windowsInfo = {windowInfo1, windowInfo2};
     auto result = WIN_MGR->GetWindowInfo(0, 0);
@@ -1986,7 +1986,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001,
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_001, TestSize.Level1)
 {
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
+    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputPolicy::FLAG_HANDWRITING, PointerEvent::TOOL_TYPE_PEN));
 }
 
 /**
@@ -1998,7 +1998,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_002, TestSize.Level1)
 {
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::NORMAL, PointerEvent::TOOL_TYPE_RUBBER));
+    ASSERT_FALSE(
+        WIN_MGR->SkipNavigationWindow(WindowInputPolicy::FLAG_HANDWRITING, PointerEvent::TOOL_TYPE_RUBBER));
 }
 
 /**
@@ -2010,7 +2011,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_003, TestSize.Level1)
 {
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::NORMAL, PointerEvent::TOOL_TYPE_PEN));
+    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputPolicy::FLAG_HANDWRITING, PointerEvent::TOOL_TYPE_PEN));
 }
 
 /**
@@ -2022,7 +2023,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_004, TestSize.Level1)
 {
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_RUBBER));
+        ASSERT_FALSE(
+        WIN_MGR->SkipNavigationWindow(WindowInputPolicy::FLAG_HANDWRITING, PointerEvent::TOOL_TYPE_RUBBER));
 }
 
 /**
@@ -2035,7 +2037,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 {
     WIN_MGR->SetAntiMisTake(true);
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
+    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputPolicy::FLAG_HANDWRITING, PointerEvent::TOOL_TYPE_PEN));
 }
 
 /**
@@ -2102,11 +2104,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedDrawPointer_001,
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipAnnotationWindow_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    uint32_t flag = WindowInfo::FLAG_BIT_HANDWRITING;
+    uint32_t flag = WindowInputPolicy::FLAG_HANDWRITING;
     int32_t toolType = PointerEvent::TOOL_TYPE_FINGER;
     bool result = WIN_MGR->SkipAnnotationWindow(flag, toolType);
     EXPECT_TRUE(result);
-    flag = WindowInfo::FLAG_BIT_HANDWRITING;
+    flag = WindowInputPolicy::FLAG_HANDWRITING;
     toolType = PointerEvent::TOOL_TYPE_PEN;
     result = WIN_MGR->SkipAnnotationWindow(flag, toolType);
     EXPECT_FALSE(result);
@@ -3901,7 +3903,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
     inputWindowsManager.lastPointerEvent_->SetPointerId(0);
     inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     WindowInfo windowInfo;
-    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.flags = WindowInputPolicy::FLAG_HANDWRITING;
     windowInfo.pointerHotAreas.push_back({100, 0, INT32_MAX, 0});
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
@@ -3975,7 +3977,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow,
     inputWindowsManager.lastLogicX_ = 200;
     inputWindowsManager.lastLogicY_ = 300;
     WindowInfo windowInfo;
-    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.flags = WindowInputPolicy::FLAG_HANDWRITING;
     windowInfo.pointerHotAreas.push_back({100, 100, INT32_MAX, 100});
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
@@ -4918,9 +4920,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
     pointerItem.targetWindowId_ = 2;
     WindowInfo windowInfo;
-    windowInfo.flags = WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    windowInfo.flags = WindowInputPolicy::FLAG_UNTOUCHABLE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
-    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.flags = WindowInputPolicy::FLAG_HANDWRITING;
     pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
     inputWindowsManager.extraData_.appended = true;
     inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
@@ -5217,6 +5219,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
     std::vector<float> transform = {0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 315.0, 690.0, 1.0};
     info.transform = transform;
     windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    windowInfo.flags =  WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     Rect rect = {0, 0, 30, 40};
     windowInfo.defaultHotAreas.push_back(rect);
     windowsInfo.push_back(windowInfo);
@@ -5256,6 +5259,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplay
     std::vector<float> transform = {0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 315.0, 690.0, 1.0};
     info.transform = transform;
     windowInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    windowInfo.flags = WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL | WindowInputPolicy::FLAG_DRAG_DISABLED;
     Rect rect = {0, 0, 30, 40};
     windowInfo.defaultHotAreas.push_back(rect);
     windowsInfo.push_back(windowInfo);
@@ -5723,7 +5727,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     rect.y = 300;
     rect.height = 1200;
     winInfo.id = 1;
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
     winInfo.defaultHotAreas.clear();
@@ -5815,7 +5819,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->bitwise_ = 0x00000000;
     winInfo.flags = 1;
     winGroupInfo.windowsInfo.push_back(winInfo);
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     winGroupInfo.windowsInfo.push_back(winInfo);
@@ -5860,7 +5865,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(15.5f);
     pointerEvent->bitwise_ = 0x00000000;
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     winInfo.defaultHotAreas = {
@@ -5972,7 +5978,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(15.5f);
     pointerEvent->bitwise_ = 0x00000000;
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
     winInfo.defaultHotAreas = {
@@ -6094,7 +6100,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(15.5f);
     pointerEvent->bitwise_ = 0x00000000;
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.id = 200;
     winInfo.defaultHotAreas = {
@@ -6157,7 +6164,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(15.5f);
     pointerEvent->bitwise_ = 0x00000000;
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.id = 200;
     winInfo.defaultHotAreas = {
@@ -6220,7 +6228,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(15.5f);
     pointerEvent->bitwise_ = 0x00000000;
-    winInfo.flags = 0;
+    winInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     winInfo.pixelMap = nullptr;
     winInfo.id = 200;
     winInfo.defaultHotAreas = {
@@ -7705,7 +7714,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_004, 
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     windowInfo.id = 150;
     windowInfo.displayId = 300;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.pointerHotAreas.push_back(rect);
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager.extraData_.appended = true;
@@ -7751,7 +7761,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_005, 
     std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     windowInfo.id = 150;
     windowInfo.displayId = 300;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.pointerHotAreas.push_back(rect);
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     inputWindowsManager.extraData_.appended = false;
@@ -8532,7 +8543,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.id = sourceWindowId;
     windowInfo.displayId = displayId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
-    windowInfo.flags &= WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    windowInfo.flags &= WindowInputPolicy::FLAG_UNTOUCHABLE;
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
     int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
@@ -9804,7 +9815,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
     inputWindowsManager.lastLogicX_ = 200;
     inputWindowsManager.lastLogicY_ = 300;
     WindowInfo windowInfo;
-    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.flags = WindowInputPolicy::FLAG_HANDWRITING;
     windowInfo.zOrder = 5.0f;
     windowInfo.pointerHotAreas.push_back({ 100, 100, 300, 300 });
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
@@ -12081,11 +12092,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfoFlag_0
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    uint32_t flag = WindowInfo::FLAG_BIT_DISABLE_USER_ACTION;
+    uint32_t flag = WindowInputPolicy::FLAG_DISABLE_USER_ACTION;
     std::shared_ptr<InputEvent> event = InputEvent::Create();
     ASSERT_NE(event, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
-    flag = WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    flag = WindowInputPolicy::FLAG_UNTOUCHABLE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateWindowInfoFlag(flag, event););
 }
 
@@ -12373,7 +12384,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     inputWindowsManager->pointerLockedWindow_.area.y = 302;
     inputWindowsManager->pointerLockedWindow_.area.width = 2090;
     inputWindowsManager->pointerLockedWindow_.area.height = 1394;
-    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
     EXPECT_EQ(integerX, displayInfo.validWidth - 1);
     EXPECT_EQ(integerY, displayInfo.validHeight - 1);
@@ -12403,7 +12414,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     inputWindowsManager->pointerLockedWindow_.area.y = 302;
     inputWindowsManager->pointerLockedWindow_.area.width = 2090;
     inputWindowsManager->pointerLockedWindow_.area.height = 1394;
-    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
     EXPECT_EQ(integerX, displayInfo.validWidth - 1);
     EXPECT_EQ(integerY, displayInfo.validHeight - 1);
@@ -12433,7 +12444,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     inputWindowsManager->pointerLockedWindow_.area.y = 302;
     inputWindowsManager->pointerLockedWindow_.area.width = 2090;
     inputWindowsManager->pointerLockedWindow_.area.height = 1394;
-    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_CONFINED;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
     inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
     EXPECT_EQ(integerX, inputWindowsManager->pointerLockedWindow_.area.x + 1);
     EXPECT_EQ(integerY, inputWindowsManager->pointerLockedWindow_.area.y + 1);
@@ -12463,7 +12474,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_LimitMouseLocaltionInE
     inputWindowsManager->pointerLockedWindow_.area.y = 302;
     inputWindowsManager->pointerLockedWindow_.area.width = 2090;
     inputWindowsManager->pointerLockedWindow_.area.height = 1394;
-    inputWindowsManager->pointerLockedWindow_.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    inputWindowsManager->pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
     inputWindowsManager->LimitMouseLocaltionInEvent(&displayInfo, integerX, integerY, x, y);
     EXPECT_EQ(integerX, 0);
     EXPECT_EQ(integerY, 0);
@@ -12485,7 +12496,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_001, 
     displayInfo.direction = Direction::DIRECTION0;
     displayInfo.displayDirection = Direction::DIRECTION0;
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
@@ -12527,7 +12538,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_002, 
     displayInfo.validWidth = 3000;
     displayInfo.validHeight = 3000;
     focusWindow.id = 1;
-    focusWindow.flags = WindowInfo::FLAG_BIT_POINTER_LOCKED;
+    focusWindow.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
     focusWindow.area.x = 507;
     focusWindow.area.y = 302;
     focusWindow.area.width = 2090;
