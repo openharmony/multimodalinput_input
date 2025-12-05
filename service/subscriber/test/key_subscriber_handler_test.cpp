@@ -4486,11 +4486,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_006, T
 }
 
 /**
- * @tc.name: KeySubscriberHandler_HandleKeyDown_007
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_007
  * @tc.desc: Test HandleKeyDown with non-matching key code
  * @tc.type: FUNC
  */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandler_HandleKeyDown_007, TestSize.Level1)
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_007, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     KeySubscriberHandler handler;
@@ -4512,11 +4512,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandler_HandleKeyDown_007, TestS
 }
 
 /**
- * @tc.name: KeySubscriberHandler_HandleKeyDown_008
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyDown_008
  * @tc.desc: Test HandleKeyDown with non-matching key code
  * @tc.type: FUNC
  */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandler_HandleKeyDown_008, TestSize.Level1)
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_008, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     KeySubscriberHandler handler;
