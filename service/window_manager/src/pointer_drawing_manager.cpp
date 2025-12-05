@@ -2430,7 +2430,7 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
     OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
-#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     UpdateDisplayInfo(displayInfo);
     lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
     lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;
