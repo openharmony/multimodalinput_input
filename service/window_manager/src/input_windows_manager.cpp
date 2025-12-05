@@ -4398,6 +4398,34 @@ std::vector<int32_t> InputWindowsManager::HandleHardwareCursor(const OLD::Displa
     return cursorPos;
 }
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_ptr<PointerEvent>& pointerEvent,
+    const std::optional<WindowInfo> &touchWindow, const InputWindowsManager &inputWindowsManager)
+{
+    static bool isInAnco = false;
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerEvent->GetPointerId());
+        return false;
+    }
+
+    if (!touchWindow) {
+        MMI_HILOGE("touchWindow is nullopt");
+        return false;
+    }
+
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        isInAnco = inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    }
+
+    if (pointerItem.IsPressed() || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        return isInAnco;
+    }
+
+    return inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
+
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -4675,12 +4703,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    static bool isInAnco = false;
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
-    }
-
-    if (isInAnco) {
+    if (MouseTargetIsInAnco(logicalX, logicalY, pointerEvent, touchWindow, *this)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         pointerEvent->SetAncoDeal(true);
         SimulatePointerExt(pointerEvent);

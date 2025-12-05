@@ -41,6 +41,8 @@ namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
+extern bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_ptr<PointerEvent>& pointerEvent,
+    const std::optional<WindowInfo> &touchWindow, const InputWindowsManager &inputWindowsManager);
 namespace {
 InputWindowsManager *g_instance;
 constexpr uint32_t DEFAULT_ICON_COLOR {0xFF};
@@ -4351,8 +4353,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
-    EXPECT_CALL(mockInputWindowsManager, IsInAncoWindow).WillRepeatedly(Return(true));
     InputWindowsManager inputWindowsManager;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -4373,6 +4373,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     item.SetPointerId(0);
     item.SetDisplayX(150);
     item.SetDisplayY(300);
+    item.SetPressed(true);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
     inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
@@ -4405,6 +4406,76 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_004,
     inputWindowsManager.mouseDownInfo_.id = 1;
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_OK);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+/**
+ * @tc.name: InputWindowsManagerTest_MouseTargetIsInAnco_001
+ * @tc.desc: Test MouseTargetIsInAnco to verify that the isInAnco branch is covered when the pointerItem is nullptr.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_MouseTargetIsInAnco_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo windowInfo;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    bool ret = OHOS::MMI::MouseTargetIsInAnco(logicalX, logicalY, pointerEvent,
+        std::make_optional(windowInfo), inputWindowsManager);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_MouseTargetIsInAnco_002
+ * @tc.desc: Test MouseTargetIsInAnco to verify that the isInAnco branch is covered when the touchWindow is nullopt.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_MouseTargetIsInAnco_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    bool ret = OHOS::MMI::MouseTargetIsInAnco(logicalX, logicalY, pointerEvent,
+        std::nullopt, inputWindowsManager);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_MouseTargetIsInAnco_003
+ * @tc.desc: Test MouseTargetIsInAnco to verify that the isInAnco branch is covered when action is move.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_MouseTargetIsInAnco_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo windowInfo;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    bool ret = OHOS::MMI::MouseTargetIsInAnco(logicalX, logicalY, pointerEvent,
+        std::make_optional(windowInfo), inputWindowsManager);
+    EXPECT_EQ(ret, false);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 /**
  * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget
