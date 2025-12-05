@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <charconv>
 #include "account_manager.h"
 
 #ifdef SCREENLOCK_MANAGER_ENABLED
@@ -472,8 +473,14 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
     std::string displayId = data.GetWant().GetStringParam("displayId");
     uint64_t currentDisplayId = MAIN_DISPLAY_ID;
     if (displayId.size() <= MAX_DISPLAYID_SIZE && IsNumeric(displayId)) {
-        currentDisplayId = static_cast<uint64_t>(std::stoull(displayId));
+        uint64_t num = 0;
+        auto [ptr, ec] = std::from_chars(displayId.data(), displayId.data() + displayId.size(), num);
+    if (ec == std::errc() && num <= UINT64_MAX) {
+        currentDisplayId = num;
         MMI_HILOGI("Switch to {%{public}" PRIu64 ":%d}", currentDisplayId, accountId);
+    } else {
+        MMI_HILOGE("Failed to convert or invalid displayId value");
+    }
     }
     if (currentDisplayId == MAIN_DISPLAY_ID && currentAccountId_ != accountId) {
         if (auto iter = accounts_.find(accountId); iter == accounts_.end()) {
