@@ -4086,9 +4086,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, Te
         it->second.displaysInfo.push_back(displaysInfo);
     }
     result = inputWindowsManager.ResetCursorPos();
-    EXPECT_EQ(result.displayId, 3);
-    EXPECT_EQ(result.cursorPos.x, 20);
-    EXPECT_EQ(result.cursorPos.y, 25);
+    EXPECT_EQ(result.displayId, displaysInfo.id);
+    EXPECT_EQ(result.cursorPos.x, displaysInfo.validWidth * HALF_RATIO);
+    EXPECT_EQ(result.cursorPos.y, displaysInfo.validHeight * HALF_RATIO);
     displaysInfo.direction = Direction::DIRECTION90;
     displaysInfo.displayDirection = Direction::DIRECTION0;
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
@@ -4096,8 +4096,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, Te
         it->second.displaysInfo.push_back(displaysInfo);
     }
     result = inputWindowsManager.ResetCursorPos();
-    EXPECT_EQ(result.cursorPos.x, 25);
-    EXPECT_EQ(result.cursorPos.y, 20);
+    EXPECT_EQ(result.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(result.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
     displaysInfo.direction = Direction::DIRECTION270;
     displaysInfo.displayDirection = Direction::DIRECTION0;
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
@@ -4105,8 +4105,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, Te
         it->second.displaysInfo.push_back(displaysInfo);
     }
     result = inputWindowsManager.ResetCursorPos();
-    EXPECT_EQ(result.cursorPos.x, 25);
-    EXPECT_EQ(result.cursorPos.y, 20);
+    EXPECT_EQ(result.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(result.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
 }
 
 /**
@@ -11409,15 +11409,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_004, Te
     displayGroupInfo.displaysInfo.clear();
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
     CursorPosition result = inputWindowsManager.ResetCursorPos(displayGroupInfo);
-    EXPECT_EQ(result.cursorPos.x, 20);
-    EXPECT_EQ(result.cursorPos.y, 15);
+    EXPECT_EQ(result.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(result.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
     displaysInfo.direction = Direction::DIRECTION270;
     displaysInfo.displayDirection = Direction::DIRECTION0;
     displayGroupInfo.displaysInfo.clear();
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
     result = inputWindowsManager.ResetCursorPos(displayGroupInfo);
-    EXPECT_EQ(result.cursorPos.x, 20);
-    EXPECT_EQ(result.cursorPos.y, 15);
+    EXPECT_EQ(result.cursorPos.x, displaysInfo.validHeight * HALF_RATIO);
+    EXPECT_EQ(result.cursorPos.y, displaysInfo.validWidth * HALF_RATIO);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
