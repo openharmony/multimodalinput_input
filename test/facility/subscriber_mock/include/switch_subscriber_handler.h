@@ -33,6 +33,10 @@ public:
     virtual int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType) = 0;
     virtual int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId) = 0;
     virtual int32_t QuerySwitchStatus(int32_t switchType, int32_t& state) = 0;
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    virtual void SyncSwitchLidState(struct libinput_device *inputDevice) = 0;
+    virtual void SyncSwitchTabletState(struct libinput_device *inputDevice) = 0;
+#endif // OHOS_BUILD_ENABLE_SWITCH
 };
 
 class SwitchSubscriberHandler : public ISwitchSubscriberHandler {
@@ -46,6 +50,10 @@ public:
     MOCK_METHOD(int32_t, SubscribeSwitchEvent, (SessionPtr, int32_t, int32_t));
     MOCK_METHOD(int32_t, UnsubscribeSwitchEvent, (SessionPtr, int32_t));
     MOCK_METHOD(int32_t, QuerySwitchStatus, (int32_t, int32_t&));
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    MOCK_METHOD(void, SyncSwitchLidState, (struct libinput_device*));
+    MOCK_METHOD(void, SyncSwitchTabletState, (struct libinput_device*));
+#endif // OHOS_BUILD_ENABLE_SWITCH
 };
 } // namespace MMI
 } // namespace OHOS

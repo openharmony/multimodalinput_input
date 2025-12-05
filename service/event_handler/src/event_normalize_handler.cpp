@@ -1073,6 +1073,16 @@ int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> 
 }
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
+void EventNormalizeHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
+{
+    CHKPV(nextHandler_);
+    DfxHisysevent::GetDispStartTime();
+    CHKPV(switchEvent);
+    nextHandler_->HandleSwitchEvent(switchEvent);
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
+}
+
 void EventNormalizeHandler::RestoreTouchPadStatus()
 {
     CALL_INFO_TRACE;
