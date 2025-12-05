@@ -1572,12 +1572,12 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
             position.y = rotateY1;
         } else if (currentDisplay.fixedDirection == DIRECTION90) {
             position.x = rotateY1;
-            position.y = posWidth - rotateX1;
+            position.y = validW - rotateX1;
         } else if (currentDisplay.fixedDirection == DIRECTION180) {
-            position.x = posWidth - rotateX1;
-            position.y = posHeight - rotateY1;
+            position.x = validW - rotateX1;
+            position.y = validH - rotateY1;
         } else if (currentDisplay.fixedDirection == DIRECTION270) {
-            position.x = posHeight - rotateY1;
+            position.x = validH - rotateY1;
             position.y = rotateX1;
         } else {
             MMI_HILOGD("Invalid fixedDirection:%{public}d", currentDisplay.fixedDirection);
