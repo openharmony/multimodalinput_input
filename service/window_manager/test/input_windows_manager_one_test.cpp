@@ -364,6 +364,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SelectWindowInfo
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -1063,6 +1064,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     WindowInfo info;
     info.id = 50;
     info.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    info.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     Rect rect {
         .x = 0,
         .y = 0,
@@ -1105,6 +1108,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTransformD
     WindowInfo info;
     info.id = 0;
     info.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    info.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     Rect rect {
         .x = 0,
         .y = 0,
@@ -2394,8 +2399,12 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
     inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
     inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    windowInfo.flags =  WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
     inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
+    windowInfo.flags =  WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL |
+                           WindowInputPolicy::FLAG_DRAG_DISABLED;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
     inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
@@ -2432,7 +2441,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ChangeWindowArea
     int32_t y = 200;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
@@ -2687,7 +2697,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_Dump, TestSize.L
     inputWindowsManager->lastTouchEvent_ = pointerEvent;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
 
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
@@ -2766,7 +2777,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowInfoByI
     int32_t focusWindowId = 1;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     WindowGroupInfo windowGroupInfo = {.focusWindowId = 1, .displayId = 1, .windowsInfo = {windowInfo}};
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
@@ -2808,7 +2820,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_NeedTouchTrackin
     pointerItem.SetGlobalY(DBL_MAX);
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
 
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
@@ -2847,7 +2860,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTrac
     inputWindowsManager->udsServer_ = &udsServer;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, windowInfo));
     pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_ACCESSIBILITY);
@@ -2876,7 +2890,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTrac
     inputWindowsManager->udsServer_ = &udsServer;
     WindowInfo windowInfo;
     windowInfo.id = 1;
-    windowInfo.flags = 0;
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
+                           WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_ACCESSIBILITY);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
@@ -2935,6 +2950,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_UpdateTargetTouc
     pointerItem.SetDisplayXPos(0.0);
     pointerItem.SetDisplayYPos(0.0);
     winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    winInfo.flags = WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL | WindowInputPolicy::FLAG_DRAG_DISABLED;
     inputWindowsManager->UpdateTargetTouchWinIds(winInfo, pointerItem, pointerEvent, pointerId, 1, 1);
     EXPECT_FALSE(inputWindowsManager->targetTouchWinIds_[1][pointerId].empty());
 }
@@ -3446,6 +3462,64 @@ HWTEST_F(InputWindowsManagerOneTest, CleanMouseEventCycle_005, TestSize.Level1)
     winMgr->mouseDownInfo_.pid = pid;
 
     EXPECT_NO_FATAL_FAILURE(winMgr->CleanMouseEventCycle(event));
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ClearMismatchTypeWinIds_001
+ * @tc.desc: Test targetTouchWinIds_.find(deviceId) == targetTouchWinIds_.end()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMismatchTypeWinIds_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t pointerId = 0;
+    int32_t displayId = 0;
+    int32_t deviceId = 0;
+    int32_t errorDeviceId = 1;
+    inputWindowsManager->targetTouchWinIds_[deviceId][pointerId].insert(pointerId);
+    inputWindowsManager->ClearMismatchTypeWinIds(pointerId, displayId, errorDeviceId);
+    EXPECT_EQ(inputWindowsManager->targetTouchWinIds_[deviceId][pointerId].size(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ClearMismatchTypeWinIds_002
+ * @tc.desc: Test targetTouchWinIds_[deviceId].find(pointerId) == targetTouchWinIds_[deviceId].end()
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMismatchTypeWinIds_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t pointerId = 0;
+    int32_t displayId = 0;
+    int32_t deviceId = 0;
+    int32_t errorPointerId = 1;
+    inputWindowsManager->targetTouchWinIds_[deviceId][pointerId].insert(pointerId);
+    inputWindowsManager->ClearMismatchTypeWinIds(errorPointerId, displayId, deviceId);
+    EXPECT_EQ(inputWindowsManager->targetTouchWinIds_[deviceId][pointerId].size(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerOneTest_ClearMismatchTypeWinIds_003
+ * @tc.desc: Test windowInfo &&
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ClearMismatchTypeWinIds_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t pointerId = 0;
+    int32_t displayId = 0;
+    int32_t deviceId = 0;
+    inputWindowsManager->targetTouchWinIds_[deviceId][pointerId].insert(pointerId);
+    inputWindowsManager->ClearMismatchTypeWinIds(pointerId, displayId, deviceId);
+    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
+    EXPECT_CALL(mockInputWindowsManager, GetWindowAndDisplayInfo).WillRepeatedly(Return(std::nullopt));
+    EXPECT_EQ(inputWindowsManager->targetTouchWinIds_[deviceId][pointerId].size(), 1);
 }
 } // namespace MMI
 } // namespace OHOS
