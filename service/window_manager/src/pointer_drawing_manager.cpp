@@ -454,9 +454,9 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (GetHardCursorEnabled()) {
-        UpdateBindDisplayId(rsId);
-    }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    UpdateBindDisplayId(rsId);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ &&
         lastDirection_ == direction && !offRenderScaleUpdate_) {
         if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
@@ -508,9 +508,9 @@ void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, in
 {
     CALL_DEBUG_ENTER;
     displayId_ = rsId;
-    if (GetHardCursorEnabled()) {
-        UpdateBindDisplayId(rsId);
-    }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    UpdateBindDisplayId(rsId);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
             MMI_HILOGE("SetCursorLocation failed");
@@ -2428,9 +2428,9 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
         return;
     }
     OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
-    if (GetHardCursorEnabled()) {
-        (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
-    }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    (void)GetMainScreenDisplayInfo(displayGroupInfo, displayInfo);
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     UpdateDisplayInfo(displayInfo);
     lastPhysicalX_ = displayInfo.validWidth / CALCULATE_MIDDLE;
     lastPhysicalY_ = displayInfo.validHeight / CALCULATE_MIDDLE;

@@ -48,7 +48,8 @@
       "input_feature_upgrade_skia",
       "input_feature_mistouch_prevention",
       "input_feature_key_hook",
-      "input_feature_key_pressed_handler"
+      "input_feature_key_pressed_handler",
+      "input_feature_external_screen"
     ],
     "adapted_system_type": [
       "standard"
