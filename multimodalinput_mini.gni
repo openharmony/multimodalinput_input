@@ -66,6 +66,7 @@ declare_args() {
   input_feature_upgrade_skia = false
   input_feature_mistouch_prevention = false
   input_feature_input_event_hook = true
+  input_feature_external_screen = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -339,6 +340,7 @@ print(
 print(
     "input_feature_one_hand_mode_enable = ${input_feature_one_hand_mode_enable}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
+print("input_feature_external_screen = ${input_feature_external_screen}")
 
 input_default_defines = []
 
@@ -543,4 +545,8 @@ if (input_feature_event_recorder) {
 
 if (input_feature_mistouch_prevention) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION" ]
+}
+
+if (input_feature_external_screen) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_EXTERNAL_SCREEN" ]
 }
