@@ -4089,6 +4089,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, Te
     EXPECT_EQ(result.displayId, 3);
     EXPECT_EQ(result.cursorPos.x, 20);
     EXPECT_EQ(result.cursorPos.y, 25);
+    displaysInfo.direction = Direction::DIRECTION90;
+    displaysInfo.displayDirection = Direction::DIRECTION0;
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.clear();
+        it->second.displaysInfo.push_back(displaysInfo);
+    }
+    result = inputWindowsManager.ResetCursorPos();
+    EXPECT_EQ(result.cursorPos.x, 25);
+    EXPECT_EQ(result.cursorPos.y, 20);
+    displaysInfo.direction = Direction::DIRECTION270;
+    displaysInfo.displayDirection = Direction::DIRECTION0;
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.clear();
+        it->second.displaysInfo.push_back(displaysInfo);
+    }
+    result = inputWindowsManager.ResetCursorPos();
+    EXPECT_EQ(result.cursorPos.x, 25);
+    EXPECT_EQ(result.cursorPos.y, 20);
 }
 
 /**
@@ -7215,10 +7233,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, 
     CALL_TEST_DEBUG;
     OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.focusWindowId = 1;
+    OLD::DisplayInfo info = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .rsId = 1};
+    displayGroupInfo.displaysInfo = {info};
 
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.pid = 1;
+    windowInfo.displayId = 0;
     windowInfo.uid = 1;
     windowInfo.area = {1, 1, 1, 1};
     windowInfo.defaultHotAreas = {windowInfo.area};
@@ -10255,12 +10276,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_002, 
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo info = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .rsId = 1};
+    displayGroupInfo.displaysInfo = {info};
     displayGroupInfo.focusWindowId = 1;
 
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.pid = 1;
     windowInfo.uid = 1;
+    windowInfo.displayId = 0;
     windowInfo.area = {1, 1, 1, 1};
     windowInfo.defaultHotAreas = {windowInfo.area};
     windowInfo.pointerHotAreas = {windowInfo.area};
@@ -10270,6 +10294,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_002, 
     windowInfo.pointerChangeAreas = {1, 2, 1, 2, 1, 2, 1, 2, 1};
     windowInfo.action = WINDOW_UPDATE_ACTION::ADD;
     displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.isDisplayCoord = true;
+    windowInfo.uiExtentionWindowInfo.push_back(windowInfo2);
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     NiceMock<MockInputWindowsManager> mockInputWindowsManager;
@@ -11374,6 +11404,20 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_004, Te
     displaysInfo.uniq = "uniq2";
     displayGroupInfo.displaysInfo.push_back(displaysInfo);
     EXPECT_EQ(inputWindowsManager.ResetCursorPos(displayGroupInfo).displayId, displaysInfo.id);
+    displaysInfo.direction = Direction::DIRECTION90;
+    displaysInfo.displayDirection = Direction::DIRECTION0;
+    displayGroupInfo.displaysInfo.clear();
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    CursorPosition result = inputWindowsManager.ResetCursorPos(displayGroupInfo);
+    EXPECT_EQ(result.cursorPos.x, 20);
+    EXPECT_EQ(result.cursorPos.y, 15);
+    displaysInfo.direction = Direction::DIRECTION270;
+    displaysInfo.displayDirection = Direction::DIRECTION0;
+    displayGroupInfo.displaysInfo.clear();
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    result = inputWindowsManager.ResetCursorPos(displayGroupInfo);
+    EXPECT_EQ(result.cursorPos.x, 20);
+    EXPECT_EQ(result.cursorPos.y, 15);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 

@@ -1221,22 +1221,22 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(OLD::DisplayGroupInfo
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
     });
-    if (GetHardCursorEnabled()) {
-        for (auto &windowInfo : displayGroupInfo.windowsInfo) {
-            if (windowInfo.isDisplayCoord) {
-                continue;
-            }
-            auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
-            CHKPR(displayInfo, action);
-            ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
-            if (!windowInfo.uiExtentionWindowInfo.empty()) {
-                for (auto &item : windowInfo.uiExtentionWindowInfo) {
-                    ChangeWindowArea(displayInfo->x, displayInfo->y, item);
-                }
-            }
-            windowInfo.isDisplayCoord = true;
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+        if (windowInfo.isDisplayCoord) {
+            continue;
         }
+        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId, displayGroupInfo);
+        CHKPR(displayInfo, action);
+        ChangeWindowArea(displayInfo->x, displayInfo->y, windowInfo);
+        if (!windowInfo.uiExtentionWindowInfo.empty()) {
+            for (auto &item : windowInfo.uiExtentionWindowInfo) {
+                ChangeWindowArea(displayInfo->x, displayInfo->y, item);
+            }
+        }
+        windowInfo.isDisplayCoord = true;
     }
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     return action;
 }
 
@@ -1322,16 +1322,14 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
     int32_t groupId = displayGroupInfo.groupId;
     if (!displayGroupInfo.displaysInfo.empty()) {
         OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+        (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
-        if (GetHardCursorEnabled()) {
-            (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
-            x = displayInfo.validWidth * HALF_RATIO;
-            y = displayInfo.validHeight * HALF_RATIO;
-            Direction direction = GetDisplayDirection(&displayInfo);
-            if (direction == DIRECTION90 || direction == DIRECTION270) {
-                std::swap(x, y);
-            }
+        Direction direction = GetDisplayDirection(&displayInfo);
+        if (direction == DIRECTION90 || direction == DIRECTION270) {
+            std::swap(x, y);
         }
         cursorPosMap_[groupId].displayId = displayInfo.id;
         cursorPosMap_[groupId].cursorPos.x = x;
@@ -1416,9 +1414,9 @@ CursorPosition InputWindowsManager::GetCursorPos(const OLD::DisplayGroupInfo &di
         cursorPosition = iter->second;
         if ((cursorPosition.displayId < 0) && !displayGroupInfo.displaysInfo.empty()) {
             OLD::DisplayInfo displayInfo = displayGroupInfo.displaysInfo[0];
-            if (GetHardCursorEnabled()) {
-                (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
-            }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+            (void)GetMainScreenDisplayInfo(displayGroupInfo.displaysInfo, displayInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
             int32_t validW = displayInfo.validWidth;
             int32_t validH = displayInfo.validHeight;
             Direction direction = GetDisplayDirection(&displayInfo);
@@ -1963,9 +1961,9 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
     bool isDisplayChanged = false;
-    if (GetHardCursorEnabled()) {
-        isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
-    }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    isDisplayChanged = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     OLD::DisplayGroupInfo displayGroupInfoTemp;
     if (displayGroupInfo.userState == UserState::USER_ACTIVE) {
         displayGroupInfoMapTmp_[displayGroupInfo.groupId] = displayGroupInfo;
@@ -1973,12 +1971,12 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     bFlag = (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() || action == WINDOW_UPDATE_ACTION::ADD_END)
         && (displayGroupInfo.userState == UserState::USER_ACTIVE);
     if (bFlag) {
-        if (GetHardCursorEnabled()) {
-            bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
-            if (isDisplayUpdate) {
-                ResetPointerPosition(displayGroupInfo);
-            }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+        bool isDisplayUpdate = OnDisplayRemovedOrCombinationChanged(displayGroupInfo);
+        if (isDisplayUpdate) {
+            ResetPointerPosition(displayGroupInfo);
         }
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         PrintChangedWindowBySync(displayGroupInfo);
         CleanInvalidPixelMap(groupId);
         HandleValidDisplayChange(displayGroupInfo);
@@ -2013,11 +2011,11 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     bFlag = (iter != pointerDrawFlagMap_.end()) ? true : false;
     if (!displayGroupInfo.displaysInfo.empty() && bFlag) {
         AdjustDisplayRotation(groupId);
-        if (GetHardCursorEnabled()) {
-            PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
-        } else {
-            PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
-        }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+#else
+        PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     }
 
     lastDpiMap_[groupId] = displayGroupInfoTemp.displaysInfo.empty() ? DEFAULT_DPI :
@@ -6317,11 +6315,9 @@ bool InputWindowsManager::CalculateLayout(const OLD::DisplayInfo &displayInfo, c
 {
     Direction direction = GetDisplayDirection(&displayInfo);
     Vector2D<double> logical = physical;
-    if (GetHardCursorEnabled()) {
-        auto screenRect = RotateRect<double>(direction, {displayInfo.width, displayInfo.height});
-        auto transforms = RotateAndFitScreen(direction, screenRect);
-        logical = MMI::ApplyTransformSteps(transforms, physical);
-    }
+    auto screenRect = RotateRect<double>(direction, {displayInfo.width, displayInfo.height});
+    auto transforms = RotateAndFitScreen(direction, screenRect);
+    logical = MMI::ApplyTransformSteps(transforms, physical);
     layout.x = logical.x + displayInfo.x;
     layout.y = logical.y + displayInfo.y;
 
@@ -6432,11 +6428,9 @@ void InputWindowsManager::FindPhysicalDisplay(const OLD::DisplayInfo& displayInf
         }
         physical = logical;
         Direction direction = GetDisplayDirection(&item);
-        if (GetHardCursorEnabled()) {
-            auto screenRect = RotateRect<double>(direction, { item.width, item.height });
-            auto transforms = RotateAndFitScreen(direction, screenRect);
-            physical = ResetTransformSteps(transforms, logical);
-        }
+        auto screenRect = RotateRect<double>(direction, { item.width, item.height });
+        auto transforms = RotateAndFitScreen(direction, screenRect);
+        physical = ResetTransformSteps(transforms, logical);
         physicalX = physical.x;
         physicalY = physical.y;
         displayId = item.id;
@@ -6703,9 +6697,9 @@ MouseLocation InputWindowsManager::GetMouseInfo()
         curMouseLocation.displayId, curMouseLocation.physicalX, curMouseLocation.physicalY);
     if ((curMouseLocation.displayId < 0) && !displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
-        if (GetHardCursorEnabled()) {
-            (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
-        }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         const auto iter = mouseLocationMap_.find(MAIN_GROUPID);
         if (iter != mouseLocationMap_.end()) {
             mouseLocationMap_[MAIN_GROUPID].displayId = displayInfo.id;
@@ -6733,9 +6727,9 @@ CursorPosition InputWindowsManager::GetCursorPos()
     }
     if ((cursorPos.displayId < 0) && !displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
-        if (GetHardCursorEnabled()) {
-            (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
-        }
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
         if (iter != cursorPosMap_.end()) {
             int32_t validW = displayInfo.validWidth;
@@ -6761,16 +6755,14 @@ CursorPosition InputWindowsManager::ResetCursorPos()
     auto &displaysInfoVector = GetDisplayInfoVector(MAIN_GROUPID);
     if (!displaysInfoVector.empty()) {
         OLD::DisplayInfo displayInfo = displaysInfoVector[0];
+#ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+        (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
+#endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
         int32_t x = displayInfo.validWidth * HALF_RATIO;
         int32_t y = displayInfo.validHeight * HALF_RATIO;
-        if (GetHardCursorEnabled()) {
-            (void)GetMainScreenDisplayInfo(displaysInfoVector, displayInfo);
-            x = displayInfo.validWidth * HALF_RATIO;
-            y = displayInfo.validHeight * HALF_RATIO;
-            Direction displayDirection = GetDisplayDirection(&displayInfo);
-            if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
-                std::swap(x, y);
-            }
+        Direction displayDirection = GetDisplayDirection(&displayInfo);
+        if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
+            std::swap(x, y);
         }
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
         if (iter != cursorPosMap_.end()) {
