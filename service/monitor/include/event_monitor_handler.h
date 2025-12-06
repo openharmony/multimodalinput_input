@@ -170,10 +170,6 @@ private:
         bool CheckIfNeedSendFingerprintEvent(SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent,
             std::unordered_set<int32_t> fingerFocusPidSet);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-        bool IsXKey(std::shared_ptr<PointerEvent> pointerEvent);
-        bool CheckIfNeedSendXkeyEvent(SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_X_KEY
 
         struct ConsumptionState {
             std::set<int32_t> eventIds_;

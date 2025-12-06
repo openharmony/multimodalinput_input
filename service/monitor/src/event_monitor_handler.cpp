@@ -785,27 +785,6 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendFingerprintEvent(
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-bool EventMonitorHandler::MonitorCollection::IsXKey(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPF(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
-        return true;
-    }
-    MMI_HILOGD("not X-key event");
-    return false;
-}
-
-bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendXkeyEvent(SessionHandler &monitor,
-    std::shared_ptr<PointerEvent> pointerEvent)
-{
-    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_X_KEY) == HANDLE_EVENT_TYPE_X_KEY && IsXKey(pointerEvent)) {
-        return true;
-    }
-    return false;
-}
-#endif // OHOS_BUILD_ENABLE_X_KEY
-
 bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
     SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent, std::unordered_set<int32_t> fingerFocusPidSet)
 {
@@ -815,11 +794,6 @@ bool EventMonitorHandler::MonitorCollection::CheckIfNeedSendToClient(
         return CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-    if (CheckIfNeedSendXkeyEvent(monitor, pointerEvent)) {
-        return true;
-    }
-#endif // OHOS_BUILD_ENABLE_X_KEY
     if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
         return true;
     } else if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
