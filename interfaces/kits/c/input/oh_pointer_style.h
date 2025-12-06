@@ -359,7 +359,7 @@ typedef enum Input_PointerStyle {
     LASER_CURSOR_DOT_RED = 51,
 
     /**
-    * User defined
+    * Developer defined
     * @since 22
     */
     DEVELOPER_DEFINED_ICON = -100
