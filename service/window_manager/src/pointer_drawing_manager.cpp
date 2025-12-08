@@ -1433,8 +1433,8 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
         case ANGLE_NW: {
             if (currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 if (GetUserIconCopy() != nullptr) {
-                    physicalX -= userIconHotSpotX_;
-                    physicalY += userIconHotSpotY_;
+                    physicalX -= userIconHotSpotY_;
+                    physicalY += userIconHotSpotX_;
                 }
             }
             break;
@@ -1511,8 +1511,8 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
         case ANGLE_NW: {
             if (currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 if (GetUserIconCopy() != nullptr) {
-                    physicalX += userIconHotSpotX_;
-                    physicalY -= userIconHotSpotY_;
+                    physicalX += userIconHotSpotY_;
+                    physicalY -= userIconHotSpotX_;
                 }
             }
             break;
