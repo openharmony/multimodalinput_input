@@ -24,6 +24,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t MAX_TIMEOUT_MS { 10000 };
+}
 class InputEnableKeyStatusCommand {
 public:
     InputEnableKeyStatusCommand() = default;
@@ -37,7 +40,8 @@ private:
     bool EnableKeyStatusOption(int32_t argc, char** argv);
     int32_t RunEnableKeyStatus();
 private:
-    std::vector<std::string> injectArgvs_;
+    bool enable_ { false };
+    int32_t timeout_ { MAX_TIMEOUT_MS };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -149,25 +149,5 @@ HWTEST_F(InputSendeventCommandTest, Test_SendEventOption_04, TestSize.Level1)
     optind = 1;
     EXPECT_TRUE(command.SendEventOption(6, argv));
 }
-
-/**
- * @tc.name: Test_RunSendEvent_01
- * @tc.desc: Test RunSendEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputSendeventCommandTest, Test_RunSendEvent_01, TestSize.Level1)
-{
-    InputSendeventCommand command;
-    command.injectArgvs_ = { "sendevent", "/dev/input/eventX", "1", "2", "3", "4" };
-    EXPECT_EQ(command.RunSendEvent(), RET_ERR);
-    command.injectArgvs_ = { "sendevent", "", "1", "2", "3" };
-    EXPECT_EQ(command.RunSendEvent(), RET_ERR);
-    command.injectArgvs_ = { "sendevent", "/dev/input/eventX", "1", "2", "3" };
-    EXPECT_EQ(command.RunSendEvent(), RET_ERR);
-    command.injectArgvs_ = { "sendevent", "/dev/input/event0", "1", "2", "3" };
-    EXPECT_EQ(command.RunSendEvent(), RET_OK);
-}
-
 } // namespace MMI
 } // namespace OHOS

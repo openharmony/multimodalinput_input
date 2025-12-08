@@ -37,11 +37,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr uint32_t SEND_EVENT_ARGC { 6 };
-constexpr uint32_t SEND_EVENT_ARGV_COUNTS { 5 };
-constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX { 1 };
-constexpr uint32_t SEND_EVENT_TYPE_INDEX { 2 };
-constexpr uint32_t SEND_EVENT_CODE_INDEX { 3 };
-constexpr uint32_t SEND_EVENT_VALUE_INDEX { 4 };
 constexpr uint32_t INPUT_TYPE_LENGTH { 5 };
 constexpr uint32_t INPUT_CODE_LENGTH { 5 };
 constexpr uint32_t INPUT_VALUE_LENGTH { 11 };
@@ -51,7 +46,7 @@ int32_t InputSendeventCommand::HandleSendEventCommand(int32_t argc, char** argv)
 {
     InputSendeventCommand command;
     if (!command.SendEventOption(argc, argv)) {
-        std::cerr << "please use 'uinput sendevent <device_node> '" << std::endl;
+        std::cerr << "please use 'uinput sendevent <device_node> <type> <code> <value>'" << std::endl;
         return RET_ERR;
     };
     int32_t ret = command.RunSendEvent();
@@ -65,36 +60,30 @@ bool InputSendeventCommand::SendEventOption(int32_t argc, char** argv)
         std::cerr << "Wrong number of input parameters" << std::endl;
         return false;
     }
-    injectArgvs_.clear();
-    injectArgvs_.push_back("sendevent");
 
     std::string deviceNode = argv[++optind];
     if (!(CheckDevice(deviceNode))) {
         std::cerr << "Input error in device node, deviceNode:" << deviceNode.c_str() << std::endl;
         return false;
     }
-    injectArgvs_.push_back(deviceNode);
 
     std::string inputType = argv[++optind];
     if (!(CheckType(inputType))) {
         std::cerr << "Input error in type, type:" << inputType.c_str() << std::endl;
         return false;
     }
-    injectArgvs_.push_back(inputType);
 
     std::string inputCode = argv[++optind];
     if (!(CheckCode(inputCode))) {
         std::cerr << "Input error in code, code:" << inputCode.c_str() << std::endl;
         return false;
     }
-    injectArgvs_.push_back(inputCode);
 
     std::string inputValue = argv[++optind];
     if (!(CheckValue(inputValue))) {
         std::cerr << "Input error in value, value:" << inputValue.c_str() << std::endl;
         return false;
     }
-    injectArgvs_.push_back(inputValue);
     return true;
 }
 
@@ -108,6 +97,7 @@ bool InputSendeventCommand::CheckValue(const std::string &inputValue)
         int64_t numberValue = 0;
         auto [ptr, ec] = std::from_chars(inputValue.data(), inputValue.data() + inputValue.size(), numberValue);
         if (ec == std::errc() && (numberValue >= INT32_MIN) && (numberValue <= INT32_MAX)) {
+            inputValue_ = numberValue;
             return true;
         }
     }
@@ -121,9 +111,10 @@ bool InputSendeventCommand::CheckCode(const std::string &inputCode)
     }
     bool isCodeNumber = std::regex_match(inputCode, std::regex("\\d+"));
     if (isCodeNumber) {
-        int32_t numberCode = 0;
+        uint16_t numberCode = 0;
         auto [ptr, ec] = std::from_chars(inputCode.data(), inputCode.data() + inputCode.size(), numberCode);
         if (ec == std::errc() && numberCode <= UINT16_MAX) {
+            inputCode_ = numberCode;
             return true;
         }
     }
@@ -137,9 +128,10 @@ bool InputSendeventCommand::CheckType(const std::string &inputType)
     }
     bool isTypeNumber = std::regex_match(inputType, std::regex("\\d+"));
     if (isTypeNumber) {
-        int32_t numberType = 0;
+        uint16_t numberType = 0;
         auto [ptr, ec] = std::from_chars(inputType.data(), inputType.data() + inputType.size(), numberType);
         if (ec == std::errc() && numberType <= UINT16_MAX) {
+            inputType_ = numberType;
             return true;
         }
     }
@@ -155,62 +147,25 @@ bool InputSendeventCommand::CheckDevice(const std::string &deviceNode)
     if (realpath(deviceNode.c_str(), realPath) == nullptr) {
         return false;
     }
+    deviceNode_ = realPath;
     return true;
 }
 
 int32_t InputSendeventCommand::RunSendEvent()
 {
-    if (injectArgvs_.size() != SEND_EVENT_ARGV_COUNTS) {
-        std::cerr << "please use 'uinput sendevent <device_node> '" << std::endl;
-        return RET_ERR;
-    }
-    std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
-    if (deviceNode.empty()) {
-        std::cerr << "Device node does not exist:" << deviceNode.c_str() << std::endl;
-        return RET_ERR;
-    }
-    char realPath[PATH_MAX] = {};
-    if (realpath(deviceNode.c_str(), realPath) == nullptr) {
-        std::cerr << "Device node path is error, path:" << deviceNode.c_str() << std::endl;
-        return RET_ERR;
-    }
-    int32_t fd = open(realPath, O_RDWR);
-    if (fd < 0) {
-        std::cerr << "Open device node failed, path:" << deviceNode.c_str() << std::endl;
-        return RET_ERR;
-    }
     struct timeval tm;
     gettimeofday(&tm, 0);
     struct input_event event = {};
     event.input_event_sec = tm.tv_sec;
     event.input_event_usec = tm.tv_usec;
-    uint16_t type = 0;
-    auto [ptr1, ec1] = std::from_chars(injectArgvs_[SEND_EVENT_TYPE_INDEX].data(),
-        injectArgvs_[SEND_EVENT_TYPE_INDEX].data() + injectArgvs_[SEND_EVENT_TYPE_INDEX].size(), type);
-    if (ec1 != std::errc()) {
-        std::cerr << "Invalid type value: " << injectArgvs_[SEND_EVENT_TYPE_INDEX] << std::endl;
-        close(fd);
+    event.type = inputType_;
+    event.code = inputCode_;
+    event.value = inputValue_;
+    int32_t fd = open(deviceNode_.c_str(), O_RDWR);
+    if (fd < 0) {
+        std::cerr << "Open device node failed, path:" << deviceNode_.c_str() << std::endl;
         return RET_ERR;
     }
-    event.type = type;
-    uint16_t code = 0;
-    auto [ptr2, ec2] = std::from_chars(injectArgvs_[SEND_EVENT_CODE_INDEX].data(),
-        injectArgvs_[SEND_EVENT_CODE_INDEX].data() + injectArgvs_[SEND_EVENT_CODE_INDEX].size(), code);
-    if (ec2 != std::errc()) {
-        std::cerr << "Invalid code value: " << injectArgvs_[SEND_EVENT_CODE_INDEX] << std::endl;
-        close(fd);
-        return RET_ERR;
-    }
-    event.code = code;
-    int32_t value = 0;
-    auto [ptr3, ec3] = std::from_chars(injectArgvs_[SEND_EVENT_VALUE_INDEX].data(),
-        injectArgvs_[SEND_EVENT_VALUE_INDEX].data() + injectArgvs_[SEND_EVENT_VALUE_INDEX].size(), value);
-    if (ec3 != std::errc()) {
-        std::cerr << "Invalid value: " << injectArgvs_[SEND_EVENT_VALUE_INDEX] << std::endl;
-        close(fd);
-        return RET_ERR;
-    }
-    event.value = value;
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
         std::cerr << "Send event to device node failed" << std::endl;
