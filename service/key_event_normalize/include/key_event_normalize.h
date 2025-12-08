@@ -51,7 +51,7 @@ public:
     void SimulatedModifierKeyEventNormalize(const std::shared_ptr<KeyEvent> &keyEvent);
     void SetKeyStatusRecord(bool enable, int32_t timeout);
     bool CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
-    void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent);
+    void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
 
 private:
     void ReadProductConfig(InputProductConfig &config) const;
@@ -66,6 +66,7 @@ private:
     void HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &keyItem);
     void SyncSimulatedModifierKeyEventState(const std::shared_ptr<KeyEvent> &keyEvent);
     void SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode);
+    bool CheckKeyEventAutoUpTimer(int32_t keyCode);
     void KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout);
 
 private:
@@ -78,7 +79,16 @@ private:
     std::mutex mtx_;
     bool keyStatusRecordSwitch_ { false };
     int32_t keyStatusRecordTimeout_ { 10000 };
-    int32_t keyEventAutoUpTimerId_ { -1 };
+    std::map<int32_t, int32_t> keyEventAutoUpTimerIds_ {
+        {KeyEvent::KEYCODE_ALT_LEFT, -1},
+        {KeyEvent::KEYCODE_ALT_RIGHT, -1},
+        {KeyEvent::KEYCODE_SHIFT_LEFT, -1},
+        {KeyEvent::KEYCODE_SHIFT_RIGHT, -1},
+        {KeyEvent::KEYCODE_CTRL_LEFT, -1},
+        {KeyEvent::KEYCODE_CTRL_RIGHT, -1},
+        {KeyEvent::KEYCODE_META_LEFT, -1},
+        {KeyEvent::KEYCODE_META_RIGHT, -1},
+    };
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI

@@ -461,11 +461,10 @@ void KeyEventNormalize::InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEve
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t keyAction = keyEvent->GetKeyAction();
     int32_t repeatKeyCode = KeyRepeat->GetRepeatKeyCode();
-    bool isInterrupt = (keyAction == KeyEvent::KEY_ACTION_DOWN) ? (repeatKeyCode != keyCode) :
-                       ((keyAction == KeyEvent::KEY_ACTION_UP) ? (repeatKeyCode == keyCode) : false);
+    bool isInterruptDown = (keyAction == KeyEvent::KEY_ACTION_DOWN && repeatKeyCode != keyCode);
+    bool isInterruptUp = (keyAction == KeyEvent::KEY_ACTION_UP && repeatKeyCode == keyCode);
+    bool isInterrupt = (isInterruptDown || isInterruptUp);
 
-    MMI_HILOGI("repeatKeyCode:%{public}d, keyCode:%{public}d, isInterrupt:%{public}d",
-        repeatKeyCode, keyCode, isInterrupt);
     if (isInterrupt) {
         MMI_HILOGI("Interrupt auto repeat key event");
         KeyRepeat->RemoveTimer();
@@ -621,23 +620,50 @@ void KeyEventNormalize::SimulatedModifierKeyEventNormalize(const std::shared_ptr
     HandleSimulatedModifierKeyActionFromShell(keyEvent);
 }
 
+bool KeyEventNormalize::CheckKeyEventAutoUpTimer(int32_t keyCode)
+{
+    auto it = keyEventAutoUpTimerIds_.find(keyCode);
+    if (it == keyEventAutoUpTimerIds_.end()) {
+        MMI_HILOGI("The keyCode does not have a keyEventAutoUpTimer");
+        return false;
+    }
+
+    int32_t timerId = it->second;
+    if (TimerMgr->IsExist(timerId)) {
+        MMI_HILOGI("Reset keyEventAutoUpTimer");
+        TimerMgr->ResetTimer(timerId);
+        return false;
+    }
+
+    keyEventAutoUpTimerIds_[keyCode] = -1;
+    return true;
+}
+
 void KeyEventNormalize::KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout)
 {
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+
     if (timeout <= 0 || timeout > MAX_TIMEOUT_MS) {
         timeout = MAX_TIMEOUT_MS;
     }
 
-    if (TimerMgr->IsExist(keyEventAutoUpTimerId_)) {
-        MMI_HILOGI("Update keyEventAutoUpTimerId");
-        TimerMgr->RemoveTimer(keyEventAutoUpTimerId_);
-        keyEventAutoUpTimerId_ = -1;
+    int32_t keyCode = keyEvent->GetKeyCode();
+    if (!CheckKeyEventAutoUpTimer(keyCode)) {
+        return;
     }
 
-    keyEventAutoUpTimerId_ = TimerMgr->AddTimer(timeout, 1, [this, keyEvent]() {
-        keyEventAutoUpTimerId_ = -1;
+    keyEventAutoUpTimerIds_[keyCode] = TimerMgr->AddTimer(timeout, 1, [this, keyEvent, keyCode]() {
+        keyEventAutoUpTimerIds_[keyCode] = -1;
+        if (keyEvent == nullptr) {
+            MMI_HILOGE("KeyEvent is null");
+            return;
+        }
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-        if (keyEvent == nullptr || inputEventNormalizeHandler == nullptr) {
-            MMI_HILOGE("keyEvent or inputEventNormalizeHandler is null");
+        if (inputEventNormalizeHandler == nullptr) {
+            MMI_HILOGE("inputEventNormalizeHandler is null");
             return;
         }
         auto keyItem = keyEvent->GetKeyItem();
@@ -647,6 +673,7 @@ void KeyEventNormalize::KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         int64_t time = GetSysClockTime();
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+        keyEvent->ClearFlag(KeyEvent::EVENT_FLAG_SHELL);
         keyEvent->SetActionTime(time);
         keyEvent->UpdateId();
         LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());

@@ -30,7 +30,9 @@ public:
     virtual ~IKeyEventNormalize() = default;
 
     virtual std::shared_ptr<KeyEvent> GetKeyEvent() = 0;
-    virtual void ModifierkeyEventNormalize(const std::shared_ptr<KeyEvent>&) = 0;
+    virtual void SimulatedModifierKeyEventNormalize(const std::shared_ptr<KeyEvent>&) = 0;
+    virtual bool CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent>&) = 0;
+    virtual void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent>&) = 0;
     virtual int32_t Normalize(libinput_event*, std::shared_ptr<KeyEvent>) = 0;
     virtual void ResetKeyEvent(struct libinput_device*) = 0;
     virtual int32_t SetShieldStatus(int32_t shieldMode, bool isShield) = 0;
@@ -44,7 +46,9 @@ public:
     virtual ~KeyEventNormalizeMock() override = default;
 
     MOCK_METHOD(std::shared_ptr<KeyEvent>, GetKeyEvent, ());
-    MOCK_METHOD(void, ModifierkeyEventNormalize, (const std::shared_ptr<KeyEvent>&));
+    MOCK_METHOD(void, SimulatedModifierKeyEventNormalize, (const std::shared_ptr<KeyEvent>&));
+    MOCK_METHOD(bool, CheckSimulatedModifierKeyEvent, (const std::shared_ptr<KeyEvent>&));
+    MOCK_METHOD(void, InterruptAutoRepeatKeyEvent, (const std::shared_ptr<KeyEvent>&));
     MOCK_METHOD(int32_t, Normalize, (libinput_event*, std::shared_ptr<KeyEvent>));
     MOCK_METHOD(void, ResetKeyEvent, (struct libinput_device*));
     MOCK_METHOD(int32_t, SetShieldStatus, (int32_t, bool));
