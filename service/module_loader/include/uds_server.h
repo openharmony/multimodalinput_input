@@ -16,6 +16,8 @@
 #ifndef UDS_SERVER_H
 #define UDS_SERVER_H
 
+#include <list>
+
 #include "uds_socket.h"
 
 #include "i_uds_server.h"

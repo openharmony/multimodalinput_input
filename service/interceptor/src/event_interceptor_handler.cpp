@@ -46,25 +46,18 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
         return;
     }
-    auto isFirstPressed = localHotKeyHandler_.IsFirstPressed(keyEvent);
-    auto isOver = localHotKeyHandler_.HandleEvent(keyEvent,
-        [this](std::shared_ptr<KeyEvent> keyEvent) -> bool {
-            return OnHandleEvent(keyEvent);
-        });
-    if (isOver) {
-        if (nextHandler_ != nullptr) {
-            localHotKeyHandler_.HandleLocalHotKey(keyEvent, *nextHandler_);
-        }
-    } else if (OnHandleEvent(keyEvent)) {
+    if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         DfxHisysevent::ReportKeyEvent("intercept");
+        localHotKeyHandler_.CleanUp(keyEvent);
         return;
-    } else if (isFirstPressed) {
-        localHotKeyHandler_.RectifyProcessed(keyEvent, LocalHotKeyAction::OVER);
     }
     CHKPV(nextHandler_);
+    localHotKeyHandler_.HandleLocalHotKey(keyEvent, *nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
+    localHotKeyHandler_.MarkDispatched(keyEvent);
+    localHotKeyHandler_.CleanUp(keyEvent);
 }
 
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -253,6 +246,9 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     CHKPF(inputDevice);
     uint32_t capKeyboard = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     for (const auto &interceptor : interceptors_) {
+        if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+            continue;
+        }
         MMI_HILOGD("The eventType:%{public}d, deviceTags:%{public}d",
             interceptor.eventType_, interceptor.deviceTags_);
         if ((capKeyboard & interceptor.deviceTags_) == 0) {
@@ -271,12 +267,13 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
                 continue;
             }
         }
-        if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
-            interceptor.SendToClient(keyEvent);
-            MMI_HILOGD("Key event was intercepted");
-            isInterceptor = true;
-            break;
+        if (ShouldHandleLocally(interceptor, keyEvent)) {
+            continue;
         }
+        interceptor.SendToClient(keyEvent);
+        MMI_HILOGD("Key event was intercepted");
+        isInterceptor = true;
+        break;
     }
     return isInterceptor;
 }
@@ -341,6 +338,33 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     return isInterceptor;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+bool EventInterceptorHandler::InterceptorCollection::ShouldHandleLocally(
+    const SessionHandler& interceptor, std::shared_ptr<KeyEvent> keyEvent) const
+{
+    auto session = interceptor.session_;
+    if (session == nullptr) {
+        return false;
+    }
+    auto tokenType = session->GetTokenType();
+    if ((tokenType != TokenType::TOKEN_HAP) && (tokenType != TokenType::TOKEN_SYSTEM_HAP)) {
+        return false;
+    }
+    auto interceptorHandler = InputHandler->GetInterceptorHandler();
+    if (interceptorHandler == nullptr) {
+        return false;
+    }
+    auto isOver = interceptorHandler->localHotKeyHandler_.HandleEvent(keyEvent,
+        [&interceptor](std::shared_ptr<KeyEvent> keyEvent) -> bool {
+            interceptor.SendToClient(keyEvent);
+            return true;
+        });
+    if (isOver) {
+        MMI_HILOGD("Should handle KeyEvent[No:%{public}d] locally", keyEvent->GetId());
+        return true;
+    }
+    return false;
+}
 
 int32_t EventInterceptorHandler::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
