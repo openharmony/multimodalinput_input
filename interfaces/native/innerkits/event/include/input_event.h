@@ -125,14 +125,16 @@ public:
 
     static constexpr uint32_t EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER = 0x00001000;
 
-      /**
+    static constexpr uint32_t EVENT_FLAG_SIMULATE_LEFT_RIGHT_ANTI_AXIS_MOVE = 0x00100000;
+
+    /**
      * The multimodal input event for device enter focus flag.
      *
-       * @since 19
-      */
+     * @since 19
+     */
     static constexpr uint32_t EVENT_FLAG_KEYBOARD_ENTER_FOCUS = 0x00002000;
-     /**
-      * The multimodal input event for device exit focus flag.
+    /**
+     * The multimodal input event for device exit focus flag.
      *
      * @since 19
      */
