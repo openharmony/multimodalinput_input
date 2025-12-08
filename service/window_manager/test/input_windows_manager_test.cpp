@@ -13260,5 +13260,53 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHitPo
     ASSERT_EQ(1, inputWindowsManager.firstTouchWindowInfos_.size());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ProcessFirstTouchHitPolicy_NewWindow
+ * @tc.desc: Test the funcation ProcessFirstTouchHitPolicy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHitPolicy_NewWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo firstTouchWindow;
+    firstTouchWindow.id = 1;
+    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
+    WindowInfo touchWindow;
+    touchWindow.id = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(0);
+    ASSERT_EQ(nullptr, inputWindowsManager.ProcessFirstTouchHitPolicy(pointerEvent, item, &touchWindow));
+    ASSERT_EQ(1, inputWindowsManager.firstTouchWindowInfos_.size());
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_ClearFirstTouchWindowInfos
+ * @tc.desc: Test the funcation ClearFirstTouchWindowInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearFirstTouchWindowInfos, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+    inputWindowsManager.ClearFirstTouchWindowInfos(0);
+    WindowInfo firstTouchWindow;
+    firstTouchWindow.id = 1;
+    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
+    inputWindowsManager.ClearFirstTouchWindowInfos(0);
+    ASSERT_EQ(0, inputWindowsManager.firstTouchWindowInfos_.size());
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
 } // namespace MMI
 } // namespace OHOS
