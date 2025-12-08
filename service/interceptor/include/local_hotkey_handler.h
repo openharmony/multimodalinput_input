@@ -71,8 +71,10 @@ public:
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent,
         std::function<bool(std::shared_ptr<KeyEvent>)> intercept);
     void MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action);
+    void MarkDispatched(std::shared_ptr<KeyEvent> keyEvent);
     void RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action);
     void HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, IInputEventHandler &handler);
+    void CleanUp(std::shared_ptr<KeyEvent> keyEvent);
     void Dump(int32_t fd, const std::vector<std::string> &args) const;
 
 private:
@@ -85,6 +87,7 @@ private:
 
     static LocalHotKeySteward steward_;
     std::map<int32_t, LocalHotKeyAction> consumedKeys_;
+    std::set<int32_t> dispatchedKeys_;
 };
 } // namespace MMI
 } // namespace OHOS
