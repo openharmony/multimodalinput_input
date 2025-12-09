@@ -44,6 +44,30 @@ enum AcrossDirection : int32_t {
     RIGHTWARDS = 4,
 };
 
+struct LastTouch {
+    int32_t deviceId_ { -1 };
+    int32_t pointerId_ { -1 };
+ 
+    bool operator<(const LastTouch &other) const
+    {
+        if (deviceId_ != other.deviceId_) {
+            return (deviceId_ < other.deviceId_);
+        }
+        return (pointerId_ < other.pointerId_);
+    }
+ 
+    bool operator==(const LastTouch &other) const
+    {
+        return (deviceId_ == other.deviceId_ && pointerId_ == other.pointerId_);
+    }
+};
+ 
+struct LastTouchInfo {
+    int32_t lastTouchLogicX { -1 };
+    int32_t lastTouchLogicY { -1 };
+    WindowInfo lastTouchWindowInfo;
+};
+
 class InputWindowsManager final : public IInputWindowsManager {
 public:
     InputWindowsManager();
@@ -391,6 +415,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void UpdateTargetTouchWinIds(const WindowInfo &item, PointerEvent::PointerItem &pointerItem,
         std::shared_ptr<PointerEvent> pointerEvent, int32_t pointerId, int32_t displayId, int32_t deviceId);
     void ClearMismatchTypeWinIds(int32_t pointerId, int32_t displayId, int32_t deviceId);
+    LastTouchInfo GetLastTouchInfo(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -525,9 +550,7 @@ private:
     PointerStyle globalStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    int32_t lastTouchLogicX_ { -1 };
-    int32_t lastTouchLogicY_ { -1 };
-    WindowInfo lastTouchWindowInfo_;
+    std::map<LastTouch, LastTouchInfo> LastTouchInfos_;
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
     std::shared_ptr<PointerEvent> lastTouchEventOnBackGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH

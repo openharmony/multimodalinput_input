@@ -2398,22 +2398,30 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
     inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
-    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = pointerId};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     windowInfo.flags =  WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
-    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
+    lastInfo.lastTouchWindowInfo.windowInputType = WindowInputType::DUALTRIGGER_TOUCH;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     windowInfo.flags =  WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
                            WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_EVENT_TRANSMIT_ALL |
                            WindowInputPolicy::FLAG_DRAG_DISABLED;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
-    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    lastInfo.lastTouchWindowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
 
-    inputWindowsManager->lastTouchWindowInfo_.windowInputType = WindowInputType::NORMAL;
-    inputWindowsManager->lastTouchWindowInfo_.transform.clear();
+    lastInfo.lastTouchWindowInfo.windowInputType = WindowInputType::NORMAL;
+    lastInfo.lastTouchWindowInfo.transform.clear();
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
     float pointerChangeAreasCount = 8;
-    inputWindowsManager->lastTouchWindowInfo_.transform.push_back(pointerChangeAreasCount);
+    lastInfo.lastTouchWindowInfo.transform.push_back(pointerChangeAreasCount);
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
 }
 
@@ -3021,20 +3029,27 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_TouchEnterLeaveE
     EXPECT_EQ(pointerEvent->GetPointerCount(), pointerId);
     pointerEvent->SetPointerId(pointerId);
     EXPECT_TRUE(pointerEvent->GetPointerItem(pointerId, pointerItem));
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = pointerId};
+    LastTouchInfo lastInfo;
     touchWindow.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
-    inputWindowsManager->lastTouchWindowInfo_.id = touchWindow.id;
+    lastInfo.lastTouchWindowInfo.id = touchWindow.id;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     touchWindow.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
                            WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE | WindowInputPolicy::FLAG_DRAG_DISABLED;
-    inputWindowsManager->lastTouchWindowInfo_.id = 5;
+    lastInfo.lastTouchWindowInfo.id = 5;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
-    inputWindowsManager->lastTouchWindowInfo_.id = -1;
+    lastInfo.lastTouchWindowInfo.id = -1;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 
-    inputWindowsManager->lastTouchWindowInfo_.id = 5;
+    lastInfo.lastTouchWindowInfo.id = 5;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     touchWindow.windowInputType = WindowInputType::SLID_TOUCH_WINDOW;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 }
