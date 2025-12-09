@@ -25,7 +25,7 @@ enum changedType: String {
     REMOVE = "remove"
 }
 union ChangedType {
-    type : changedType;
+    type : String;
 }
 
 enum sourceType : String {
@@ -37,7 +37,7 @@ enum sourceType : String {
     TRACKBALL = "trackball"
 }
 union SourceType {
-    type : sourceType;
+    type : String;
 }
 
 enum axisType: String {
@@ -52,7 +52,7 @@ enum axisType: String {
     AXIS_NULL = "null"
 }
 union AxisType {
-    type : axisType;
+    type : String;
 }
 
 enum KeyboardType : i32 {
