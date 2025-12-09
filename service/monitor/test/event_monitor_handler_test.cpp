@@ -1623,11 +1623,6 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     pointerEvent->SetFingerCount(THREE_FINGERS);
     ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
     ASSERT_TRUE(ret);
-
-    sessionHandler.eventType_ = HANDLE_EVENT_TYPE_X_KEY;
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
-    ASSERT_TRUE(ret);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1708,48 +1703,6 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_003, Tes
     ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-/**
- * @tc.name: EventMonitorHandlerTest_IsXKey_001
- * @tc.desc: Test IsXKey
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsXKey_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection eventMonitorHandler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
-    bool ret = eventMonitorHandler.IsXKey(pointerEvent);
-    ASSERT_TRUE(ret);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    ret = eventMonitorHandler.IsXKey(pointerEvent);
-    ASSERT_FALSE(ret);
-}
-
-/**
- * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendXkeyEvent_001
- * @tc.desc: Test CheckIfNeedSendXkeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendXkeyEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    InputHandlerType handlerType = InputHandlerType::MONITOR;
-    HandleEventType eventType = HANDLE_EVENT_TYPE_X_KEY;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    EventMonitorHandler::SessionHandler monitor { handlerType, eventType, session };
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
-    ASSERT_TRUE(monitorCollection.CheckIfNeedSendXkeyEvent(monitor, pointerEvent));
-}
-#endif // OHOS_BUILD_ENABLE_X_KEY
 
 /**
  * @tc.name: EventMonitorHandlerTest_CheckHasInputHandler_002

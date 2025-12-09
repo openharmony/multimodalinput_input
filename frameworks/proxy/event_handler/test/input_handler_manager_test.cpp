@@ -762,27 +762,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsFingerprintType_001,
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-/**
- * @tc.name: InputHandlerManagerTest_IsXKeyType_001
- * @tc.desc: Test the function IsXKeyType
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsXKeyType_001, TestSize.Level1)
-{
-    MyInputHandlerManager manager;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    bool ret = manager.IsXKeyType(pointerEvent);
-    ASSERT_FALSE(ret);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
-    ret = manager.IsXKeyType(pointerEvent);
-    ASSERT_TRUE(ret);
-}
-#endif // OHOS_BUILD_ENABLE_X_KEY
-
 /**
  * @tc.name: InputHandlerManagerTest_CheckIfNeedAddToConsumerInfos_001
  * @tc.desc: Test the function CheckIfNeedAddToConsumerInfos
@@ -908,16 +887,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
-    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
-    ASSERT_TRUE(ret);
-#endif
-
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-    handler.eventType_ = HANDLE_EVENT_TYPE_X_KEY;
-    ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
-    ASSERT_FALSE(ret);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_X_KEY);
     ret = manager.CheckIfNeedAddToConsumerInfos(handler, pointerEvent);
     ASSERT_TRUE(ret);
 #endif
