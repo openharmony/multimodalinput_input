@@ -6775,9 +6775,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PullEnterLeaveEvent, T
     PointerEvent::PointerItem lastPointerItem;
     touchWindow.id = 200;
     inputWindowsMgr.udsServer_ = &udsServer;
-    inputWindowsMgr.lastTouchWindowInfo_.id = 100;
     inputWindowsMgr.lastTouchEvent_->SetPointerId(10);
     lastPointerItem.SetPointerId(10);
+    inputWindowsMgr.lastTouchEvent_->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    touchWindow.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
+    lastInfo.lastTouchWindowInfo.id = 100;
+    inputWindowsMgr.LastTouchInfos_[touch] = lastInfo;
     inputWindowsMgr.lastTouchEvent_->AddPointerItem(lastPointerItem);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 }
@@ -12811,7 +12816,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsEnterWindowTriggered
     WindowInfo lastTouchWindowInfo;
     touchWindow.id = 1;
     lastTouchWindowInfo.id = 2;
-    inputWindowsManager->lastTouchWindowInfo_ = lastTouchWindowInfo;
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo = lastTouchWindowInfo;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_TRUE(inputWindowsManager->IsEnterWindowTriggered(pointerEvent, &touchWindow));
 }
  
@@ -12862,7 +12872,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsLeaveWindowTriggered
     WindowInfo lastTouchWindowInfo;
     touchWindow.id = 1;
     lastTouchWindowInfo.id = 2;
-    inputWindowsManager->lastTouchWindowInfo_ = lastTouchWindowInfo;
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo = lastTouchWindowInfo;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     EXPECT_TRUE(inputWindowsManager->IsLeaveWindowTriggered(pointerEvent, &touchWindow));
 }
  
@@ -12899,14 +12914,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEve
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->lastTouchWindowInfo_.id = 100;
-    inputWindowsManager->lastTouchWindowInfo_.pid = 200;
     int32_t logicalX = 100;
     int32_t logicalY = 100;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
     pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo.id = 100;
+    lastInfo.lastTouchWindowInfo.pid = 200;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     WindowInfo touchWindow;
     touchWindow.id = 200;
     touchWindow.pid = 300;
@@ -12924,14 +12944,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEve
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->lastTouchWindowInfo_.id = -1;
-    inputWindowsManager->lastTouchWindowInfo_.pid = -1;
     int32_t logicalX = 150;
     int32_t logicalY = 150;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
     pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo.id = -1;
+    lastInfo.lastTouchWindowInfo.pid = -1;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     WindowInfo touchWindow;
     touchWindow.id = 100;
     touchWindow.pid = 200;
@@ -12949,14 +12974,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEve
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->lastTouchWindowInfo_.id = 50;
-    inputWindowsManager->lastTouchWindowInfo_.pid = 100;
     int32_t logicalX = 200;
     int32_t logicalY = 200;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
     pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo.id = 50;
+    lastInfo.lastTouchWindowInfo.pid = 100;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     WindowInfo touchWindow;
     touchWindow.id = 300;
     touchWindow.pid = 400;
@@ -12974,14 +13004,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEve
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->lastTouchWindowInfo_.id = 100;
-    inputWindowsManager->lastTouchWindowInfo_.pid = 200;
     int32_t logicalX = 100;
     int32_t logicalY = 100;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEVITATE_MOVE);
     pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(10);
+    pointerEvent->SetDeviceId(5);
+    LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
+    LastTouchInfo lastInfo;
+    lastInfo.lastTouchWindowInfo.id = 100;
+    lastInfo.lastTouchWindowInfo.pid = 200;
+    inputWindowsManager->LastTouchInfos_[touch] = lastInfo;
     WindowInfo touchWindow;
     touchWindow.id = 100;
     touchWindow.pid = 200;
