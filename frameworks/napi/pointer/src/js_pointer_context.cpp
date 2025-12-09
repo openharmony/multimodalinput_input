@@ -844,7 +844,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     }
     int32_t pointerStyle = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
-    if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > SCREENRECORDER_CURSOR) {
+    if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > LASER_CURSOP_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
         return nullptr;
@@ -894,7 +894,7 @@ napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_inf
     }
     int32_t pointerStyle = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
-    if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > SCREENRECORDER_CURSOR) {
+    if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > LASER_CURSOP_DOT_RED) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
         return nullptr;
@@ -1070,8 +1070,20 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(napi_create_int32(env, MOUSE_ICON::RUNNING, &running), CREATE_INT32);
     napi_value developer_defined_icon = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::DEVELOPER_DEFINED_ICON, &developer_defined_icon), CREATE_INT32);
+    napi_value running_left = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::RUNNING_LEFT, &running_left), CREATE_INT32);
+    napi_value running_right = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::RUNNING_RIGHT, &running_right), CREATE_INT32);
+    napi_value aech_developer_defined_icon = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::AECH_DEVEIOPER_DEFINED_ICON, &aech_developer_defined_icon), CREATE_INT32);
     napi_value screenrecorder_cursor = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::SCREENRECORDER_CURSOR, &screenrecorder_cursor), CREATE_INT32);
+    napi_value laser_cursor = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::LASER_CURSOR, &laser_cursor), CREATE_INT32);
+    api_value laser_cursor_dot = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::LASER_CURSOR_DOT, &laser_cursor_dot), CREATE_INT32);
+    api_value laser_cursor_dot_red = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::LASER_CURSOR_DOT_RED, &laser_cursor_dot_red), CREATE_INT32);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DEFAULT", defaults),
@@ -1120,7 +1132,13 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("LOADING", loading),
         DECLARE_NAPI_STATIC_PROPERTY("RUNNING", running),
         DECLARE_NAPI_STATIC_PROPERTY("DEVELOPER_DEFINED_ICON", developer_defined_icon),
+        DECLARE_NAPI_STATIC_PROPERTY("RUNNING_LEFT", running_left),
+        DECLARE_NAPI_STATIC_PROPERTY("RUNNING_RIGHT", running_right),
+        DECLARE_NAPI_STATIC_PROPERTY("AECH_DEVEIOPER_DEFINED_ICON", aech_developer_defined_icon),
         DECLARE_NAPI_STATIC_PROPERTY("SCREENRECORDER_CURSOR", screenrecorder_cursor),
+        DECLARE_NAPI_STATIC_PROPERTY("LASER_CURSOR", laser_cursor),
+        DECLARE_NAPI_STATIC_PROPERTY("LASER_CURSOR_DOT", laser_cursor_dot),
+        DECLARE_NAPI_STATIC_PROPERTY("LASER_CURSOR_DOT_RED", laser_cursor_dot_red),
     };
     napi_value result = nullptr;
     CHKRP(napi_define_class(env, "PointerStyle", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
