@@ -2005,9 +2005,9 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     if (!displayGroupInfo.displaysInfo.empty() && bFlag) {
         AdjustDisplayRotation(groupId);
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
-        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
+        (void)PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayChanged);
 #else
-        PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
+        (void)PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     }
 
@@ -5726,7 +5726,7 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHitPolicy(std::shared_pt
     if (pointerEvent == nullptr || touchWindow == nullptr) {
         return nullptr;
     }
- 
+
     int32_t deviceId = pointerEvent->GetDeviceId();
     if (pointerEvent->GetPointerId() == FIRST_TOUCH) {
         auto iter = firstTouchWindowInfos_.find(deviceId);
@@ -5741,7 +5741,7 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHitPolicy(std::shared_pt
         }
         return nullptr;
     }
- 
+
     if (IsFirstTouchHitWindow(deviceId)) {
         return ProcessFirstTouchHit(pointerEvent, touchWindow);
     } else {
@@ -5749,7 +5749,7 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHitPolicy(std::shared_pt
         return nullptr;
     }
 }
- 
+
 bool InputWindowsManager::IsFirstTouchHitWindow(int32_t deviceId)
 {
     if (firstTouchWindowInfos_.find(deviceId) != firstTouchWindowInfos_.end()) {
@@ -5763,7 +5763,7 @@ bool InputWindowsManager::IsFirstTouchHitWindow(int32_t deviceId)
     MMI_HILOG_DISPATCHW("Can't find first pointer hit window");
     return false;
 }
- 
+
 const WindowInfo* InputWindowsManager::ProcessFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
     const WindowInfo* touchWindow)
 {
@@ -5789,7 +5789,7 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHit(std::shared_ptr<Poin
     }
     return nullptr;
 }
- 
+
 void InputWindowsManager::ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
     PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow)
 {
