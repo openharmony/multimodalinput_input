@@ -359,5 +359,230 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_AddPermissionUsedRecord001, 
     int32_t failCount = 1;
     EXPECT_FALSE(PER_HELPER->AddPermissionUsedRecord(token, permissionName, successCount, failCount));
 }
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInfraredEmmit001
+ * @tc.desc: Test CheckInfraredEmmit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInfraredEmmit001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckInfraredEmmit();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckInfraredEmmit();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckInfraredEmmit();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckInfraredEmmit();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckAuthorize001
+ * @tc.desc: Test CheckAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckAuthorize001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckAuthorize();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckAuthorize();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckAuthorize();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckAuthorize();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_RequestFromShell001
+ * @tc.desc: Test RequestFromShell
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_RequestFromShell001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_INVALID;
+    bool result1 = PER_HELPER->RequestFromShell();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result2 = PER_HELPER->RequestFromShell();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result3 = PER_HELPER->RequestFromShell();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result4 = PER_HELPER->RequestFromShell();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckMouseCursor001
+ * @tc.desc: Test CheckMouseCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckMouseCursor001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckMouseCursor();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckMouseCursor();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckMouseCursor();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckMouseCursor();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputEventFilter001
+ * @tc.desc: Test CheckInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputEventFilter001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckInputEventFilter();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckInputEventFilter();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckInputEventFilter();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckInputEventFilter();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInputDeviceController001
+ * @tc.desc: Test CheckInputDeviceController
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInputDeviceController001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckInputDeviceController();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckInputDeviceController();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckInputDeviceController();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckInputDeviceController();
+    EXPECT_TRUE(result4);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckFunctionKeyEnabled001
+ * @tc.desc: Test CheckFunctionKeyEnabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckFunctionKeyEnabled001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result1 = PER_HELPER->CheckFunctionKeyEnabled();
+    EXPECT_TRUE(result1);
+
+    tokenId = 2;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result2 = PER_HELPER->CheckFunctionKeyEnabled();
+    EXPECT_TRUE(result2);
+
+    tokenId = 3;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result3 = PER_HELPER->CheckFunctionKeyEnabled();
+    EXPECT_TRUE(result3);
+
+    tokenId = 4;
+    tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result4 = PER_HELPER->CheckFunctionKeyEnabled();
+    EXPECT_TRUE(result4);
+}
 } // namespace MMI
 } // namespace OHOS
