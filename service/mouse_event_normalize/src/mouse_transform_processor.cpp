@@ -572,7 +572,6 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
 void MouseTransformProcessor::SetPointerEventRightButtonSource(const int32_t evenType)
 {
-    MMI_HILOGI("test, right button event, evenType:%{public}d", evenType);
     if (evenType == LIBINPUT_EVENT_POINTER_TAP) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::TOUCHPAD_TWO_FINGER_TAP);
     } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {

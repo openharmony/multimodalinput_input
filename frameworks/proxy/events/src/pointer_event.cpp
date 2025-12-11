@@ -1329,7 +1329,6 @@ bool PointerEvent::ReadRightButtonSourceFromParcel(Parcel &in)
         return false;
     }
     rightButtonSource_ = static_cast<RightButtonSource>(value);
-    MMI_HILOGI("test, read rightButtonSource_:%{public}d", static_cast<int32_t>(rightButtonSource_));
     return true;
 }
 
