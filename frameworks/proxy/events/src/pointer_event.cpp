@@ -676,7 +676,8 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       throwSpeed_(other.throwSpeed_),
       settings_(other.settings_),
       autoToVirtualScreen_(other.autoToVirtualScreen_),
-      handOption_(other.handOption_), fixedMode_(other.fixedMode_) {}
+      handOption_(other.handOption_), fixedMode_(other.fixedMode_),
+      rightButtonSource_(other.rightButtonSource_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -709,6 +710,7 @@ void PointerEvent::Reset()
     fingerprintDistanceX_ = 0.0;
     fingerprintDistanceY_ = 0.0;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    rightButtonSource_ = RightButtonSource::OTHERS;
 }
 
 std::string PointerEvent::ToString()
@@ -1195,6 +1197,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     WRITEINT32(out, handOption_);
     WRITEINT32(out, static_cast<int32_t>(fixedMode_));
+    WRITEINT32(out, static_cast<int32_t>(rightButtonSource_));
     WRITEINT32(out, settings_.scrollRows_);
     WRITEBOOL(out, autoToVirtualScreen_);
     return true;
@@ -1285,6 +1288,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!ReadFixedModeFromParcel(in)) {
         return false;
     }
+    if (!ReadRightButtonSourceFromParcel(in)) {
+        return false;
+    }
     READINT32(in, settings_.scrollRows_);
     READBOOL(in, autoToVirtualScreen_);
     return true;
@@ -1310,6 +1316,20 @@ bool PointerEvent::ReadFixedModeFromParcel(Parcel &in)
             return false;
     }
     fixedMode_ = static_cast<FixedMode>(value);
+    return true;
+}
+
+bool PointerEvent::ReadRightButtonSourceFromParcel(Parcel &in)
+{
+    int32_t value = 0;
+    READINT32(in, value);
+    if (value < static_cast<int32_t>(RightButtonSource::OTHERS) ||
+        value > static_cast<int32_t>(RightButtonSource::TOUCHPAD_TWO_FINGER_TAP)) {
+        MMI_HILOGE("invalid rightButton source %{public}d", value);
+        return false;
+    }
+    rightButtonSource_ = static_cast<RightButtonSource>(value);
+    MMI_HILOGI("test, read rightButtonSource_:%{public}d", static_cast<int32_t>(rightButtonSource_));
     return true;
 }
 
@@ -1648,6 +1668,16 @@ std::string PointerEvent::GetFixedModeStr() const
         default:
             return "unknown";
     }
+}
+
+void PointerEvent::SetRightButtonSource(PointerEvent::RightButtonSource rightButtonSource)
+{
+    rightButtonSource_ = rightButtonSource;
+}
+
+PointerEvent::RightButtonSource PointerEvent::GetRightButtonSource() const
+{
+    return rightButtonSource_;
 }
 
 std::string_view PointerEvent::ActionToShortStr(int32_t action)

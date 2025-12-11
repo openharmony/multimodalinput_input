@@ -141,6 +141,7 @@ private:
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
+    void SetPointerEventRightButtonSource(const int32_t evenType);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static bool IsEventFromVirtualSource(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);
