@@ -3561,6 +3561,7 @@ protected:
 public:
     void SetFourceMonitorFlag(bool fourceMonitorFlag);
     bool GetFourceMonitorFlag();
+    void AddReleasedKeyItems(const KeyItem& keyItem);
     void RemoveReleasedKeyItems();
 
 private:
