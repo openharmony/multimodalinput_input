@@ -1273,6 +1273,8 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_002, TestSize.Level1)
     keyEvent->AddPressedKeyItems(key2);
 
     LocalHotKeyHandler handler;
+    handler.consumedKeys_.emplace(keyEvent->GetKeyCode(), LocalHotKeyAction::OVER);
+
     NiceMock<InputEventHandlerMock> eventHandler;
     handler.HandleLocalHotKey(keyEvent, eventHandler);
     EXPECT_EQ(eventHandler.events_.size(), SINGLE_ITEM);
@@ -1309,7 +1311,7 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_003, TestSize.Level1)
     keyEvent->AddPressedKeyItems(key1);
 
     LocalHotKeyHandler handler;
-    handler.MarkProcessed(keyEvent, LocalHotKeyAction::OVER);
+    handler.MarkDispatched(keyEvent);
 
     KeyEvent::KeyItem key2 {};
     key2.SetPressed(true);
@@ -1328,6 +1330,7 @@ HWTEST_F(LocalHotKeyHandlerTest, HandleLocalHotKey_003, TestSize.Level1)
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
 
     InputEventHandlerMock eventHandler;
+    handler.consumedKeys_.emplace(keyEvent->GetKeyCode(), LocalHotKeyAction::OVER);
     handler.HandleLocalHotKey(keyEvent, eventHandler);
     EXPECT_EQ(eventHandler.events_.size(), SINGLE_ITEM);
     if (!eventHandler.events_.empty()) {
