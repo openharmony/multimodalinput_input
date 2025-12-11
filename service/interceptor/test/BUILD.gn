@@ -16,6 +16,84 @@ import("../../../multimodalinput_mini.gni")
 
 module_output_path = "input/input"
 
+ohos_unittest("EventInterceptorTestWithMock") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/app_state_manager/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/interceptor/test/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+  ]
+
+  sources = [
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
+    "${mmi_path}/service/interceptor/src/event_interceptor_handler.cpp",
+    "${mmi_path}/service/interceptor/src/local_hotkey_handler.cpp",
+    "${mmi_path}/service/module_loader/src/uds_server.cpp",
+    "src/event_interceptor_test_with_mock.cpp",
+    "src/uds_session.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service/connect_manager:multimodal_input_interface",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
+    "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
+    "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
+    "${mmi_path}/test/facility/event_handler_mock:event_handler_mock",
+    "${mmi_path}/test/facility/init_libbegetutil_mock:init_libbegetutil_mock",
+    "${mmi_path}/test/facility/key_command_mock:key_command_mock",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+}
+
 ohos_unittest("LocalHotKeyHandlerTest") {
   module_out_path = module_output_path
   defines = input_default_defines
@@ -87,6 +165,9 @@ group("EventInterceptorTests") {
   deps = []
 
   if (input_feature_interceptor && input_feature_keyboard) {
-      deps += [ ":LocalHotKeyHandlerTest" ]
+    deps += [
+      ":EventInterceptorTestWithMock",
+      ":LocalHotKeyHandlerTest",
+    ]
   }
 }

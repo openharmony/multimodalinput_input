@@ -535,6 +535,13 @@ void LocalHotKeyHandler::MarkProcessed(std::shared_ptr<KeyEvent> keyEvent, Local
     }
 }
 
+void LocalHotKeyHandler::MarkDispatched(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        dispatchedKeys_.insert(keyEvent->GetKeyCode());
+    }
+}
+
 void LocalHotKeyHandler::RectifyProcessed(std::shared_ptr<KeyEvent> keyEvent, LocalHotKeyAction action)
 {
     if ((keyEvent) == nullptr) {
@@ -553,6 +560,12 @@ void LocalHotKeyHandler::HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, I
     if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
         return;
     }
+    auto iter = consumedKeys_.find(keyEvent->GetKeyCode());
+    if ((iter == consumedKeys_.cend()) ||
+        ((iter->second != LocalHotKeyAction::OVER) &&
+         (iter->second != LocalHotKeyAction::COPY))) {
+        return;
+    }
     auto event = KeyEvent::Create();
     CHKPV(event);
     std::vector<KeyEvent::KeyItem> pressedKeys;
@@ -568,9 +581,6 @@ void LocalHotKeyHandler::HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, I
         }
     }
     for (auto &keyItem : pressedKeys) {
-        if (HasKeyBeenDispatched(keyItem.GetKeyCode())) {
-            continue;
-        }
         auto actionTime = GetSysClockTime();
         event->SetActionTime(actionTime);
         event->SetKeyCode(keyItem.GetKeyCode());
@@ -580,9 +590,23 @@ void LocalHotKeyHandler::HandleLocalHotKey(std::shared_ptr<KeyEvent> keyEvent, I
         keyItem.SetDownTime(actionTime);
         event->AddPressedKeyItems(keyItem);
 
+        if (HasKeyBeenDispatched(keyItem.GetKeyCode())) {
+            continue;
+        }
+        MMI_HILOGD("Reissue KeyEvent[%{private}d]", event->GetKeyCode());
         handler.HandleKeyEvent(event);
         MarkProcessed(event, LocalHotKeyAction::OVER);
+        MarkDispatched(event);
     }
+}
+
+void LocalHotKeyHandler::CleanUp(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        return;
+    }
+    consumedKeys_.erase(keyEvent->GetKeyCode());
+    dispatchedKeys_.erase(keyEvent->GetKeyCode());
 }
 
 void LocalHotKeyHandler::Dump(int32_t fd, const std::vector<std::string> &args) const
@@ -658,9 +682,7 @@ std::optional<LocalHotKey> LocalHotKeyHandler::KeyEvent2LocalHotKey(std::shared_
 
 bool LocalHotKeyHandler::HasKeyBeenDispatched(int32_t keyCode) const
 {
-    auto iter = consumedKeys_.find(keyCode);
-    return ((iter != consumedKeys_.end()) &&
-            ((iter->second == LocalHotKeyAction::OVER) || (iter->second == LocalHotKeyAction::COPY)));
+    return (dispatchedKeys_.find(keyCode) != dispatchedKeys_.end());
 }
 } // namespace MMI
 } // namespace OHOS
