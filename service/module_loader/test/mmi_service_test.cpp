@@ -27,6 +27,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
 class MMIServerTest : public testing::Test {
@@ -1584,7 +1585,7 @@ HWTEST_F(MMIServerTest, MMIServerTest_AddGestureMonitor_001, TestSize.Level1)
         3,
         2);
     MMI_HILOGI("AddGestureMonitor invalid handlerType, ret: %{public}d", ret);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, -COMMON_PARAMETER_ERROR);
 }
 
 /**
