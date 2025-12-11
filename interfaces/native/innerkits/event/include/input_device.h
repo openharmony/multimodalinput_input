@@ -270,8 +270,8 @@ private:
     std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
     std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
-    bool isVirtual_ {false};
-    bool isLocal_ {false};
+    bool isVirtual_ { false };
+    bool isLocal_ { false };
 };
 
 inline unsigned long InputDevice::GetCapabilities() const
