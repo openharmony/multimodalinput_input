@@ -104,8 +104,7 @@ HWTEST_F(InputEnableKeyStatusCommandTest, Test_HandleEnableKeyStatusCommand_02, 
 HWTEST_F(InputEnableKeyStatusCommandTest, Test_RunEnableKeyStatus_01, TestSize.Level1)
 {
     InputEnableKeyStatusCommand command;
-    command.injectArgvs_.clear();
-    EXPECT_EQ(command.RunEnableKeyStatus(), RET_ERR);
+    EXPECT_EQ(command.RunEnableKeyStatus(), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

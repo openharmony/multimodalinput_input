@@ -39,12 +39,8 @@ namespace MMI {
 namespace {
 constexpr int32_t MIN_ARGC { 3 };
 constexpr int32_t MAX_ARGC { 4 };
-constexpr uint32_t MIN_ARGV_COUNTS { 2 };
-constexpr uint32_t ENABLE_INDEX { 1 };
-constexpr uint32_t TIMEOUT_INDEX { 2 };
 constexpr uint32_t ENABLE_LENGTH { 1 };
 constexpr uint32_t TIMEOUT_LENGTH { 2 };
-constexpr int32_t MAX_TIMEOUT_MS { 10000 };
 constexpr int32_t S_TO_MS { 1000 };
 } // namespace
 
@@ -52,7 +48,7 @@ int32_t InputEnableKeyStatusCommand::HandleEnableKeyStatusCommand(int32_t argc, 
 {
     InputEnableKeyStatusCommand command;
     if (!command.EnableKeyStatusOption(argc, argv)) {
-        std::cout << "please use 'uinput enable_key_status '" << std::endl;
+        std::cerr << "please use 'uinput enable_key_status <enable> [timeout]'" << std::endl;
         return RET_ERR;
     };
     int32_t ret = command.RunEnableKeyStatus();
@@ -63,84 +59,75 @@ bool InputEnableKeyStatusCommand::EnableKeyStatusOption(int32_t argc, char** arg
 {
     CALL_DEBUG_ENTER;
     if (argc < MIN_ARGC || argc > MAX_ARGC) {
-        std::cout << "Wrong number of input parameters" << std::endl;
-    return false;
-    }
-    injectArgvs_.clear();
-    injectArgvs_.push_back(argv[optind++]);
-
-    std::string enable = argv[optind++];
-    if (!(CheckEnable(enable))) {
-        std::cout << "Input error in enable, enable:" << enable.c_str() << std::endl;
+        std::cerr << "Wrong number of input parameters" << std::endl;
         return false;
     }
-    injectArgvs_.push_back(enable);
 
-    if (argc == optind) {
+    std::string enable = argv[++optind];
+    if (!(CheckEnable(enable))) {
+        std::cerr << "Input error in enable, enable:" << enable.c_str() << std::endl;
+        return false;
+    }
+
+    if (argc == optind + 1) {
         return true;
     }
 
-    std::string timeout = argv[optind++];
+    std::string timeout = argv[++optind];
     if (!(CheckTimeout(timeout))) {
-        std::cout << "Input error in timeout, timeout:" << timeout.c_str() << std::endl;
+        std::cerr << "Input error in timeout, timeout:" << timeout.c_str() << std::endl;
         return false;
     }
-    injectArgvs_.push_back(timeout);
     return true;
 }
 
 bool InputEnableKeyStatusCommand::CheckEnable(const std::string &enable)
 {
     if ((enable.length()) > ENABLE_LENGTH) {
-        std::cout << "The value entered is out of range, enable:" << enable.c_str() << std::endl;
-    return false;
+        std::cerr << "The value entered is out of range, enable:" << enable.c_str() << std::endl;
+        return false;
     }
+    enable_ = (enable == "1");
     return enable == "0" || enable == "1";
 }
 
 bool InputEnableKeyStatusCommand::CheckTimeout(const std::string &timeout)
 {
     if ((timeout.length()) > TIMEOUT_LENGTH) {
-        std::cout << "The value entered is out of range, timeout:" << timeout.c_str() << std::endl;
-    return false;
+        std::cerr << "The value entered is out of range, timeout:" << timeout.c_str() << std::endl;
+        return false;
     }
-    if (IsNumeric(timeout)) {
-        int32_t numberCode = 0;
-        auto [ptr, ec] = std::from_chars(timeout.data(), timeout.data() + timeout.size(), numberCode);
+    bool isInteger = IsInteger(timeout.c_str());
+    if (isInteger) {
+        int32_t numberTimeout = MAX_TIMEOUT_MS / S_TO_MS;
+        auto [ptr, ec] = std::from_chars(timeout.data(), timeout.data() + timeout.size(), numberTimeout);
         if (ec != std::errc()) {
-            std::cout << "Invalid timeout value, timeout:" << timeout.c_str() << std::endl;
+            std::cerr << "Invalid timeout value, timeout:" << timeout.c_str() << std::endl;
             return false;
         }
-        if (numberCode <= 0) {
+        if (numberTimeout <= 0) {
             return false;
         }
-        if (numberCode * S_TO_MS > MAX_TIMEOUT_MS) {
+        if (numberTimeout * S_TO_MS > MAX_TIMEOUT_MS) {
             return false;
         }
+        timeout_ = numberTimeout * S_TO_MS;
     }
-    return IsNumeric(timeout);
+    return isInteger;
 }
 
 int32_t InputEnableKeyStatusCommand::RunEnableKeyStatus()
 {
-    if (injectArgvs_.empty()) {
+    auto inputManager = InputManager::GetInstance();
+    if (inputManager == nullptr) {
+        std::cerr << "InputManager instance is null" << std::endl;
         return RET_ERR;
     }
-    int32_t timeout = MAX_TIMEOUT_MS;
-    if (injectArgvs_.size() > MIN_ARGV_COUNTS) {
-        int32_t parsedTimeout = 0;
-        auto [ptr, ec] = std::from_chars(injectArgvs_[TIMEOUT_INDEX].data(),
-            injectArgvs_[TIMEOUT_INDEX].data() + injectArgvs_[TIMEOUT_INDEX].size(), parsedTimeout);
-        if (ec == std::errc()) {
-            timeout = parsedTimeout * S_TO_MS;
-        } else {
-            return RET_ERR;
-        }
+    int32_t ret = inputManager->SetKeyStatusRecord(enable_, timeout_);
+    if (ret != RET_OK) {
+        std::cerr << "Failed to enable key status record" << std::endl;
     }
-    bool enable = injectArgvs_[ENABLE_INDEX] == "1";
-
-    InputManager::GetInstance()->SetKeyStatusRecord(enable, timeout);
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

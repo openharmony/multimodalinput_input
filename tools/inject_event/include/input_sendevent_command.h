@@ -39,7 +39,10 @@ private:
     bool SendEventOption(int32_t argc, char** argv);
     int32_t RunSendEvent();
 private:
-    std::vector<std::string> injectArgvs_;
+    std::string deviceNode_ { "" };
+    uint16_t inputType_ { 0 };
+    uint16_t inputCode_ { 0 };
+    int32_t inputValue_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
