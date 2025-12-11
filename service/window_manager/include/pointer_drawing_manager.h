@@ -244,6 +244,13 @@ private:
     int32_t DrawHardCursor(std::shared_ptr<ScreenPointer> sp, const RenderConfig &cfg);
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint64_t screenId);
+    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> CopyScreenPointers();
+    std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> InsertScreenPointer(
+        uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer);
+    std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> UpdateScreenPointer(
+        uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer);
+    bool DeleteScreenPointer(uint64_t screenId);
+    void ClearDisappearedScreenPointer(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
     Direction CalculateRenderDirection(bool isHard, bool isWindowRotation);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
@@ -304,6 +311,7 @@ private:
     std::list<PidInfo> pidInfos_;
     std::list<PidInfo> hapPidInfos_;
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
+    std::mutex userIconMtx_;
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
@@ -323,11 +331,11 @@ private:
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::atomic<bool> isRenderRunning_{ false };
     std::unique_ptr<std::thread> renderThread_ { nullptr };
-    std::mutex mtx_;
     std::recursive_mutex recursiveMtx_;
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
     sptr<ScreenModeChangeListener> screenModeChangeListener_ { nullptr };
     std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers_;
+    std::shared_mutex screenPointersMtx_;
     PointerRenderer pointerRenderer_;
     std::shared_ptr<AppExecFwk::EventRunner> softCursorRunner_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> softCursorHandler_ { nullptr };
