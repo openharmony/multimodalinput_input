@@ -513,7 +513,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
-    info.isLocal = true;
     AddPhysicalInputDeviceInner(deviceId, info);
     int32_t keyboardType = 0;
     GetKeyboardType(deviceId, keyboardType);
@@ -595,6 +594,9 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
+    if (info.inputDeviceOrigin != nullptr) {
+        info.isLocal = true;
+    }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -933,6 +935,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
         return RET_ERR;
     }
     device->SetId(deviceId);
+    device->SetVirtual(true);
     AddVirtualInputDeviceInner(deviceId, device);
     MMI_HILOGI("AddVirtualInputDevice successfully, deviceId:%{public}d, deviceName=%{public}s",
         deviceId, device->GetName().c_str());
@@ -1499,7 +1502,6 @@ void InputDeviceManager::SetSpecialVirtualDevice(std::shared_ptr<InputDevice> in
             inputDevice->SetLocal(true);
         }
     }
-    inputDevice->SetVirtual(true);
 }
 } // namespace MMI
 } // namespace OHOS
