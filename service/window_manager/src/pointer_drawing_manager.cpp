@@ -1059,11 +1059,7 @@ int32_t PointerDrawingManager::DrawDynamicHardwareCursor(std::shared_ptr<ScreenP
 
 void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        screenPointers = screenPointers_;
-    }
+    auto screenPointers = CopyScreenPointers();
     RenderConfig cfg {
         .style_ = mouseStyle,
         .align_ = MouseIcon2IconType(mouseStyle),
@@ -1129,11 +1125,7 @@ int32_t PointerDrawingManager::DrawDynamicSoftCursor(std::shared_ptr<Rosen::RSSu
 
 void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        screenPointers = screenPointers_;
-    }
+    auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         RenderConfig cfg {
             .style_ = mouseStyle,
@@ -1705,9 +1697,10 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
     std::shared_ptr<ScreenPointer> sp = nullptr;
     {
         if (screenPointers_.count(rsId)) {
-            sp = screenPointers_[rsId];
+            auto screenPointers = CopyScreenPointers();
+            sp = screenPointers[rsId];
             if (!g_isRsRestart) {
-                for (auto it : screenPointers_) {
+                for (auto it : screenPointers) {
                     CHKPR(it.second, RET_ERR);
                     it.second->Init(pointerRenderer_);
                 }
@@ -1722,7 +1715,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
             g_isRsRestart = true;
             sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
             CHKPR(sp, RET_ERR);
-            screenPointers_[displayInfo_.rsId] = sp;
+            InsertScreenPointer(displayInfo_.rsId, sp);
             if (!sp->Init(pointerRenderer_)) {
                 MMI_HILOGE("ScreenPointer %{public}" PRIu64 " init failed", displayInfo_.rsId);
                 return RET_ERR;
@@ -2055,7 +2048,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CursorPixelMap curPixelMap,
     float yAxis = (float)cursorHeight_ / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(userIconMtx_);
         userIcon_.reset(newPixelMap);
     }
     userIconHotSpotX_ = static_cast<int32_t>((float)newFocusX * xAxis);
@@ -2086,7 +2079,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, Curso
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(curPixelMap.pixelMap);
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(userIconMtx_);
         userIcon_.reset(pixelMapPtr);
         curPixelMap.pixelMap = nullptr;
     }
@@ -2295,7 +2288,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
     CALL_DEBUG_ENTER;
     if (GetHardCursorEnabled()) {
         if (screenPointers_.count(displayInfo.rsId)) {
-            auto sp = screenPointers_[displayInfo.rsId];
+            auto sp = GetScreenPointer(displayInfo.rsId);
             CHKPV(sp);
             sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
             if (sp->IsMain()) {
@@ -2484,8 +2477,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
             return;
         }
         if (GetHardCursorEnabled()) {
-            std::lock_guard<std::mutex> lock(mtx_);
-            for (auto sp : screenPointers_) {
+            auto screenPointers = CopyScreenPointers();
+            for (auto sp : screenPointers) {
                 if (sp.second != nullptr && sp.second->IsMirror()) {
                     sp.second->SetInvisible();
                 }
@@ -2502,8 +2495,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 
 void PointerDrawingManager::AttachAllSurfaceNode()
 {
-    std::lock_guard<std::mutex> lock(mtx_);
-    for (auto sp : screenPointers_) {
+    auto screenPointers = CopyScreenPointers();
+    for (auto sp : screenPointers) {
         if (sp.second == nullptr) {
             continue;
         }
@@ -2520,7 +2513,8 @@ void PointerDrawingManager::AttachAllSurfaceNode()
         surfaceNode->AttachToDisplay(screenId);
     }
     if (GetSurfaceNode() == nullptr) {
-        for (auto sp : screenPointers_) {
+        screenPointers = CopyScreenPointers();
+        for (auto sp : screenPointers) {
             if (sp.second != nullptr && sp.second->IsMirror()) {
                 sp.second->SetInvisible();
                 MMI_HILOGI("surfaceNode_ is nullptr, hide mirror pointer screenId:%{public}" PRIu64,
@@ -2533,8 +2527,8 @@ void PointerDrawingManager::AttachAllSurfaceNode()
 
 void PointerDrawingManager::DetachAllSurfaceNode()
 {
-    std::lock_guard<std::mutex> lock(mtx_);
-    for (auto sp : screenPointers_) {
+    auto screenPointers = CopyScreenPointers();
+    for (auto sp : screenPointers) {
         if (sp.second != nullptr) {
             auto surfaceNode = sp.second->GetSurfaceNode();
             if (surfaceNode != nullptr) {
@@ -3374,7 +3368,6 @@ sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindM
     sptr<OHOS::Rosen::ScreenInfo> mainScreen = nullptr;
     std::set<uint64_t> screenIds;
     // Update or construct ScreenPointer for new ScreenInfo
-    std::lock_guard<std::mutex> lock(mtx_);
     for (const auto &screen : screens) {
         if (ShouldSkipScreen(screen)) {
             continue;
@@ -3385,20 +3378,21 @@ sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindM
         if (screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
             mainScreen = screen;
         }
-        auto [iter, insertOk] = screenPointers_.try_emplace(sid, nullptr);
+        auto [iter, insertOk] = InsertScreenPointer(sid, nullptr);
         if (!insertOk && iter->second != nullptr) {
             // Update ScreenPointer when it already exist
-            iter->second->UpdateScreenInfo(screen);
+            auto sp = GetScreenPointer(sid);
+            sp->UpdateScreenInfo(screen);
             MMI_HILOGI("Update ScreenPointer, screenId=%{public}" PRIu64, sid);
         } else {
             // Create and init ScreenPointer when it does not exist
             auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, screen);
             if (sp == nullptr || !sp->Init(pointerRenderer_)) {
                 MMI_HILOGE("Failed to init ScreenPointer, screenId=%{public}" PRIu64, sid);
-                screenPointers_.erase(iter);
+                DeleteScreenPointer(sid);
                 continue;
             }
-            iter->second = sp;
+            UpdateScreenPointer(sid, sp);
             MMI_HILOGI("Create ScreenPointer, screenId=%{public}" PRIu64, sid);
         }
         if (screen->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
@@ -3407,14 +3401,7 @@ sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindM
         }
     }
     // Delete ScreenPointers that disappeared
-    for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
-        if (screenIds.count(it->first) == 0) {
-            MMI_HILOGI("OnScreenModeChange, delete screen %{public}" PRIu64, it->first);
-            it = screenPointers_.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    ClearDisappearedScreenPointer(screens);
     // Return main screenInfo
     return mainScreen;
 }
@@ -3431,8 +3418,8 @@ void PointerDrawingManager::UpdateScreenScalesAndPadding(const sptr<OHOS::Rosen:
     rotation_t mainRotation = static_cast<rotation_t>(mainScreen->GetRotation());
     float mainDPI = mainScreen->GetVirtualPixelRatio();
     // Update screen scale and padding
-    std::lock_guard<std::mutex> lock(mtx_);
-    for (auto& [sid, sp] : screenPointers_) {
+    auto screenPointers = CopyScreenPointers();
+    for (auto& [sid, sp] : screenPointers) {
         if (sp == nullptr) {
             MMI_HILOGE("ScreenPointer is null, screenId=%{public}" PRIu64, sid);
             continue;
@@ -3516,12 +3503,7 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
 
 void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        screenPointers = screenPointers_;
-    }
-
+    auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         CHKPV(it.second);
         RenderConfig cfg;
@@ -3543,12 +3525,7 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
 
 void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
 {
-    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        screenPointers = screenPointers_;
-    }
-
+    auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         CHKPV(it.second);
         RenderConfig cfg;
@@ -3636,8 +3613,8 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
     CHKPV(sp);
     uint32_t mainWidth = sp->GetScreenWidth();
     uint32_t mainHeight = sp->GetScreenHeight();
-    std::lock_guard<std::mutex> lock(mtx_);
-    for (auto it : screenPointers_) {
+    auto screenPointers = CopyScreenPointers();
+    for (auto it : screenPointers) {
         if (it.second == nullptr) {
             continue;
         }
@@ -3676,8 +3653,8 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
 std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScreenPointers()
 {
     std::vector<std::shared_ptr<ScreenPointer>> mirrors;
-    std::lock_guard<std::mutex> lock(mtx_);
-    for (auto it : screenPointers_) {
+    auto screenPointers = CopyScreenPointers();
+    for (auto it : screenPointers) {
         CHKPC(it.second);
         if (it.second->IsMirror()) {
             mirrors.push_back(it.second);
@@ -3686,13 +3663,58 @@ std::vector<std::shared_ptr<ScreenPointer>> PointerDrawingManager::GetMirrorScre
     return mirrors;
 }
 
-std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint64_t sid)
+std::shared_ptr<ScreenPointer> PointerDrawingManager::GetScreenPointer(uint64_t screenId)
 {
-    std::lock_guard<std::mutex> lock(mtx_);
-    if (screenPointers_.count(sid)) {
-        return screenPointers_[sid];
+    std::shared_lock<std::shared_mutex> lock(screenPointersMtx_);
+    if (screenPointers_.count(screenId)) {
+        return screenPointers_[screenId];
     }
     return nullptr;
+}
+
+std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> PointerDrawingManager::CopyScreenPointers()
+{
+    std::shared_lock<std::shared_mutex> lock(screenPointersMtx_);
+    return screenPointers_;
+}
+
+std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool>
+PointerDrawingManager::InsertScreenPointer(uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer)
+{
+    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    auto pair = screenPointers_.try_emplace(screenId, screenPointer);
+    return pair;
+}
+
+std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool>
+PointerDrawingManager::UpdateScreenPointer(uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer)
+{
+    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    if (!screenPointers_.count(screenId)) {
+        return [nullptr, false];
+    }
+    auto pair = screenPointers_.insert_or_assign(screenId, screenPointer);
+    return pair;
+}
+
+bool PointerDrawingManager::DeleteScreenPointer(uint64_t screenId)
+{
+    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    size_t result = screenPointers_.erase(screenId);
+    return (result == 1);
+}
+
+void PointerDrawingManager::ClearDisappearedScreenPointer(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
+{
+    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
+        if (screenIds.count(it->first) == 0) {
+            MMI_HILOGI("OnScreenModeChange, delete screen %{public}" PRIu64, it->first);
+            it = screenPointers_.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
@@ -3706,10 +3728,7 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, displayId_);
     }
     std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        screenPointers = screenPointers_;
-    }
+    auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         CHKPC(it.second);
         if (it.second->IsMirror()) {
@@ -3846,7 +3865,7 @@ void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerS
 
 std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy(bool setSurfaceNode)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard<std::mutex> guard(userIconMtx_);
     CHKPP(userIcon_);
     MessageParcel data;
     userIcon_->Marshalling(data);
@@ -3945,7 +3964,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CustomCursor cursor)
     cursorWidth_ = imageInfo.size.width;
     cursorHeight_ = imageInfo.size.height;
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(userIconMtx_);
         userIcon_.reset(newPixelMap);
     }
     focusX_ = cursor.focusX;
