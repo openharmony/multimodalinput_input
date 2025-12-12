@@ -163,7 +163,10 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
 {
     CHKPV(switchEvent);
     UpdateSwitchState(switchEvent);
-    switchEventType_ = switchEvent->GetSwitchType();
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET ||
+        switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
+        switchEventType_ = switchEvent->GetSwitchType();
+    }
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
         ffrt::submit([this, switchEvent] {
             this->PublishTabletEvent(switchEvent);
