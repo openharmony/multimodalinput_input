@@ -503,7 +503,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     GlobalCoords DisplayCoords2GlobalCoords(const Coordinate2D &displayCoords, int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    bool CancelTouch(int32_t touch);
+    bool CancelTouch(int32_t touch, int32_t deviceId);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsPointerActiveRectValid(const OLD::DisplayInfo &currentDisplay);
@@ -576,8 +576,8 @@ private:
     std::map<int32_t, CursorPosition> cursorPosMap_;
 
 
-    std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
-    std::map<int32_t, WindowInfoEX> thpFeatureTouchDownInfos_;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfos_;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> thpFeatureTouchDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
