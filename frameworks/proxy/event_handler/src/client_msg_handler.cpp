@@ -259,13 +259,14 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         processedCount_ = 0;
         lastEventId_ = pointerEvent->GetId();
     }
-    MMI_HILOGD("Report current pointer event, No:%{public}d,PA:%{public}s,PI:%{public}d",
-        pointerEvent->GetId(), pointerEvent->DumpPointerAction(), pointerEvent->GetPointerId());
+    MMI_HILOGD("Report current pointer event, No:%{public}d,PA:%{public}s,PI:%{public}d,WI:%{public}d",
+        pointerEvent->GetId(), pointerEvent->DumpPointerAction(), pointerEvent->GetPointerId(),
+        pointerEvent->GetTargetWindowId());
     std::list<PointerEvent::PointerItem> pointerItems{ pointerEvent->GetAllPointerItems() };
     for (const auto &item : pointerItems) {
-        MMI_HILOGD("Report pointer event, PI:%{public}d,DX:%{private}d,DY:%{private}d"
+        MMI_HILOGD("Report pointer event,PI:%{public}d,WI:%{public}d,DX:%{private}d,DY:%{private}d"
             ",DXP:%{private}f,DYP:%{private}f,WXP:%{private}f,WYP:%{private}f,GX:%{private}f,GY:%{private}f",
-            item.GetPointerId(),
+            item.GetPointerId(), item.GetTargetWindowId(),
             item.GetDisplayX(), item.GetDisplayY(),
             item.GetDisplayXPos(), item.GetDisplayYPos(),
             item.GetWindowXPos(), item.GetWindowYPos(),
