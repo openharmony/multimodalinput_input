@@ -3678,15 +3678,16 @@ std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> PointerDrawingManag
     return screenPointers_;
 }
 
-std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool>
-PointerDrawingManager::InsertScreenPointer(uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer)
+std::pair<ScreenPointersIter, bool> PointerDrawingManager::InsertScreenPointer(uint64_t screenId,
+    std::shared_ptr<ScreenPointer> screenPointer)
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
     auto pair = screenPointers_.try_emplace(screenId, screenPointer);
     return pair;
 }
 
-std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> PointerDrawingManager::UpdateScreenPointer(uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer)
+std::pair<ScreenPointersIter, bool> PointerDrawingManager::UpdateScreenPointer(uint64_t screenId,
+    std::shared_ptr<ScreenPointer> screenPointer)
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
     if (!screenPointers_.count(screenId)) {
