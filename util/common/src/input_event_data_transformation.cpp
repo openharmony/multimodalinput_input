@@ -330,6 +330,8 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
     } else {
         pkt << static_cast<int32_t>(PointerEvent::FixedMode::SCREEN_MODE_UNKNOWN);
     }
+    PointerEvent::RightButtonSource rightButtonSource = event->GetRightButtonSource();
+    pkt << static_cast<int32_t>(rightButtonSource);
     pkt << event->GetAutoToVirtualScreen();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     pkt << event->GetAncoDeal();
@@ -370,6 +372,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetHandOption(tField);
     pkt >> tField;
     event->SetFixedMode(static_cast<PointerEvent::FixedMode>(tField));
+    pkt >> tField;
+    event->SetRightButtonSource(static_cast<PointerEvent::RightButtonSource>(tField));
     bool bField;
     pkt >> bField;
     event->SetAutoToVirtualScreen(bField);
