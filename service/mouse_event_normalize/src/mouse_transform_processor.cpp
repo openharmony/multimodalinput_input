@@ -66,7 +66,6 @@ const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.fo
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 35 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t FINE_CALCULATE { 20 };
@@ -536,19 +535,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     }
 
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
-        int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
-        GetTouchpadRightClickType(switchTypeData);
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
-        if (isVirtualDeviceEvent_) {
-            GetVirtualTouchpadRightClickType(switchTypeData);
-        }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
-        RightClickType switchType = RightClickType(switchTypeData);
-        if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
-            button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
-            MMI_HILOGI("Right click up, do sleep");
-            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_BUTTON_UP));
-        }
+        SetPointerEventRightButtonSource(type);
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -557,6 +544,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
+        SetPointerEventRightButtonSource(type);
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -580,6 +568,19 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     }
 #endif // OHOS_BUILD_ENABLE_WATCH
     return RET_OK;
+}
+
+void MouseTransformProcessor::SetPointerEventRightButtonSource(const int32_t evenType)
+{
+    if (evenType == LIBINPUT_EVENT_POINTER_TAP) {
+        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::TOUCHPAD_TWO_FINGER_TAP);
+    } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
+    } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON) {
+        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::MOUSE_RIGHT);
+    } else {
+        MMI_HILOGD("Invalid type, evenType:%{public}d", evenType);
+    }
 }
 
 void MouseTransformProcessor::HandleTouchPadButton(enum libinput_button_state state, int32_t type)

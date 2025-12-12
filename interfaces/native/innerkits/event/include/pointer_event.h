@@ -394,6 +394,21 @@ public:
         SCREEN_MODE_MAX
     };
 
+    enum RightButtonSource {
+        /**
+         * Indicates others right button.
+         */
+        OTHERS = -1,
+        /**
+         * Indicates mouse right.
+         */
+        MOUSE_RIGHT,
+        /**
+         * Indicates touchpad two finger tap.
+         */
+        TOUCHPAD_TWO_FINGER_TAP
+    };
+
     /**
      * Indicates an invalid button ID.
      *
@@ -2070,6 +2085,8 @@ public:
     void SetFixedMode(PointerEvent::FixedMode fixedMode);
     PointerEvent::FixedMode GetFixedMode() const;
     std::string GetFixedModeStr() const;
+    void SetRightButtonSource(PointerEvent::RightButtonSource rightButtonSource);
+    PointerEvent::RightButtonSource GetRightButtonSource() const;
 
 protected:
     /**
@@ -2090,6 +2107,7 @@ private:
     bool ReadBufferFromParcel(Parcel &in);
     bool ReadAxisFromParcel(Parcel &in);
     bool ReadFixedModeFromParcel(Parcel &in);
+    bool ReadRightButtonSourceFromParcel(Parcel &in);
 
 private:
     struct Settings {
@@ -2130,6 +2148,7 @@ private:
     // Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
     FixedMode fixedMode_ { FixedMode::NORMAL };
+    RightButtonSource rightButtonSource_ { RightButtonSource::OTHERS };
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
