@@ -3401,7 +3401,7 @@ sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindM
         }
     }
     // Delete ScreenPointers that disappeared
-    ClearDisappearedScreenPointer(screens);
+    ClearDisappearedScreenPointer(screenIds);
     // Return main screenInfo
     return mainScreen;
 }
@@ -3686,12 +3686,12 @@ PointerDrawingManager::InsertScreenPointer(uint64_t screenId, std::shared_ptr<Sc
     return pair;
 }
 
-std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool>
-PointerDrawingManager::UpdateScreenPointer(uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer)
+std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> PointerDrawingManager::UpdateScreenPointer(uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer)
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
     if (!screenPointers_.count(screenId)) {
-        return [nullptr, false];
+        MMI_HILOGI("screenPointers_ not contains  %{public}" PRIu64, screenId);
+        return {screenPointers_.end(), false};
     }
     auto pair = screenPointers_.insert_or_assign(screenId, screenPointer);
     return pair;
@@ -3704,7 +3704,7 @@ bool PointerDrawingManager::DeleteScreenPointer(uint64_t screenId)
     return (result == 1);
 }
 
-void PointerDrawingManager::ClearDisappearedScreenPointer(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens)
+void PointerDrawingManager::ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds)
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
     for (auto it = screenPointers_.begin(); it != screenPointers_.end();) {
@@ -3727,7 +3727,6 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
         ret = RET_ERR;
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, displayId_);
     }
-    std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> screenPointers;
     auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         CHKPC(it.second);
