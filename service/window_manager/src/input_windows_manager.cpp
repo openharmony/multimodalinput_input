@@ -5727,7 +5727,7 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHitPolicy(std::shared_pt
         return nullptr;
     }
     int32_t deviceId = pointerEvent->GetDeviceId();
-    if (pointerEvent->GetPointerId() == FIRST_TOUCH) {
+    if ((pointerEvent->GetPointerId() % SIMULATE_POINTER_ID) == FIRST_TOUCH) {
         auto action = pointerEvent->GetPointerAction();
         if (action == PointerEvent::POINTER_ACTION_DOWN) {
             MMI_HILOGD("firstTouchWindowInfos_:%{public}d:%{public}d", action, touchWindow->id);
@@ -5735,7 +5735,8 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHitPolicy(std::shared_pt
             return nullptr;
         }
         bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == FIRST_TOUCH) ||
+            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
+            (extraData_.pointerId % SIMULATE_POINTER_ID) == FIRST_TOUCH) ||
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
         if (checkExtraData) {
             MMI_HILOGD("firstTouchWindowInfos_:%{public}d", touchWindow->id);
@@ -5775,7 +5776,7 @@ const WindowInfo* InputWindowsManager::ProcessFirstTouchHit(std::shared_ptr<Poin
         return nullptr;
     }
     int32_t currentPointerId = pointerEvent->GetPointerId();
-    if (currentPointerId == FIRST_TOUCH) {
+    if (currentPointerId % SIMULATE_POINTER_ID == FIRST_TOUCH) {
         return nullptr;
     }
     if (touchWindow->groupId != firstTouchWindowInfos_[deviceId].groupId ||
@@ -5799,7 +5800,7 @@ void InputWindowsManager::ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> p
         return;
     }
     int32_t currentPointerId = pointerEvent->GetPointerId();
-    if (currentPointerId == FIRST_TOUCH) {
+    if (currentPointerId % SIMULATE_POINTER_ID == FIRST_TOUCH) {
         return;
     }
     if (pointerItem.GetPointerId() != currentPointerId) {
