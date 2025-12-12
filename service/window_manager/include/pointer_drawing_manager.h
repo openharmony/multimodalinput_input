@@ -250,7 +250,7 @@ private:
     std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> UpdateScreenPointer(
         uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer);
     bool DeleteScreenPointer(uint64_t screenId);
-    void ClearDisappearedScreenPointer(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
+    void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
     Direction CalculateRenderDirection(bool isHard, bool isWindowRotation);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
