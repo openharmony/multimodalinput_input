@@ -36,6 +36,8 @@ constexpr int32_t INVALID_DISPLAY_ID { -1 };
 constexpr float HARDWARE_CANVAS_SIZE { 512.0f };
 } // namespace
 
+using ScreenPointersIter = std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator;
+
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
@@ -245,10 +247,10 @@ private:
     std::vector<std::shared_ptr<ScreenPointer>> GetMirrorScreenPointers();
     std::shared_ptr<ScreenPointer> GetScreenPointer(uint64_t screenId);
     std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>> CopyScreenPointers();
-    std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> InsertScreenPointer(
-        uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer);
-    std::pair<std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator, bool> UpdateScreenPointer(
-        uint64_t screenId, std::shared_ptr<ScreenPointer> screenPointer);
+    std::pair<ScreenPointersIter, bool> InsertScreenPointer(uint64_t screenId,
+        std::shared_ptr<ScreenPointer> screenPointer);
+    std::pair<ScreenPointersIter, bool> UpdateScreenPointer(uint64_t screenId,
+        std::shared_ptr<ScreenPointer> screenPointer);
     bool DeleteScreenPointer(uint64_t screenId);
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
