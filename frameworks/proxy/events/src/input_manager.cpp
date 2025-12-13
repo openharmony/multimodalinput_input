@@ -1064,5 +1064,10 @@ void InputManager::GetLastEventIds(int32_t &markedId, int32_t &processedId, int3
 {
     return InputMgrImpl.GetLastEventIds(markedId, processedId, dispatchedEventId);
 }
+
+int32_t InputManager::GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub)
+{
+    return InputMgrImpl.GetExternalObject(pluginName, pluginRemoteStub);
+}
 } // namespace MMI
 } // namespace OHOS
