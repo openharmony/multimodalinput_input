@@ -1337,6 +1337,13 @@ public:
     */
     void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
 
+    /*
+    * @brief Get plugin remote stub.
+    * @param plugin name.
+    * @param plugin remote stub.
+    * @since 23
+    */
+    int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
