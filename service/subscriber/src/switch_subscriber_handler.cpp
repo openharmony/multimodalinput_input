@@ -132,14 +132,15 @@ bool SwitchSubscriberHandler::PublishSwitchCommonEvent(int32_t switchType, int32
         EventFwk::CommonEventPublishInfo publishInfo;
         publishInfo.SetSticky(true);
         bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
-        MMI_HILOGI("PublishCommonEvent: SWITCH_LID %{public}d return %{public}d", switchValue, ret);
+        MMI_HILOGI("PublishCommonEvent: %{public}d value: %{public}d return %{public}d",
+            switchType, switchValue, ret);
         if (ret) {
             return true;
         }
     }
 
     timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, switchType, switchValue]() {
-        MMI_HILOGI("Retry PublishLidEvent: SWITCH_LID %{public}d", switchValue);
+        MMI_HILOGI("Retry PublishLidEvent: %{public}d value: %{public}d", switchType, switchValue);
         PublishSwitchCommonEvent(switchType, switchValue);
         timerId_ = -1;
     }, "SwitchSubscriberHandler-PublishSwitchCommonEvent");
