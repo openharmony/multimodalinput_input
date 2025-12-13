@@ -1694,43 +1694,40 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
 {
     CALL_DEBUG_ENTER;
     // suface node init
-    std::shared_ptr<ScreenPointer> sp = nullptr;
-    {
-        if (screenPointers_.count(rsId)) {
+    auto sp = GetScreenPointer(rsId);
+    if (sp != nullptr) {
+        if (!g_isRsRestart) {
             auto screenPointers = CopyScreenPointers();
-            sp = screenPointers[rsId];
-            if (!g_isRsRestart) {
-                for (auto it : screenPointers) {
-                    CHKPR(it.second, RET_ERR);
-                    it.second->Init(pointerRenderer_);
-                }
-                if (rsId == displayInfo_.rsId) {
-                    CHKPR(sp, RET_ERR);
-                    SetSurfaceNode(sp->GetSurfaceNode());
-                }
-                Rosen::RSTransaction::FlushImplicitTransaction();
-                g_isRsRestart = true;
-            }
-        } else {
-            g_isRsRestart = true;
-            sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
-            CHKPR(sp, RET_ERR);
-            InsertScreenPointer(displayInfo_.rsId, sp);
-            if (!sp->Init(pointerRenderer_)) {
-                MMI_HILOGE("ScreenPointer %{public}" PRIu64 " init failed", displayInfo_.rsId);
-                return RET_ERR;
+            for (auto it : screenPointers) {
+                CHKPR(it.second, RET_ERR);
+                it.second->Init(pointerRenderer_);
             }
             if (rsId == displayInfo_.rsId) {
                 SetSurfaceNode(sp->GetSurfaceNode());
             }
-            MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
-                rsId, displayInfo_.rsId);
             Rosen::RSTransaction::FlushImplicitTransaction();
+            g_isRsRestart = true;
         }
+    } else {
+        g_isRsRestart = true;
+        sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
+        CHKPR(sp, RET_ERR);
+        InsertScreenPointer(displayInfo_.rsId, sp);
+        if (!sp->Init(pointerRenderer_)) {
+            MMI_HILOGE("ScreenPointer %{public}" PRIu64 " init failed", displayInfo_.rsId);
+            return RET_ERR;
+        }
+        if (rsId == displayInfo_.rsId) {
+            SetSurfaceNode(sp->GetSurfaceNode());
+        }
+        MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
+            rsId, displayInfo_.rsId);
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
     CHKPR(sp, RET_ERR);
-    SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
+    auto sptr = sp->GetSurfaceNode(); // use SurfaceNode from current display
     CHKPR(GetSurfaceNode(), RET_ERR);
+    SetSurfaceNode(sptr);
     sp->MoveSoft(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)));
     return RET_OK;
 }
@@ -2287,13 +2284,11 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
 {
     CALL_DEBUG_ENTER;
     if (GetHardCursorEnabled()) {
-        if (screenPointers_.count(displayInfo.rsId)) {
-            auto sp = GetScreenPointer(displayInfo.rsId);
-            CHKPV(sp);
-            sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
-            if (sp->IsMain()) {
-                UpdateMirrorScreens(sp, displayInfo);
-            }
+        auto sp = GetScreenPointer(displayInfo.rsId);
+        CHKPV(sp);
+        sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
+        if (sp->IsMain()) {
+            UpdateMirrorScreens(sp, displayInfo);
         }
     }
 
