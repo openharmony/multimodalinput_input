@@ -152,11 +152,11 @@ ani_object TaiheInputDeviceUtils::WrapBusinessError(ani_env* env, const std::str
         return nullptr;
     }
 
-    if ((status = env->FindClass("Lescompat/Error;", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("escompat.Error", &cls)) != ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;Lescompat/ErrorOptions;:V", &method)) !=
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "C{std.core.String}C{escompat.ErrorOptions}:", &method)) !=
         ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
@@ -173,12 +173,12 @@ ani_ref TaiheInputDeviceUtils::CreateBusinessError(ani_env* env, ani_int code, c
 {
     ani_class cls;
     ani_status status = ANI_OK;
-    if ((status = env->FindClass("L@ohos/base/BusinessError;", &cls)) != ANI_OK) {
+    if ((status = env->FindClass("@ohos.base.BusinessError", &cls)) != ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
     }
     ani_method ctor;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "ILescompat/Error;:V", &ctor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "iC{escompat.Error}:", &ctor)) != ANI_OK) {
         MMI_HILOGE("The ani function call failed, status:%{public}d", status);
         return nullptr;
     }
