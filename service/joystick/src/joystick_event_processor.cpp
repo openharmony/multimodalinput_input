@@ -167,8 +167,9 @@ std::shared_ptr<PointerEvent> JoystickEventProcessor::OnAxisEvent(struct libinpu
     for (const auto &[source, axisInfo] : axesMap_) {
         if (libinput_event_get_joystick_axis_value_is_changed(rawAxisEvent, source)) {
             auto rawAxisInfo = libinput_event_get_joystick_axis_abs_info(rawAxisEvent, source);
-            CHKPC(rawAxisInfo);
-            NormalizeAxisValue(*rawAxisInfo, axisInfo);
+            if (rawAxisInfo != nullptr) {
+                NormalizeAxisValue(*rawAxisInfo, axisInfo);
+            }
         }
     }
     if (!HasAxisValueChanged()) {
