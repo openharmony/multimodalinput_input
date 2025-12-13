@@ -26,10 +26,14 @@
 #include "input_event_handler.h"
 #include "util_ex.h"
 #include "ffrt.h"
+#include "display_event_monitor.h"
+#include "timer_manager.h"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SwitchSubscriberHandler"
+constexpr int32_t REPEAT_COOLING_TIME { 2000 };
+constexpr int32_t REPEAT_ONCE { 1 };
 
 namespace OHOS {
 namespace MMI {
@@ -67,18 +71,8 @@ bool SwitchSubscriberHandler::PublishTabletEvent(const std::shared_ptr<SwitchEve
         return false;
     }
     tabletStandState_ = switchEvent->GetSwitchValue();
-    OHOS::AAFwk::Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TABLET_MODE_CHANGED);
-    want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_TABLET);
-    want.SetParam("eventState", switchEvent->GetSwitchValue());
-        
-    EventFwk::CommonEventData data;
-    data.SetWant(want);
-    EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetSticky(true);
-    bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
-    MMI_HILOGI("PublishCommonEvent: SWITCH_TABLET %{public}d return %{public}d",
-        switchEvent->GetSwitchValue(), ret);
+    int ret = this->PublishSwitchCommonEvent(switchEvent->GetSwitchType(),
+        switchEvent->GetSwitchValue());
     return ret;
 }
 
@@ -101,18 +95,7 @@ bool SwitchSubscriberHandler::PublishLidEvent(const std::shared_ptr<SwitchEvent>
         return false;
     }
     lidState_ = switchEvent->GetSwitchValue();
-    OHOS::AAFwk::Want want;
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LID_STATE_CHANGED);
-    want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_LID);
-    want.SetParam("eventState", switchEvent->GetSwitchValue());
-        
-    EventFwk::CommonEventData data;
-    data.SetWant(want);
-    EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetSticky(true);
-    bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
-    MMI_HILOGI("PublishCommonEvent: SWITCH_LID %{public}d return %{public}d",
-        switchEvent->GetSwitchValue(), ret);
+    int ret = this->PublishSwitchCommonEvent(switchEvent->GetSwitchType(), switchEvent->GetSwitchValue());
     return ret;
 }
 
@@ -129,6 +112,44 @@ void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::st
 }
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
+bool SwitchSubscriberHandler::PublishSwitchCommonEvent(int32_t switchType, int32_t switchValue)
+{
+    if (DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
+        OHOS::AAFwk::Want want;
+        if (switchType == SwitchEvent::SwitchType::SWITCH_LID) {
+            want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_LID_STATE_CHANGED);
+            want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_LID);
+        } else if (switchType == SwitchEvent::SwitchType::SWITCH_TABLET) {
+            want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_TABLET_MODE_CHANGED);
+            want.SetParam("eventType", SwitchEvent::SwitchType::SWITCH_TABLET);
+        } else {
+            return false;
+        }
+        want.SetParam("eventState", switchValue);
+        
+        EventFwk::CommonEventData data;
+        data.SetWant(want);
+        EventFwk::CommonEventPublishInfo publishInfo;
+        publishInfo.SetSticky(true);
+        bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
+        MMI_HILOGI("PublishCommonEvent: %{public}d value: %{public}d return %{public}d",
+            switchType, switchValue, ret);
+        if (ret) {
+            return true;
+        }
+    }
+
+    timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this, switchType, switchValue]() {
+        MMI_HILOGI("Retry PublishLidEvent: %{public}d value: %{public}d", switchType, switchValue);
+        PublishSwitchCommonEvent(switchType, switchValue);
+        timerId_ = -1;
+    }, "SwitchSubscriberHandler-PublishSwitchCommonEvent");
+    if (timerId_ < 0) {
+        MMI_HILOGE("AddTimer fail, SubscribeCommonEvent fail");
+    }
+    return false;
+}
+
 void SwitchSubscriberHandler::SyncSwitchLidState(struct libinput_device *inputDevice)
 {
     if (libinput_device_switch_has_switch(inputDevice, LIBINPUT_SWITCH_LID) <= 0) {
@@ -163,7 +184,10 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
 {
     CHKPV(switchEvent);
     UpdateSwitchState(switchEvent);
-    switchEventType_ = switchEvent->GetSwitchType();
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET ||
+        switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
+        switchEventType_ = switchEvent->GetSwitchType();
+    }
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
         ffrt::submit([this, switchEvent] {
             this->PublishTabletEvent(switchEvent);
