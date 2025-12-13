@@ -1,0 +1,112 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../multimodalinput_mini.gni")
+
+module_output_path = "input/input"
+
+ohos_unittest("EventNormalizeHandlerTestWithMock") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-error=tautological-constant-out-of-range-compare",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/crown_transform_processor/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/event_dump/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/event_resample/include",
+    "${mmi_path}/service/fingerprint_event_processor/include",
+    "${mmi_path}/service/libinput_adapter/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/common/include",
+  ]
+
+  sources = [
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
+    "${mmi_path}/service/event_dump/src/event_statistic.cpp",
+    "${mmi_path}/service/event_handler/src/event_normalize_handler.cpp",
+    "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
+    "${mmi_path}/service/event_handler/src/key_auto_repeat.cpp",
+    "src/event_normalize_handler_test_with_mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/common/property_name_mapper:property_name_mapper",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
+    "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
+    "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
+    "${mmi_path}/test/facility/event_hook_mock:event_hook_mock",
+    "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
+    "${mmi_path}/test/facility/joystick_mock:joystick_mock",
+    "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
+    "${mmi_path}/test/facility/key_command_mock:key_command_mock",
+    "${mmi_path}/test/facility/key_event_normalize_mock:key_event_normalize_mock",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/mouse_event_normalize_mock:mouse_event_normalize_mock",
+    "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
+    "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
+    "${mmi_path}/test/facility/touch_event_normalize_mock:touch_event_normalize_mock",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "preferences:native_preferences",
+  ]
+
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+}
+
+group("EventHandlerTests") {
+  testonly = true
+
+  deps = [ ":EventNormalizeHandlerTestWithMock" ]
+}

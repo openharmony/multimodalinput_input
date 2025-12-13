@@ -1,0 +1,88 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../multimodalinput_mini.gni")
+
+module_output_path = "input/input"
+
+ohos_unittest("JoystickLayoutMapTest") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-error=tautological-constant-out-of-range-compare",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/joystick/include",
+    "${mmi_path}/service/joystick/test/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/util/common/include",
+  ]
+
+  sources = [
+    "${mmi_path}/service/joystick/src/joystick_event_normalize.cpp",
+    "${mmi_path}/service/joystick/src/joystick_event_processor.cpp",
+    "${mmi_path}/service/joystick/src/joystick_layout_map.cpp",
+    "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
+    "src/joystick_event_normalize_test.cpp",
+    "src/joystick_event_processor_test.cpp",
+    "src/joystick_layout_map_builder.cpp",
+    "src/joystick_layout_map_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/common/property_name_mapper:property_name_mapper",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
+    "${mmi_path}/test/facility/event_handler_mock:event_handler_mock",
+    "${mmi_path}/test/facility/key_event_normalize_mock:key_event_normalize_mock",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+}
+
+group("JoystickTests") {
+  testonly = true
+
+  deps = [ ":JoystickLayoutMapTest" ]
+}
