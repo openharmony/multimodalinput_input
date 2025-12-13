@@ -112,7 +112,8 @@ void SwitchSubscriberHandler::DumpLidState(int32_t fd, const std::vector<std::st
 }
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-bool SwitchSubscriberHandler::PublishSwitchCommonEvent(int32_t switchType, int32_t switchValue) {
+bool SwitchSubscriberHandler::PublishSwitchCommonEvent(int32_t switchType, int32_t switchValue)
+{
     if (DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
         OHOS::AAFwk::Want want;
         if (switchType == SwitchEvent::SwitchType::SWITCH_LID) {
