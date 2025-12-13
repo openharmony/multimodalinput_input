@@ -46,6 +46,7 @@ public:
     void DumpLidState(int32_t fd, const std::vector<std::string> &args);
     void SyncSwitchLidState(struct libinput_device *inputDevice);
     void SyncSwitchTabletState(struct libinput_device *inputDevice);
+    bool PublishSwitchCommonEvent(int32_t switchType, int32_t switchValue);
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
@@ -79,6 +80,7 @@ private:
     std::atomic<int32_t> lidState_ { 0 };
     std::atomic<int32_t> tabletStandState_ { 0 };
     std::atomic<int32_t> switchEventType_ {0};
+    static inline int32_t timerId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
