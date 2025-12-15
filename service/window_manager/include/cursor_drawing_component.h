@@ -31,7 +31,7 @@ public:
     static CursorDrawingComponent& GetInstance();
     void Load();
     void UnLoad();
-    
+
     bool ResetUnloadTimer(int32_t unloadTime = -1, int32_t checkInterval = -1);
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
