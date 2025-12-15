@@ -1504,8 +1504,7 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     MMI_HILOGD("Start checking vtp cursor active area");
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
-        IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
+    if (IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
         validW = currentDisplay.pointerActiveWidth;
         validH = currentDisplay.pointerActiveHeight;
         MMI_HILOGD("vtp cursor active area w:%{private}f, h:%{private}f", validW, validH);
@@ -1514,7 +1513,8 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
     if (isPhysicalPos) {
         Direction displayDirection = static_cast<Direction>((
         ((currentDisplay.direction - currentDisplay.fixedDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        if (displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
+        if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
+            displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
             std::swap(validW, validH);
             std::swap(posWidth, posHeight);
         }
