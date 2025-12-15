@@ -1514,7 +1514,7 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
         Direction displayDirection = static_cast<Direction>((
         ((currentDisplay.direction - currentDisplay.fixedDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
         if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
-            displayDirection == DIRECTION90 || displayDirection == DIRECTION270) {
+            (displayDirection == DIRECTION90 || displayDirection == DIRECTION270)) {
             std::swap(validW, validH);
             std::swap(posWidth, posHeight);
         }
