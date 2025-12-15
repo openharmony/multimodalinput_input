@@ -1504,7 +1504,8 @@ bool InputWindowsManager::IsPositionOutValidDisplay(
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     MMI_HILOGD("Start checking vtp cursor active area");
-    if (IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
+        IsPointerActiveRectValid(currentDisplay) && !isPhysicalPos) {
         validW = currentDisplay.pointerActiveWidth;
         validH = currentDisplay.pointerActiveHeight;
         MMI_HILOGD("vtp cursor active area w:%{private}f, h:%{private}f", validW, validH);
@@ -2026,8 +2027,8 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
     CursorPosition cursorPosCur;
 
     const auto iter = cursorPosMap_.find(groupId);
-    if (iter == cursorPosMap_.end()) {
-        cursorPosMap_[groupId]  = cursorPosCur;
+    if (iter != cursorPosMap_.end()) {
+        cursorPosCur = cursorPosMap_[groupId];
     }
     PhysicalCoordinate coord {
         .x = cursorPosCur.cursorPos.x,
@@ -2054,7 +2055,11 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
             cursorPosMap_[groupId].direction = displayInfo->direction;
             cursorPosMap_[groupId].displayDirection = displayInfo->displayDirection;
         }
-        UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            UpdateAndAdjustMouseLocation(cursorPosCur.displayId, cursorPosCur.cursorPos.x, cursorPosCur.cursorPos.y);
+        } else {
+            UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
+        }
         if (GetHardCursorEnabled() && extraData_.appended &&
             (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
             AdjustDragPosition(groupId);
@@ -2970,7 +2975,7 @@ const OLD::DisplayInfo *InputWindowsManager::GetDefaultDisplayInfo() const
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputWindowsManager::ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const
+void InputWindowsManager::ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& info, PhysicalCoordinate& coord)
 {
     int32_t groupId = FindDisplayGroupId(info.id);
     Direction rotation = info.direction;
@@ -2994,6 +2999,22 @@ void InputWindowsManager::ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& in
         double temp = coord.y;
         coord.y = height -coord.x;
         coord.x = temp;
+    }
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        RotateDisplayScreen(info, coord);
+    } else {
+        if ((static_cast<int32_t>(lastRotation) + 1) % 4 == static_cast<int32_t>(rotation)) {
+            double temp = coord.x;
+            coord.x = width - coord.y;
+            coord.y = temp;
+        } else if ((static_cast<int32_t>(lastRotation) + 2) % 4 == static_cast<int32_t>(rotation)) {
+            coord.x = width - coord.x;
+            coord.y = height - coord.y;
+        } else {
+            double temp = coord.y;
+            coord.y = height -coord.x;
+            coord.x = temp;
+        }
     }
 }
 
@@ -6575,10 +6596,10 @@ void InputWindowsManager::GetWidthAndHeight(const OLD::DisplayInfo* displayInfo,
         return;
     }
     auto displayDirection = GetDisplayDirection(displayInfo);
-    if (displayDirection == DIRECTION0 || displayDirection == DIRECTION180) {
-        width = displayInfo->validWidth;
-        height = displayInfo->validHeight;
-    } else {
+    width = displayInfo->validWidth;
+    height = displayInfo->validHeight;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
+        (displayDirection  DIRECTION90 || displayDirection  DIRECTION270)) {
         height = displayInfo->validWidth;
         width = displayInfo->validHeight;
     }
@@ -6644,6 +6665,13 @@ void InputWindowsManager::ReverseRotateDisplayScreen(const OLD::DisplayInfo& inf
         info.height,
         info.validWidth,
         info.validHeight);
+    int32_t width = info.validWidth;
+    int32_t height = info.validHeight;
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
+        (displayDirection  DIRECTION90 || displayDirection  DIRECTION270)) {
+        height = info.validWidth;
+        width = info.validHeight;
+    }
     switch (displayDirection) {
         case DIRECTION0: {
             cursorPos.x = x;
@@ -6652,19 +6680,19 @@ void InputWindowsManager::ReverseRotateDisplayScreen(const OLD::DisplayInfo& inf
             break;
         }
         case DIRECTION90: {
-            cursorPos.y = static_cast<double>(info.validWidth) - 1 - x;
+            cursorPos.y = static_cast<double>(width) - 1 - x;
             cursorPos.x = y;
             MMI_HILOGD("DIRECTION90, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
-            cursorPos.x = static_cast<double>(info.validWidth) - 1 - x;
-            cursorPos.y = static_cast<double>(info.validHeight) - 1 - y;
+            cursorPos.x = static_cast<double>(width) - 1 - x;
+            cursorPos.y = static_cast<double>(height) - 1 - y;
             MMI_HILOGD("DIRECTION180, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
-            cursorPos.x = static_cast<double>(info.validHeight) - 1 - y;
+            cursorPos.x = static_cast<double>(height) - 1 - y;
             cursorPos.y = x;
             MMI_HILOGD("DIRECTION270, physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
