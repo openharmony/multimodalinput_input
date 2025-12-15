@@ -200,7 +200,8 @@ public:
     void UpdateOneHandDataExt(const OLD::DisplayInfo &displayInfo);
     void UpdateShellWindow(const WindowInfo &window);
     void UpdateDisplayInfoExt(const OLD::DisplayGroupInfo &displayGroupInfo);
-    bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
+    bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y,
+        int32_t sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN) const;
     bool IsAncoWindow(const WindowInfo &window) const;
     bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
@@ -214,6 +215,10 @@ public:
     bool IsShouldSendToAnco(std::shared_ptr<PointerEvent> pointerEvent, bool isFirstSpecialWindow);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+    int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName);
+    bool ShouldSendMouseEventToAnco(int32_t sourceType, int32_t windowId) const;
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool UpdateDisplayId(int32_t& displayId);
     void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent);

@@ -1712,6 +1712,13 @@ public:
     void UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem);
 
     /**
+     * @brief Reset pointerItem id to originPointerId.
+     * @return void
+     * @since 23
+     */
+    void ResetPointerItemsId();
+
+    /**
      * @brief Obtains the set of pressed buttons.
      * @return Returns the pressed buttons.
      * @since 9

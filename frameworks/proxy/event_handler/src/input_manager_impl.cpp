@@ -3141,5 +3141,14 @@ uint32_t InputManagerImpl::WindowInputTypeToFlag(const WindowInfo &window)
         resultFlags);
     return resultFlags;
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+void InputManagerImpl::ControlMouseEventToAnco(int32_t windowId, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(MULTIMODAL_INPUT_CONNECT_MGR);
+    MULTIMODAL_INPUT_CONNECT_MGR->ControlMouseEventToAnco(windowId, enable);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 } // namespace MMI
 } // namespace OHOS

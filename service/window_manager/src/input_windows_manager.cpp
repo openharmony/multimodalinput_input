@@ -858,7 +858,9 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
         SimulateKeyEventIfNeeded(keyEvent);
+#ifndef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
         return secSubWindows;
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     TargetInfo targetInfo = { windowInfo->privacyMode, windowInfo->id, windowInfo->agentWindowId };
@@ -4409,14 +4411,14 @@ bool MouseTargetIsInAnco(int32_t logicalX, int32_t logicalY, const std::shared_p
     }
 
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        isInAnco = inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
+        isInAnco = inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY, pointerEvent->GetSourceType());
     }
 
     if (pointerItem.IsPressed() || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         return isInAnco;
     }
 
-    return inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    return inputWindowsManager.IsInAncoWindow(*touchWindow, logicalX, logicalY, pointerEvent->GetSourceType());
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
 

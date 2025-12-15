@@ -35,6 +35,11 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+constexpr uint32_t EVENT_FLAG_HMOS = 0x10000000;
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
 /**
  * @tc.name: MMIServerTest_OnThread_01
  * @tc.desc: Test OnThread
@@ -1798,6 +1803,34 @@ HWTEST_F(MMIServerTest, MMIServerTest_InjectPointerEvent_002, TestSize.Level1)
     MMI_HILOGI("InjectPointerEvent_002 ret: %{public}d", ret);
     EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+/**
+ * @tc.name: MMIServerTest_InjectPointerEventExt_001
+ * @tc.desc: InjectPointerEventExt correctly maps simulated pointer IDs back to original IDs
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InjectPointerEventExt_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    int32_t originPointerId = 0;
+    int32_t pointerId = originPointerId + SIMULATE_EVENT_START_ID;
+    pointerItem.SetPointerId(pointerId);
+    pointerItem.SetOriginPointerId(originPointerId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->AddFlag(EVENT_FLAG_HMOS);
+    mmiService.InjectPointerEventExt(pointerEvent, 0, true, true);
+    pointerEvent->GetPointerItem(originPointerId, pointerItem);
+    EXPECT_EQ(pointerItem.GetPointerId(), originPointerId);
+    EXPECT_EQ(pointerEvent->GetPointerId(), originPointerId);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 
 /**
  * @tc.name: MMIServerTest_ScreenCaptureCallback_001
@@ -4860,5 +4893,36 @@ HWTEST_F(MMIServerTest, MMIService_GetUserDefinedCursorPixelMap_001, TestSize.Le
     ErrCode ret = mmiService.GetUserDefinedCursorPixelMap(pixelMap);
     EXPECT_NE(ret, RET_OK);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+/**
+ * @tc.name: MMIService_ControlMouseEventToAnco_001
+ * @tc.desc: ControlMouseEventToAnco when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ControlMouseEventToAnco_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    ErrCode ret = mmiService.ControlMouseEventToAnco(0, true);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
+
+/**
+ * @tc.name: MMIService_ControlMouseEventToAnco_002
+ * @tc.desc: ControlMouseEventToAnco when service is running but not system app
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_ControlMouseEventToAnco_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    ErrCode ret = mmiService.ControlMouseEventToAnco(0, true);
+    EXPECT_NE(ret, RET_OK);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 } // namespace MMI
 } // namespace OHOS
