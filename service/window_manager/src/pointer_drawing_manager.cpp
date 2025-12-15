@@ -326,16 +326,7 @@ void PointerDrawingManager::ClearResources()
             commonEventSubscriber_ = nullptr;
         }
         initDisplayStatusReceiverFlag_ = false;
-
-        if  (screenModeChangeListener_ != nullptr) {
-            auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().UnregisterScreenModeChangeListener(
-                screenModeChangeListener_);
-            if (ret != OHOS::Rosen::DMError::DM_OK) {
-                MMI_HILOGE("UnregisterScreenModeChangeListener failed, ret=%{public}d", ret);
-                return;
-            }
-            screenModeChangeListener_ = nullptr;
-        }
+        UnSubscribeScreenModeChange();
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
         if (surfaceNodePtr != nullptr) {
@@ -3131,6 +3122,18 @@ void PointerDrawingManager::SubscribeScreenModeChange()
         return;
     }
     MMI_HILOGI("SubscribeScreenModeChange success");
+}
+
+void PointerDrawingManager::UnSubscribeScreenModeChange()
+{
+    CHKPV(screenModeChangeListener_);
+    auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().UnregisterScreenModeChangeListener(
+        screenModeChangeListener_);
+    if (ret != OHOS::Rosen::DMError::DM_OK) {
+        MMI_HILOGE("UnregisterScreenModeChangeListener failed, ret=%{public}d", ret);
+        return;
+    }
+    screenModeChangeListener_ = nullptr;
 }
 
 void PointerDrawingManager::RegisterDisplayStatusReceiver()
