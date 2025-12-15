@@ -1321,5 +1321,14 @@ int32_t MultimodalInputConnectManager::IsPointerInit(bool &status)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->IsPointerInit(status);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+int32_t MultimodalInputConnectManager::ControlMouseEventToAnco(int32_t windowId, bool enable)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->ControlMouseEventToAnco(windowId, enable);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 } // namespace MMI
 } // namespace OHOS

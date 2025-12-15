@@ -67,6 +67,7 @@ declare_args() {
   input_feature_mistouch_prevention = false
   input_feature_input_event_hook = true
   input_feature_external_screen = true
+  input_ext_feature_anco_game_event_mapping = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -548,4 +549,8 @@ if (input_feature_mistouch_prevention) {
 
 if (input_feature_external_screen) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_EXTERNAL_SCREEN" ]
+}
+
+if (input_ext_feature_anco_game_event_mapping) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING" ]
 }
