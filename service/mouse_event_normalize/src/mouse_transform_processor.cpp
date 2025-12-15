@@ -444,8 +444,8 @@ bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayIn
 
 Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
-    Direction displayDirection = DIRECTION0;
     CHKPR(displayInfo, DIRECTION0);
+    Direction displayDirection = displayInfo->direction;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = static_cast<Direction>((
             ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
@@ -464,7 +464,6 @@ Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *d
 void MouseTransformProcessor::CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset)
 {
 #ifndef OHOS_BUILD_EMULATOR
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         Direction direction = GetDisplayDirection(displayInfo);
         std::negate<double> neg;
         if (direction == DIRECTION90) {
@@ -479,7 +478,6 @@ void MouseTransformProcessor::CalculateOffset(const OLD::DisplayInfo* displayInf
             offset.dx = neg(offset.dy);
             offset.dy = tmp;
         }
-    }
 #endif // OHOS_BUILD_EMULATOR
 }
 
