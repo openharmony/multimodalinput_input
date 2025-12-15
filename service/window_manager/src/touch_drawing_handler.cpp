@@ -304,20 +304,33 @@ void TouchDrawingHandler::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
     CHKPV(canvasNode);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    double whDiff = std::fabs(displayInfo_.validWidth - displayInfo_.validHeight);
     if (displayDirection == Direction::DIRECTION90) {
         canvasNode->SetRotation(ROTATION_ANGLE_270);
-        canvasNode->SetTranslateX(0);
+        if (displayInfo_.validHeight > displayInfo_.validWidth) {
+            canvasNode->SetTranslateY(-whDiff);
+        } else {
+            canvasNode->SetTranslateX(0);
+        }
     } else if (displayDirection == Direction::DIRECTION270) {
         canvasNode->SetRotation(ROTATION_ANGLE_90);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo_.validWidth - displayInfo_.validHeight));
+        if (displayInfo_.validHeight > displayInfo_.validWidth) {
+            canvasNode->SetTranslateY(0);
+        } else {
+            canvasNode->SetTranslateX(-whDiff);
+        }
     } else if (displayDirection == Direction::DIRECTION180) {
         canvasNode->SetRotation(ROTATION_ANGLE_180);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo_.validWidth - displayInfo_.validHeight));
+        if (displayInfo_.validWidth > displayInfo_.validHeight) {
+            canvasNode->SetTranslateY(-whDiff);
+        } else {
+            canvasNode->SetTranslateX(-whDiff);
+        }
     } else {
         canvasNode->SetRotation(ROTATION_ANGLE_0);
         canvasNode->SetTranslateX(0);
+        canvasNode->SetTranslateY(0);
     }
-    canvasNode->SetTranslateY(0);
 }
 
 void TouchDrawingHandler::ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode)
