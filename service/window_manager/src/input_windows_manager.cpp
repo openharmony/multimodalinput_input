@@ -6599,7 +6599,7 @@ void InputWindowsManager::GetWidthAndHeight(const OLD::DisplayInfo* displayInfo,
     width = displayInfo->validWidth;
     height = displayInfo->validHeight;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
-        (displayDirection  DIRECTION90 || displayDirection  DIRECTION270)) {
+        (displayDirection == DIRECTION90 || displayDirection == DIRECTION270)) {
         height = displayInfo->validWidth;
         width = displayInfo->validHeight;
     }
@@ -6668,7 +6668,7 @@ void InputWindowsManager::ReverseRotateDisplayScreen(const OLD::DisplayInfo& inf
     int32_t width = info.validWidth;
     int32_t height = info.validHeight;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
-        (displayDirection  DIRECTION90 || displayDirection  DIRECTION270)) {
+        (displayDirection == DIRECTION90 || displayDirection == DIRECTION270)) {
         height = info.validWidth;
         width = info.validHeight;
     }
