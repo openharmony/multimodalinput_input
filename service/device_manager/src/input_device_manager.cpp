@@ -72,6 +72,8 @@ constexpr size_t EXPECTED_SUBMATCH{ 1 };
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
 std::mutex InputDeviceManager::mutex_;
+constexpr int32_t UNLOAD_DELAY_MS = 30 * 1000; // 30 seconds
+constexpr int32_t CHECK_PERIOD_MS = 5 * 1000;  // check every 5 seconds
 
 std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
 {
@@ -662,7 +664,8 @@ void InputDeviceManager::ScanPointerDevice()
     }
     if (!existEnabledNoEventReportedPointerDevice && POINTER_DEV_MGR.isInit) {
         POINTER_DEV_MGR.isInit = false;
-        CursorDrawingComponent::GetInstance().UnLoad();
+        CursorDrawingComponent::GetInstance().UnSubscribeScreenModeChange();
+        CursorDrawingComponent::GetInstance().ResetUnloadTimer(UNLOAD_DELAY_MS, CHECK_PERIOD_MS);
     }
     // LCOV_EXCL_STOP
 }
