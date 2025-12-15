@@ -279,20 +279,33 @@ void KnuckleDrawingManager::RotationCanvasNode(
     CHKPV(canvasNode);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo.direction - displayInfo.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    double whDiff = std::fabs(displayInfo.validWidth - displayInfo.validHeight);
     if (displayDirection == Direction::DIRECTION90) {
         canvasNode->SetRotation(ROTATION_ANGLE_270);
-        canvasNode->SetTranslateX(0);
+        if (displayInfo.validHeight > displayInfo.validWidth) {
+            canvasNode->SetTranslateY(-whDiff);
+        } else {
+            canvasNode->SetTranslateX(0);
+        }
     } else if (displayDirection == Direction::DIRECTION270) {
         canvasNode->SetRotation(ROTATION_ANGLE_90);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo.validWidth - displayInfo.validHeight));
+        if (displayInfo.validHeight > displayInfo.validWidth) {
+            canvasNode->SetTranslateY(0);
+        } else {
+            canvasNode->SetTranslateX(-whDiff);
+        }
     } else if (displayDirection == Direction::DIRECTION180) {
         canvasNode->SetRotation(ROTATION_ANGLE_180);
-        canvasNode->SetTranslateX(-std::fabs(displayInfo.validWidth - displayInfo.validHeight));
+        if (displayInfo.validWidth > displayInfo.validHeight) {
+            canvasNode->SetTranslateY(-whDiff);
+        } else {
+            canvasNode->SetTranslateX(-whDiff);
+        }
     } else {
         canvasNode->SetRotation(ROTATION_ANGLE_0);
         canvasNode->SetTranslateX(0);
+        canvasNode->SetTranslateY(0);
     }
-    canvasNode->SetTranslateY(0);
 }
 
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC

@@ -878,6 +878,70 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RotationCanvasNode
     EXPECT_NO_FATAL_FAILURE(kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo));
 }
 
+/**
+ * @tc.name: KnuckleDrawingManagerTest_RotationCanvasNode_002
+ * @tc.desc: Test Height > Width
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RotationCanvasNode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.validWidth = 720;
+    displayInfo.validHeight = 1800;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    auto canvasNode = Rosen::RSCanvasNode::Create();
+    double whDiff = std::fabs(displayInfo.validWidth - displayInfo.validHeight);
+    displayInfo.direction = Direction::DIRECTION90;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, -whDiff);
+    displayInfo.direction = Direction::DIRECTION270;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, 0);
+    displayInfo.direction = Direction::DIRECTION180;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, -whDiff);
+    displayInfo.direction = Direction::DIRECTION0;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, 0);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, 0);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_RotationCanvasNode_003
+ * @tc.desc: Test Width > Height
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RotationCanvasNode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.validWidth = 1800;
+    displayInfo.validHeight = 720;
+    displayInfo.direction = Direction::DIRECTION90;
+    displayInfo.displayDirection = Direction::DIRECTION0;
+    auto canvasNode = Rosen::RSCanvasNode::Create();
+    double whDiff = std::fabs(displayInfo.validWidth - displayInfo.validHeight);
+    displayInfo.direction = Direction::DIRECTION90;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, 0);
+    displayInfo.direction = Direction::DIRECTION270;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, -whDiff);
+    displayInfo.direction = Direction::DIRECTION180;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, -whDiff);
+    displayInfo.direction = Direction::DIRECTION0;
+    kceDrawMgr.RotationCanvasNode(canvasNode, displayInfo);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, 0);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, 0);
+}
+
 #ifdef OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC
 /**
  * @tc.name: KnuckleDrawingManagerTest_GetDeltaColor_001
