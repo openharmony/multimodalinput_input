@@ -2983,23 +2983,6 @@ void InputWindowsManager::ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& in
     Direction lastRotation = (it != cursorPosMap_.end()) ? it->second.direction : cursorPos_.direction;
     int32_t width = info.validWidth;
     int32_t height = info.validHeight;
-    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
-        (rotation == DIRECTION90 || rotation == DIRECTION270)) {
-        height = info.validWidth;
-        width = info.validHeight;
-    }
-    if ((static_cast<int32_t>(lastRotation) + 1) % 4 == static_cast<int32_t>(rotation)) {
-        double temp = coord.x;
-        coord.x = width - coord.y;
-        coord.y = temp;
-    } else if ((static_cast<int32_t>(lastRotation) + 2) % 4 == static_cast<int32_t>(rotation)) {
-        coord.x = width - coord.x;
-        coord.y = height - coord.y;
-    } else {
-        double temp = coord.y;
-        coord.y = height -coord.x;
-        coord.x = temp;
-    }
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         RotateDisplayScreen(info, coord);
     } else {
