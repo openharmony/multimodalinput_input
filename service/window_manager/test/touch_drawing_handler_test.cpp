@@ -585,6 +585,68 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_005
 }
 
 /**
+ * @tc.name: TouchDrawingManagerTest_RotationCanvasNode_006
+ * @tc.desc: Test Height > Width
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    ASSERT_NE(canvasNode, nullptr);
+    touchDrawingHandler.displayInfo_.validWidth = 720;
+    touchDrawingHandler.displayInfo_.validHeight = 1800;
+    double whDiff =
+        std::fabs(touchDrawingHandler.displayInfo_.validWidth - touchDrawingHandler.displayInfo_.validHeight);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION90;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, -whDiff);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION270;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, 0);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION180;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, -whDiff);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION0;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, 0);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, 0);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationCanvasNode_007
+ * @tc.desc: Test Width > Height
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_RotationCanvasNode_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingHandler touchDrawingHandler;
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    ASSERT_NE(canvasNode, nullptr);
+    touchDrawingHandler.displayInfo_.validWidth = 1800;
+    touchDrawingHandler.displayInfo_.validHeight = 720;
+    double whDiff =
+        std::fabs(touchDrawingHandler.displayInfo_.validWidth - touchDrawingHandler.displayInfo_.validHeight);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION90;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, 0);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION270;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, -whDiff);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION180;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, -whDiff);
+    touchDrawingHandler.displayInfo_.direction = Direction::DIRECTION0;
+    touchDrawingHandler.RotationCanvasNode(canvasNode);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().x_, 0);
+    EXPECT_EQ(canvasNode->GetStagingProperties().GetTranslate().y_, 0);
+}
+
+/**
  * @tc.name: TouchDrawingHandlerTest_RotationCanvas_001
  * @tc.desc: Test RotationCanvas
  * @tc.type: Function
