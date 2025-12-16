@@ -1338,11 +1338,7 @@ public:
     void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
 
     /*
-<<<<<<< HEAD
     * @brief Get external object.
-=======
-    * @brief Get plugin remote stub.
->>>>>>> 5bd48b767366e7b44e27f740dbd89859049d2ed6
     * @param plugin name.
     * @param plugin remote stub.
     * @since 23
