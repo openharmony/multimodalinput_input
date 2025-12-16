@@ -37,6 +37,7 @@
 #include "sensor_agent_type.h"
 #include "stylus_key_handler.h"
 #include "timer_manager.h"
+#include "whitelist_data_share_accessor.h"
 #include "multimodal_input_plugin_manager.h"
 #include <dlfcn.h>
 #include <iostream>
@@ -218,12 +219,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 
 void KeyCommandHandler::InitializeLongPressConfigurations()
 {
-    if (!isParseLongPressConfig_) {
-        if (!ParseLongPressConfig()) {
-            MMI_HILOGE("Parse long press configFile failed");
-        }
-        isParseLongPressConfig_ = true;
-    }
     if (!isDistanceConfig_) {
         distanceDefaultConfig_ = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG * VPR_CONFIG;
         distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
@@ -1430,14 +1425,6 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
-    if (!isParseLongPressConfig_) {
-        if (!ParseLongPressConfig()) {
-            MMI_HILOGE("Parse long press configFile failed");
-            DfxHisysevent::ReportFailHandleKey("PreHandleEvent", key->GetKeyCode(),
-                DfxHisysevent::KEY_ERROR_CODE::FAILED_PARSE_CONFIG);
-        }
-        isParseLongPressConfig_ = true;
-    }
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
         isParseMaxCount_ = true;
@@ -1457,12 +1444,6 @@ bool KeyCommandHandler::PreHandleEvent()
             return false;
         }
         isParseConfig_ = true;
-    }
-    if (!isParseLongPressConfig_) {
-        if (!ParseLongPressConfig()) {
-            MMI_HILOGE("Parse long press configFile failed");
-        }
-        isParseLongPressConfig_ = true;
     }
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
@@ -1608,12 +1589,6 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
             return false;
         }
         isParseConfig_ = true;
-    }
-    if (!isParseLongPressConfig_) {
-        if (!ParseLongPressConfig()) {
-            MMI_HILOGE("Parse long press configFile failed");
-        }
-        isParseLongPressConfig_ = true;
     }
     return HandleMulFingersTap(pointer);
 }
@@ -2915,56 +2890,9 @@ void KeyCommandHandler::TouchPadKnuckleDoubleClickProcess(const std::string bund
     LaunchAbility(ability, NO_DELAY);
 }
 
-bool KeyCommandHandler::ParseLongPressConfig()
-{
-    std::string configPath = "/system/variant/phone/base/etc/multimodalinput/universal_drag_app_whitelist.json";
-    return ParseLongPressJson(configPath);
-}
-
-bool KeyCommandHandler::ParseLongPressJson(const std::string &configFile)
-{
-    CALL_DEBUG_ENTER;
-    std::string jsonStr = ReadJsonFile(configFile);
-    if (jsonStr.empty()) {
-        MMI_HILOGE("Read configFile failed");
-        return false;
-    }
-    JsonParser parser(jsonStr.c_str());
-    if (parser.Get() == nullptr) {
-        MMI_HILOGE("parse is nullptr");
-        return false;
-    }
-    if (!cJSON_IsArray(parser.Get())) {
-        MMI_HILOGE("Parser.Get() is not object");
-        return false;
-    }
-
-    cJSON* item = nullptr;
-    cJSON* enable = nullptr;
-    cJSON* status = nullptr;
-    cJSON_ArrayForEach(item, parser.Get()) {
-        if (!cJSON_IsObject(item)) {
-            continue;
-        }
-        enable = cJSON_GetObjectItem(item, KEY_ENABLE);
-        status = cJSON_GetObjectItem(item, KEY_STATUS);
-        if (enable == NULL || status == NULL) {
-            continue;
-        }
-        if (enable->valueint == 1) {
-            appWhiteList_.insert(item->string);
-        }
-    }
-    return true;
-}
-
 bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
-    if (!isParseLongPressConfig_) {
-        MMI_HILOGE("Parse configFile failed");
-        return false;
-    }
     int32_t windowPid = WIN_MGR->GetWindowPid(touchEvent->GetTargetWindowId());
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
@@ -2976,8 +2904,8 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
         MMI_HILOGE("Failed to get bundle name, pid %{public}d", windowPid);
         return false;
     }
-    if (appWhiteList_.find(bundleName) == appWhiteList_.end()) {
-        MMI_HILOGD("%{public}s not support long-press drag", bundleName.c_str());
+    if (!WhitelistDataShareAccessor::GetInstance().IsWhitelisted(bundleName)) {
+        MMI_HILOGW("%{public}s not support long-press drag", bundleName.c_str());
         return false;
     }
     return true;
