@@ -50,8 +50,6 @@ public:
     bool IsScreenFold();
     void SimulatedModifierKeyEventNormalize(const std::shared_ptr<KeyEvent> &keyEvent);
     void SetKeyStatusRecord(bool enable, int32_t timeout);
-    bool CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
-    void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
 
 private:
     void ReadProductConfig(InputProductConfig &config) const;
@@ -59,6 +57,7 @@ private:
     void CheckProductParam(InputProductConfig &productConfig) const;
     int32_t TransformVolumeKey(struct libinput_device *dev, int32_t keyCode, int32_t keyAction) const;
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
+    bool CheckSimulatedModifierKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
     bool CheckSimulatedModifierKeyEventFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyActionFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
@@ -66,6 +65,7 @@ private:
     void HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &keyItem);
     void SyncSimulatedModifierKeyEventState(const std::shared_ptr<KeyEvent> &keyEvent);
     void SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEvent> &keyEvent, int32_t funcKeyCode);
+    void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
     bool CheckKeyEventAutoUpTimer(int32_t keyCode);
     void KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout);
 
