@@ -360,10 +360,6 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
         keyEvent->SetRepeat(false);
-    } else {
-        if (KeyEventHdr->CheckSimulatedModifierKeyEvent(keyEvent)) {
-            KeyEventHdr->InterruptAutoRepeatKeyEvent(keyEvent);
-        }
     }
     DfxHisysevent::CalcKeyDispTimes();
     DfxHisysevent::ReportDispTimes();
