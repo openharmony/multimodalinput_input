@@ -376,6 +376,7 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/drag_security/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -491,6 +492,8 @@ ohos_unittest("TabletToolTranformTest") {
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared"
   ]
 
   if (hitrace_enabled) {

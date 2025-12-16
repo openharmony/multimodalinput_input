@@ -2094,6 +2094,10 @@ public:
     std::string GetFixedModeStr() const;
     void SetRightButtonSource(PointerEvent::RightButtonSource rightButtonSource);
     PointerEvent::RightButtonSource GetRightButtonSource() const;
+    void SetDistributeEventTime(uint64_t distributeEventTime);
+    uint64_t GetDistributeEventTime();
+    void SetSignature(const std::string &signature);
+    std::string GetSignature() const;
 
 protected:
     /**
@@ -2155,7 +2159,9 @@ private:
     // Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
     FixedMode fixedMode_ { FixedMode::NORMAL };
-    RightButtonSource rightButtonSource_ { RightButtonSource::OTHERS };
+    RightButtonSource rightButtonSource_ { RightButtonSource::INVALID };
+    std::string signature_;
+    uint64_t distributeEventTime_;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

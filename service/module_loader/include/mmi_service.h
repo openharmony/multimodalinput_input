@@ -237,6 +237,7 @@ public:
     ErrCode SetKeyStatusRecord(bool enable, int32_t timeout) override;
     ErrCode GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
     ErrCode GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixelMap) override;
+    ErrCode DeliverNonce(const std::string &nonce) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     ErrCode ControlMouseEventToAnco(int32_t windowId, bool enable) override;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING

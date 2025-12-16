@@ -1069,5 +1069,10 @@ int32_t InputManager::GetExternalObject(const std::string &pluginName, sptr<IRem
 {
     return InputMgrImpl.GetExternalObject(pluginName, pluginRemoteStub);
 }
+
+int32_t InputManager::DeliverNonce(const std::string &nonce)
+{
+    return InputMgrImpl.DeliverNonce(nonce);
+}
 } // namespace MMI
 } // namespace OHOS

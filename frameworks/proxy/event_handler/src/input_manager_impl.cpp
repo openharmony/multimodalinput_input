@@ -3150,5 +3150,15 @@ void InputManagerImpl::ControlMouseEventToAnco(int32_t windowId, bool enable)
     MULTIMODAL_INPUT_CONNECT_MGR->ControlMouseEventToAnco(windowId, enable);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+int32_t InputManagerImpl::DeliverNonce(const std::string &nonce)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->DeliverNonce(nonce);
+    if (ret != RET_ERR) {
+        MMI_HILOGE("Deliver nonce failed, ret: %{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
