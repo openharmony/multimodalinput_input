@@ -146,7 +146,7 @@ public:
         Coordinate2D& cursorPos) const;
     void ReverseRotateDisplayScreen(const OLD::DisplayInfo& info, const double x, const double y,
         Coordinate2D& cursorPos) const;
-    void ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
+    void ScreenRotateAdjustDisplayXY(const OLD::DisplayInfo& info, PhysicalCoordinate& coord);
     void RotateScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateDisplayScreen(const OLD::DisplayInfo& info, PhysicalCoordinate& coord);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
