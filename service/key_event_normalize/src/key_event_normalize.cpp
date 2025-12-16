@@ -480,7 +480,7 @@ void KeyEventNormalize::HandleSimulatedModifierKeyActionFromShell(const std::sha
     }
 
     int32_t keyAction = keyEvent->GetKeyAction();
-    bool isShell = keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL);
+    bool isShell = keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL);
     bool isKeyDown = keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN;
     bool isAutoUp = isShell && isKeyDown && keyStatusRecordSwitch_;
 
@@ -563,7 +563,7 @@ bool KeyEventNormalize::CheckSimulatedModifierKeyEventFromShell(const std::share
         return false;
     }
 
-    if (!keyEvent->HasFlag(KeyEvent::EVENT_FLAG_SHELL)) {
+    if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_SHELL)) {
         MMI_HILOGI("The simulated modifier key event is not from shell");
         return true;
     }
@@ -618,6 +618,7 @@ void KeyEventNormalize::SimulatedModifierKeyEventNormalize(const std::shared_ptr
     }
     HandleSimulatedModifierKeyAction(keyEvent);
     HandleSimulatedModifierKeyActionFromShell(keyEvent);
+    InterruptAutoRepeatKeyEvent(keyEvent);
 }
 
 bool KeyEventNormalize::CheckKeyEventAutoUpTimer(int32_t keyCode)
@@ -673,7 +674,7 @@ void KeyEventNormalize::KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         int64_t time = GetSysClockTime();
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        keyEvent->ClearFlag(KeyEvent::EVENT_FLAG_SHELL);
+        keyEvent->ClearFlag(InputEvent::EVENT_FLAG_SHELL);
         keyEvent->SetActionTime(time);
         keyEvent->UpdateId();
         LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
