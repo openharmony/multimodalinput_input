@@ -167,6 +167,9 @@ public:
     MOCK_METHOD(void, EnsureMouseEventCycle, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(void, CleanMouseEventCycle, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+    MOCK_METHOD(int32_t, ControlMouseEventToAnco, (int32_t, bool, const std::string &));
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
     static void ReleaseInstance();

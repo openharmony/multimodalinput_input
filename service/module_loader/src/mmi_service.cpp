@@ -5728,5 +5728,35 @@ int32_t MMIService::IsPointerInit(bool &status)
     }
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+ErrCode MMIService::ControlMouseEventToAnco(int32_t windowId, bool enable)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    CHKPR(WIN_MGR, ERROR_NULL_POINTER);
+
+    std::string callingTokenName;
+    Security::AccessToken::HapTokenInfo callingTokenInfo;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, callingTokenInfo) != RET_OK) {
+        MMI_HILOGE("GetHapTokenInfo failed");
+        return RET_ERR;
+    }
+
+    callingTokenName = callingTokenInfo.bundleName;
+    int32_t ret = delegateTasks_.PostSyncTask([windowId, enable, callingTokenName] {
+        return WIN_MGR->ControlMouseEventToAnco(windowId, enable, callingTokenName);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("ControlMouseEventToAnco failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 } // namespace MMI
 } // namespace OHOS

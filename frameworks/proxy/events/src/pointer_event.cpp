@@ -956,6 +956,13 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
     AddPointerItem(pointerItem);
 }
 
+void PointerEvent::ResetPointerItemsId()
+{
+    for (auto &item : pointers_) {
+        item.SetPointerId(item.GetOriginPointerId());
+    }
+}
+
 std::set<int32_t> PointerEvent::GetPressedButtons() const
 {
     return pressedButtons_;
