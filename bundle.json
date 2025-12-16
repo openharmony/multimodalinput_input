@@ -108,7 +108,8 @@
         "idl_tool",
         "runtime_core",
         "libinput",
-	"libuv"
+	      "libuv",
+        "openssl"
       ],
       "third_party": [
         "libuv",

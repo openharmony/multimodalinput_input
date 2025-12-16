@@ -100,6 +100,7 @@
 #endif // PLAYER_FRAMEWORK_EXISTS
 #include "tablet_subscriber_handler.h"
 #include "config_policy_utils.h"
+#include "drag_security_manager.h"
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -145,6 +146,7 @@ constexpr int32_t GAME_UID { 7011 };
 constexpr int32_t PENGLAI_UID { 7655 };
 constexpr int32_t SYNERGY_UID { 5521 };
 constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
+constexpr int32_t MSDP_UID { 6699 };
 
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
@@ -5758,5 +5760,27 @@ ErrCode MMIService::ControlMouseEventToAnco(int32_t windowId, bool enable)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+ErrCode MMIService::DeliverNonce(const std::string &nonce)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t callingUid = GetCallingUid();
+    if (callingUid != MSDP_UID) {
+        MMI_HILOGE("No permission");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask([nonce] {
+        return DragSecurityManager::GetInstance().DeliverNonce(nonce);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask DeliverNonce failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

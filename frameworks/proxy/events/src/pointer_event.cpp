@@ -677,7 +677,10 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       settings_(other.settings_),
       autoToVirtualScreen_(other.autoToVirtualScreen_),
       handOption_(other.handOption_), fixedMode_(other.fixedMode_),
-      rightButtonSource_(other.rightButtonSource_) {}
+      rightButtonSource_(other.rightButtonSource_),
+      signature_(other.signature_),
+      distributeEventTime_(other.distributeEventTime_)
+      {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -1207,6 +1210,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, static_cast<int32_t>(rightButtonSource_));
     WRITEINT32(out, settings_.scrollRows_);
     WRITEBOOL(out, autoToVirtualScreen_);
+    WRITESTRING(out, signature_);
+    WRITEUINT64(out, distributeEventTime_);
     return true;
 }
 
@@ -1300,6 +1305,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
     READINT32(in, settings_.scrollRows_);
     READBOOL(in, autoToVirtualScreen_);
+    READSTRING(in, signature_);
+    READUINT64(in, distributeEventTime_);
     return true;
 }
 
@@ -1783,6 +1790,26 @@ void PointerEvent::SetScrollRows(int32_t scrollRows)
 int32_t PointerEvent::GetScrollRows() const
 {
     return settings_.scrollRows_;
+}
+
+void PointerEvent::SetDistributeEventTime(uint64_t distributeEventTime)
+{
+    distributeEventTime_ = distributeEventTime;
+}
+
+uint64_t PointerEvent::GetDistributeEventTime()
+{
+    return distributeEventTime_;
+}
+
+void PointerEvent::SetSignature(const std::string &signature)
+{
+    signature_ = signature;
+}
+
+std::string PointerEvent::GetSignature() const
+{
+    return signature_;
 }
 } // namespace MMI
 } // namespace OHOS

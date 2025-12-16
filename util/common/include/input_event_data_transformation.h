@@ -56,6 +56,8 @@ private:
     static int32_t DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static bool SerializeSettings(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static bool DeserializeSettings(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
+    static bool SerializeDragSecurityData(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
+    static bool DeserializeDragSecurityData(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     static constexpr uint32_t MAX_HMAC_SIZE = 160;
