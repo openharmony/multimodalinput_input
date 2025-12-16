@@ -94,18 +94,8 @@ void CursorDrawingComponent::Load()
         }
     }
 
-    if (timerId_ > 0) {
-        TimerMgr->RemoveTimer(timerId_);
-    }
-    timerId_ = TimerMgr->AddLongTimer(CHECK_INTERVAL_MS, CHECK_COUNT, [this] {
-        auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - lastCallTime_).count();
-        if ((idleTime >= UNLOAD_TIME_MS) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
-            this->UnLoad();
-        }
-    }, "libcursor_drawing_adapter-Unload");
-    if (timerId_ < 0) {
-        MMI_HILOGE("Add timer for unloading libcursor_drawing_adapter library fail");
+    if (!ResetUnloadTimer()) {
+        MMI_HILOGE("reset timer for unloading libcursor_drawing_adapter library fail");
         UnLoad();
         return;
     }
@@ -149,6 +139,30 @@ bool CursorDrawingComponent::LoadLibrary()
     }
     isLoaded_ = true;
     POINTER_DEV_MGR.isInitDefaultMouseIconPath = true;
+    return true;
+}
+
+bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkInterval)
+{
+    if (timerId_ > 0) {
+        TimerMgr->RemoveTimer(timerId_);
+    }
+    if (unloadTime == -1) {
+        unloadTime = UNLOAD_TIME_MS;
+    }
+    if (checkInterval == -1) {
+        checkInterval = CHECK_INTERVAL_MS;
+    }
+    timerId_ = TimerMgr->AddLongTimer(checkInterval, CHECK_COUNT, [this, unloadTime] {
+        auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - lastCallTime_).count();
+        if ((idleTime >= unloadTime) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
+            this->UnLoad();
+        }
+    }, "libcursor_drawing_adapter-ResetUnloadTimer");
+    if (timerId_ < 0) {
+        return false;
+    }
     return true;
 }
 
@@ -475,6 +489,12 @@ void CursorDrawingComponent::SubscribeScreenModeChange()
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
     pointerInstance_->SubscribeScreenModeChange();
+}
+
+void CursorDrawingComponent::UnSubscribeScreenModeChange()
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->UnSubscribeScreenModeChange();
 }
 
 void CursorDrawingComponent::RegisterDisplayStatusReceiver()

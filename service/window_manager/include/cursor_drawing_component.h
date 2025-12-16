@@ -32,6 +32,7 @@ public:
     void Load();
     void UnLoad();
 
+    bool ResetUnloadTimer(int32_t unloadTime = -1, int32_t checkInterval = -1);
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
     void UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo);
@@ -81,6 +82,7 @@ public:
     void DestroyPointerWindow();
     void DrawScreenCenterPointer(const PointerStyle &pointerStyle);
     void SubscribeScreenModeChange();
+    void UnSubscribeScreenModeChange();
     void RegisterDisplayStatusReceiver();
     void InitDefaultMouseIconPath();
     int32_t UpdateMouseLayer(

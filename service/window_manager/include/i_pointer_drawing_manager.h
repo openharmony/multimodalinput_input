@@ -166,6 +166,7 @@ public:
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
     virtual void SubscribeScreenModeChange() {}
+    virtual void UnSubscribeScreenModeChange() {}
     virtual void RegisterDisplayStatusReceiver() {}
     virtual void InitDefaultMouseIconPath() {}
     virtual int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
