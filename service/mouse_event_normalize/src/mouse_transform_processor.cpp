@@ -61,11 +61,6 @@ constexpr int32_t TABLET_DEVICE_HEIGHT { 1920 };
 const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
-constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr char ROTATE_WINDOW_ROTATE { '0' };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t FINE_CALCULATE { 20 };
@@ -421,27 +416,6 @@ double MouseTransformProcessor::CalculateProportion(long long key, long &total, 
     return isUsed ? (1.0 * curMap.find(key)->second / total) : 0;
 }
 
-bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayInfo)
-{
-    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
-        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
-    CHKPF(displayInfo);
-
-    bool foldableDevicePolicyMain = false;
-    bool foldableDevicePolicyFull = false;
-    if (!FOLDABLE_DEVICE_POLICY.empty()) {
-        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
-    }
-    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
-        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
-    }
-
-    return (ROTATE_POLICY == WINDOW_ROTATE ||
-        (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
-        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
-}
-
 Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     CHKPR(displayInfo, DIRECTION0);
@@ -449,14 +423,6 @@ Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *d
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = static_cast<Direction>((
             ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    }
-    if (WIN_MGR->GetHardCursorEnabled()) {
-        if (IsWindowRotation(displayInfo)) {
-            displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
-                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        } else {
-            displayDirection = displayInfo->direction;
-        }
     }
     return displayDirection;
 }

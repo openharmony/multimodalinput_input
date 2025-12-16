@@ -59,11 +59,6 @@ namespace {
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
-constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr char ROTATE_WINDOW_ROTATE { '0' };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
 constexpr int32_t SCALE_X { 0 };
@@ -1329,6 +1324,8 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
         cursorPosMap_[groupId].displayId = displayInfo.id;
         cursorPosMap_[groupId].cursorPos.x = x;
         cursorPosMap_[groupId].cursorPos.y = y;
+        cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
+        cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
     } else {
         cursorPosMap_[groupId].displayId = -1;
         cursorPosMap_[groupId].cursorPos.x = 0;
@@ -2048,7 +2045,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
             displayInfo->id, displayInfo->x, displayInfo->y, displayInfo->width, displayInfo->height,
             displayInfo->dpi, displayInfo->name.c_str(), displayInfo->uniq.c_str(), displayInfo->direction,
             displayInfo->displayDirection);
-        if (!GetHardCursorEnabled() && cursorPosCur.displayDirection != displayInfo->displayDirection) {
+        if (cursorPosCur.displayDirection != displayInfo->displayDirection) {
             ScreenRotateAdjustDisplayXY(*displayInfo, coord);
         }
 
@@ -2062,8 +2059,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
         } else {
             UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
         }
-        if (GetHardCursorEnabled() && extraData_.appended &&
-            (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+        if (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
             AdjustDragPosition(groupId);
         }
         CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*displayInfo);
@@ -6535,40 +6531,11 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
     }
 }
 
-bool InputWindowsManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo)
-{
-    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
-        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
-    CHKPF(displayInfo);
-
-    bool foldableDevicePolicyMain = false;
-    bool foldableDevicePolicyFull = false;
-    if (!FOLDABLE_DEVICE_POLICY.empty()) {
-        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
-    }
-    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
-        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
-    }
-
-    return (ROTATE_POLICY == WINDOW_ROTATE ||
-        (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
-        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
-}
-
 Direction InputWindowsManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     CHKPR(displayInfo, DIRECTION0);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    if (GetHardCursorEnabled()) {
-        if (IsWindowRotation(displayInfo)) {
-            displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
-                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        } else {
-            displayDirection = displayInfo->direction;
-        }
-    }
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = displayInfo->direction;
     }
@@ -7634,11 +7601,6 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const OLD::Displa
         return true;
     }
     return false;
-}
-
-bool InputWindowsManager::GetHardCursorEnabled()
-{
-    return CursorDrawingComponent::GetInstance().GetHardCursorEnabled();
 }
 
 void InputWindowsManager::SetFoldState()

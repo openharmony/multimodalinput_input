@@ -34,6 +34,7 @@ constexpr int32_t UDS_UID = 100;
 constexpr int32_t UDS_PID = 100;
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
+constexpr double HALF_RATIO { 0.5 };
 } // namespace
 
 class InputWindowsManagerTest : public testing::Test {
@@ -3729,7 +3730,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_009
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     OLD::DisplayInfo displayInfo;
@@ -3746,6 +3746,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation,
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
         iter->second.displaysInfo.push_back(displayInfo);
     }
+    inputWindowsManager->extraData_.appended = true;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
 }
 
@@ -3758,7 +3759,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation,
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     OLD::DisplayInfo displayInfo;
@@ -3787,7 +3787,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(true));
     InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.AdjustDisplayRotation());
 }
@@ -3801,24 +3800,32 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     OLD::DisplayInfo displayInfo;
-    displayInfo.id = 100;
+    displayInfo.id = 104;
     displayInfo.direction = DIRECTION90;
     displayInfo.displayDirection = DIRECTION90;
+    displayInfo.validWidth = 300;
+    displayInfo.validHeight = 200;
     auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->cursorPosMap_.end()) {
-        it->second.displayId = 100;
+        it->second.displayId = 104;
         it->second.direction = Direction::DIRECTION90;
         it->second.displayDirection = Direction::DIRECTION0;
+        it->second.cursorPos.x = 100;
+        it->second.cursorPos.y = 150;
     }
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
         iter->second.displaysInfo.push_back(displayInfo);
     }
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->AdjustDisplayRotation();
+    EXPECT_EQ(it->second.cursorPos.x, displayInfo.validWidth * HALF_RATIO);
+    EXPECT_EQ(it->second.cursorPos.y, displayInfo.validHeight * HALF_RATIO);
 }
 
 /**
@@ -3830,24 +3837,32 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(true));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     OLD::DisplayInfo displayInfo;
-    displayInfo.id = 100;
+    displayInfo.id = 105;
     displayInfo.direction = DIRECTION90;
     displayInfo.displayDirection = DIRECTION90;
+    displayInfo.validWidth = 300;
+    displayInfo.validHeight = 200;
     auto it = inputWindowsManager->cursorPosMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->cursorPosMap_.end()) {
-        it->second.displayId = 100;
+        it->second.displayId = 105;
         it->second.direction = Direction::DIRECTION0;
         it->second.displayDirection = Direction::DIRECTION0;
+        it->second.cursorPos.x = 100;
+        it->second.cursorPos.y = 150;
     }
     auto iter = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (iter != inputWindowsManager->displayGroupInfoMap_.end()) {
         iter->second.displaysInfo.push_back(displayInfo);
     }
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    inputWindowsManager->AdjustDisplayRotation();
+    EXPECT_EQ(it->second.cursorPos.x, displayInfo.validWidth * HALF_RATIO);
+    EXPECT_EQ(it->second.cursorPos.y, displayInfo.validHeight * HALF_RATIO);
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
