@@ -51,8 +51,6 @@ constexpr int32_t MAX_PIXEL_MAP_HEIGHT {600};
 constexpr int32_t INT32_BYTE {4};
 constexpr int32_t NUMBER_TWO {2};
 constexpr double HALF_RATIO { 0.5 };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -8445,47 +8443,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowAgentPid, Tes
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-/**
- * @tc.name: InputWindowsManagerTest_IsWindowRotation_001
- * @tc.desc: Test IsWindowRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowRotation_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(::OHOS::MMI::IInputWindowsManager::GetInstance());
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<OLD::DisplayInfo> physicalDisplayInfo = std::make_shared<OLD::DisplayInfo>();
-    ASSERT_NE(physicalDisplayInfo, nullptr);
-    physicalDisplayInfo->direction = DIRECTION0;
-    physicalDisplayInfo->displayDirection = DIRECTION90;
-    auto ret = inputWindowsManager->IsWindowRotation(physicalDisplayInfo.get());
-    EXPECT_EQ(ret, true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsWindowRotation_002
- * @tc.desc: Test the function IsWindowRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowRotation_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(::OHOS::MMI::IInputWindowsManager::GetInstance());
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<OLD::DisplayInfo> physicalDisplayInfo = std::make_shared<OLD::DisplayInfo>();
-    ASSERT_NE(physicalDisplayInfo, nullptr);
-    bool ret = inputWindowsManager->IsWindowRotation(physicalDisplayInfo.get());
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
-        ASSERT_EQ(ret, true);
-    } else {
-        ASSERT_EQ(ret, false);
-    }
-}
 /**
  * @tc.name: InputWindowsManagerTest_ShiftAppPointerEvent_001
  * @tc.desc: Test ShiftAppPointerEvent failed for sourceWindowInfo not exist
