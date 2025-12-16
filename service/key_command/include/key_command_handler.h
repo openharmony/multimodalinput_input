@@ -223,8 +223,6 @@ private:
     bool ParseExcludeJson(const std::string &configFile);
     void ParseRepeatKeyMaxCount();
     void ParseStatusConfigObserver();
-    bool ParseLongPressConfig();
-    bool ParseLongPressJson(const std::string &configFile);
     void LaunchAbility(const Ability &ability);
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
@@ -348,7 +346,6 @@ private:
     std::set<std::string> lastMatchedKeys_;
     ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
-    std::set<std::string> appWhiteList_;
     std::vector<Sequence> sequences_;
     std::vector<ExcludeKey> excludeKeys_;
     std::vector<Sequence> filterSequences_;
@@ -357,7 +354,6 @@ private:
     std::vector<std::string> businessIds_;
     bool isParseConfig_ { false };
     bool isParseExcludeConfig_ { false };
-    bool isParseLongPressConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     std::map<int32_t, int32_t> repeatKeyMaxTimes_;
