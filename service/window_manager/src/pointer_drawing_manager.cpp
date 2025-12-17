@@ -3418,7 +3418,7 @@ Direction PointerDrawingManager::CalculateRenderDirection(bool isHard)
 {
     if (isHard) {
         return displayInfo_.direction;
-    } else if (isWindowRotation) {
+    } else {
         return static_cast<Direction>((((displayInfo_.direction - displayInfo_.displayDirection) *
             ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     }
