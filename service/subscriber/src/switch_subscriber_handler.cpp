@@ -24,6 +24,7 @@
 #include "dfx_hisysevent.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "iservice_registry.h"
 #include "util_ex.h"
 #include "ffrt.h"
 #undef MMI_LOG_DOMAIN
