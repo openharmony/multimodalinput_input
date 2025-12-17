@@ -30,6 +30,7 @@
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SwitchSubscriberHandler"
+constexpr int MAX_WAIT_TIME = 5;
 
 namespace OHOS {
 namespace MMI {
@@ -180,7 +181,7 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
         ffrt::submit([this, switchEvent] {
             std::unique_lock<std::mutex> lock(mtx_);
-            bool status = cv_.wait_for(lock, std::chrono::seconds(10), [this] {
+            bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
                 return isCesReady_.load();
             });
 
@@ -193,7 +194,7 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         ffrt::submit([this, switchEvent] {
             std::unique_lock<std::mutex> lock(mtx_);
-            bool status = cv_.wait_for(lock, std::chrono::seconds(10), [this] {
+            bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
                 return isCesReady_.load();
             });
             if (status) {
