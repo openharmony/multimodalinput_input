@@ -1472,6 +1472,7 @@ public:
          * @param key the extension data type
          * @param val the extension data value
          * @return void
+         * @since 23
          */
         void SetExtension(const PointerItemExtension &key, const int32_t &val);
         void SetExtension(const PointerItemExtension &key, const double &val);
@@ -1481,6 +1482,7 @@ public:
          * @param key the extension data type
          * @param outVal the output value
          * @return bool: success or not
+         * @since 23
          */
         bool GetExtension(PointerItemExtension key, double &outVal) const;
         bool GetExtension(PointerItemExtension key, int32_t &outVal) const;
@@ -1543,14 +1545,14 @@ public:
             PointerItemExtension key;
             ExtensionValueType type;
             union {
-                int32_t intVal;
+                int32_t intVal = 0;
                 double doubleVal;
             };
             ExtensionData() = default;
-            ExtensionData(PointerItemExtension k, int32_t v) :
-                key(k), type(ExtensionValueType::TYPE_INT32), intVal(v) {}
-            ExtensionData(PointerItemExtension k, double v) :
-                key(k), type(ExtensionValueType::TYPE_DOUBLE), doubleVal(v) {}
+            ExtensionData(PointerItemExtension k, int32_t v) : key(k),
+                type(ExtensionValueType::TYPE_INT32), intVal(v) {}
+            ExtensionData(PointerItemExtension k, double v) : key(k),
+                type(ExtensionValueType::TYPE_DOUBLE), doubleVal(v) {}
         };
 
         std::vector<ExtensionData> extensionData_;
