@@ -21,7 +21,6 @@
 #include "i_input_event_handler.h"
 #include "uds_server.h"
 #include "libinput.h"
-#include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {

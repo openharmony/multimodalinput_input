@@ -25,6 +25,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "iservice_registry.h"
+#include "system_ability_definition.h"
 #include "util_ex.h"
 #include "ffrt.h"
 #undef MMI_LOG_DOMAIN
