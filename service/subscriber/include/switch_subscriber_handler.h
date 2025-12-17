@@ -19,7 +19,6 @@
 #include <atomic>
 #include <unordered_map>
 #include "i_input_event_handler.h"
-#include "iservice_registry.h"
 #include "uds_server.h"
 #include "libinput.h"
 #include "system_ability_definition.h"
