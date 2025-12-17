@@ -2387,7 +2387,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
-        TOUCH_DRAWING_MGR->ResetTouchWindow();
+        delegateTasks_.PostAsyncTask([] {
+            TOUCH_DRAWING_MGR->ResetTouchWindow();
+            return RET_OK;
+        });
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #endif // OHOS_RSS_CLIENT
