@@ -494,6 +494,9 @@ bool ScreenPointer::Move(int32_t x, int32_t y)
     CHKPF(buffer);
     auto bh = buffer->GetBufferHandle();
     CHKPF(bh);
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
     int32_t px = x - FOCUS_POINT;
     int32_t py = y - FOCUS_POINT;
     BytraceAdapter::StartHardPointerMove(buffer->GetWidth(), buffer->GetHeight(), bufferId_, screenId_);
