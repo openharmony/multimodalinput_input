@@ -1324,8 +1324,8 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
         cursorPosMap_[groupId].displayId = displayInfo.id;
         cursorPosMap_[groupId].cursorPos.x = x;
         cursorPosMap_[groupId].cursorPos.y = y;
-        cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
-        cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
+        cursorPosMap_[groupId].direction = displayInfo.direction;
+        cursorPosMap_[groupId].displayDirection = displayInfo.displayDirection;
     } else {
         cursorPosMap_[groupId].displayId = -1;
         cursorPosMap_[groupId].cursorPos.x = 0;
@@ -6818,6 +6818,8 @@ CursorPosition InputWindowsManager::ResetCursorPos()
             cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
             cursorPosMap_[MAIN_GROUPID].cursorPos.x = x;
             cursorPosMap_[MAIN_GROUPID].cursorPos.y = y;
+            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
+            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
         }
     } else {
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
