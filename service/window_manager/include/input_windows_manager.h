@@ -530,12 +530,10 @@ private:
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
-    const WindowInfo* ProcessFirstTouchHitPolicy(std::shared_ptr<PointerEvent> pointerEvent,
-        PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
-    bool IsFirstTouchHitWindow(int32_t deviceId);
-    const WindowInfo* ProcessFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
-        const WindowInfo* touchWindow);
-    void ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
+    bool IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFindFirstTouchFlagWindow(const WindowInfo &item, std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    void ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
         PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
 private:
     UDSServer* udsServer_ { nullptr };
@@ -586,7 +584,12 @@ private:
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
-    std::map<int32_t, WindowInfo> firstTouchWindowInfos_;
+    struct WindowPartInfo {
+        int32_t displayId { -1 };
+        int32_t windowId { -1 };
+        uint32_t flags { 0 };
+    };
+    std::map<int32_t, WindowPartInfo> firstTouchWindowInfos_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
         int32_t windowId { -1 };

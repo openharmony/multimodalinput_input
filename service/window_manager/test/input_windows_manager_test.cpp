@@ -13101,20 +13101,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleLevitateInOutEve
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_ProcessFirstTouchHit_FirstTouch
- * @tc.desc: Test the funcation ProcessFirstTouchHit
+ * @tc.name: InputWindowsManagerTest_IsHitFirstTouchWindow_FirstTouch
+ * @tc.desc: Test the funcation IsFollowFirstTouchWindow
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHit_FirstTouch, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_FirstTouch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
-    WindowInfo touchWindow;
-    touchWindow.id = 2;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
@@ -13123,25 +13121,20 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHit_F
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(0);
-    ASSERT_EQ(nullptr, inputWindowsManager.ProcessFirstTouchHit(pointerEvent, &touchWindow));
+    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
- 
+
 /**
- * @tc.name: InputWindowsManagerTest_ProcessFirstTouchHit_OTHERSTouch
- * @tc.desc: Test the funcation ProcessFirstTouchHit
+ * @tc.name: InputWindowsManagerTest_IsHitFirstTouchWindow_firstTouchWindowEmpty
+ * @tc.desc: Test the funcation IsFollowFirstTouchWindow
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHit_OthersTouch, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_firstTouchWindowEmpty, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
-    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
-    WindowInfo touchWindow;
-    touchWindow.id = 2;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
@@ -13151,13 +13144,66 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHit_O
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_NE(nullptr, inputWindowsManager.ProcessFirstTouchHit(pointerEvent, &touchWindow));
+    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsHitFirstTouchWindow_OthersTouch_NotHit
+ * @tc.desc: Test the funcation IsFollowFirstTouchWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_OthersTouch_NotHit, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
+    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsHitFirstTouchWindow_OthersTouch_Hit
+ * @tc.desc: Test the funcation IsFollowFirstTouchWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_OthersTouch_Hit, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
+    firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
+    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_TRUE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
 /**
  * @tc.name: InputWindowsManagerTest_ProcessNoFirstTouchHit_TouchWindowFlag
- * @tc.desc: Test the funcation ProcessNoFirstTouchHit
+ * @tc.desc: Test the funcation ProcessOtherTouchHit
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -13165,8 +13211,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
     touchWindow.id = 2;
@@ -13178,14 +13224,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(0);
-    inputWindowsManager.ProcessNoFirstTouchHit(pointerEvent, item, &touchWindow);
+    inputWindowsManager.ProcessOtherTouchHit(pointerEvent, item, &touchWindow);
     ASSERT_FALSE(item.IsCanceled());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
 /**
  * @tc.name: InputWindowsManagerTest_ProcessNoFirstTouchHit_FirstTouch
- * @tc.desc: Test the funcation ProcessNoFirstTouchHit
+ * @tc.desc: Test the funcation ProcessOtherTouchHit
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -13193,8 +13239,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
     touchWindow.id = 2;
@@ -13207,14 +13253,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(0);
-    inputWindowsManager.ProcessNoFirstTouchHit(pointerEvent, item, &touchWindow);
+    inputWindowsManager.ProcessOtherTouchHit(pointerEvent, item, &touchWindow);
     ASSERT_FALSE(item.IsCanceled());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
 /**
  * @tc.name: InputWindowsManagerTest_ProcessNoFirstTouchHit_OtherTouch
- * @tc.desc: Test the funcation ProcessNoFirstTouchHit
+ * @tc.desc: Test the funcation ProcessOtherTouchHit
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -13222,8 +13268,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
     touchWindow.id = 2;
@@ -13232,144 +13278,177 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessNoFirstTouchHit
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
-    item.SetPressed(false);
+    item.SetPressed(true);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    inputWindowsManager.ProcessNoFirstTouchHit(pointerEvent, item, &touchWindow);
+    inputWindowsManager.ProcessOtherTouchHit(pointerEvent, item, &touchWindow);
     ASSERT_TRUE(item.IsCanceled());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
 /**
- * @tc.name: InputWindowsManagerTest_IsFirstTouchHitWindow_True
- * @tc.desc: Test the funcation IsFirstTouchHitWindow
+ * @tc.name: InputWindowsManagerTest_IsFindFirstTouchWindow_FindWindow
+ * @tc.desc: Test the funcation IsFindFirstTouchFlagWindow
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFirstTouchHitWindow_True, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFindFirstTouchWindow_FindWindow, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
+    firstTouchWindow.displayId = 0;
     firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
-    ASSERT_TRUE(inputWindowsManager.IsFirstTouchHitWindow(0));
-    inputWindowsManager.firstTouchWindowInfos_.clear();
-}
- 
-/**
- * @tc.name: InputWindowsManagerTest_IsFirstTouchHitWindow_False
- * @tc.desc: Test the funcation IsFirstTouchHitWindow
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFirstTouchHitWindow_False, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
-    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
-    ASSERT_FALSE(inputWindowsManager.IsFirstTouchHitWindow(0));
-    inputWindowsManager.firstTouchWindowInfos_.clear();
-}
- 
-/**
- * @tc.name: InputWindowsManagerTest_IsFirstTouchHitWindow_No
- * @tc.desc: Test the funcation IsFirstTouchHitWindow
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFirstTouchHitWindow_No, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
-    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
-    ASSERT_FALSE(inputWindowsManager.IsFirstTouchHitWindow(1));
-    inputWindowsManager.firstTouchWindowInfos_.clear();
-}
- 
-/**
- * @tc.name: InputWindowsManagerTest_ProcessFirstTouchHitPolicy_nullPointer
- * @tc.desc: Test the funcation ProcessFirstTouchHitPolicy
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHitPolicy_nullPointer, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
-    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     WindowInfo touchWindow;
-    touchWindow.id = 2;
-    touchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
+    touchWindow.id = 1;
+    touchWindow.displayId = 0;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
-    ASSERT_EQ(nullptr, inputWindowsManager.ProcessFirstTouchHitPolicy(nullptr, item, &touchWindow));
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_TRUE(inputWindowsManager.IsFindFirstTouchFlagWindow(touchWindow, pointerEvent));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
 /**
- * @tc.name: InputWindowsManagerTest_ProcessFirstTouchHitPolicy_FirstTouch
- * @tc.desc: Test the funcation ProcessFirstTouchHitPolicy
+ * @tc.name: InputWindowsManagerTest_IsFindFirstTouchWindow_FindUiextentionWindow
+ * @tc.desc: Test the funcation IsFindFirstTouchFlagWindow
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHitPolicy_FirstTouch, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFindFirstTouchWindow_FindUiextentionWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
+    firstTouchWindow.displayId = 0;
+    firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
+    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
+    WindowInfo touchWindow;
+    touchWindow.id = 0;
+    touchWindow.displayId = 0;
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.displayId = 0;
+    std::vector<WindowInfo> uiExtentionWindowInfo;
+    uiExtentionWindowInfo.push_back(windowInfo);
+    touchWindow.uiExtentionWindowInfo = uiExtentionWindowInfo;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_TRUE(inputWindowsManager.IsFindFirstTouchFlagWindow(touchWindow, pointerEvent));
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_IsFindFirstTouchWindow_NotFound
+ * @tc.desc: Test the funcation IsFindFirstTouchFlagWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsFindFirstTouchWindow_NotFound, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
+    firstTouchWindow.displayId = 0;
+    firstTouchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
+    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
+    WindowInfo touchWindow;
+    touchWindow.id = 0;
+    touchWindow.displayId = 0;
+    WindowInfo windowInfo;
+    windowInfo.id = 2;
+    windowInfo.displayId = 0;
+    std::vector<WindowInfo> uiExtentionWindowInfo;
+    uiExtentionWindowInfo.push_back(windowInfo);
+    touchWindow.uiExtentionWindowInfo = uiExtentionWindowInfo;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_FALSE(inputWindowsManager.IsFindFirstTouchFlagWindow(touchWindow, pointerEvent));
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateFirstTouchWindowInfos_FirstTouch
+ * @tc.desc: Test the funcation UpdateFirstTouchWindowInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateFirstTouchWindowInfos_FirstTouch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     WindowInfo touchWindow;
     touchWindow.id = 2;
+    touchWindow.displayId = 0;
     touchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetPressed(false);
+    item.SetPressed(true);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_EQ(nullptr, inputWindowsManager.ProcessFirstTouchHitPolicy(pointerEvent, item, &touchWindow));
-    ASSERT_EQ(1, inputWindowsManager.firstTouchWindowInfos_.size());
-    inputWindowsManager.firstTouchWindowInfos_.clear();
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_ProcessFirstTouchHitPolicy_NewWindow
- * @tc.desc: Test the funcation ProcessFirstTouchHitPolicy
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ProcessFirstTouchHitPolicy_NewWindow, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
-    inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
-    WindowInfo touchWindow;
-    touchWindow.id = 2;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetPressed(false);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetDeviceId(0);
-    pointerEvent->SetPointerId(0);
-    ASSERT_EQ(nullptr, inputWindowsManager.ProcessFirstTouchHitPolicy(pointerEvent, item, &touchWindow));
+    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, &touchWindow);
     ASSERT_EQ(1, inputWindowsManager.firstTouchWindowInfos_.size());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateFirstTouchWindowInfos_OtherTouch
+ * @tc.desc: Test the funcation UpdateFirstTouchWindowInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateFirstTouchWindowInfos_OtherTouch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo touchWindow;
+    touchWindow.id = 2;
+    touchWindow.displayId = 0;
+    touchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, &touchWindow);
+    ASSERT_EQ(0, inputWindowsManager.firstTouchWindowInfos_.size());
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+
 /**
  * @tc.name: InputWindowsManagerTest_ClearFirstTouchWindowInfos
  * @tc.desc: Test the funcation ClearFirstTouchWindowInfos
@@ -13382,8 +13461,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearFirstTouchWindowI
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.firstTouchWindowInfos_.clear();
     inputWindowsManager.ClearFirstTouchWindowInfos(0);
-    WindowInfo firstTouchWindow;
-    firstTouchWindow.id = 1;
+    InputWindowsManager::WindowPartInfo firstTouchWindow;
+    firstTouchWindow.windowId = 1;
     inputWindowsManager.firstTouchWindowInfos_.insert(std::make_pair(0, firstTouchWindow));
     inputWindowsManager.ClearFirstTouchWindowInfos(0);
     ASSERT_EQ(0, inputWindowsManager.firstTouchWindowInfos_.size());
