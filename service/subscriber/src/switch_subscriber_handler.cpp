@@ -179,8 +179,8 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
         switchEventType_ = switchEvent->GetSwitchType();
     }
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
-        ffrt::submit([this, switchEvent]
-            {
+        ffrt::submit(
+            [this, switchEvent] {
                 std::unique_lock<std::mutex> lock(mtx_);
                 bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
                     return isCesReady_.load();
@@ -193,8 +193,8 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
             },
             ffrt::task_attr().name("publish_tablet_mode_common_event"));
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
-        ffrt::submit([this, switchEvent]
-            {
+        ffrt::submit(
+            [this, switchEvent] {
                 std::unique_lock<std::mutex> lock(mtx_);
                 bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
                     return isCesReady_.load();
