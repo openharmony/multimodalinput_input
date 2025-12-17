@@ -184,13 +184,13 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
             bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
                 return isCesReady_.load();
             });
-
             if (status) {
                 this->PublishTabletEvent(switchEvent);
             } else {
                 MMI_HILOGI("wait COMMON_EVENT_SERVICE timeout.");
             }
-        }, ffrt::task_attr());
+        },
+        ffrt::task_attr().name("publish_tablet_mode_common_event"));
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         ffrt::submit([this, switchEvent] {
             std::unique_lock<std::mutex> lock(mtx_);
@@ -202,7 +202,8 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
             } else {
                 MMI_HILOGI("wait COMMON_EVENT_SERVICE timeout.");
             }
-        }, ffrt::task_attr());
+        },
+        ffrt::task_attr().name("publish_lid_state_common_event"));
     }
     if (OnSubscribeSwitchEvent(switchEvent)) {
         MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
