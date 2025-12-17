@@ -2911,6 +2911,7 @@ ohos_unittest("InputEventHandlerTest") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwm",
+    "samgr:samgr_proxy",
   ]
 }
 
