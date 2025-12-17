@@ -2163,7 +2163,12 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 
     bool isLaunchAbility = false;
     for (auto iter = filterSequences_.begin(); iter != filterSequences_.end();) {
+        int32_t timerId = iter->timerId;
         if (!HandleSequence((*iter), isLaunchAbility)) {
+            if (TimerMgr->IsExist(timerId)) {
+                MMI_HILOGW("Remove timer, id: %{public}d", timerId);
+                TimerMgr->RemoveTimer(timerId);
+            }
             iter = filterSequences_.erase(iter);
             continue;
         }
@@ -2251,7 +2256,7 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
         MMI_HILOGE("Add Timer failed");
         return false;
     }
-    MMI_HILOGI("Add timer success");
+    MMI_HILOGI("Add timer success, id: %{public}d", sequence.timerId);
     matchedSequence_ = sequence;
     isLaunchAbility = true;
     return true;
@@ -2299,7 +2304,7 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
             DfxHisysevent::KEY_ERROR_CODE::FAILED_TIMER);
         return false;
     }
-    MMI_HILOGI("Add timer success");
+    MMI_HILOGI("Add timer success, id: %{public}d", sequence.timerId);
     isLaunchAbility = true;
     return true;
 }
