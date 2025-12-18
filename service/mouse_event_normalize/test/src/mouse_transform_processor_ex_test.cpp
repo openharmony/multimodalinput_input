@@ -190,5 +190,115 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_Normalize_00
     processor.pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     EXPECT_EQ(processor.Normalize(&event), RET_ERR);
 }
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_000
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_000,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
+    int32_t evenType = LIBINPUT_EVENT_POINTER_TAP;
+    uint32_t button = 272;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::INVALID);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_001
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
+    int32_t evenType = LIBINPUT_EVENT_POINTER_TAP;
+    uint32_t button = 273;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::TOUCHPAD_TWO_FINGER_TAP);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_002
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
+    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    uint32_t button = 273;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::TOUCHPAD_RIGHT_BUTTONS);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_003
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
+    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON;
+    uint32_t button = 273;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::MOUSE_RIGHT);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_004
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_004,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
+    int32_t evenType = 408;
+    uint32_t button = 273;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::OTHERS);
+}
 }
 }

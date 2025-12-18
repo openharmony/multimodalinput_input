@@ -396,9 +396,17 @@ public:
 
     enum RightButtonSource {
         /**
+         * Indicates invalidity. For example, left-click on touchpad, left-click with mouse, touch screen, stylus, etc.
+         */
+        INVALID = -1,
+        /**
          * Indicates others right button.
          */
-        OTHERS = -1,
+        OTHERS,
+        /**
+         * Indicates touchpad right button.
+         */
+        TOUCHPAD_RIGHT_BUTTONS,
         /**
          * Indicates mouse right.
          */
@@ -2155,7 +2163,7 @@ private:
     // Left and right hand steady-state reporting status
     int32_t handOption_ { -1 };
     FixedMode fixedMode_ { FixedMode::NORMAL };
-    RightButtonSource rightButtonSource_ { RightButtonSource::OTHERS };
+    RightButtonSource rightButtonSource_ { RightButtonSource::INVALID };
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
