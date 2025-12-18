@@ -2140,6 +2140,7 @@ ohos_unittest("MonitorTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libdm_lite",
     "window_manager:libwm",
   ]
