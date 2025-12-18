@@ -220,7 +220,7 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
 void SwitchSubscriberHandler::SetCesReady()
 {
     std::lock_guard<std::mutex> lock(mtx_);
-    isCesReady_ = true;
+    isCesReady_.store(true, std::memory_order_release);
     MMI_HILOGI("isCesReady_ set true");
     cv_.notify_one();
 }
@@ -240,7 +240,7 @@ void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnAddSystemAbility(
             break;
         }
         default: {
-            MMI_HILOGE("unhandled sysabilityId:%{public}d", systemAbilityId);
+            MMI_HILOGW("unhandled sysabilityId:%{public}d", systemAbilityId);
             break;
         }
     }
@@ -253,12 +253,12 @@ void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnRemoveSystemAbili
     MMI_HILOGI("systemAbilityId:%{public}d", systemAbilityId);
     switch (systemAbilityId) {
         case COMMON_EVENT_SERVICE_ID: {
-            SwitchSubscriberHandler::isCesReady_ = false;
+            SwitchSubscriberHandler::isCesReady_.store(false, std::memory_order_release);
             MMI_HILOGI("isCesReady_ set false");
             break;
         }
         default: {
-            MMI_HILOGE("unhandled sysabilityId:%{public}d", systemAbilityId);
+            MMI_HILOGW("unhandled sysabilityId:%{public}d", systemAbilityId);
             break;
         }
     }
@@ -268,13 +268,14 @@ void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnRemoveSystemAbili
 void SwitchSubscriberHandler::SubSwitchSubscriberSystemAbility()
 {
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!samgrProxy) {
+    if (samgrProxy == nullptr) {
         MMI_HILOGE("failed to get samgrProxy");
         return;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, switchSubscriberSystemAbility_);
     if (ret != ERR_OK) {
-        MMI_HILOGI("subscribe %{public}d: bluetooth service failed!", COMMON_EVENT_SERVICE_ID);
+        MMI_HILOGI("subscribe %{public}d: switch subscriber handler failed! ret: %{public}d",
+            COMMON_EVENT_SERVICE_ID, ret);
     }
 }
 
@@ -287,7 +288,8 @@ void SwitchSubscriberHandler::UnSubSwitchSubscriberSystemAbility()
     }
     int32_t ret = samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, switchSubscriberSystemAbility_);
     if (ret != ERR_OK) {
-        MMI_HILOGI("subscribe %{public}d: bluetooth service failed!", COMMON_EVENT_SERVICE_ID);
+        MMI_HILOGI("unSubscribe %{public}d: switch subscriber handler failed! ret: %{public}d",
+            COMMON_EVENT_SERVICE_ID, ret);
     }
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
