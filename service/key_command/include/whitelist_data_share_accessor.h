@@ -38,7 +38,7 @@ private:
     int32_t InitializeImpl();
     int32_t AddWhitelistObserver();
     int32_t ReadWhitelistFromDB(std::vector<std::string> &whitelist);
-    void OnUpdate(const std::string &whitelist);
+    void OnUpdate(const std::string &whitelistKey);
     static std::vector<std::string> Split(const std::string& str, char delimiter = ';');
     void UpdateWhitelist(const std::vector<std::string> &whitelist);
  
