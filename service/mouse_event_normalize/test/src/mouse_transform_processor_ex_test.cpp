@@ -205,6 +205,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
     MouseTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
     int32_t evenType = LIBINPUT_EVENT_POINTER_TAP;
     uint32_t button = 272;
@@ -227,6 +228,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
     MouseTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
     int32_t evenType = LIBINPUT_EVENT_POINTER_TAP;
     uint32_t button = 273;
@@ -249,6 +251,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
     MouseTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
     int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
     uint32_t button = 273;
@@ -271,6 +274,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
     MouseTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
     int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON;
     uint32_t button = 273;
@@ -293,6 +297,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
     MouseTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
     int32_t evenType = 408;
     uint32_t button = 273;
