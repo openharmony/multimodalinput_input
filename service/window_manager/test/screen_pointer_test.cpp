@@ -364,20 +364,20 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_001, TestSize.Level1)
     int32_t height = 1080;
     rotation_t rotation = rotation_t::ROTATION_0;
     screenpointer->Rotate(rotation, x, y, width, height);
-    EXPECT_EQ(x ,0);
-    EXPECT_EQ(y ,0);
+    EXPECT_EQ(x, 0);
+    EXPECT_EQ(y, 0);
     rotation = rotation_t::ROTATION_90;
     screenpointer->Rotate(rotation, x, y, width, height);
-    EXPECT_EQ(x ,1080);
-    EXPECT_EQ(y ,0);
+    EXPECT_EQ(x, 1080);
+    EXPECT_EQ(y, 0);
     rotation = rotation_t::ROTATION_180;
     screenpointer->Rotate(rotation, x, y, width, height);
-    EXPECT_EQ(x ,840);
-    EXPECT_EQ(y ,1080);
+    EXPECT_EQ(x, 840);
+    EXPECT_EQ(y, 1080);
     rotation = rotation_t::ROTATION_270;
     screenpointer->Rotate(rotation, x, y, width, height);
-    EXPECT_EQ(x ,1080);
-    EXPECT_EQ(y ,1080);
+    EXPECT_EQ(x, 1080);
+    EXPECT_EQ(y, 1080);
     delete screenpointer;
 }
 

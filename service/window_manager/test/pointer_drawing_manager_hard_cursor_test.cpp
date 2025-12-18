@@ -31,18 +31,22 @@ constexpr uint32_t SLEEP_TIME_IN_US = 200000; // 200ms
 constexpr int32_t DEFAULT_VALUE { -1 };
 } // namespace
 
+#define NUM_100 100
+#define NUM_200 200
+
 class PointerDrawingManagerHardCursorTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {};
     static void TearDownTestCase(void) {};
     void SetUp(void) {}
     void TearDown(void) {}
-    static sptr<Rosen::ScreenInfo> CreateScreenInfo(Rosen::ScreenId rsId, uint32_t modeId, Rosen::ScreenSourceMode sourceMode)
+    static sptr<Rosen::ScreenInfo> CreateScreenInfo(Rosen::ScreenId rsId, uint32_t modeId,
+        Rosen::ScreenSourceMode sourceMode)
     {
         sptr<Rosen::ScreenInfo> screenInfo = new Rosen::ScreenInfo();
         sptr<Rosen::SupportedScreenModes> mode = new Rosen::SupportedScreenModes();
-        mode->width_ = 100;
-        mode->height_ = 200;
+        mode->width_ = NUM_100;
+        mode->height_ = NUM_200;
         screenInfo->SetRsId(rsId);
         screenInfo->SetType(Rosen::ScreenType::REAL);
         screenInfo->SetModeId(modeId);
@@ -134,7 +138,8 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_UpdatePointerVisible_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_UpdatePointerVisible_001,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
@@ -161,7 +166,8 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMove_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMove_001,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
@@ -194,7 +200,8 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMove_002, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorMove_002,
+    TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
