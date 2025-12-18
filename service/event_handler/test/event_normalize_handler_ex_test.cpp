@@ -336,5 +336,43 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_OnEventDeviceR
     auto ret = handler.OnEventDeviceRemoved(&event);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_ResetRightButtonSource_001
+ * @tc.desc: Test the function ResetRightButtonSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetRightButtonSource_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
+    handler.ResetRightButtonSource(pointerEvent);
+    PointerEvent::RightButtonSource rightButtonSource = pointerEvent->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::OTHERS);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_ResetRightButtonSource_002
+ * @tc.desc: Test the function ResetRightButtonSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetRightButtonSource_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
+    handler.ResetRightButtonSource(pointerEvent);
+    PointerEvent::RightButtonSource rightButtonSource = pointerEvent->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::INVALID);
+}
 } // namespace MMI
 } // namespace OHOS

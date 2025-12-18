@@ -533,7 +533,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     }
 
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
-        SetPointerEventRightButtonSource(type);
+        SetPointerEventRightButtonSource(type, button);
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -542,7 +542,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
-        SetPointerEventRightButtonSource(type);
+        SetPointerEventRightButtonSource(type, button);
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
@@ -568,16 +568,21 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-void MouseTransformProcessor::SetPointerEventRightButtonSource(const int32_t evenType)
+void MouseTransformProcessor::SetPointerEventRightButtonSource(const int32_t evenType, uint32_t button)
 {
+    if (button != MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
+        return;
+    }
     if (evenType == LIBINPUT_EVENT_POINTER_TAP) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::TOUCHPAD_TWO_FINGER_TAP);
     } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
+        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::TOUCHPAD_RIGHT_BUTTONS);
     } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::MOUSE_RIGHT);
     } else {
         MMI_HILOGD("Invalid type, evenType:%{public}d", evenType);
+        pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
     }
 }
 
