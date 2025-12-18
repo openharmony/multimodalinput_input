@@ -1461,15 +1461,16 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_CancelTouch_001,
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     int32_t touch = 1;
+    int32_t deviceId = 1;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = true;
-    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(touch, winInfoEx));
-    EXPECT_TRUE(inputWindowsManager->CancelTouch(touch));
+    inputWindowsManager->touchItemDownInfos_[deviceId].insert(std::make_pair(touch, winInfoEx));
+    EXPECT_TRUE(inputWindowsManager->CancelTouch(touch, deviceId));
 
-    EXPECT_FALSE(inputWindowsManager->CancelTouch(touch));
+    EXPECT_FALSE(inputWindowsManager->CancelTouch(touch, deviceId+1));
 
-    inputWindowsManager->touchItemDownInfos_.clear();
-    EXPECT_FALSE(inputWindowsManager->CancelTouch(touch));
+    inputWindowsManager->touchItemDownInfos_[deviceId].clear();
+    EXPECT_FALSE(inputWindowsManager->CancelTouch(touch, deviceId));
 }
 
 /* *
@@ -1635,6 +1636,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPoi
     ASSERT_NE(pointerEvent, nullptr);
     ShiftWindowInfo info;
     auto ret = inputWindowsManager->ShiftAppTouchPointerEvent(info);
+    ASSERT_EQ(ret, RET_ERR);
+    WindowInfoEX winInfoEx;
+    inputWindowsManager->lastTouchEvent_->SetDeviceId(1);
+    inputWindowsManager->touchItemDownInfos_[0].insert(std::make_pair(100, winInfoEx));
+    ret = inputWindowsManager->ShiftAppTouchPointerEvent(info);
     ASSERT_EQ(ret, RET_ERR);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -2101,7 +2107,8 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerTest_SendCancelEventWhen
     windowInfoEX.flag = true;
     pointerEvent->SetPointerId(1);
 
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()]
+        .insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(2);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(1);
