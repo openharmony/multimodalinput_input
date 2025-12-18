@@ -117,15 +117,20 @@ void FingerprintEventProcessor::SetPowerAndVolumeKeyState(struct libinput_event*
     }
 }
 
+void FingerprintEventProcessor::SetScreenState(bool isTouch)
+{
+    CALL_DEBUG_ENTER;
+    ChangeScreenMissTouchFlag(isTouch);
+}
+
 /*
 * This is a poorly designed state machine for handling screen touch errors, SAD :(
 */
 void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool cancel)
 {
-    int32_t flag = screenMissTouchFlag_ ? 1 : 0;
     bool isFingerPressed = TOUCH_EVENT_HDR->IsFingerPressed();
     MMI_HILOGD("screenMissTouchFlag_ :%{private}d, screen:%{private}d, cancel:%{private}d",
-        flag, isFingerPressed, cancel);
+        screenMissTouchFlag_.load(), isFingerPressed, cancel);
     if (screenMissTouchFlag_ == false) {
         if (isFingerPressed == true) {
             screenMissTouchFlag_ = true;
