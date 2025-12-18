@@ -348,10 +348,12 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetRightButt
     CALL_TEST_DEBUG;
     EventNormalizeHandler handler;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
     handler.ResetRightButtonSource(pointerEvent);
     PointerEvent::RightButtonSource rightButtonSource = pointerEvent->GetRightButtonSource();
-    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::INVALID);
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::OTHERS);
 }
 
 /**
@@ -365,6 +367,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetRightButt
     CALL_TEST_DEBUG;
     EventNormalizeHandler handler;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
     handler.ResetRightButtonSource(pointerEvent);
