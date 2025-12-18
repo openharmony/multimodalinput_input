@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const int32_t MULTIMODAL_INPUT_SERVICE_ID = 3101;
-const std::string CONFIG_WHITELIST { "CONFIG_WHITELIST" };
+const std::string CONFIG_WHITELIST { "UNIVERSAL_DRAG_CONFIG_WHITELIST" };
 const std::string SETTING_URI_PROXY { "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true" };
 } // namespace
  
@@ -70,7 +70,7 @@ int32_t WhitelistDataShareAccessor::InitializeImpl()
     }
     UpdateWhitelist(whitelist);
     if (AddWhitelistObserver() != RET_OK) {
-        MMI_HILOGE("ReadWhitelistFromDB failed");
+        MMI_HILOGE("AddWhitelistObserver failed");
         return RET_ERR;
     }
     initialized_.store(true);
@@ -89,6 +89,7 @@ bool WhitelistDataShareAccessor::IsWhitelisted(const std::string &bundleName)
  
 int32_t WhitelistDataShareAccessor::ReadWhitelistFromDB(std::vector<std::string> &whitelist)
 {
+    CALL_INFO_TRACE;
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
     std::string value;
     if (auto ret = settingHelper.GetStringValue(CONFIG_WHITELIST, value, SETTING_URI_PROXY); ret != RET_OK) {
@@ -102,26 +103,33 @@ int32_t WhitelistDataShareAccessor::ReadWhitelistFromDB(std::vector<std::string>
  
 int32_t WhitelistDataShareAccessor::AddWhitelistObserver()
 {
+    CALL_INFO_TRACE;
     auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-    SettingObserver::UpdateFunc updateFunc = [this](const std::string& value) {
-        this->OnUpdate(value);
+    SettingObserver::UpdateFunc updateFunc = [this](const std::string &key) {
+        this->OnUpdate(key);
     };
     sptr<SettingObserver> settingObserver = settingHelper.CreateObserver(CONFIG_WHITELIST, updateFunc);
     if (settingObserver == nullptr) {
         MMI_HILOGE("CreateObserver failed");
         return RET_ERR;
     }
-    if (int32_t ret = settingHelper.RegisterObserver(settingObserver, SETTING_URI_PROXY) != ERR_OK) {
+    if (int32_t ret = settingHelper.RegisterObserver(settingObserver, SETTING_URI_PROXY); ret != ERR_OK) {
         MMI_HILOGE("RegisterObserver failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
 }
  
-void WhitelistDataShareAccessor::OnUpdate(const std::string &whitelist)
+void WhitelistDataShareAccessor::OnUpdate(const std::string &whitelistKey)
 {
-    MMI_HILOGI("Whitelist updated, %{public}s", whitelist.c_str());
-    UpdateWhitelist(Split(whitelist));
+    CALL_INFO_TRACE;
+    MMI_HILOGI("Whitelist updated, %{public}s", whitelistKey.c_str());
+    std::vector<std::string> whitelist;
+    if (ReadWhitelistFromDB(whitelist) != RET_OK) {
+        MMI_HILOGE("ReadWhitelistFromDB failed");
+        return;
+    }
+    UpdateWhitelist(whitelist);
 }
  
 std::vector<std::string> WhitelistDataShareAccessor::Split(const std::string& str, char delimiter)
