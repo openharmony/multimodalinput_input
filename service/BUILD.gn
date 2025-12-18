@@ -1557,7 +1557,7 @@ ohos_unittest("PointerDrawingManagerHardCursorTest") {
  
   cflags_cc = [
     "-Wno-unused-variable",
-    "-Wno-unused-function"
+    "-Wno-unused-function",
     "-Wno-inconsistent-missing-override",
   ]
  
