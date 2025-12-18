@@ -212,14 +212,14 @@ public:
      * @since 23
      */
     static constexpr int32_t POINTER_ACTION_LEVITATE_MOVE = 51;
- 
+
     /**
      * Indicates that the cursor appears to levitate into the window.
      *
      * @since 23
      */
     static constexpr int32_t POINTER_ACTION_LEVITATE_IN_WINDOW = 52;
- 
+
     /**
      * Indicates that the cursor appears to levitate out of the window.
      *
@@ -941,7 +941,7 @@ public:
          * @since 20
          */
         double GetGlobalX() const;
-    
+
         /**
          * @brief Set global Y coordinate.
          * @param globalY Indicates the global Y coordinate to set.
@@ -973,7 +973,7 @@ public:
          * @since 23
          */
         double GetWindowXPredict() const;
-    
+
         /**
          * @brief Set Predicted Window Y coordinate. Used in client only. IPC not allowed.
          * @param windowYPredict Indicates the Predicted Window Y coordinate to set.

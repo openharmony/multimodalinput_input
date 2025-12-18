@@ -171,7 +171,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
         return;
     }
-    
+
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is LIBINPUT_EVENT_TOUCH_FRAME type:%{public}d", type);
@@ -780,7 +780,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         return RET_OK;
     }
     lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    
+
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");
@@ -1219,7 +1219,7 @@ void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> 
     double swipeSpeed = std::fabs(curMovePosX - currentPointDownPosX_)/(curTime - currentPointDownTime_);
     if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
         g_isSwipeInward = true;
-        
+
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
         DfxHisysevent::ReportTouchpadSwipeInwardEvent();
     }
