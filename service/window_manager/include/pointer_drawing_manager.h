@@ -293,7 +293,7 @@ private:
     bool userIconFollowSystem_ { false };
     bool followSystem_ { false };
     bool offRenderScaleUpdate_ { false };
-    std::atomic<bool> mouseDirectionUpdate_{false};
+    std::atomic<bool> mouseDirectionUpdate_{ false };
     OLD::DisplayInfo displayInfo_ {};
     int32_t lastPhysicalX_ { -1 };
     int32_t lastPhysicalY_ { -1 };
