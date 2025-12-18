@@ -305,5 +305,51 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
     PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
     EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::OTHERS);
 }
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_005
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_005,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::MOUSE_RIGHT);
+    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON;
+    uint32_t button = 272;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::INVALID);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorExTest_SetPointerEventRightButtonSource_006
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointerEventRightButtonSource_006,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    processor.pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::MOUSE_RIGHT);
+    int32_t evenType = LIBINPUT_EVENT_POINTER_TAP;
+    uint32_t button = 273;
+    processor.SetPointerEventRightButtonSource(evenType, button);
+    PointerEvent::RightButtonSource rightButtonSource = processor.pointerEvent_->GetRightButtonSource();
+    EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::TOUCHPAD_TWO_FINGER_TAP);
+}
 }
 }
