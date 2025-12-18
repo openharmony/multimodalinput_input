@@ -3035,7 +3035,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd, TestSize.
     WindowInfoEX windowInfoEX;
     windowInfoEX.flag = false;
     pointerEvent->SetPointerId(0);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()]
+        .insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
     EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetTargetDisplayId(10);
@@ -3058,12 +3059,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd, TestSize.
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
     EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    inputWindowsManager.touchItemDownInfos_.clear();
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()].clear();
     windowInfoEX.flag = true;
     windowInfoEX.window.agentWindowId = 1;
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()]
+        .insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
     EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
     pointerEvent->SetPointerId(7);
     EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
@@ -4890,14 +4892,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_003, TestS
     windowInfoEX.window = windows[0];
     windowInfoEX.flag = false;
     pointerEvent->pointerId_ = 1;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, windowInfoEX));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(1, windowInfoEX));
     int32_t ret = inputWindowsManager.GetClientFd(pointerEvent);
     EXPECT_EQ(ret, -1);
     windowInfoEX.flag = true;
     std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = 5;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(10, windowInfoEX));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(10, windowInfoEX));
     ret = inputWindowsManager.GetClientFd(pointerEvent);
     EXPECT_EQ(ret, -1);
 }
@@ -5731,9 +5733,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -5802,9 +5804,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -5996,9 +5998,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6056,9 +6058,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6116,9 +6118,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6179,9 +6181,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6243,9 +6245,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6307,9 +6309,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6370,9 +6372,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     WindowInfoEX winEx;
     winEx.flag = true;
     winEx.window = winInfo;
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerId, winEx));
-    auto iter = inputWindowsMgr.touchItemDownInfos_.find(pointerId);
-    if (iter != inputWindowsMgr.touchItemDownInfos_.end()) {
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    auto iter = inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].find(pointerId);
+    if (iter != inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].end()) {
         iter->second.window.transform.clear();
         iter->second.window.transform = winInfo.transform;
     }
@@ -6440,6 +6442,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     displayInfo.height = 100;
     pointerEvent->SetTargetDisplayId(displayId);
     pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
     item.SetPointerId(pointerId);
     item.SetDisplayXPos(500);
     item.SetDisplayYPos(500);
@@ -6477,6 +6481,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
         windowsPerDisplayIter->second.insert(std::make_pair(windowId, winGroupInfo));
     }
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), winGroupInfo));
+    inputWindowsMgr.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winEx));
     EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_OK);
 }
 
@@ -6504,7 +6509,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
     WindowInfoEX windowInfoEX;
     windowInfoEX.flag = true;
     pointerEvent->SetPointerId(1);
-    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()]
+        .insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(2);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(1);
@@ -7638,12 +7644,20 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag, Te
     winInfoEx.flag = true;
     int32_t pointerId = 100;
     pointerEvent->SetPointerId(100);
+    pointerEvent->SetDeviceId(1);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winInfoEx));
     EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 
     pointerEvent->SetPointerId(200);
+    inputWindowsManager.touchItemDownInfos_[1].insert(std::make_pair(200, winInfoEx));
     EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+
+    inputWindowsManager.touchItemDownInfos_[0].insert(std::make_pair(pointerId, winInfoEx));
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+
+    inputWindowsManager.touchItemDownInfos_[1].insert(std::make_pair(0, winInfoEx));
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
 
 /**
@@ -8255,7 +8269,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_008, TestS
     pointerEvent->bitwise_ |= flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = true;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()]
+        .insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
@@ -8278,7 +8293,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_009, TestS
     pointerEvent->bitwise_ |= flag;
     WindowInfoEX winInfoEx;
     winInfoEx.flag = false;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()]
+        .insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetClientFd(pointerEvent));
 }
@@ -8369,7 +8385,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002
 
     InputWindowsManager inputWindowsManager;
     WindowInfoEX winInfoEx;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
@@ -9349,15 +9365,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouch_001, TestS
     int32_t touch = 0;
     WindowInfoEX windowInfoEX;
     windowInfoEX.flag = true;
-    inputWindowsManager.touchItemDownInfos_[0] = windowInfoEX;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch));
+    inputWindowsManager.touchItemDownInfos_[0].insert(std::make_pair(0, windowInfoEX));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch, 0));
 
     windowInfoEX.flag = false;
-    inputWindowsManager.touchItemDownInfos_[0] = windowInfoEX;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch));
+    inputWindowsManager.touchItemDownInfos_[0].insert(std::make_pair(0, windowInfoEX));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch, 0));
 
     touch = 1;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch, 0));
 }
 
 /**
@@ -9399,7 +9415,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelAllTouches_002, 
 
     WindowInfoEX windowInfoEX;
     windowInfoEX.flag = false;
-    inputWindowsManager.touchItemDownInfos_[0] = windowInfoEX;
+    inputWindowsManager.touchItemDownInfos_[0].insert(std::make_pair(0, windowInfoEX));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelAllTouches(pointerEvent));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
@@ -10613,7 +10629,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEven
     item.SetPressed(true);
     WindowInfoEX windowInfoEX;
     windowInfoEX.flag = true;
-    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(pointerId, windowInfoEX));
+    inputWindowsManager->touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, windowInfoEX));
     pointerEvent->AddPointerItem(item);
     EXPECT_EQ(pointerEvent->pointers_.size(), 1);
 
@@ -10646,7 +10662,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEven
     item.SetPressed(true);
     WindowInfoEX windowInfoEX;
     windowInfoEX.flag = true;
-    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(pointerId, windowInfoEX));
+    inputWindowsManager->touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, windowInfoEX));
     pointerEvent->AddPointerItem(item);
     EXPECT_EQ(pointerEvent->pointers_.size(), 1);
 
@@ -11381,18 +11397,21 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowPositionCh
     inputWindowsManager.lastPointerEventForWindowChange_->bitwise_ = 0x00000080;
     inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[inputWindowsManager.lastPointerEventForWindowChange_->GetDeviceId()]
+        .insert(std::make_pair(pointerId, winInfoEx));
     pointerId = 50;
     winInfoEx.window.id = 100;
     winInfo.rectChangeBySystem = false;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[inputWindowsManager.lastPointerEventForWindowChange_->GetDeviceId()]
+        .insert(std::make_pair(pointerId, winInfoEx));
     inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
     pointerId = 80;
     winInfo.rectChangeBySystem = true;
     inputWindowsManager.displayGroupInfo_.windowsInfo.clear();
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[inputWindowsManager.lastPointerEventForWindowChange_->GetDeviceId()]
+        .insert(std::make_pair(pointerId, winInfoEx));
     OLD::DisplayGroupInfo displayGroupInfoRef;
     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager.displayGroupInfoMap_.end())
@@ -11806,9 +11825,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_002
     winInfoEx.flag = true;
     int32_t pointerId = 100;
     pointerEvent->SetPointerId(100);
+    pointerEvent->SetDeviceId(1);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddFlag(InputEvent::EVENT_TYPE_AXIS);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winInfoEx));
     EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
 
@@ -11828,9 +11848,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_003
     winInfoEx.flag = true;
     int32_t pointerId = 100;
     pointerEvent->SetPointerId(100);
+    pointerEvent->SetDeviceId(1);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, winInfoEx));
+    inputWindowsManager.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winInfoEx));
     EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
 
