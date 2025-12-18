@@ -595,10 +595,18 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     if (!item.IsCanceled()) {
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
+    ResetRightButtonSource(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
+}
+
+void EventNormalizeHandler::ResetRightButtonSource(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        pointerEvent->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
+    }
 }
 
 void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent)
