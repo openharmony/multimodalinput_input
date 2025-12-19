@@ -1802,24 +1802,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ClearWindowPoi
 }
 
 /**
- * @tc.name: PointerDrawingManagerExTest_IsWindowRotation_001
- * @tc.desc: Test the function IsWindowRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_IsWindowRotation_001, TestSize.Level1)
-{
-    OLD::DisplayInfo displayInfo;
-    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    bool ret = pointerDrawingManager->IsWindowRotation(&displayInfo);
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
-        ASSERT_EQ(ret, true);
-    } else {
-        ASSERT_EQ(ret, false);
-    }
-}
-
-/**
  * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_001
  * @tc.desc: Test the function InitDefaultMouseIconPath
  * @tc.type: FUNC

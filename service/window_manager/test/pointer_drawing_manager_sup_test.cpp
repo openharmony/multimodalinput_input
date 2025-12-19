@@ -198,7 +198,6 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetCursorLoc
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    auto align = pointerDrawingManager.MouseIcon2IconType(MOUSE_ICON(2));
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager.lastMouseStyle_.id = 2;
@@ -206,7 +205,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetCursorLoc
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
@@ -220,22 +219,21 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetCursorLoc
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    auto align = pointerDrawingManager.MouseIcon2IconType(MOUSE_ICON(2));
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     pointerDrawingManager.lastMouseStyle_.id = 2;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
     pointerDrawingManager.lastMouseStyle_.id = 42;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
     pointerDrawingManager.lastMouseStyle_.id = 43;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetCursorLocation(physicalX, physicalY));
 }
 
 /**
@@ -1298,7 +1296,6 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     OLD::DisplayInfo displaysInfo;
     int32_t x = 1;
     int32_t y = 1;
-    ICON_TYPE align = ANGLE_E;
 
     displaysInfo.rsId = 100;
     displaysInfo.direction = DIRECTION0;
@@ -1317,14 +1314,14 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_HardwareCurs
     spMirror->displayDirection_ = DIRECTION0;
     pointerDrawingManager.screenPointers_[displaysInfo.rsId] = spMirror;
     pointerDrawingManager.displayId_ = 100;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y));
     ASSERT_NO_FATAL_FAILURE(
-        pointerDrawingManager.SoftwareCursorMove(pointerDrawingManager.displayId_, x, y, align));
+        pointerDrawingManager.SoftwareCursorMove(pointerDrawingManager.displayId_, x, y));
     spMirror->mode_ = mode_t::SCREEN_EXTEND;
     pointerDrawingManager.displayId_ = 200;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y, align));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorMove(x, y));
     ASSERT_NO_FATAL_FAILURE(
-        pointerDrawingManager.SoftwareCursorMoveAsync(pointerDrawingManager.displayId_, x, y, align));
+        pointerDrawingManager.SoftwareCursorMoveAsync(pointerDrawingManager.displayId_, x, y));
 }
 
 /**

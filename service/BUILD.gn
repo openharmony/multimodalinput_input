@@ -1544,6 +1544,100 @@ ohos_unittest("CursorDrawingComponentTest") {
   ]
 }
 
+ohos_unittest("PointerDrawingManagerHardCursorTest") {
+  module_out_path = module_output_path
+ 
+  configs = [
+    "${mmi_path}:coverage_flags",
+  ]
+ 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+ 
+  cflags_cc = [
+    "-Wno-unused-variable",
+    "-Wno-unused-function",
+    "-Wno-inconsistent-missing-override",
+  ]
+ 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+ 
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
+ 
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/events/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+  ]
+ 
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
+ 
+  sources = [
+    "window_manager/src/pointer_drawing_manager.cpp",
+    "window_manager/src/pointer_renderer.cpp",
+    "window_manager/src/screen_pointer.cpp",
+    "window_manager/test/pointer_drawing_manager_hard_cursor_test.cpp",
+  ]
+ 
+  deps = [
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
+    "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/hardware_cursor_pointer_manager_mock:hardware_cursor_pointer_manager_mock",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/util:mmi_json_parser",
+  ]
+ 
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "init:libbegetutil",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libdm_lite",
+    "window_manager:libwmutil",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("KnuckleDrawingManagerTest") {
   module_out_path = module_output_path
 

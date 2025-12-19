@@ -152,16 +152,15 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_001, TestSize.Level1)
         Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
     ASSERT_NE(screenpointer->surfaceNode_, nullptr);
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    ICON_TYPE align = ANGLE_W;
     int32_t x = 0;
     int32_t y = 0;
-    bool ret = screenpointer->MoveSoft(x, y, align);
+    bool ret = screenpointer->MoveSoft(x, y);
     EXPECT_TRUE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    ret = screenpointer->MoveSoft(x, y, align);
+    ret = screenpointer->MoveSoft(x, y);
     EXPECT_TRUE(ret);
     screenpointer->mode_ = mode_t::SCREEN_EXTEND;
-    ret = screenpointer->MoveSoft(x, y, align);
+    ret = screenpointer->MoveSoft(x, y);
     EXPECT_TRUE(ret);
 }
 
@@ -189,8 +188,7 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_MoveSoft_002, TestSize.Level1)
 
     int32_t x = -1;
     int32_t y = -1;
-    ICON_TYPE align = ICON_TYPE::ANGLE_N;
-    auto ret = screenpointer->MoveSoft(x, y, align);
+    auto ret = screenpointer->MoveSoft(x, y);
     EXPECT_TRUE(ret);
 }
 
@@ -218,27 +216,26 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_001, TestSize.Level1)
     ASSERT_NE(screenpointer->surfaceNode_, nullptr);
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
     screenpointer->isCurrentOffScreenRendering_ = true;
-    ICON_TYPE align = ANGLE_W;
     int32_t x = 0;
     int32_t y = 0;
-    bool ret = screenpointer->Move(x, y, align);
-    EXPECT_EQ(ret, hwcmgr->IsSupported());
+    bool ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
     screenpointer->isCurrentOffScreenRendering_ = true;
-    ret = screenpointer->Move(x, y, align);
-    EXPECT_EQ(ret, hwcmgr->IsSupported());
+    ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->isWindowRotation_ = true;
-    ret = screenpointer->Move(x, y, align);
-    EXPECT_EQ(ret, hwcmgr->IsSupported());
+    ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
     screenpointer->mode_ = mode_t::SCREEN_EXTEND;
     screenpointer->isCurrentOffScreenRendering_ = false;
-    ret = screenpointer->Move(x, y, align);
-    EXPECT_EQ(ret, hwcmgr->IsSupported());
+    ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
     screenpointer->isCurrentOffScreenRendering_ = false;
-    ret = screenpointer->Move(x, y, align);
-    EXPECT_EQ(ret, hwcmgr->IsSupported());
+    ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
+    delete screenpointer;
 }
 
 /**
@@ -264,20 +261,18 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_002, TestSize.Level1)
         Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
     ASSERT_NE(screenpointer->surfaceNode_, nullptr);
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    screenpointer->isWindowRotation_ = true;
-    ICON_TYPE align = ANGLE_W;
     int32_t x = 0;
     int32_t y = 0;
-    bool ret = screenpointer->Move(x, y, align);
+    bool ret = screenpointer->Move(x, y);
     EXPECT_FALSE(ret);
     screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->isWindowRotation_ = true;
-    ret = screenpointer->Move(x, y, align);
+    ret = screenpointer->Move(x, y);
     EXPECT_FALSE(ret);
     x = -1;
     y = -1;
-    ret = screenpointer->Move(x, y, align);
+    ret = screenpointer->Move(x, y);
     EXPECT_FALSE(ret);
+    delete screenpointer;
 }
 
 /**
@@ -304,12 +299,48 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_003, TestSize.Level1)
     ASSERT_NE(screenpointer->surfaceNode_, nullptr);
     screenpointer->mode_ = mode_t::SCREEN_MIRROR;
     screenpointer->isCurrentOffScreenRendering_ = true;
-    ICON_TYPE align = ANGLE_W;
     int32_t x = 0;
     int32_t y = 0;
     screenpointer->SetVirtualExtend(true);
-    bool ret = screenpointer->Move(x, y, align);
+    bool ret = screenpointer->Move(x, y);
     EXPECT_TRUE(ret);
+    delete screenpointer;
+}
+
+/**
+ * @tc.name: ScreenPointerTest_Move_004
+ * @tc.desc: Test Move
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_Move_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    OLD::DisplayInfo di;
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
+    ASSERT_NE(screenpointer, nullptr);
+    PointerRenderer renderer;
+    ASSERT_TRUE(screenpointer->Init(renderer));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    screenpointer->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig,
+        Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE);
+    ASSERT_NE(screenpointer->surfaceNode_, nullptr);
+    screenpointer->mode_ = mode_t::SCREEN_ALONE;
+    int32_t x = 0;
+    int32_t y = 0;
+    bool ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
+    screenpointer->mode_ = mode_t::SCREEN_UNIQUE;
+    ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
+    screenpointer->mode_ = static_cast<mode_t>(5);
+    ret = screenpointer->Move(x, y);
+    EXPECT_FALSE(ret);
+    delete screenpointer;
 }
 
 /**
@@ -329,34 +360,34 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_001, TestSize.Level1)
     ASSERT_NE(screenpointer, nullptr);
     int32_t x = 0;
     int32_t y = 0;
-    rotation_t rotation = rotation_t(DIRECTION90);
-    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->rotation_ = rotation_t::ROTATION_180;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->rotation_ = rotation_t::ROTATION_270;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->rotation_ = rotation_t::ROTATION_90;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->rotation_ = rotation_t::ROTATION_180;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->rotation_ = rotation_t::ROTATION_270;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
+    int32_t width = 1920;
+    int32_t height = 1080;
+    rotation_t rotation = rotation_t::ROTATION_0;
+    screenpointer->Rotate(rotation, x, y, width, height);
+    EXPECT_EQ(x, 0);
+    EXPECT_EQ(y, 0);
+    rotation = rotation_t::ROTATION_90;
+    screenpointer->Rotate(rotation, x, y, width, height);
+    EXPECT_EQ(x, 1080);
+    EXPECT_EQ(y, 0);
+    rotation = rotation_t::ROTATION_180;
+    screenpointer->Rotate(rotation, x, y, width, height);
+    EXPECT_EQ(x, 840);
+    EXPECT_EQ(y, 1080);
+    rotation = rotation_t::ROTATION_270;
+    screenpointer->Rotate(rotation, x, y, width, height);
+    EXPECT_EQ(x, 1080);
+    EXPECT_EQ(y, 1080);
+    delete screenpointer;
 }
 
 /**
- * @tc.name: ScreenPointerTest_Rotate_002
- * @tc.desc: Test Rotate
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForMain_001
+ * @tc.desc: Test CalculateHwcPositionForMain
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_002, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForMain_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
@@ -365,27 +396,28 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_002, TestSize.Level1)
     OLD::DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    int32_t x = 0;
-    int32_t y = 0;
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_180;
-    rotation_t rotation = rotation_t(DIRECTION90);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION180);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION270);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION0);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
+    screenpointer->displayDirection_ = Direction::DIRECTION90;
+    int32_t x = 10;
+    int32_t y = 20;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->CalculateHwcPositionForMain(x, y);
+    EXPECT_EQ(x, 20);
+    EXPECT_EQ(y, 1070);
+    screenpointer->displayDirection_ = Direction::DIRECTION270;
+    screenpointer->CalculateHwcPositionForMain(x, y);
+    EXPECT_EQ(x, 850);
+    EXPECT_EQ(y, 20);
+    delete screenpointer;
 }
 
 /**
- * @tc.name: ScreenPointerTest_Rotate_003
- * @tc.desc: Test Rotate
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForExtend_001
+ * @tc.desc: Test CalculateHwcPositionForExtend
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_003, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForExtend_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
@@ -394,38 +426,23 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_003, TestSize.Level1)
     OLD::DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    int32_t x = 0;
-    int32_t y = 0;
-    screenpointer->mode_ = mode_t::SCREEN_MAIN;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    screenpointer->isWindowRotation_ = true;
-    screenpointer->displayDirection_ = DIRECTION90;
-    rotation_t rotation = rotation_t(DIRECTION90);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION180);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION270);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION0);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->displayDirection_ = DIRECTION270;
-    rotation = rotation_t(DIRECTION90);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION180);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION270);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION0);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
+    int32_t x = 10;
+    int32_t y = 20;
+    screenpointer->offRenderScale_ = 0.5;
+    screenpointer->isCurrentOffScreenRendering_ = true;
+    screenpointer->CalculateHwcPositionForExtend(x, y);
+    EXPECT_EQ(x, 5);
+    EXPECT_EQ(y, 10);
+    delete screenpointer;
 }
 
 /**
- * @tc.name: ScreenPointerTest_Rotate_004
- * @tc.desc: Test Rotate
+ * @tc.name: ScreenPointerTest_CalculateHwcPositionForMirror_001
+ * @tc.desc: Test CalculateHwcPositionForMirror
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_004, TestSize.Level1)
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_CalculateHwcPositionForMirror_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
@@ -434,29 +451,22 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_Rotate_004, TestSize.Level1)
     OLD::DisplayInfo di;
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
-    int32_t x = 0;
-    int32_t y = 0;
-    screenpointer->mode_ = mode_t::SCREEN_MIRROR;
-    screenpointer->rotation_ = rotation_t::ROTATION_0;
-    screenpointer->isWindowRotation_ = true;
-    screenpointer->displayDirection_ = DIRECTION90;
-    rotation_t rotation = rotation_t(DIRECTION90);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION180);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION270);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION0);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    screenpointer->displayDirection_ = DIRECTION270;
-    rotation = rotation_t(DIRECTION90);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION180);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION270);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
-    rotation = rotation_t(DIRECTION0);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->Rotate(rotation, x, y));
+    screenpointer->displayDirection_ = Direction::DIRECTION90;
+    int32_t x = 40;
+    int32_t y = 80;
+    screenpointer->width_ = 1920;
+    screenpointer->height_ = 1080;
+    screenpointer->scale_ = 0.5;
+    screenpointer->paddingLeft_ = 150;
+    screenpointer->paddingTop_ = 0;
+    screenpointer->CalculateHwcPositionForMirror(x, y);
+    EXPECT_EQ(x, 190);
+    EXPECT_EQ(y, 1060);
+    screenpointer->displayDirection_ = Direction::DIRECTION270;
+    screenpointer->CalculateHwcPositionForMirror(x, y);
+    EXPECT_EQ(x, 1240);
+    EXPECT_EQ(y, 95);
+    delete screenpointer;
 }
 
 /**
@@ -675,15 +685,15 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_OnDisplayInfo_001, TestSize.Level1
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, di);
     ASSERT_NE(screenpointer, nullptr);
     screenpointer->bufferId_ = 5;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di, false));
+    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
     screenpointer->bufferId_ = 1;
     screenpointer->isCurrentOffScreenRendering_ = true;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di, false));
+    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
     screenpointer->isCurrentOffScreenRendering_ = false;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di, false));
+    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
 
     screenpointer->screenId_ = 1;
-    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di, false));
+    EXPECT_NO_FATAL_FAILURE(screenpointer->OnDisplayInfo(di));
 }
 
 /**
