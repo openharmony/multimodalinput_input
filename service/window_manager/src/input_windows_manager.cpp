@@ -5522,7 +5522,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     static bool isInAnco = false;
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN && pointerId == 0) {
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     }
 
