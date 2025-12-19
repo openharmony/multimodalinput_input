@@ -451,6 +451,7 @@ ohos_shared_library("libmmi-server") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_surface:surface",
+    "samgr:samgr_proxy",
   ]
 
   if (input_feature_pointer_drawing) {
@@ -1793,6 +1794,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -1878,6 +1880,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libdm_lite",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -2232,6 +2235,7 @@ ohos_unittest("MonitorTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libdm_lite",
     "window_manager:libwm",
   ]
@@ -2655,6 +2659,7 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm_lite",
   ]
 }
@@ -2920,6 +2925,7 @@ ohos_unittest("EventHandlerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -3003,6 +3009,7 @@ ohos_unittest("InputEventHandlerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -3485,6 +3492,7 @@ ohos_unittest("DeviceManagerExTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libdm_lite",
   ]
 }
@@ -3677,6 +3685,7 @@ ohos_unittest("EventDumpTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -3719,6 +3728,7 @@ ohos_unittest("DeviceEventMonitorTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -3757,6 +3767,7 @@ ohos_unittest("DfxHisysEventTest") {
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -4274,6 +4285,7 @@ ohos_unittest("KeyEventHookManagerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -4413,6 +4425,7 @@ ohos_unittest("InputEventHookManagerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -4497,6 +4510,7 @@ ohos_unittest("KeyLoopClosureCheckerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -4581,6 +4595,7 @@ ohos_unittest("PointerLoopClosureCheckerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -4670,6 +4685,7 @@ ohos_unittest("PointerEventHookTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -4759,6 +4775,7 @@ ohos_unittest("KeyEventHookTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -4848,6 +4865,7 @@ ohos_unittest("InputEventHookTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }

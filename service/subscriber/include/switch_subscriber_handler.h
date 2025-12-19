@@ -21,14 +21,15 @@
 #include "i_input_event_handler.h"
 #include "uds_server.h"
 #include "libinput.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace MMI {
 class SwitchSubscriberHandler final : public IInputEventHandler {
 public:
-    SwitchSubscriberHandler() = default;
+    SwitchSubscriberHandler();
     DISALLOW_COPY_AND_MOVE(SwitchSubscriberHandler);
-    ~SwitchSubscriberHandler() = default;
+    ~SwitchSubscriberHandler();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -46,7 +47,7 @@ public:
     void DumpLidState(int32_t fd, const std::vector<std::string> &args);
     void SyncSwitchLidState(struct libinput_device *inputDevice);
     void SyncSwitchTabletState(struct libinput_device *inputDevice);
-    bool PublishSwitchCommonEvent(int32_t switchType, int32_t switchValue);
+    void SetCesReady();
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
@@ -65,6 +66,15 @@ private:
     };
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
+    class SwitchSubscriberSystemAbility : public SystemAbilityStatusChangeStub {
+        public:
+            void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+            void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    };
+
+    void SubSwitchSubscriberSystemAbility();
+    void UnSubSwitchSubscriberSystemAbility();
+
 private:
     bool OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent> keyEvent);
     void NotifySubscriber(std::shared_ptr<SwitchEvent> keyEvent,
@@ -80,7 +90,10 @@ private:
     std::atomic<int32_t> lidState_ { 0 };
     std::atomic<int32_t> tabletStandState_ { 0 };
     std::atomic<int32_t> switchEventType_ {0};
-    static inline int32_t timerId_ { -1 };
+    static inline sptr<SwitchSubscriberSystemAbility> switchSubscriberSystemAbility_ = nullptr;
+    static inline std::atomic<bool> isCesReady_ { false };
+    std::mutex mtx_;
+    std::condition_variable cv_;
 };
 } // namespace MMI
 } // namespace OHOS
