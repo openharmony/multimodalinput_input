@@ -205,7 +205,6 @@ public:
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();
-    virtual bool GetHardCursorEnabled() = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     virtual int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING

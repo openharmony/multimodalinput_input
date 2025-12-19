@@ -75,11 +75,6 @@ const char* POINTER_SIZE { "pointerSize" };
 const char* MAGIC_POINTER_COLOR { "magicPointerColor" };
 const char* MAGIC_POINTER_SIZE { "magicPointerSize"};
 const char* POINTER_CURSOR_RENDER_RECEIVER_NAME { "PointerCursorReceiver" };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
-constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr char ROTATE_WINDOW_ROTATE { '0' };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 [[ maybe_unused ]] constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
@@ -375,7 +370,7 @@ ICON_TYPE PointerDrawingManager::MouseIcon2IconType(MOUSE_ICON m)
     return ICON_TYPE(mouseIcons_[m].alignmentWay);
 }
 
-bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType)
+bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physicalY)
 {
     bool magicCursorSetBounds = false;
     if (UpdateSurfaceNodeBounds(physicalX, physicalY) == RET_OK) {
@@ -389,13 +384,13 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
             if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
                 // Change the coordinates issued by RS to asynchronous,
                 // without blocking the issuance of HardwareCursor coordinates.
-                SoftwareCursorMoveAsync(displayId_, physicalX, physicalY, iconType);
+                SoftwareCursorMoveAsync(displayId_, physicalX, physicalY);
             }
         }
         if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
             ResetMoveRetryTimer();
-            if (HardwareCursorMove(physicalX, physicalY, iconType) != RET_OK) {
-                MoveRetryAsync(physicalX, physicalY, iconType);
+            if (HardwareCursorMove(physicalX, physicalY) != RET_OK) {
+                MoveRetryAsync(physicalX, physicalY);
             }
         }
     } else {
@@ -415,15 +410,14 @@ void PointerDrawingManager::ForceClearPointerVisibleStatus()
     UpdatePointerVisible();
 }
 
-int32_t PointerDrawingManager::UpdateMouseLayer(const PointerStyle& pointerStyle,
-    int32_t physicalX, int32_t physicalY)
+int32_t PointerDrawingManager::UpdateMouseLayer(int32_t physicalX, int32_t physicalY)
 {
     if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
-    if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+    if (!SetCursorLocation(physicalX, physicalY)) {
         return RET_ERR;
     }
     return RET_OK;
@@ -449,8 +443,8 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     UpdateBindDisplayId(rsId);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ &&
-        lastDirection_ == direction && !offRenderScaleUpdate_) {
-        if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+        lastDirection_ == direction && !offRenderScaleUpdate_ && !mouseDirectionUpdate_) {
+        if (!SetCursorLocation(physicalX, physicalY)) {
             return RET_ERR;
         }
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle, id:%{public}d, size:%{public}d",
@@ -465,7 +459,7 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     if (GetHardCursorEnabled()) {
         UpdatePointerVisible();
     } else {
-        int32_t UpdateLayerRes = UpdateMouseLayer(pointerStyle, physicalX, physicalY);
+        int32_t UpdateLayerRes = UpdateMouseLayer(physicalX, physicalY);
         if (UpdateLayerRes != RET_OK) {
             MMI_HILOGE("Update Mouse Layer failed.");
         }
@@ -473,6 +467,7 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     }
     mouseIconUpdate_ = false;
     offRenderScaleUpdate_ = false;
+    mouseDirectionUpdate_ = false;
     MMI_HILOGD("Leave, rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
     return RET_OK;
@@ -503,24 +498,11 @@ void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, in
     UpdateBindDisplayId(rsId);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     if (GetSurfaceNode() != nullptr) {
-        if (!SetCursorLocation(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+        if (!SetCursorLocation(physicalX, physicalY)) {
             MMI_HILOGE("SetCursorLocation failed");
             return;
         }
         MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
-    }
-}
-
-void PointerDrawingManager::SetHardwareCursorPosition(int32_t physicalX, int32_t physicalY,
-    PointerStyle pointerStyle)
-{
-    if (GetHardCursorEnabled() && lastMouseStyle_.id != MOUSE_ICON::LOADING &&
-            lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
-        auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-        ResetMoveRetryTimer();
-        if (HardwareCursorMove(physicalX, physicalY, align) != RET_OK) {
-            MoveRetryAsync(physicalX, physicalY, align);
-        }
     }
 }
 
@@ -561,7 +543,6 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
         return;
     }
     UpdatePointerVisible();
-    SetHardwareCursorPosition(physicalX, physicalY, lastMouseStyle_);
     MMI_HILOGI("Leave, rsId:%{private}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
 }
@@ -615,7 +596,6 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
         return ret;
     }
     UpdatePointerVisible();
-    SetHardwareCursorPosition(physicalX, physicalY, lastMouseStyle_);
     return RET_OK;
 }
 
@@ -1128,7 +1108,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
         CHKPV(it.second);
-        Direction direction = CalculateRenderDirection(false, IsWindowRotation(&displayInfo_));
+        Direction direction = CalculateRenderDirection(false);
         cfg.direction = it.second->IsMirror() ? DIRECTION0 : direction;
         auto sn = it.second->GetSurfaceNode();
         cfg.dpi = it.second->GetDPI();
@@ -1170,14 +1150,12 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
 
         HardwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
         ResetMoveRetryTimer();
-        if (HardwareCursorMove(lastPhysicalX_, lastPhysicalY_,
-            MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id))) != RET_OK) {
-            MoveRetryAsync(lastPhysicalX_, lastPhysicalY_, MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
+        if (HardwareCursorMove(lastPhysicalX_, lastPhysicalY_) != RET_OK) {
+            MoveRetryAsync(lastPhysicalX_, lastPhysicalY_);
         }
         PostSoftCursorTask([this]() {
             SoftwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
-            SoftwareCursorMove(displayId_, lastPhysicalX_, lastPhysicalY_,
-                MouseIcon2IconType(MOUSE_ICON(currentMouseStyle_.id)));
+            SoftwareCursorMove(displayId_, lastPhysicalX_, lastPhysicalY_);
         });
         currentFrame_++;
         if (currentFrame_ == frameCount_) {
@@ -1525,40 +1503,11 @@ bool PointerDrawingManager::GetMouseDisplayState() const
     return mouseDisplayState_;
 }
 
-bool PointerDrawingManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo)
-{
-    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
-        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
-    CHKPF(displayInfo);
-
-    bool foldableDevicePolicyMain = false;
-    bool foldableDevicePolicyFull = false;
-    if (!FOLDABLE_DEVICE_POLICY.empty()) {
-        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
-    }
-    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
-        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
-    }
-
-    return (ROTATE_POLICY == WINDOW_ROTATE ||
-        (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
-        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
-}
-
 Direction PointerDrawingManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     CHKPR(displayInfo, DIRECTION0);
     Direction direction = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    if (GetHardCursorEnabled()) {
-        if (IsWindowRotation(displayInfo)) {
-            direction = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
-                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        } else {
-            direction = displayInfo->direction;
-        }
-    }
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = displayInfo->direction;
     }
@@ -1719,7 +1668,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
     auto sptr = sp->GetSurfaceNode(); // use SurfaceNode from current display
     CHKPR(GetSurfaceNode(), RET_ERR);
     SetSurfaceNode(sptr);
-    sp->MoveSoft(physicalX, physicalY, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)));
+    sp->MoveSoft(physicalX, physicalY);
     return RET_OK;
 }
 
@@ -2253,7 +2202,6 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         }
     }
     UpdatePointerVisible();
-    SetHardwareCursorPosition(lastPhysicalX_, lastPhysicalY_, lastMouseStyle_);
     return RET_OK;
 }
 
@@ -2277,7 +2225,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
     if (GetHardCursorEnabled()) {
         auto sp = GetScreenPointer(displayInfo.rsId);
         CHKPV(sp);
-        sp->OnDisplayInfo(displayInfo, IsWindowRotation(&displayInfo));
+        sp->OnDisplayInfo(displayInfo);
         if (sp->IsMain()) {
             UpdateMirrorScreens(sp, displayInfo);
         }
@@ -2288,6 +2236,9 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
         ((float(displayInfo_.screenRealWidth) / displayInfo_.width) !=
         (float(displayInfo.screenRealWidth) / displayInfo.width))) {
         offRenderScaleUpdate_ = true;
+    }
+    if (displayInfo_.direction != displayInfo.direction) {
+        mouseDirectionUpdate_ = true;
     }
     displayInfo_ = displayInfo;
     int32_t size = GetPointerSize();
@@ -2364,7 +2315,6 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         return RET_ERR;
     }
     UpdatePointerVisible();
-    SetHardwareCursorPosition(physicalX, physicalY, lastMouseStyle_);
     return RET_OK;
 }
 
@@ -2616,8 +2566,7 @@ void PointerDrawingManager::UpdatePointerVisible()
                 MMI_HILOGE("Init Layer failed");
                 return;
             }
-            auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-            if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_, align)) {
+            if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_)) {
                 MMI_HILOGE("SetCursorLocation fail");
             }
         }
@@ -2788,7 +2737,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t rs
     CHKPV(surfaceNodePtr);
     displayId_ = rsId;
     if (GetHardCursorEnabled()) {
-        if (!SetCursorLocation(x, y, MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id)))) {
+        if (!SetCursorLocation(x, y)) {
             MMI_HILOGE("SetCursorLocation fail");
             return;
         }
@@ -3341,8 +3290,7 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
     AttachToDisplay();
 
     // 新屏幕上软硬光标位置更新
-    auto align = MouseIcon2IconType(MOUSE_ICON(lastMouseStyle_.id));
-    if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_, align)) {
+    if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_)) {
         MMI_HILOGE("SetCursorLocation fail");
     }
 
@@ -3429,10 +3377,9 @@ void PointerDrawingManager::UpdateScreenScalesAndPadding(const sptr<OHOS::Rosen:
         }
         if (sp->IsMirror()) {
             // Update ScreenPointer on the mirror screen
-            sp->SetRotation(mainRotation);
+            sp->SetSourceScreenRotation(mainRotation);
             sp->UpdatePadding(mainWidth, mainHeight);
             if (hasDisplay_ && displayInfo_.displaySourceMode == DisplaySourceMode::SCREEN_MAIN) {
-                sp->SetIsWindowRotation(IsWindowRotation(&displayInfo_));
                 sp->SetDisplayDirection(displayInfo_.displayDirection);
             }
             sp->SetDPI(mainDPI);
@@ -3467,16 +3414,14 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     });
 }
 
-Direction PointerDrawingManager::CalculateRenderDirection(bool isHard, bool isWindowRotation)
+Direction PointerDrawingManager::CalculateRenderDirection(bool isHard)
 {
-    Direction direction = DIRECTION0;
     if (isHard) {
-        direction = displayInfo_.direction;
-    } else if (isWindowRotation) {
-        direction = static_cast<Direction>((((displayInfo_.direction - displayInfo_.displayDirection) *
+        return displayInfo_.direction;
+    } else {
+        return static_cast<Direction>((((displayInfo_.direction - displayInfo_.displayDirection) *
             ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
     }
-    return direction;
 }
 
 void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
@@ -3491,7 +3436,7 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.isHard = isHard;
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
-    Direction direction = CalculateRenderDirection(isHard, IsWindowRotation(&displayInfo_));
+    Direction direction = CalculateRenderDirection(isHard);
     cfg.direction = sp->IsMirror() ? DIRECTION0 : direction;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
@@ -3623,12 +3568,11 @@ void PointerDrawingManager::UpdateMirrorScreens(std::shared_ptr<ScreenPointer> s
         }
         if (it.second->IsMirror()) {
             auto& mirrorScreen = it.second;
-            mirrorScreen->SetIsWindowRotation(IsWindowRotation(&displayInfo));
             bool isDirectionChanged = false;
-            if (mirrorScreen->GetRotation() != static_cast<rotation_t>(displayInfo.direction)) {
+            if (mirrorScreen->GetSourceScreenRotation() != static_cast<rotation_t>(displayInfo.direction)) {
                 MMI_HILOGI("update mirror screen, rotation from %{public}u to %{public}d,",
-                    mirrorScreen->GetRotation(), displayInfo.direction);
-                mirrorScreen->SetRotation(static_cast<rotation_t>(displayInfo.direction));
+                    mirrorScreen->GetSourceScreenRotation(), displayInfo.direction);
+                mirrorScreen->SetSourceScreenRotation(static_cast<rotation_t>(displayInfo.direction));
                 isDirectionChanged = true;
             }
             if (mirrorScreen->GetDisplayDirection() != displayInfo.displayDirection) {
@@ -3721,13 +3665,13 @@ void PointerDrawingManager::ClearDisappearedScreenPointer(const std::set<uint64_
     }
 }
 
-int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align)
+int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y)
 {
-    MMI_HILOGD("HardwareCursorMove loc: (%{private}d, %{private}d), align type: %{public}d", x, y, align);
+    MMI_HILOGD("HardwareCursorMove loc: (%{private}d, %{private}d)", x, y);
     int32_t ret = RET_OK;
     auto sp = GetScreenPointer(displayId_);
     CHKPR(sp, RET_ERR);
-    if (!sp->Move(x, y, align)) {
+    if (!sp->Move(x, y)) {
         ret = RET_ERR;
         MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, displayId_);
     }
@@ -3735,12 +3679,12 @@ int32_t PointerDrawingManager::HardwareCursorMove(int32_t x, int32_t y, ICON_TYP
     for (auto it : screenPointers) {
         CHKPC(it.second);
         if (it.second->IsMirror()) {
-            if (!it.second->Move(x, y, align)) {
+            if (!it.second->Move(x, y)) {
                 ret = RET_ERR;
                 MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, it.first);
             }
         } else if (it.first != displayId_) {
-            if (!it.second->Move(0, 0, align)) {
+            if (!it.second->Move(0, 0)) {
                 ret = RET_ERR;
                 MMI_HILOGE("ScreenPointer::Move failed, screenId: %{public}" PRIu64, it.first);
             }
@@ -3754,7 +3698,7 @@ int32_t PointerDrawingManager::CheckHwcReady()
     auto sp = GetScreenPointer(displayId_);
     CHKPR(sp, RET_ERR);
     int32_t failCount = 0;
-    while (sp != nullptr && !sp->Move(lastPhysicalX_, lastPhysicalY_, ICON_TYPE::ANGLE_NW)) {
+    while (sp != nullptr && !sp->Move(lastPhysicalX_, lastPhysicalY_)) {
         failCount++;
         if (failCount > MAX_FAIL_COUNT) {
             MMI_HILOGE("CheckHwcReady failed, screenId: %{public}" PRIu64, displayId_);
@@ -3766,39 +3710,39 @@ int32_t PointerDrawingManager::CheckHwcReady()
     return RET_OK;
 }
 
-void PointerDrawingManager::SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align)
+void PointerDrawingManager::SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y)
 {
     auto sp = GetScreenPointer(displayId);
     CHKPV(sp);
-    sp->MoveSoft(x, y, align);
+    sp->MoveSoft(x, y);
 
     for (auto& msp : GetMirrorScreenPointers()) {
         CHKPC(msp);
-        msp->MoveSoft(x, y, align);
+        msp->MoveSoft(x, y);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void PointerDrawingManager::SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align)
+void PointerDrawingManager::SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y)
 {
-    PostSoftCursorTask([this, displayId, x, y, align]() {
-        SoftwareCursorMove(displayId, x, y, align);
+    PostSoftCursorTask([this, displayId, x, y]() {
+        SoftwareCursorMove(displayId, x, y);
     });
 }
 
-void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align)
+void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y)
 {
-    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, x, y, align]() {
-        PostMoveRetryTask([this, x, y, align]() {
+    moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, x, y]() {
+        PostMoveRetryTask([this, x, y]() {
             moveRetryCount_++;
-            MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, align:%{public}d, Timer Id:%{public}d,"
-                "move retry count:%{public}d", x, y, align, moveRetryTimerId_, moveRetryCount_);
+            MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, Timer Id:%{public}d,"
+                "move retry count:%{public}d", x, y, moveRetryTimerId_, moveRetryCount_);
             if (moveRetryTimerId_ == DEFAULT_VALUE) {
                 moveRetryCount_ = 0;
                 MMI_HILOGI("MoveRetryAsync timer id is invalid, stop retry");
                 return;
             }
-            if (HardwareCursorMove(x, y, align) == RET_OK) {
+            if (HardwareCursorMove(x, y) == RET_OK) {
                 int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
                 MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d, ret:%{public}d",
                     moveRetryTimerId_, ret);

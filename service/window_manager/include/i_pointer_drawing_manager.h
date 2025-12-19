@@ -169,8 +169,7 @@ public:
     virtual void UnSubscribeScreenModeChange() {}
     virtual void RegisterDisplayStatusReceiver() {}
     virtual void InitDefaultMouseIconPath() {}
-    virtual int32_t UpdateMouseLayer(const PointerStyle& pointerStyle,
-        int32_t physicalX, int32_t physicalY)
+    virtual int32_t UpdateMouseLayer(int32_t physicalX, int32_t physicalY)
     {
         return 0;
     }

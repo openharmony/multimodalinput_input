@@ -44,7 +44,7 @@ public:
     bool InitSurface();
     void UpdateScreenInfo(screen_info_ptr_t si);
     bool UpdatePadding(uint32_t mainWidth, uint32_t mainHeight);
-    void OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotation);
+    void OnDisplayInfo(const OLD::DisplayInfo &di);
 
     buffer_ptr_t GetDefaultBuffer();
     buffer_ptr_t GetTransparentBuffer();
@@ -52,8 +52,8 @@ public:
     buffer_ptr_t RequestBuffer(const RenderConfig &cfg, bool &isCommonBuffer);
     buffer_ptr_t GetCurrentBuffer();
 
-    bool Move(int32_t x, int32_t y, ICON_TYPE align);
-    bool MoveSoft(int32_t x, int32_t y, ICON_TYPE align);
+    bool Move(int32_t x, int32_t y);
+    bool MoveSoft(int32_t x, int32_t y);
     void CalculatePositionForMirror(int32_t x, int32_t y, int32_t* px, int32_t* py);
     bool SetInvisible();
 
@@ -133,9 +133,14 @@ public:
 
     float GetRenderDPI() const;
 
-    void SetRotation(const rotation_t rotation)
+    void SetSourceScreenRotation(const rotation_t sourceScreenRotation)
     {
-        rotation_ = rotation;
+        sourceScreenRotation_ = sourceScreenRotation;
+    }
+ 
+    rotation_t GetSourceScreenRotation()
+    {
+        return sourceScreenRotation_;
     }
 
     rotation_t GetRotation()
@@ -161,11 +166,6 @@ public:
     Direction GetDisplayDirection()
     {
         return displayDirection_;
-    }
-
-    void SetIsWindowRotation(bool isWindowRotation)
-    {
-        isWindowRotation_ = isWindowRotation;
     }
 
     bool IsPositionOutScreen(int32_t x, int32_t y);
@@ -202,12 +202,10 @@ public:
 private:
     bool InitSurfaceNode();
     bool FlushSerfaceBuffer();
-    void Rotate(rotation_t rotation, int32_t& x, int32_t& y);
+    void Rotate(rotation_t rotation, int32_t& x, int32_t& y, int32_t width, int32_t height);
     void CalculateHwcPositionForMirror(int32_t& x, int32_t& y);
     void CalculateHwcPositionForExtend(int32_t& x, int32_t& y);
-#ifdef OHOS_BUILD_EXTERNAL_SCREEN
     void CalculateHwcPositionForMain(int32_t& x, int32_t& y);
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
     bool InitDefaultBuffer(const OHOS::BufferRequestConfig &bufferCfg, PointerRenderer &render);
     bool InitTransparentBuffer(const OHOS::BufferRequestConfig &bufferCfg);
     bool InitCommonBuffer(const OHOS::BufferRequestConfig &bufferCfg);
@@ -226,12 +224,12 @@ private:
     rotation_t rotation_{rotation_t::ROTATION_0};
     float dpi_{1.0f};
     Direction displayDirection_{DIRECTION0};
-    bool isWindowRotation_{false};
 
-    // screen scale and padding info
+    // screen scale and padding info for mirror mode
     float scale_{1.0f};
     int32_t paddingTop_{0};
     int32_t paddingLeft_{0};
+    rotation_t sourceScreenRotation_ {rotation_t::ROTATION_0};
 
     hwcmgr_ptr_t hwcMgr_{nullptr};
     handler_ptr_t handler_{nullptr};
