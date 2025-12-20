@@ -5508,7 +5508,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     winMap.clear();
-    UpdateFirstTouchWindowInfos(pointerEvent, touchWindow);
+    UpdateFirstTouchWindowInfos(pointerEvent, pointerItem, touchWindow);
     if (!isFollowFirstTouch) {
         ProcessOtherTouchHit(pointerEvent, pointerItem, touchWindow);
     }
@@ -5838,20 +5838,34 @@ bool InputWindowsManager::IsFindFirstTouchFlagWindow(const WindowInfo &item, std
 }
 
 void InputWindowsManager::UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent,
-    const WindowInfo* touchWindow)
+    const PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow)
 {
     if (pointerEvent == nullptr || touchWindow == nullptr) {
         return;
     }
     int32_t deviceId = pointerEvent->GetDeviceId();
     if ((pointerEvent->GetPointerId() % SIMULATE_POINTER_ID) == FIRST_TOUCH) {
-        firstTouchWindowInfos_[deviceId].displayId = touchWindow->displayId;
-        firstTouchWindowInfos_[deviceId].windowId = touchWindow->id;
-        firstTouchWindowInfos_[deviceId].flags = touchWindow->flags;
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOG_DISPATCHD("firstTouchWindowInfos_:deviceId:%{public}d,PI:%{public}d"
+            firstTouchWindowInfos_[deviceId].displayId = touchWindow->displayId;
+            firstTouchWindowInfos_[deviceId].windowId = touchWindow->id;
+            firstTouchWindowInfos_[deviceId].flags = touchWindow->flags;
+            MMI_HILOG_DISPATCHD("firstTouchWindowInfos_:deviceId:%{public}d,PI:%{public}d,"
                 "WI:%{public}d, flags:%{public}d", deviceId, pointerEvent->GetPointerId(),
                 touchWindow->id, touchWindow->flags);
+            return;
+        }
+        bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
+            (extraData_.pointerId % SIMULATE_POINTER_ID) == FIRST_TOUCH) ||
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+        if (checkExtraData) {
+            firstTouchWindowInfos_[deviceId].displayId = touchWindow->displayId;
+            firstTouchWindowInfos_[deviceId].windowId = touchWindow->id;
+            firstTouchWindowInfos_[deviceId].flags = touchWindow->flags;
+            MMI_HILOG_DISPATCHD("firstTouchWindowInfos_ drag:deviceId:%{public}d,PI:%{public}d,"
+                "WI:%{public}d, flags:%{public}d", deviceId, pointerEvent->GetPointerId(),
+                touchWindow->id, touchWindow->flags);
+            return;
         }
     }
 }
