@@ -29,6 +29,10 @@
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "pointer_device_manager.h"
 
+#ifdef OHOS_BUILD_ENABLE_DRAG_SECURITY
+#include "drag_security_manager.h"
+#endif // OHOS_BUILD_ENABLE_DRAG_SECURITY
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
@@ -469,6 +473,11 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     pointerEvent->SetMarkEnabled(AcquireEnableMark(pointerEvent));
     pointerEvent->SetSensorInputTime(point->GetSensorInputTime());
     FilterInvalidPointerItem(pointerEvent, fd);
+#ifdef OHOS_BUILD_ENABLE_DRAG_SECURITY
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        DragSecurityManager::GetInstance().DragSecurityUpdatePointerEvent(pointerEvent);
+    }
+#endif // OHOS_BUILD_ENABLE_DRAG_SECURITY
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

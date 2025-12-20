@@ -205,6 +205,7 @@ public:
     int32_t GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle);
     int32_t GetUserDefinedCursorPixelMap(void *pixelMapPtr);
     int32_t IsPointerInit(bool &status);
+    int32_t DeliverNonce(const std::string &nonce);
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING

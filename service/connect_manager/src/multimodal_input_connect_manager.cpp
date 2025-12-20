@@ -1330,5 +1330,16 @@ int32_t MultimodalInputConnectManager::ControlMouseEventToAnco(int32_t windowId,
     return multimodalInputConnectService_->ControlMouseEventToAnco(windowId, enable);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+int32_t MultimodalInputConnectManager::DeliverNonce(const std::string &nonce)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("MultimodalInputConnectService_ is nullptr");
+        return INVALID_HANDLER_ID;
+    }
+    return multimodalInputConnectService_->DeliverNonce(nonce);
+}
 } // namespace MMI
 } // namespace OHOS
