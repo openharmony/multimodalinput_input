@@ -215,7 +215,6 @@ void SwitchSubscriberHandler::SubmitWaitAndPublishEvent(const std::shared_ptr<Sw
                 auto curTime = std::chrono::steady_clock::now();
                 auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
                     curTime - startTime).count();
-
                 if (elapsed >= MAX_WAIT_TIME) {
                     MMI_HILOGW("wait COMMON_EVENT_SERVICE timeout.");
                     return;
