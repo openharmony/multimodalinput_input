@@ -33,6 +33,7 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SwitchSubscriberHandler"
 constexpr int MAX_WAIT_TIME = 5;
+constexpr int32_t DELAY_CHECK_CES_STATUS = 100;
 
 namespace OHOS {
 namespace MMI {
@@ -183,29 +184,35 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
         ffrt::submit(
             [this, switchEvent] {
-                std::unique_lock<std::mutex> lock(mtx_);
-                bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
-                    return isCesReady_.load();
-                });
-                if (status) {
-                    this->PublishTabletEvent(switchEvent);
-                } else {
-                    MMI_HILOGI("wait COMMON_EVENT_SERVICE timeout.");
+                auto startTime = std::chrono::steady_clock::now();
+                while (!isCesReady_.load(std::memory_order_acquire)) {
+                    auto curTime = std::chrono::steady_clock::now();
+                    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+                        curTime - startTime).count();
+                    if (elapsed >= MAX_WAIT_TIME) {
+                        MMI_HILOGW("wait COMMON_EVENT_SERVICE timeout.");
+                        return;
+                    }
+                    ffrt::this_task::sleep_for(std::chrono::milliseconds(DELAY_CHECK_CES_STATUS));
                 }
+                this->PublishTabletEvent(switchEvent);
             },
             ffrt::task_attr().name("publish_tablet_mode_common_event"));
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         ffrt::submit(
             [this, switchEvent] {
-                std::unique_lock<std::mutex> lock(mtx_);
-                bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
-                    return isCesReady_.load();
-                });
-                if (status) {
-                    this->PublishLidEvent(switchEvent);
-                } else {
-                    MMI_HILOGI("wait COMMON_EVENT_SERVICE timeout.");
+                auto startTime = std::chrono::steady_clock::now();
+                while (!isCesReady_.load(std::memory_order_acquire)) {
+                    auto curTime = std::chrono::steady_clock::now();
+                    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+                        curTime - startTime).count();
+                    if (elapsed >= MAX_WAIT_TIME) {
+                        MMI_HILOGW("wait COMMON_EVENT_SERVICE timeout.");
+                        return;
+                    }
+                    ffrt::this_task::sleep_for(std::chrono::milliseconds(DELAY_CHECK_CES_STATUS));
                 }
+                this->PublishLidEvent(switchEvent);
             },
             ffrt::task_attr().name("publish_lid_state_common_event"));
     }
@@ -217,14 +224,6 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     nextHandler_->HandleSwitchEvent(switchEvent);
 }
 
-void SwitchSubscriberHandler::SetCesReady()
-{
-    std::lock_guard<std::mutex> lock(mtx_);
-    isCesReady_.store(true, std::memory_order_release);
-    MMI_HILOGI("isCesReady_ set true");
-    cv_.notify_one();
-}
-
 void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnAddSystemAbility(int32_t systemAbilityId,
     const std::string &deviceId)
 {
@@ -233,7 +232,8 @@ void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnAddSystemAbility(
         case COMMON_EVENT_SERVICE_ID: {
             auto switchSubscriberHandler = InputHandler->GetSwitchSubscriberHandler();
             if (switchSubscriberHandler != nullptr) {
-                switchSubscriberHandler->SetCesReady();
+                SwitchSubscriberHandler::isCesReady_.store(true, std::memory_order_release);
+                MMI_HILOGI("isCesReady_ set true");
             } else {
                 MMI_HILOGE("switchSubscriberHandler is null");
             }
