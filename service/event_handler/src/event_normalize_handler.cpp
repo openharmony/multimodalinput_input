@@ -781,6 +781,11 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     }
     lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
 
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        FingerprintEventHdr->SetScreenState(true);
+    }
+#endif
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");
