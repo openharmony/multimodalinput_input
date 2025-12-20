@@ -1347,6 +1347,15 @@ public:
     * @since 23
     */
     int32_t GetExternalObject(const std::string &pluginName, sptr<IRemoteObject> &pluginRemoteStub);
+
+    /**
+    * @brief Deliver drag auth nonce.
+    * @param nonce Drag auth nonce.
+    * @return Return <b>0</b> if successful; returns a non-0 value otherwise.
+    * @since 23
+    */
+    int32_t DeliverNonce(const std::string &nonce);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

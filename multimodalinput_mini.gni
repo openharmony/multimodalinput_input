@@ -68,6 +68,12 @@ declare_args() {
   input_feature_input_event_hook = true
   input_feature_external_screen = true
   input_ext_feature_anco_game_event_mapping = false
+  input_feature_drag_security = false
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_device_status)) {
+    input_feature_drag_security = true
+  }
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -344,6 +350,10 @@ print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 print("input_feature_external_screen = ${input_feature_external_screen}")
 
 input_default_defines = []
+
+if (input_feature_drag_security) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_DRAG_SECURITY" ]
+}
 
 if (input_feature_pointer_drawing) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]

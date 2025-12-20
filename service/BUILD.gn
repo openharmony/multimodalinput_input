@@ -298,6 +298,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/include",
     "${mmi_path}/util/json_parser/include",
     "${mmi_service_path}/product_property_config/include",
+    "${mmi_path}/service/drag_security/include",
   ]
 
   sources += [
@@ -305,6 +306,7 @@ ohos_shared_library("libmmi-server") {
     "display_state_manager/src/display_event_monitor.cpp",
     "subscriber/src/tablet_subscriber_handler.cpp",
     "window_manager/src/cursor_drawing_component.cpp",
+    "drag_security/src/drag_security_manager.cpp"
   ]
 
   if (input_feature_keyboard) {
@@ -548,6 +550,8 @@ ohos_shared_library("libmmi-server") {
       "init:libbegetutil",
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
+      "openssl:libcrypto_shared",
+      "openssl:libssl_shared"
     ]
   }
 
@@ -1895,6 +1899,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "${mmi_path}/libudev/include",
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/drag_security/include",
   ]
 
   configs = [
@@ -3153,6 +3158,7 @@ ohos_unittest("EventDispatchTest") {
     "${mmi_path}/util/common/include",
     "${target_gen_dir}",
     "${target_gen_dir}/connect_manager",
+    "${mmi_path}/service/drag_security/include",
   ]
 
   sources = [
@@ -3189,6 +3195,8 @@ ohos_unittest("EventDispatchTest") {
     "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared"
   ]
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]

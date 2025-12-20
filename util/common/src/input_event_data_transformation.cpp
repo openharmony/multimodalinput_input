@@ -308,6 +308,10 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("SerializeSettings fail");
         return RET_ERR;
     }
+    if (!SerializeDragSecurityData(event, pkt)) {
+        MMI_HILOGE("serializeDragSecurityData fail");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -472,6 +476,10 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
 
     if (!DeserializeSettings(pkt, event)) {
         MMI_HILOGE("DeserializeSettings fail");
+        return RET_ERR;
+    }
+    if (!DeserializeDragSecurityData(pkt, event)) {
+        MMI_HILOGE("DeserializeDragSecurityData fail");
         return RET_ERR;
     }
     return RET_OK;
@@ -657,6 +665,24 @@ bool InputEventDataTransformation::DeserializeSettings(NetPacket &pkt, std::shar
 
     pkt >> setting;
     event->SetScrollRows(setting);
+
+    return !pkt.ChkRWError();
+}
+
+bool InputEventDataTransformation::SerializeDragSecurityData(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+    pkt <<event->GetDistributeEventTime() << event->GetSignature();
+    return !pkt.ChkRWError();
+}
+
+bool InputEventDataTransformation::DeserializeDragSecurityData(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    uint64_t distributeEventTime = 0 ;
+    pkt >> distributeEventTime;
+    event->SetDistributeEventTime(distributeEventTime);
+    std::string signature;
+    pkt >>signature;
+    event->SetSignature(signature);
 
     return !pkt.ChkRWError();
 }
