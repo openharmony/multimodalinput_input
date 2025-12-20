@@ -1635,20 +1635,22 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
     CALL_DEBUG_ENTER;
     // suface node init
     auto sp = GetScreenPointer(rsId);
-    if (sp != nullptr) {
-        if (!g_isRsRestart) {
-            auto screenPointers = CopyScreenPointers();
-            for (auto it : screenPointers) {
-                CHKPR(it.second, RET_ERR);
-                it.second->Init(pointerRenderer_);
+    if (sp != nullptr && !g_isRsRestart) {
+        auto screenPointers = CopyScreenPointers();
+        for (auto it : screenPointers) {
+            CHKPR(it.second, RET_ERR);
+            if (it.second == nullptr) {
+                return RET_ERR;
             }
-            if (rsId == displayInfo_.rsId) {
-                SetSurfaceNode(sp->GetSurfaceNode());
-            }
-            Rosen::RSTransaction::FlushImplicitTransaction();
-            g_isRsRestart = true;
+            it.second->Init(pointerRenderer_);
         }
-    } else {
+        if (rsId == displayInfo_.rsId) {
+            SetSurfaceNode(sp->GetSurfaceNode());
+        }
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        g_isRsRestart = true;
+
+    } else if (sp == nullptr) {
         g_isRsRestart = true;
         sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
         CHKPR(sp, RET_ERR);
@@ -1665,9 +1667,8 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
     CHKPR(sp, RET_ERR);
-    auto sptr = sp->GetSurfaceNode(); // use SurfaceNode from current display
+    SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
     CHKPR(GetSurfaceNode(), RET_ERR);
-    SetSurfaceNode(sptr);
     sp->MoveSoft(physicalX, physicalY);
     return RET_OK;
 }
@@ -2222,9 +2223,8 @@ int32_t PointerDrawingManager::GetPointerColor()
 void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
-    if (GetHardCursorEnabled()) {
-        auto sp = GetScreenPointer(displayInfo.rsId);
-        CHKPV(sp);
+    auto sp = GetScreenPointer(displayInfo.rsId);
+    if (GetHardCursorEnabled() && sp != nullptr) {
         sp->OnDisplayInfo(displayInfo);
         if (sp->IsMain()) {
             UpdateMirrorScreens(sp, displayInfo);
@@ -3046,6 +3046,10 @@ void PointerDrawingManager::SubscribeScreenModeChange()
             this->OnScreenModeChange(screens);
         }
     };
+    if (screenModeChangeListener_ != nullptr) {
+        OHOS::Rosen::ScreenManagerLite::GetInstance().
+            UnregisterScreenModeChangeListener(screenModeChangeListener_);
+    }
     screenModeChangeListener_ = new ScreenModeChangeListener(callback);
     auto begin = std::chrono::high_resolution_clock::now();
     auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().RegisterScreenModeChangeListener(
@@ -3407,6 +3411,10 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     }
     CursorDrawingComponent::GetInstance();
     delegateProxy->OnPostSyncTask([this, screens] {
+        if (!POINTER_DEV_MGR.isInit) {
+            MMI_HILOGE("skip ScreenModeChange callback");
+            return RET_OK;
+        }
         auto mainScreen = this->UpdateScreenPointerAndFindMainScreenInfo(screens);
         this->UpdateScreenScalesAndPadding(mainScreen);
         this->UpdatePointerVisible();
