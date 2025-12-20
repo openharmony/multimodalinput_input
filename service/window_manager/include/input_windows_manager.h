@@ -530,7 +530,8 @@ private:
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsFindFirstTouchFlagWindow(const WindowInfo &item, std::shared_ptr<PointerEvent> pointerEvent);
-    void UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    void UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent,
+        const PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
     void ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
         PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
 private:

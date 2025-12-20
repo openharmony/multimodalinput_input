@@ -13394,7 +13394,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateFirstTouchWindow
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, &touchWindow);
+    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, item, &touchWindow);
     ASSERT_EQ(1, inputWindowsManager.firstTouchWindowInfos_.size());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
@@ -13422,9 +13422,43 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateFirstTouchWindow
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, &touchWindow);
+    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, item, &touchWindow);
     ASSERT_EQ(0, inputWindowsManager.firstTouchWindowInfos_.size());
     inputWindowsManager.firstTouchWindowInfos_.clear();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateFirstTouchWindowInfos_drag
+ * @tc.desc: Test the funcation UpdateFirstTouchWindowInfos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateFirstTouchWindowInfos_drag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.extraData_.appended = true;
+    inputWindowsManager.extraData_.buffer.push_back(1);
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    inputWindowsManager.extraData_.pointerId = 0;
+    WindowInfo touchWindow;
+    touchWindow.id = 2;
+    touchWindow.displayId = 0;
+    touchWindow.flags |= WindowInputPolicy::FLAG_FIRST_TOUCH_HIT;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    inputWindowsManager.UpdateFirstTouchWindowInfos(pointerEvent, item, &touchWindow);
+    ASSERT_EQ(1, inputWindowsManager.firstTouchWindowInfos_.size());
+    inputWindowsManager.firstTouchWindowInfos_.clear();
+    inputWindowsManager.extraData_.appended = false;
 }
 
 /**
