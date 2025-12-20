@@ -33,7 +33,7 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SwitchSubscriberHandler"
 constexpr int MAX_WAIT_TIME = 5;
-constexpr int32_t DELAY_CHECK_CES_STATUS = 100;
+constexpr int DELAY_CHECK_CES_STATUS = 100;
 
 namespace OHOS {
 namespace MMI {
