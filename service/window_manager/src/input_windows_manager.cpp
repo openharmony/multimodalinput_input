@@ -59,11 +59,6 @@ namespace {
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
-constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr char ROTATE_WINDOW_ROTATE { '0' };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
 constexpr int32_t SCALE_X { 0 };
@@ -291,8 +286,11 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleTouchEvent(tPointerEvent);
-        auto iter = touchItemDownInfos_.find(pointerId);
-        if (iter != touchItemDownInfos_.end()) {
+        if (touchItemDownInfos_.find(item.GetDeviceId()) == touchItemDownInfos_.end()) {
+            continue;
+        }
+        auto iter = touchItemDownInfos_[item.GetDeviceId()].find(pointerId);
+        if (iter != touchItemDownInfos_[item.GetDeviceId()].end()) {
             iter->second.flag = false;
         }
     }
@@ -386,8 +384,13 @@ bool InputWindowsManager::CheckAppFocused(int32_t pid)
 bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-        if (iter != touchItemDownInfos_.end()) {
+        int32_t deviceId = pointerEvent->GetDeviceId();
+        if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+            MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+            return false;
+        }
+        auto iter = touchItemDownInfos_[deviceId].find(pointerEvent->GetPointerId());
+        if (iter != touchItemDownInfos_[deviceId].end()) {
             return iter->second.flag;
         }
         return true;
@@ -406,6 +409,7 @@ bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointer
         return false;
     }
     int32_t pointerId = pointerEvent->GetPointerId();
+    int32_t deviceId = pointerEvent->GetDeviceId();
     PointerEvent::PointerItem pointerItem;
     bool isPenHover = pointerEvent->GetPointerItem(pointerId, pointerItem) && pointerItem.IsPressed() == false &&
         (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN ||
@@ -413,8 +417,12 @@ bool InputWindowsManager::AdjustFingerFlag(std::shared_ptr<PointerEvent> pointer
     if (isPenHover) {
         return false;
     }
-    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    return (iter != touchItemDownInfos_.end() && !(iter->second.flag));
+    if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+        return false;
+    }
+    auto iter = touchItemDownInfos_[deviceId].find(pointerEvent->GetPointerId());
+    return (iter != touchItemDownInfos_[deviceId].end() && !(iter->second.flag));
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
@@ -422,7 +430,12 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, INVALID_FD);
     const WindowInfo* windowInfo = nullptr;
-    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+        return INVALID_FD;
+    }
+    auto iter = touchItemDownInfos_[deviceId].find(pointerEvent->GetPointerId());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         int32_t pointerId = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
@@ -431,7 +444,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PENCIL);
         if (isPenHover) {
             MMI_HILOG_DISPATCHD("Skip hover event");
-        } else if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
+        } else if (iter != touchItemDownInfos_[deviceId].end() && !(iter->second.flag)) {
             MMI_HILOG_DISPATCHD("Drop event");
             return INVALID_FD;
         }
@@ -525,7 +538,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     int32_t agentPid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        if (iter != touchItemDownInfos_.end()) {
+        if (iter != touchItemDownInfos_[deviceId].end()) {
             MMI_HILOG_DISPATCHI("Cant not find agentPid");
             agentPid = iter->second.window.agentPid;
             iter->second.flag = false;
@@ -560,9 +573,14 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+        return;
+    }
+    auto iter = touchItemDownInfos_[deviceId].find(pointerEvent->GetPointerId());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        if (iter == touchItemDownInfos_.end()) {
+        if (iter == touchItemDownInfos_[deviceId].end()) {
             MMI_HILOG_DISPATCHD("Unable to find finger information for touch.pointerId:%{public}d",
                 pointerEvent->GetPointerId());
             return;
@@ -1329,6 +1347,8 @@ CursorPosition InputWindowsManager::ResetCursorPos(const OLD::DisplayGroupInfo &
         cursorPosMap_[groupId].displayId = displayInfo.id;
         cursorPosMap_[groupId].cursorPos.x = x;
         cursorPosMap_[groupId].cursorPos.y = y;
+        cursorPosMap_[groupId].direction = displayInfo.direction;
+        cursorPosMap_[groupId].displayDirection = displayInfo.displayDirection;
     } else {
         cursorPosMap_[groupId].displayId = -1;
         cursorPosMap_[groupId].cursorPos.x = 0;
@@ -2048,7 +2068,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
             displayInfo->id, displayInfo->x, displayInfo->y, displayInfo->width, displayInfo->height,
             displayInfo->dpi, displayInfo->name.c_str(), displayInfo->uniq.c_str(), displayInfo->direction,
             displayInfo->displayDirection);
-        if (!GetHardCursorEnabled() && cursorPosCur.displayDirection != displayInfo->displayDirection) {
+        if (cursorPosCur.displayDirection != displayInfo->displayDirection) {
             ScreenRotateAdjustDisplayXY(*displayInfo, coord);
         }
 
@@ -2062,8 +2082,7 @@ void InputWindowsManager::AdjustDisplayRotation(int32_t groupId)
         } else {
             UpdateAndAdjustMouseLocation(cursorPosCur.displayId, coord.x, coord.y);
         }
-        if (GetHardCursorEnabled() && extraData_.appended &&
-            (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+        if (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
             AdjustDragPosition(groupId);
         }
         CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*displayInfo);
@@ -5279,7 +5298,15 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             ClearActiveWindow();
         }
     }
+    bool isFollowFirstTouch = IsFollowFirstTouchWindow(pointerEvent);
     for (auto &item : windowsInfo) {
+        if (isFollowFirstTouch) {
+            if (IsFindFirstTouchFlagWindow(item, pointerEvent)) {
+                touchWindow = &item;
+                break;
+            }
+            continue;
+        }
         bool checkWindow = (item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -5435,16 +5462,20 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             MMI_HILOG_DISPATCHI("Pre search window %{public}d %{public}s", targetWindowId, oss.str().c_str());
         }
     }
-    std::map<int32_t, WindowInfoEX> tmpWindowInfo;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> tmpWindowInfo;
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
         tmpWindowInfo = thpFeatureTouchDownInfos_;
     } else {
         tmpWindowInfo = touchItemDownInfos_;
     }
     if (touchWindow == nullptr) {
-        auto it = tmpWindowInfo.find(pointerId);
+        if (tmpWindowInfo.find(pointerEvent->GetDeviceId()) == tmpWindowInfo.end()) {
+            MMI_HILOGI("get deviceId failed:%{public}d", pointerEvent->GetDeviceId());
+            return RET_ERR;
+        }
+        auto it = tmpWindowInfo[pointerEvent->GetDeviceId()].find(pointerId);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (it == tmpWindowInfo.end() ||
+            if (it == tmpWindowInfo[pointerEvent->GetDeviceId()].end() ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                 int32_t originPointerAction = pointerEvent->GetPointerAction();
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
@@ -5470,16 +5501,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
             if (it->second.flag) {
-                thpFeatureTouchDownInfos_[pointerId].flag = false;
+                thpFeatureTouchDownInfos_[pointerEvent->GetDeviceId()][pointerId].flag = false;
             } else {
                 pointerItem.SetCanceled(true);
             }
         }
     }
     winMap.clear();
-    const WindowInfo* firstHitWindow = ProcessFirstTouchHitPolicy(pointerEvent, pointerItem, touchWindow);
-    if (firstHitWindow != nullptr) {
-        touchWindow = firstHitWindow;
+    UpdateFirstTouchWindowInfos(pointerEvent, touchWindow);
+    if (!isFollowFirstTouch) {
+        ProcessOtherTouchHit(pointerEvent, pointerItem, touchWindow);
     }
     UpdateWindowInfoFlag(touchWindow->flags, pointerEvent);
     ProcessTouchTracking(pointerEvent, *touchWindow);
@@ -5491,7 +5522,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     static bool isInAnco = false;
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN && pointerId == 0) {
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     }
 
@@ -5588,7 +5619,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             WindowInfoEX windowInfoEX;
             windowInfoEX.window = *touchWindow;
             windowInfoEX.flag = true;
-            thpFeatureTouchDownInfos_[pointerId] = windowInfoEX;
+            if (thpFeatureTouchDownInfos_.find(pointerEvent->GetDeviceId()) == thpFeatureTouchDownInfos_.end()) {
+                MMI_HILOG_DISPATCHI("get deviceId fail, deviceId=%{public}d", pointerEvent->GetDeviceId());
+                return RET_ERR;
+            }
+            thpFeatureTouchDownInfos_[pointerEvent->GetDeviceId()][pointerId] = windowInfoEX;
         }
         return ERR_OK;
     }
@@ -5704,13 +5739,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t curGroupId = FindDisplayGroupId(pointerEvent->GetTargetDisplayId());
     lastPointerEventForWindowChangeMap_[curGroupId] = pointerEvent;
     lastPointerEventForGesture_ = pointerEvent;
+    int32_t deviceId = lastPointerEventForGesture_->GetDeviceId();
     pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
         WindowInfoEX windowInfoEX;
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
-        touchItemDownInfos_[pointerId] = windowInfoEX;
+        if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+            MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+            return RET_ERR;
+        }
+        touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
         MMI_HILOGD("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOG_DISPATCHD("Clear extra data");
@@ -5726,83 +5766,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     return ERR_OK;
 }
 
-const WindowInfo* InputWindowsManager::ProcessFirstTouchHitPolicy(std::shared_ptr<PointerEvent> pointerEvent,
+void InputWindowsManager::ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
     PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow)
 {
-    if (pointerEvent == nullptr || touchWindow == nullptr) {
-        return nullptr;
-    }
-    int32_t deviceId = pointerEvent->GetDeviceId();
-    if ((pointerEvent->GetPointerId() % SIMULATE_POINTER_ID) == FIRST_TOUCH) {
-        auto action = pointerEvent->GetPointerAction();
-        if (action == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOGD("firstTouchWindowInfos_:%{public}d:%{public}d", action, touchWindow->id);
-            firstTouchWindowInfos_[deviceId] = *touchWindow;
-            return nullptr;
-        }
-        bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
-            (extraData_.pointerId % SIMULATE_POINTER_ID) == FIRST_TOUCH) ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
-        if (checkExtraData) {
-            MMI_HILOGD("firstTouchWindowInfos_:%{public}d", touchWindow->id);
-            firstTouchWindowInfos_[deviceId] = *touchWindow;
-        }
-        return nullptr;
-    }
-
-    if (IsFirstTouchHitWindow(deviceId)) {
-        return ProcessFirstTouchHit(pointerEvent, touchWindow);
-    } else {
-        ProcessNoFirstTouchHit(pointerEvent, pointerItem, touchWindow);
-        return nullptr;
-    }
-}
-
-bool InputWindowsManager::IsFirstTouchHitWindow(int32_t deviceId)
-{
-    if (firstTouchWindowInfos_.find(deviceId) != firstTouchWindowInfos_.end()) {
-        if (firstTouchWindowInfos_[deviceId].flags & WindowInputPolicy::FLAG_FIRST_TOUCH_HIT) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    return false;
-}
-
-const WindowInfo* InputWindowsManager::ProcessFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
-    const WindowInfo* touchWindow)
-{
-    if (touchWindow == nullptr) {
-        return nullptr;
-    }
-    int32_t deviceId = pointerEvent->GetDeviceId();
-    if (firstTouchWindowInfos_.find(deviceId) == firstTouchWindowInfos_.end()) {
-        return nullptr;
-    }
-    int32_t currentPointerId = pointerEvent->GetPointerId();
-    if (currentPointerId % SIMULATE_POINTER_ID == FIRST_TOUCH) {
-        return nullptr;
-    }
-    if (touchWindow->groupId != firstTouchWindowInfos_[deviceId].groupId ||
-            touchWindow->displayId != firstTouchWindowInfos_[deviceId].displayId||
-            touchWindow->id != firstTouchWindowInfos_[deviceId].id ||
-            touchWindow->pid != firstTouchWindowInfos_[deviceId].pid ||
-            touchWindow->agentPid != firstTouchWindowInfos_[deviceId].agentPid) {
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOG_DISPATCHI("%{public}d follow the first hit touch strategy:{%{public}d:%{public}d}",
-                currentPointerId, touchWindow->id, firstTouchWindowInfos_[deviceId].id);
-        }
-        return &firstTouchWindowInfos_[deviceId];
-    }
-    return nullptr;
-}
-
-void InputWindowsManager::ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
-    PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow)
-{
-    if (touchWindow == nullptr || !(touchWindow->flags & WindowInputPolicy::FLAG_FIRST_TOUCH_HIT)) {
+    if (pointerEvent == nullptr || touchWindow == nullptr ||
+        !(touchWindow->flags & WindowInputPolicy::FLAG_FIRST_TOUCH_HIT)) {
         return;
     }
     int32_t currentPointerId = pointerEvent->GetPointerId();
@@ -5819,6 +5787,73 @@ void InputWindowsManager::ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> p
         MMI_HILOG_DISPATCHI("currentPointerId:%{public}d set canceled", currentPointerId);
     }
     return;
+}
+
+bool InputWindowsManager::IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent == nullptr) {
+        return false;
+    }
+    if (pointerEvent->GetPointerId() % SIMULATE_POINTER_ID == FIRST_TOUCH) {
+        return false;
+    }
+    auto deviceId = pointerEvent->GetDeviceId();
+    if (firstTouchWindowInfos_.find(deviceId) == firstTouchWindowInfos_.end()) {
+        return false;
+    }
+    if (firstTouchWindowInfos_[deviceId].flags & WindowInputPolicy::FLAG_FIRST_TOUCH_HIT) {
+        return true;
+    }
+    return false;
+}
+ 
+bool InputWindowsManager::IsFindFirstTouchFlagWindow(const WindowInfo &item, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent == nullptr) {
+        return false;
+    }
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    if (firstTouchWindowInfos_.find(deviceId) == firstTouchWindowInfos_.end()) {
+        return false;
+    }
+    if (firstTouchWindowInfos_[deviceId].windowId == item.id &&
+        firstTouchWindowInfos_[deviceId].displayId == item.displayId) {
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            MMI_HILOG_DISPATCHI("currentPointerId:%{public}d follow first touch window:%{public}d",
+                pointerEvent->GetPointerId(), item.id);
+        }
+        return true;
+    }
+    for (const auto &uiExtentionWindow : item.uiExtentionWindowInfo) {
+        if (firstTouchWindowInfos_[deviceId].windowId == uiExtentionWindow.id &&
+            firstTouchWindowInfos_[deviceId].displayId == uiExtentionWindow.displayId) {
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                MMI_HILOG_DISPATCHI("currentPointerId:%{public}d follow first touch uiExtentionwindow:%{public}d",
+                    pointerEvent->GetPointerId(), uiExtentionWindow.id);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+void InputWindowsManager::UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent,
+    const WindowInfo* touchWindow)
+{
+    if (pointerEvent == nullptr || touchWindow == nullptr) {
+        return;
+    }
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    if ((pointerEvent->GetPointerId() % SIMULATE_POINTER_ID) == FIRST_TOUCH) {
+        firstTouchWindowInfos_[deviceId].displayId = touchWindow->displayId;
+        firstTouchWindowInfos_[deviceId].windowId = touchWindow->id;
+        firstTouchWindowInfos_[deviceId].flags = touchWindow->flags;
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            MMI_HILOG_DISPATCHD("firstTouchWindowInfos_:deviceId:%{public}d,PI:%{public}d"
+                "WI:%{public}d, flags:%{public}d", deviceId, pointerEvent->GetPointerId(),
+                touchWindow->id, touchWindow->flags);
+        }
+    }
 }
 
 void InputWindowsManager::ClearFirstTouchWindowInfos(int32_t deviceId)
@@ -6535,40 +6570,11 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
     }
 }
 
-bool InputWindowsManager::IsWindowRotation(const OLD::DisplayInfo *displayInfo)
-{
-    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
-        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
-    CHKPF(displayInfo);
-
-    bool foldableDevicePolicyMain = false;
-    bool foldableDevicePolicyFull = false;
-    if (!FOLDABLE_DEVICE_POLICY.empty()) {
-        foldableDevicePolicyMain = FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE;
-    }
-    if (FOLDABLE_DEVICE_POLICY.size() > FOLDABLE_DEVICE) {
-        foldableDevicePolicyFull = FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE;
-    }
-
-    return (ROTATE_POLICY == WINDOW_ROTATE ||
-        (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo->displayMode == DisplayMode::MAIN && foldableDevicePolicyMain) ||
-        (displayInfo->displayMode == DisplayMode::FULL && foldableDevicePolicyFull))));
-}
-
 Direction InputWindowsManager::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
     CHKPR(displayInfo, DIRECTION0);
     Direction displayDirection = static_cast<Direction>((
         ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    if (GetHardCursorEnabled()) {
-        if (IsWindowRotation(displayInfo)) {
-            displayDirection = static_cast<Direction>((((displayInfo->direction - displayInfo->displayDirection) *
-                ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        } else {
-            displayDirection = displayInfo->direction;
-        }
-    }
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = displayInfo->direction;
     }
@@ -6851,6 +6857,8 @@ CursorPosition InputWindowsManager::ResetCursorPos()
             cursorPosMap_[MAIN_GROUPID].displayId = displayInfo.id;
             cursorPosMap_[MAIN_GROUPID].cursorPos.x = x;
             cursorPosMap_[MAIN_GROUPID].cursorPos.y = y;
+            cursorPosMap_[MAIN_GROUPID].direction = displayInfo.direction;
+            cursorPosMap_[MAIN_GROUPID].displayDirection = displayInfo.displayDirection;
         }
     } else {
         const auto iter = cursorPosMap_.find(MAIN_GROUPID);
@@ -7275,6 +7283,7 @@ void InputWindowsManager::SendCancelEventWhenLock()
 {
     CALL_INFO_TRACE;
     CHKPV(lastTouchEventOnBackGesture_);
+    int32_t deviceId = lastTouchEventOnBackGesture_->GetDeviceId();
     if (lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) {
             return;
@@ -7287,8 +7296,12 @@ void InputWindowsManager::SendCancelEventWhenLock()
     CHKPV(inputEventNormalizeHandler);
     MMI_HILOGI("Screen locked, Send cancel event");
     inputEventNormalizeHandler->HandleTouchEvent(lastTouchEventOnBackGesture_);
-    auto iter = touchItemDownInfos_.find(lastTouchEventOnBackGesture_->GetPointerId());
-    if (iter != touchItemDownInfos_.end()) {
+    if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+        return;
+    }
+    auto iter = touchItemDownInfos_[deviceId].find(lastTouchEventOnBackGesture_->GetPointerId());
+    if (iter != touchItemDownInfos_[deviceId].end()) {
         iter->second.flag = false;
     }
 }
@@ -7636,11 +7649,6 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const OLD::Displa
     return false;
 }
 
-bool InputWindowsManager::GetHardCursorEnabled()
-{
-    return CursorDrawingComponent::GetInstance().GetHardCursorEnabled();
-}
-
 void InputWindowsManager::SetFoldState()
 {
     BytraceAdapter::StartFoldState(Rosen::DisplayManagerLite::GetInstance().IsFoldable());
@@ -7817,9 +7825,14 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
         return RET_ERR;
     }
     WindowInfoEX windowInfoEX;
+    int32_t deviceId = lastTouchEvent_->GetDeviceId();
+    if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+        return RET_ERR;
+    }
     windowInfoEX.window = shiftWindowInfo.targetWindowInfo;
     windowInfoEX.flag = true;
-    touchItemDownInfos_[shiftWindowInfo.fingerId] = windowInfoEX;
+    touchItemDownInfos_[deviceId][shiftWindowInfo.fingerId] = windowInfoEX;
     MMI_HILOGI("Shift pointer event success for touch");
     return RET_OK;
 }
@@ -7853,10 +7866,14 @@ int32_t InputWindowsManager::ShiftAppPointerEvent(const ShiftWindowParam &param,
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-bool InputWindowsManager::CancelTouch(int32_t touch)
+bool InputWindowsManager::CancelTouch(int32_t touch, int32_t deviceId)
 {
-    auto iter = touchItemDownInfos_.find(touch);
-    if ((iter != touchItemDownInfos_.end()) && iter->second.flag) {
+    if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
+        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
+        return false;
+    }
+    auto iter = touchItemDownInfos_[deviceId].find(touch);
+    if ((iter != touchItemDownInfos_[deviceId].end()) && iter->second.flag) {
         iter->second.flag = false;
         return true;
     }
@@ -7909,7 +7926,7 @@ void InputWindowsManager::CancelAllTouches(std::shared_ptr<PointerEvent> event, 
         auto filter = InputHandler->GetFilterHandler();
         CHKPV(filter);
         filter->HandleTouchEvent(pointerEvent);
-        CancelTouch(item.GetPointerId());
+        CancelTouch(item.GetPointerId(), item.GetDeviceId());
     }
 }
 

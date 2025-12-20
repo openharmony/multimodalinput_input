@@ -574,11 +574,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayS
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateMouseLayer_001, TestSize.Level1)
 {
-    PointerStyle pointerStyle;
-    int32_t displayId = 1;
     int32_t physicalX = 1;
     int32_t physicalY = 1;
-    int32_t ret = instance_->UpdateMouseLayer(pointerStyle, displayId, physicalX, physicalY);
+    int32_t ret = instance_->UpdateMouseLayer(physicalX, physicalY);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -592,18 +590,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawNewDpiPointe
 {
     int32_t ret = instance_->DrawNewDpiPointer();
     EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: CursorDrawingComponentTest_GetHardCursorEnabled_001
- * @tc.desc: Test GetHardCursorEnabled
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetHardCursorEnabled_001, TestSize.Level1)
-{
-    bool ret = instance_->GetHardCursorEnabled();
-    EXPECT_EQ(ret, false);
 }
 
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR

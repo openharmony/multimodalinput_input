@@ -5786,7 +5786,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_02, TestSiz
     KeyCommandHandler handler;
 
     handler.isParseConfig_ = false;
-    handler.isParseLongPressConfig_ = false;
     handler.isParseMaxCount_ = false;
     bool ret = false;
     ret = handler.PreHandleEvent();
@@ -6409,7 +6408,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_003, TestSize.
     handler.powerUpTime_ = 0;
     handler.sosLaunchTime_ = 0;
     handler.isParseConfig_ = true;
-    handler.isParseLongPressConfig_ = true;
     handler.isParseMaxCount_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
 }
@@ -6434,7 +6432,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_004, TestSize.
     handler.powerUpTime_ = 0;
     handler.sosLaunchTime_ = 0;
     handler.isParseConfig_ = true;
-    handler.isParseLongPressConfig_ = true;
     handler.isParseMaxCount_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
 }
@@ -6459,7 +6456,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_005, TestSize.
     handler.powerUpTime_ = 0;
     handler.sosLaunchTime_ = 0;
     handler.isParseConfig_ = true;
-    handler.isParseLongPressConfig_ = true;
     handler.isParseMaxCount_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(keyEvent));
 }

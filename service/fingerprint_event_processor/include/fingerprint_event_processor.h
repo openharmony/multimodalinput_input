@@ -40,6 +40,7 @@ public:
     int32_t HandleFingerprintEvent(struct libinput_event* event);
     void SetPowerAndVolumeKeyState(struct libinput_event* event);
     void SetPowerKeyState(struct libinput_event* event);
+    void SetScreenState(bool isTouch);
 
     static constexpr int32_t FINGERPRINT_CODE_DOWN { 121 };
     static constexpr int32_t FINGERPRINT_CODE_UP { 122 };

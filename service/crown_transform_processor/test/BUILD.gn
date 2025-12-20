@@ -64,6 +64,7 @@ ohos_unittest("CrownTransformProcessorTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }

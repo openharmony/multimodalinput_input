@@ -16,6 +16,7 @@
 #include "pointer_renderer.h"
 
 #include <regex>
+#include <unistd.h>
 #include "image_source.h"
 #include "window_info.h"
 #include "util.h"
@@ -36,6 +37,7 @@ constexpr uint32_t FOCUS_POINT{256};
 constexpr float CALCULATE_MOUSE_ICON_BIAS{ 5.0f / 33.0f };
 constexpr float ROTATION_ANGLE90 {90.0f};
 constexpr float MAX_DPI {1.93f};   //1.93 is the max dpi for hardware cursor pointer to limit the image size within 256
+constexpr float EPSILON = 1e-6;
 constexpr uint32_t MAX_POINTER_SIZE {7};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 
@@ -49,7 +51,7 @@ int32_t RenderConfig::GetImageSize() const
 
 float RenderConfig::AdjustIncreaseRatio(float originDpi) const
 {
-    if (originDpi == 0.0f) {
+    if (std::fabs(originDpi) < EPSILON) {
         MMI_HILOGE("The originDpi cannot be 0, return default increase ratio");
         return INCREASE_RATIO;
     }

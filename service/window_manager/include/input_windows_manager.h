@@ -258,11 +258,9 @@ public:
     void CleanInvalidPixelMap(int32_t groupId = DEFAULT_GROUP_ID);
     void HandleWindowPositionChange(const OLD::DisplayGroupInfo &displayGroupInfo);
     void SendCancelEventWhenWindowChange(int32_t pointerId, int32_t groupId = DEFAULT_GROUP_ID);
-    bool GetHardCursorEnabled();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
-    bool IsWindowRotation(const OLD::DisplayInfo *displayInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
@@ -508,7 +506,7 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     GlobalCoords DisplayCoords2GlobalCoords(const Coordinate2D &displayCoords, int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    bool CancelTouch(int32_t touch);
+    bool CancelTouch(int32_t touch, int32_t deviceId);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool IsPointerActiveRectValid(const OLD::DisplayInfo &currentDisplay);
@@ -530,12 +528,10 @@ private:
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
-    const WindowInfo* ProcessFirstTouchHitPolicy(std::shared_ptr<PointerEvent> pointerEvent,
-        PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
-    bool IsFirstTouchHitWindow(int32_t deviceId);
-    const WindowInfo* ProcessFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
-        const WindowInfo* touchWindow);
-    void ProcessNoFirstTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
+    bool IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFindFirstTouchFlagWindow(const WindowInfo &item, std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    void ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
         PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
 private:
     UDSServer* udsServer_ { nullptr };
@@ -581,12 +577,17 @@ private:
     std::map<int32_t, CursorPosition> cursorPosMap_;
 
 
-    std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
-    std::map<int32_t, WindowInfoEX> thpFeatureTouchDownInfos_;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfos_;
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> thpFeatureTouchDownInfos_;
     std::map<int32_t, std::map<int32_t, WindowInfoEX>> touchItemDownInfosMap_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     std::map<int32_t, std::map<int32_t, std::vector<Rect>>> windowsHotAreasMap_;
-    std::map<int32_t, WindowInfo> firstTouchWindowInfos_;
+    struct WindowPartInfo {
+        int32_t displayId { -1 };
+        int32_t windowId { -1 };
+        uint32_t flags { 0 };
+    };
+    std::map<int32_t, WindowPartInfo> firstTouchWindowInfos_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
         int32_t windowId { -1 };

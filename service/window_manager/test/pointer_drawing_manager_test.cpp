@@ -1197,44 +1197,26 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCursorLocation_00
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    auto align = pointerDrawingManager.MouseIcon2IconType(MOUSE_ICON(2));
     int32_t physicalX = 100;
     int32_t physicalY = 100;
     pointerDrawingManager.lastMouseStyle_.id = 2;
-    auto visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align);
+    auto visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY);
     EXPECT_EQ(visible, false);
     physicalX = 200;
     physicalY = 200;
     pointerDrawingManager.lastMouseStyle_.id = 4;
-    visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align);
+    visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY);
     EXPECT_EQ(visible, false);
     physicalX = 300;
     physicalY = 300;
     pointerDrawingManager.lastMouseStyle_.id = 8;
-    visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align);
+    visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY);
     EXPECT_EQ(visible, false);
     physicalX = 400;
     physicalY = 400;
     pointerDrawingManager.lastMouseStyle_.id = 12;
-    visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY, align);
+    visible = pointerDrawingManager.SetCursorLocation(physicalX, physicalY);
     EXPECT_EQ(visible, false);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetHardwareCursorPosition_001
- * @tc.desc: Test SetHardwareCursorPosition
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetHardwareCursorPosition_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    int32_t physicalX = 100;
-    int32_t physicalY = 100;
-    pointerDrawingManager.lastMouseStyle_.id = 2;
-    ASSERT_NO_FATAL_FAILURE(
-        pointerDrawingManager.SetHardwareCursorPosition(physicalX, physicalY, pointerDrawingManager.lastMouseStyle_));
 }
 
 /**
@@ -1291,23 +1273,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerOneTest_CreatePointerWind
         pointerDrawingManager.CreatePointerWindow(rsId, physicalX, physicalY, Direction::DIRECTION180));
     EXPECT_NO_FATAL_FAILURE(
         pointerDrawingManager.CreatePointerWindow(rsId, physicalX, physicalY, Direction::DIRECTION270));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_IsWindowRotation_001
- * @tc.desc: Test IsWindowRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_IsWindowRotation_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    OLD::DisplayInfo displayInfo;
-    displayInfo.direction = DIRECTION0;
-    displayInfo.displayDirection = DIRECTION90;
-    auto color = pointerDrawingManager.IsWindowRotation(&displayInfo);
-    EXPECT_EQ(color, true);
 }
 
 /**
@@ -3026,51 +2991,11 @@ HWTEST_F(PointerDrawingManagerTest, CalculateRenderDirection_001, TestSize.Level
     pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
     pointerDrawingManager->displayInfo_.direction = DIRECTION90;
     bool isHard = true;
-    bool isWindowRotate = true;
-    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
-    ASSERT_EQ(ret, DIRECTION90);
-    isHard = true;
-    isWindowRotate = false;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard);
     ASSERT_EQ(ret, DIRECTION90);
     isHard = false;
-    isWindowRotate = true;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
+    ret = pointerDrawingManager->CalculateRenderDirection(isHard);
     ASSERT_EQ(ret, DIRECTION180);
-    isHard = false;
-    isWindowRotate = false;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
-    ASSERT_EQ(ret, DIRECTION0);
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_CalculateRenderDirection_002
- * @tc.desc: Test CalculateRenderDirection
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, CalculateRenderDirection_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION270;
-    pointerDrawingManager->displayInfo_.direction = DIRECTION90;
-    bool isHard = true;
-    bool isWindowRotate = true;
-    Direction ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
-    ASSERT_EQ(ret, DIRECTION90);
-    isHard = true;
-    isWindowRotate = false;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
-    ASSERT_EQ(ret, DIRECTION90);
-    isHard = false;
-    isWindowRotate = true;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
-    ASSERT_EQ(ret, DIRECTION180);
-    isHard = false;
-    isWindowRotate = false;
-    ret = pointerDrawingManager->CalculateRenderDirection(isHard, isWindowRotate);
-    ASSERT_EQ(ret, DIRECTION0);
 }
 
 /**
@@ -3182,14 +3107,13 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseLayer, Te
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
     int32_t physicalX = 1;
     int32_t physicalY = 2;
     pointerDrawingManager.surfaceNode_ = nullptr;
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
     pointerDrawingManager.lastMouseStyle_.id = 2;
-    ASSERT_EQ(pointerDrawingManager.UpdateMouseLayer(pointerStyle, physicalX, physicalY), RET_ERR);
+    ASSERT_EQ(pointerDrawingManager.UpdateMouseLayer(physicalX, physicalY), RET_ERR);
 }
 
 /**
@@ -3453,7 +3377,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_003,
     int32_t displayId = 1;
     int32_t physicalX = 2;
     int32_t physicalY = 3;
-    auto align = manager.MouseIcon2IconType(MOUSE_ICON(2));
     Direction direction = DIRECTION0;
     manager.surfaceNode_ = nullptr;
     int32_t ret = manager.DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
@@ -3463,7 +3386,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_003,
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    auto setlot = manager.SetCursorLocation(physicalX, physicalY, align);
+    auto setlot = manager.SetCursorLocation(physicalX, physicalY);
     EXPECT_EQ(setlot, true);
     ret = manager.DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
     EXPECT_EQ(ret, RET_OK);
@@ -3900,14 +3823,14 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenScalesAndPadding_002, TestSize.L
     ASSERT_NE(mainSp, nullptr);
     mainSp->mode_ = mode_t::SCREEN_MAIN;
     mainSp->SetDPI(1.0);
-    mainSp->SetRotation(OHOS::Rosen::Rotation::ROTATION_0);
+    mainSp->rotation_ = OHOS::Rosen::Rotation::ROTATION_0;
     pointerDrawingManager.screenPointers_.insert({0, mainSp});
 
     auto mirrorSp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
     ASSERT_NE(mirrorSp, nullptr);
     mirrorSp->mode_ = mode_t::SCREEN_MIRROR;
     mirrorSp->SetDPI(2.0);
-    mirrorSp->SetRotation(OHOS::Rosen::Rotation::ROTATION_90);
+    mirrorSp->SetSourceScreenRotation(OHOS::Rosen::Rotation::ROTATION_90);
     pointerDrawingManager.screenPointers_.insert({1, mirrorSp});
 
     pointerDrawingManager.UpdateScreenScalesAndPadding(mainScreen);
