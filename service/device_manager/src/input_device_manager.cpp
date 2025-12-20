@@ -1110,7 +1110,7 @@ void InputDeviceManager::PointerDeviceInit()
         CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    POINTER_DEV_MGR.isInit = true;
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
     POINTER_DEV_MGR.isFirstAddCommonEventService = false;
@@ -1122,6 +1122,8 @@ void InputDeviceManager::PointerDeviceInit()
     CursorDrawingComponent::GetInstance().InitPointerObserver();
     POINTER_DEV_MGR.isFirstAdddistributedKVDataService = false;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    POINTER_DEV_MGR.isInit = true;
+    
     // LCOV_EXCL_STOP
 }
 
