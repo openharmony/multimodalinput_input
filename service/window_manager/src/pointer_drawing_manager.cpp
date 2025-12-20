@@ -1649,7 +1649,6 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         }
         Rosen::RSTransaction::FlushImplicitTransaction();
         g_isRsRestart = true;
-
     } else if (sp == nullptr) {
         g_isRsRestart = true;
         sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, displayInfo_);
