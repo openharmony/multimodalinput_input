@@ -503,23 +503,16 @@ void CursorDrawingComponent::RegisterDisplayStatusReceiver()
     pointerInstance_->RegisterDisplayStatusReceiver();
 }
 
-int32_t CursorDrawingComponent::UpdateMouseLayer(
-    const PointerStyle &pointerStyle, uint64_t displayId, int32_t physicalX, int32_t physicalY)
+int32_t CursorDrawingComponent::UpdateMouseLayer(int32_t physicalX, int32_t physicalY)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->UpdateMouseLayer(pointerStyle, physicalX, physicalY);
+    return pointerInstance_->UpdateMouseLayer(physicalX, physicalY);
 }
 
 int32_t CursorDrawingComponent::DrawNewDpiPointer()
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
     return pointerInstance_->DrawNewDpiPointer();
-}
-
-bool CursorDrawingComponent::GetHardCursorEnabled()
-{
-    CHK_IS_LOADF(isLoaded_, pointerInstance_)
-    return pointerInstance_->GetHardCursorEnabled();
 }
 
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR

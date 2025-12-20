@@ -3065,12 +3065,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleCallEnded, Tes
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberTimer
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberTimer_001
  * @tc.desc: Test RemoveSubscriberTimer
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTimer, TestSize.Level1)
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTimer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
@@ -3083,6 +3083,75 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTime
         keyEvent->keys_.push_back(keyItem);
     }
     EXPECT_NO_FATAL_FAILURE(handler.RemoveSubscriberTimer(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberTimer_002
+ * @tc.desc: Test RemoveSubscriberTimer when VOLUME_DOWN event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTimer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    handler.needSkipPowerKeyUp_ = true;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    for (auto i = 0; i < 5; i++) {
+        KeyEvent::KeyItem keyItem;
+        keyItem.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+        keyItem.SetPressed(true);
+        keyEvent->keys_.push_back(keyItem);
+    }
+    handler.RemoveSubscriberTimer(keyEvent);
+    EXPECT_FALSE(handler.needSkipPowerKeyUp_);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberTimer_003
+ * @tc.desc: Test RemoveSubscriberTimer when VOLUME_UP event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTimer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    handler.needSkipPowerKeyUp_ = true;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    for (auto i = 0; i < 5; i++) {
+        KeyEvent::KeyItem keyItem;
+        keyItem.SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+        keyItem.SetPressed(true);
+        keyEvent->keys_.push_back(keyItem);
+    }
+    handler.RemoveSubscriberTimer(keyEvent);
+    EXPECT_FALSE(handler.needSkipPowerKeyUp_);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberTimer_004
+ * @tc.desc: Test RemoveSubscriberTimer not reset the flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberTimer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    handler.needSkipPowerKeyUp_ = true;
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    for (auto i = 0; i < 5; i++) {
+        KeyEvent::KeyItem keyItem;
+        keyItem.SetKeyCode(KeyEvent::KEYCODE_POWER);
+        keyItem.SetPressed(true);
+        keyEvent->keys_.push_back(keyItem);
+    }
+    handler.RemoveSubscriberTimer(keyEvent);
+    EXPECT_TRUE(handler.needSkipPowerKeyUp_);
 }
 #endif // OHOS_BUILD_ENABLE_CALL_MANAGER
 

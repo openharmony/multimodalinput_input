@@ -1478,6 +1478,11 @@ void KeySubscriberHandler::RemoveSubscriberTimer(std::shared_ptr<KeyEvent> keyEv
         IsMatchForegroundPid(subscribers, pids);
         ClearSubscriberTimer(subscribers);
     }
+    if (needSkipPowerKeyUp_ && (keyCode == KeyEvent::KEYCODE_VOLUME_DOWN ||
+        keyCode == KeyEvent::KEYCODE_VOLUME_UP)) {
+        MMI_HILOGI("Reset needSkipPowerKeyUp to false");
+        needSkipPowerKeyUp_ = false;
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_CALL_MANAGER

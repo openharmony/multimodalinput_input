@@ -145,7 +145,7 @@ public:
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
-    int32_t UpdateMouseLayer(const PointerStyle& pointerStyle, int32_t physicalX, int32_t physicalY) override;
+    int32_t UpdateMouseLayer(int32_t physicalX, int32_t physicalY) override;
 #ifndef OHOS_BUILD_ENABLE_WATCH
     void NotifyPointerEventToRS(int32_t pointAction, int32_t pointCnt, int32_t sourceType) override;
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -199,7 +199,6 @@ private:
     int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
-    bool IsWindowRotation(const OLD::DisplayInfo *displayInfo);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
     bool IsPointerStyleParamValid(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
@@ -217,9 +216,7 @@ private:
     void ForceClearPointerVisibleStatus() override;
     int32_t UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
     void CreateCanvasNode();
-    bool SetCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
-    void SetHardwareCursorPosition(int32_t physicalX, int32_t physicalY,
-        PointerStyle pointerStyle);
+    bool SetCursorLocation(int32_t physicalX, int32_t physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy(bool setSurfaceNode = true);
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
     void SetSurfaceNodeBounds();
@@ -255,14 +252,14 @@ private:
     bool DeleteScreenPointer(uint64_t screenId);
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
-    Direction CalculateRenderDirection(bool isHard, bool isWindowRotation);
+    Direction CalculateRenderDirection(bool isHard);
     void SoftwareCursorRender(MOUSE_ICON mouseStyle);
     void HardwareCursorRender(MOUSE_ICON mouseStyle);
-    void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align);
-    void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y, ICON_TYPE align);
-    void MoveRetryAsync(int32_t x, int32_t y, ICON_TYPE align);
+    void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
+    void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
+    void MoveRetryAsync(int32_t x, int32_t y);
     void ResetMoveRetryTimer();
-    int32_t HardwareCursorMove(int32_t x, int32_t y, ICON_TYPE align);
+    int32_t HardwareCursorMove(int32_t x, int32_t y);
     void HideHardwareCursors();
     int32_t GetMainScreenDisplayInfo(const OLD::DisplayGroupInfo &displayGroupInfo,
         OLD::DisplayInfo &mainScreenDisplayInfo) const;
@@ -296,6 +293,7 @@ private:
     bool userIconFollowSystem_ { false };
     bool followSystem_ { false };
     bool offRenderScaleUpdate_ { false };
+    std::atomic<bool> mouseDirectionUpdate_{ false };
     OLD::DisplayInfo displayInfo_ {};
     int32_t lastPhysicalX_ { -1 };
     int32_t lastPhysicalY_ { -1 };

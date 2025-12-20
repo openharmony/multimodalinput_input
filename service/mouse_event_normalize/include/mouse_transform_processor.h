@@ -126,7 +126,6 @@ private:
     double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
     void CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset);
-    bool IsWindowRotation(const OLD::DisplayInfo* displayInfo);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
     double CalculateProportion(long long key, long &total, std::map<long long, int32_t> &curMap);
     void HandleReportMouseResponseTime(std::string &connectType, std::map<long long, int32_t> &curMap);
@@ -141,7 +140,7 @@ private:
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
-    void SetPointerEventRightButtonSource(const int32_t evenType);
+    void SetPointerEventRightButtonSource(const int32_t evenType, uint32_t button);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static bool IsEventFromVirtualSource(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);

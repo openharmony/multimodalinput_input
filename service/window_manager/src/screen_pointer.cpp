@@ -333,7 +333,7 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
 }
 
-void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotation)
+void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
 {
     if (screenId_ != di.rsId) {
         return;
@@ -345,7 +345,6 @@ void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di, bool isWindowRotat
         rotation_ = static_cast<rotation_t>(di.direction);
     }
     displayDirection_ = di.displayDirection;
-    isWindowRotation_ = isWindowRotation;
     MMI_HILOGD("Update with DisplayInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
         "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
     if (isCurrentOffScreenRendering_) {
@@ -376,7 +375,8 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
         MMI_HILOGE("Invalid parameters, mainWidth=%{public}u, mainHeight=%{public}u", mainWidth, mainHeight);
         return false;
     }
-    if ((rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270) && IsMirror()) {
+    if ((sourceScreenRotation_  == rotation_t::ROTATION_90 || sourceScreenRotation_  == rotation_t::ROTATION_270)
+        && IsMirror()) {
         std::swap(mainWidth, mainHeight);
     }
 
@@ -394,26 +394,10 @@ bool ScreenPointer::UpdatePadding(uint32_t mainWidth, uint32_t mainHeight)
     return true;
 }
 
-void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
+void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y, int32_t width, int32_t height)
 {
-    // 坐标轴绕原点旋转 再平移
     int32_t tmpX = x;
     int32_t tmpY = y;
-    int32_t width = static_cast<int32_t>(width_);
-    int32_t height = static_cast<int32_t>(height_);
-    if (IsMirror()) {
-        height -= paddingTop_ * NUM_TWO;
-        width -= paddingLeft_ * NUM_TWO;
-    }
-    // 主屏旋转 坐标系会一起旋转，但镜像屏此时坐标系不旋转
-    if (IsMirror() && (rotation_ == rotation_t::ROTATION_90 || rotation_ == rotation_t::ROTATION_270)) {
-        std::swap(width, height);
-    }
-    if ((IsMain() || IsMirror()) && isWindowRotation_ &&
-        (displayDirection_ == DIRECTION90 || displayDirection_ == DIRECTION270)) {
-        std::swap(width, height);
-    }
-
     if (rotation == rotation_t(DIRECTION90)) {
         x = height - tmpY;
         y = tmpX;
@@ -426,71 +410,95 @@ void ScreenPointer::Rotate(rotation_t rotation, int32_t& x, int32_t& y)
     }
 }
 
+void ScreenPointer::CalculateHwcPositionForMain(int32_t& x, int32_t& y)
+{
+    if (GetIsCurrentOffScreenRendering()) {
+        x = x * offRenderScale_;
+        y = y * offRenderScale_;
+    }
+    Direction direction = static_cast<Direction>((((DIRECTION0 - displayDirection_) *
+        ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    int32_t width = static_cast<int32_t>(width_) - paddingLeft_ * NUM_TWO;
+    int32_t height = static_cast<int32_t>(height_) - paddingTop_ * NUM_TWO;
+#else
+    int32_t width = static_cast<int32_t>(width_);
+    int32_t height = static_cast<int32_t>(height_);
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
+    if (displayDirection_ == DIRECTION90 || displayDirection_ == DIRECTION270) {
+        std::swap(width, height);
+    }
+    Rotate(rotation_t(direction), x, y, width, height);
+#ifdef OHOS_BUILD_EXTERNAL_SCREEN
+    x += paddingLeft_;
+    y += paddingTop_;
+#endif // OHOS_BUILD_EXTERNAL_SCREEN
+}
+
+void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
+{
+    if (GetIsCurrentOffScreenRendering()) {
+        x = x * offRenderScale_;
+        y = y * offRenderScale_;
+    }
+}
+
 void ScreenPointer::CalculateHwcPositionForMirror(int32_t& x, int32_t& y)
 {
     x = x * scale_;
     y = y * scale_;
-    Direction direction = DIRECTION0;
-    if (isWindowRotation_) {
-        direction = static_cast<Direction>((((static_cast<Direction>(rotation_) - displayDirection_) *
-            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-    } else {
-        direction = static_cast<Direction>(rotation_);
+    Direction direction = static_cast<Direction>((((static_cast<Direction>(sourceScreenRotation_) - displayDirection_) *
+        ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    int32_t width = static_cast<int32_t>(width_) - paddingLeft_ * NUM_TWO;
+    int32_t height = static_cast<int32_t>(height_) - paddingTop_ * NUM_TWO;
+    if (direction == DIRECTION90 || direction == DIRECTION270) {
+        std::swap(width, height);
     }
-    Rotate(rotation_t(direction), x, y);
-
+    Rotate(rotation_t(direction), x, y, width, height);
     x += paddingLeft_;
     y += paddingTop_;
 }
 
-#ifdef OHOS_BUILD_EXTERNAL_SCREEN
-void ScreenPointer::CalculateHwcPositionForMain(int32_t& x, int32_t& y)
-{
-    x += paddingLeft_;
-    y += paddingTop_;
-}
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
-
-void ScreenPointer::CalculateHwcPositionForExtend(int32_t& x, int32_t& y)
-{
-    x = x * offRenderScale_;
-    y = y * offRenderScale_;
-}
-
-bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
+bool ScreenPointer::Move(int32_t x, int32_t y)
 {
     if (isVirtualExtend_) {
         MMI_HILOGD("Virtual extend screen move, screenId=%{public}" PRIu64, screenId_);
         return true;
     }
     CHKPF(hwcMgr_);
-    int32_t px = 0;
-    int32_t py = 0;
-#ifdef OHOS_BUILD_EXTERNAL_SCREEN
-    if (IsMain()) {
-        CalculateHwcPositionForMain(x, y);
+    switch (mode_) {
+        case mode_t::SCREEN_ALONE:
+        case mode_t::SCREEN_UNIQUE:{
+            MMI_HILOGE("Unsupport screen mode, mode=%{public}u", mode_);
+            return false;
+        }
+        case mode_t::SCREEN_MAIN: {
+            CalculateHwcPositionForMain(x, y);
+            break;
+        }
+        case mode_t::SCREEN_EXTEND: {
+            CalculateHwcPositionForExtend(x, y);
+            break;
+        }
+        case mode_t::SCREEN_MIRROR: {
+            CalculateHwcPositionForMirror(x, y);
+            break;
+        }
+        default: {
+            MMI_HILOGE("Invalid screen mode, mode=%{public}u", mode_);
+            return false;
+        }
     }
-#endif // OHOS_BUILD_EXTERNAL_SCREEN
-    if (IsMirror()) {
-        CalculateHwcPositionForMirror(x, y);
-    } else if (GetIsCurrentOffScreenRendering() && !IsMirror()) {
-        CalculateHwcPositionForExtend(x, y);
-    }
-    if (IsMain() && isWindowRotation_) {
-        Direction direction = static_cast<Direction>((((DIRECTION0 - displayDirection_) *
-            ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
-        Rotate(rotation_t(direction), x, y);
-    }
-    if (IsPositionOutScreen(x, y)) {
-        MMI_HILOGE("Position out of screen");
-    }
-    px = x - FOCUS_POINT;
-    py = y - FOCUS_POINT;
 
     auto buffer = GetCurrentBuffer();
     CHKPF(buffer);
     auto bh = buffer->GetBufferHandle();
     CHKPF(bh);
+    if (IsPositionOutScreen(x, y)) {
+        MMI_HILOGE("Position out of screen");
+    }
+    int32_t px = x - FOCUS_POINT;
+    int32_t py = y - FOCUS_POINT;
     BytraceAdapter::StartHardPointerMove(buffer->GetWidth(), buffer->GetHeight(), bufferId_, screenId_);
     auto ret = hwcMgr_->SetPosition(screenId_, px, py, bh);
     BytraceAdapter::StopHardPointerMove();
@@ -502,18 +510,14 @@ bool ScreenPointer::Move(int32_t x, int32_t y, ICON_TYPE align)
     return true;
 }
 
-bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
+bool ScreenPointer::MoveSoft(int32_t x, int32_t y)
 {
     CHKPF(surfaceNode_);
-    int32_t px = 0;
-    int32_t py = 0;
     if (IsMirror()) {
         CalculateHwcPositionForMirror(x, y);
-    } else if (!IsExtend() && !isWindowRotation_) {
-        Rotate(rotation_, x, y);
     }
-    px = x - FOCUS_POINT;
-    py = y - FOCUS_POINT;
+    int32_t px = x - FOCUS_POINT;
+    int32_t py = y - FOCUS_POINT;
 
     if (!IsMirror()) {
         int64_t nodeId = surfaceNode_->GetId();
@@ -521,7 +525,9 @@ bool ScreenPointer::MoveSoft(int32_t x, int32_t y, ICON_TYPE align)
     } else {
         surfaceNode_->SetBounds(px, py, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
     }
-
+    MMI_HILOGD("Pointer Window SetBounds ScreenId:%{public}" PRIu64
+        ", surfaceNodeId=%{public}" PRId64 ", pos=(%{private}d, %{private}d)",
+        screenId_, surfaceNode_->GetId(), px, py);
     return true;
 }
 

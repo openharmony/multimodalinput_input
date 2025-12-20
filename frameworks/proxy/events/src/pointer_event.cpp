@@ -713,7 +713,7 @@ void PointerEvent::Reset()
     fingerprintDistanceX_ = 0.0;
     fingerprintDistanceY_ = 0.0;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    rightButtonSource_ = RightButtonSource::OTHERS;
+    rightButtonSource_ = RightButtonSource::INVALID;
 }
 
 std::string PointerEvent::ToString()
@@ -1337,7 +1337,7 @@ bool PointerEvent::ReadRightButtonSourceFromParcel(Parcel &in)
 {
     int32_t value = 0;
     READINT32(in, value);
-    if (value < static_cast<int32_t>(RightButtonSource::OTHERS) ||
+    if (value < static_cast<int32_t>(RightButtonSource::INVALID) ||
         value > static_cast<int32_t>(RightButtonSource::TOUCHPAD_TWO_FINGER_TAP)) {
         MMI_HILOGE("invalid rightButton source %{public}d", value);
         return false;
