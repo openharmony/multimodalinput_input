@@ -655,6 +655,30 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_HandleFing
 }
 
 /**
+ * @tc.name: LongPressSubscribeHandlerTest_HandleFingerGestureDownEvent_003
+ * @tc.desc: Verify if (pressTimeInterval > TWO_FINGERS_TIME_LIMIT)
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_HandleFingerGestureDownEvent_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = SetupDoubleFingerDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    auto fingerCount = pointerEvent->GetPointerIds().size();
+    ASSERT_TRUE(fingerCount == 2);
+    pointerEvent->SetFixedMode(PointerEvent::FixedMode::AUTO);
+    PointerEvent::PointerItem item;
+    int32_t pointerId = 1;
+    bool result = pointerEvent->GetPointerItem(pointerId, item);
+    ASSERT_TRUE(result);
+    item.SetDownTime(item.GetDownTime() + 150000);
+    pointerEvent->UpdatePointerItem(pointerId, item);
+    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(pointerEvent));
+}
+
+/**
  * @tc.name: LongPressSubscribeHandlerTest_HandleFingerGestureMoveEvent_001
  * @tc.desc: Verify if (isAllTimerClosed)
  * @tc.type: Function

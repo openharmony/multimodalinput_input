@@ -228,8 +228,13 @@ void LongPressSubscriberHandler::HandleFingerGestureDownEvent(const std::shared_
         PointerEvent::PointerItem item;
         touchEvent->GetPointerItem(id, item);
         fingerGesture_.touches[fingerCount - 1].id = id;
-        fingerGesture_.touches[fingerCount - 1].x = item.GetDisplayX();
-        fingerGesture_.touches[fingerCount - 1].y = item.GetDisplayY();
+        if (MMI::PointerEvent::FixedMode::AUTO == touchEvent->GetFixedMode()) {
+            fingerGesture_.touches[fingerCount - 1].x = item.GetFixedDisplayX();
+            fingerGesture_.touches[fingerCount - 1].y = item.GetFixedDisplayY();
+        } else {
+            fingerGesture_.touches[fingerCount - 1].x = item.GetDisplayX();
+            fingerGesture_.touches[fingerCount - 1].y = item.GetDisplayY();
+        }
         fingerGesture_.touches[fingerCount - 1].downTime = item.GetDownTime();
     } else {
         MMI_HILOGD("The number of finger count is not 1 or 2");
@@ -276,8 +281,15 @@ void LongPressSubscriberHandler::HandleFingerGestureMoveEvent(const std::shared_
         MMI_HILOGE("Cant't find the pointer id");
         return;
     }
-    auto dx = std::abs(pos->x - item.GetDisplayX());
-    auto dy = std::abs(pos->y - item.GetDisplayY());
+    int32_t dx = -1;
+    int32_t dy = -1;
+    if (MMI::PointerEvent::FixedMode::AUTO == touchEvent->GetFixedMode()) {
+        dx = std::abs(pos->x - item.GetFixedDisplayX());
+        dy = std::abs(pos->y - item.GetFixedDisplayY());
+    } else {
+        dx = std::abs(pos->x - item.GetDisplayX());
+        dy = std::abs(pos->y - item.GetDisplayY());
+    }
     auto moveDistance = sqrt(pow(dx, TWO_FINGER) + pow(dy, TWO_FINGER));
     if (moveDistance > TOUCH_MOVE_THRESHOLD) {
         MMI_HILOGD("Finger movement distance greater than 15PX, defaultDistance:%{public}d, moveDistance:%{public}f",
