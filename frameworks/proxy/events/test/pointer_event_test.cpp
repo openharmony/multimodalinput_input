@@ -1095,15 +1095,20 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtensionData_001, TestSize.Level
     CALL_TEST_DEBUG;
     double x = 10.0;
     int y = 256;
-    PointerEvent::PointerItem item;
-    ASSERT_NO_FATAL_FAILURE(item.SetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_X, x));
-    ASSERT_NO_FATAL_FAILURE(item.SetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_Y, y));
     double outx;
     int outy;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_X, x));
+    ASSERT_FALSE(item.GetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_Y, outy));
+    ASSERT_NO_FATAL_FAILURE(item.SetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_Y, y));
     ASSERT_TRUE(item.GetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_X, outx));
     ASSERT_EQ(outx, x);
     ASSERT_TRUE(item.GetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_Y, outy));
     ASSERT_EQ(outy, y);
+    ASSERT_NO_FATAL_FAILURE(item.SetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_X, y));
+    ASSERT_NO_FATAL_FAILURE(item.SetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_Y, x));
+    ASSERT_TRUE(item.GetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_X, outx));
+    ASSERT_TRUE(item.GetExtension(PointerEvent::PointerItemExtension::PREDICT_WINDOW_Y, outy));
 }
 
 /**
