@@ -784,6 +784,10 @@ public:
     };
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
+     /**
+     * @brief All possible extension values
+     * @since 23
+     */
     enum class PointerItemExtension : int32_t {
         PREDICT_WINDOW_X = 1001,
         PREDICT_WINDOW_Y = 1002,
@@ -1537,10 +1541,19 @@ public:
         int32_t sizeLevel_ {};
         uint32_t color_ {};
 
+        /**
+         * @brief Extension Data struct and properties
+         * @since 23
+         */
         enum class ExtensionValueType : int32_t {
             TYPE_INT32 = 0,
             TYPE_DOUBLE = 1,
         };
+
+        /**
+         * @brief Extension Data struct and properties
+         * @since 23
+         */
         struct ExtensionData {
             PointerItemExtension key;
             ExtensionValueType type;
