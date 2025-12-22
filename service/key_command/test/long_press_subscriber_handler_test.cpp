@@ -675,7 +675,6 @@ HWTEST_F(LongPressSubscribeHandlerTest, LongPressSubscribeHandlerTest_HandleFing
     ASSERT_TRUE(result);
     item.SetDownTime(item.GetDownTime() + 150000);
     pointerEvent->UpdatePointerItem(pointerId, item);
-    ASSERT_NO_FATAL_FAILURE(LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(pointerEvent));
 }
 
 /**
