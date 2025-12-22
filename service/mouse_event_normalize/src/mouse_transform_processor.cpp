@@ -1317,8 +1317,8 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
     }
 }
 
-void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t eventType,
-    uint32_t &button)
+void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data,
+    const int32_t eventType, uint32_t &button)
 {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     // skip button remapping for virtual trackpad
