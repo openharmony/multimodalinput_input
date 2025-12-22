@@ -534,20 +534,20 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-void MouseTransformProcessor::SetPointerEventRightButtonSource(const int32_t evenType, uint32_t button)
+void MouseTransformProcessor::SetPointerEventRightButtonSource(const int32_t eventType, uint32_t button)
 {
     if (button != MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::INVALID);
         return;
     }
-    if (evenType == LIBINPUT_EVENT_POINTER_TAP) {
+    if (eventType == LIBINPUT_EVENT_POINTER_TAP) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::TOUCHPAD_TWO_FINGER_TAP);
-    } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+    } else if (eventType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::TOUCHPAD_RIGHT_BUTTONS);
-    } else if (evenType == LIBINPUT_EVENT_POINTER_BUTTON) {
+    } else if (eventType == LIBINPUT_EVENT_POINTER_BUTTON) {
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::MOUSE_RIGHT);
     } else {
-        MMI_HILOGD("Invalid type, evenType:%{public}d", evenType);
+        MMI_HILOGD("Invalid type, eventType:%{public}d", eventType);
         pointerEvent_->SetRightButtonSource(PointerEvent::RightButtonSource::OTHERS);
     }
 }
@@ -1260,7 +1260,7 @@ int32_t MouseTransformProcessor::GetPointerLocation(int32_t &displayId, double &
 }
 
 #ifndef OHOS_BUILD_ENABLE_WATCH
-void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
+void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer *data, const int32_t eventType,
     uint32_t &button)
 {
     // touchpad left click 280 -> 272
@@ -1271,7 +1271,7 @@ void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_po
 
     // touchpad two finger tap 273 -> 0
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
-        evenType == LIBINPUT_EVENT_POINTER_TAP) {
+        eventType == LIBINPUT_EVENT_POINTER_TAP) {
         button = 0;
         return;
     }
@@ -1285,7 +1285,7 @@ void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_po
     }
 }
 
-void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_pointer *data, const int32_t evenType,
+void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_pointer *data, const int32_t eventType,
     uint32_t &button)
 {
     // touchpad left click 280 -> 273
@@ -1297,14 +1297,14 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
     // touchpad right click 273 -> 272
     uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
-        evenType != LIBINPUT_EVENT_POINTER_TAP && fingerCount != TP_RIGHT_CLICK_FINGER_CNT) {
+        eventType != LIBINPUT_EVENT_POINTER_TAP && fingerCount != TP_RIGHT_CLICK_FINGER_CNT) {
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
         return;
     }
 
     // touchpad two finger tap 273 -> 0
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
-        evenType == LIBINPUT_EVENT_POINTER_TAP) {
+        eventType == LIBINPUT_EVENT_POINTER_TAP) {
         button = 0;
         return;
     }
@@ -1317,7 +1317,7 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
     }
 }
 
-void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t evenType,
+void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t eventType,
     uint32_t &button)
 {
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -1338,7 +1338,7 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
 
     // touchpad right click 273 -> 272
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
-        evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        eventType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
         return;
     }
@@ -1351,30 +1351,30 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
 }
 
 void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrRightButton(struct libinput_event_pointer *data,
-    const int32_t evenType, uint32_t &button)
+    const int32_t eventType, uint32_t &button)
 {
     uint32_t buttonTemp = button;
-    HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
+    HandleTouchpadTwoFingerButton(data, eventType, buttonTemp);
     if (buttonTemp == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
         button = buttonTemp;
         return;
     }
-    HandleTouchpadRightButton(data, evenType, button);
+    HandleTouchpadRightButton(data, eventType, button);
 }
 
 void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrLeftButton(struct libinput_event_pointer *data,
-    const int32_t evenType, uint32_t &button)
+    const int32_t eventType, uint32_t &button)
 {
     uint32_t buttonTemp = button;
-    HandleTouchpadTwoFingerButton(data, evenType, buttonTemp);
+    HandleTouchpadTwoFingerButton(data, eventType, buttonTemp);
     if (buttonTemp == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
         button = buttonTemp;
         return;
     }
-    HandleTouchpadLeftButton(data, evenType, button);
+    HandleTouchpadLeftButton(data, eventType, button);
 }
 
-void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
+void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t eventType,
     uint32_t &button)
 {
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
@@ -1386,36 +1386,36 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     RightClickType switchType = RightClickType(switchTypeData);
-    if (evenType != LIBINPUT_EVENT_POINTER_TAP && evenType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+    if (eventType != LIBINPUT_EVENT_POINTER_TAP && eventType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         MMI_HILOGD("Event not from touchpad");
         return;
     }
-    MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
+    MMI_HILOGD("Transform right button event, eventType:%d, switchType:%d, button:%d", eventType, switchType, button);
     uint32_t btn = button;
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         button = pressedButton_;
         if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
-            MMI_HILOGE("button release from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
-                button, btn, evenType, switchType);
+            MMI_HILOGE("button release from:%{public}d to :%{public}d, eventType:%{public}d, switchType:%{public}d",
+                button, btn, eventType, switchType);
         }
         return;
     }
     switch (switchType) {
         case RightClickType::TP_RIGHT_BUTTON:
-            HandleTouchpadRightButton(data, evenType, button);
+            HandleTouchpadRightButton(data, eventType, button);
             break;
         case RightClickType::TP_LEFT_BUTTON:
-            HandleTouchpadLeftButton(data, evenType, button);
+            HandleTouchpadLeftButton(data, eventType, button);
             break;
         case RightClickType::TP_TWO_FINGER_TAP:
-            HandleTouchpadTwoFingerButton(data, evenType, button);
+            HandleTouchpadTwoFingerButton(data, eventType, button);
             break;
         case RightClickType::TP_TWO_FINGER_TAP_OR_RIGHT_BUTTON:
-            HandleTouchpadTwoFingerButtonOrRightButton(data, evenType, button);
+            HandleTouchpadTwoFingerButtonOrRightButton(data, eventType, button);
             break;
         case RightClickType::TP_TWO_FINGER_TAP_OR_LEFT_BUTTON:
-            HandleTouchpadTwoFingerButtonOrLeftButton(data, evenType, button);
+            HandleTouchpadTwoFingerButtonOrLeftButton(data, eventType, button);
             break;
         default:
             MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
@@ -1424,8 +1424,8 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pressedButton_ = button;
         if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
-            MMI_HILOGE("button press from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
-                button, btn, evenType, switchType);
+            MMI_HILOGE("button press from:%{public}d to :%{public}d, eventType:%{public}d, switchType:%{public}d",
+                button, btn, eventType, switchType);
         }
     }
 }
