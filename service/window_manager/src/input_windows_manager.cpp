@@ -1625,7 +1625,7 @@ bool InputWindowsManager::IsKeyEventFromVKeyboard(std::shared_ptr<KeyEvent> keyE
         MMI_HILOGE("Failed to get inputDevice by deviceId: %{public}d", keyEvent->GetDeviceId());
         return false;
     }
-    return SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && device->GetName() == "input_mt_wrapper";
+    return device->GetName() == "input_mt_wrapper";
 }
 
 bool InputWindowsManager::IsPointInsideWindowArea(int x, int y, const WindowInfo& windowItem) const {
