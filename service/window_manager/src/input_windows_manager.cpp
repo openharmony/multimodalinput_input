@@ -518,7 +518,8 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
         MMI_HILOG_DISPATCHD("window info is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEAVE_WINDOW ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
+            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW ||
+            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW) {
             LastTouchInfo lastInfo = GetLastTouchInfo(pointerEvent);
             auto win = pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ?
                 lastInfo.lastTouchWindowInfo : lastWindowInfo_;
