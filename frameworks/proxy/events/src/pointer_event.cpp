@@ -294,36 +294,6 @@ double PointerEvent::PointerItem::GetGlobalY() const
     return globalY_;
 }
 
-void PointerEvent::PointerItem::SetWindowXPredict(double windowXPredict)
-{
-    windowXPredict_ = windowXPredict;
-}
-
-double PointerEvent::PointerItem::GetWindowXPredict() const
-{
-    return windowXPredict_;
-}
-
-void PointerEvent::PointerItem::SetWindowYPredict(double windowYPredict)
-{
-    windowYPredict_ = windowYPredict;
-}
-
-double PointerEvent::PointerItem::GetWindowYPredict() const
-{
-    return windowYPredict_;
-}
-
-void PointerEvent::PointerItem::SetPredictExist(bool predictExist)
-{
-    predictExist_ = predictExist;
-}
-
-bool PointerEvent::PointerItem::GetPredictExist() const
-{
-    return predictExist_;
-}
-
 bool PointerEvent::PointerItem::IsValidGlobalXY() const
 {
     return globalX_ > DBL_MIN && globalX_ < DBL_MAX &&
@@ -552,6 +522,62 @@ uint32_t PointerEvent::PointerItem::GetColor() const
 void PointerEvent::PointerItem::SetColor(uint32_t color)
 {
     color_ = color;
+}
+
+void PointerEvent::PointerItem::SetExtension(const PointerEvent::PointerItemExtension &key, const int32_t &val)
+{
+    for (auto &item : extensionData_) {
+        if (item.key == key) {
+            item.type = PointerEvent::PointerItem::ExtensionValueType::TYPE_INT32;
+            item.intVal = val;
+            return;
+        }
+    }
+    extensionData_.emplace_back(key, val);
+}
+
+void PointerEvent::PointerItem::SetExtension(const PointerEvent::PointerItemExtension &key, const double &val)
+{
+    for (auto &item : extensionData_) {
+        if (item.key == key) {
+            item.type = PointerEvent::PointerItem::ExtensionValueType::TYPE_DOUBLE;
+            item.doubleVal = val;
+            return;
+        }
+    }
+    extensionData_.emplace_back(key, val);
+}
+
+bool PointerEvent::PointerItem::GetExtension(PointerEvent::PointerItemExtension key, double &outVal) const
+{
+    for (const auto &item : extensionData_) {
+        if (item.key == key) {
+            if (item.type == PointerEvent::PointerItem::ExtensionValueType::TYPE_DOUBLE) {
+                outVal = item.doubleVal;
+                return true;
+            } else if (item.type == PointerEvent::PointerItem::ExtensionValueType::TYPE_INT32) {
+                outVal = static_cast<double>(item.intVal);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool PointerEvent::PointerItem::GetExtension(PointerEvent::PointerItemExtension key, int32_t &outVal) const
+{
+    for (const auto &item : extensionData_) {
+        if (item.key == key) {
+            if (item.type == PointerEvent::PointerItem::ExtensionValueType::TYPE_INT32) {
+                outVal = item.intVal;
+                return true;
+            } else if (item.type == PointerEvent::PointerItem::ExtensionValueType::TYPE_DOUBLE) {
+                outVal = static_cast<int32_t>(item.doubleVal);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const

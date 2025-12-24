@@ -784,6 +784,14 @@ public:
     };
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
+     /**
+     * @brief All possible extension values
+     * @since 23
+     */
+    enum class PointerItemExtension : int32_t {
+        PREDICT_WINDOW_X = 1001,
+        PREDICT_WINDOW_Y = 1002,
+    };
 
 public:
     class PointerItem {
@@ -957,53 +965,6 @@ public:
          * @since 20
          */
         double GetGlobalY() const;
-
-        /**
-         * @brief Set Predicted global X coordinate. Used in client only. IPC not allowed.
-         * @param windowXPredict Indicates the Predicted Window X coordinate to set.
-         * @return void
-         * @since 23
-         */
-        void SetWindowXPredict(double windowXPredict);
-
-         /**
-         * @brief Get Predicted Window X coordinate. Used in client only. IPC not allowed.
-         * Returns the Predicted Window X coordinate.
-         * @return double
-         * @since 23
-         */
-        double GetWindowXPredict() const;
-
-        /**
-         * @brief Set Predicted Window Y coordinate. Used in client only. IPC not allowed.
-         * @param windowYPredict Indicates the Predicted Window Y coordinate to set.
-         * @return void
-         * @since 23
-         */
-        void SetWindowYPredict(double windowYPredict);
-
-        /**
-         * @brief Get Predicted Window X coordinate. Used in client only. IPC not allowed.
-         * Returns the Predicted Window Y coordinate.
-         * @return double
-         * @since 23
-         */
-        double GetWindowYPredict() const;
-
-        /**
-         * @brief Set whether predict coords exists. Used in client only. IPC not allowed.
-         * @param predictExist Indicates whether predict coords exists;
-         * @return void
-         * @since 23
-         */
-        void SetPredictExist(bool predictExist);
-
-        /**
-         * @brief Get whether predict coords exist. Used in client only. IPC not allowed.
-         * @return bool
-         * @since 23
-         */
-        bool GetPredictExist() const;
 
         /**
          * @brief Whether the global coordinates are valid.
@@ -1509,6 +1470,26 @@ public:
          * @return void
          */
         void SetColor(uint32_t color);
+        
+        /**
+         * @brief Sets the Extension value
+         * @param key the extension data type
+         * @param val the extension data value
+         * @return void
+         * @since 23
+         */
+        void SetExtension(const PointerItemExtension &key, const int32_t &val);
+        void SetExtension(const PointerItemExtension &key, const double &val);
+
+        /**
+         * @brief Get Extension data Value
+         * @param key the extension data type
+         * @param outVal the output value
+         * @return bool: success or not
+         * @since 23
+         */
+        bool GetExtension(PointerItemExtension key, double &outVal) const;
+        bool GetExtension(PointerItemExtension key, int32_t &outVal) const;
 
     private:
         int32_t pointerId_ { -1 };
@@ -1559,6 +1540,35 @@ public:
         int32_t style_ {};
         int32_t sizeLevel_ {};
         uint32_t color_ {};
+
+        /**
+         * @brief Extension Data struct and properties
+         * @since 23
+         */
+        enum class ExtensionValueType : int32_t {
+            TYPE_INT32 = 0,
+            TYPE_DOUBLE = 1,
+        };
+
+        /**
+         * @brief Extension Data struct and properties
+         * @since 23
+         */
+        struct ExtensionData {
+            PointerItemExtension key;
+            ExtensionValueType type;
+            union {
+                int32_t intVal = 0;
+                double doubleVal;
+            };
+            ExtensionData() = default;
+            ExtensionData(PointerItemExtension k, int32_t v) : key(k),
+                type(ExtensionValueType::TYPE_INT32), intVal(v) {}
+            ExtensionData(PointerItemExtension k, double v) : key(k),
+                type(ExtensionValueType::TYPE_DOUBLE), doubleVal(v) {}
+        };
+
+        std::vector<ExtensionData> extensionData_;
     };
 
 public:
