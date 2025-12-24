@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,41 +11,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../device_status.gni")
+import("../../multimodalinput_mini.gni")
 
-config("intention_prototype_public_config") {
-  include_dirs = [ "include" ]
+config("input_service_prototype_configs") {
+  include_dirs = [
+    "include",
+    "${root_out_dir}/diff_libinput_mmi/export_include",
+    "${mmi_path}/libudev/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+  ]
 }
 
-ohos_source_set("intention_prototype") {
+ohos_source_set("input_service_prototype") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
 
-  branch_protector_ret = "pac_ret"
+  include_dirs = []
 
-  include_dirs = [ "include" ]
+  sources = []
 
-  sources = [ "src/i_dsoftbus_adapter.cpp" ]
+  configs = [ ":input_service_prototype_configs" ]
 
-  public_configs = [ ":intention_prototype_public_config" ]
+  public_configs = [ ":input_service_prototype_configs" ]
 
-  deps = [
-    "${device_status_root_path}/utils/common:devicestatus_util",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-  ]
+  deps = []
 
-  external_deps = [
-    "common_event_service:cesfwk_innerkits",
-    "dsoftbus:softbus_client",
-    "hilog:libhilog",
-  ]
+  external_deps = []
 
-  subsystem_name = "${device_status_subsystem_name}"
-  part_name = "${device_status_part_name}"
+  part_name = "${mmi_part_name}"
+  subsystem_name = "${mmi_subsystem_name}"
 }

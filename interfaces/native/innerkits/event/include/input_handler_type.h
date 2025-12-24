@@ -16,6 +16,9 @@
 #ifndef INPUT_HANDLER_TYPE_H
 #define INPUT_HANDLER_TYPE_H
 
+#include <cstddef>
+#include <cstdint>
+
 namespace OHOS {
 namespace MMI {
 inline constexpr size_t MAX_N_INPUT_HANDLERS { 16 };

@@ -23,9 +23,16 @@ extern "C" {
 #endif
 #endif // __cplusplus
 
+#define MAX_CFG_POLICY_DIRS_CNT 32
 #define MAX_PATH_LEN    256  // max length of a filepath
 
+struct CfgFiles {
+    char *paths[MAX_CFG_POLICY_DIRS_CNT];
+};
+
 char* GetOneCfgFile(const char *pathSuffix, char *buf, unsigned int bufLength);
+CfgFiles *GetCfgFiles(const char *pathSuffix);
+void FreeCfgFiles(CfgFiles *res);
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -41,6 +48,8 @@ public:
     virtual ~IConfigPolicyUtils() = default;
 
     virtual char* GetOneCfgFile(const char *pathSuffix, char *buf, unsigned int bufLength) = 0;
+    virtual CfgFiles *GetCfgFiles(const char *pathSuffix) = 0;
+    virtual void FreeCfgFiles(CfgFiles *res) = 0;
 };
 
 class ConfigPolicyUtilsMock : public IConfigPolicyUtils {
@@ -49,6 +58,8 @@ public:
     virtual ~ConfigPolicyUtilsMock() override = default;
 
     MOCK_METHOD(char*, GetOneCfgFile, (const char*, char*, unsigned int));
+    MOCK_METHOD(CfgFiles*, GetCfgFiles, (const char*));
+    MOCK_METHOD(void, FreeCfgFiles, (CfgFiles *res));
 };
 } // namespace MMI
 } // namespace OHOS

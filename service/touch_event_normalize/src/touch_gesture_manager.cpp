@@ -113,7 +113,7 @@ void TouchGestureManager::StartRecognization(TouchGestureType gestureType, int32
         DelegateInterface::HandlerSummary {
             .handlerName = TOUCH_GESTURE_RECOGNIZER_NAME,
             .eventType = HANDLE_EVENT_TYPE_POINTER,
-            .mode = HandlerMode::SYNC,
+            .mode = IDelegateInterface::HandlerMode::SYNC,
             .cb = callback,
         });
     if (ret != RET_OK) {
