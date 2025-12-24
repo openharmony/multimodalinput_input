@@ -31,5 +31,15 @@ extern "C" char* GetOneCfgFile(const char *pathSuffix, char *buf, unsigned int b
 {
     return g_instance->GetOneCfgFile(pathSuffix, buf, bufLength);
 }
+
+extern "C" CfgFiles *GetCfgFiles(const char *pathSuffix)
+{
+    return g_instance->GetCfgFiles(pathSuffix);
+}
+
+extern "C" void FreeCfgFiles(CfgFiles *res)
+{
+    g_instance->FreeCfgFiles(res);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -17,6 +17,7 @@
 #define UDS_SERVER_H
 
 #include <list>
+#include <map>
 
 #include "uds_socket.h"
 
@@ -50,7 +51,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetClientFd(int32_t pid) const;
     int32_t GetClientPid(int32_t fd) const;
-    void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
+    void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback) override;
     int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
         const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
         int32_t& tokenType, uint32_t tokenId, bool isRealProcessName) override;

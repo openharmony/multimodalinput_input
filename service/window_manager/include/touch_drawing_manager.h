@@ -73,7 +73,7 @@ private:
     uint64_t displayNodeScreenId_ { 0 };
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     std::unique_ptr<ITouchDrawingHandler, ComponentManager::Component<ITouchDrawingHandler>> touchDrawingHandler_ {
-        nullptr, ComponentManager::Component<ITouchDrawingHandler>(nullptr, nullptr) };
+        nullptr, ComponentManager::Component<ITouchDrawingHandler>() };
     int32_t timerId_ { -1 };
 };
 
