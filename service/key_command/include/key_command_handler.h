@@ -267,6 +267,7 @@ private:
     void SendKeyEvent();
     bool CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent);
     bool IsMusicActivate();
+    bool IsCallScene();
     template <class T>
     void CreateStatusConfigObserver(T& item);
     bool GetKnuckleSwitchStatus(const std::string& key, const std::string &strUri, bool defaultValue);
