@@ -1048,6 +1048,23 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
     intervalTime_ = tempDelay;
 }
 
+bool KeyCommandHandler::IsCallScene()
+{
+    auto callState = DEVICE_MONITOR->GetCallState();
+    auto voipCallState = DEVICE_MONITOR->GetVoipCallState();
+    if (callState == StateType::CALL_STATUS_ACTIVE || callState == StateType::CALL_STATUS_HOLDING ||
+        callState == StateType::CALL_STATUS_INCOMING || callState == StateType::CALL_STATUS_ANSWERED ||
+        callState == StateType::CALL_STATUS_ALERTING) {
+        return true;
+    }
+    if (voipCallState == StateType::CALL_STATUS_ACTIVE || voipCallState == StateType::CALL_STATUS_HOLDING ||
+        voipCallState == StateType::CALL_STATUS_INCOMING || voipCallState == StateType::CALL_STATUS_ANSWERED ||
+        voipCallState == StateType::CALL_STATUS_ALERTING) {
+        return true;
+    }
+    return false;
+}
+
 bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared_ptr<KeyEvent> keyEvent)
 {
     if (item.keyCode != keyEvent->GetKeyCode()) {
@@ -1072,10 +1089,7 @@ bool KeyCommandHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared
         (screenStatus != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF && isScreenLocked)) {
             return true;
     }
-    auto callState = DEVICE_MONITOR->GetCallState();
-    if (callState == StateType::CALL_STATUS_ACTIVE || callState == StateType::CALL_STATUS_HOLDING ||
-        callState == StateType::CALL_STATUS_INCOMING || callState == StateType::CALL_STATUS_ANSWERED ||
-        callState == StateType::CALL_STATUS_ALERTING) {
+    if (IsCallScene()) {
         return true;
     }
     MMI_HILOGI("ScreenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
