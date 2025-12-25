@@ -103,7 +103,9 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   configs = [
     "${mmi_path}:coverage_flags",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -113,7 +115,12 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   cflags_cc = [ "-Wno-string-conversion" ]
 
+  include_dirs = [ "${mmi_path}/service/module_loader/include" ]
+
   sources = [
+    "${mmi_path}/service/module_loader/src/input_service_context.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_adapter.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_detector.cpp",
     "src/remote_control_transform_processor_test.cpp",
     "src/touch_event_normalize_test.cpp",
     "src/touch_gesture_detector_test.cpp",
@@ -124,6 +131,7 @@ ohos_unittest("TouchEventNormalizeTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service/filter:event_filter_interface",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
@@ -131,10 +139,14 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   external_deps = [
     "c_utils:utilsbase",
+    "config_policy:configpolicy_util",
+    "cJSON:cjson",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -1071,21 +1083,29 @@ ohos_unittest("TouchGestureAdapterTest") {
     blocklist = "./../../ipc_blocklist.txt"
   }
 
-  include_dirs = [ "${mmi_path}/service/touch_event_normalize/include" ]
+  include_dirs = [
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+  ]
 
   sources = [
+    "${mmi_path}/service/module_loader/src/input_service_context.cpp",
     "${mmi_path}/service/touch_event_normalize/src/touch_gesture_adapter.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_detector.cpp",
     "src/touch_gesture_adapter_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
@@ -1122,11 +1142,23 @@ ohos_unittest("TouchGestureManagerTest") {
     blocklist = "./../../ipc_blocklist.txt"
   }
 
-  include_dirs = [ "${mmi_path}/service/touch_event_normalize/include" ]
+  include_dirs = [
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+  ]
 
-  sources = [ "src/touch_gesture_manager_test.cpp" ]
+  sources = [
+    "${mmi_path}/service/module_loader/src/input_service_context.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_adapter.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_detector.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_interface.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_gesture_manager.cpp",
+    "src/touch_gesture_interface_test.cpp",
+    "src/touch_gesture_manager_test.cpp",
+  ]
 
   deps = [
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -1135,10 +1167,14 @@ ohos_unittest("TouchGestureManagerTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
+    "ffrt:libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
   ]
 
   if (enable_player_framework) {
@@ -1295,9 +1331,10 @@ group("TouchEventNormalizeTests") {
 
   deps = [
     ":TouchEventNormalizeTest",
+    ":TouchGestureAdapterTest",
+    ":TouchGestureManagerTest",
     ":TouchpadTransformProcessorEXTest",
     ":TouchEventNormalizeTestWithMock",
     ":TransformPointTest",
-    ":TouchGestureManagerTestWithMock",
   ]
 }

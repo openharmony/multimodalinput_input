@@ -16,7 +16,7 @@
 #include "property_name_mapper_impl.h"
 
 #include "define_multimodal.h"
-#include "i_context.h"
+#include "i_input_service_context.h"
 #include "key_event.h"
 
 #undef MMI_LOG_DOMAIN
@@ -267,7 +267,7 @@ PointerEvent::AxisType PropertyNameMapperImpl::MapAxis(const std::string &name) 
     return PointerEvent::AXIS_TYPE_UNKNOWN;
 }
 
-extern "C" IPropertyNameMapper* CreateInstance(IContext *env)
+extern "C" IPropertyNameMapper* CreateInstance(IInputServiceContext *env)
 {
     return new PropertyNameMapperImpl();
 }

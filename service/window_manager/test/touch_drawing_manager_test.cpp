@@ -333,9 +333,8 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetDelegateProxy, Test
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetPressed(true);
-    std::shared_ptr<DelegateInterface> proxy;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetDelegateProxy(proxy));
-    EXPECT_EQ(TOUCH_DRAWING_MGR->delegateProxy_, proxy);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetDelegateProxy(nullptr));
+    EXPECT_EQ(TOUCH_DRAWING_MGR->delegateProxy_, nullptr);
 }
 
 /**
@@ -354,7 +353,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetMultiWindowScreenId
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetPressed(true);
-    std::shared_ptr<DelegateInterface> proxy;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId));
 }
 
