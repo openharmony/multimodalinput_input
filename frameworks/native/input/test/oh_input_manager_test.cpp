@@ -2952,6 +2952,70 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventGlobalCoordinates, Tes
 }
 
 /*
+ * @tc.name: OHInputManagerTest_TouchEventPressure
+ * @tc.desc: Test the function OH_Input_SetTouchEventPressure OH_Input_GetTouchEventPressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure, TestSize.Level1)
+{
+    Input_TouchEvent touchEvent;
+    double pressure = 0.5;
+    OH_Input_SetTouchEventPressure(&touchEvent, pressure);
+    auto ret = OH_Input_GetTouchEventPressure(&touchEvent);
+    EXPECT_EQ(ret, pressure);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventWindowCoordinates
+ * @tc.desc: Test the function OH_Input_SetTouchEventWindowX OH_Input_SetTouchEventWindowY
+ * OH_Input_GetTouchEventWindowX OH_Input_GetTouchEventWindowY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventWindowCoordinates, TestSize.Level1)
+{
+    Input_TouchEvent touchEvent;
+    auto windowX = 100;
+    auto windowY = 100;
+    OH_Input_SetTouchEventWindowX(&touchEvent, windowX);
+    OH_Input_SetTouchEventWindowY(&touchEvent, windowY);
+    auto retX = OH_Input_GetTouchEventWindowX(&touchEvent);
+    auto retY = OH_Input_GetTouchEventWindowY(&touchEvent);
+    EXPECT_TRUE((retX == windowX) && (retY == windowY));
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventDownTime
+ * @tc.desc: Test the function OH_Input_SetTouchEventDownTime OH_Input_GetTouchEventDownTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventDownTime, TestSize.Level1)
+{
+    Input_TouchEvent touchEvent;
+    int64_t downTime = 100;
+    OH_Input_SetTouchEventDownTime(&touchEvent, downTime);
+    auto ret = OH_Input_GetTouchEventDownTime(&touchEvent);
+    EXPECT_EQ(ret, downTime);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventToolType
+ * @tc.desc: Test the function OH_Input_SetTouchEventToolType OH_Input_GetTouchEventToolType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType, TestSize.Level1)
+{
+    Input_TouchEvent touchEvent;
+    Input_TouchEventToolType toolType = Input_TouchEventToolType::TOOL_TYPE_FINGER;
+    OH_Input_SetTouchEventToolType(&touchEvent, toolType);
+    auto ret = OH_Input_GetTouchEventToolType(&touchEvent);
+    EXPECT_EQ(ret, toolType);
+}
+
+/*
  * @tc.name: OHInputManagerTest_AxisEventGlobalCoordinates
  * @tc.desc: OH_Input_SetAxisEventGlobalX OH_Input_SetAxisEventGlobalY
  * OH_Input_GetAxisEventGlobalX OH_Input_GetAxisEventGlobalY

@@ -328,6 +328,60 @@ typedef enum Input_InjectionStatus {
 } Input_InjectionStatus;
 
 /**
+ * @brief Input_TouchEventToolType
+ * @since 24
+ */
+typedef enum Input_TouchEventToolType {
+    /**
+    * Finger
+    * @since 24
+    */
+    TOOL_TYPE_FINGER = 0,
+
+    /**
+    * Pen
+    * @since 24
+    */
+    TOOL_TYPE_PEN = 1,
+
+    /**
+    * Rubber
+    * @since 24
+    */
+    TOOL_TYPE_RUBBER = 2,
+
+    /**
+    * Brush
+    * @since 24
+    */
+    TOOL_TYPE_BRUSH = 3,
+
+    /**
+    * Pencil
+    * @since 24
+    */
+    TOOL_TYPE_PENCIL = 4,
+
+    /**
+    * Air brush
+    * @since 24
+    */
+    TOOL_TYPE_AIRBRUSH = 5,
+
+    /**
+    * Mouse
+    * @since 24
+    */
+    TOOL_TYPE_MOUSE = 6,
+
+    /**
+    * lens
+    * @since 24
+    */
+    TOOL_TYPE_LENS = 7,
+} Input_TouchEventToolType;
+
+/**
  * @brief Defines the hot key structure.
  *
  * @since 13
@@ -1212,6 +1266,102 @@ void OH_Input_SetTouchEventGlobalY(struct Input_TouchEvent* touchEvent, int32_t 
  * @since 20
  */
 int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the pressure of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param pressure Pressure, the value ranges from 0 to 1.
+* @return OH_Input_SetTouchEventPressure function result code.
+ *         {@link INPUT_SUCCESS} Sets the pressure of the touch event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The touchEvent is NULL or pressure value not within range.\n
+ * @since 24
+ */
+Input_Result OH_Input_SetTouchEventPressure(struct Input_TouchEvent* touchEvent, double pressure);
+
+/**
+ * @brief Obtains the pressure of a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return pressure.
+ * @since 24
+ */
+double OH_Input_GetTouchEventPressure(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the window X coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param windowX Window X coordinate.
+ * @since 24
+ */
+void OH_Input_SetTouchEventWindowX(struct Input_TouchEvent* touchEvent, int32_t windowX);
+
+/**
+ * @brief Queries the window X coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return window X coordinate.
+ * @since 24
+ */
+int32_t OH_Input_GetTouchEventWindowX(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the window Y coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param windowY Window Y coordinate.
+ * @since 24
+ */
+void OH_Input_SetTouchEventWindowY(struct Input_TouchEvent* touchEvent, int32_t windowY);
+
+/**
+ * @brief Queries the window Y coordinate of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return window Y coordinate.
+ * @since 24
+ */
+int32_t OH_Input_GetTouchEventWindowY(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the down time of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param downTime Down time.
+ * @since 24
+ */
+void OH_Input_SetTouchEventDownTime(struct Input_TouchEvent* touchEvent, int64_t downTime);
+
+/**
+ * @brief Obtains the down time of a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return down time.
+ * @since 24
+ */
+int64_t OH_Input_GetTouchEventDownTime(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Set the tool type of the touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @param toolType Tool type. refer to Input_TouchEventToolType for value range.
+ * @return OH_Input_SetTouchEventToolType function result code.
+ *         {@link INPUT_SUCCESS} Sets the toolType success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The touchEvent is NULL or toolType value not within range.\n
+ * @since 24
+ */
+Input_Result OH_Input_SetTouchEventToolType(struct Input_TouchEvent* touchEvent, Input_TouchEventToolType toolType);
+
+/**
+ * @brief Obtains the tool type of a touch event.
+ *
+ * @param touchEvent Touch event object.
+ * @return toolType.
+ * @since 24
+ */
+Input_TouchEventToolType OH_Input_GetTouchEventToolType(const struct Input_TouchEvent* touchEvent);
 
 /**
  * @brief Cancels event injection and revokes authorization.
