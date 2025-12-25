@@ -39,10 +39,12 @@ class FingerprintEventProcessorTest : public testing::Test {
 public:
     static void SetUpTestCase(void){};
     static void TearDownTestCase(void){};
-    void SetUp() override {
+    void SetUp() override
+    {
         FingerprintEventHdr = std::make_unique<FingerprintEventProcessor>();
     }
-    void TearDown() override {
+    void TearDown() override
+    {
         FingerprintEventHdr.reset();
     }
 protected:
