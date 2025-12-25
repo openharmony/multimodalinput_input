@@ -22,6 +22,7 @@
 #include "input_event_handler.h"
 #include "mouse_device_state.h"
 #include "pointer_device_manager.h"
+#include "pointer_motion_acceleration.h"
 #include "scene_board_judgement.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_transform_processor.h"
@@ -255,14 +256,14 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
         }
         int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
         float factor = ScreenFactor(diagonalInch);
-        ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &abs_x, &abs_y, globalPointerSpeed_, dalta_time, displayPpi, static_cast<double>(factor));
+        ret = PointerMotionAcceleration::DynamicAccelerateMouse(offset,  WIN_MGR->GetMouseIsCaptureMode(),
+            globalPointerSpeed_, dalta_time, displayPpi, static_cast<double>(factor), abs_x, abs_y);
         return ret;
     } else {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
-        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &abs_x, &abs_y, globalPointerSpeed_, deviceType);
+        ret = PointerMotionAcceleration::AccelerateMouse(offset, WIN_MGR->GetMouseIsCaptureMode(),
+            globalPointerSpeed_, static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     }
 }
@@ -280,14 +281,14 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         displayInfo->height == static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
-        ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
+        ret = PointerMotionAcceleration::AccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
+            GetTouchpadSpeed(), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
-        ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &abs_x, &abs_y, GetTouchpadSpeed(), deviceType);
+        ret = PointerMotionAcceleration::AccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
+            GetTouchpadSpeed(), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
@@ -312,8 +313,8 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
             return RET_ERR;
         }
         UpdateTouchpadCDG(touchpadPPi, touchpadSize, frequency);
-        ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &abs_x, &abs_y, GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency);
+        ret = PointerMotionAcceleration::DynamicAccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
+            GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency, abs_x, abs_y);
         return ret;
     }
 }
@@ -1184,6 +1185,7 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
+    PointerMotionAcceleration::Dump(fd, args);
 }
 
 int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
