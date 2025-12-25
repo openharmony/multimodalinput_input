@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -281,9 +281,10 @@ HWTEST_F(TouchTransformProcessorTest, NotifyFingersenseProcess_001, TestSize.Lev
     CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchTransformProcessor processor(deviceId);
+    int32_t displayId = 0;
     PointerEvent::PointerItem item;
     int32_t toolType = 0;
-    EXPECT_NO_FATAL_FAILURE(processor.NotifyFingersenseProcess(item, toolType));
+    EXPECT_NO_FATAL_FAILURE(processor.NotifyFingersenseProcess(displayId, item, toolType));
 }
 
 /**
