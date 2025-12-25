@@ -420,7 +420,7 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnInputEventHandler_02, Te
     };
     handler1.cb = callback;
     ASSERT_NO_FATAL_FAILURE(CreateDelegateInterface().OnInputEventHandler(type, pointerEvent));
-    handler1.mode = HandlerMode::ASYNC;
+    handler1.mode = IDelegateInterface::HandlerMode::ASYNC;
     ASSERT_NO_FATAL_FAILURE(CreateDelegateInterface().OnInputEventHandler(type, pointerEvent));
 }
 

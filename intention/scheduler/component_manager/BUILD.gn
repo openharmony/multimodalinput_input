@@ -17,6 +17,7 @@ config("component_manager_config") {
   include_dirs = [
     "include",
     "${mmi_path}/intention/prototype/include",
+    "${mmi_path}/service/module_loader/include",
   ]
 }
 

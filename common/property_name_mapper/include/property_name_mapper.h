@@ -51,7 +51,7 @@ private:
     static std::shared_ptr<PropertyNameMapper> instance_;
     static int32_t timerId_;
     std::unique_ptr<IPropertyNameMapper, ComponentManager::Component<IPropertyNameMapper>> mapper_ {
-        nullptr, ComponentManager::Component<IPropertyNameMapper>(nullptr, nullptr) };
+        nullptr, ComponentManager::Component<IPropertyNameMapper>() };
 };
 } // namespace MMI
 } // namespace OHOS

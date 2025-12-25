@@ -17,6 +17,7 @@
 #define COMPONENT_MANAGER_H
 
 #include <memory>
+#include <string>
 #include <dlfcn.h>
 #include <nocopyable.h>
 
@@ -44,7 +45,8 @@ public:
     template<typename IComponent>
     class Component final {
     public:
-        Component(IContext *context, void *handle);
+        Component() = default;
+        Component(const std::string &name, IContext *context, void *handle);
         Component(Component &&other);
         ~Component();
         DISALLOW_COPY(Component);
@@ -57,6 +59,7 @@ public:
         void DeleteInstance(IComponent *instance);
         void Unload();
 
+        std::string name_;
         IContext *context_ { nullptr };
         void *handle_ { nullptr };
         IComponent *instance_ { nullptr };
@@ -71,8 +74,8 @@ public:
 };
 
 template<typename IComponent>
-ComponentManager::Component<IComponent>::Component(IContext *context, void *handle)
-    : context_(context), handle_(handle)
+ComponentManager::Component<IComponent>::Component(const std::string &name, IContext *context, void *handle)
+    : name_(name), context_(context), handle_(handle)
 {}
 
 template<typename IComponent>
@@ -83,8 +86,9 @@ ComponentManager::Component<IComponent>::~Component()
 
 template<typename IComponent>
 ComponentManager::Component<IComponent>::Component(ComponentManager::Component<IComponent> &&other)
-    : context_(other.context_), handle_(other.handle_), instance_(other.instance_)
+    : name_(other.name_), context_(other.context_), handle_(other.handle_), instance_(other.instance_)
 {
+    other.name_.clear();
     other.context_ = nullptr;
     other.handle_ = nullptr;
     other.instance_ = nullptr;
@@ -98,9 +102,11 @@ ComponentManager::Component<IComponent>& ComponentManager::Component<IComponent>
         return *this;
     }
     Unload();
+    name_ = other.name_;
     context_ = other.context_;
     handle_ = other.handle_;
     instance_ = other.instance_;
+    other.name_.clear();
     other.context_ = nullptr;
     other.handle_ = nullptr;
     other.instance_ = nullptr;
@@ -126,6 +132,7 @@ IComponent* ComponentManager::Component<IComponent>::GetInstance()
         MMI_HILOGE("dlsym('CreateInstance') fail: %{public}s", err);
         return nullptr;
     }
+    MMI_HILOGI("Create instance of module(%{private}s)", name_.c_str());
     instance_ = create(context_);
     return instance_;
 }
@@ -143,6 +150,7 @@ void ComponentManager::Component<IComponent>::DeleteInstance(IComponent *instanc
         MMI_HILOGE("dlsym('DestroyInstance') fail: %{public}s", err);
         return;
     }
+    MMI_HILOGI("Destroy instance of module(%{private}s)", name_.c_str());
     destroy(instance_);
     instance_ = nullptr;
 }
@@ -152,6 +160,7 @@ void ComponentManager::Component<IComponent>::Unload()
 {
     if (handle_ != nullptr) {
         DeleteInstance(instance_);
+        MMI_HILOGI("Unload module(%{private}s)", name_.c_str());
         if (::dlclose(handle_) != RET_OK) {
             MMI_HILOGE("dlclose fail: %{public}s", ::dlerror());
         }
@@ -165,7 +174,7 @@ std::unique_ptr<IComponent, ComponentManager::Component<IComponent>> ComponentMa
 {
     if (libPath == nullptr) {
         MMI_HILOGE("libPath is null");
-        return { nullptr, ComponentManager::Component<IComponent>(nullptr, nullptr) };
+        return { nullptr, ComponentManager::Component<IComponent>() };
     }
     void *handle = ::dlopen(libPath, RTLD_NOW);
     if (handle == nullptr) {
@@ -174,9 +183,9 @@ std::unique_ptr<IComponent, ComponentManager::Component<IComponent>> ComponentMa
         } else {
             MMI_HILOGE("dlopen fail for %{public}s", libPath);
         }
-        return { nullptr, ComponentManager::Component<IComponent>(nullptr, nullptr) };
+        return { nullptr, ComponentManager::Component<IComponent>() };
     }
-    Component<IComponent> plugin(context, handle);
+    Component<IComponent> plugin(std::string(libPath), context, handle);
     return { plugin.GetInstance(), std::move(plugin) };
 }
 } // namespace MMI

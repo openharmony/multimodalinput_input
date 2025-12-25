@@ -16,21 +16,16 @@
 #ifndef DELEGATE_INTERFACE_H
 #define DELEGATE_INTERFACE_H
 
-#include <functional>
-
 #include "nocopyable.h"
 
 #include "delegate_tasks.h"
+#include "i_delegate_interface.h"
 #include "i_input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-enum class HandlerMode {
-    SYNC,
-    ASYNC
-};
-using TaskCallback = std::function<int32_t(std::shared_ptr<PointerEvent>)>;
 class DelegateInterface final :
+    public IDelegateInterface,
     public IInputEventHandler::IInputEventConsumer,
     public std::enable_shared_from_this<DelegateInterface> {
 public:
@@ -38,24 +33,13 @@ public:
     explicit DelegateInterface(std::function<int32_t(DTaskCallback)> delegate,
         std::function<int32_t(DTaskCallback)> asyncFun) : delegateTasks_(delegate), asyncDelegateTasks_(asyncFun) {}
     void Init();
-    int32_t OnPostSyncTask(DTaskCallback cb) const;
-    int32_t OnPostAsyncTask(DTaskCallback cb) const;
+    int32_t OnPostSyncTask(DTaskCallback cb) const override;
+    int32_t OnPostAsyncTask(DTaskCallback cb) const override;
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    struct HandlerSummary {
-        std::string handlerName;
-        HandleEventType eventType { HANDLE_EVENT_TYPE_NONE };
-        HandlerMode mode { HandlerMode::SYNC };
-        int32_t priority {};
-        uint32_t deviceTags {};
-        TouchGestureType gestureType { TOUCH_GESTURE_TYPE_NONE };
-        int32_t fingers {};
-        TaskCallback cb;
-    };
-
-    void RemoveHandler(InputHandlerType handlerType, const std::string &name);
-    int32_t AddHandler(InputHandlerType handlerType, const HandlerSummary &summary);
-    bool HasHandler(const std::string &name) const;
+    void RemoveHandler(InputHandlerType handlerType, const std::string &name) override;
+    int32_t AddHandler(InputHandlerType handlerType, const HandlerSummary &summary) override;
+    bool HasHandler(const std::string &name) const override;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 private:
