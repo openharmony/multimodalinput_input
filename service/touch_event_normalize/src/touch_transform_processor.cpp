@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -137,7 +137,7 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     auto keyHandler = InputHandler->GetKeyCommandHandler();
     if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect()) &&
         toolType != PointerEvent::TOOL_TYPE_THP_FEATURE) {
-        NotifyFingersenseProcess(item, toolType);
+        NotifyFingersenseProcess(pointerEvent_->GetTargetDisplayId(), item, toolType);
     } else {
         MMI_HILOGD("Skip fingersense detect");
     }
@@ -169,10 +169,11 @@ void TouchTransformProcessor::UpdatePointerItemByTouchInfo(PointerEvent::Pointer
 
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 __attribute__((no_sanitize("cfi")))
-void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType)
+void TouchTransformProcessor::NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem,
+    int32_t &toolType)
 {
     CALL_DEBUG_ENTER;
-    TransformTouchProperties(rawTouch_, pointerItem);
+    TransformTouchProperties(displayId, pointerItem, rawTouch_);
     if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
         MMI_HILOGD("Fingersense start classify touch down event");
         TouchType rawTouchTmp = rawTouch_;
@@ -190,13 +191,19 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
     }
 }
 
-void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
+void TouchTransformProcessor::TransformTouchProperties(int32_t displayId, const PointerEvent::PointerItem &pointerItem,
+    TouchType &rawTouch)
 {
     CALL_DEBUG_ENTER;
     rawTouch.id = pointerItem.GetPointerId();
     rawTouch.pressure = pointerItem.GetPressure();
     rawTouch.x = pointerItem.GetRawDisplayX();
     rawTouch.y = pointerItem.GetRawDisplayY();
+    /*
+     * the knuckle algorithm distinguishes between the main screen and the secondary screen using displayId and
+     * shield the knuckle event on the secondary screen.
+     */
+    rawTouch.displayId = displayId;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
@@ -283,7 +290,7 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     auto keyHandler = InputHandler->GetKeyCommandHandler();
     if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect())) {
-        TransformTouchProperties(rawTouch_, item);
+        TransformTouchProperties(pointerEvent_->GetTargetDisplayId(), item, rawTouch_);
         if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
             MMI_HILOGD("Notify fingersense touch up event");
             TouchType rawTouchTmp = rawTouch_;
