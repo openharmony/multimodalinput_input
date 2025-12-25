@@ -4194,6 +4194,53 @@ HWTEST_F(MMIServerTest, MMIService_GetAllSystemHotkeys_002, TestSize.Level1)
 #endif
 }
 
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+
+/**
+ * @tc.name: MMIService_AddGestureHandlerSync_001
+ * @tc.desc: normal case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_AddGestureHandlerSync_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t session { 1 };
+    TouchGestureType gestureType { TOUCH_GESTURE_TYPE_SWIPE };
+    int32_t nFingers { 5 };
+    MMIService mmiService {};
+    EXPECT_TRUE(mmiService.AddGestureHandlerSync(session, gestureType, nFingers));
+    EXPECT_EQ(mmiService.touchGestureMgrTimer_, -1);
+    EXPECT_NE(mmiService.touchGestureMgr_, nullptr);
+    if (mmiService.touchGestureMgr_ != nullptr) {
+        EXPECT_TRUE(mmiService.touchGestureMgr_->HasHandler());
+    }
+}
+
+/**
+ * @tc.name: MMIService_RemoveGestureHandlerSync_001
+ * @tc.desc: normal case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_RemoveGestureHandlerSync_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t session { 1 };
+    TouchGestureType gestureType { TOUCH_GESTURE_TYPE_SWIPE };
+    int32_t nFingers { 5 };
+    MMIService mmiService {};
+    EXPECT_TRUE(mmiService.AddGestureHandlerSync(session, gestureType, nFingers));
+    mmiService.RemoveGestureHandlerSync(session, gestureType, nFingers);
+    EXPECT_NE(mmiService.touchGestureMgrTimer_, -1);
+    EXPECT_NE(mmiService.touchGestureMgr_, nullptr);
+    if (mmiService.touchGestureMgr_ != nullptr) {
+        EXPECT_FALSE(mmiService.touchGestureMgr_->HasHandler());
+    }
+}
+
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+
 /**
  * @tc.name: MMIService_SetInputDeviceEnable_IllegalSession_001
  * @tc.desc: Return failure when SessionPtr is null

@@ -29,6 +29,7 @@ ohos_source_set("window_manager_mock") {
 
   include_dirs = [
     "include",
+    "${mmi_path}/intention/prototype/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/delegate_task/include",

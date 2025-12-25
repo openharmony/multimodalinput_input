@@ -263,7 +263,7 @@ public:
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    void AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr);
+    void AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr);
     void CancelAllTouches(std::shared_ptr<PointerEvent> event, bool isDisplayChanged = false);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -557,7 +557,7 @@ private:
     std::shared_ptr<PointerEvent> lastTouchEventOnBackGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    std::weak_ptr<TouchGestureManager> touchGestureMgr_;
+    std::weak_ptr<ITouchGestureManager> touchGestureMgr_;
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap_;
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMapTmp_;

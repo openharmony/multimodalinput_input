@@ -23,7 +23,7 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "i_context.h"
+#include "i_input_service_context.h"
 #include "mmi_matrix3.h"
 #include "table_dump.h"
 
@@ -874,7 +874,7 @@ void TouchDrawingHandler::StopTrace()
 #endif // HITRACE_ENABLED
 }
 
-extern "C" ITouchDrawingHandler* CreateInstance(IContext *env)
+extern "C" ITouchDrawingHandler* CreateInstance(IInputServiceContext *env)
 {
     return new TouchDrawingHandler();
 }

@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-class DelegateInterface;
 class TouchDrawingManager {
     struct DevMode {
         std::string SwitchName;
@@ -44,7 +43,7 @@ public:
     void RotationScreen();
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool IsWindowRotation() const;
-    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy);
+    void SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     void ResetTouchWindow();
 
@@ -71,7 +70,7 @@ private:
     bool hasPointerObserver_{ false };
     uint64_t windowScreenId_ { 0 };
     uint64_t displayNodeScreenId_ { 0 };
-    std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
+    std::shared_ptr<IDelegateInterface> delegateProxy_ { nullptr };
     std::unique_ptr<ITouchDrawingHandler, ComponentManager::Component<ITouchDrawingHandler>> touchDrawingHandler_ {
         nullptr, ComponentManager::Component<ITouchDrawingHandler>() };
     int32_t timerId_ { -1 };
