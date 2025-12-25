@@ -349,7 +349,7 @@ void TouchDrawingManager::UnloadTouchDrawingHandler()
     if (bubbleMode_.isShow || pointerMode_.isShow) {
         return;
     }
-    touchDrawingHandler_ = { nullptr, ComponentManager::Component<ITouchDrawingHandler>(nullptr, nullptr) };
+    touchDrawingHandler_ = { nullptr, ComponentManager::Component<ITouchDrawingHandler>() };
 }
 
 void TouchDrawingManager::ResetTouchWindow()

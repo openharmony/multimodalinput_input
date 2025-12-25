@@ -23,6 +23,7 @@
 #include <mutex>
 #include <queue>
 
+#include "i_delegate_interface.h"
 #include "id_factory.h"
 #include "util.h"
 
@@ -31,7 +32,7 @@ namespace MMI {
 namespace {
 constexpr size_t FDS_SIZE = 2;
 } // namespace
-using DTaskCallback = std::function<int32_t()>;
+
 class DelegateTasks {
 public:
     struct TaskData {

@@ -20,6 +20,7 @@
 
 #include "singleton.h"
 
+#include "i_timer_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -45,16 +46,16 @@ private:
 };
 
 namespace MMI {
-class TimerManager final {
+class TimerManager final : public ITimerManager {
 public:
     ~TimerManager();
     DISALLOW_COPY_AND_MOVE(TimerManager);
     static std::shared_ptr<TimerManager> GetInstance();
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
-        const std::string &name = "");
+        const std::string &name = "") override;
     int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
         const std::string &name = "");
-    int32_t RemoveTimer(int32_t timerId, const std::string &name = "");
+    int32_t RemoveTimer(int32_t timerId, const std::string &name = "") override;
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);
     int32_t CalcNextDelay();
