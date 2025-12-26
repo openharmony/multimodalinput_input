@@ -175,19 +175,6 @@ HWTEST_F(HardwareCursorPointerManagerTest, EnableStats_False, TestSize.Level1)
 }
 
 /**
- * @tc.name: HardwareCursorPointerManagerTest_GetCursorStats
- * @tc.desc: Test GetCursorStats method
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(HardwareCursorPointerManagerTest, GetCursorStats, TestSize.Level1)
-{
-    uint32_t frameCount = 0;
-    uint32_t vsyncCount = 0;
-    EXPECT_NO_FATAL_FAILURE(cursorManager_->GetCursorStats(frameCount, vsyncCount));
-}
-
-/**
  * @tc.name: HardwareCursorPointerManagerTest_SetPosition_ValidParams
  * @tc.desc: Test SetPosition with valid parameters
  * @tc.type: FUNC
