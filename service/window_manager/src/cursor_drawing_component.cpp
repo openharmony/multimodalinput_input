@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <securec.h>
 
+#include "ffrt.h"
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
 #include "timer_manager.h"
@@ -157,10 +158,13 @@ bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkI
         auto idleTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - lastCallTime_).count();
         if ((idleTime >= unloadTime) && !POINTER_DEV_MGR.isInit && !POINTER_DEV_MGR.isPointerVisible) {
-            this->UnLoad();
+            ffrt::submit([this] {
+                this->UnLoad();
+            });
         }
     }, "libcursor_drawing_adapter-ResetUnloadTimer");
     if (timerId_ < 0) {
+        MMI_HILOGE("Failed to add timer.");
         return false;
     }
     return true;
