@@ -3299,5 +3299,24 @@ HWTEST_F(PointerEventTest, PointerEventTest_Hash_001, TestSize.Level1)
     CHKPV(pointerEvent2);
     ASSERT_EQ(pointerEvent->Hash(), pointerEvent2->Hash());
 }
+
+/**
+ * @tc.name: ResetPointerItemsId_001
+ * @tc.desc: Verify ResetPointerItemsId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, ResetPointerItemsId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10000);
+    item.SetOriginPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->ResetPointerItemsId();
+    ASSERT_EQ(pointerEvent->GetPointerItem(0, item), true);
+}
 } // namespace MMI
 } // namespace OHOS
