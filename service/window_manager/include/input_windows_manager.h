@@ -217,7 +217,6 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName);
-    bool ShouldSendMouseEventToAnco(int32_t sourceType, int32_t windowId) const;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool UpdateDisplayId(int32_t& displayId);
