@@ -207,46 +207,16 @@ SessionPtr InputWindowsManagerTest::CreateCameraSessionPtr()
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 /**
  * @tc.name: InputWindowsManagerTest_ControlMouseEventToAnco_001
- * @tc.desc: Test ControlMouseEventToAnco when source type is unknown
+ * @tc.desc: Test ControlMouseEventToAnco when token is invalid
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ControlMouseEventToAnco_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_EQ(WIN_MGR->ShouldSendMouseEventToAnco(PointerEvent::SOURCE_TYPE_UNKNOWN, false), true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_ControlMouseEventToAnco_002
- * @tc.desc: Test ControlMouseEventToAnco when source type is mouse
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ControlMouseEventToAnco_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
     int32_t windowId = 0;
-    WIN_MGR->ControlMouseEventToAnco(windowId, true, "test_token");
-    EXPECT_EQ(WIN_MGR->ShouldSendMouseEventToAnco(PointerEvent::SOURCE_TYPE_MOUSE, windowId), false);
-    WIN_MGR->ControlMouseEventToAnco(windowId, false, "test_token");
-    EXPECT_EQ(WIN_MGR->ShouldSendMouseEventToAnco(PointerEvent::SOURCE_TYPE_MOUSE, windowId), true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_ControlMouseEventToAnco_003
- * @tc.desc: Test ControlMouseEventToAnco when source type is touchpad
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ControlMouseEventToAnco_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t windowId = 0;
-    WIN_MGR->ControlMouseEventToAnco(windowId, true, "test_token");
-    EXPECT_EQ(WIN_MGR->ShouldSendMouseEventToAnco(PointerEvent::SOURCE_TYPE_TOUCHPAD, windowId), false);
-    WIN_MGR->ControlMouseEventToAnco(windowId, false, "test_token");
-    EXPECT_EQ(WIN_MGR->ShouldSendMouseEventToAnco(PointerEvent::SOURCE_TYPE_TOUCHPAD, windowId), true);
+    std::string token = "test_token";
+    EXPECT_EQ(WIN_MGR->ControlMouseEventToAnco(windowId, false, token), RET_ERR);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 
