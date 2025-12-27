@@ -23,6 +23,7 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "key_monitor_manager.h"
+#include "touch_event_normalize.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -649,6 +650,35 @@ std::string InputPlugin::GetFocusedAppInfo()
         return "";
     }
     return info.processName_;
+}
+
+bool InputPlugin::IsFingerPressed() const
+{
+    if (TOUCH_EVENT_HDR == nullptr) {
+        return false;
+    }
+    return TOUCH_EVENT_HDR->IsFingerPressed();
+}
+
+const ISessionHandlerCollection *InputPlugin::GetMonitorCollection() const
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (InputHandler != nullptr) {
+        auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
+        if (eventMonitorHandler_ != nullptr) {
+            return eventMonitorHandler_->GetMonitorCollection();
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return nullptr;
+}
+
+int32_t InputPlugin::GetFocusedPid() const
+{
+    if (WIN_MGR == nullptr) {
+        return -1;
+    }
+    return WIN_MGR->GetFocusPid();
 }
 } // namespace MMI
 } // namespace OHOS
