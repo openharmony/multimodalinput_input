@@ -16,6 +16,10 @@
 #include "pointer_style.h"
 
 #include "pixel_map.h"
+#include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerStyle"
 
 namespace OHOS {
 namespace MMI {
@@ -28,6 +32,10 @@ bool CustomCursorParcel::Marshalling(Parcel &out) const
         return false;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    if (pixelMapPtr == nullptr) {
+        MMI_HILOGE("PixelMapPtr is nullptr");
+        return false;
+    }
     if (pixelMapPtr->GetCapacity() == 0) {
         return false;
     }
@@ -60,6 +68,10 @@ bool CustomCursorParcel::ReadFromParcel(Parcel &in)
 CustomCursorParcel *CustomCursorParcel::Unmarshalling(Parcel &in)
 {
     CustomCursorParcel *data = new (std::nothrow) CustomCursorParcel();
+    if (data == nullptr) {
+        MMI_HILOGE("data is nullptr");
+        return nullptr;
+    }
     if (data && !data->ReadFromParcel(in)) {
         delete data;
         data = nullptr;
@@ -99,6 +111,10 @@ bool CursorPixelMap::Marshalling(Parcel &out) const
         return false;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    if (pixelMapPtr == nullptr) {
+        MMI_HILOGE("PixelMapPtr is nullptr");
+        return false;
+    }
     if (pixelMapPtr->GetCapacity() == 0) {
         return false;
     }
@@ -122,6 +138,10 @@ bool CursorPixelMap::ReadFromParcel(Parcel &in)
 CursorPixelMap *CursorPixelMap::Unmarshalling(Parcel &in)
 {
     CursorPixelMap *data = new (std::nothrow) CursorPixelMap();
+    if (data == nullptr) {
+        MMI_HILOGE("data is nullptr");
+        return nullptr;
+    }
     if (data && !data->ReadFromParcel(in)) {
         delete data;
         data = nullptr;
