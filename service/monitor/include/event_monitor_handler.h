@@ -130,7 +130,6 @@ private:
         std::shared_ptr<IInputEventConsumer> callback_ { nullptr };
     };
 
-    class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
     class MonitorCollection : public IInputEventCollectionHandler,
                               public ISessionHandlerCollection,
                               protected NoCopyable {

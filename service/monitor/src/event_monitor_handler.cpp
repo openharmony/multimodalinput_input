@@ -774,12 +774,11 @@ bool EventMonitorHandler::MonitorCollection::IsThreeFingersTap(std::shared_ptr<P
     return true;
 }
 
-+void EventMonitorHandler::MonitorCollection::Foreach(
+void EventMonitorHandler::MonitorCollection::Foreach(
     std::function<void(std::shared_ptr<ISessionHandler>)> foreachFunc) const
 {
     for (const auto &sessionHandler : monitors_) {
         foreachFunc(std::make_shared<SessionHandler>(sessionHandler));
-     }
     }
 }
 
