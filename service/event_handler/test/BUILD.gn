@@ -50,6 +50,7 @@ ohos_unittest("EventNormalizeHandlerTestWithMock") {
     "${mmi_path}/service/fingerprint_event_processor/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/common/include",
   ]
 

@@ -310,7 +310,7 @@ bool TouchDrawingManager::IsWindowRotation() const
                FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
 }
 
-void TouchDrawingManager::SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
+void TouchDrawingManager::SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy)
 {
     delegateProxy_ = proxy;
 }

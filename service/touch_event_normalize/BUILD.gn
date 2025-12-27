@@ -11,34 +11,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/test.gni")
 import("../../multimodalinput_mini.gni")
 
-config("property_name_mapper_public_config") {
-  include_dirs = [ "include" ]
-}
-
-ohos_shared_library("mmi_property_name_mapper") {
+ohos_shared_library("mmi_touch_gesture_manager") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
 
-  branch_protector_ret = "pac_ret"
+  defines = input_default_defines
+
+  if (input_feature_product == "pc") {
+    defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
+  }
 
   include_dirs = [
-    "include",
     "${mmi_path}/intention/prototype/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/touch_event_normalize/include",
   ]
 
-  sources = [ "src/property_name_mapper_impl.cpp" ]
+  sources = [
+    "src/touch_gesture_adapter.cpp",
+    "src/touch_gesture_detector.cpp",
+    "src/touch_gesture_manager.cpp",
+  ]
 
   configs = [ "${mmi_path}/common/anco/comm:mmi_anco_channel_config" ]
 
-  defines = input_default_defines
-
   deps = [
-    "${mmi_path}/common/anco/comm:anco_channel_interface",
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/util:libmmi-util",
@@ -47,6 +51,7 @@ ohos_shared_library("mmi_property_name_mapper") {
   external_deps = [
     "c_utils:utils",
     "cJSON:cjson",
+    "config_policy:configpolicy_util",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
@@ -55,7 +60,11 @@ ohos_shared_library("mmi_property_name_mapper") {
   subsystem_name = "${mmi_subsystem_name}"
 }
 
-ohos_source_set("property_name_mapper") {
+config("touch_gesture_manager_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_source_set("touch_gesture_manager") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -64,16 +73,13 @@ ohos_source_set("property_name_mapper") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [
-    "include",
-    "${mmi_path}/service/timer_manager/include",
-  ]
+  include_dirs = [ "include" ]
 
-  sources = [ "src/property_name_mapper.cpp" ]
+  sources = [ "src/touch_gesture_interface.cpp" ]
 
   configs = [ "${mmi_path}/common/anco/comm:mmi_anco_channel_config" ]
 
-  public_configs = [ ":property_name_mapper_public_config" ]
+  public_configs = [ ":touch_gesture_manager_public_config" ]
 
   defines = input_default_defines
 
@@ -87,6 +93,7 @@ ohos_source_set("property_name_mapper") {
 
   external_deps = [
     "c_utils:utils",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]

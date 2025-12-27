@@ -14,8 +14,7 @@
  */
 
 #include "touch_gesture_manager.h"
-
-#include "key_command_handler_util.h"
+#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -25,14 +24,13 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const char* TOUCH_GESTURE_RECOGNIZER_NAME { "touchGesture" };
-}
+const char TOUCH_GESTURE_RECOGNIZER_NAME[] { "touchGesture" };
+} // namespace
 
-TouchGestureManager::TouchGestureManager(std::shared_ptr<DelegateInterface> delegate)
-    : delegate_(delegate)
+TouchGestureManager::TouchGestureManager(IInputServiceContext *env)
+    : env_(env)
 {
-    touchGesture_ = TouchGestureAdapter::GetGestureFactory();
-    SetupSessionObserver();
+    touchGesture_ = TouchGestureAdapter::GetGestureFactory(env);
 }
 
 TouchGestureManager::~TouchGestureManager()
@@ -40,12 +38,17 @@ TouchGestureManager::~TouchGestureManager()
     RemoveAllHandlers();
 }
 
-void TouchGestureManager::AddHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers)
+bool TouchGestureManager::DoesSupportGesture(TouchGestureType gestureType, int32_t nFingers) const
 {
-    if (!GestureMonitorHandler::CheckMonitorValid(gestureType, nFingers)) {
+    return TouchGestureParameter::Load().DoesSupportGesture(gestureType, nFingers);
+}
+
+bool TouchGestureManager::AddHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers)
+{
+    if (!DoesSupportGesture(gestureType, nFingers)) {
         MMI_HILOGE("Unsupported touch gesture (GestureType:%{public}d, FingerNo:%{public}d)",
             static_cast<int32_t>(gestureType), nFingers);
-        return;
+        return false;
     }
     Handler handler {
         .session_ = session,
@@ -53,12 +56,13 @@ void TouchGestureManager::AddHandler(int32_t session, TouchGestureType gestureTy
         .nFingers_ = nFingers,
     };
     if (handlers_.find(handler) != handlers_.cend()) {
-        return;
+        return true;
     }
     MMI_HILOGI("Start monitoring touch gesture(Session:%{public}d, Gesture:%{public}u, nFingers:%{public}d)",
         session, gestureType, nFingers);
     StartRecognization(gestureType, nFingers);
     handlers_.emplace(handler);
+    return true;
 }
 
 void TouchGestureManager::RemoveHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers)
@@ -78,10 +82,32 @@ void TouchGestureManager::RemoveHandler(int32_t session, TouchGestureType gestur
     StopRecognization(gestureType, nFingers);
 }
 
+bool TouchGestureManager::HasHandler() const
+{
+    return !handlers_.empty();
+}
+
 void TouchGestureManager::HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent)
 {
     CHKPV(touchGesture_);
     touchGesture_->HandleGestureWindowEmerged(windowId, lastTouchEvent);
+}
+
+void TouchGestureManager::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    const auto &touchGestureParam = TouchGestureParameter::Load();
+    mprintf(fd, "Touch-gesture parameters:");
+    mprintf(fd, "\tMaxFingerSpacing: %f", touchGestureParam.GetMaxFingerSpacing());
+    mprintf(fd, "\tMaxDownInterval: %lldus", touchGestureParam.GetMaxDownInterval());
+    mprintf(fd, "\tFingerMovementThreshold: %f", touchGestureParam.GetFingerMovementThreshold());
+    mprintf(fd, "\tMaxFingerCountForPinch: %d", touchGestureParam.GetMaxFingerCountForPinch());
+    mprintf(fd, "\tMinFingerCountForPinch: %d", touchGestureParam.GetMinFingerCountForPinch());
+    mprintf(fd, "\tFingerCountOffsetForPinch: %d", touchGestureParam.GetFingerCountOffsetForPinch());
+    mprintf(fd, "\tContinuousPinchesForNotification: %d", touchGestureParam.GetContinuousPinchesForNotification());
+    mprintf(fd, "\tMinGravityOffsetForPinch: %f", touchGestureParam.GetMinGravityOffsetForPinch());
+    mprintf(fd, "\tMaxFingerCountForSwipe: %d", touchGestureParam.GetMaxFingerCountForSwipe());
+    mprintf(fd, "\tMinFingerCountForSwipe: %d", touchGestureParam.GetMinFingerCountForSwipe());
+    mprintf(fd, "\tMinKeepTimeForSwipe: %d", touchGestureParam.GetMinKeepTimeForSwipe());
 }
 
 void TouchGestureManager::StartRecognization(TouchGestureType gestureType, int32_t nFingers)
@@ -97,7 +123,7 @@ void TouchGestureManager::StartRecognization(TouchGestureType gestureType, int32
     CHKPV(touchGesture_);
     touchGesture_->SetGestureCondition(true, gestureType, nFingers);
 
-    auto delegate = delegate_.lock();
+    auto delegate = TouchGestureAdapter::GetDelegateInterface(env_);
     CHKPV(delegate);
     if (delegate->HasHandler(TOUCH_GESTURE_RECOGNIZER_NAME)) {
         return;
@@ -110,7 +136,7 @@ void TouchGestureManager::StartRecognization(TouchGestureType gestureType, int32
     };
     auto ret = delegate->AddHandler(
         InputHandlerType::MONITOR,
-        DelegateInterface::HandlerSummary {
+        IDelegateInterface::HandlerSummary {
             .handlerName = TOUCH_GESTURE_RECOGNIZER_NAME,
             .eventType = HANDLE_EVENT_TYPE_POINTER,
             .mode = IDelegateInterface::HandlerMode::SYNC,
@@ -138,7 +164,7 @@ void TouchGestureManager::StopRecognization(TouchGestureType gestureType, int32_
         return;
     }
     MMI_HILOGI("Stop touch gesture recognization");
-    auto delegate = delegate_.lock();
+    auto delegate = TouchGestureAdapter::GetDelegateInterface(env_);
     CHKPV(delegate);
     delegate->RemoveHandler(InputHandlerType::MONITOR, TOUCH_GESTURE_RECOGNIZER_NAME);
 }
@@ -148,16 +174,6 @@ void TouchGestureManager::RemoveAllHandlers()
     for (auto iter = handlers_.cbegin(); iter != handlers_.cend(); iter = handlers_.cbegin()) {
         RemoveHandler(iter->session_, iter->gesture_, iter->nFingers_);
     }
-}
-
-void TouchGestureManager::SetupSessionObserver()
-{
-    auto udsServerPtr = InputHandler->GetUDSServer();
-    CHKPV(udsServerPtr);
-    udsServerPtr->AddSessionDeletedCallback([this](SessionPtr session) {
-        CHKPV(session);
-        OnSessionLost(session->GetPid());
-    });
 }
 
 void TouchGestureManager::OnSessionLost(int32_t session)
@@ -177,6 +193,18 @@ void TouchGestureManager::OnSessionLost(int32_t session)
                 handler.gesture_, handler.nFingers_, handler.session_);
             RemoveHandler(handler.session_, handler.gesture_, handler.nFingers_);
         });
+}
+
+extern "C" ITouchGestureManager* CreateInstance(IInputServiceContext *env)
+{
+    return new TouchGestureManager(env);
+}
+
+extern "C" void DestroyInstance(ITouchGestureManager *instance)
+{
+    if (instance != nullptr) {
+        delete instance;
+    }
 }
 } // namespace MMI
 } // namespace OHOS
