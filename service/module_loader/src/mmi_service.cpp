@@ -71,7 +71,7 @@
 #include "cursor_drawing_component.h"
 #include "touch_event_normalize.h"
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-#include "touch_gesture_manager.h"
+#include "touch_gesture_interface.h"
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "util_ex.h"
 #include "xcollie/xcollie.h"
@@ -147,6 +147,8 @@ constexpr int32_t PENGLAI_UID { 7655 };
 constexpr int32_t SYNERGY_UID { 5521 };
 constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 constexpr int32_t MSDP_UID { 6699 };
+constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
+constexpr int32_t REPEAT_ONCE { 1 };
 
 const size_t QUOTES_BEGIN = 1;
 const size_t QUOTES_END = 2;
@@ -250,7 +252,10 @@ static void CheckDefine()
     // LCOV_EXCL_STOP
 }
 
-MMIService::MMIService() : SystemAbility(MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
+MMIService::MMIService() : SystemAbility(MMIService::MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true)
+{
+    serviceContext_ = std::make_shared<InputServiceContext>();
+}
 
 MMIService::~MMIService()
 {
@@ -412,6 +417,9 @@ bool MMIService::InitDelegateTasks()
     };
     delegateInterface_ = std::make_shared<DelegateInterface>(fun, asyncFun);
     delegateInterface_->Init();
+    if (serviceContext_ != nullptr) {
+        serviceContext_->AttachDelegateInterface(delegateInterface_);
+    }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
     // LCOV_EXCL_STOP
@@ -2058,15 +2066,10 @@ ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, u
                 MMI_HILOGE("Illegal type:%{public}d", eType);
                 return RET_ERR;
             }
-            if (!GestureMonitorHandler::CheckMonitorValid(gType, fingers)) {
-                MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
+            if (!AddGestureHandlerSync(pid, gType, fingers)) {
+                MMI_HILOGE("Failed to add gesture handler");
                 return RET_ERR;
             }
-            if (touchGestureMgr_ == nullptr) {
-                touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
-            }
-            touchGestureMgr_->AddHandler(pid, gType, fingers);
-
             auto sess = GetSessionByPid(pid);
             CHKPR(sess, ERROR_NULL_POINTER);
             return sMsgHandler_.OnAddGestureMonitor(sess, hType, eType, gType, fingers);
@@ -2112,9 +2115,7 @@ ErrCode MMIService::RemoveGestureMonitor(int32_t handlerType, uint32_t eventType
                 MMI_HILOGE("Failed to remove gesture recognizer, ret:%{public}d", ret);
                 return ret;
             }
-            if (touchGestureMgr_ != nullptr) {
-                touchGestureMgr_->RemoveHandler(pid, gType, fingers);
-            }
+            RemoveGestureHandlerSync(pid, gType, fingers);
             return RET_OK;
         });
     if (ret != RET_OK) {
@@ -3171,7 +3172,7 @@ void MMIService::PreEventLoop()
 {
     // LCOV_EXCL_START
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    SetupTouchGestureHandler();
+    AddSessionObserver();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     libinputAdapter_.ProcessPendingEvents();
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
@@ -4943,12 +4944,49 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
 }
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-void MMIService::SetupTouchGestureHandler()
+void MMIService::AddSessionObserver()
 {
-    // LCOV_EXCL_START
-    touchGestureMgr_ = std::make_shared<TouchGestureManager>(delegateInterface_);
-    WIN_MGR->AttachTouchGestureMgr(touchGestureMgr_);
-    // LCOV_EXCL_STOP
+    AddSessionDeletedCallback([this](SessionPtr session) {
+        if ((session != nullptr) && (touchGestureMgr_ != nullptr)) {
+            touchGestureMgr_->OnSessionLost(session->GetPid());
+        }
+    });
+}
+
+bool MMIService::AddGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers)
+{
+    if (touchGestureMgrTimer_ >= 0) {
+        TimerMgr->RemoveTimer(touchGestureMgrTimer_);
+        touchGestureMgrTimer_ = -1;
+    }
+    if (touchGestureMgr_ == nullptr) {
+        touchGestureMgr_ = TouchGestureInterface::Load(serviceContext_.get());
+        if (touchGestureMgr_ == nullptr) {
+            MMI_HILOGE("TouchGestureInterface loading fail");
+            return false;
+        }
+        WIN_MGR->AttachTouchGestureMgr(touchGestureMgr_);
+        MMIEventDump->AttachTouchGestureMgr(touchGestureMgr_);
+    }
+    return touchGestureMgr_->AddHandler(session, gestureType, nFingers);
+}
+
+void MMIService::RemoveGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers)
+{
+    if (touchGestureMgr_ == nullptr) {
+        return;
+    }
+    touchGestureMgr_->RemoveHandler(session, gestureType, nFingers);
+    if (touchGestureMgr_->HasHandler() || (touchGestureMgrTimer_ >= 0)) {
+        return;
+    }
+    MMI_HILOGI("Schedule unloading TouchGesture");
+    touchGestureMgrTimer_ = TimerMgr->AddTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
+        [this]() {
+            MMI_HILOGI("Unload TouchGesture");
+            touchGestureMgrTimer_ = -1;
+            touchGestureMgr_ = nullptr;
+        });
 }
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 

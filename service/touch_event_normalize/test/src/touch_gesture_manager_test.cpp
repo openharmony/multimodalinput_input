@@ -18,6 +18,7 @@
 
 #include "delegate_interface.h"
 #include "input_event_handler.h"
+#include "input_service_context.h"
 #include "touch_gesture_manager.h"
 #include "mmi_log.h"
 
@@ -28,13 +29,17 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-}
+} // namespace
+
 class TouchGestureManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp() {}
     void TearDown() {}
+
+private:
+    InputServiceContext env_ {};
 };
 
 /**
@@ -46,16 +51,9 @@ public:
 HWTEST_F(TouchGestureManagerTest, AddHandler_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto delegateFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto asyncFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto delegate = std::make_shared<DelegateInterface>(delegateFunc, asyncFunc);
-    TouchGestureManager touchGestureManager(delegate);
+    TouchGestureManager touchGestureManager(&env_);
     int32_t session = 1;
-    TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE;
+    TouchGestureType gestureType = TOUCH_GESTURE_TYPE_SWIPE;
     int32_t nFingers = 0;
     touchGestureManager.AddHandler(session, gestureType, nFingers);
     EXPECT_NE(touchGestureManager.handlers_.size(), 1);
@@ -71,20 +69,13 @@ HWTEST_F(TouchGestureManagerTest, AddHandler_Test_001, TestSize.Level1)
 HWTEST_F(TouchGestureManagerTest, AddHandler_Test_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto delegateFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto asyncFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto delegate = std::make_shared<DelegateInterface>(delegateFunc, asyncFunc);
-    TouchGestureManager touchGestureManager(delegate);
+    TouchGestureManager touchGestureManager(&env_);
     int32_t session = 1;
-    TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE;
+    TouchGestureType gestureType = TOUCH_GESTURE_TYPE_SWIPE;
     int32_t nFingers = 0;
     touchGestureManager.AddHandler(session, gestureType, nFingers);
     int32_t newSession = 2;
-    TouchGestureType newGestureType = TOUCH_GESTURE_TYPE_NONE;
+    TouchGestureType newGestureType = TOUCH_GESTURE_TYPE_SWIPE;
     int32_t newNFingers = 0;
     touchGestureManager.AddHandler(newSession, newGestureType, newNFingers);
     EXPECT_NE(touchGestureManager.handlers_.size(), 2);
@@ -103,14 +94,7 @@ HWTEST_F(TouchGestureManagerTest, AddHandler_Test_003, TestSize.Level1)
 HWTEST_F(TouchGestureManagerTest, StartRecognization_ShouldNotAddHandler_WhenHandlerExists, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto delegateFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto asyncFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto delegate = std::make_shared<DelegateInterface>(delegateFunc, asyncFunc);
-    TouchGestureManager touchGestureManager(delegate);
+    TouchGestureManager touchGestureManager(&env_);
     TouchGestureType gestureType = TOUCH_GESTURE_TYPE_ALL;
     int32_t nFingers = 1;
     EXPECT_NO_FATAL_FAILURE(touchGestureManager.StartRecognization(gestureType, nFingers));
@@ -127,14 +111,7 @@ HWTEST_F(TouchGestureManagerTest, StartRecognization_ShouldNotAddHandler_WhenHan
 HWTEST_F(TouchGestureManagerTest, StopRecognization_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto delegateFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto asyncFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto delegate = std::make_shared<DelegateInterface>(delegateFunc, asyncFunc);
-    TouchGestureManager touchGestureManager(delegate);
+    TouchGestureManager touchGestureManager(&env_);
     TouchGestureType gestureType = 1;
     int32_t nFingers = 0;
     EXPECT_NO_FATAL_FAILURE(touchGestureManager.StopRecognization(gestureType, nFingers));
@@ -151,14 +128,7 @@ HWTEST_F(TouchGestureManagerTest, StopRecognization_Test_002, TestSize.Level1)
 HWTEST_F(TouchGestureManagerTest, OnSessionLost_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto delegateFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto asyncFunc = [](DTaskCallback cb) -> int32_t {
-        return 0;
-    };
-    auto delegate = std::make_shared<DelegateInterface>(delegateFunc, asyncFunc);
-    TouchGestureManager manager(delegate);
+    TouchGestureManager manager(&env_);
     int32_t session = 1;
     TouchGestureType gestureType = 1;
     int32_t nFingers = 0;

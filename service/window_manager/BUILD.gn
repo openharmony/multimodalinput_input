@@ -30,10 +30,7 @@ ohos_shared_library("mmi_touch_drawing_handler") {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
-  include_dirs = [
-    "${mmi_path}/intention/prototype/include",
-    "${mmi_path}/service/window_manager/include",
-  ]
+  include_dirs = [ "${mmi_path}/service/window_manager/include" ]
 
   sources = [ "src/touch_drawing_handler.cpp" ]
 
@@ -41,6 +38,7 @@ ohos_shared_library("mmi_touch_drawing_handler") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -64,7 +62,10 @@ ohos_shared_library("mmi_touch_drawing_handler") {
 ohos_unittest("TouchDrawingHandlerTest") {
   module_out_path = module_output_path
 
-  configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
 
   cflags = [
     "-Dprivate=public",
@@ -96,7 +97,9 @@ ohos_unittest("TouchDrawingHandlerTest") {
   ]
 
   deps = [
+    "${mmi_path}/common/anco/comm:anco_channel_interface",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/util:libmmi-util",
   ]
 

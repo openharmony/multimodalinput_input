@@ -85,6 +85,7 @@ config("libmmi_server_config") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
     "crown_transform_processor/include",
+    "${mmi_path}/intention/prototype/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
@@ -218,6 +219,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/util:mmi_json_parser",
   ]
 
@@ -365,17 +367,6 @@ ohos_shared_library("libmmi-server") {
       ]
     }
   }
-  if (input_feature_touchscreen && input_feature_monitor) {
-    sources += [
-      "touch_event_normalize/src/touch_gesture_adapter.cpp",
-      "touch_event_normalize/src/touch_gesture_detector.cpp",
-      "touch_event_normalize/src/touch_gesture_manager.cpp",
-    ]
-
-    if (input_feature_product == "pc") {
-      defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
-    }
-  }
   if (input_feature_fingerprint) {
     sources += [
       "fingerprint_event_processor/src/fingerprint_event_processor.cpp"
@@ -427,6 +418,7 @@ ohos_shared_library("libmmi-server") {
     ":mmi_rust",
     "${mmi_path}/common/property_name_mapper:property_name_mapper",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
@@ -448,6 +440,10 @@ ohos_shared_library("libmmi-server") {
   }
 
   deps += ["${mmi_path}/service/custom_config_parser:mmi_custom_config_parser"]
+
+  if (input_feature_touchscreen && input_feature_monitor) {
+    deps += [ "${mmi_path}/service/touch_event_normalize:touch_gesture_manager" ]
+  }
 
   external_deps = [
     "cJSON:cjson",
@@ -627,6 +623,7 @@ ohos_shared_library("libmmi-knuckle") {
   }
 
   deps = [
+    "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -919,6 +916,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/subscriber/test/include",
+    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -1430,6 +1428,7 @@ ohos_unittest("TouchDrawingManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
   cflags = [
@@ -1446,6 +1445,7 @@ ohos_unittest("TouchDrawingManagerTest") {
   }
 
   include_dirs = [
+    "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/util/json_parser/include"
   ]
@@ -1460,6 +1460,7 @@ ohos_unittest("TouchDrawingManagerTest") {
   }
 
   deps = [
+    "${mmi_path}/common/anco/comm:anco_channel_interface",
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",

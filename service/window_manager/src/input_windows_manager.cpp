@@ -26,6 +26,7 @@
 #include "knuckle_drawing_component.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
 #include "key_command_handler_util.h"
+#include "libinput.h"
 #include "mmi_matrix3.h"
 #include "cursor_drawing_component.h"
 #include "scene_board_judgement.h"
@@ -7895,7 +7896,7 @@ bool InputWindowsManager::CancelTouch(int32_t touch, int32_t deviceId)
     return false;
 }
 
-void InputWindowsManager::AttachTouchGestureMgr(std::shared_ptr<TouchGestureManager> touchGestureMgr)
+void InputWindowsManager::AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr)
 {
     touchGestureMgr_ = touchGestureMgr;
 }
