@@ -216,12 +216,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
     int32_t deviceId = 3;
     MouseTransformProcessor processor(deviceId);
     uint32_t button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
-    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
 
     libinput_event_pointer event {};
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillRepeatedly(Return(TP_RIGHT_CLICK_FINGER_CNT));
-    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, evenType, button));
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, eventType, button));
 }
 
 /**
@@ -236,12 +236,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
     int32_t deviceId = 5;
     MouseTransformProcessor processor(deviceId);
     uint32_t button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
-    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
 
     libinput_event_pointer event {};
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillRepeatedly(Return(TP_CLICK_FINGER_ONE));
-    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, evenType, button));
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, eventType, button));
 }
 
 /**
@@ -256,12 +256,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
     int32_t deviceId = 5;
     MouseTransformProcessor processor(deviceId);
     uint32_t button = BTN_RIGHT_MENUE_CODE;
-    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
 
     libinput_event_pointer event {};
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillRepeatedly(Return(TP_CLICK_FINGER_ONE));
-    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, evenType, button));
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, eventType, button));
 }
 
 /**
