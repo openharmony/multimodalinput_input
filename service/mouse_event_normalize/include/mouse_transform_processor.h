@@ -115,13 +115,13 @@ private:
     int32_t UpdateTouchpadMoveLocation(const OLD::DisplayInfo* displayInfo, struct libinput_event* event,
         Offset &offset, double &abs_x, double &abs_y, int32_t deviceType);
 #ifndef OHOS_BUILD_ENABLE_WATCH
-    void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
-    void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
-    void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
+    void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t eventType, uint32_t &button);
+    void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t eventType, uint32_t &button);
+    void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t eventType, uint32_t &button);
     void HandleTouchpadTwoFingerButtonOrRightButton(struct libinput_event_pointer* data,
-        const int32_t evenType, uint32_t &button);
+        const int32_t eventType, uint32_t &button);
     void HandleTouchpadTwoFingerButtonOrLeftButton(struct libinput_event_pointer* data,
-        const int32_t evenType, uint32_t &button);
+        const int32_t eventType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
     double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -140,7 +140,7 @@ private:
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
-    void SetPointerEventRightButtonSource(const int32_t evenType, uint32_t button);
+    void SetPointerEventRightButtonSource(const int32_t eventType, uint32_t button);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static bool IsEventFromVirtualSource(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);
