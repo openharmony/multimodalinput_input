@@ -19,6 +19,7 @@
 #include <map>
 #include <unordered_set>
 
+#include "i_input_service_context.h"
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -54,8 +55,8 @@ public:
         virtual void OnGestureTrend(std::shared_ptr<PointerEvent> event) = 0;
     };
 
-    TouchGestureDetector(TouchGestureType type, std::shared_ptr<GestureListener> listener)
-        : gestureType_(type), listener_(listener) {}
+    TouchGestureDetector(IInputServiceContext *env, TouchGestureType type, std::shared_ptr<GestureListener> listener)
+        : env_(env), gestureType_(type), listener_(listener) {}
     bool OnTouchEvent(std::shared_ptr<PointerEvent> event);
     void AddGestureFingers(int32_t fingers);
     void RemoveGestureFingers(int32_t fingers);
@@ -83,12 +84,11 @@ private:
 
     Point CalcClusterCenter(const std::map<int32_t, Point> &points) const;
     Point CalcGravityCenter(std::map<int32_t, Point> &map);
-    double CalcTwoPointsDistance(const Point &p1, const Point &p2) const;
+    float CalcTwoPointsDistance(const Point &p1, const Point &p2) const;
     void CalcAndStoreDistance();
     int32_t CalcMultiFingerMovement(std::map<int32_t, Point> &map);
     void HandlePinchMoveEvent(std::shared_ptr<PointerEvent> event);
     bool InOppositeDirections(const std::unordered_set<SlideState> &directions) const;
-    bool InDiverseDirections(const std::unordered_set<SlideState> &directions) const;
     GestureMode JudgeOperationMode(std::map<int32_t, Point> &movePoint);
     bool AntiJitter(std::shared_ptr<PointerEvent> event, GestureMode mode);
     std::vector<std::pair<int32_t, Point>> SortPoints(std::map<int32_t, Point> &points);
@@ -108,6 +108,7 @@ private:
     std::string DumpTouches() const;
 
 private:
+    IInputServiceContext *env_ { nullptr };
     std::set<int32_t> fingers_;
     TouchGestureType gestureType_ { TOUCH_GESTURE_TYPE_NONE };
     bool isRecognized_ { false };
@@ -120,7 +121,7 @@ private:
     int32_t gestureTimer_ { -1 };
     std::map<int32_t, Point> downPoint_;
     std::map<int32_t, Point> movePoint_;
-    std::map<int32_t, double> lastDistance_;
+    std::map<int32_t, float> lastDistance_;
     std::shared_ptr<GestureListener> listener_ { nullptr };
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
 };
