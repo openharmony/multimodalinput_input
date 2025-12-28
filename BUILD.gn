@@ -230,7 +230,7 @@ group("mmi_tests") {
     "service:InputWindowsManagerTest",
     "service:InterceptorTest",
     "service:KeyAutoRepeatExTest",
-    "service:KeyCommandTest",
+    "service/key_command/test:KeyCommandTest",
     "service:KeyEventHookTest",
     "service:KeyEventHookManagerTest",
     "service:KeyEventNormalizeTest",
