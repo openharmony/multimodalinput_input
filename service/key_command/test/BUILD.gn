@@ -1,0 +1,99 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../multimodalinput_mini.gni")
+
+module_output_path = "input/input"
+
+ohos_unittest("KeyCommandTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/test/unittest/common/include",
+    "${mmi_path}/service/product_property_config/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  sources = [
+    "ability_launcher_test.cpp",
+    "key_command_handler_test.cpp",
+    "key_config_parser_test.cpp",
+    "repeat_key_handler_test.cpp",
+    "sequence_key_handler_test.cpp",
+    "short_key_handler_test.cpp",
+    "two_finger_gesture_handler_test.cpp",
+
+    "key_cmd_handleRepeatKey_test.cpp",
+    "key_cmd_sendKeyEvent_test.cpp",
+    "key_command_handler_util_test.cpp",
+    "pull_throw_subscriber_handler_test.cpp",
+    "setting_datashare_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/util:mmi_json_parser",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "samgr:samgr_proxy",
+    "window_manager:libwm",
+  ]
+}
+
+group("EventKeyCommandTest") {
+  testonly = true
+
+  deps = [ ":KeyCommandTest" ]
+}
