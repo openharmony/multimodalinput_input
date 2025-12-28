@@ -46,7 +46,7 @@ public:
         context_.repeatKeys_ = repeatKeys_.get();
         context_.excludeKeys_ = excludeKeys_.get();
 
-        service_ = std::make_unique<TestKeyCommandService>();  
+        service_ = std::make_unique<TestKeyCommandService>();
         handler_ = std::make_unique<KeyConfigParser>(context_, *service_);
     }
 
