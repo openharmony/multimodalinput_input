@@ -18,6 +18,8 @@
 
 #include "singleton.h"
 
+#include "i_touch_gesture_manager.h"
+
 namespace OHOS {
 namespace MMI {
 class EventDump final {
@@ -28,6 +30,11 @@ public:
     void DumpEventHelp(int32_t fd, const std::vector<std::string> &args);
     void DumpHelp(int32_t fd);
     void CheckCount(int32_t fd, const std::vector<std::string> &args, int32_t &count);
+
+    void AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr);
+
+private:
+    std::weak_ptr<ITouchGestureManager> touchGestureMgr_;
 };
 
 #define MMIEventDump ::OHOS::DelayedSingleton<EventDump>::GetInstance()

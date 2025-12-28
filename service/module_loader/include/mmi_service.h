@@ -20,7 +20,12 @@
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
+#include "delegate_interface.h"
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#include "i_touch_gesture_manager.h"
+#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 #include "input_event_handler.h"
+#include "input_service_context.h"
 #include "json_parser.h"
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "knuckle_drawing_component.h"
@@ -351,7 +356,9 @@ private:
     void UpdateConsumers(const cJSON* consumer);
     bool ParseDeviceConsumerConfig();
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    void SetupTouchGestureHandler();
+    void AddSessionObserver();
+    bool AddGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
+    void RemoveGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -370,8 +377,10 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+    std::shared_ptr<InputServiceContext> serviceContext_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    std::shared_ptr<TouchGestureManager> touchGestureMgr_ { nullptr };
+    int32_t touchGestureMgrTimer_ { -1 };
+    std::shared_ptr<ITouchGestureManager> touchGestureMgr_ { nullptr };
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
     sptr<AppDebugListener> appDebugListener_;
