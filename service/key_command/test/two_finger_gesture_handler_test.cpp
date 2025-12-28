@@ -530,33 +530,6 @@ HWTEST_F(TwoFingerGestureHandlerTest, TwoFingerGestureHandlerTest_CheckTwoFinger
     ASSERT_NO_FATAL_FAILURE(handler_->CheckTwoFingerGestureAction());
 }
 
-
-// /**
-//  * @tc.name: TwoFingerGestureHandlerTest_ConvertVPToPX_004
-//  * @tc.desc: Test the funcation ConvertVPToPX
-//  * @tc.type: FUNC
-//  * @tc.require:
-//  */
-// HWTEST_F(TwoFingerGestureHandlerTest, TwoFingerGestureHandlerTest_ConvertVPToPX_004, TestSize.Level1)
-// {
-//     CALL_TEST_DEBUG;
-//     int32_t vp = 10;
-//     InputWindowsManager inputWindowsManager;
-//     OLD::DisplayInfo displayInfo;
-//     displayInfo.dpi = -10;
-//     displayInfo.uniq = "default0";
-//     auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-//     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-//         it->second.displaysInfo.push_back(displayInfo);
-//     }
-//     int32_t ret = handler_->ConvertVPToPX(vp);
-//     ASSERT_EQ(ret, 0);
-//     displayInfo.dpi = 160;
-//     it->second.displaysInfo.push_back(displayInfo);
-//     ret = handler_->ConvertVPToPX(vp);
-//     ASSERT_EQ(ret, 0);
-// }
-
 /**
  * @tc.name: TwoFingerGestureHandlerTest_ConvertVPToPX_005
  * @tc.desc: Verify if (vp <= 0)
