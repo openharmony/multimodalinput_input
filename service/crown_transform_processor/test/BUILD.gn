@@ -54,6 +54,7 @@ ohos_unittest("CrownTransformProcessorTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "googletest:gmock_main",
