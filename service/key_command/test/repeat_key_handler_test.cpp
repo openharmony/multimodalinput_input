@@ -36,7 +36,7 @@ constexpr int32_t MODULE_TYPE { 1 };
 constexpr int32_t UDS_FD { -1 };
 constexpr int32_t UDS_UID { 100 };
 constexpr int32_t UDS_PID { 100 };
-const std::string SOS_BUNDLE_NAME { "com.huawei.hmos.emergencycommunication" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 } // namespace
 class RepeatKeyHandlerTest : public testing::Test {
 public:
@@ -55,7 +55,7 @@ public:
         context_.repeatKeys_ = repeatKeys_.get();
         context_.excludeKeys_ = excludeKeys_.get();
 
-        service_ = std::make_unique<TestKeyCommandService>();  
+        service_ = std::make_unique<TestKeyCommandService>();
         handler_ = std::make_unique<RepeatKeyHandler>(context_, *service_);
     }
 
@@ -371,7 +371,7 @@ HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_CheckSpecialRepeatKey_001, T
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
-        it->second.focusWindowId = 0;   
+        it->second.focusWindowId = 0;
     }
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
@@ -414,7 +414,7 @@ HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_CheckSpecialRepeatKey_002, T
         displayGroupInfoRef = it->second;
     }
     displayGroupInfoRef.windowsInfo.push_back(windowInfo);
-    displayGroupInfoRef.focusWindowId = 0;    
+    displayGroupInfoRef.focusWindowId = 0;
     UDSServer udsServer;
     udsServer.idxPidMap_.insert(std::make_pair(0, 1));
     SessionPtr sessionPtr = std::make_shared<UDSSession>(repeatKey.ability.bundleName,
