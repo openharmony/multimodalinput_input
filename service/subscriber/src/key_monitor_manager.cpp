@@ -187,13 +187,12 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
                 if (CheckMeeTimeMonitor(keyEvent)) {
                     NotifyMeeTimeMonitor(keyEvent);
                     return true;
-                } else {
-                    if (IsMeeTimeSession(monitor.session_)) {
-                        MMI_HILOGI("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
-                            keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), monitor.session_);
-                        return false;
-                    }
-                 }
+                }
+                if (IsMeeTimeSession(monitor.session_)) {
+                    MMI_HILOGI("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
+                        keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), monitor.session_);
+                    return false;
+                }
                 if (monitor.IsFocused() &&
                     (sessions.find(monitor.session_) == sessions.cend())) {
                     sessions.emplace(monitor.session_);
@@ -221,13 +220,12 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t de
             if (CheckMeeTimeMonitor(keyEvent)) {
                 NotifyMeeTimeMonitor(keyEvent);
                 return true;
-            } else {
-                if (IsMeeTimeSession(monitor.session_)) {
-                    MMI_HILOGI("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
-                        keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), monitor.session_);
-                    return false;
-                }
-             }
+            }
+            if (IsMeeTimeSession(monitor.session_)) {
+                MMI_HILOGI("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
+                    keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), monitor.session_);
+                return false;
+            }
             if (!monitor.IsFocused()) {
                 return false;
             }
