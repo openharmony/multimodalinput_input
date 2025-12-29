@@ -120,6 +120,7 @@ ohos_unittest("MouseEventNormalizeTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
@@ -313,6 +314,7 @@ ohos_unittest("MouseEventNormalizeEXTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
