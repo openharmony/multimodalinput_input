@@ -89,7 +89,10 @@ void PropertyNameMapper::Unload(UnloadOption option)
 
 int32_t PropertyNameMapper::MapKey(const std::string &name) const
 {
-    CHKPR(mapper_, KeyEvent::KEYCODE_UNKNOWN);
+    if (mapper_ == nullptr) {
+        MMI_HILOGE("mapper_ is null");
+        return KeyEvent::KEYCODE_UNKNOWN;
+    }
     return mapper_->MapKey(name);
 }
 

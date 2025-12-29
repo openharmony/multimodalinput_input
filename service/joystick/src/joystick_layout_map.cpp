@@ -15,6 +15,7 @@
 
 #include "joystick_layout_map.h"
 
+#include <filesystem>
 #include <fstream>
 #include <unistd.h>
 
@@ -185,7 +186,8 @@ std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(const std::string &fi
         MMI_HILOGE("File is too large: %{private}s", realPath.get());
         return nullptr;
     }
-    std::ifstream ifs(realPath.get());
+    std::filesystem::path normalizedPath = std::filesystem::canonical(realPath.get());
+    std::ifstream ifs(normalizedPath);
     if (!ifs.is_open()) {
         MMI_HILOGE("Can not open '%{private}s'", realPath.get());
         return nullptr;
