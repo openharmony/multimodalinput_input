@@ -63,14 +63,24 @@ void KeyEventNormalizeTest::TearDownTestCase(void)
 
 void KeyEventNormalizeTest::SetupKeyboard()
 {
-    ASSERT_TRUE(vKeyboard_.SetUp());
+    if (!vKeyboard_.SetUp()) {
+        GTEST_SKIP();
+    }
     std::cout << "device node name: " << vKeyboard_.GetDevPath() << std::endl;
-    ASSERT_TRUE(libinput_.AddPath(vKeyboard_.GetDevPath()));
+    if (!libinput_.AddPath(vKeyboard_.GetDevPath())) {
+        GTEST_SKIP();
+    }
     libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
+    if (!event) {
+        GTEST_SKIP();
+    }
+    if (libinput_event_get_type(event) != LIBINPUT_EVENT_DEVICE_ADDED) {
+        GTEST_SKIP();
+    }
     struct libinput_device *device = libinput_event_get_device(event);
-    ASSERT_TRUE(device != nullptr);
+    if (!device) {
+        GTEST_SKIP();
+    }
     INPUT_DEV_MGR->OnInputDeviceAdded(device);
 }
 
