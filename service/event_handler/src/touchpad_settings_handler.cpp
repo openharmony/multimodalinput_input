@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <charconv>
 #include <system_ability_definition.h>
 #include <regex>
 #include "setting_datashare.h"
@@ -201,7 +202,13 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterSwipeInwardObserver()
         MMI_HILOGI("Config changed, key:%{public}s, value:%{public}s", key.c_str(), value.c_str());
         bool isTypeNumber = regex_match(value, std::regex("\\d+"));
         if (isTypeNumber) {
-            this->SetSupportSwipeInward(std::stoi(value));
+            int32_t num = 0;
+            auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), num);
+            if (ec == std::errc()) {
+                this->SetSupportSwipeInward(num);
+            } else {
+                MMI_HILOGE("Failed to convert value to integer");
+            }
         }
     };
 
