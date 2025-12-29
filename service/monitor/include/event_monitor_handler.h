@@ -158,8 +158,7 @@ private:
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent,
-            NetPacket &pkt, std::unordered_set<int32_t> fingerFocusPidSet);
+        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent);
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
