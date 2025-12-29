@@ -41,6 +41,8 @@ private:
     void PreNotify(const RepeatKey &item);
     std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed);
     bool IsCallScene();
+    bool HandleRepeatKeyCountDown(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeyCountUp(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     std::map<std::string, int32_t> repeatKeyTimerIds_;
