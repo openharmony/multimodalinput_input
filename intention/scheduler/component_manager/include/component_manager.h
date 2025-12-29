@@ -22,7 +22,7 @@
 #include <nocopyable.h>
 
 #include "define_multimodal.h"
-#include "i_context.h"
+#include "i_input_service_context.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -36,7 +36,7 @@ namespace MMI {
 class ComponentManager final {
 private:
     template<typename IComponent>
-    using CreateComponent = IComponent* (*)(IContext *context);
+    using CreateComponent = IComponent* (*)(IInputServiceContext *context);
 
     template<typename IComponent>
     using DestroyComponent = void (*)(IComponent *);
@@ -46,7 +46,7 @@ public:
     class Component final {
     public:
         Component() = default;
-        Component(const std::string &name, IContext *context, void *handle);
+        Component(const std::string &name, IInputServiceContext *context, void *handle);
         Component(Component &&other);
         ~Component();
         DISALLOW_COPY(Component);
@@ -60,7 +60,7 @@ public:
         void Unload();
 
         std::string name_;
-        IContext *context_ { nullptr };
+        IInputServiceContext *context_ { nullptr };
         void *handle_ { nullptr };
         IComponent *instance_ { nullptr };
     };
@@ -70,11 +70,13 @@ public:
     DISALLOW_COPY_AND_MOVE(ComponentManager);
 
     template<typename IComponent>
-    static std::unique_ptr<IComponent, Component<IComponent>> LoadLibrary(IContext *context, const char *libPath);
+    static std::unique_ptr<IComponent, Component<IComponent>> LoadLibrary(
+        IInputServiceContext *context, const char *libPath);
 };
 
 template<typename IComponent>
-ComponentManager::Component<IComponent>::Component(const std::string &name, IContext *context, void *handle)
+ComponentManager::Component<IComponent>::Component(
+    const std::string &name, IInputServiceContext *context, void *handle)
     : name_(name), context_(context), handle_(handle)
 {}
 
@@ -170,7 +172,7 @@ void ComponentManager::Component<IComponent>::Unload()
 
 template<typename IComponent>
 std::unique_ptr<IComponent, ComponentManager::Component<IComponent>> ComponentManager::LoadLibrary(
-    IContext *context, const char *libPath)
+    IInputServiceContext *context, const char *libPath)
 {
     if (libPath == nullptr) {
         MMI_HILOGE("libPath is null");

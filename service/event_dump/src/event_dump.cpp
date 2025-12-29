@@ -172,6 +172,11 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                     goto RELEASE_RES;
                 }
                 monitorHandler->Dump(fd, args);
+                if (auto touchGesture = touchGestureMgr_.lock(); touchGesture == nullptr) {
+                    mprintf(fd, "There is no touch-gesture monitor");
+                } else {
+                    touchGesture->Dump(fd, args);
+                }
 #else
                 mprintf(fd, "Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -309,6 +314,11 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -e, --event: dump the libinput event information\t");
     mprintf(fd, "      -t, --lidstate: dump the status of the laptop cover\t");
     mprintf(fd, "      -b, --tabletStandState: dump the status of the tablet stand\t");
+}
+
+void EventDump::AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr)
+{
+    touchGestureMgr_ = touchGestureMgr;
 }
 } // namespace MMI
 } // namespace OHOS
