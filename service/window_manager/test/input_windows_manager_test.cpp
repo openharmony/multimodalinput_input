@@ -1790,6 +1790,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTopBottomArea_00
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTopBottomArea_003
+ * @tc.desc: Test updating top-bottom area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTopBottomArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Rect windowArea = {0, 0, 100, 100};
+    std::vector<int32_t> pointerChangeAreas = {0, 0, 0, 0};
+    std::vector<Rect> windowHotAreas;
+    WIN_MGR->UpdateTopBottomArea(windowArea, pointerChangeAreas, windowHotAreas);
+    EXPECT_EQ(windowHotAreas.size(), 0);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateLeftRightArea_001
  * @tc.desc: Test updating left-right area
  * @tc.type: FUNC
@@ -1856,6 +1872,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateLeftRightArea_00
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateLeftRightArea_003
+ * @tc.desc: Test updating left-right area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateLeftRightArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Rect windowArea = {0, 0, 100, 100};
+    std::vector<int32_t> pointerChangeAreas = {10, 0, 30, 40};
+    std::vector<Rect> windowHotAreas;
+    WIN_MGR->UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
+    EXPECT_EQ(windowHotAreas.size(), 0);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateInnerAngleArea_001
  * @tc.desc: Test updating inner angle area
  * @tc.type: FUNC
@@ -1869,7 +1901,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea_0
     windowArea.y = 20;
     windowArea.width = 100;
     windowArea.height = 200;
-    std::vector<int32_t> pointerChangeAreas(4, 10);
+    std::vector<int32_t> pointerChangeAreas(8, 10);
     std::vector<Rect> windowHotAreas;
     WIN_MGR->UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas);
     int32_t ret1 = windowHotAreas.size();
@@ -1893,11 +1925,31 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea_0
     int32_t ret10 = windowHotAreas[2].x;
     EXPECT_EQ(ret10, -10);
     int32_t ret11 = windowHotAreas[2].y;
-    EXPECT_NE(ret11, 110);
+    EXPECT_NE(ret11, 210);
     int32_t ret12 = windowHotAreas[2].width;
-    EXPECT_NE(ret12, 21);
+    EXPECT_NE(ret12, 30);
     int32_t ret13 = windowHotAreas[2].height;
-    EXPECT_EQ(ret13, 32);
+    EXPECT_EQ(ret13, 30);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateInnerAngleArea_002
+ * @tc.desc: Test updating inner angle area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Rect windowArea;
+    windowArea.x = 10;
+    windowArea.y = 20;
+    windowArea.width = 100;
+    windowArea.height = 200;
+    std::vector<int32_t> pointerChangeAreas(4, 10);
+    std::vector<Rect> windowHotAreas;
+    WIN_MGR->UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas);
+    EXPECT_EQ(windowHotAreas.size(), 0);
 }
 
 /**
