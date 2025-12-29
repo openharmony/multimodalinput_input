@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2474,6 +2474,180 @@ HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_007, TestSize.Level1)
     window.flags = 0;
     window.windowInputType = WindowInputType::SLID_TOUCH_WINDOW;
     EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), window.flags);
+}
+
+/**
+ * @tc.name: StringSplit_EmptyString
+ * @tc.desc: Test StringSplit with an empty string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_EmptyString, TestSize.Level1)
+{
+    std::string str = "";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    EXPECT_TRUE(result.empty());
+}
+
+/**
+ * @tc.name: StringSplit_NoDelimiter
+ * @tc.desc: Test StringSplit with a string that has no delimiter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_NoDelimiter, TestSize.Level1)
+{
+    std::string str = "hello";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    ASSERT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], "hello");
+}
+
+/**
+ * @tc.name: StringSplit_DelimiterAtStart
+ * @tc.desc: Test StringSplit with a delimiter at the start of the string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_DelimiterAtStart, TestSize.Level1)
+{
+    std::string str = ",hello";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    ASSERT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], "hello");
+}
+
+/**
+ * @tc.name: StringSplit_DelimiterAtEnd
+ * @tc.desc: Test StringSplit with a delimiter at the end of the string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_DelimiterAtEnd, TestSize.Level1)
+{
+    std::string str = "hello,";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    ASSERT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], "hello");
+}
+
+/**
+ * @tc.name: StringSplit_DelimiterInMiddle
+ * @tc.desc: Test StringSplit with a delimiter in the middle of the string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_DelimiterInMiddle, TestSize.Level1)
+{
+    std::string str = "hello,world";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    ASSERT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0], "hello");
+    EXPECT_EQ(result[1], "world");
+}
+
+/**
+ * @tc.name: StringSplit_ConsecutiveDelimiters
+ * @tc.desc: Test StringSplit with consecutive delimiters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_ConsecutiveDelimiters, TestSize.Level1)
+{
+    std::string str = "hello,,world";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    ASSERT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0], "hello");
+    EXPECT_EQ(result[1], "world");
+}
+
+/**
+ * @tc.name: StringSplit_MultipleDelimiters
+ * @tc.desc: Test StringSplit with multiple delimiters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, StringSplit_MultipleDelimiters, TestSize.Level1)
+{
+    std::string str = "hello,world,foo,bar";
+    char delim = ',';
+    InputManagerImpl inputManagerImpl;
+    std::vector<std::string> result = inputManagerImpl.StringSplit(str, delim);
+
+    ASSERT_EQ(result.size(), 4);
+    EXPECT_EQ(result[0], "hello");
+    EXPECT_EQ(result[1], "world");
+    EXPECT_EQ(result[2], "foo");
+    EXPECT_EQ(result[3], "bar");
+}
+
+/**
+ * @tc.name: PackUiExtentionWindowInfo_NoError
+ * @tc.desc: Test PackUiExtentionWindowInfo with no write error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, PackUiExtentionWindowInfo_NoError, TestSize.Level1)
+{
+    NetPacket pkt(MmiMessageId::INVALID);
+    pkt.rwErrorStatus_ = StreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    std::vector<WindowInfo> windowsInfo;
+    InputManagerImpl inputManagerImpl;
+    int32_t result = inputManagerImpl.PackUiExtentionWindowInfo(windowsInfo, pkt);
+
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: PackUiExtentionWindowInfo_WriteError_001
+ * @tc.desc: Test PackUiExtentionWindowInfo with write error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, PackUiExtentionWindowInfo_WriteError_001, TestSize.Level1)
+{
+    NetPacket pkt(MmiMessageId::INVALID);
+    pkt.rwErrorStatus_ = StreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    std::vector<WindowInfo> windowsInfo;
+    InputManagerImpl inputManagerImpl;
+    int32_t result = inputManagerImpl.PackUiExtentionWindowInfo(windowsInfo, pkt);
+
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: PackUiExtentionWindowInfo_WriteError_002
+ * @tc.desc: Test PackUiExtentionWindowInfo with write error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, PackUiExtentionWindowInfo_WriteError_002, TestSize.Level1)
+{
+    NetPacket pkt(MmiMessageId::INVALID);
+    pkt.rwErrorStatus_ = StreamBuffer::ErrorStatus::ERROR_STATUS_WRITE;
+    std::vector<WindowInfo> windowsInfo;
+    InputManagerImpl inputManagerImpl;
+    int32_t result = inputManagerImpl.PackUiExtentionWindowInfo(windowsInfo, pkt);
+
+    EXPECT_EQ(result, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
