@@ -497,6 +497,9 @@ void PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX, in
 #ifdef OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
     UpdateBindDisplayId(rsId);
 #endif // OHOS_BUILD_ENABLE_EXTERNAL_SCREEN
+    Direction direction = static_cast<Direction>((
+        ((displayInfo_.direction - displayInfo_.displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
+    AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(lastMouseStyle_.id), physicalX, physicalY);
     if (GetSurfaceNode() != nullptr) {
         if (!SetCursorLocation(physicalX, physicalY)) {
             MMI_HILOGE("SetCursorLocation failed");
