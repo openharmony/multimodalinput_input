@@ -372,8 +372,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_002, TestSiz
     EXPECT_FALSE(ret);
 }
 
-
-
 /**
  * @tc.name: KeyCommandHandlerTest_HandlePointerEvent_002
  * @tc.desc: Test the funcation HandlePointerEvent
