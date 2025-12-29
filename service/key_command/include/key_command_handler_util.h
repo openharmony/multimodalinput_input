@@ -87,36 +87,12 @@ const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
 };
 
 bool IsSpecialType(int32_t keyCode, SpecialType type);
-bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue, std::vector<std::string> &businessIds);
-bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey);
-bool GetTrigger(const cJSON* jsonData, int32_t &triggerType);
-bool GetKeyDownDuration(const cJSON* jsonData, int32_t &keyDownDurationInt);
-bool GetKeyFinalKey(const cJSON* jsonData, int32_t &finalKeyInt);
 void GetKeyVal(const cJSON* json, const std::string &key, std::string &value);
 bool GetEntities(const cJSON* jsonAbility, Ability &ability);
 bool GetParams(const cJSON* jsonAbility, Ability &ability);
 bool PackageAbility(const cJSON* jsonAbility, Ability &ability);
-bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::vector<std::string> &businessIds);
-bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt);
-bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt);
-bool GetDelay(const cJSON* jsonData, int64_t &delayInt);
-bool GetRepeatKeyDelay(const cJSON* jsonData, int64_t &delayInt);
-bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt);
 bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt);
-bool PackageSequenceKey(const cJSON* sequenceKeysJson, SequenceKey &sequenceKey);
-bool GetSequenceKeys(const cJSON* jsonData, Sequence &sequence);
-bool IsSequenceKeysValid(const Sequence &sequence);
-bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence);
-bool ConvertToExcludeKey(const cJSON* jsonData, ExcludeKey &exKey);
-bool ConvertToKeyRepeat(const cJSON* jsonData, RepeatKey &repeatKey);
-std::string GenerateKey(const ShortcutKey& key);
-bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap,
-    std::vector<std::string>& businessIds);
-bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec);
-bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& excludeKeyVec);
-bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec,
-    std::map<int32_t, int32_t>& repeatKeyMaxTimes);
-bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture);
+
 bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture, Ability &launchAbility);
 bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, KnuckleGesture &knuckleGesture);
 float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent);

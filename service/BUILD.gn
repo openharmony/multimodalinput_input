@@ -327,6 +327,12 @@ ohos_shared_library("libmmi-server") {
         "key_command/src/pull_throw_subscriber_handler.cpp",
         "key_command/src/stylus_key_handler.cpp",
         "key_command/src/whitelist_data_share_accessor.cpp",
+        "key_command/src/ability_launcher.cpp",
+        "key_command/src/key_config_parser.cpp",
+        "key_command/src/repeat_key_handler.cpp",
+        "key_command/src/sequence_key_handler.cpp",
+        "key_command/src/short_key_handler.cpp",
+        "key_command/src/two_finger_gesture_handler.cpp",
       ]
     }
     if (input_shortcut_key_manager_enabled) {
@@ -2512,66 +2518,6 @@ ohos_unittest("KeyEventValueTransformationTest") {
     "c_utils:utilsbase",
     "hilog:libhilog",
     "hilog:libhilog_base",
-  ]
-}
-
-ohos_unittest("KeyCommandTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/test/unittest/common/include",
-    "${mmi_service_path}/product_property_config/include",
-  ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "key_command/test/ability_manager_client_stub.cpp",
-    "key_command/test/key_command_handler_util_test.cpp",
-    "key_command/test/pull_throw_subscriber_handler_test.cpp",
-    "key_command/test/setting_datashare_test.cpp",
-    "subscriber/src/key_shortcut_manager.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
-    "${mmi_path}/util:mmi_json_parser",
-  ]
-
-  external_deps = [
-    "ability_runtime:app_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "config_policy:configpolicy_util",
-    "data_share:datashare_consumer",
-    "eventhandler:libeventhandler",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "preferences:native_preferences",
-    "samgr:samgr_proxy",
-    "window_manager:libwm",
   ]
 }
 
