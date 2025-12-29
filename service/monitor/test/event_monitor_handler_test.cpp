@@ -1636,5 +1636,142 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_0
     eventMonitorHandler.ProcessScreenCapture(pid, isStart);
 }
 #endif // PLAYER_FRAMEWORK_EXISTS
+
+/**
+ * @tc.name: EventMonitorHandlerTest_GetPid_001
+ * @tc.desc: session_ == nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_GetPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_EQ(sessionHandler.GetPid(), -1);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_GetPid_002
+ * @tc.desc: session_ != nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_GetPid_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_EQ(sessionHandler.GetPid(), g_pid);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ContainHandlerEventType_001
+ * @tc.desc: (eventType_ & handleEventType) == handleEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ContainHandlerEventType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    EXPECT_EQ(sessionHandler.ContainHandlerEventType(HANDLE_EVENT_TYPE_KEY), true);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ContainHandlerEventType_002
+ * @tc.desc: session_ != nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ContainHandlerEventType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    EXPECT_EQ(sessionHandler.ContainHandlerEventType(HANDLE_EVENT_TYPE_KEY), false);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ContainHandlerEventType_003
+ * @tc.desc: session_== nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ContainHandlerEventType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    EXPECT_EQ(sessionHandler.ContainHandlerEventType(HANDLE_EVENT_TYPE_KEY), false);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_SendToClient_002
+ * @tc.desc: session_ == nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    sessionHandler.SendToClient(nullptr);
+    sessionHandler.SendToClient(pointerEvent);
+    EXPECT_EQ(sessionHandler.session_, nullptr);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_SendToClient_003
+ * @tc.desc: session_ != nullptr && Expect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    sessionHandler.SendToClient(pointerEvent);
+    EXPECT_NE(sessionHandler.session_, nullptr);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_SendToClient_004
+ * @tc.desc: session_ != nullptr && !Expect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    sessionHandler.SendToClient(pointerEvent);
+    EXPECT_NE(sessionHandler.session_, nullptr);
+}
 } // namespace MMI
 } // namespace OHOS

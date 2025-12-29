@@ -176,7 +176,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         if (result == RET_DO) {
             return;
         }
-     }
+    }
 
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
     if (type == LIBINPUT_EVENT_TOUCH_FRAME) {

@@ -277,7 +277,6 @@ bool EventMonitorHandler::SessionHandler::ContainHandlerEventType(HandleEventTyp
 
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPV(pointerEvent);
     if (pointerEvent == nullptr) {
         MMI_HILOGD("pointerEvent is nullptr");
         return;
