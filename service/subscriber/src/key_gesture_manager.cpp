@@ -253,7 +253,11 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
     }
     if (IsActive()) {
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-        KEY_MONITOR_MGR->NotifyPendingMonitors();
+        bool ret = KEY_MONITOR_MGR->NotifyPendingMonitors();
+        if (!ret) {
+            MMI_HILOGW("Do not consume volume keys");
+            return false;
+        }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
         Reset();
         if ((keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP) &&
