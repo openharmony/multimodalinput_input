@@ -1269,8 +1269,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed
     ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
 }
 
-
-
 /**
  * @tc.name: KeyCommandHandlerTest_HandleSpecialKeys
  * @tc.desc: HandleSpecialKeys
@@ -3195,11 +3193,13 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAiScreenAbility_001,
 
     auto now = std::chrono::high_resolution_clock::now();
     auto duration = now.time_since_epoch();
-    handler.context_.twoFingerGesture_.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    handler.context_.twoFingerGesture_.startTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 
-    handler.context_.twoFingerGesture_.windowId = handler.context_.twoFingerGesture_.touchEvent->GetTargetWindowId();
+    handler.context_.twoFingerGesture_.windowId =
+        handler.context_.twoFingerGesture_.touchEvent->GetTargetWindowId();
     ret = handler.LaunchAiScreenAbility(pid);
     EXPECT_NE(ret, RET_OK);
 
