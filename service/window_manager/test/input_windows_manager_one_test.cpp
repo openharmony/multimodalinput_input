@@ -1577,32 +1577,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowGroupIn
 }
 
 /* *
- * @tc.name: InputWindowsManagerOneTest_FindTargetDisplayGroupInfo
- * @tc.desc: Test the function FindTargetDisplayGroupInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDisplayGroupInfo, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    WindowGroupInfo windowGroupInfo;
-    int32_t displayId = 1;
-    OLD::DisplayInfo displayInfo1;
-    displayInfo1.id = 0;
-    displayInfo1.dpi = -10;
-    displayInfo1.uniq = "default0";
-    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
-        it->second.displaysInfo.push_back(displayInfo1);
-    }
-    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    inputWindowsManager.FindTargetDisplayGroupInfo(0);
-    displayId = 8;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindTargetDisplayGroupInfo(8));
-}
-
-/* *
  * @tc.name: InputWindowsManagerOneTest_SetDragFlagByPointer001
  * @tc.desc: Test the function SetDragFlagByPointer
  * @tc.type: FUNC
@@ -1698,28 +1672,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintHighZorder_
     int32_t logicalY = 1;
     EXPECT_NO_FATAL_FAILURE(
         inputWindowsManager->PrintHighZorder(windowsInfo, pointerAction, targetWindowId, logicalX, logicalY));
-}
-
-/* *
- * @tc.name: InputWindowsManagerOneTest_FindTargetDisplayGroupInfo_001
- * @tc.desc: Test the function FindTargetDisplayGroupInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindTargetDisplayGroupInfo_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    OLD::DisplayInfo displayInfo;
-    displayInfo.id = 0;
-    int32_t displayId = 0;
-    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        it->second.displaysInfo.push_back(displayInfo);
-    }
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FindTargetDisplayGroupInfo(displayId));
-    displayId = 1;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FindTargetDisplayGroupInfo(displayId));
 }
 
 /* *

@@ -356,11 +356,14 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
+            if (isShell) {
+                pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SHELL);
+            }
+            WIN_MGR->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate);
+            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell, useCoordinate)) {
                 return RET_ERR;
             }
             DealGesturePointers(pointerEvent);
-            WIN_MGR->ProcessInjectEventGlobalXY(pointerEvent, useCoordinate);
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
                 !(IsCastInject(pointerEvent->GetDeviceId())) &&
@@ -661,24 +664,26 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
-    int32_t action, bool isShell)
+    int32_t action, bool isShell, int32_t useCoordinate)
 {
     int32_t targetWindowId = -1;
     if (isShell) {
-        targetWindowId = FixTargetWindowId(pointerEvent, shellTargetWindowIds_);
+        targetWindowId = FixTargetWindowId(pointerEvent, shellTargetWindowIds_, useCoordinate);
     } else if ((IsCastInject(pointerEvent->GetDeviceId())) && (pointerEvent->GetZOrder() > 0)) {
-        targetWindowId = FixTargetWindowId(pointerEvent, castTargetWindowIds_, true, CAST_POINTER_ID);
+        targetWindowId = FixTargetWindowId(pointerEvent, castTargetWindowIds_, useCoordinate, true, CAST_POINTER_ID);
     } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-        targetWindowId = FixTargetWindowId(pointerEvent, accessTargetWindowIds_);
+        targetWindowId = FixTargetWindowId(pointerEvent, accessTargetWindowIds_, useCoordinate);
     } else {
-        targetWindowId = FixTargetWindowId(pointerEvent, nativeTargetWindowIds_, true, DEFAULT_POINTER_ID);
+        targetWindowId = FixTargetWindowId(pointerEvent, nativeTargetWindowIds_, useCoordinate,
+            true, DEFAULT_POINTER_ID);
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     return UpdateTouchEvent(pointerEvent, action, targetWindowId);
 }
 
 int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
-    const std::map<InjectionTouch, int32_t>& targetWindowIdMap, bool bNeedResetPointerId, int32_t diffPointerId)
+    const std::map<InjectionTouch, int32_t>& targetWindowIdMap, int32_t useCoordinate,
+    bool bNeedResetPointerId, int32_t diffPointerId)
 {
     CHKPR(pointerEvent, RET_ERR);
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
@@ -703,6 +708,7 @@ int32_t ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointe
         MMI_HILOG_DISPATCHE("This display is not existent");
         return RET_ERR;
     }
+    UpdateOthersTouchEvent(pointerEvent, displayId, targetWindowIdMap, useCoordinate);
     InjectionTouch touch{
         .displayId_ = displayId, .pointerId_ = pointerEvent->GetPointerId()};
     auto iter = targetWindowIdMap.find(touch);
@@ -736,6 +742,101 @@ bool ServerMsgHandler::UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEve
     pointerItem.SetTargetWindowId(targetWindowId);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     return true;
+}
+
+void ServerMsgHandler::UpdateOthersTouchEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t displayId, const std::map<InjectionTouch, int32_t>& targetWindowIdMap, int32_t useCoordinate)
+{
+    if (useCoordinate != PointerEvent::DISPLAY_COORDINATE && useCoordinate != PointerEvent::GLOBAL_COORDINATE) {
+        MMI_HILOGW("useCoordinate:%{public}d", useCoordinate);
+        return;
+    }
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
+    int32_t currentPointerId = pointerEvent->GetPointerId();
+    for (auto &pointerItem : pointerItems) {
+        if (currentPointerId == pointerItem.GetPointerId()) {
+            continue;
+        }
+        if (useCoordinate == PointerEvent::DISPLAY_COORDINATE) {
+            if (!UpdateOtherTouchForDisplayCoordinate(pointerItem, displayId)) {
+                continue;
+            }
+        }
+        if (useCoordinate == PointerEvent::GLOBAL_COORDINATE) {
+            if (!UpdateOtherTouchForGlobalCoordinate(pointerItem)) {
+                continue;
+            }
+        }
+        InjectionTouch touch{
+            .displayId_ = displayId, .pointerId_ = pointerItem.GetPointerId()};
+        auto iter = targetWindowIdMap.find(touch);
+        if (iter == targetWindowIdMap.end()) {
+            continue;
+        }
+        pointerItem.SetTargetWindowId(iter->second);
+        int32_t displayX = pointerItem.GetDisplayX();
+        int32_t displayY = pointerItem.GetDisplayY();
+        int32_t globalX = pointerItem.GetGlobalX();
+        int32_t globalY = pointerItem.GetGlobalY();
+        auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(iter->second, displayId);
+        if (!windowInfo) {
+            continue;
+        }
+        double windowX = globalX - windowInfo->area.x;
+        double windowY = globalY - windowInfo->area.y;
+        if (!(windowInfo->transform.empty())) {
+            auto windowXY = WIN_MGR->TransformWindowXY(*windowInfo, globalX, globalY);
+            windowX = windowXY.first;
+            windowY = windowXY.second;
+        }
+        pointerItem.SetWindowX(static_cast<int32_t>(windowX));
+        pointerItem.SetWindowY(static_cast<int32_t>(windowY));
+        pointerItem.SetWindowXPos(windowX);
+        pointerItem.SetWindowYPos(windowY);
+        MMI_HILOGD("UpdateOthersTouchEvent :{%{public}d:%{public}d}", pointerItem.GetPointerId(), iter->second);
+        pointerEvent->UpdatePointerItem(pointerItem.GetPointerId(), pointerItem);
+    }
+}
+ 
+bool ServerMsgHandler::UpdateOtherTouchForDisplayCoordinate(PointerEvent::PointerItem& pointerItem, int32_t displayId)
+{
+    auto displayX = pointerItem.GetDisplayX();
+    auto displayY = pointerItem.GetDisplayY();
+    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(displayId);
+    if (physicDisplayInfo == nullptr) {
+        MMI_HILOGW("physicDisplayInfo is nullptr,displayId:%{public}d", displayId);
+        return false;
+    }
+    auto globalX = displayX + physicDisplayInfo->x;
+    auto globalY = displayY + physicDisplayInfo->y;
+    pointerItem.SetGlobalX(globalX);
+    pointerItem.SetGlobalY(globalY);
+    pointerItem.SetDisplayXPos(displayX);
+    pointerItem.SetDisplayYPos(displayY);
+    return true;
+}
+ 
+bool ServerMsgHandler::UpdateOtherTouchForGlobalCoordinate(PointerEvent::PointerItem& pointerItem)
+{
+    auto globalX = pointerItem.GetGlobalX();
+    auto globalY = pointerItem.GetGlobalY();
+    if (globalX == DBL_MAX || globalY == DBL_MAX) {
+        MMI_HILOG_DISPATCHW("globalXY is invalid");
+        return false;
+    }
+    const auto& mainGroup = WIN_MGR->GetDefaultDisplayGroupInfo();
+    for (const auto& display : mainGroup.displaysInfo) {
+        if (globalX >= display.x && globalX <= display.x + display.width &&
+            globalY >= display.y && globalY <= display.y + display.height) {
+            pointerItem.SetDisplayX(static_cast<int32_t>(globalX - display.x));
+            pointerItem.SetDisplayY(static_cast<int32_t>(globalY - display.y));
+            pointerItem.SetDisplayXPos(globalX - display.x);
+            pointerItem.SetDisplayYPos(globalY - display.y);
+            return true;
+        }
+    }
+    MMI_HILOG_DISPATCHW("global find not display");
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
