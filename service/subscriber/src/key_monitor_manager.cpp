@@ -257,13 +257,10 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t de
 
 bool KeyMonitorManager::NotifyPendingMonitors()
 {
-    if (pendingData.keyEvent_ == nullptr) {
-        MMI_HILOGE("pendingData.keyEvent_ is null");
-        return false;
-    }
     for (const auto &[monitor, pendingData] : pending_) {
         TimerMgr->RemoveTimer(pendingData.timerId_);
         if (!CheckMeeTimeMonitor(pendingData.keyEvent_) && IsMeeTimeSession(monitor.session_)) {
+            CHKPF(pendingData.keyEvent_);
             MMI_HILOGE("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
                 pendingData.keyEvent_->GetKeyCode(), pendingData.keyEvent_->GetKeyAction(), monitor.session_);
             return false;
