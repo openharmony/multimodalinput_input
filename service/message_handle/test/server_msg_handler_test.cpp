@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <cinttypes>
 
-#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "display_event_monitor.h"
 #include "input_event_handler.h"
 #include "libinput.h"
@@ -99,6 +99,18 @@ public:
     void SetUp() {}
     void TearDoen() {}
     std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
+};
+
+class MockIUdsServer : public IUdsServer {
+public:
+    MOCK_METHOD(void, AddSessionDeletedCallback, (std::function<void(SessionPtr)> callback), (override));
+
+    MOCK_METHOD(int32_t, AddSocketPairInfo,
+        (const std::string &programName, const int32_t moduleType, const int32_t uid, const int32_t pid,
+            int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType, uint32_t tokenId, bool isRealProcessName),
+        (override));
+
+    MOCK_METHOD(SessionPtr, GetSessionByPid, (int32_t pid), (const, override));
 };
 
 std::unique_ptr<OHOS::Media::PixelMap> ServerMsgHandlerTest::SetMouseIconTest(const std::string iconPath)
@@ -418,26 +430,117 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithNullSessio
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 /**
- * @tc.name: ServerMsgHandlerTest_OnSubscribeKeyEvent
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeKeyEvent_001
  * @tc.desc: Test OnSubscribeKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeKeyEvent, TestSize.Level1)
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeKeyEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
-    UDSServer udsServer;
+    UDSServer *udsServer = nullptr;
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    EXPECT_EQ(servermsghandler.OnSubscribeKeyEvent(udsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeKeyEvent_002
+ * @tc.desc: Test OnSubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(nullptr));
+    ServerMsgHandler servermsghandler;
     int32_t pid = 0;
     int32_t subscribeId = 0;
     std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
     option->SetPreKeys({1, 2, 3});
-    EXPECT_EQ(servermsghandler.OnSubscribeKeyEvent(&udsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
-    EXPECT_EQ(servermsghandler.OnUnsubscribeKeyEvent(&udsServer, pid, subscribeId), ERROR_NULL_POINTER);
+    EXPECT_EQ(servermsghandler.OnSubscribeKeyEvent(&mockUdsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnSubscribeHotkey
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeKeyEvent_003
+ * @tc.desc: Test OnSubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(session));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    option->SetPreKeys({1, 2, 3});
+    EXPECT_EQ(servermsghandler.OnSubscribeKeyEvent(&mockUdsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeKeyEvent_001
+ * @tc.desc: Test OnUnsubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    UDSServer *udsServer = nullptr;
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    EXPECT_EQ(servermsghandler.OnUnsubscribeKeyEvent(udsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeKeyEvent_002
+ * @tc.desc: Test OnUnsubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(nullptr));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    EXPECT_EQ(servermsghandler.OnUnsubscribeKeyEvent(&mockUdsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeKeyEvent_003
+ * @tc.desc: Test OnUnsubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(session));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    EXPECT_EQ(servermsghandler.OnUnsubscribeKeyEvent(&mockUdsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeHotkey_001
  * @tc.desc: Test OnSubscribeHotkey
  * @tc.type: FUNC
  * @tc.require:
@@ -446,13 +549,99 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeHotkey, TestSize.
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
-    UDSServer udsServer;
+    UDSServer *udsServer = nullptr;
     int32_t pid = 0;
     int32_t subscribeId = 0;
     std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
-    option->SetPreKeys({1, 2, 3});
-    EXPECT_EQ(servermsghandler.OnSubscribeHotkey(&udsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
-    EXPECT_EQ(servermsghandler.OnUnsubscribeHotkey(&udsServer, pid, subscribeId), ERROR_NULL_POINTER);
+    EXPECT_EQ(servermsghandler.OnSubscribeHotkey(udsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeHotkey_002
+ * @tc.desc: Test OnSubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeHotkey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    MockIUdsServer mockUdsServer;
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    EXPECT_EQ(servermsghandler.OnSubscribeHotkey(&mockUdsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeHotkey_003
+ * @tc.desc: Test OnSubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeHotkey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    MockIUdsServer mockUdsServer;
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(session));
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    EXPECT_EQ(servermsghandler.OnSubscribeHotkey(&mockUdsServer, pid, subscribeId, option), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeHotkey_001
+ * @tc.desc: Test OnUnsubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeHotkey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    UDSServer *udsServer = nullptr;
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    EXPECT_EQ(servermsghandler.OnUnsubscribeHotkey(udsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeHotkey_002
+ * @tc.desc: Test OnUnsubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeHotkey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    MockIUdsServer mockUdsServer;
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(nullptr));
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    EXPECT_EQ(servermsghandler.OnUnsubscribeHotkey(&mockUdsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeHotkey_003
+ * @tc.desc: Test OnUnsubscribeHotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeHotkey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    MockIUdsServer mockUdsServer;
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(session));
+    int32_t pid = 0;
+    int32_t subscribeId = 0;
+    EXPECT_EQ(servermsghandler.OnUnsubscribeHotkey(&mockUdsServer, pid, subscribeId), ERROR_NULL_POINTER);
 }
 #endif
 
@@ -492,22 +681,111 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnQuerySwitchStatus, TestSiz
 #endif
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnSubscribeLongPressEvent
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeLongPressEvent_001
  * @tc.desc: Test OnSubscribeLongPressEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeLongPressEvent, TestSize.Level1)
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeLongPressEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
-    UDSServer udsServer;
+    UDSServer *udsServer = nullptr;
     int32_t pid = 1;
     int32_t subscribeId = 1;
     LongPressRequest longPressRequest;
-    EXPECT_EQ(servermsghandler.OnSubscribeLongPressEvent(&udsServer, pid, subscribeId, longPressRequest),
+    EXPECT_EQ(
+        servermsghandler.OnSubscribeLongPressEvent(udsServer, pid, subscribeId, longPressRequest), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeLongPressEvent_002
+ * @tc.desc: Test OnSubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeLongPressEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(nullptr));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 1;
+    int32_t subscribeId = 1;
+    LongPressRequest longPressRequest;
+    EXPECT_EQ(servermsghandler.OnSubscribeLongPressEvent(&mockUdsServer, pid, subscribeId, longPressRequest),
         ERROR_NULL_POINTER);
-    EXPECT_EQ(servermsghandler.OnUnsubscribeLongPressEvent(&udsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSubscribeLongPressEvent_003
+ * @tc.desc: Test OnSubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSubscribeLongPressEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(session));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 1;
+    int32_t subscribeId = 1;
+    LongPressRequest longPressRequest;
+    EXPECT_EQ(servermsghandler.OnSubscribeLongPressEvent(&mockUdsServer, pid, subscribeId, longPressRequest),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeLongPressEvent_001
+ * @tc.desc: Test OnUnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeLongPressEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    UDSServer *udsServer = nullptr;
+    int32_t pid = 1;
+    int32_t subscribeId = 1;
+    EXPECT_EQ(servermsghandler.OnUnsubscribeLongPressEvent(udsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeLongPressEvent_002
+ * @tc.desc: Test OnUnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeLongPressEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(nullptr));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 1;
+    int32_t subscribeId = 1;
+    EXPECT_EQ(servermsghandler.OnUnsubscribeLongPressEvent(&mockUdsServer, pid, subscribeId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUnsubscribeLongPressEvent_003
+ * @tc.desc: Test OnUnsubscribeLongPressEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUnsubscribeLongPressEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MockIUdsServer mockUdsServer;
+    SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
+    EXPECT_CALL(mockUdsServer, GetSessionByPid(testing::_)).WillOnce(testing::Return(session));
+    ServerMsgHandler servermsghandler;
+    int32_t pid = 1;
+    int32_t subscribeId = 1;
+    EXPECT_EQ(servermsghandler.OnUnsubscribeLongPressEvent(&mockUdsServer, pid, subscribeId), ERROR_NULL_POINTER);
 }
 
 /**
