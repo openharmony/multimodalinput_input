@@ -166,57 +166,73 @@ bool RepeatKeyHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::sh
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        upActionTime_ = keyEvent->GetActionTime();
-        context_.repeatKey_.keyCode = item.keyCode;
-        context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
-        int64_t intervalTime = context_.intervalTime_;
-        if (item.keyCode == KeyEvent::KEYCODE_POWER) {
-            intervalTime = context_.intervalTime_ - (upActionTime_ - downActionTime_);
-            if (context_.walletLaunchDelayTimes_ != 0) {
-                intervalTime = context_.walletLaunchDelayTimes_;
-            }
-        }
-        MMI_HILOGD("IntervalTime:%{public}" PRId64, intervalTime);
-        repeatTimerId_ = TimerMgr->AddTimer(intervalTime / SECONDS_SYSTEM, 1, [this] () {
-            SendKeyEvent();
-            repeatTimerId_ = -1;
-        }, "RepeatKeyHandler-HandleRepeatKeyCount");
-        if (repeatTimerId_ < 0) {
-            return false;
-        }
-        return true;
+        return HandleRepeatKeyCountUp(item, keyEvent);
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-        if (context_.repeatKey_.keyCode != item.keyCode) {
-            context_.count_ = 1;
-            context_.repeatKey_.keyCode = item.keyCode;
-            context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
-        } else {
-            if (context_.repeatKey_.keyAction == keyEvent->GetKeyAction()) {
-                MMI_HILOGD("Repeat key, reset down status");
-                context_.count_ = 0;
-                context_.isDownStart_ = false;
-                context_.repeatKeyCountMap_.clear();
-                return true;
-            } else {
-                context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
-                context_.count_++;
-                MMI_HILOGD("Repeat count:%{public}d", context_.count_);
-            }
-        }
-        context_.isDownStart_ = true;
-        downActionTime_ = keyEvent->GetActionTime();
-        if ((downActionTime_ - upActionTime_) < context_.intervalTime_) {
-            if (repeatTimerId_ >= 0) {
-                TimerMgr->RemoveTimer(repeatTimerId_);
-                repeatTimerId_ = DEFAULT_TIMER_ID;
-                context_.isHandleSequence_ = false;
-            }
-        }
-        return true;
+        return HandleRepeatKeyCountDown(item, keyEvent);
     }
     return false;
+}
+
+bool RepeatKeyHandler::HandleRepeatKeyCountDown(const RepeatKey &item,
+    const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (context_.repeatKey_.keyCode != item.keyCode) {
+        context_.count_ = 1;
+        context_.repeatKey_.keyCode = item.keyCode;
+        context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
+    } else {
+        if (context_.repeatKey_.keyAction == keyEvent->GetKeyAction()) {
+            MMI_HILOGD("Repeat key, reset down status");
+            context_.count_ = 0;
+            context_.isDownStart_ = false;
+            context_.repeatKeyCountMap_.clear();
+            return true;
+        } else {
+            context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
+            context_.count_++;
+            MMI_HILOGD("Repeat count:%{public}d", context_.count_);
+        }
+    }
+    context_.isDownStart_ = true;
+    downActionTime_ = keyEvent->GetActionTime();
+    if ((downActionTime_ - upActionTime_) < context_.intervalTime_) {
+        if (repeatTimerId_ >= 0) {
+            TimerMgr->RemoveTimer(repeatTimerId_);
+            repeatTimerId_ = DEFAULT_TIMER_ID;
+            context_.isHandleSequence_ = false;
+        }
+    }
+    return true;
+}
+
+bool RepeatKeyHandler::HandleRepeatKeyCountUp(const RepeatKey &item,
+    const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    upActionTime_ = keyEvent->GetActionTime();
+    context_.repeatKey_.keyCode = item.keyCode;
+    context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
+    int64_t intervalTime = context_.intervalTime_;
+    if (item.keyCode == KeyEvent::KEYCODE_POWER) {
+        intervalTime = context_.intervalTime_ - (upActionTime_ - downActionTime_);
+        if (context_.walletLaunchDelayTimes_ != 0) {
+            intervalTime = context_.walletLaunchDelayTimes_;
+        }
+    }
+    MMI_HILOGD("IntervalTime:%{public}" PRId64, intervalTime);
+    repeatTimerId_ = TimerMgr->AddTimer(intervalTime / SECONDS_SYSTEM, 1, [this] () {
+        SendKeyEvent();
+        repeatTimerId_ = -1;
+    }, "RepeatKeyHandler-HandleRepeatKeyCount");
+    if (repeatTimerId_ < 0) {
+        return false;
+    }
+    return true;
 }
   
 bool RepeatKeyHandler::HandleRepeatKeyAbility(const RepeatKey &item,
