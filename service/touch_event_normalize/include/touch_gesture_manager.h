@@ -20,46 +20,32 @@
 
 #include <nocopyable.h>
 
-#include "delegate_interface.h"
+#include "i_input_service_context.h"
+#include "i_touch_gesture_manager.h"
 #include "touch_gesture_adapter.h"
 
 namespace OHOS {
 namespace MMI {
-class TouchGestureManager final {
-    struct Handler {
-        int32_t session_ { -1 };
-        TouchGestureType gesture_ { TOUCH_GESTURE_TYPE_NONE };
-        int32_t nFingers_ {};
-
-        bool operator<(const Handler &other) const
-        {
-            if (session_ != other.session_) {
-                return (session_ < other.session_);
-            }
-            if (gesture_ != other.gesture_) {
-                return (gesture_ < other.gesture_);
-            }
-            return (nFingers_ < other.nFingers_);
-        }
-    };
-
+class TouchGestureManager final : public ITouchGestureManager {
 public:
-    TouchGestureManager(std::shared_ptr<DelegateInterface> delegate);
+    TouchGestureManager(IInputServiceContext *env);
     ~TouchGestureManager();
     DISALLOW_COPY_AND_MOVE(TouchGestureManager);
 
-    void AddHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers);
-    void RemoveHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers);
-    void HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent);
+    bool DoesSupportGesture(TouchGestureType gestureType, int32_t nFingers) const override;
+    bool AddHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers) override;
+    void RemoveHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers) override;
+    bool HasHandler() const override;
+    void HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent) override;
+    void Dump(int32_t fd, const std::vector<std::string> &args) override;
+    void OnSessionLost(int32_t session) override;
 
 private:
     void StartRecognization(TouchGestureType gestureType, int32_t nFingers);
     void StopRecognization(TouchGestureType gestureType, int32_t nFingers);
     void RemoveAllHandlers();
-    void SetupSessionObserver();
-    void OnSessionLost(int32_t session);
 
-    std::weak_ptr<DelegateInterface> delegate_;
+    IInputServiceContext *env_ { nullptr };
     std::shared_ptr<TouchGestureAdapter> touchGesture_;
     std::set<Handler> handlers_;
 };
