@@ -2432,10 +2432,7 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
             }
         }
     }
-    it = g_callbacks.find(hotkeyInfo->hotkeyId);
-    if (it != g_callbacks.end()) {
-        it->second.push_back(hotkeyInfo);
-    }
+    it->second.push_back(hotkeyInfo);
     return INPUT_SUCCESS;
 }
 
