@@ -155,10 +155,10 @@ private:
         void RemoveScreenCaptureMonitor(SessionPtr session);
         void RecoveryScreenCaptureMonitor(SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-        void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt);
+        void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent);
+        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt);
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
