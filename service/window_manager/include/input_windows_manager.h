@@ -281,7 +281,7 @@ public:
     void EnsureMouseEventCycle(std::shared_ptr<PointerEvent> event);
     void CleanMouseEventCycle(std::shared_ptr<PointerEvent> event);
 #endif // OHOS_BUILD_ENABLE_POINTER
-
+    const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo();
 private:
     bool NeedTouchTracking(PointerEvent &event) const;
     void ProcessTouchTracking(std::shared_ptr<PointerEvent> event, const WindowInfo &targetWindow);
@@ -519,10 +519,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void ClearActiveWindow();
     void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
 private:
-    OLD::DisplayGroupInfo& FindTargetDisplayGroupInfo(int32_t displayId);
     int32_t FindDisplayGroupId(int32_t displayId) const;
     const OLD::DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
-    OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo();
     const OLD::DisplayGroupInfo& GetConstMainDisplayGroupInfo() const;
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;

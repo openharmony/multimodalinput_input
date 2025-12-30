@@ -627,18 +627,6 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-OLD::DisplayGroupInfo& InputWindowsManager::FindTargetDisplayGroupInfo(int32_t displayId)
-{
-    for (auto& it : displayGroupInfoMap_) {
-        for (const auto& item : it.second.displaysInfo) {
-            if (item.id == displayId) {
-                return it.second;
-            }
-        }
-    }
-    return GetDefaultDisplayGroupInfo();
-}
-
 int32_t InputWindowsManager::FindDisplayGroupId(int32_t displayId) const
 {
     for (const auto& it : displayGroupInfoMap_) {
@@ -663,7 +651,7 @@ int32_t InputWindowsManager::FindDisplayUserId(int32_t displayId) const
     return RET_ERR;
 }
 
-OLD::DisplayGroupInfo& InputWindowsManager::GetDefaultDisplayGroupInfo()
+const OLD::DisplayGroupInfo& InputWindowsManager::GetDefaultDisplayGroupInfo()
 {
     for (auto &item : displayGroupInfoMap_) {
         if (item.second.type == GroupType::GROUP_DEFAULT) {

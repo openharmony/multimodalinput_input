@@ -162,10 +162,11 @@ protected:
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, bool isShell);
+    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, bool isShell,
+        int32_t useCoordinate);
     int32_t FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
-        const std::map<InjectionTouch, int32_t>& targetWindowIdMap, bool bNeedResetPointerId = false,
-        int32_t diffPointerId = 0);
+        const std::map<InjectionTouch, int32_t>& targetWindowIdMap, int32_t useCoordinate,
+        bool bNeedResetPointerId = false, int32_t diffPointerId = 0);
     bool UpdateTouchEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t targetWindowId);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
@@ -176,6 +177,10 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateOthersTouchEvent(std::shared_ptr<PointerEvent> pointerEvent,
+        int32_t displayId, const std::map<InjectionTouch, int32_t>& targetWindowIdMap, int32_t useCoordinate);
+    bool UpdateOtherTouchForDisplayCoordinate(PointerEvent::PointerItem& pointerItem, int32_t displayId);
+    bool UpdateOtherTouchForGlobalCoordinate(PointerEvent::PointerItem& pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void CalculateOffset(Direction direction, Offset &offset);
