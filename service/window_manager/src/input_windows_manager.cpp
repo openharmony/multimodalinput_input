@@ -4717,7 +4717,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     CHKPR(udsServer_, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
+        UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
+    }
 #elif defined(OHOS_BUILD_EMULATOR)
     if (CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
         UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
