@@ -30,9 +30,6 @@ constexpr int32_t UID_ROOT { 0 };
 static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
 int32_t g_moduleType = 3;
 int32_t g_pid = 0;
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-int32_t g_no_focus_pid = 1;
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 int32_t g_writeFd = -1;
 constexpr size_t MAX_EVENTIDS_SIZE = 1001;
 constexpr int32_t REMOVE_OBSERVER { -2 };
@@ -1422,113 +1419,6 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsThreeFingersTap, Tes
     ASSERT_FALSE(ret);
 }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-/**
- * @tc.name: EventMonitorHandlerTest_IsFingerprint
- * @tc.desc: Test IsFingerprint
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    bool ret = false;
-    ret = monitorCollection.IsFingerprint(pointerEvent);
-    ASSERT_FALSE(ret);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
-    ret = monitorCollection.IsFingerprint(pointerEvent);
-    ASSERT_TRUE(ret);
-}
-
-/**
- * @tc.name: EventMonitorHandlerTest_IsFingerprint_002
- * @tc.desc: Test IsFingerprint_002
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_IsFingerprint_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    ASSERT_FALSE(monitorCollection.IsFingerprint(pointerEvent));
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
-    ASSERT_TRUE(monitorCollection.IsFingerprint(pointerEvent));
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_HOLD);
-    ASSERT_TRUE(monitorCollection.IsFingerprint(pointerEvent));
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL);
-    ASSERT_TRUE(monitorCollection.IsFingerprint(pointerEvent));
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
-    ASSERT_FALSE(monitorCollection.IsFingerprint(pointerEvent));
-}
-
-/**
- * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_001
- * @tc.desc: Test CheckIfNeedSendFingerprintEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    InputHandlerType handlerType = InputHandlerType::MONITOR;
-    HandleEventType eventType = HANDLE_EVENT_TYPE_KP;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    EventMonitorHandler::SessionHandler monitor { handlerType, eventType, session };
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
-    std::unordered_set<int32_t> fingerFocusPidSet;
-    ASSERT_FALSE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
-}
-
-/**
- * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_002
- * @tc.desc: Test CheckIfNeedSendFingerprintEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendFingerprintEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler::MonitorCollection monitorCollection;
-    InputHandlerType handlerType = InputHandlerType::MONITOR;
-    HandleEventType eventType = HANDLE_EVENT_TYPE_FINGERPRINT;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    EventMonitorHandler::SessionHandler monitor { handlerType, eventType, session };
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
-    std::unordered_set<int32_t> fingerFocusPidSet;
-    ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
-    ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
-
-    fingerFocusPidSet.insert(g_pid);
-    ASSERT_TRUE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
-
-    fingerFocusPidSet.clear();
-    fingerFocusPidSet.insert(g_no_focus_pid);
-    ASSERT_FALSE(monitorCollection.CheckIfNeedSendFingerprintEvent(monitor, pointerEvent, fingerFocusPidSet));
-}
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 /**
  * @tc.name: EventMonitorHandlerTest_CheckIfNeedSendToClient_01
  * @tc.desc: Test CheckIfNeedSendToClient
@@ -1549,39 +1439,38 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
     bool ret = false;
-    std::unordered_set<int32_t> fingerFocusPidSet;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_FALSE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_SWIPEINWARD;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_TOUCH;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_MOUSE;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_PINCH;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSSWIP;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
     pointerEvent->SetFingerCount(THREE_FINGERS);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 }
 
@@ -1607,21 +1496,20 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_CheckIfNeedSendToClien
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
     pointerEvent->SetFingerCount(FOUR_FINGERS);
     bool ret = false;
-    std::unordered_set<int32_t> fingerFocusPidSet;
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_ROTATE;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 
     sessionHandler.eventType_ = HANDLE_EVENT_TYPE_THREEFINGERSTAP;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
     pointerEvent->SetFingerCount(THREE_FINGERS);
-    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent, fingerFocusPidSet);
+    ret = monitorCollection.CheckIfNeedSendToClient(sessionHandler, pointerEvent);
     ASSERT_TRUE(ret);
 }
 
@@ -1748,5 +1636,142 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_0
     eventMonitorHandler.ProcessScreenCapture(pid, isStart);
 }
 #endif // PLAYER_FRAMEWORK_EXISTS
+
+/**
+ * @tc.name: EventMonitorHandlerTest_GetPid_001
+ * @tc.desc: session_ == nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_GetPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_EQ(sessionHandler.GetPid(), -1);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_GetPid_002
+ * @tc.desc: session_ != nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_GetPid_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_EQ(sessionHandler.GetPid(), g_pid);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ContainHandlerEventType_001
+ * @tc.desc: (eventType_ & handleEventType) == handleEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ContainHandlerEventType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    EXPECT_EQ(sessionHandler.ContainHandlerEventType(HANDLE_EVENT_TYPE_KEY), true);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ContainHandlerEventType_002
+ * @tc.desc: session_ != nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ContainHandlerEventType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    EXPECT_EQ(sessionHandler.ContainHandlerEventType(HANDLE_EVENT_TYPE_KEY), false);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_ContainHandlerEventType_003
+ * @tc.desc: session_== nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ContainHandlerEventType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    EXPECT_EQ(sessionHandler.ContainHandlerEventType(HANDLE_EVENT_TYPE_KEY), false);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_SendToClient_002
+ * @tc.desc: session_ == nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = nullptr;
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    sessionHandler.SendToClient(nullptr);
+    sessionHandler.SendToClient(pointerEvent);
+    EXPECT_EQ(sessionHandler.session_, nullptr);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_SendToClient_003
+ * @tc.desc: session_ != nullptr && Expect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    sessionHandler.SendToClient(pointerEvent);
+    EXPECT_NE(sessionHandler.session_, nullptr);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_SendToClient_004
+ * @tc.desc: session_ != nullptr && !Expect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
+    auto pointerEvent = PointerEvent::Create();
+    sessionHandler.SendToClient(pointerEvent);
+    EXPECT_NE(sessionHandler.session_, nullptr);
+}
 } // namespace MMI
 } // namespace OHOS

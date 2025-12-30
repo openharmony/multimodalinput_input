@@ -71,6 +71,9 @@ public:
                 std::shared_ptr<IPluginData> data), (override));
     MOCK_METHOD(void, HandleMonitorStatus, (bool monitorStatus, const std::string &monitorType), (override));
     MOCK_METHOD(std::string, GetFocusedAppInfo, (), (override));
+    MOCK_METHOD(bool, IsFingerPressed, (), (override, const));
+    MOCK_METHOD(const ISessionHandlerCollection *, GetMonitorCollection, (), (override, const));
+    MOCK_METHOD(int32_t, GetFocusedPid, (), (override, const));
 };
 
 class MockInputPlugin : public IInputPlugin {
@@ -590,6 +593,30 @@ HWTEST_F(
     inputPluginContext->Init(mockInputPlugin);
     std::shared_ptr<IInputPlugin> inputPlugin = inputPluginContext->GetPlugin();
     EXPECT_NE(inputPlugin, nullptr);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_IsFingerPressed_001
+ * @tc.desc: test TOUCH_EVENT_HDR == nullptr
+ * @tc.require: test IsFingerPressed
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_IsFingerPressed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    EXPECT_EQ(inputPluginContext->IsFingerPressed(), false);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_GetFocusedPid_001
+ * @tc.desc: test WIN_MGR == nullptr
+ * @tc.require: test GetFocusedPid
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetFocusedPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    EXPECT_EQ(inputPluginContext->GetFocusedPid(), 0);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -47,6 +47,7 @@ enum class InputPluginStage {
     INPUT_AFTER_LIBINPUT_ADAPTER_ON_EVENT = 13,
     INPUT_BEFORE_NORMALIZED = 15,
     INPUT_AFTER_NORMALIZED,
+    INPUT_AFTER_NORMALIZED_LIBINPUT,
     INPUT_DEVICE_CHANGE = 20,
     INPUT_BEFORE_FILTER = 25,
     INPUT_AFTER_FILTER,
@@ -103,6 +104,16 @@ struct ISequenceKey {
     }
 };
 
+struct ISessionHandler {
+    virtual int32_t GetPid() const = 0;
+    virtual bool ContainHandlerEventType(HandleEventType handleEventType) const = 0;
+    virtual void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const = 0;
+};
+
+struct ISessionHandlerCollection {
+    virtual void Foreach(std::function<void(std::shared_ptr<ISessionHandler>)> foreachFunc) const = 0;
+};
+
 struct IInputPlugin {
     virtual int32_t GetPriority() const = 0;
     virtual const std::string GetVersion() const = 0;
@@ -142,6 +153,9 @@ struct IPluginContext {
     virtual PluginResult HandleEvent(std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data) =  0;
     virtual void HandleMonitorStatus(bool monitorStatus, const std::string &monitorType) = 0;
     virtual std::string GetFocusedAppInfo() = 0;
+    virtual bool IsFingerPressed() const = 0;
+    virtual const ISessionHandlerCollection *GetMonitorCollection() const = 0;
+    virtual int32_t GetFocusedPid() const = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

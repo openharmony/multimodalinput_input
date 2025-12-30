@@ -28,6 +28,7 @@
             "vtable for OHOS::MMI::EventInterceptorHandler::InterceptorCollection";
             "vtable for OHOS::MMI::EventMonitorHandler";
             "vtable for OHOS::MMI::EventMonitorHandler::MonitorCollection";
+            "vtable for OHOS::MMI::EventMonitorHandler::SessionHandler";
             "vtable for OHOS::MMI::InjectNoticeManager::InjectNoticeConnection";
             "vtable for OHOS::MMI::AuthorizationDialog::DialogAbilityConnection";
             "VTT for OHOS::MMI::InjectNoticeManager::InjectNoticeConnection";
