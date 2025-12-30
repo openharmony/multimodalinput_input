@@ -2208,7 +2208,7 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
                 hotkeys[i] = nullptr;
             }
         }
-        if (hotkeys != nullptr) {       
+        if (hotkeys != nullptr) {
             delete[] hotkeys;
             hotkeys = nullptr;
         }
