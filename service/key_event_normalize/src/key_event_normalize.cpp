@@ -419,7 +419,7 @@ void KeyEventNormalize::SyncSwitchFunctionKeyState(const std::shared_ptr<KeyEven
             continue;
         }
         int32_t state = libinput_get_funckey_state(device, functionKey);
-        if (state == preState) {
+        if (state == static_cast<int32_t>(preState)) {
             MMI_HILOGW("Failed to enable the function key, device id %{public}d", deviceId);
         }
     }
