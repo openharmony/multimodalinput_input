@@ -4138,7 +4138,7 @@ void InputWindowsManager::UpdatePointerChangeAreas(const OLD::DisplayGroupInfo &
         std::vector<Rect> windowHotAreas;
         int32_t windowId = windowInfo.id;
         Rect windowArea = windowInfo.area;
-        if (windowInfo.transform.size() <= 0) {
+        if (windowInfo.transform.size() <= SCALE_Y) {
             continue;
         }
         windowArea.width = windowInfo.transform[SCALE_X] != 0 ? windowInfo.area.width / windowInfo.transform[SCALE_X]
@@ -4175,6 +4175,10 @@ void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vecto
     std::vector<Rect> &windowHotAreas)
 {
     CALL_DEBUG_ENTER;
+    if (pointerChangeAreas.size() < BOTTOM_LEFT_AREA + 1) {
+        MMI_HILOGE("The size of pointerChangeAreas is not enough, size:%{public}zu", pointerChangeAreas.size());
+        return;
+    }
     Rect newTopRect;
     newTopRect.x = windowArea.x + pointerChangeAreas[TOP_LEFT_AREA];
     newTopRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
@@ -4202,6 +4206,10 @@ void InputWindowsManager::UpdateLeftRightArea(const Rect &windowArea, std::vecto
     std::vector<Rect> &windowHotAreas)
 {
     CALL_DEBUG_ENTER;
+    if (pointerChangeAreas.size() < LEFT_AREA + 1) {
+        MMI_HILOGE("The size of pointerChangeAreas is not enough, size:%{public}zu", pointerChangeAreas.size());
+        return;
+    }
     Rect newLeftRect;
     newLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
     newLeftRect.y = windowArea.y + pointerChangeAreas[TOP_LEFT_AREA];
@@ -4229,6 +4237,10 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
     std::vector<Rect> &windowHotAreas)
 {
     CALL_DEBUG_ENTER;
+    if (pointerChangeAreas.size() < BOTTOM_LEFT_AREA + 1) {
+        MMI_HILOGE("The size of pointerChangeAreas is not enough, size:%{public}zu", pointerChangeAreas.size());
+        return;
+    }
     Rect newTopLeftRect;
     newTopLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
     newTopLeftRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
