@@ -29,7 +29,7 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchTransformProcessor);
     ~TouchTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
-    std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
+    std::shared_ptr<PointerEvent> GetPointerEvent() override { return pointerEvent_; }
     void OnDeviceRemoved() override;
 
 private:

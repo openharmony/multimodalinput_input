@@ -22,6 +22,7 @@
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
 #include "nap_process.h"
+#include "plugin_stage.h"
 
 namespace OHOS {
 namespace MMI {
@@ -63,13 +64,14 @@ public:
 #ifdef PLAYER_FRAMEWORK_EXISTS
     void ProcessScreenCapture(int32_t pid, bool isStart);
 #endif
+    const ISessionHandlerCollection *GetMonitorCollection() const;
 
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
 
 private:
-    class SessionHandler {
+    class SessionHandler : public ISessionHandler {
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
             std::shared_ptr<IInputEventConsumer> cb,
@@ -104,10 +106,13 @@ private:
             gesture_ = other.gesture_;
             actionsType_ = other.actionsType_;
         }
-
+        virtual ~SessionHandler() = default;
         bool Expect(std::shared_ptr<PointerEvent> pointerEvent) const;
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
+        int32_t GetPid() const;
+        bool ContainHandlerEventType(HandleEventType handleEventType) const;
+        void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         bool operator<(const SessionHandler& other) const
         {
             return (session_ < other.session_);
@@ -125,7 +130,9 @@ private:
         std::shared_ptr<IInputEventConsumer> callback_ { nullptr };
     };
 
-    class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
+    class MonitorCollection : public IInputEventCollectionHandler,
+                              public ISessionHandlerCollection,
+                              protected NoCopyable {
     public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
@@ -151,26 +158,19 @@ private:
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent,
-            NetPacket &pkt, std::unordered_set<int32_t> fingerFocusPidSet);
+        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt);
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
-        bool CheckIfNeedSendToClient(SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent,
-            std::unordered_set<int32_t> fingerFocusPidSet);
+        bool CheckIfNeedSendToClient(SessionHandler monitor, std::shared_ptr<PointerEvent> pointerEvent);
         bool IsPinch(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsRotate(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent);
         bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-        bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
-        bool CheckIfNeedSendFingerprintEvent(SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent,
-            std::unordered_set<int32_t> fingerFocusPidSet);
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
-
+        void Foreach(std::function<void(std::shared_ptr<ISessionHandler>)> foreachFunc) const override;
         struct ConsumptionState {
             std::set<int32_t> eventIds_;
             bool isMonitorConsumed_ { false };

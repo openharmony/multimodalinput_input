@@ -25,9 +25,6 @@
 #include "event_resample.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #include "event_statistic.h"
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-#include "fingerprint_event_processor.h"
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 #include "i_joystick_event_normalize.h"
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
@@ -163,13 +160,22 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             }
         }
     }
+    auto manager = InputPluginManager::GetInstance();
+    std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
+    data->stage = InputPluginStage::INPUT_AFTER_NORMALIZED_LIBINPUT;
     std::string name = libinput_device_get_name(device);
     size_t pos = name.find("hand_status_dev");
     if ((pos != std::string::npos) && (type == LIBINPUT_EVENT_MSDP)) {
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-        FingerprintEventHdr->HandleFingerprintEvent(event);
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+        if (manager != nullptr) {
+            manager->HandleEvent(event, data);
+        }
         return;
+    }
+    if (manager != nullptr) {
+        int32_t result = manager->HandleEvent(event, data);
+        if (result == RET_DO) {
+            return;
+        }
     }
 
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
@@ -440,13 +446,6 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
 
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    FingerprintEventHdr->SetPowerAndVolumeKeyState(event);
-    if (FingerprintEventHdr->IsFingerprintEvent(event)) {
-        DfxHisysevent::ReportKeyEvent("fingerprint");
-        return FingerprintEventHdr->HandleFingerprintEvent(event);
-    }
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     g_lastKeyboardEventTime = GetSysClockTime();
@@ -537,11 +536,6 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    if (FingerprintEventHdr->IsFingerprintEvent(event)) {
-        return FingerprintEventHdr->HandleFingerprintEvent(event);
-    }
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (CROWN_EVENT_HDR->IsCrownEvent(event)) {
 #ifdef OHOS_BUILD_ENABLE_CROWN
@@ -781,11 +775,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     }
     lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
 
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        FingerprintEventHdr->SetScreenState(true);
-    }
-#endif
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");

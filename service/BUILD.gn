@@ -113,10 +113,6 @@ config("libmmi_server_config") {
     }
   }
 
-  if (input_feature_fingerprint) {
-    include_dirs += [ "fingerprint_event_processor/include" ]
-  }
-
   if (input_ext_feature_anco) {
     include_dirs += [
       "${mmi_ext_path}/anco_uds_manager/include",
@@ -373,10 +369,16 @@ ohos_shared_library("libmmi-server") {
       ]
     }
   }
-  if (input_feature_fingerprint) {
+  if (input_feature_touchscreen && input_feature_monitor) {
     sources += [
-      "fingerprint_event_processor/src/fingerprint_event_processor.cpp"
+      "touch_event_normalize/src/touch_gesture_adapter.cpp",
+      "touch_event_normalize/src/touch_gesture_detector.cpp",
+      "touch_event_normalize/src/touch_gesture_manager.cpp",
     ]
+
+    if (input_feature_product == "pc") {
+      defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
+    }
   }
   if (input_feature_joystick) {
     sources += [
