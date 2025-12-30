@@ -58,7 +58,7 @@ public:
     void RemoveMonitor(const Monitor &monitor, const std::string &bundleName);
     bool Intercept(std::shared_ptr<KeyEvent> keyEvent);
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent, int32_t delay);
-    void NotifyPendingMonitors();
+    bool NotifyPendingMonitors();
     void ResetAll(int32_t keyCode);
     void SetMeeTimeSubcriber(bool status, std::string monitorType);
 
@@ -70,6 +70,7 @@ private:
     void NotifyKeyMonitor(std::shared_ptr<KeyEvent> keyEvent, int32_t session, int32_t status);
     bool CheckMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent);
     void NotifyMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent);
+    bool IsMeeTimeSession(int32_t session);
 
     std::set<Monitor> monitors_;
     std::map<Monitor, PendingMonitor> pending_;

@@ -180,10 +180,6 @@ void KeyMonitorManager::NotifyMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent)
 bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
-    if (CheckMeeTimeMonitor(keyEvent)) {
-        NotifyMeeTimeMonitor(keyEvent);
-        return true;
-    }
     std::set<int32_t> sessions;
     auto nTriggered = std::count_if(monitors_.cbegin(), monitors_.cend(),
         [this, keyEvent, &sessions](const auto &monitor) {
@@ -191,6 +187,11 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
                 if (CheckMeeTimeMonitor(keyEvent)) {
                     NotifyMeeTimeMonitor(keyEvent);
                     return true;
+                }
+                if (IsMeeTimeSession(monitor.session_)) {
+                    MMI_HILOGI("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
+                        keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), monitor.session_);
+                    return false;
                 }
                 if (monitor.IsFocused() &&
                     (sessions.find(monitor.session_) == sessions.cend())) {
@@ -219,6 +220,11 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t de
             if (CheckMeeTimeMonitor(keyEvent)) {
                 NotifyMeeTimeMonitor(keyEvent);
                 return true;
+            }
+            if (IsMeeTimeSession(monitor.session_)) {
+                MMI_HILOGI("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
+                    keyEvent->GetKeyCode(), keyEvent->GetKeyAction(), monitor.session_);
+                return false;
             }
             if (!monitor.IsFocused()) {
                 return false;
@@ -249,13 +255,20 @@ bool KeyMonitorManager::Intercept(std::shared_ptr<KeyEvent> keyEvent, int32_t de
     return (nTriggered > 0);
 }
 
-void KeyMonitorManager::NotifyPendingMonitors()
+bool KeyMonitorManager::NotifyPendingMonitors()
 {
     for (const auto &[monitor, pendingData] : pending_) {
         TimerMgr->RemoveTimer(pendingData.timerId_);
+        if (!CheckMeeTimeMonitor(pendingData.keyEvent_) && IsMeeTimeSession(monitor.session_)) {
+            CHKPF(pendingData.keyEvent_);
+            MMI_HILOGE("[KC, KA, SE]:[%{private}d, %{public}d, %{public}d]",
+                pendingData.keyEvent_->GetKeyCode(), pendingData.keyEvent_->GetKeyAction(), monitor.session_);
+            return false;
+        }
         NotifyKeyMonitor(pendingData.keyEvent_, monitor.session_, isMeeTimeSubcriber_);
     };
     pending_.clear();
+    return true;
 }
 
 void KeyMonitorManager::ResetAll(int32_t keyCode)
@@ -358,6 +371,21 @@ bool KeyMonitorManager::CheckMeeTimeMonitor(std::shared_ptr<KeyEvent> keyEvent)
         flag, static_cast<bool>(isMeeTimeSubcriber_));
     if (flag && isMeeTimeSubcriber_) {
         return true;
+    }
+    return false;
+}
+
+bool KeyMonitorManager::IsMeeTimeSession(int32_t session)
+{
+    CALL_DEBUG_ENTER;
+    std::string name = BUNDLE_NAME_PARSER.GetBundleName(MEETIME_NAME);
+    auto it = meeTimeMonitor_.find(name);
+    if (it != meeTimeMonitor_.cend()) {
+        int32_t value = it->second;
+        MMI_HILOGD("[value, session]:[%{public}d, %{public}d]", value, session);
+        if (value == session) {
+            return true;
+        }
     }
     return false;
 }
