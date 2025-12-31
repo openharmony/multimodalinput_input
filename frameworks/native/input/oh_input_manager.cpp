@@ -184,6 +184,7 @@ static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
 static std::atomic_int32_t g_keyEventHookId = INVALID_INTERCEPTOR_ID;
 static int32_t UNKNOWN_MAX_TOUCH_POINTS { -1 };
 static int32_t NOT_ENABLE_POINTER { -2 };
+static int32_t g_pixelMapMaxSize { 256 };
 
 static const std::vector<int32_t> g_pressKeyCodes = {
     OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
@@ -3335,6 +3336,25 @@ Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, in
 {
     CALL_DEBUG_ENTER;
     CHKPP(pixelMap);
+    OH_Pixelmap_ImageInfo* imageInfo = nullptr;
+    if (OH_PixelmapImageInfo_Create(&imageInfo) != IMAGE_SUCCESS) {
+        return nullptr;
+    }
+    if (OH_PixelmapNative_GetImageInfo(pixelMap, imageInfo) != IMAGE_SUCCESS) {
+        OH_PixelmapImageInfo_Release(imageInfo);
+        return nullptr;
+    }
+    uint32_t width = 0;
+    uint32_t height = 0;
+    bool ret = true;
+    ret &= OH_PixelmapImageInfo_GetWidth(imageInfo, &width) == IMAGE_SUCCESS;
+    ret &= OH_PixelmapImageInfo_GetHeight(imageInfo, &height) == IMAGE_SUCCESS;
+    OH_PixelmapImageInfo_Release(imageInfo);
+    if (!ret || width > g_pixelMapMaxSize || height > g_pixelMapMaxSize ||
+        anchorX > static_cast<int32_t>(width) || anchorX < 0 ||
+        anchorY > static_cast<int32_t>(height) || anchorY < 0) {
+        return nullptr;
+    }
     Input_CustomCursor* customCursor = new (std::nothrow) Input_CustomCursor();
     CHKPP(customCursor);
     customCursor->pixelMap = pixelMap;
@@ -3437,7 +3457,7 @@ Input_Result OH_Input_GetPixelMapOptions(OH_PixelmapNative* pixelMap, OHOS::Medi
     options->alphaType = static_cast<OHOS::Media::AlphaType>(alphaType);
     options->srcPixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
     options->pixelFormat = static_cast<OHOS::Media::PixelFormat>(pixelFormat);
-    if (rowStride > INT32_MAX) {
+    if (rowStride > INT32_MAX || width > INT32_MAX || height > INT32_MAX) {
         return INPUT_PARAMETER_ERROR;
     }
     options->srcRowStride = static_cast<int32_t>(rowStride);
