@@ -244,7 +244,7 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event *event)
         CHKPF(touchpadEvent);
         int32_t toolType = libinput_event_touchpad_get_tool_type(touchpadEvent);
         if (toolType == MT_TOOL_PALM) {
-            MMI_HILOGD("Touchpad event is palm");
+            MMI_HILOGI("Touchpad event is palm");
             return false;
         }
     }
@@ -254,9 +254,6 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event *event)
     }
     if (type == LIBINPUT_EVENT_POINTER_TAP) {
         return IsTouchpadTapMistouch(event);
-    }
-    if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
-        return IsTouchpadMotionMistouch(event);
     }
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         return IsTouchpadPointerMotionMistouch(event);
@@ -283,14 +280,14 @@ bool InputEventHandler::IsTouchpadButtonMistouch(libinput_event* event)
         if (isDwtEdgeAreaForTouchpadButtonActing_ &&
             (coordX <= TOUCHPAD_EDGE_WIDTH_FOR_BUTTON || coordX >= touchpadSizeX - TOUCHPAD_EDGE_WIDTH_FOR_BUTTON)) {
             isButtonMistouch_ = true;
-            MMI_HILOGD("The buttonPressed event is mistouch");
+            MMI_HILOGI("The buttonPressed event is mistouch");
             return true;
         }
     }
     if (buttonState == LIBINPUT_BUTTON_STATE_RELEASED) {
         if (isButtonMistouch_) {
             isButtonMistouch_ = false;
-            MMI_HILOGD("The buttonReleased event is mistouch");
+            MMI_HILOGI("The buttonReleased event is mistouch");
             return true;
         }
     }
@@ -315,14 +312,14 @@ bool InputEventHandler::IsTouchpadTapMistouch(libinput_event* event)
         if (isDwtEdgeAreaForTouchpadTapActing_ &&
             (coordX <= TOUCHPAD_EDGE_WIDTH_FOR_TAP || coordX >= touchpadSizeX - TOUCHPAD_EDGE_WIDTH_FOR_TAP)) {
             isTapMistouch_ = true;
-            MMI_HILOGD("Touchpad tap presse event is mistouch");
+            MMI_HILOGI("Touchpad tap presse event is mistouch");
             return true;
         }
     }
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         if (isTapMistouch_) {
             isTapMistouch_ = false;
-            MMI_HILOGD("Touchpad tap release event is mistouch");
+            MMI_HILOGI("Touchpad tap release event is mistouch");
             return true;
         }
     }
