@@ -3176,6 +3176,20 @@ public:
      * @since 20
      */
     static const int32_t KEYCODE_DIV;
+
+    /**
+     * Assistant By Mouse
+     *
+     * @since 23
+     */
+    static const int32_t KEYCODE_MOUSE_ASSISTANT;
+
+    /**
+     * Intelligence Selection By Mouse
+     *
+     * @since 23
+     */
+    static const int32_t KEYCODE_MOUSE_INTELLIGENCE_SELECTION;
 public:
     class KeyItem {
     public:
