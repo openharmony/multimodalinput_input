@@ -47,7 +47,9 @@ public:
     void DumpLidState(int32_t fd, const std::vector<std::string> &args);
     void SyncSwitchLidState(struct libinput_device *inputDevice);
     void SyncSwitchTabletState(struct libinput_device *inputDevice);
-    void SetCesReady();
+    void SubmitWaitAndPublishEvent(const std::shared_ptr<SwitchEvent> switchEvent,
+        std::function<void(const std::shared_ptr<SwitchEvent>)> publishFunc,
+        const char* taskName);
 #endif // OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
@@ -92,8 +94,6 @@ private:
     std::atomic<int32_t> switchEventType_ {0};
     static inline sptr<SwitchSubscriberSystemAbility> switchSubscriberSystemAbility_ = nullptr;
     static inline std::atomic<bool> isCesReady_ { false };
-    std::mutex mtx_;
-    std::condition_variable cv_;
 };
 } // namespace MMI
 } // namespace OHOS
