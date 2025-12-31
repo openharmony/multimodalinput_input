@@ -1214,6 +1214,7 @@ void EventNormalizeHandler::SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> 
     if (swipeSpeed > SWIPE_INWARD_SPEED_THRE) {
         g_isSwipeInward = true;
 
+        MMI_HILOGI("Touchpad swipeInward action");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
         DfxHisysevent::ReportTouchpadSwipeInwardEvent();
     }
