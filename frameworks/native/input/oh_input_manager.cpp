@@ -2198,7 +2198,8 @@ Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
 void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
 {
     std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
-    if (g_hotkeyCounts.find(hotkeys) != g_hotkeyCounts.end()) {
+    auto iter = g_hotkeyCounts.find(hotkeys);
+    if (iter != g_hotkeyCounts.end()) {
         if (count != g_hotkeyCounts[hotkeys]) {
                 MMI_HILOGW("Parameter inconsistency");
             }
@@ -2212,7 +2213,7 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
             delete[] hotkeys;
             hotkeys = nullptr;
         }
-        g_hotkeyCounts.erase(hotkeys);
+        g_hotkeyCounts.erase(iter);
     }
 }
 
