@@ -47,6 +47,7 @@ public:
     bool IsCommonEventSubscriberInit();
     void SetScreenStatus(const std::string &screenStatus)
     {
+        MMI_HILOGD("SetScreenStatus: %{public}s", screenStatus.c_str());
         screenStatus_ = screenStatus;
     }
     const std::string GetScreenStatus()
