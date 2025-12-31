@@ -33,6 +33,7 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SwitchSubscriberHandler"
 constexpr int MAX_WAIT_TIME = 5;
+constexpr int DELAY_CHECK_CES_STATUS = 100;
 
 namespace OHOS {
 namespace MMI {
@@ -181,33 +182,19 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
         switchEventType_ = switchEvent->GetSwitchType();
     }
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_TABLET) {
-        ffrt::submit(
-            [this, switchEvent] {
-                std::unique_lock<std::mutex> lock(mtx_);
-                bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
-                    return isCesReady_.load();
-                });
-                if (status) {
-                    this->PublishTabletEvent(switchEvent);
-                } else {
-                    MMI_HILOGI("wait COMMON_EVENT_SERVICE timeout.");
-                }
+        SubmitWaitAndPublishEvent(
+            switchEvent,
+            [this](const std::shared_ptr<SwitchEvent> event) {
+                this->PublishTabletEvent(event);
             },
-            ffrt::task_attr().name("publish_tablet_mode_common_event"));
+            "publish_tablet_mode_common_event");
     } else if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
-        ffrt::submit(
-            [this, switchEvent] {
-                std::unique_lock<std::mutex> lock(mtx_);
-                bool status = cv_.wait_for(lock, std::chrono::seconds(MAX_WAIT_TIME), [this] {
-                    return isCesReady_.load();
-                });
-                if (status) {
-                    this->PublishLidEvent(switchEvent);
-                } else {
-                    MMI_HILOGI("wait COMMON_EVENT_SERVICE timeout.");
-                }
+        SubmitWaitAndPublishEvent(
+            switchEvent,
+            [this](const std::shared_ptr<SwitchEvent> event) {
+                this->PublishLidEvent(event);
             },
-            ffrt::task_attr().name("publish_lid_state_common_event"));
+            "publish_lid_state_common_event");
     }
     if (OnSubscribeSwitchEvent(switchEvent)) {
         MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
@@ -217,12 +204,26 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
     nextHandler_->HandleSwitchEvent(switchEvent);
 }
 
-void SwitchSubscriberHandler::SetCesReady()
+void SwitchSubscriberHandler::SubmitWaitAndPublishEvent(const std::shared_ptr<SwitchEvent> switchEvent,
+    std::function<void(const std::shared_ptr<SwitchEvent>)> publishFunc,
+    const char* taskName)
 {
-    std::lock_guard<std::mutex> lock(mtx_);
-    isCesReady_.store(true, std::memory_order_release);
-    MMI_HILOGI("isCesReady_ set true");
-    cv_.notify_one();
+    ffrt::submit(
+        [this, switchEvent, publishFunc] {
+            auto startTime = std::chrono::steady_clock::now();
+            while (!isCesReady_.load(std::memory_order_acquire)) {
+                auto curTime = std::chrono::steady_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+                    curTime - startTime).count();
+                if (elapsed >= MAX_WAIT_TIME) {
+                    MMI_HILOGW("wait COMMON_EVENT_SERVICE timeout.");
+                    return;
+                }
+                ffrt::this_task::sleep_for(std::chrono::milliseconds(DELAY_CHECK_CES_STATUS));
+            }
+            publishFunc(switchEvent);
+        },
+        ffrt::task_attr().name(taskName));
 }
 
 void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnAddSystemAbility(int32_t systemAbilityId,
@@ -233,7 +234,8 @@ void SwitchSubscriberHandler::SwitchSubscriberSystemAbility::OnAddSystemAbility(
         case COMMON_EVENT_SERVICE_ID: {
             auto switchSubscriberHandler = InputHandler->GetSwitchSubscriberHandler();
             if (switchSubscriberHandler != nullptr) {
-                switchSubscriberHandler->SetCesReady();
+                SwitchSubscriberHandler::isCesReady_.store(true, std::memory_order_release);
+                MMI_HILOGI("isCesReady_ set true");
             } else {
                 MMI_HILOGE("switchSubscriberHandler is null");
             }
