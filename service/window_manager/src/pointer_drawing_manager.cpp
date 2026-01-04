@@ -3414,7 +3414,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     }
     CursorDrawingComponent::GetInstance();
     delegateProxy->OnPostSyncTask([this, screens] {
-        if (this.workerThreadId_ != GetThisThreadId() && !POINTER_DEV_MGR.isInit) {
+        if (this->workerThreadId_ != GetThisThreadId() && !POINTER_DEV_MGR.isInit) {
             MMI_HILOGE("skip ScreenModeChange callback");
             return RET_OK;
         }
