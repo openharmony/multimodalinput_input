@@ -3098,6 +3098,7 @@ void MMIService::OnThread()
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
+    CursorDrawingComponent::GetInstance().SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 #ifdef OHOS_BUILD_PC_PRIORITY
     SetMmiServicePriority(0);
