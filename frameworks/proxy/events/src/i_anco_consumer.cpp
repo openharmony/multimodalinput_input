@@ -174,16 +174,6 @@ AncoOneHandData *AncoOneHandData::Unmarshalling(Parcel &parcel)
     return data;
 }
 
-AncoOneHandData *AncoOneHandData::Unmarshalling(Parcel &parcel)
-{
-    AncoOneHandData *data = new (std::nothrow) AncoOneHandData();
-    if (data && !data->ReadFromParcel(parcel)) {
-        delete data;
-        data = nullptr;
-    }
-    return data;
-}
-
 bool AncoExcludedKeyEventWindow::Marshalling(Parcel &parcel) const
 {
     return parcel.WriteInt32Vector(windowIds);
