@@ -68,7 +68,9 @@ ErrCode AncoChannel::SyncKnuckleStatus(bool isKnuckleEnable)
 ErrCode AncoChannel::UpdateExcludedKeyEventWindow(
     const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
 {
-    CHKPR(consumer_, RET_ERR);
+    if (consumer_ == nullptr) {
+        return RET_ERR;
+    }
     return consumer_->UpdateExcludedKeyEventWindow(excludedKeyEventWindow);
 }
 } // namespace MMI
