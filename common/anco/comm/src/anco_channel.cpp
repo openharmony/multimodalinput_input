@@ -70,5 +70,6 @@ ErrCode AncoChannel::UpdateExcludedKeyEventWindow(
 {
     CHKPR(consumer_, RET_ERR);
     return consumer_->UpdateExcludedKeyEventWindow(excludedKeyEventWindow);
+}
 } // namespace MMI
 } // namespace OHOS
