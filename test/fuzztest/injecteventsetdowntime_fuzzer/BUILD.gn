@@ -107,7 +107,6 @@ ohos_fuzztest("InjecteventSetDownTimeFuzzTest") {
     "graphic_2d:librender_service_client",
     "hicollie:libhicollie",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbeget_proxy",
