@@ -28,6 +28,7 @@ ohos_unittest("InputManagerAncoTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/common/anco/comm:mmi_anco_channel_stub",
   ]
 
   external_deps = [
