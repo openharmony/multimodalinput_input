@@ -1034,7 +1034,6 @@ ohos_unittest("TimerManagerTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
@@ -2519,7 +2518,6 @@ ohos_unittest("KeyEventValueTransformationTest") {
   external_deps = [
     "c_utils:utilsbase",
     "hilog:libhilog",
-    "hilog:libhilog_base",
   ]
 }
 
@@ -2678,7 +2676,6 @@ ohos_unittest("InfraredEmitterTest") {
     "graphic_2d:2d_graphics",
     "hdf_core:libhdi",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
@@ -2720,7 +2717,6 @@ ohos_unittest("InfraredEmitterEXTest") {
     "graphic_2d:2d_graphics",
     "hdf_core:libhdi",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
@@ -2752,7 +2748,6 @@ ohos_unittest("InterceptorTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
@@ -2786,7 +2781,6 @@ ohos_unittest("InterceptorExTest") {
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "init:libbegetutil",
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
@@ -3179,7 +3173,6 @@ ohos_unittest("LibinputAdapterTest") {
     "c_utils:utilsbase",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "libinput:libinput-third-mmi",
   ]
 }
@@ -3360,7 +3353,6 @@ ohos_unittest("DeviceManagerTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
@@ -3443,7 +3435,6 @@ ohos_unittest("DeviceManagerExTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
@@ -3519,7 +3510,6 @@ ohos_unittest("DelegateTaskTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "init:libbegetutil",
     "napi:ace_napi",
   ]
@@ -3679,7 +3669,6 @@ ohos_unittest("DeviceEventMonitorTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -3720,7 +3709,6 @@ ohos_unittest("DfxHisysEventTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
@@ -3776,7 +3764,6 @@ ohos_unittest("KeymapMgrTest") {
     "data_share:datashare_consumer",
     "googletest:gmock_main",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "preferences:native_preferences",
   ]
@@ -3936,7 +3923,6 @@ ohos_unittest("ProductTypeParserTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
@@ -3992,7 +3978,6 @@ ohos_unittest("SpecialInputDeviceParserTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hilog:libhilog_base",
     "hisysevent:libhisysevent",
     "init:libbegetutil",
     "ipc:ipc_core",
