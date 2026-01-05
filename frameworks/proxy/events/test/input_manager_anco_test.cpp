@@ -41,6 +41,8 @@ public:
     int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
     int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
     int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) override;
+    int32_t UpdateExcludedKeyEventWindow(
+        const AncoExcludedKeyEventWindow &excludedKeyEventWindow) override;
 };
 
 int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -68,6 +70,12 @@ int32_t AncoMonitor::SyncKnuckleStatus(bool isKnuckleEnable)
 }
 
 int32_t AncoMonitor::UpdateOneHandData(const AncoOneHandData &oneHandData)
+{
+    return RET_OK;
+}
+
+int32_t AncoMonitor::UpdateExcludedKeyEventWindow(
+    const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
 {
     return RET_OK;
 }
