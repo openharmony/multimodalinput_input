@@ -89,7 +89,6 @@ ohos_unittest("e2e-libudev-test") {
     "c_utils:utilsbase",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
-    "hilog:libhilog_base",
     "ipc:ipc_core",
     "libevdev:libevdev",
   ]
