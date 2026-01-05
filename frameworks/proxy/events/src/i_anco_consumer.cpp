@@ -173,5 +173,35 @@ AncoOneHandData *AncoOneHandData::Unmarshalling(Parcel &parcel)
     }
     return data;
 }
+
+AncoOneHandData *AncoOneHandData::Unmarshalling(Parcel &parcel)
+{
+    AncoOneHandData *data = new (std::nothrow) AncoOneHandData();
+    if (data && !data->ReadFromParcel(parcel)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
+}
+
+bool AncoExcludedKeyEventWindow::Marshalling(Parcel &parcel) const
+{
+    return parcel.WriteInt32Vector(windowIds);
+}
+
+bool AncoExcludedKeyEventWindow::ReadFromParcel(Parcel &parcel)
+{
+    return parcel.ReadInt32Vector(&windowIds);
+}
+
+AncoExcludedKeyEventWindow *AncoExcludedKeyEventWindow::Unmarshalling(Parcel &parcel)
+{
+    AncoExcludedKeyEventWindow *data = new (std::nothrow) AncoExcludedKeyEventWindow();
+    if (data && !data->ReadFromParcel(parcel)) {
+        delete data;
+        data = nullptr;
+    }
+    return data;
+}
 } // namespace MMI
 } // namespace OHOS

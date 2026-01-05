@@ -23,4 +23,5 @@ interface OHOS.MMI.IAncoChannel {
     void UpdateWindowInfo([in] AncoWindows windows);
     void SyncKnuckleStatus([in] boolean isKnuckleEnable);
     [oneway] void UpdateOneHandData([in] AncoOneHandData oneHandData);
+    [oneway] void UpdateExcludedKeyEventWindow([in] AncoExcludedKeyEventWindow excludedKeyEventWindow);
 }
