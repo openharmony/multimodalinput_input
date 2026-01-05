@@ -6506,6 +6506,110 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_017
+ * @tc.desc: Test UpdateTouchScreenTarget to verify the branch when deviceId not found in touchItemDownInfos_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_017, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t deviceId = 100;
+    
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(deviceId);
+
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(deviceId);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(-1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+    
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = displayId;
+    displayInfo.x = 0;
+    displayInfo.y = 0;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowGroupInfo winGroupInfo;
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(displayId, winGroupInfo));
+
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_018
+ * @tc.desc: Test UpdateTouchScreenTarget to verify the branch when touchItemDownInfos_ deviceId not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_018, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    constexpr int32_t pointerId = 0;
+    constexpr int32_t displayId = 1;
+    constexpr int32_t deviceId = 101;
+    constexpr int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetDeviceId(deviceId);
+    pointerEvent->SetPointerAction(action);
+
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(deviceId);
+    item.SetPointerId(pointerId);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(-1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = displayId;
+    displayInfo.x = 0;
+    displayInfo.y = 0;
+    auto it = inputWindowsMgr.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsMgr.displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowGroupInfo winGroupInfo;
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(displayId, winGroupInfo));
+
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.pid = 1000;
+    winInfo.area = {0, 0, 1000, 1000};
+    winInfo.defaultHotAreas.push_back({0, 0, 1000, 1000});
+    winInfo.flags = 0;
+    winInfo.zOrder = 1.0f;
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsMgr.windowsPerDisplay_[displayId] = winGroupInfo;
+
+    EXPECT_EQ(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_001
  * @tc.desc: Test the function SendCancelEventWhenLock
  * @tc.type: FUNC
@@ -7002,6 +7106,28 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
 }
 
+/**
+ * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_003
+ * @tc.desc: Test SendCancelEventWhenLock when touchItemDownInfos does not contain the device ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLock_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+
+    inputWindowsMgr.lastTouchEventOnBackGesture_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsMgr.lastTouchEventOnBackGesture_, nullptr);
+
+    constexpr int32_t deviceId = 100;
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetDeviceId(deviceId);
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+
+    ASSERT_TRUE(inputWindowsMgr.touchItemDownInfos_.find(deviceId) == inputWindowsMgr.touchItemDownInfos_.end());
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+}
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -8254,6 +8380,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_004, 
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_005
+ * @tc.desc: Test AdjustFingerFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(999);
+    pointerEvent->SetPointerId(0);
+    InputWindowsManager inputWindowsManager;
+    EXPECT_FALSE(inputWindowsManager.AdjustFingerFlag(pointerEvent));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_GetClientFd_007
  * @tc.desc: Test GetClientFd
  * @tc.type: FUNC
@@ -8371,6 +8515,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_011, TestS
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_012
+ * @tc.desc: Test GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(999);
+    pointerEvent->SetPointerId(100);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation_001
  * @tc.desc: Test FoldScreenRotation
  * @tc.type: FUNC
@@ -8407,6 +8569,24 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002
     WindowInfoEX winInfoEx;
     inputWindowsManager.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
 
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_003
+ * @tc.desc: Test FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(999);
+    pointerEvent->SetPointerId(100);
+    InputWindowsManager inputWindowsManager;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
 
@@ -9353,6 +9533,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouch_001, TestS
 
     touch = 1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CancelTouch(touch, 0));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CancelTouch_002
+ * @tc.desc: Test CancelTouch when deviceId is not found in touchItemDownInfos_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CancelTouch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t touch = 0;
+    int32_t deviceId = 999;
+
+    EXPECT_EQ(inputWindowsManager.CancelTouch(touch, deviceId), false);
 }
 
 /**
@@ -10651,6 +10847,35 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEven
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ReissueCancelTouchEvent(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ReissueCancelTouchEvent_004
+ * @tc.desc: Test ReissueCancelTouchEvent when deviceId not in touchItemDownInfos_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pointerId = 100;
+    int32_t deviceId = 999;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    item.SetDeviceId(deviceId);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+
+    std::shared_ptr<EventNormalizeHandler> handler = std::make_shared<EventNormalizeHandler>();
+    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
+    EXPECT_CALL(mockInputWindowsManager, GetEventNormalizeHandler).WillRepeatedly(Return(handler));
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ReissueCancelTouchEvent(pointerEvent));
+}
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 /**
@@ -11832,6 +12057,26 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_003
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     inputWindowsManager.touchItemDownInfos_[1].insert(std::make_pair(pointerId, winInfoEx));
     EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetCancelEventFlag_004
+ * @tc.desc: Test GetCancelEventFlag when deviceId not in touchItemDownInfos_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCancelEventFlag_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(999);
+    pointerEvent->SetPointerId(100);
+
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
 
 /**
