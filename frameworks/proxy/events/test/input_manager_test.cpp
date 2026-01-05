@@ -6437,7 +6437,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetLastEventIds, TestSize.Level1)
     EXPECT_TRUE(dispatchedEventId >= 0);
 }
 
-
 /*
  * @tc.name: InputManagerTest_GetExternalObject
  * @tc.desc: GetExternalObject
