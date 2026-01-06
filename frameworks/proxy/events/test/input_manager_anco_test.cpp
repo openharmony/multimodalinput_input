@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
@@ -26,13 +25,6 @@
 namespace OHOS {
 namespace MMI {
 using namespace testing::ext;
-using namespace testing;
-
-MockParcel : public Parcel {
-public:
-    MOCK_METHOD(WriteInt32Vector, bool(const std::vector<int32_t>&));
-    MOCK_METHOD(ReadInt32Vector, bool(std::vector<int32_t>*));
-};
 
 class InputManagerAncoTest : public testing::Test {
 public:
@@ -175,9 +167,8 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_0
 HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    MockParcel mockParcel;
-    EXPECT_CALL(mockParcel, ReadInt32Vector(_)).WillOnce(Return(false));
-    auto failedWindow = AncoExcludedKeyEventWindow::Unmarshalling(mockParcel);
+    Parcel testParcel;
+    auto failedWindow = AncoExcludedKeyEventWindow::Unmarshalling(testParcel);
 
     ASSERT_EQ(failedWindow, nullptr);
 }
