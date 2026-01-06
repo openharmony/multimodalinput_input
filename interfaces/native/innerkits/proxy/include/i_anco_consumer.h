@@ -92,7 +92,6 @@ struct AncoOneHandData : public Parcelable {
     static AncoOneHandData* Unmarshalling(Parcel &parcel);
 };
 
-
 struct AncoExcludedKeyEventWindow : public Parcelable {
     std::vector<int32_t> windowIds;
 
@@ -100,6 +99,7 @@ struct AncoExcludedKeyEventWindow : public Parcelable {
     bool ReadFromParcel(Parcel &parcel);
     static AncoExcludedKeyEventWindow* Unmarshalling(Parcel &parcel);
 };
+
 class IAncoConsumer {
 public:
     IAncoConsumer() = default;

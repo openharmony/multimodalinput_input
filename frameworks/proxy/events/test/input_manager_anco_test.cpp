@@ -108,12 +108,12 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_UpdateExcludedKeyEventWindow
     auto monitor = std::make_shared<AncoMonitor>();
     AncoExcludedKeyEventWindow data;
     data.windowIds = {1001, 1002, 1003};
-    ASSERT_TRUE(monitor->UpdateExcludedKeyEventWindow(data), RET_OK);
+    ASSERT_EQ(monitor->UpdateExcludedKeyEventWindow(data), RET_OK);
 }
 
 /**
  * @tc.name: InputManagerAncoTest_AncoExcludedKeyEventWindow_001
- * @tc.desc: MarshallingAndUmarshallingTest
+ * @tc.desc: MarshallingAndUnmarshallingTest
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -138,7 +138,7 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_0
 }
 
 /**
- * @tc.name: InputManagerAncoTest_SyncPointerEvent_001
+ * @tc.name: InputManagerAncoTest_AncoExcludedKeyEventWindow_002
  * @tc.desc: EmptyWindowIdsTest
  * @tc.type: FUNC
  * @tc.require:
@@ -159,7 +159,7 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_0
 }
 
 /**
- * @tc.name: InputManagerAncoTest_SyncPointerEvent_001
+ * @tc.name: InputManagerAncoTest_AncoExcludedKeyEventWindow_003
  * @tc.desc: ReadFromParcelFailureTest
  * @tc.type: FUNC
  * @tc.require:
@@ -168,6 +168,7 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_0
 {
     CALL_TEST_DEBUG;
     Parcel testParcel;
+    testParcel.WriteInt32(1);
     auto failedWindow = AncoExcludedKeyEventWindow::Unmarshalling(testParcel);
 
     ASSERT_EQ(failedWindow, nullptr);
@@ -192,7 +193,7 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoChannel_001, TestSize.Le
 
 /**
  * @tc.name: InputManagerAncoTest_AncoChannel_002
- * @tc.desc: ReadFromParcelFailureTest
+ * @tc.desc: UpdateExcludedKeyEventWindowNullConsumerTest
  * @tc.type: FUNC
  * @tc.require:
  */
