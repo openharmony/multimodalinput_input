@@ -3033,11 +3033,12 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
     return RET_OK;
 }
 
-void PointerDrawingManager::SubscribeScreenModeChange()
+void PointerDrawingManager::SubscribeScreenModeChange(uint64_t tid)
 {
     if (!GetHardCursorEnabled()) {
         return;
     }
+    workerThreadId_ = tid;
     std::vector<sptr<OHOS::Rosen::ScreenInfo>> screenInfos;
     if (!screenInfos.empty()) {
         OnScreenModeChange(screenInfos);
@@ -3413,7 +3414,7 @@ void PointerDrawingManager::OnScreenModeChange(const std::vector<sptr<OHOS::Rose
     }
     CursorDrawingComponent::GetInstance();
     delegateProxy->OnPostSyncTask([this, screens] {
-        if (!POINTER_DEV_MGR.isInit) {
+        if (this->workerThreadId_ != GetThisThreadId() && !POINTER_DEV_MGR.isInit) {
             MMI_HILOGE("skip ScreenModeChange callback");
             return RET_OK;
         }
