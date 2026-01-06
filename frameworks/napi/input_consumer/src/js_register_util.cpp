@@ -332,7 +332,7 @@ void EmitAsyncCallbackWork(sptr<KeyEventMonitorInfo> reportEvent)
     std::lock_guard<std::mutex> lock(reportEvent->envMutex_);
     auto task = [reportEvent] () { UvQueueWorkAsyncCallback(reportEvent); };
     CHKPV(reportEvent->env);
-    int32_t ret = napi_send_event(reportEvent->env, task, napi_eprio_vip);
+    int32_t ret = napi_send_event(reportEvent->env, task, napi_eprio_vip, "onKeyConsumer");
     if (ret != 0) {
         MMI_HILOGE("napi_send_event failed");
         return;
@@ -429,11 +429,11 @@ void EmitSystemHotkey(sptr<CallbackInfo> cb)
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
     int32_t ret = 0;
-    ret = uv_queue_work_with_qos(
+    ret = uv_queue_work_with_qos_internal(
         loop, work,
         [](uv_work_t *work) {
             MMI_HILOGD("uv_queue_work CallHotkeyPromiseWork callback function is called");
-        }, CallHotkeyPromiseWork, uv_qos_user_initiated);
+        }, CallHotkeyPromiseWork, uv_qos_user_initiated, "getAllSystemHotkeys");
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
         cb->DecStrongRef(nullptr);
