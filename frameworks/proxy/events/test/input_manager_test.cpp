@@ -185,6 +185,23 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerTest::SetMouseIconTest(const 
     return pixelMap;
 }
 
+#ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+/**
+ * @tc.name: InputManagerTest_ControlMouseEventToAnco_001
+ * @tc.desc: Test the function ControlMouseEventToAnco
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ControlMouseEventToAnco_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool enable = true;
+    int32_t windowId = 0;
+    int32_t ret = InputManager::GetInstance()->ControlMouseEventToAnco(windowId, enable);
+    EXPECT_EQ(ret, RET_ERR);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
 /**
  * @tc.name: InputManagerTest_SetTouchpadThreeFingersTapSwitch_001
  * @tc.desc: Test the function SetTouchpadThreeFingersTapSwitch
