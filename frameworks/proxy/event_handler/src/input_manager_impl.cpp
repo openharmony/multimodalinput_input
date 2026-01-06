@@ -3115,7 +3115,8 @@ uint32_t InputManagerImpl::WindowInputTypeToFlag(const WindowInfo &window)
         case WindowInputType::NORMAL:
             break;
         case WindowInputType::TRANSMIT_ANTI_AXIS_MOVE:
-            resultFlags |= WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
+            resultFlags |= WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE |
+                           WindowInputPolicy::FLAG_DRAG_DISABLED;
             break;
         case WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE:
             resultFlags |= WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
