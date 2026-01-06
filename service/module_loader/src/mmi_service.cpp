@@ -749,7 +749,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
-    auto ret = RemoveInputEventFilter(-1);
+    auto ret = sMsgHandler_.RemoveInputEventFilter(-1, s->GetPid());
     if (ret != RET_OK) {
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
