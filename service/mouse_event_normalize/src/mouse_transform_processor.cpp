@@ -210,8 +210,8 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
     dalta_time = filterInsertionPoint_.filterDeltaTime;
     HandleFilterMouseEvent(&offset);
-    CalculateOffset(displayInfo, offset);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
+    CalculateOffset(displayInfo, offset);
     if (!enableMouseAleaccelerateBool_) {
         abs_x += offset.dx;
         abs_y += offset.dy;
@@ -424,8 +424,8 @@ bool MouseTransformProcessor::IsWindowRotation(const OLD::DisplayInfo* displayIn
 
 Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
-    Direction displayDirection = DIRECTION0;
     CHKPR(displayInfo, DIRECTION0);
+    Direction displayDirection = displayInfo->direction;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = static_cast<Direction>((
             ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
@@ -444,21 +444,19 @@ Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *d
 void MouseTransformProcessor::CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset)
 {
 #ifndef OHOS_BUILD_EMULATOR
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        Direction direction = GetDisplayDirection(displayInfo);
-        std::negate<double> neg;
-        if (direction == DIRECTION90) {
-            double tmp = offset.dx;
-            offset.dx = offset.dy;
-            offset.dy = neg(tmp);
-        } else if (direction == DIRECTION180) {
-            offset.dx = neg(offset.dx);
-            offset.dy = neg(offset.dy);
-        } else if (direction == DIRECTION270) {
-            double tmp = offset.dx;
-            offset.dx = neg(offset.dy);
-            offset.dy = tmp;
-        }
+    Direction direction = GetDisplayDirection(displayInfo);
+    std::negate<double> neg;
+    if (direction == DIRECTION90) {
+        double tmp = offset.dx;
+        offset.dx = offset.dy;
+        offset.dy = neg(tmp);
+    } else if (direction == DIRECTION180) {
+        offset.dx = neg(offset.dx);
+        offset.dy = neg(offset.dy);
+    } else if (direction == DIRECTION270) {
+        double tmp = offset.dx;
+        offset.dx = neg(offset.dy);
+        offset.dy = tmp;
     }
 #endif // OHOS_BUILD_EMULATOR
 }
