@@ -3354,7 +3354,8 @@ sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindM
             MMI_HILOGI("Create ScreenPointer, screenId=%{public}" PRIu64, sid);
         }
         if (screen->GetType() == OHOS::Rosen::ScreenType::VIRTUAL &&
-            screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND) {
+            screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_EXTEND &&
+            iter->second != nullptr) {
             iter->second->SetVirtualExtend(true);
         }
     }
