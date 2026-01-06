@@ -342,11 +342,11 @@ void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointer
             return;
         }
         MMI_HILOGD("the loop status %{public}d", loop->stop_flag);
-        int32_t ret = uv_queue_work_with_qos(
+        int32_t ret = uv_queue_work_with_qos_internal(
             loop, work,
             executeCallback,
             AniInputMonitorConsumer::AniWorkCallback,
-            uv_qos_user_initiated);
+            uv_qos_user_initiated, "PointerEventByMonitor");
         if (ret != 0) {
             MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
             CleanData(&monitorInfo, &work);
