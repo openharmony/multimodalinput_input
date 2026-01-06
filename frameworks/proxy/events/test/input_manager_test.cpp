@@ -6436,5 +6436,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetLastEventIds, TestSize.Level1)
     EXPECT_TRUE(processedId >= 0);
     EXPECT_TRUE(dispatchedEventId >= 0);
 }
+
+/*
+ * @tc.name: InputManagerTest_GetExternalObject
+ * @tc.desc: GetExternalObject
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetExternalObject, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string pluginName = "phone.keyboard.edmCustomize.202511";
+    sptr<IRemoteObject> pluginRemoteStub;
+    InputManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
+    EXPECT_TRUE(pluginRemoteStub != nullptr);
+}
 } // namespace MMI
 } // namespace OHOS
