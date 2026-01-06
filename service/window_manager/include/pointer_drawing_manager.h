@@ -123,7 +123,7 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
-    void SubscribeScreenModeChange() override;
+    void SubscribeScreenModeChange(uint64_t tid = 0) override;
     void UnSubscribeScreenModeChange() override;
     void RegisterDisplayStatusReceiver() override;
     OLD::DisplayInfo GetCurrentDisplayInfo() override;
@@ -365,6 +365,7 @@ private:
     std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ { nullptr };
     bool isCleared_ { false };
     std::mutex isClearedMtx_;
+    uint64_t workerThreadId_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
