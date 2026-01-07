@@ -40,7 +40,7 @@ public:
     std::atomic<bool> isPointerVisible { false };
     std::atomic<int32_t> mouseId_ { 0 };
     std::string mouseIcons_;
-
+    std::atomic<bool> mouseDisplayState { false };
 private:
     PointerDeviceManager() = default;
     ~PointerDeviceManager() = default;
