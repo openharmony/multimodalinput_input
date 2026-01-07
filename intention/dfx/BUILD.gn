@@ -29,10 +29,7 @@ ohos_source_set("cooperate_dfx") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [
-    "include",
-    "/third_party/cJSON",
-  ]
+  include_dirs = [ "include" ]
 
   sources = [ "src/cooperate_hisysevent.cpp" ]
 
@@ -46,6 +43,7 @@ ohos_source_set("cooperate_dfx") {
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "cJSON:cjson",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
