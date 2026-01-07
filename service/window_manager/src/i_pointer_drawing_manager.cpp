@@ -18,7 +18,7 @@
 #include <common/rs_common_def.h>
 
 #include "define_multimodal.h"
-
+#include "pointer_device_manager.h"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 
@@ -30,6 +30,7 @@ public:
     void SetMouseDisplayState(bool state) override
     {
         mouseDisplayState_ = state;
+        POINTER_DEV_MGR.mouseDisplayState = mouseDisplayState_;
     }
 
     bool GetMouseDisplayState() const override

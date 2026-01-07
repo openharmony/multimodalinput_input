@@ -1499,6 +1499,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
         MMI_HILOGI("The state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
     }
+    POINTER_DEV_MGR.mouseDisplayState = mouseDisplayState_;
 }
 
 bool PointerDrawingManager::GetMouseDisplayState() const
