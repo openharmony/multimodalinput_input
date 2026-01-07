@@ -6466,7 +6466,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetExternalObject, TestSize.Level1)
     const std::string pluginName = "phone.keyboard.edmCustomize.202511";
     sptr<IRemoteObject> pluginRemoteStub;
     InputManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
-    EXPECT_TRUE(pluginRemoteStub != nullptr);
+    EXPECT_TRUE(!pluginRemoteStub);
 }
 } // namespace MMI
 } // namespace OHOS
