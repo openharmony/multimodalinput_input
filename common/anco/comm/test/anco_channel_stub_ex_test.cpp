@@ -54,6 +54,11 @@ public:
     {
         return 0;
     }
+    int32_t UpdateExcludedKeyEventWindow(
+        const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
+    {
+        return 0;
+    }
 };
 } // namespace
 
@@ -192,6 +197,22 @@ HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubUpdateOneHandData, Tes
     MessageParcel data;
     MessageParcel reply;
     EXPECT_EQ(ancoChannel->StubUpdateOneHandData(data, reply), RET_ERR);
+}
+
+/**
+ * @tc.name: AncoChannelStubExTest_StubUpdateExcludedKeyEventWindow
+ * @tc.desc: Test StubUpdateExcludedKeyEventWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AncoChannelStubExTest, AncoChannelStubExTest_StubUpdateExcludedKeyEventWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<AncoChannelStub> ancoChannel = std::make_shared<AncoChannelTest>();
+    ASSERT_NE(ancoChannel, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(ancoChannel->StubUpdateExcludedKeyEventWindow(data, reply), RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS

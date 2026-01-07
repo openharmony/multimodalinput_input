@@ -92,6 +92,14 @@ struct AncoOneHandData : public Parcelable {
     static AncoOneHandData* Unmarshalling(Parcel &parcel);
 };
 
+struct AncoExcludedKeyEventWindow : public Parcelable {
+    std::vector<int32_t> windowIds;
+
+    bool Marshalling(Parcel &parcel) const;
+    bool ReadFromParcel(Parcel &parcel);
+    static AncoExcludedKeyEventWindow* Unmarshalling(Parcel &parcel);
+};
+
 class IAncoConsumer {
 public:
     IAncoConsumer() = default;
@@ -102,6 +110,8 @@ public:
     virtual int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) = 0;
     virtual int32_t SyncKnuckleStatus(bool isKnuckleEnable) = 0;
     virtual int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) = 0;
+    virtual int32_t UpdateExcludedKeyEventWindow(
+        const AncoExcludedKeyEventWindow &excludedKeyEventWindow) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

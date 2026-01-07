@@ -17,6 +17,7 @@
 
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "anco_channel.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerAncoTest"
@@ -41,6 +42,8 @@ public:
     int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
     int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
     int32_t UpdateOneHandData(const AncoOneHandData &oneHandData) override;
+    int32_t UpdateExcludedKeyEventWindow(
+        const AncoExcludedKeyEventWindow &excludedKeyEventWindow) override;
 };
 
 int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -72,6 +75,12 @@ int32_t AncoMonitor::UpdateOneHandData(const AncoOneHandData &oneHandData)
     return RET_OK;
 }
 
+int32_t AncoMonitor::UpdateExcludedKeyEventWindow(
+    const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
+{
+    return RET_OK;
+}
+
 /**
  * @tc.name: InputManagerAncoTest_SyncPointerEvent_001
  * @tc.desc: Verify key event
@@ -85,6 +94,116 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_SyncPointerEvent_001, TestSi
     ASSERT_EQ(InputManager::GetInstance()->AncoAddConsumer(monitor), RET_OK);
     std::this_thread::sleep_for(std::chrono::minutes(1));
     ASSERT_EQ(InputManager::GetInstance()->AncoRemoveConsumer(monitor), RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerAncoTest_UpdateExcludedKeyEventWindow_001
+ * @tc.desc: UpdateExcludedKeyEventWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_UpdateExcludedKeyEventWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto monitor = std::make_shared<AncoMonitor>();
+    AncoExcludedKeyEventWindow data;
+    data.windowIds = {1001, 1002, 1003};
+    ASSERT_EQ(monitor->UpdateExcludedKeyEventWindow(data), RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerAncoTest_AncoExcludedKeyEventWindow_001
+ * @tc.desc: MarshallingAndUnmarshallingTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoExcludedKeyEventWindow originalWindow;
+    originalWindow.windowIds = {1001, 1002, 1003};
+
+    Parcel parcel;
+    ASSERT_TRUE(originalWindow.Marshalling(parcel));
+
+    auto decodedWindow = AncoExcludedKeyEventWindow::Unmarshalling(parcel);
+    ASSERT_NE(decodedWindow, nullptr);
+
+    ASSERT_EQ(decodedWindow->windowIds.size(), 3);
+    ASSERT_EQ(decodedWindow->windowIds[0], 1001);
+    ASSERT_EQ(decodedWindow->windowIds[1], 1002);
+    ASSERT_EQ(decodedWindow->windowIds[2], 1003);
+
+    delete decodedWindow;
+}
+
+/**
+ * @tc.name: InputManagerAncoTest_AncoExcludedKeyEventWindow_002
+ * @tc.desc: EmptyWindowIdsTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoExcludedKeyEventWindow emptyWindow;
+    Parcel parcel;
+
+    ASSERT_TRUE(emptyWindow.Marshalling(parcel));
+    auto decodedWindow = AncoExcludedKeyEventWindow::Unmarshalling(parcel);
+
+    ASSERT_NE(decodedWindow, nullptr);
+    ASSERT_TRUE(decodedWindow->windowIds.empty());
+
+    delete decodedWindow;
+}
+
+/**
+ * @tc.name: InputManagerAncoTest_AncoExcludedKeyEventWindow_003
+ * @tc.desc: ReadFromParcelFailureTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoExcludedKeyEventWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Parcel testParcel;
+    testParcel.WriteInt32(1);
+    auto failedWindow = AncoExcludedKeyEventWindow::Unmarshalling(testParcel);
+
+    ASSERT_EQ(failedWindow, nullptr);
+}
+
+/**
+ * @tc.name: InputManagerAncoTest_AncoChannel_001
+ * @tc.desc: UpdateExcludedKeyEventWindowNormalTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoChannel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AncoExcludedKeyEventWindow testWindow;
+    testWindow.windowIds = {1001, 1002, 1003};
+    auto ancoMonitor = std::make_shared<AncoMonitor>();
+    sptr<IAncoChannel> channel = sptr<AncoChannel>::MakeSptr(ancoMonitor);
+    auto result = channel->UpdateExcludedKeyEventWindow(testWindow);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerAncoTest_AncoChannel_002
+ * @tc.desc: UpdateExcludedKeyEventWindowNullConsumerTest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_AncoChannel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    sptr<IAncoChannel> channel = sptr<AncoChannel>::MakeSptr(nullptr);
+    AncoExcludedKeyEventWindow testWindow;
+    auto result = channel->UpdateExcludedKeyEventWindow(testWindow);
+    ASSERT_EQ(result, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS

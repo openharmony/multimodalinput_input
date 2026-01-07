@@ -64,5 +64,14 @@ ErrCode AncoChannel::SyncKnuckleStatus(bool isKnuckleEnable)
     CHKPR(consumer_, RET_ERR);
     return consumer_->SyncKnuckleStatus(isKnuckleEnable);
 }
+
+ErrCode AncoChannel::UpdateExcludedKeyEventWindow(
+    const AncoExcludedKeyEventWindow &excludedKeyEventWindow)
+{
+    if (consumer_ == nullptr) {
+        return RET_ERR;
+    }
+    return consumer_->UpdateExcludedKeyEventWindow(excludedKeyEventWindow);
+}
 } // namespace MMI
 } // namespace OHOS
