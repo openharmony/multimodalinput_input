@@ -556,6 +556,17 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SubscribeScreenM
 }
 
 /**
+ * @tc.name: CursorDrawingComponentTest_UnSubscribeScreenModeChange_001
+ * @tc.desc: Test UnSubscribeScreenModeChange
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnSubscribeScreenModeChange_001, TestSize.Level1)
+{
+    EXPECT_NO_FATAL_FAILURE(instance_->UnSubscribeScreenModeChange());
+}
+
+/**
  * @tc.name: CursorDrawingComponentTest_RegisterDisplayStatusReceiver_001
  * @tc.desc: Test RegisterDisplayStatusReceiver
  * @tc.type: FUNC
@@ -634,6 +645,20 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_002, Test
     instance_->isLoaded_ = true;
     ASSERT_NE(instance_->soHandle_, nullptr);
     EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_ResetUnloadTimer_001
+ * @tc.desc: Test ResetUnloadTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ResetUnloadTimer_001, TestSize.Level1)
+{
+    instance_ = &CursorDrawingComponent::GetInstance();
+    ASSERT_NE(instance_, nullptr);
+    instance_->timerId_ = -1;
+    EXPECT_NO_FATAL_FAILURE(instance_->ResetUnloadTimer());
 }
 
 /**
@@ -764,6 +789,20 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerIte
     pointerItem.SetPointerId(pointerId);
     instance_->UpdatePointerItemCursorInfo(pointerItem);
     ASSERT_EQ(pointerItem.GetPointerId(), pointerId);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetWorkerThreadId_001
+ * @tc.desc: Test SetWorkerThreadId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadId_001, TestSize.Level1)
+{
+    instance_->isLoaded_ = true;
+    uint64_t tid = 1;
+    instance_->SetWorkerThreadId(tid);
+    ASSERT_EQ(instance_->workerThreadId_, tid);
 }
 } // namespace MMI
 } // namespace OHOS
