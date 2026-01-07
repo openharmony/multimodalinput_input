@@ -637,6 +637,21 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_002, Test
 }
 
 /**
+ * @tc.name: CursorDrawingComponentTest_ResetUnloadTimer_001
+ * @tc.desc: Test ResetUnloadTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ResetUnloadTimer_001, TestSize.Level1)
+{
+    instance_ = &CursorDrawingComponent::GetInstance();
+    ASSERT_NE(instance_, nullptr);
+    instance_->timerId_ = -1;
+    instance_->ResetUnloadTimer();
+    ASSERT_NE(instance_->timerId_, -1);
+}
+
+/**
  * @tc.name: CursorDrawingComponentTest_GetMouseIconPath
  * @tc.desc: Test GetMouseIconPath
  * @tc.type: FUNC
@@ -764,6 +779,20 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdatePointerIte
     pointerItem.SetPointerId(pointerId);
     instance_->UpdatePointerItemCursorInfo(pointerItem);
     ASSERT_EQ(pointerItem.GetPointerId(), pointerId);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetWorkerThreadId_001
+ * @tc.desc: Test SetWorkerThreadId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadId_001, TestSize.Level1)
+{
+    instance_->isLoaded_ = true;
+    uint64_t tid = 1;
+    instance_->SetWorkerThreadId(tid);
+    ASSERT_EQ(instance_->workerThreadId_, tid);
 }
 } // namespace MMI
 } // namespace OHOS
