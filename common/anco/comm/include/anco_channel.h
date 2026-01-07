@@ -34,6 +34,8 @@ public:
     ErrCode UpdateWindowInfo(const AncoWindows& windows) override;
     ErrCode SyncKnuckleStatus(bool isKnuckleEnable) override;
     ErrCode UpdateOneHandData(const AncoOneHandData &oneHandData) override;
+    ErrCode UpdateExcludedKeyEventWindow(
+        const AncoExcludedKeyEventWindow &excludedKeyEventWindow) override;
 
 private:
     std::shared_ptr<IAncoConsumer> consumer_;
