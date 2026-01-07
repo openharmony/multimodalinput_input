@@ -271,7 +271,7 @@ public:
     void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
     int32_t DeliverNonce(const std::string &nonce);
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
-    void ControlMouseEventToAnco(int32_t windowId, bool enable);
+    int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 private:
     int32_t PackScreensInfo(NetPacket &pkt, const std::vector<ScreenInfo>& screens);

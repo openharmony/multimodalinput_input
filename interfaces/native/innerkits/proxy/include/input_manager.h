@@ -966,7 +966,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
-    void ControlMouseEventToAnco(int32_t windowId, bool enable);
+    int32_t ControlMouseEventToAnco(int32_t windowId, bool enable);
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void SimulateInputEventExt(std::shared_ptr<KeyEvent> keyEvent);
