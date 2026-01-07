@@ -298,9 +298,7 @@ int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<Pointer
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
         if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-            if (POINTER_DEV_MGR.isInit) {
-                CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
-            }
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
         } else if ((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
             (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {
             if (POINTER_DEV_MGR.isInit && !CursorDrawingComponent::GetInstance().IsPointerVisible()) {
