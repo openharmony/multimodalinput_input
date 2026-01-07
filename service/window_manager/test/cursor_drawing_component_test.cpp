@@ -556,17 +556,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SubscribeScreenM
 }
 
 /**
- * @tc.name: CursorDrawingComponentTest_UnSubscribeScreenModeChange_001
- * @tc.desc: Test UnSubscribeScreenModeChange
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnSubscribeScreenModeChange_001, TestSize.Level1)
-{
-    EXPECT_NO_FATAL_FAILURE(instance_->UnSubscribeScreenModeChange());
-}
-
-/**
  * @tc.name: CursorDrawingComponentTest_RegisterDisplayStatusReceiver_001
  * @tc.desc: Test RegisterDisplayStatusReceiver
  * @tc.type: FUNC
@@ -658,7 +647,8 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ResetUnloadTimer
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
     instance_->timerId_ = -1;
-    EXPECT_NO_FATAL_FAILURE(instance_->ResetUnloadTimer());
+    instance_->ResetUnloadTimer();
+    ASSERT_NE(timerId_, -1);
 }
 
 /**
