@@ -902,6 +902,7 @@ int32_t KnuckleDrawingManager::ClearBrushCanvas()
 {
     CALL_DEBUG_ENTER;
     CHKPR(brushCanvasNode_, RET_ERR);
+    brushCanvasNode_->RemoveAllAnimations();
 #ifndef USE_ROSEN_DRAWING
     auto brushCanvas = static_cast<Rosen::RSRecordingCanvas *>(brushCanvasNode_->
         BeginRecording(scaleW_, scaleH_));
