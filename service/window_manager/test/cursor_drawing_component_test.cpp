@@ -648,7 +648,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ResetUnloadTimer
     ASSERT_NE(instance_, nullptr);
     instance_->timerId_ = -1;
     instance_->ResetUnloadTimer();
-    ASSERT_NE(timerId_, -1);
+    ASSERT_NE(instance_->timerId_, -1);
 }
 
 /**
