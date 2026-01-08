@@ -2288,6 +2288,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         MMI_HILOGE("Set pointer size failed, code:%{public}d", ret);
         return ret;
     }
+    MMI_HILOGI("Set pointer size successfully, size:%{public}d", size);
 
     CHKPR(GetSurfaceNode(), RET_OK);
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
