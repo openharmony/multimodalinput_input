@@ -4196,6 +4196,114 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Create_001
 }
 
 /**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_Create_002
+ * @tc.desc: Test OH_Input_CustomCursor_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Create_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative *pixelmap = nullptr;
+    OH_Pixelmap_InitializationOptions *options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    EXPECT_NE(options, nullptr);
+    OH_PixelmapInitializationOptions_SetWidth(options, 1);
+    OH_PixelmapInitializationOptions_SetHeight(options, 1);
+    Image_ErrorCode errorCode = OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap);
+    EXPECT_EQ(errorCode, IMAGE_SUCCESS);
+    int32_t anchorX = -1;
+    int32_t anchorY = -1;
+    Input_CustomCursor *customCursor = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_PixelmapInitializationOptions_Release(options);
+    OH_PixelmapNative_Release(pixelmap);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_Create_003
+ * @tc.desc: Test OH_Input_CustomCursor_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Create_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative *pixelmap = nullptr;
+    OH_Pixelmap_InitializationOptions *options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    EXPECT_NE(options, nullptr);
+    OH_PixelmapInitializationOptions_SetWidth(options, 256);
+    OH_PixelmapInitializationOptions_SetHeight(options, 256);
+    Image_ErrorCode errorCode = OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap);
+    EXPECT_EQ(errorCode, IMAGE_SUCCESS);
+    int32_t anchorX = 257;
+    int32_t anchorY = 257;
+    Input_CustomCursor *customCursor = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_PixelmapInitializationOptions_Release(options);
+    OH_PixelmapNative_Release(pixelmap);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_Create_004
+ * @tc.desc: Test OH_Input_CustomCursor_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Create_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative *pixelmap = nullptr;
+    OH_Pixelmap_InitializationOptions *options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    EXPECT_NE(options, nullptr);
+    OH_PixelmapInitializationOptions_SetWidth(options, 257);
+    OH_PixelmapInitializationOptions_SetHeight(options, 257);
+    Image_ErrorCode errorCode = OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap);
+    EXPECT_EQ(errorCode, IMAGE_SUCCESS);
+    int32_t anchorX = -1;
+    int32_t anchorY = -1;
+    Input_CustomCursor *customCursor = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_PixelmapInitializationOptions_Release(options);
+    OH_PixelmapNative_Release(pixelmap);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_Create_005
+ * @tc.desc: Test OH_Input_CustomCursor_Create
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Create_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative *pixelmap = nullptr;
+    OH_Pixelmap_InitializationOptions *options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    EXPECT_NE(options, nullptr);
+    OH_PixelmapInitializationOptions_SetWidth(options, 75);
+    OH_PixelmapInitializationOptions_SetHeight(options, 75);
+    Image_ErrorCode errorCode = OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap);
+    EXPECT_EQ(errorCode, IMAGE_SUCCESS);
+    int32_t anchorX = 80;
+    int32_t anchorY = 80;
+    Input_CustomCursor *customCursor = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    EXPECT_EQ(customCursor, nullptr);
+    OH_PixelmapInitializationOptions_Release(options);
+    OH_PixelmapNative_Release(pixelmap);
+}
+
+/**
  * @tc.name: OHInputManagerTest_OH_Input_CursorConfig_Create_001
  * @tc.desc: Test OH_Input_CursorConfig_Create
  * @tc.type: FUNC
@@ -4266,10 +4374,10 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_002, Te
     anchorX = 32;
     anchorY = 32;
     Input_CustomCursor* customCursor2 = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
-    EXPECT_NE(customCursor2, nullptr);
+    EXPECT_EQ(customCursor2, nullptr);
     bool isfollowSystem = true;
     Input_CursorConfig* cursorConfig = OH_Input_CursorConfig_Create(isfollowSystem);
-    EXPECT_NE(cursorConfig, nullptr);
+    EXPECT_EQ(cursorConfig, nullptr);
     int32_t windowId = -1;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
@@ -4277,7 +4385,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_002, Te
     res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     res = OH_Input_SetCustomCursor(windowId, customCursor2, cursorConfig);
-    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
+    EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     OH_Input_CustomCursor_Destroy(&customCursor);
     OH_Input_CustomCursor_Destroy(&customCursor2);
     OH_Input_CursorConfig_Destroy(&cursorConfig);
