@@ -248,6 +248,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
     };
     if ((napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc)) != napi_ok) {
         MMI_HILOGE("%{public}s failed", std::string("napi_define_properties()").c_str());
+        return nullptr;
     }
     return exports;
 }
