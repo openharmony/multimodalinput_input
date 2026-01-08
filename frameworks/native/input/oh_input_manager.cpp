@@ -90,7 +90,7 @@ struct Input_TouchEvent {
     int32_t windowX { 0 };
     int32_t windowY { 0 };
     int64_t downTime { 0 };
-    int32_t toolType { 0 };
+    Input_TouchEventToolType toolType { Input_TouchEventToolType::TOOL_TYPE_FINGER };
     double pressure { 0.0 };
 };
 
@@ -900,7 +900,7 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     }
     if (touchEvent->toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
         touchEvent->pressure <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
-        item.SetToolType(touchEvent->toolType);
+        item.SetToolType(static_cast<int32_t>(touchEvent->toolType));
     }
     item.SetPointerId(id);
     g_touchEvent->SetPointerId(id);
@@ -1649,7 +1649,11 @@ static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     touchEvent->windowX = item.GetWindowX();
     touchEvent->windowY = item.GetWindowY();
     touchEvent->downTime = item.GetDownTime();
-    touchEvent->toolType = item.GetToolType();
+    auto toolType = item.GetToolType();
+    if (toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
+        toolType <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        touchEvent->toolType = static_cast<Input_TouchEventToolType>(toolType);
+    }
     touchEvent->pressure = item.GetPressure();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_touchMonitorCallbacks) {
@@ -2105,7 +2109,11 @@ static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     touchEvent->windowX = item.GetWindowX();
     touchEvent->windowY = item.GetWindowY();
     touchEvent->downTime = item.GetDownTime();
-    touchEvent->toolType = item.GetToolType();
+    auto toolType = item.GetToolType();
+    if (toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
+        toolType <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        touchEvent->toolType = static_cast<Input_TouchEventToolType>(toolType);
+    }
     touchEvent->pressure = item.GetPressure();
     g_pointerInterceptorCallback->touchCallback(touchEvent);
     OH_Input_DestroyTouchEvent(&touchEvent);
