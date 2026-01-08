@@ -243,8 +243,13 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event *event)
         auto touchpadEvent = libinput_event_get_touchpad_event(event);
         CHKPF(touchpadEvent);
         int32_t toolType = libinput_event_touchpad_get_tool_type(touchpadEvent);
+        double pressure = libinput_event_touchpad_get_pressure(touchpadEvent);
         if (toolType == MT_TOOL_PALM) {
             MMI_HILOGI("Touchpad event is palm");
+            return false;
+        }
+        if (std::fabs(SYNC_TOUCHPAD_SETTINGS - pressure) <= std::numeric_limits<double>::epsilon()) {
+            MMI_HILOGD("Touchpad event is settings sync");
             return false;
         }
     }
@@ -254,6 +259,9 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event *event)
     }
     if (type == LIBINPUT_EVENT_POINTER_TAP) {
         return IsTouchpadTapMistouch(event);
+    }
+    if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
+        return IsTouchpadMotionMistouch(event);
     }
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         return IsTouchpadPointerMotionMistouch(event);
