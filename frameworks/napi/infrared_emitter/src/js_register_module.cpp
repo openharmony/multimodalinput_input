@@ -246,7 +246,10 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getInfraredFrequencies", GetInfraredFrequencies),
         DECLARE_NAPI_FUNCTION("transmitInfrared", TransmitInfrared)
     };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    // NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    if ((napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc)) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string("napi_define_properties()").c_str());
+    }
     return exports;
 }
 EXTERN_C_END

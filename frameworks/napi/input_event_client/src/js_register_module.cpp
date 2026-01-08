@@ -881,7 +881,10 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("injectJoystickEvent", InjectJoystickEvent),
         DECLARE_NAPI_FUNCTION("permitInjection", PermitInjection),
     };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    // NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    if ((napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc)) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string("napi_define_properties()").c_str());
+    }
     return exports;
 }
 EXTERN_C_END
