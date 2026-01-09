@@ -118,7 +118,7 @@ protected:
     void MarkConsumed(int32_t eventId);
 
 private:
-    void initFuncInfo(); 
+    void initFuncInfo();
     void OnPerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnTouchCallback(std::shared_ptr<PointerEvent> pointerEvent);
     void OnTouchNeedResultCallback(std::shared_ptr<PointerEvent> pointerEvent, bool &retValue);
@@ -149,7 +149,7 @@ private:
     mutable int32_t flowCtrl_ { 0 };
 
     mutable std::queue<std::shared_ptr<PointerEvent>> evQueue_;
-    std::map<MONITORFUNTYPE, FuncCallbackInfo> funcTypeInfo_; 
+    std::map<MONITORFUNTYPE, FuncCallbackInfo> funcTypeInfo_;
 };
 } // namespace MMI
 } // namespace OHOS

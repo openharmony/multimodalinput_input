@@ -42,7 +42,7 @@ static TaiheInfraredFrequency InfraredFrequencyToAni(OHOS::MMI::InfraredFrequenc
     return frequency;
 }
 
-std::string HandleError(int32_t ret, int32_t &errorCode) 
+std::string HandleError(int32_t ret, int32_t &errorCode)
 {
     std::string result = "";
     if (ret == RET_OK) {

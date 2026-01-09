@@ -125,7 +125,7 @@ TaiheInputDeviceData TaiheInputDeviceUtils::ConverterInputDevice(std::shared_ptr
     result.phys = std::string_view(device->GetPhys());
     result.uniq = std::string_view(device->GetUniq());
     result.isVirtual = device->IsVirtual();
-    result.isLocal = device->IsLocal();  
+    result.isLocal = device->IsLocal();
     return result;
 }
 

@@ -86,7 +86,7 @@ InputDeviceData GetDeviceAsync(int32_t deviceId)
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
-            codeMsg.msg = "Unknown error"; 
+            codeMsg.msg = "Unknown error";
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get device, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
