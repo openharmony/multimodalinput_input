@@ -82,10 +82,11 @@ InputDeviceData GetDeviceAsync(int32_t deviceId)
         _device = device;
     };
     int32_t ret = InputManager_t::GetInstance()->GetDevice(deviceId, callback);
-    if (ret != OTHER_ERROR && ret != RET_OK) {
+    if (ret != RET_OK) {
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
+            codeMsg.msg = "Unknown error"; 
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get device, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
@@ -126,6 +127,7 @@ InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
     if (size < MIN_N_SIZE || size > MAX_N_SIZE) {
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(COMMON_PARAMETER_ERROR, codeMsg)) {
+            codeMsg.msg = "Unknown error";
             MMI_HILOGE("Error code %{public}d not found", COMMON_PARAMETER_ERROR);
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, codeMsg.msg);
@@ -144,8 +146,8 @@ InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
     if (ret != RET_OK) {
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
+            codeMsg.msg = "Unknown error";
             MMI_HILOGE("Error code %{public}d not found", ret);
-            return ::taihe::array<bool>(nullptr, 0);
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to support keys, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
@@ -298,7 +300,7 @@ bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
             return resultState;
         }
         taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set functionKey state, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
+        MMI_HILOGE("failed to get functionKey state, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         return resultState;
     }
     return resultState;
@@ -339,34 +341,27 @@ bool ANIPromiseVoidCallback(ani_env* env, ani_resolver deferred, int32_t errCode
 
 uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
 {
-    CALL_DEBUG_ENTER;
     if (deviceId < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid deviceId!");
         MMI_HILOGE("Invalid deviceId");
         return 0;
     }
     ani_env *env = taihe::get_env();
-    CHKPR(env, 0);
+    if (!env) {
+        MMI_HILOGE("env is null");
+        return 0;
+    }
     ani_status status = ANI_OK;
     ani_object promise;
     ani_resolver deferred = nullptr;
-    ani_vm *vm = nullptr;
-    CHKFR(ANI_OK == env->GetVM(&vm), 0, "env GetVM faild");
     if ((status = env->Promise_New(&deferred, &promise)) != ANI_OK) {
         MMI_HILOGE("create promise object failed, status = %{public}d", status);
         return reinterpret_cast<uintptr_t>(promise);
     }
-    std::function<void(int32_t)> callback = [vm, deferred](int32_t errcode) {
+    std::function<void(int32_t)> callback = [env, deferred](int32_t errcode) {
         CALL_DEBUG_ENTER;
-        auto etsVm = vm;
-        ani_env* etsEnv;
-        ani_status aniResult = ANI_ERROR;
-        ani_options aniArgs { 0, nullptr };
-        aniResult = etsVm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &etsEnv);
-        CHKFRV(ANI_OK == aniResult, "AttachCurrentThread error");
+        ani_env* etsEnv = env;
         ANIPromiseVoidCallback(etsEnv, deferred, errcode);
-        aniResult = etsVm->DetachCurrentThread();
-        CHKFRV(ANI_OK == aniResult, "DetachCurrentThread error");
     };
     int32_t ret = InputManager_t::GetInstance()->SetInputDeviceEnabled(deviceId, enabled, callback);
     if (ret != RET_OK) {
@@ -403,7 +398,7 @@ TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
     return kType;
 }
 
-TaiheKeyboardType GetKeyboardTypeAsync(int32_t deviceId)
+TaiheKeyboardType GetKeyboardTypeSyncWrapper(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     return GetKeyboardTypeSync(deviceId);
@@ -417,9 +412,10 @@ TaiheKeyboardType GetKeyboardTypeAsync(int32_t deviceId)
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(COMMON_PARAMETER_ERROR, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", COMMON_PARAMETER_ERROR);
+            codeMsg.msg = "Unknown error";
         }
         taihe::set_business_error(COMMON_PARAMETER_ERROR, codeMsg.msg);
-        MMI_HILOGE("param is invaild, code:%{public}d message: %{public}s",
+        MMI_HILOGE("param is invalid, code:%{public}d message: %{public}s",
             COMMON_PARAMETER_ERROR, codeMsg.msg.c_str());
         return ::taihe::array<bool>(nullptr, 0);
     }
@@ -434,6 +430,7 @@ TaiheKeyboardType GetKeyboardTypeAsync(int32_t deviceId)
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
+            codeMsg.msg = "Unknown error";
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to support keys sync, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
@@ -453,10 +450,11 @@ InputDeviceData GetDeviceInfoSync(int32_t deviceId)
     std::shared_ptr<InputDevice_t> _device = std::make_shared<InputDevice_t>();
     auto callback = [&_device](std::shared_ptr<InputDevice_t> device) { _device = device; };
     int32_t ret = InputManager_t::GetInstance()->GetDevice(deviceId, callback);
-    if (ret != OTHER_ERROR && ret != RET_OK) {
+    if (ret != RET_OK) {
         TaiheError_t codeMsg;
         if (!TaiheConverter::GetApiError(ret, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", ret);
+            codeMsg.msg = "Unknown error";
         }
         taihe::set_business_error(ret, codeMsg.msg);
         MMI_HILOGE("failed to get device info, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
@@ -498,7 +496,7 @@ TH_EXPORT_CPP_API_GetIntervalSinceLastInputAsync(GetIntervalSinceLastInputAsync)
 TH_EXPORT_CPP_API_SetFunctionKeyEnabledAsync(SetFunctionKeyEnabledAsync);
 TH_EXPORT_CPP_API_IsFunctionKeyEnabledAsync(IsFunctionKeyEnabledAsync);
 TH_EXPORT_CPP_API_SetInputDeviceEnablePromise(SetInputDeviceEnablePromise);
-TH_EXPORT_CPP_API_GetKeyboardTypeAsync(GetKeyboardTypeAsync);
+TH_EXPORT_CPP_API_GetKeyboardTypeSyncWrapper(GetKeyboardTypeSyncWrapper);
 TH_EXPORT_CPP_API_GetKeyboardTypeSync(GetKeyboardTypeSync);
 TH_EXPORT_CPP_API_SupportKeysSync(SupportKeysSync);
 TH_EXPORT_CPP_API_GetDeviceInfoSync(GetDeviceInfoSync);

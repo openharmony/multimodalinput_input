@@ -13,22 +13,29 @@
  * limitations under the License.
  */
 
+#include "mmi_log.h"
 #include "ohos.multimodalInput.gestureEvent.ani.hpp"
-#include "define_multimodal.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "gestureEvent_ani_constructor"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
-    CHKPR(vm, ANI_ERROR);
-    CHKPR(result, ANI_ERROR);
-    ani_env *env;
+    if (!vm) {
+        MMI_HILOGE("vm is null");
+        return ANI_ERROR;
+    }
+    if (!result) {
+        MMI_HILOGE("result is null");
+        return ANI_ERROR;
+    }
+    ani_env *env = nullptr;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         MMI_HILOGE("Failed to get ANI environment");
         return ANI_ERROR;
     }
-    if (int32_t ret = ohos::multimodalInput::gestureEvent::ANIRegister(env) != ANI_OK) {
+    int32_t ret = ohos::multimodalInput::gestureEvent::ANIRegister(env);
+    if (ret != ANI_OK) {
         MMI_HILOGE("ANIRegister failed, error: %{public}d", ret);
         return ANI_ERROR;
     }

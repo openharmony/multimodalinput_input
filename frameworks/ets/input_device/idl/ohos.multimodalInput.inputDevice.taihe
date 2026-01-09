@@ -145,7 +145,7 @@ function SetInputDeviceEnablePromise(deviceId: i32, enabled: bool):@sts_type("Pr
 function GetKeyboardTypeSync(deviceId: i32): KeyboardType;
 @gen_async("getKeyboardType")
 @gen_promise("getKeyboardType")
-function GetKeyboardTypeAsync(deviceId: i32): KeyboardType;
+function GetKeyboardTypeSyncWrapper(deviceId: i32): KeyboardType;
 
 function SupportKeysSync(deviceId: i32, keys: Array<KeyCode>): Array<bool>;
 

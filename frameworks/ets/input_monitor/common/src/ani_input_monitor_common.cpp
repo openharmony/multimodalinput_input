@@ -24,51 +24,54 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t INJECTION_EVENT_FLAG { 10000 };
+}
 int32_t TaiheMonitorConverter::TouchEventToTaihe(const PointerEvent &pointerEvent, TaiheTouchEvent &out)
 {
     CALL_DEBUG_ENTER;
-    auto ret = InputEventToTaihe(pointerEvent, out.base);
-    CHKFR(ret == RET_OK, RET_ERR, "InputEventToTaihe failed");
-    ret = TouchActionToTaihe(pointerEvent.GetPointerAction(), out.action);
-    CHKFR(ret == RET_OK, RET_ERR, "TouchActionToTaihe failed");
+    if (InputEventToTaihe(pointerEvent, out.base) != RET_OK) {
+        MMI_HILOGE("InputEventToTaihe failed");
+        return RET_ERR;
+    }
+    if (TouchActionToTaihe(pointerEvent.GetPointerAction(), out.action) != RET_OK) {
+        MMI_HILOGE("TouchActionToTaihe failed");
+        return RET_ERR;
+    }
     std::vector<TaiheTouch> vecTouches;
     for (auto item : pointerEvent.GetPointerIds()) {
         PointerEvent::PointerItem pointerItem;
         if (!pointerEvent.GetPointerItem(item, pointerItem)) {
             MMI_HILOGE("Get pointer item failed");
-            return ret;
+            return RET_ERR;
         }
         if (pointerItem.GetPointerId() == pointerEvent.GetPointerId()) {
-            ret = TouchToTaihe(pointerItem, out.touch);
-            if (ret!= RET_OK) {
+            if (TouchToTaihe(pointerItem, out.touch) != RET_OK) {
                 MMI_HILOGE("TouchToTaihe failed");
                 return RET_ERR;
             }
         }
         auto taiheTouch = TaiheTouch {.toolType = TaiheToolType::key_t::FINGER};
-        ret = TouchToTaihe(pointerItem, taiheTouch);
-        if (ret!= RET_OK) {
+        if (TouchToTaihe(pointerItem, taiheTouch) != RET_OK) {
             MMI_HILOGE("TouchToTaihe failed");
             return RET_ERR;
         }
         vecTouches.push_back(taiheTouch);
     }
     out.touches = taihe::array<TaiheTouch>(vecTouches);
-    ret = SourceTypeToTaihe(pointerEvent.GetSourceType(), out.sourceType);
-    if (ret!= RET_OK) {
+    if (SourceTypeToTaihe(pointerEvent.GetSourceType(), out.sourceType) != RET_OK) {
         MMI_HILOGE("SourceTypeToTaihe failed");
         return RET_ERR;
     }
     auto fixedmode = TaiheFixedMode::from_value(RET_ERR);
-    ret = FixedModeToTaihe(pointerEvent.GetFixedMode(), fixedmode);
-    if (ret != RET_OK) {
-        MMI_HILOGE("FixedModeToTaihe failed");
+    if (TouchActionToTaihe(pointerEvent.GetPointerAction(), out.action) != RET_OK) {
+        MMI_HILOGE("TouchActionToTaihe failed");
         return RET_ERR;
     }
     out.fixedMode = taihe::optional<TaiheFixedMode>(std::in_place_t{}, fixedmode);
     out.isInject = taihe::optional<bool>(std::in_place,
         const_cast<PointerEvent*>(&pointerEvent)->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
-    return ret;
+    return RET_OK;
 }
 
 int32_t TaiheMonitorConverter::InputEventToTaihe(const InputEvent &inputEvent, TaiheInputEvent &out)
@@ -83,7 +86,7 @@ int32_t TaiheMonitorConverter::InputEventToTaihe(const InputEvent &inputEvent, T
 
 int32_t TaiheMonitorConverter::TouchActionToTaihe(int32_t action, TaiheTouchAction &out)
 {
-    bool ret = RET_OK;
+    int32_t ret = RET_OK;
     switch (action) {
         case PointerEvent::POINTER_ACTION_CANCEL: {
             out = TaiheTouchAction::key_t::CANCEL;
@@ -362,19 +365,22 @@ int32_t TaiheMonitorConverter::SwipeInwardToTaihe(const PointerEvent &pointerEve
     auto type = TaiheGestureActionType::from_value(RET_ERR);
     auto ret = SwipeActionToTaihe(pointerEvent.GetPointerAction(), type);
     if (ret != RET_OK) {
-        return ret;
+        return RET_ERR;
     }
     out.type = type;
     PointerEvent::PointerItem pointeritem;
     int32_t pointerId = 0;
-    ret = pointerEvent.GetPointerItem(pointerId, pointeritem);
-    if (ret != RET_OK) {
+    if (INJECTION_EVENT_FLAG <= pointerEvent.GetPointerId()) {
+        pointerId = pointerEvent.GetPointerId();
+    }
+    
+    if (!pointerEvent.GetPointerItem(pointerId, pointeritem)) {
         MMI_HILOGE("Can't find this pointerItem");
-        return ret;
+        return RET_ERR;
     }
     out.x =  pointeritem.GetDisplayX();
     out.y =  pointeritem.GetDisplayY();
-    return ret;
+    return RET_OK;
 }
 
 int32_t TaiheMonitorConverter::ThreeFingersSwipeToTaihe(const PointerEvent &pointerEvent, TaiheThreeFingersSwipe &out)
@@ -383,19 +389,21 @@ int32_t TaiheMonitorConverter::ThreeFingersSwipeToTaihe(const PointerEvent &poin
     auto ret = SwipeActionToTaihe(pointerEvent.GetPointerAction(), type);
     if (ret != RET_OK) {
         MMI_HILOGE("SwipeActionToTaihe error");
-        return ret;
+        return RET_ERR;
     }
     out.type = type;
     PointerEvent::PointerItem pointeritem;
     int32_t pointerId = 0;
-    ret = pointerEvent.GetPointerItem(pointerId, pointeritem);
-    if (ret != RET_OK) {
+    if (INJECTION_EVENT_FLAG <= pointerEvent.GetPointerId()) {
+        pointerId = pointerEvent.GetPointerId();
+    }
+    if (!pointerEvent.GetPointerItem(pointerId, pointeritem)) {
         MMI_HILOGE("Can't find this pointerItem");
-        return ret;
+        return RET_ERR;
     }
     out.x =  pointeritem.GetDisplayX();
     out.y =  pointeritem.GetDisplayY();
-    return ret;
+    return RET_OK;
 }
 
 int32_t TaiheMonitorConverter::FourFingersSwipeToTaihe(const PointerEvent &pointerEvent, TaiheFourFingersSwipe &out)
@@ -404,19 +412,21 @@ int32_t TaiheMonitorConverter::FourFingersSwipeToTaihe(const PointerEvent &point
     auto ret = SwipeActionToTaihe(pointerEvent.GetPointerAction(), type);
     if (ret != RET_OK) {
         MMI_HILOGE("SwipeActionToTaihe error");
-        return ret;
+        return RET_ERR;
     }
     out.type = type;
     PointerEvent::PointerItem pointeritem;
     int32_t pointerId = 0;
-    ret = pointerEvent.GetPointerItem(pointerId, pointeritem);
-    if (ret != RET_OK) {
+    if (INJECTION_EVENT_FLAG <= pointerEvent.GetPointerId()) {
+        pointerId = pointerEvent.GetPointerId();
+    }
+    if (!pointerEvent.GetPointerItem(pointerId, pointeritem)) {
         MMI_HILOGE("Can't find this pointerItem");
-        return ret;
+        return RET_ERR;
     }
     out.x =  pointeritem.GetDisplayX();
     out.y =  pointeritem.GetDisplayY();
-    return ret;
+    return RET_OK;
 }
 
 int32_t TaiheMonitorConverter::TouchGestureEventToTaihe(const PointerEvent &pointerEvent, TaiheTouchGestureEvent &out)
@@ -543,28 +553,41 @@ int32_t TaiheMonitorConverter::KeyEventActionToTaihe(int32_t action, TaiheKeyEve
 
 int32_t TaiheMonitorConverter::TaiheKeyEventToTaihe(const KeyEvent &keyEvent, TaiheKeyEvent &out)
 {
-    CALL_DEBUG_ENTER;
     auto action = TaiheKeyEventAction::from_value(RET_ERR);
-    auto ret = KeyEventActionToTaihe(keyEvent.GetKeyAction(), action);
-    CHKFR(ret == RET_OK, ret, "TaiheKeyEventToTaihe error");
+    if (KeyEventActionToTaihe(keyEvent.GetKeyAction(), action) != RET_OK) {
+        MMI_HILOGE("KeyEventActionToTaihe error");
+        return RET_ERR;
+    }
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent.GetKeyItem();
-    CHKFR(keyItem != std::nullopt, RET_ERR, "The keyItem is nullopt");
-    ret = TaiheKeyEventKeyToTaihe(keyItem.value(), out.key);
-    CHKFR(ret == RET_OK, ret, "TaiheKeyEventToTaihe error");
+    if (keyItem == std::nullopt) {
+        MMI_HILOGE("The keyItem is nullopt");
+        return RET_ERR;
+    }
+    if (TaiheKeyEventKeyToTaihe(keyItem.value(), out.key) != RET_OK) {
+        MMI_HILOGE("TaiheKeyEventKeyToTaihe error");
+        return RET_ERR;
+    }
     out.unicodeChar = static_cast<int32_t>(keyItem->GetUnicode());
-    std::vector<int32_t> pressedKeys = keyEvent.GetPressedKeys();
     std::vector<TaiheKeyEventKey> keys;
-    for (const auto &pressedKeyCode : pressedKeys) {
+    for (const auto &pressedKeyCode : keyEvent.GetPressedKeys()) {
         std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent.GetKeyItem(pressedKeyCode);
-        CHKFR(pressedKeyItem != std::nullopt, RET_ERR, "The pressedKeyItem is nullopt");
+        if (pressedKeyItem == std::nullopt) {
+            MMI_HILOGE("The keyItem is nullopt");
+            return RET_ERR;
+        }
         auto taiheKey = TaiheKeyEventKey{ .code = KeyCode::key_t::KEYCODE_UNKNOWN };
-        ret = TaiheKeyEventKeyToTaihe(pressedKeyItem.value(), taiheKey);
-        CHKFR(ret == RET_OK, ret, "TaiheKeyEventToTaihe error");
+        if (TaiheKeyEventKeyToTaihe(pressedKeyItem.value(), taiheKey) != RET_OK) {
+            MMI_HILOGE("TaiheKeyEventToTaihe error");
+            return RET_ERR;
+        }
         keys.push_back(taiheKey);
     }
     out.keys = taihe::array<TaiheKeyEventKey>(keys);
-    ret = InputEventToTaihe(keyEvent, out.base);
-    CHKFR(ret == RET_OK, ret, "TaiheKeyEventToTaihe error");
+    if (InputEventToTaihe(keyEvent, out.base) != RET_OK) {
+        MMI_HILOGE("InputEventToTaihe error");
+        return RET_ERR;
+    }
+    std::vector<int32_t> pressedKeys = keyEvent.GetPressedKeys();
     out.ctrlKey = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT)
         || HasKeyCode(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT);
     out.altKey = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_ALT_LEFT)
@@ -577,7 +600,7 @@ int32_t TaiheMonitorConverter::TaiheKeyEventToTaihe(const KeyEvent &keyEvent, Ta
     out.capsLock = keyEvent.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
     out.numLock =  keyEvent.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY);
     out.scrollLock = keyEvent.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
-    return ret;
+    return RET_OK;
 }
 
 int32_t TaiheMonitorConverter::TaiheKeyEventKeyToTaihe(const KeyEvent::KeyItem &keyItem, TaiheKeyEventKey &out)
@@ -592,7 +615,10 @@ int32_t TaiheMonitorConverter::TaiheKeyEventKeyToTaihe(const KeyEvent::KeyItem &
 int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent> pointerEvent,
     const PointerEvent::PointerItem& item, TaiheMouseEvent &mouseEvent)
 {
-    CHKPR(pointerEvent, RET_ERR);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return RET_ERR;
+    }
     int32_t ret = RET_OK;
     int32_t buttonId = pointerEvent->GetButtonId();
     if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
@@ -619,7 +645,10 @@ int32_t TaiheMonitorConverter::SetMouseProperty(std::shared_ptr<PointerEvent> po
 
 int32_t TaiheMonitorConverter::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, TaiheAxisValue& value)
 {
-    CHKPR(pointerEvent, RET_ERR);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return RET_ERR;
+    }
     double axisValue = -1.0;
     int32_t axis = -1;
     if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
@@ -642,7 +671,10 @@ int32_t TaiheMonitorConverter::GetAxesValue(const std::shared_ptr<PointerEvent> 
 int32_t TaiheMonitorConverter::GetMousePointerItem(
     std::shared_ptr<PointerEvent> pointerEvent, TaiheMouseEvent &mouseEvent)
 {
-    CHKPR(pointerEvent, RET_ERR);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return RET_ERR;
+    }
     int32_t ret = RET_OK;
     int32_t currentPointerId = pointerEvent->GetPointerId();
     std::vector<TaiheAxisValue> axisValueVec;
@@ -738,7 +770,10 @@ int32_t TaiheMonitorConverter::MouseActionToTaihe(int32_t action, TaiheMouseActi
 
 int32_t TaiheMonitorConverter::MouseEventToTaihe(std::shared_ptr<PointerEvent> pointerEvent, TaiheMouseEvent &out)
 {
-    CHKPR(pointerEvent, RET_ERR);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return RET_ERR;
+    }
     int32_t ret = MouseActionToTaihe(pointerEvent->GetPointerAction(), out.action);
     if (ret != RET_OK) {
         return ret;
@@ -780,8 +815,10 @@ int32_t TaiheMonitorConverter::MouseEventToTaihe(std::shared_ptr<PointerEvent> p
 bool TaiheMonitorConverter::GetIntObject(ani_env* env, const char* propertyName,
     ani_object object, int32_t& result)
 {
-    CHKPR(env, false);
-    CHKPR(propertyName, false);
+    if (!env || !propertyName) {
+        MMI_HILOGE("env or propertyName is null");
+        return false;
+    }
     ani_long value;
     ani_status ret = env->Object_GetPropertyByName_Long(object, propertyName, &value);
     if (ret != ANI_OK) {
