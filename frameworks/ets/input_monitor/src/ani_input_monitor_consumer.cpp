@@ -83,7 +83,7 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
     }
 }
 
-void AniInputMonitorConsumer::initFuncInfo() 
+void AniInputMonitorConsumer::initFuncInfo()
 {
     funcTypeInfo_ = {
         { MONITORFUNTYPE::ON_TOUCH_BOOL, {"touch", &AniInputMonitorConsumer::OnTouchNeedResultCallback}},
@@ -92,7 +92,7 @@ void AniInputMonitorConsumer::initFuncInfo()
         { MONITORFUNTYPE::ON_PINCH, {"pinch", &AniInputMonitorConsumer::OnPinchCallback}},
         { MONITORFUNTYPE::ON_PINCH_FINGERS, {"pinch", &AniInputMonitorConsumer::OnPinchCallback}},
         { MONITORFUNTYPE::ON_ROTATE_FINGERS, {"rotate", &AniInputMonitorConsumer::OnRotateCallback}},
-        { MONITORFUNTYPE::ON_THREEFINGERSWIPE, 
+        { MONITORFUNTYPE::ON_THREEFINGERSWIPE,
             {"threeFingersSwipe", &AniInputMonitorConsumer::OnThreeFingersSwipeCallback}},
         { MONITORFUNTYPE::ON_FOURFINGERSWIPE,
             {"fourFingersSwipe", &AniInputMonitorConsumer::OnFourFingersSwipeCallback}},
@@ -232,12 +232,12 @@ void AniInputMonitorConsumer::Stop()
     if (it != TO_GESTURE_TYPE.end()) {
         InputManager::GetInstance()->RemoveGestureMonitor(monitorId_);
         monitorId_ = -1;
-        return;  
-    } 
+        return;
+    }
     if (TO_HANDLE_EVENT_TYPE.find(typeName) != TO_HANDLE_EVENT_TYPE.end()) {
         InputManager::GetInstance()->RemoveMonitor(monitorId_);
         monitorId_ = -1;
-        return;  
+        return;
     }
     MMI_HILOGE("not found typeName:%{public}s", typeName.c_str());
     monitorId_ = -1;
@@ -1051,7 +1051,7 @@ void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> po
     } else if (std::holds_alternative<FuncPointerEventWithRetCB>(itFind->second.func_)) {
         auto func = std::get<FuncPointerEventWithRetCB>(itFind->second.func_);
         (this->*func)(pointerEvent, retValue);
-    }else {
+    } else {
         MMI_HILOGE("type invalid");
         pointerEvent->MarkProcessed();
         return;

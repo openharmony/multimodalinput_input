@@ -152,7 +152,7 @@ void HandleCommonErrors(int32_t ret)
     } else if (errorCode == COMMON_PARAMETER_ERROR) {
         MMI_HILOGE("Parameter error");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
-    }else if (errorCode != RET_OK) {
+    } else if (errorCode != RET_OK) {
         MMI_HILOGE("Unknown error, errorCode:%{public}d", errorCode);
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.unknown error");
     }
