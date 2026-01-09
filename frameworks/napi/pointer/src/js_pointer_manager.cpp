@@ -212,8 +212,8 @@ napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     napi_value result = nullptr;
     if ((napi_get_boolean(env, visible, &result)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_get_boolean()").c_str());
-        return result;
+        MMI_HILOGE("%{public}s failed", std::string("napi_get_boolean").c_str());
+        return nullptr;
     }
     return result;
 }
@@ -302,8 +302,8 @@ napi_value JsPointerManager::GetPointerColorSync(napi_env env)
     }
     napi_value result = nullptr;
     if ((napi_create_int32(env, color, &result)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32()").c_str());
-        return result;
+        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32").c_str());
+        return nullptr;
     }
     return result;
 }
@@ -365,8 +365,8 @@ napi_value JsPointerManager::GetPointerSpeedSync(napi_env env)
     InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
     napi_value result = nullptr;
     if ((napi_create_int32(env, pointerSpeed, &result)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32()").c_str());
-        return result;
+        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32").c_str());
+        return nullptr;
     }
     return result;
 }
@@ -565,8 +565,8 @@ napi_value JsPointerManager::GetPointerSizeSync(napi_env env)
     }
     napi_value result = nullptr;
     if ((napi_create_int32(env, size, &result)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32()").c_str());
-        return result;
+        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32").c_str());
+        return nullptr;
     }
     return result;
 }
@@ -660,8 +660,8 @@ napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid)
     }
     napi_value result = nullptr;
     if ((napi_create_int32(env, pointerStyle.id, &result)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32()").c_str());
-        return result;
+        MMI_HILOGE("%{public}s failed", std::string("napi_create_int32").c_str());
+        return nullptr;
     }
     return result;
 }
@@ -1084,12 +1084,12 @@ napi_value JsPointerManager::GetHardwareCursorStats(napi_env env)
         frameCount, vsyncCount);
     napi_value frameNapiCount;
     if ((napi_create_uint32(env, frameCount, &frameNapiCount)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_create_uint32()").c_str());
+        MMI_HILOGE("%{public}s failed", std::string("napi_create_uint32").c_str());
         return nullptr;
     }
     napi_value vsyncNapiCount;
     if ((napi_create_uint32(env, vsyncCount, &vsyncNapiCount)) != napi_ok) {
-        MMI_HILOGE("%{public}s failed", std::string("napi_create_uint32()").c_str());
+        MMI_HILOGE("%{public}s failed", std::string("napi_create_uint32").c_str());
         return nullptr;
     }
     status = napi_set_named_property(env, result, "frameCount", frameNapiCount);
