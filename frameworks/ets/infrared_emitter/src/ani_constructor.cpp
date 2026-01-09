@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "define_multimodal.h"
 #include "ohos.multimodalInput.infraredEmitter.ani.hpp"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "aniInputInfraredconstructor"

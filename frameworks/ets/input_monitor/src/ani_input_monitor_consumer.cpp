@@ -28,37 +28,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::map<MONITORFUNTYPE, std::string> FUNCTTOYPENAME = {
-    { MONITORFUNTYPE::ON_TOUCH, "touch"},
-    { MONITORFUNTYPE::ON_TOUCH_BOOL, "touch"},
-    { MONITORFUNTYPE::ON_MOUSE, "mouse"},
-    { MONITORFUNTYPE::ON_MOUSE_RECT, "mouse"},
-    { MONITORFUNTYPE::ON_PINCH, "pinch"},
-    { MONITORFUNTYPE::ON_PINCH_FINGERS, "pinch"},
-    { MONITORFUNTYPE::ON_ROTATE_FINGERS, "rotate"},
-    { MONITORFUNTYPE::ON_THREEFINGERSWIPE, "threeFingersSwipe"},
-    { MONITORFUNTYPE::ON_FOURFINGERSWIPE, "fourFingersSwipe"},
-    { MONITORFUNTYPE::ON_THREEFINGERSTAP, "threeFingersTap"},
-    { MONITORFUNTYPE::ON_FINGERPRINT, "fingerprint"},
-    { MONITORFUNTYPE::ON_SWIPEINWARD, "swipeInward"},
-    { MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS, "touchscreenSwipe"},
-    { MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS, "touchscreenPinch"},
-    { MONITORFUNTYPE::ON_KEYPRESSED_KEYS, "keyPressed"},
-    { MONITORFUNTYPE::OFF_TOUCH, "touch"},
-    { MONITORFUNTYPE::OFF_MOUSE, "mouse"},
-    { MONITORFUNTYPE::OFF_PINCH, "pinch"},
-    { MONITORFUNTYPE::OFF_PINCH_FINGERS, "pinch"},
-    { MONITORFUNTYPE::OFF_ROTATE_FINGERS, "rotate"},
-    { MONITORFUNTYPE::OFF_THREEFINGERSWIPE, "threeFingersSwipe"},
-    { MONITORFUNTYPE::OFF_FOURFINGERSWIPE, "fourFingersSwipe"},
-    { MONITORFUNTYPE::OFF_THREEFINGERSTAP, "threeFingersTap"},
-    { MONITORFUNTYPE::OFF_FINGERPRINT, "fingerprint"},
-    { MONITORFUNTYPE::OFF_SWIPEINWARD, "swipeInward"},
-    { MONITORFUNTYPE::OFF_TOUCHSCREENSWIPE_FINGERS, "touchscreenSwipe"},
-    { MONITORFUNTYPE::OFF_TOUCHSCREENPINCH_FINGERS, "touchscreenPinch"},
-    { MONITORFUNTYPE::OFF_KEYPRESSED_KEYS, "keyPressed"},
-};
-
 constexpr int32_t MOUSE_FLOW { 10 };
 const std::string INVALID_TYPE_NAME { "" };
 constexpr int32_t ONE_FINGERS { 1 };
@@ -114,8 +83,38 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
     }
 }
 
+void AniInputMonitorConsumer::initFuncInfo() 
+{
+    funcTypeInfo_ = {
+        { MONITORFUNTYPE::ON_TOUCH_BOOL, {"touch", &AniInputMonitorConsumer::OnTouchNeedResultCallback}},
+        { MONITORFUNTYPE::ON_MOUSE, { "mouse", &AniInputMonitorConsumer::OnMouseCallback}},
+        { MONITORFUNTYPE::ON_MOUSE_RECT, {"mouse", &AniInputMonitorConsumer::OnMouseCallback}},
+        { MONITORFUNTYPE::ON_PINCH, {"pinch", &AniInputMonitorConsumer::OnPinchCallback}},
+        { MONITORFUNTYPE::ON_PINCH_FINGERS, {"pinch", &AniInputMonitorConsumer::OnPinchCallback}},
+        { MONITORFUNTYPE::ON_ROTATE_FINGERS, {"rotate", &AniInputMonitorConsumer::OnRotateCallback}},
+        { MONITORFUNTYPE::ON_THREEFINGERSWIPE, 
+            {"threeFingersSwipe", &AniInputMonitorConsumer::OnThreeFingersSwipeCallback}},
+        { MONITORFUNTYPE::ON_FOURFINGERSWIPE,
+            {"fourFingersSwipe", &AniInputMonitorConsumer::OnFourFingersSwipeCallback}},
+        { MONITORFUNTYPE::ON_THREEFINGERSTAP,
+            {"threeFingersTap", &AniInputMonitorConsumer::OnThreeFingersTapCallback}},
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+        { MONITORFUNTYPE::ON_FINGERPRINT, {"fingerprint", &AniInputMonitorConsumer::OnFingerprintCallback}},
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+        { MONITORFUNTYPE::ON_SWIPEINWARD, {"swipeInward", &AniInputMonitorConsumer::OnSwipeInwardCallback}},
+        { MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS,
+            {"touchscreenSwipe", &AniInputMonitorConsumer::OnTouchScreenPinchCallback}},
+        { MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS,
+            {"touchscreenPinch", &AniInputMonitorConsumer::OnTouchScreenPinchCallback}},
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+       { MONITORFUNTYPE::ON_X_KEY, {"xKey",  &AniInputMonitorConsumer::OnXkeyCallback}},
+#endif // OHOS_BUILD_ENABLE_X_KEY
+        { MONITORFUNTYPE::ON_KEYPRESSED_KEYS, {"keyPressed", std::monostate{}}},
+    };
+}
+
 AniInputMonitorConsumer::AniInputMonitorConsumer(MONITORFUNTYPE funType, int32_t fingers,
-    std::vector<Rect> hotRectArea, std::vector<int32_t> keys,
+    std::vector<Rect> &hotRectArea, std::vector<int32_t> &keys,
     std::shared_ptr<CallbackObject> &aniCallback)
     : funType_(funType),
       fingers_(fingers),
@@ -123,6 +122,7 @@ AniInputMonitorConsumer::AniInputMonitorConsumer(MONITORFUNTYPE funType, int32_t
       hotRectArea_(hotRectArea),
       aniCallback_(aniCallback)
 {
+    initFuncInfo();
 }
 
 int32_t AniInputMonitorConsumer::GetId() const
@@ -137,9 +137,9 @@ int32_t AniInputMonitorConsumer::GetFingers() const
 
 std::string AniInputMonitorConsumer::GetTypeName() const
 {
-    auto itFind = FUNCTTOYPENAME.find(funType_);
-    if (itFind != FUNCTTOYPENAME.end()) {
-        return itFind->second;
+    auto itFind = funcTypeInfo_.find(funType_);
+    if (itFind != funcTypeInfo_.end()) {
+        return itFind->second.typeName_;
     }
     return "";
 }
@@ -151,18 +151,19 @@ MONITORFUNTYPE AniInputMonitorConsumer::GetFunType() const
 
 bool AniInputMonitorConsumer::IsOnFunc() const
 {
-    if (funType_ >= MONITORFUNTYPE::ON_TOUCH && funType_ <= MONITORFUNTYPE::ON_KEYPRESSED_KEYS) {
-        return true;
-    }
-    return false;
+    return AniInputMonitorConsumer::IsOnFunc(funType_);
 }
 
 bool AniInputMonitorConsumer::CheckOffFuncParam(MONITORFUNTYPE funType, int32_t fingers) const
 {
     bool bCheck = false;
-    if (GetFunType() == funType) {
-        if (funType == MONITORFUNTYPE::OFF_TOUCHSCREENSWIPE_FINGERS ||
-            funType ==  MONITORFUNTYPE::OFF_TOUCHSCREENPINCH_FINGERS) {
+    if ((funType_ == MONITORFUNTYPE::ON_MOUSE || funType_ == MONITORFUNTYPE::ON_MOUSE_RECT)
+        && funType == MONITORFUNTYPE::ON_MOUSE) {
+        return true;
+    }
+    if (funType_ == funType) {
+        if (funType == MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS ||
+            funType ==  MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS) {
                 if (fingers == GetFingers()) {
                     bCheck = true;
                 }
@@ -185,21 +186,16 @@ int32_t AniInputMonitorConsumer::Start()
         ret = InputManager::GetInstance()->AddPreMonitor(shared_from_this(), iter->second, keys_);
         bFindType = true;
     }
-
     auto it = TO_GESTURE_TYPE.find(typeName);
-    if (it != TO_GESTURE_TYPE.end()) {
+    if (!bFindType  && it != TO_GESTURE_TYPE.end()) {
         ret = InputManager::GetInstance()->AddGestureMonitor(shared_from_this(), it->second, fingers_);
         bFindType = true;
     }
-
-    int32_t eventType = 0;
     auto itFind = TO_HANDLE_EVENT_TYPE.find(typeName);
-    if (itFind != TO_HANDLE_EVENT_TYPE.end()) {
-        eventType = itFind->second;
-        ret = InputManager::GetInstance()->AddMonitor(shared_from_this(), eventType);
+    if (!bFindType  && itFind != TO_HANDLE_EVENT_TYPE.end()) {
+        ret = InputManager::GetInstance()->AddMonitor(shared_from_this(), itFind->second);
         bFindType = true;
     }
-
     if (!bFindType) {
         MMI_HILOGE("not found type:%{public}s", typeName.c_str());
         return ret;
@@ -224,20 +220,26 @@ void AniInputMonitorConsumer::Stop()
         MMI_HILOGE("Invalid values");
         return;
     }
-
-    auto iter = TO_HANDLE_PRE_EVENT_TYPE.find(GetTypeName().c_str());
+    auto typeName = GetTypeName();
+    auto iter = TO_HANDLE_PRE_EVENT_TYPE.find(typeName);
     if (iter != TO_HANDLE_PRE_EVENT_TYPE.end()) {
         InputManager::GetInstance()->RemovePreMonitor(monitorId_);
         monitorId_ = -1;
         return;
     }
 
-    auto it = TO_GESTURE_TYPE.find(GetTypeName());
+    auto it = TO_GESTURE_TYPE.find(typeName);
     if (it != TO_GESTURE_TYPE.end()) {
         InputManager::GetInstance()->RemoveGestureMonitor(monitorId_);
-    } else {
+        monitorId_ = -1;
+        return;  
+    } 
+    if (TO_HANDLE_EVENT_TYPE.find(typeName) != TO_HANDLE_EVENT_TYPE.end()) {
         InputManager::GetInstance()->RemoveMonitor(monitorId_);
+        monitorId_ = -1;
+        return;  
     }
+    MMI_HILOGE("not found typeName:%{public}s", typeName.c_str());
     monitorId_ = -1;
 }
 
@@ -291,9 +293,12 @@ std::shared_ptr<AniInputMonitorConsumer> AniInputMonitorConsumer::CreateAniInput
 void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CALL_DEBUG_ENTER;
-    CHKPV(keyEvent);
+    if (!keyEvent) {
+        MMI_HILOGE("keyEvent is null.");
+        return;
+    }
     auto typeName = GetTypeName();
-    if (typeName == INVALID_TYPE_NAME || typeName != "keyPressed") {
+    if (typeName != "keyPressed") {
         MMI_HILOGE("Failed to process key event.");
         return;
     }
@@ -302,7 +307,10 @@ void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) c
 
 bool AniInputMonitorConsumer::IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     bool res = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
@@ -318,14 +326,20 @@ void executeCallback(uv_work_t *work)
 void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    }
     if (!PrepareData(pointerEvent)) {
         MMI_HILOGE("The Parepate Data failed");
         return;
     }
     if (!evQueue_.empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
-        CHKPV(work);
+        if (!work) {
+            MMI_HILOGE("work is null.");
+            return;
+        }
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
         if (monitorInfo == nullptr) {
             MMI_HILOGE("The monitorInfo is nullptr");
@@ -357,22 +371,43 @@ void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-bool AniInputMonitorConsumer::PrepareData(std::shared_ptr<PointerEvent> pointerEvent) const
+bool AniInputMonitorConsumer::CheckAndUpdateFlowCtrl(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
-    CHKPF(pointerEvent);
-    std::lock_guard<std::mutex> guard(mutex_);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
         && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-        if (++flowCtrl_ < MOUSE_FLOW) {
-            MMI_HILOGE("Failed to flowCtrl_");
+        if (flowCtrl_ < MOUSE_FLOW) {
+            flowCtrl_ = flowCtrl_ + 1;
+            MMI_HILOGD("Flow control threshold exceeded");
             return false;
         } else {
             flowCtrl_ = 0;
         }
     }
+    return true;
+}
+
+bool AniInputMonitorConsumer::PrepareData(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!CheckAndUpdateFlowCtrl(pointerEvent)) {
+        MMI_HILOGD("CheckAndUpdateFlowCtrl Failed");
+        return false;
+    }
     auto typeName = GetTypeName();
-    CHKFR(typeName != INVALID_TYPE_NAME, false, "Failed to process pointer event");
+    if (typeName == INVALID_TYPE_NAME) {
+        MMI_HILOGD("typeName invalid");
+        return false;
+    };
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (typeName != "touch" && typeName != TOUCH_SWIPE_GESTURE &&
             typeName != TOUCH_PINCH_GESTURE && typeName != TOUCH_ALL_GESTURE) {
@@ -389,7 +424,10 @@ bool AniInputMonitorConsumer::PrepareData(std::shared_ptr<PointerEvent> pointerE
         SetConsumeState(pointerEvent);
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
-        CHKFR(IsGestureEvent(pointerEvent), false, "not gesture event");
+        if (!IsGestureEvent(pointerEvent)) {
+            MMI_HILOGD("not gesture event");
+            return false;
+        }
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK && (GetTypeName() != "joystick")) {
         MMI_HILOGE("Failed to process joystick event");
@@ -406,13 +444,22 @@ bool AniInputMonitorConsumer::PrepareData(std::shared_ptr<PointerEvent> pointerE
 void AniInputMonitorConsumer::AniWorkCallback(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(work);
+    if (!work) {
+        MMI_HILOGE("work is null.");
+        return;
+    }
     auto temp = static_cast<MonitorInfo*>(work->data);
+    if (!temp) {
+        MMI_HILOGE("temp is null.");
+        return;
+    }
     delete work;
     work = nullptr;
     auto monitor = ANI_INPUT_MONITOR_MGR.GetMonitor(temp->monitorId);
     if (monitor) {
         monitor->OnPointerEventInEvThread();
+    } else {
+        MMI_HILOGE("Monitor with ID %{public}d not found.", temp->monitorId);
     }
     delete temp;
     temp = nullptr;
@@ -448,7 +495,10 @@ void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent)
 
 void AniInputMonitorConsumer::SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    }
     if (pointerEvent->GetPointerIds().size() == 1) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
             consumed_ = false;
@@ -458,7 +508,10 @@ void AniInputMonitorConsumer::SetConsumeState(std::shared_ptr<PointerEvent> poin
 
 bool AniInputMonitorConsumer::IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     auto ret = GetTypeName();
     if (ret != "pinch" && ret != "threeFingersSwipe" &&
         ret != "fourFingersSwipe" && ret != "threeFingersTap" &&
@@ -476,7 +529,10 @@ bool AniInputMonitorConsumer::IsGestureEvent(std::shared_ptr<PointerEvent> point
 
 bool AniInputMonitorConsumer::IsPinch(std::shared_ptr<PointerEvent> pointerEvent, const int32_t fingers) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if ((fingers > 0 && ((pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE &&
         pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) ||
         pointerEvent->GetFingerCount() != fingers)) ||
@@ -494,7 +550,10 @@ bool AniInputMonitorConsumer::IsPinch(std::shared_ptr<PointerEvent> pointerEvent
 
 bool AniInputMonitorConsumer::IsRotate(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_BEGIN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
@@ -504,35 +563,39 @@ bool AniInputMonitorConsumer::IsRotate(std::shared_ptr<PointerEvent> pointerEven
     return true;
 }
 
-bool AniInputMonitorConsumer::IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent) const
+bool AniInputMonitorConsumer::IsMultiFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t fingerCount) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
-        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        pointerEvent->GetFingerCount() != fingerCount ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
         return false;
     }
     return true;
+}
+
+bool AniInputMonitorConsumer::IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    return IsMultiFingersSwipe(pointerEvent, THREE_FINGERS);
 }
 
 bool AniInputMonitorConsumer::IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPF(pointerEvent);
-    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
-        pointerEvent->GetFingerCount() != FOUR_FINGERS ||
-        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
-        return false;
-    }
-    return true;
+    return IsMultiFingersSwipe(pointerEvent, FOUR_FINGERS);
 }
 
 bool AniInputMonitorConsumer::IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
         pointerEvent->GetFingerCount() != THREE_FINGERS ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TRIPTAP)) {
@@ -543,8 +606,10 @@ bool AniInputMonitorConsumer::IsThreeFingersTap(std::shared_ptr<PointerEvent> po
 
 bool AniInputMonitorConsumer::IsJoystick(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     return (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN ||
@@ -553,7 +618,10 @@ bool AniInputMonitorConsumer::IsJoystick(std::shared_ptr<PointerEvent> pointerEv
 
 bool AniInputMonitorConsumer::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPF(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         MMI_HILOGE("Failed to do swipe inward, wrong source:%{public}d ", pointerEvent->GetSourceType());
         return false;
@@ -572,7 +640,10 @@ bool AniInputMonitorConsumer::IsSwipeInward(std::shared_ptr<PointerEvent> pointe
 
 bool AniInputMonitorConsumer::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
         ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
@@ -588,7 +659,10 @@ bool AniInputMonitorConsumer::IsFingerprint(std::shared_ptr<PointerEvent> pointe
 #ifdef OHOS_BUILD_ENABLE_X_KEY
 bool AniInputMonitorConsumer::IsXKey(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null");
+        return false;
+    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
         return true;
     }
@@ -600,7 +674,10 @@ bool AniInputMonitorConsumer::IsXKey(std::shared_ptr<PointerEvent> pointerEvent)
 void AniInputMonitorConsumer::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (retValue) {
         auto eventId = pointerEvent->GetId();
         MarkConsumed(eventId);
@@ -621,7 +698,7 @@ void AniInputMonitorConsumer::MarkConsumed(int32_t eventId)
     consumed_ = true;
 }
 
-bool AniInputMonitorConsumer::IsLocaledWithinRect(
+bool AniInputMonitorConsumer::IsLocatedWithinRect(
     std::shared_ptr<PointerEvent> pointerEvent, std::vector<Rect> hotRectArea) const
 {
     bool bFind = false;
@@ -659,7 +736,10 @@ bool AniInputMonitorConsumer::IsLocaledWithinRect(
 void AniInputMonitorConsumer::OnTouchCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -679,7 +759,10 @@ void AniInputMonitorConsumer::OnTouchCallback(std::shared_ptr<PointerEvent> poin
 void AniInputMonitorConsumer::OnTouchNeedResultCallback(std::shared_ptr<PointerEvent> pointerEvent, bool &retValue)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -700,12 +783,15 @@ void AniInputMonitorConsumer::OnTouchNeedResultCallback(std::shared_ptr<PointerE
 void AniInputMonitorConsumer::OnMouseCallback(std::shared_ptr<PointerEvent> pointerEvent, bool retRectArea)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
     }
-    if (retRectArea && IsLocaledWithinRect(pointerEvent, hotRectArea_)) {
+    if (retRectArea && !IsLocatedWithinRect(pointerEvent, hotRectArea_)) {
         MMI_HILOGD("not in area.");
         return;
     }
@@ -724,7 +810,10 @@ void AniInputMonitorConsumer::OnMouseCallback(std::shared_ptr<PointerEvent> poin
 void AniInputMonitorConsumer::OnPinchCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -746,7 +835,10 @@ void AniInputMonitorConsumer::OnPinchCallback(std::shared_ptr<PointerEvent> poin
 void AniInputMonitorConsumer::OnRotateCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -768,7 +860,10 @@ void AniInputMonitorConsumer::OnRotateCallback(std::shared_ptr<PointerEvent> poi
 void AniInputMonitorConsumer::OnThreeFingersSwipeCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -790,7 +885,10 @@ void AniInputMonitorConsumer::OnThreeFingersSwipeCallback(std::shared_ptr<Pointe
 void AniInputMonitorConsumer::OnFourFingersSwipeCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -812,7 +910,10 @@ void AniInputMonitorConsumer::OnFourFingersSwipeCallback(std::shared_ptr<Pointer
 void AniInputMonitorConsumer::OnThreeFingersTapCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -835,7 +936,10 @@ void AniInputMonitorConsumer::OnThreeFingersTapCallback(std::shared_ptr<PointerE
 void AniInputMonitorConsumer::OnFingerprintCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -858,7 +962,10 @@ void AniInputMonitorConsumer::OnFingerprintCallback(std::shared_ptr<PointerEvent
 void AniInputMonitorConsumer::OnSwipeInwardCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -880,7 +987,10 @@ void AniInputMonitorConsumer::OnSwipeInwardCallback(std::shared_ptr<PointerEvent
 void AniInputMonitorConsumer::OnTouchScreenPinchCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    };
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -899,7 +1009,10 @@ void AniInputMonitorConsumer::OnTouchScreenPinchCallback(std::shared_ptr<Pointer
 void AniInputMonitorConsumer::OnXkeyCallback(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (!pointerEvent) {
+        MMI_HILOGE("pointerEvent is null.");
+        return;
+    }
     if (!aniCallback_) {
         MMI_HILOGE("Callback object is null");
         return;
@@ -915,74 +1028,33 @@ void AniInputMonitorConsumer::OnXkeyCallback(std::shared_ptr<PointerEvent> point
 void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
-    if (!isMonitoring_) {
-        MMI_HILOGE("AniInputMonitorConsumer stop");
+    if (!pointerEvent || !isMonitoring_) {
+        MMI_HILOGE("pointerEvent is null or AniInputMonitorConsumer stop.");
         return;
     }
     auto eventString = pointerEvent->ToString();
     MMI_HILOGD("pointer event:%{public}s", eventString.c_str());
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     bool retValue = false;
-    switch (funType_) {
-        case MONITORFUNTYPE::ON_TOUCH: {
-            OnTouchCallback(pointerEvent);
-            break;
-        }
-        case MONITORFUNTYPE::ON_TOUCH_BOOL: {
-            OnTouchNeedResultCallback(pointerEvent, retValue);
-            break;
-        }
-        case MONITORFUNTYPE::ON_MOUSE:
-        case MONITORFUNTYPE::ON_MOUSE_RECT: {
-            OnMouseCallback(pointerEvent, funType_ == MONITORFUNTYPE::ON_MOUSE_RECT);
-            break;
-        }
-        case MONITORFUNTYPE::ON_PINCH:
-        case MONITORFUNTYPE::ON_PINCH_FINGERS: {
-            OnPinchCallback(pointerEvent);
-            break;
-        }
-        case MONITORFUNTYPE::ON_ROTATE_FINGERS: {
-            OnRotateCallback(pointerEvent);
-            break;
-        }
-        case MONITORFUNTYPE::ON_THREEFINGERSWIPE: {
-            OnThreeFingersSwipeCallback(pointerEvent);
-            break;
-        }
-        case MONITORFUNTYPE::ON_FOURFINGERSWIPE: {
-            OnFourFingersSwipeCallback(pointerEvent);
-            break;
-        }
-        case MONITORFUNTYPE::ON_THREEFINGERSTAP: {
-            OnThreeFingersTapCallback(pointerEvent);
-            break;
-        }
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-        case MONITORFUNTYPE::ON_FINGERPRINT: {
-            OnFingerprintCallback(pointerEvent);
-            break;
-        }
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
-        case MONITORFUNTYPE::ON_SWIPEINWARD: {
-            OnSwipeInwardCallback(pointerEvent);
-            break;
-        }
-        case MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS:
-        case MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS: {
-            OnTouchScreenPinchCallback(pointerEvent);
-            break;
-        }
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-        case MONITORFUNTYPE::ON_KEYPRESSED_KEYS: {
-            OnXkeyCallback(pointerEvent);
-            break;
-        }
-#endif // OHOS_BUILD_ENABLE_X_KEY
-        default:
-           MMI_HILOGE("This event is invalid");
-           break;
+    auto itFind = funcTypeInfo_.find(funType_);
+    if (itFind == funcTypeInfo_.end()) {
+        MMI_HILOGI("This event is invalid");
+        pointerEvent->MarkProcessed();
+        return;
+    }
+    if (std::holds_alternative<FuncPointerEventCB>(itFind->second.func_)) {
+        FuncPointerEventCB func = std::get<FuncPointerEventCB>(itFind->second.func_);
+        (this->*func)(pointerEvent);
+    } else if (std::holds_alternative<FuncPointerEventWithBoolCB>(itFind->second.func_)) {
+        auto func = std::get<FuncPointerEventWithBoolCB>(itFind->second.func_);
+        (this->*func)(pointerEvent, funType_ == MONITORFUNTYPE::ON_MOUSE_RECT);
+    } else if (std::holds_alternative<FuncPointerEventWithRetCB>(itFind->second.func_)) {
+        auto func = std::get<FuncPointerEventWithRetCB>(itFind->second.func_);
+        (this->*func)(pointerEvent, retValue);
+    }else {
+        MMI_HILOGE("type invalid");
+        pointerEvent->MarkProcessed();
+        return;
     }
     pointerEvent->MarkProcessed();
     // [static]: It feels like something other than a mouse

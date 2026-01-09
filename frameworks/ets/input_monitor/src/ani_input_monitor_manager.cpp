@@ -96,7 +96,7 @@ bool AniInputMonitorManager::CreateCallback(callbackType &&cb, uintptr_t opq, st
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_); // map 锁加在外面
-    std::lock_guard<std::mutex> lock(jsCbMapMutex);
+    std::lock_guard<std::mutex> lock(jsCbMapMutex_);
     ani_object callbackObj = reinterpret_cast<ani_object>(opq);
     ani_ref callbackRef;
     ani_env *env = taihe::get_env();
@@ -126,7 +126,7 @@ bool AniInputMonitorManager::IsExistCallback(const std::shared_ptr<CallbackObjec
     taihe::optional_view<uintptr_t> opq)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(jsCbMapMutex);
+    std::lock_guard<std::mutex> lock(jsCbMapMutex_);
     if (!opq.has_value()) {
         MMI_HILOGE("callback is nullptr!");
         return false;
@@ -176,6 +176,7 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
         return false;
     }
     std::lock_guard<std::mutex> guard(mutex_);
+    MMI_HILOGD("retStart:%{public}d", retStart);
     monitors_.emplace(retStart, consumer);
     return true;
 }
@@ -183,7 +184,7 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
 bool AniInputMonitorManager::RemoveMonitor(MONITORFUNTYPE funType, taihe::optional_view<uintptr_t> opq, int32_t fingers)
 {
     CALL_DEBUG_ENTER;
-    if (!AniInputMonitorConsumer::IsOffFunc(funType)) {
+    if (!AniInputMonitorConsumer::IsOnFunc(funType)) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "EventType is invalid");
         return false;
     }

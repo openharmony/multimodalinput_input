@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "mmi_log.h"
 #include "ohos.multimodalInput.pointer.ani.hpp"
 

@@ -27,7 +27,6 @@
 namespace {
 constexpr int32_t MAX_NUMBER_ARRAY_ELEMENT { 1024 };
 enum EtsErrorCode : int32_t {
-    OTHER_ERROR = -1,
     COMMON_PERMISSION_CHECK_ERROR = 201,
     COMMON_USE_SYSAPI_ERROR = 202,
     COMMON_PARAMETER_ERROR = 401,
@@ -43,7 +42,7 @@ static TaiheInfraredFrequency InfraredFrequencyToAni(OHOS::MMI::InfraredFrequenc
     return frequency;
 }
 
-std::string HandleError(int32_t ret, int32_t &errorCode)
+std::string HandleError(int32_t ret, int32_t &errorCode) 
 {
     std::string result = "";
     if (ret == RET_OK) {

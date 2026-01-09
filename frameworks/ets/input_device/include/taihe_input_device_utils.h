@@ -41,7 +41,7 @@ struct DeviceType {
 class TaiheInputDeviceUtils {
 public:
     static TaihesType ConverterSType(const std::string &sourceType);
-    static TaiheaType ConverterATxis(const std::string &axisType);
+    static TaiheaType ConverterAxisType(const std::string &axisType);
     static TaiheSType ConverterSourceType(const TaihesType &sType);
     static TaiheAType ConverterAxisType(const TaiheaType &aType);
     static TaiheAxisRange ConverterAxisRange(const InputDevice::AxisInfo &axisInfo,
