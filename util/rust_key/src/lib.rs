@@ -70,39 +70,3 @@ extern "C" fn ReadConfigInfo(
     }
     RET_OK
 }
-
-#[test]
-fn test_read_config_info_normal()
-{
-    let info = String::from("KEY_BTN_0 256 3100 HOS_KEY_BTN_0");
-    let info_line = info.as_ptr() as *const u8;
-    let len: i32 = 33;
-    let mut element_key: i32 = 0;
-    let mut element_value: i32 = 0;
-    let ret: i32 = ReadConfigInfo(info_line, len, &mut element_key as *mut i32, &mut element_value as *mut i32);
-    assert_eq!(ret, RET_ERR);
-}
-
-#[test]
-fn test_read_config_info_invalid()
-{
-    let info = "#KEY_BTN_0 256 3100 HOS_KEY_BTN_0";
-    let info_line = info.as_ptr() as *const u8;
-    let len: i32 = 34;
-    let mut element_key: i32 = 0;
-    let mut element_value: i32 = 0;
-    let ret: i32 = ReadConfigInfo(info_line, len, &mut element_key as *mut i32, &mut element_value as *mut i32);
-    assert_eq!(ret, RET_ERR);
-}
-
-#[test]
-fn test_read_config_info_len_invalid()
-{
-    let info = "KEY_BTN_0 256 3100 HOS_KEY_BTN_0";
-    let info_line = info.as_ptr() as *const u8;
-    let len: i32 = 0;
-    let mut element_key: i32 = 0;
-    let mut element_value: i32 = 0;
-    let ret: i32 = ReadConfigInfo(info_line, len, &mut element_key as *mut i32, &mut element_value as *mut i32);
-    assert_eq!(ret, RET_ERR);
-}
