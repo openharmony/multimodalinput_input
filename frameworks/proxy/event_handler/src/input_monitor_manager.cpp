@@ -35,6 +35,8 @@ int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> mon
     return AddHandler(InputHandlerType::MONITOR, monitor, eventType);
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
+
 int32_t InputMonitorManager::AddGestureMonitor(
     std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
 {
@@ -47,6 +49,8 @@ int32_t InputMonitorManager::RemoveGestureMonitor(int32_t monitorId)
 {
     return InputHandlerManager::RemoveGestureMonitor(monitorId, InputHandlerType::MONITOR);
 }
+
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 int32_t InputMonitorManager::RemoveMonitor(int32_t monitorId)
 {

@@ -413,17 +413,6 @@ ohos_shared_library("libmmi-server") {
       ]
     }
   }
-  if (input_feature_touchscreen && input_feature_monitor) {
-    sources += [
-      "touch_event_normalize/src/touch_gesture_adapter.cpp",
-      "touch_event_normalize/src/touch_gesture_detector.cpp",
-      "touch_event_normalize/src/touch_gesture_manager.cpp",
-    ]
-
-    if (input_feature_product == "pc") {
-      defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
-    }
-  }
 
   if (input_feature_touchpad) {
     sources += [
@@ -491,7 +480,7 @@ ohos_shared_library("libmmi-server") {
 
   deps += ["${mmi_path}/service/custom_config_parser:mmi_custom_config_parser"]
 
-  if (input_feature_touchscreen && input_feature_monitor) {
+  if (input_feature_touch_gesture) {
     deps += [ "${mmi_path}/service/touch_event_normalize:touch_gesture_manager" ]
   }
 
