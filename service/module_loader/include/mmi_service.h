@@ -21,9 +21,9 @@
 
 #include "app_debug_listener.h"
 #include "delegate_interface.h"
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
 #include "i_touch_gesture_manager.h"
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 #include "input_event_handler.h"
 #include "input_service_context.h"
 #include "json_parser.h"
@@ -33,10 +33,6 @@
 
 namespace OHOS {
 namespace MMI {
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-class TouchGestureManager;
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-
 struct DeviceConsumer {
     std::string name {};
     std::vector<int32_t> uids {};
@@ -354,11 +350,11 @@ private:
     std::vector<std::string> FilterConsumers(const std::vector<std::string> &deviceNames);
     void UpdateConsumers(const cJSON* consumer);
     bool ParseDeviceConsumerConfig();
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#if OHOS_BUILD_ENABLE_TOUCH_GESTURE
     void AddSessionObserver();
     bool AddGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
     void RemoveGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
@@ -377,10 +373,10 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
     std::shared_ptr<InputServiceContext> serviceContext_ { nullptr };
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t touchGestureMgrTimer_ { -1 };
     std::shared_ptr<ITouchGestureManager> touchGestureMgr_ { nullptr };
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };

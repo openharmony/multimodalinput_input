@@ -95,6 +95,8 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     return handlerId;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
+
 int32_t InputHandlerManager::AddGestureMonitor(
     InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
     HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
@@ -124,6 +126,8 @@ int32_t InputHandlerManager::AddGestureMonitor(
     }
     return handlerId;
 }
+
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
     std::vector<int32_t> actionsType)
@@ -155,6 +159,8 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     return handlerId;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
+
 int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType)
 {
     std::lock_guard guard(mtxHandlers_);
@@ -178,6 +184,8 @@ int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandle
     }
     return ret;
 }
+
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 bool InputHandlerManager::IsNeedAddToServer(std::vector<int32_t> actionsType)
 {
@@ -241,6 +249,8 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
     return RET_ERR;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
+
 int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
     TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer)
 {
@@ -269,6 +279,8 @@ int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventTyp
     }
     return RET_OK;
 }
+
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor)

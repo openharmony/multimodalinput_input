@@ -1309,13 +1309,18 @@ group("TouchEventNormalizeTests") {
 
   deps = [
     ":TouchEventNormalizeTest",
-    ":TouchGestureAdapterTest",
-    ":TouchGestureManagerTest",
     ":TransformPointTest",
   ]
   if (input_feature_touchpad) {
     deps += [
       ":TouchpadTransformProcessorEXTest",
+    ]
+  }
+
+  if (input_feature_touch_gesture) {
+    deps += [
+      ":TouchGestureAdapterTest",
+      ":TouchGestureManagerTest",
     ]
   }
 }
