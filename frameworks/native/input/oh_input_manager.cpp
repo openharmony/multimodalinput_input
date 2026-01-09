@@ -899,7 +899,7 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
         item.SetPressure(touchEvent->pressure);
     }
     if (touchEvent->toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
-        touchEvent->pressure <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        touchEvent->toolType <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
         item.SetToolType(static_cast<int32_t>(touchEvent->toolType));
     }
     item.SetPointerId(id);
