@@ -14,7 +14,9 @@
  */
 
 @!namespace("@ohos.multimodalInput.shortKey", "shortKey")
-
+@!sts_inject("""
+static { loadLibraryWithPermissionCheck("short_key_ani.z", "@ohos.multimodalInput.shortKey") }
+""")
 @gen_async("setKeyDownDuration")
 @gen_promise("setKeyDownDuration")
 function SetKeyDownDurationAsync(businessKey: String, delay: i32): void;

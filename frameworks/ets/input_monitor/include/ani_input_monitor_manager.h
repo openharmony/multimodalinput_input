@@ -49,7 +49,7 @@ private:
 private:
      std::mutex mutex_;
      std::map<int32_t, std::shared_ptr<AniInputMonitorConsumer>> monitors_;
-     std::mutex jsCbMapMutex;
+     std::mutex jsCbMapMutex_;
 };
 #define ANI_INPUT_MONITOR_MGR ::OHOS::MMI::AniInputMonitorManager::GetInstance()
 } // namespace MMI

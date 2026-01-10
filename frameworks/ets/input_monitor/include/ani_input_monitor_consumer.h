@@ -33,7 +33,6 @@
 namespace OHOS {
 namespace MMI {
 enum class MONITORFUNTYPE: int32_t {
-    ON_TOUCH,
     ON_TOUCH_BOOL,
     ON_MOUSE,
     ON_MOUSE_RECT,
@@ -47,29 +46,28 @@ enum class MONITORFUNTYPE: int32_t {
     ON_SWIPEINWARD,
     ON_TOUCHSCREENSWIPE_FINGERS,
     ON_TOUCHSCREENPINCH_FINGERS,
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+    ON_X_KEY,
+#endif // OHOS_BUILD_ENABLE_X_KEY
     ON_KEYPRESSED_KEYS,
-
-    OFF_TOUCH,
-    OFF_MOUSE,
-    OFF_PINCH,
-    OFF_PINCH_FINGERS,
-    OFF_ROTATE_FINGERS,
-    OFF_THREEFINGERSWIPE,
-    OFF_FOURFINGERSWIPE,
-    OFF_THREEFINGERSTAP,
-    OFF_FINGERPRINT,
-    OFF_SWIPEINWARD,
-    OFF_TOUCHSCREENSWIPE_FINGERS,
-    OFF_TOUCHSCREENPINCH_FINGERS,
-    OFF_KEYPRESSED_KEYS
+};
+class AniInputMonitorConsumer;
+using FuncPointerEventCB = void (AniInputMonitorConsumer::*)(std::shared_ptr<PointerEvent>);
+using FuncPointerEventWithRetCB = void (AniInputMonitorConsumer::*)(std::shared_ptr<PointerEvent>, bool&);
+using FuncPointerEventWithBoolCB = void (AniInputMonitorConsumer::*)(std::shared_ptr<PointerEvent>, bool);
+using FuncPointerEvent = std::variant<std::monostate, FuncPointerEventCB, FuncPointerEventWithRetCB,
+    FuncPointerEventWithBoolCB>;
+struct FuncCallbackInfo {
+    std::string typeName_ { "" };
+    FuncPointerEvent func_ { std::monostate{} };
 };
 
 using ConsumerParmType = std::variant<int32_t, std::vector<Rect>, std::vector<int32_t>>;
 class AniInputMonitorConsumer : public IInputEventConsumer,
     public std::enable_shared_from_this<AniInputMonitorConsumer> {
 public:
-    AniInputMonitorConsumer(MONITORFUNTYPE funType, int32_t fingers, std::vector<Rect> hotRectArea,
-        std::vector<int32_t> keys, std::shared_ptr<CallbackObject> &aniCallback);
+    AniInputMonitorConsumer(MONITORFUNTYPE funType, int32_t fingers, std::vector<Rect> &hotRectArea,
+        std::vector<int32_t> &keys, std::shared_ptr<CallbackObject> &aniCallback);
     ~AniInputMonitorConsumer() override = default;
     int32_t GetId() const;
     int32_t GetFingers() const;
@@ -87,12 +85,7 @@ public:
         const ConsumerParmType &param, callbackType &&cb, uintptr_t opq);
     static bool IsOnFunc(MONITORFUNTYPE funType)
     {
-        return funType >= MONITORFUNTYPE::ON_TOUCH && funType <= MONITORFUNTYPE::ON_KEYPRESSED_KEYS;
-    }
-
-    static bool IsOffFunc(MONITORFUNTYPE funType)
-    {
-        return funType >= MONITORFUNTYPE::OFF_TOUCH && funType <= MONITORFUNTYPE::OFF_KEYPRESSED_KEYS;
+        return funType >= MONITORFUNTYPE::ON_TOUCH_BOOL && funType <= MONITORFUNTYPE::ON_KEYPRESSED_KEYS;
     }
 
 protected:
@@ -101,6 +94,7 @@ protected:
     void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
     static void AniWorkCallback(uv_work_t *work, int32_t status);
 
+    bool CheckAndUpdateFlowCtrl(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool PrepareData(std::shared_ptr<PointerEvent> pointerEvent) const;
     void OnPointerEventInEvThread();
     void OnAniKeyEvent(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -109,18 +103,22 @@ protected:
     bool IsPinch(std::shared_ptr<PointerEvent> pointerEvent, const int32_t fingers) const;
     bool IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsRotate(std::shared_ptr<PointerEvent> pointerEvent) const;
+    bool IsMultiFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent, int32_t fingerCount) const;
     bool IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent) const;
-    bool IsLocaledWithinRect(std::shared_ptr<PointerEvent> pointerEvent, std::vector<Rect> hotRectArea) const;
-
+    bool IsLocatedWithinRect(std::shared_ptr<PointerEvent> pointerEvent, std::vector<Rect> hotRectArea) const;
+#ifdef OHOS_BUILD_ENABLE_X_KEY
+    bool IsXKey(const std::shared_ptr<PointerEvent> pointerEvent) const;
+#endif // OHOS_BUILD_ENABLE_X_KEY
     void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void MarkConsumed(int32_t eventId);
 
 private:
+    void initFuncInfo();
     void OnPerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnTouchCallback(std::shared_ptr<PointerEvent> pointerEvent);
     void OnTouchNeedResultCallback(std::shared_ptr<PointerEvent> pointerEvent, bool &retValue);
@@ -151,6 +149,7 @@ private:
     mutable int32_t flowCtrl_ { 0 };
 
     mutable std::queue<std::shared_ptr<PointerEvent>> evQueue_;
+    std::map<MONITORFUNTYPE, FuncCallbackInfo> funcTypeInfo_;
 };
 } // namespace MMI
 } // namespace OHOS

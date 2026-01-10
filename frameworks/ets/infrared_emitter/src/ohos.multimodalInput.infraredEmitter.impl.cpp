@@ -27,7 +27,6 @@
 namespace {
 constexpr int32_t MAX_NUMBER_ARRAY_ELEMENT { 1024 };
 enum EtsErrorCode : int32_t {
-    OTHER_ERROR = -1,
     COMMON_PERMISSION_CHECK_ERROR = 201,
     COMMON_USE_SYSAPI_ERROR = 202,
     COMMON_PARAMETER_ERROR = 401,

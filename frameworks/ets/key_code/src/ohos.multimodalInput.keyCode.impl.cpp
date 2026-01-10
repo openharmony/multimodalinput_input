@@ -384,10 +384,14 @@ keyCode::KeyCode TaiheKeyCodeConverter::ConvertEtsKeyCode(int32_t keyCode)
 
 KeyCodeEts TaiheKeyCodeConverter::GetKeyCodeByValue(keyCode::KeyCode code)
 {
+    static std::mutex reverseMapMutex;
     static std::unordered_map<keyCode::KeyCode, int32_t> reverseMap;
     if (reverseMap.empty()) {
-        for (const auto& [key, val] : KEY_CODE_TRANSFORMATION) {
-            reverseMap[val] = key;
+        std::lock_guard<std::mutex> guard(reverseMapMutex);
+        if (reverseMap.empty()) {
+            for (const auto& [key, val] : KEY_CODE_TRANSFORMATION) {
+                reverseMap[val] = key;
+            }
         }
     }
     auto it = reverseMap.find(code);

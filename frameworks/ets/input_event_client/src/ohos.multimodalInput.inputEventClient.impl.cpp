@@ -37,6 +37,18 @@ using namespace ohos::multimodalInput::inputEventClient;
 using namespace OHOS::MMI;
 
 namespace {
+
+static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
+    { JS_MOUSE_BUTTON_LEFT, PointerEvent::MOUSE_BUTTON_LEFT },
+    { JS_MOUSE_BUTTON_RIGHT, PointerEvent::MOUSE_BUTTON_RIGHT },
+    { JS_MOUSE_BUTTON_MIDDLE, PointerEvent::MOUSE_BUTTON_MIDDLE },
+    { JS_MOUSE_BUTTON_SIDE, PointerEvent::MOUSE_BUTTON_SIDE },
+    { JS_MOUSE_BUTTON_EXTRA, PointerEvent::MOUSE_BUTTON_EXTRA },
+    { JS_MOUSE_BUTTON_FORWARD, PointerEvent::MOUSE_BUTTON_FORWARD },
+    { JS_MOUSE_BUTTON_BACK, PointerEvent::MOUSE_BUTTON_BACK },
+    { JS_MOUSE_BUTTON_TASK, PointerEvent::MOUSE_BUTTON_TASK }
+};
+
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
     ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent)
@@ -59,12 +71,12 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
         return;
     }
     if (thKeyEvent.keyDownDuration < 0) {
-        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", thKeyEvent.keyDownDuration);
+        MMI_HILOGE("keyDownDuration value is invalid.value:%{public}d", thKeyEvent.keyDownDuration);
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
         return;
     }
     if (thKeyEvent.keyCode < 0) {
-        MMI_HILOGE("keyCode is less 0, can not process");
+        MMI_HILOGE("keyCode value is invalid, can not process");
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
         return;
     }
@@ -88,6 +100,7 @@ void InjectKeyEventSync(::ohos::multimodalInput::inputEventClient::KeyEventData 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
     GetInjectionEventDataNative(keyEventNative, keyEvent.keyEvent);
+    OH_Input_DestroyKeyEvent(&keyEventNative);
 #else
     auto newKeyEvent = OHOS::MMI::KeyEvent::Create();
     GetInjectionEventData(newKeyEvent, keyEvent.keyEvent);
@@ -99,6 +112,7 @@ void InjectEventSync(::ohos::multimodalInput::inputEventClient::KeyEventInfo con
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
     GetInjectionEventDataNative(keyEventNative, keyEvent.KeyEvent);
+    OH_Input_DestroyKeyEvent(&keyEventNative);
 #else
     auto lkeyEvent = OHOS::MMI::KeyEvent::Create();
     GetInjectionEventData(lkeyEvent, keyEvent.KeyEvent);
@@ -240,7 +254,20 @@ void InjectMouseEventSync(::ohos::multimodalInput::inputEventClient::MouseEventD
     HandleMouseAction(mouseEvent.mouseEvent, pointerEvent, item);
     HandleMousePropertyInt32(mouseEvent.mouseEvent, pointerEvent, item);
     HandleMousePressedButtons(mouseEvent.mouseEvent, pointerEvent, item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    bool useGlobalCoordinate = mouseEvent.useGlobalCoordinate.value_or(false);
+    int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
+    if (useGlobalCoordinate) {
+        MMI_HILOGD("useGlobalCoordinate");
+        if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+            if (!item.IsValidGlobalXY()) {
+                MMI_HILOGE("globalX globalY is invalid");
+                ::taihe::set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.globalX globalY is invalid");
+                return;
+            }
+        }
+        useCoordinate = PointerEvent::GLOBAL_COORDINATE;
+    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, true, useCoordinate);
 }
 
 int32_t HandleTouchAction(::ohos::multimodalInput::touchEvent::TouchEvent touchEvent,
@@ -265,7 +292,7 @@ int32_t HandleTouchAction(::ohos::multimodalInput::touchEvent::TouchEvent touchE
             break;
         default:
             action = RET_ERR;
-            MMI_HILOGD("action is unknown");
+            MMI_HILOGE("action is unknown");
             break;
     }
     return action;
@@ -387,7 +414,21 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
         set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.");
         return;
     }
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen());
+    bool useGlobalCoordinate = touchEvent.useGlobalCoordinate.value_or(false);
+    int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
+    if (useGlobalCoordinate) {
+        MMI_HILOGD("useGlobalCoordinate");
+        if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+            if (!item.IsValidGlobalXY()) {
+                MMI_HILOGE("globalX globalY is invalid");
+                ::taihe::set_business_error(INPUT_PARAMETER_ERROR, "Parameter error.globalX globalY is invalid");
+                return;
+            }
+        }
+        useCoordinate = PointerEvent::GLOBAL_COORDINATE;
+    }
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, pointerEvent->GetAutoToVirtualScreen(),
+        useCoordinate);
 }
 
 void PermitInjectionSync(bool result)

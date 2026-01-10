@@ -14,10 +14,6 @@
  */
 
 @!namespace("@ohos.multimodalInput.shortKey")
-@!sts_inject("""
-  { loadLibraryWithPermissionCheck("ShortKey.z", "@ohos.multimodalInput.shortKey") }
-""")
-
 enum FingerprintAction : i32 {
   DOWN = 0,
   UP = 1,

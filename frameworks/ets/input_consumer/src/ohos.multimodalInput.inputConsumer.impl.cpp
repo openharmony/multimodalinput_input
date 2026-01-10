@@ -149,9 +149,12 @@ void HandleCommonErrors(int32_t ret)
         MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR,
             "Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
-    } else if (errorCode != RET_OK) {
-        MMI_HILOGE("Dispatch control failed");
+    } else if (errorCode == COMMON_PARAMETER_ERROR) {
+        MMI_HILOGE("Parameter error");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
+    } else if (errorCode != RET_OK) {
+        MMI_HILOGE("Unknown error, errorCode:%{public}d", errorCode);
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.unknown error");
     }
 }
 
@@ -488,8 +491,6 @@ void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
         MMI_HILOGE("reportEvent or keyOption value is null");
         return;
     }
-    CHKPV(reportEvent);
-    CHKPV(reportEvent->keyOption);
     std::lock_guard<std::mutex> lock(jsCbMapMutex);
     auto &cbVec = jsCbMap_[reportEvent->eventType];
     for (auto &cb : cbVec) {
@@ -497,7 +498,7 @@ void EmitHotkeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
             continue;
         }
         size_t typeIndex = cb->callback.index();
-        if (typeIndex == FIRST_INDEX) {
+        if (typeIndex == SECOND_INDEX) {
             auto &func = std::get<taihe::callback<void(HotkeyOptions const&)>>(cb->callback);
             auto hotkeyOptions = ConvertTaiheHotkeyOptions(reportEvent->keyOption);
             func(hotkeyOptions);
@@ -746,7 +747,7 @@ void EmitKeyCallbackWork(std::shared_ptr<KeyEventMonitorInfo> reportEvent)
             continue;
         }
         size_t typeIndex = cb->callback.index();
-        if (typeIndex == SECOND_INDEX) {
+        if (typeIndex == FIRST_INDEX) {
             auto &func = std::get<taihe::callback<void(KeyOptions const&)>>(cb->callback);
             auto keyOptions = ConvertTaiheKeyOptions(reportEvent->keyOption);
             func(keyOptions);
@@ -974,10 +975,12 @@ bool GetShieldStatus(::ohos::multimodalInput::inputConsumer::ShieldMode shieldMo
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Shield mode does not exist");
         return isShield;
     }
-
     auto ret = InputManager::GetInstance()->GetShieldStatus(shieldMode, isShield);
-    HandleCommonErrors(ret);
-    return true;
+    if (ret != RET_OK) {
+        HandleCommonErrors(ret);
+        return false;
+    }
+    return isShield;
 }
 
 ::taihe::array<inputConsumer::HotkeyOptions> GetAllSystemHotkeysSync()
