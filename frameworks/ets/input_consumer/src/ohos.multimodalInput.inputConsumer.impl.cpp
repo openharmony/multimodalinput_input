@@ -265,9 +265,9 @@ void OnSubscribeKeyMonitor(size_t keyMonitorId, std::shared_ptr<KeyEvent> keyEve
 bool CheckKeyMonitorOption(const KeyMonitorOption &keyOption)
 {
     return ((allowedKeys_.find(keyOption.GetKey()) != allowedKeys_.cend()) &&
-            (keyOption.GetAction() == KeyEvent::KEY_ACTION_DOWN));
+           ((keyOption.GetAction() == KeyEvent::KEY_ACTION_DOWN) ||
+           (keyOption.GetAction() == KeyEvent::KEY_ACTION_UP)));
 }
-
 
 bool ParseKeyMonitorOption(KeyPressedConfig const& options, KeyMonitor &keyMonitor)
 {
