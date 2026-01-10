@@ -729,9 +729,9 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     if ((napi_get_boolean(env, isShield, &result)) != napi_ok) {
         MMI_HILOGE("%{public}s failed", std::string("napi_get_boolean").c_str());
-        return result;
+        return nullptr;
     }
-    return nullptr;
+    return result;
 }
 
 static napi_value GetAllSystemHotkeys(napi_env env, napi_callback_info info)
