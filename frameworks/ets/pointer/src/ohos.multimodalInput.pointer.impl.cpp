@@ -350,17 +350,18 @@ void SetCustomCursorAsync(int32_t windowId, ::ohos::multimodalInput::pointer::Cu
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "windowId is invalid");
         return;
     }
-    auto newCursor = TaihePointerUtils::ConverterToCustomCursor(cursor);
+    auto newCursor = TaihePointerUtils::ConvertToCustomCursor(cursor);
     if (!CheckCustomCursor(newCursor)) {
         MMI_HILOGE("cursor is invalid");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "cursor is invalid");
         return;
     }
-    auto options = TaihePointerUtils::ConverterToCursorConfig(config);
+    auto options = TaihePointerUtils::ConvertToCursorConfig(config);
     auto errorCode = InputManager::GetInstance()->SetCustomCursor(windowId, newCursor, options);
     if (errorCode != RET_OK) {
         TaiheError codeMsg;
         if (!TaiheConverter::GetApiError(errorCode, codeMsg)) {
+            codeMsg.msg = "Parameter error.Unknown error!";
             MMI_HILOGE("Error code %{public}d not found", errorCode);
             return;
         }
@@ -707,20 +708,7 @@ void SetPointerSizeSyncImpl(int32_t size)
 
 void SetPointerSizeAsync(int32_t size)
 {
-    CALL_DEBUG_ENTER;
-    if (size < MIN_POINTER_SIZE) {
-        size = MIN_POINTER_SIZE;
-    } else if (size > MAX_POINTER_SIZE) {
-        size = MAX_POINTER_SIZE;
-    }
-    auto errorCode = InputManager::GetInstance()->SetPointerSize(size);
-    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("Non system applications use system API");
-        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-    } else if (errorCode != RET_OK) {
-        MMI_HILOGE("SetPointerSize failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
-    }
+    SetPointerSizeSyncImpl(size);
 }
 
 int32_t GetPointerColorAsync()
@@ -774,9 +762,9 @@ void SetPointerSpeedSyncImpl(int32_t speed)
     }
     auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
     if (errorCode != RET_OK) {
-        MMI_HILOGE("Non system applications use system API");
         TaiheError codeMsg;
         if (!TaiheConverter::GetApiError(errorCode, codeMsg)) {
+            codeMsg.msg = "Parameter error.Unknown error";
             MMI_HILOGE("Error code %{public}d not found", errorCode);
         }
         taihe::set_business_error(errorCode, codeMsg.msg);
@@ -795,12 +783,13 @@ int32_t GetPointerColorSyncImpl()
     CALL_DEBUG_ENTER;
     int32_t color = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerColor(color);
-    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("Non system applications use system API");
-        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-    } else if (errorCode != RET_OK) {
-        MMI_HILOGE("GetPointerColor failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+    if (errorCode != RET_OK) {
+        TaiheError codeMsg;
+        if (!TaiheConverter::GetApiError(errorCode, codeMsg)) {
+            codeMsg.msg = "Parameter error.Unknown error!";
+            MMI_HILOGE("Error code %{public}d not found", errorCode);
+        }
+        taihe::set_business_error(errorCode, codeMsg.msg);
     }
     return color;
 }
@@ -810,12 +799,13 @@ int32_t GetPointerSizeSyncImpl()
     CALL_DEBUG_ENTER;
     int32_t size = 1;
     auto errorCode = InputManager::GetInstance()->GetPointerSize(size);
-    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("Non system applications use system API");
-        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-    } else if (errorCode != RET_OK) {
-        MMI_HILOGE("GetPointerSize failed");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+    if (errorCode != RET_OK) {
+        TaiheError codeMsg;
+        if (!TaiheConverter::GetApiError(errorCode, codeMsg)) {
+            codeMsg.msg = "Parameter error.Unknown error!";
+            MMI_HILOGE("Error code %{public}d not found", errorCode);
+        }
+        taihe::set_business_error(errorCode, codeMsg.msg);
     }
     return size;
 }

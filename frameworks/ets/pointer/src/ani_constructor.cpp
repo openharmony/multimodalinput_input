@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "mmi_log.h"
 #include "ohos.multimodalInput.pointer.ani.hpp"
 
@@ -34,7 +33,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         MMI_HILOGE("Failed to get ANI environment");
         return ANI_ERROR;
     }
-    if (int32_t ret = ohos::multimodalInput::pointer::ANIRegister(env) != ANI_OK) {
+    int32_t ret = ohos::multimodalInput::pointer::ANIRegister(env);
+    if (ret != ANI_OK) {
         MMI_HILOGE("ANIRegister failed, error: %{public}d", ret);
         return ANI_ERROR;
     }

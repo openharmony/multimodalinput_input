@@ -187,17 +187,17 @@ void onKeyPressedImpl(::taihe::array_view<::ohos::multimodalInput::keyCode::KeyC
 
 void offTouchImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_TOUCH, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_TOUCH_BOOL, receiver);
 }
 
 void offMouseImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_MOUSE, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_MOUSE, receiver);
 }
 
 void offPinchImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_PINCH, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_PINCH, receiver);
 }
 
 void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
@@ -206,7 +206,7 @@ void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receive
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_PINCH_FINGERS, receiver, fingers);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_PINCH_FINGERS, receiver, fingers);
 }
 
 void offRotateByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
@@ -215,32 +215,32 @@ void offRotateByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiv
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_ROTATE_FINGERS, receiver, fingers);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_ROTATE_FINGERS, receiver, fingers);
 }
 
 void offThreeFingersSwipeImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_THREEFINGERSWIPE, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_THREEFINGERSWIPE, receiver);
 }
 
 void offFourFingersSwipeImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_FOURFINGERSWIPE, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_FOURFINGERSWIPE, receiver);
 }
 
 void offThreeFingersTapImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_THREEFINGERSTAP, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_THREEFINGERSTAP, receiver);
 }
 
 void offFingerprintImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_FINGERPRINT, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_FINGERPRINT, receiver);
 }
 
 void offSwipeInwardImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_SWIPEINWARD, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_SWIPEINWARD, receiver);
 }
 
 void offTouchscreenSwipeImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
@@ -249,7 +249,7 @@ void offTouchscreenSwipeImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> 
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_TOUCHSCREENSWIPE_FINGERS, receiver, fingers);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS, receiver, fingers);
 }
 
 void offTouchscreenPinchImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
@@ -258,12 +258,12 @@ void offTouchscreenPinchImpl(int32_t fingers, ::taihe::optional_view<uintptr_t> 
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_TOUCHSCREENPINCH_FINGERS, receiver, fingers);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS, receiver, fingers);
 }
 
 void offKeyPressedImpl(::taihe::optional_view<uintptr_t> receiver)
 {
-    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::OFF_KEYPRESSED_KEYS, receiver);
+    ANI_INPUT_MONITOR_MGR.RemoveMonitor(MONITORFUNTYPE::ON_KEYPRESSED_KEYS, receiver);
 }
 }  // namespace
 

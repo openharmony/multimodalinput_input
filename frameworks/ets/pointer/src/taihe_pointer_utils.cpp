@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
-CustomCursor TaihePointerUtils::ConverterToCustomCursor(const ohos::multimodalInput::pointer::CustomCursor &value)
+CustomCursor TaihePointerUtils::ConvertToCustomCursor(const ohos::multimodalInput::pointer::CustomCursor &value)
 {
     CustomCursor cursor;
     ani_env *env = taihe::get_env();
@@ -55,7 +55,7 @@ CustomCursor TaihePointerUtils::ConverterToCustomCursor(const ohos::multimodalIn
     return cursor;
 }
 
-CursorOptions TaihePointerUtils::ConverterToCursorConfig(const ohos::multimodalInput::pointer::CursorConfig &value)
+CursorOptions TaihePointerUtils::ConvertToCursorConfig(const ohos::multimodalInput::pointer::CursorConfig &value)
 {
     CursorOptions opts;
     opts.followSystem = value.followSystem;

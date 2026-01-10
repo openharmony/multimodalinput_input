@@ -42,7 +42,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
     ret = ohos::multimodalInput::shortKeyFunc::ANIRegister(env);
     if (ret != ANI_OK) {
-        MMI_HILOGE("ANIRegister failed, error: %{public}d", ret);
+        MMI_HILOGE("ShortKeyFunc ANIRegister failed, error: %{public}d", ret);
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;

@@ -24,8 +24,8 @@ namespace OHOS {
 namespace MMI {
 class TaihePointerUtils {
 public:
-    static CustomCursor ConverterToCustomCursor(const ohos::multimodalInput::pointer::CustomCursor &value);
-    static CursorOptions ConverterToCursorConfig(const ohos::multimodalInput::pointer::CursorConfig &value);
+    static CustomCursor ConvertToCustomCursor(const ohos::multimodalInput::pointer::CustomCursor &value);
+    static CursorOptions ConvertToCursorConfig(const ohos::multimodalInput::pointer::CursorConfig &value);
 };
 
 } // namespace MMI

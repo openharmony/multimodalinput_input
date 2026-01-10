@@ -54,7 +54,7 @@ TaihesType TaiheInputDeviceUtils::ConverterSType(const std::string &sourceType)
     return ohos::multimodalInput::inputDevice::sourceType::from_value(sourceType);
 }
 
-TaiheaType TaiheInputDeviceUtils::ConverterATxis(const std::string &axisType)
+TaiheaType TaiheInputDeviceUtils::ConverterAxisType(const std::string &axisType)
 {
     return ohos::multimodalInput::inputDevice::axisType::from_value(axisType);
 }
@@ -75,7 +75,7 @@ TaiheAxisRange TaiheInputDeviceUtils::ConverterAxisRange(const InputDevice::Axis
 {
     TaiheAxisRange result {
         .source = ConverterSourceType(ConverterSType(sourceType)),
-        .axis = ConverterAxisType(ConverterATxis(axisType)),
+        .axis = ConverterAxisType(ConverterAxisType(axisType)),
     };
     result.max = axisInfo.GetMaximum();
     result.min = axisInfo.GetMinimum();
