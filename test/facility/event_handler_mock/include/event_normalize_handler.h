@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class IEventNormalizeHandler {
+class IEventNormalizeHandler : public IInputEventHandler {
 public:
     IEventNormalizeHandler() = default;
     virtual ~IEventNormalizeHandler() = default;

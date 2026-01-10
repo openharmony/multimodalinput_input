@@ -55,6 +55,7 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/service/joystick/src/joystick_event_processor.cpp",
     "${mmi_path}/service/joystick/src/joystick_layout_map.cpp",
     "${mmi_path}/service/common/timer_manager/src/timer_manager.cpp",
+    "${mmi_path}/service/module_loader/src/input_service_context.cpp",
     "src/joystick_event_normalize_test.cpp",
     "src/joystick_event_processor_test.cpp",
     "src/joystick_layout_map_builder.cpp",
@@ -66,9 +67,15 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
+    "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
+    "${mmi_path}/test/facility/event_filter_mock:event_filter_mock",
     "${mmi_path}/test/facility/event_handler_mock:event_handler_mock",
+    "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
+    "${mmi_path}/test/facility/key_command_mock:key_command_mock",
     "${mmi_path}/test/facility/key_event_normalize_mock:key_event_normalize_mock",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
+    "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
     "${mmi_path}/util:libmmi-util",
   ]
 
