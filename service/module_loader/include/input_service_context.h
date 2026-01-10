@@ -34,6 +34,8 @@ public:
     std::shared_ptr<IInputEventHandler> GetMonitorHandler() const override;
     std::shared_ptr<ITimerManager> GetTimerManager() const override;
     std::shared_ptr<IInputWindowsManager> GetInputWindowsManager() const override;
+    std::shared_ptr<IInputDeviceManager> GetDeviceManager() const override;
+    std::shared_ptr<IKeyMapManager> GetKeyMapManager() const override;
 
     void AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate);
 

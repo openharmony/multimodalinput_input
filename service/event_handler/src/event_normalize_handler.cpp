@@ -26,7 +26,7 @@
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #include "event_statistic.h"
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
-#include "i_joystick_event_normalize.h"
+#include "joystick_event_interface.h"
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 #include "i_input_windows_manager.h"
 #include "input_device_manager.h"

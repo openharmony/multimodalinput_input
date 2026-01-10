@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include "define_multimodal.h"
+#include "joystick_event_normalize.h"
 #include "util.h"
 
 #undef MMI_LOG_DOMAIN
@@ -33,6 +34,8 @@ namespace {
 constexpr char EMPTY_NAME[] { "" };
 constexpr char CONFIG_FILE_EXTENSION[] { ".json" };
 constexpr std::uintmax_t MAX_SIZE_OF_CONFIG { 4096 };
+constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
+constexpr int32_t REPEAT_ONCE { 1 };
 } // namespace
 
 std::vector<std::filesystem::path> JoystickLayoutMap::configBasePaths_ {
@@ -60,7 +63,7 @@ void JoystickLayoutMap::AddConfigBasePath(const std::string &basePath)
     configBasePaths_.push_back(std::move(tBasePath));
 }
 
-std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(struct libinput_device *device)
+std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(IInputServiceContext *env, struct libinput_device *device)
 {
     CHKPP(device);
     const char *name = libinput_device_get_name(device);
@@ -72,7 +75,7 @@ std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(struct libinput_devic
         return nullptr;
     }
     MMI_HILOGD("[%{public}s] Loading joystick layout from '%{private}s'", devName, cfgName.c_str());
-    auto layout = Load(cfgName);
+    auto layout = Load(env, cfgName);
     if (layout != nullptr) {
         MMI_HILOGI("[%{public}s] Joystick layout loaded from '%{private}s'", devName, layout->GetFilePath().c_str());
         return layout;
@@ -88,8 +91,16 @@ std::string JoystickLayoutMap::MapAxisModeName(AxisMode mode)
     return std::string();
 }
 
-JoystickLayoutMap::JoystickLayoutMap(const std::string &filePath)
-    : filePath_(filePath) {}
+JoystickLayoutMap::JoystickLayoutMap(IInputServiceContext *env, const std::string &filePath)
+    : env_(env), filePath_(filePath) {}
+
+JoystickLayoutMap::~JoystickLayoutMap()
+{
+    auto timerMgr = JoystickEventNormalize::GetTimerManager(env_);
+    if (timerMgr != nullptr) {
+        timerMgr->RemoveTimer(mapperTimerId_);
+    }
+}
 
 std::string JoystickLayoutMap::GetFilePath() const
 {
@@ -167,7 +178,7 @@ std::string JoystickLayoutMap::FormatConfigPath(const std::string &name)
     return std::string();
 }
 
-std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(const std::string &filePath)
+std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(IInputServiceContext *env, const std::string &filePath)
 {
     auto realPath = std::unique_ptr<char, std::function<void(char *)>>(
         ::realpath(filePath.c_str(), nullptr),
@@ -205,7 +216,7 @@ std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(const std::string &fi
         MMI_HILOGE("Failed to parse config");
         return nullptr;
     }
-    auto keyLayout = std::make_shared<JoystickLayoutMap>(realPath.get());
+    auto keyLayout = std::make_shared<JoystickLayoutMap>(env, realPath.get());
     keyLayout->OnLoading();
     keyLayout->LoadKeys(jsonDoc.get());
     keyLayout->LoadAxes(jsonDoc.get());
@@ -215,13 +226,23 @@ std::shared_ptr<JoystickLayoutMap> JoystickLayoutMap::Load(const std::string &fi
 
 void JoystickLayoutMap::OnLoading()
 {
-    mapper_ = PropertyNameMapper::Load(PropertyNameMapper::UnloadOption::UNLOAD_MANUALLY);
+    mapper_ = PropertyNameMapper::Load(nullptr, PropertyNameMapper::UnloadOption::UNLOAD_MANUALLY);
 }
 
 void JoystickLayoutMap::OnLoaded()
 {
-    mapper_.reset();
-    PropertyNameMapper::Unload(PropertyNameMapper::UnloadOption::UNLOAD_AUTOMATICALLY_WITH_DELAY);
+    auto timerMgr = JoystickEventNormalize::GetTimerManager(env_);
+    if (timerMgr == nullptr) {
+        MMI_HILOGE("TimerMgr is nullptr");
+    } else {
+        mapperTimerId_ = timerMgr->AddTimer(
+            DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
+            [this]() {
+                mapperTimerId_ = -1;
+                mapper_.reset();
+                PropertyNameMapper::Unload(nullptr, PropertyNameMapper::UnloadOption::UNLOAD_AUTOMATICALLY);
+            }, std::string("UnloadPropertyNameMapper"));
+    }
 }
 
 void JoystickLayoutMap::LoadKeys(cJSON *jsonDoc)
