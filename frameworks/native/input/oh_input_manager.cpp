@@ -895,7 +895,7 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
         item.SetGlobalX(DBL_MAX);
         item.SetGlobalY(DBL_MAX);
     }
-    if (touchEvent->pressure >= 0 && touchEvent->pressure <= 1.0) {
+    if (OHOS::MMI::MMI_DOUBLE_GE(touchEvent->pressure, 0) && OHOS::MMI::MMI_DOUBLE_LE(touchEvent->pressure, 1.0)) {
         item.SetPressure(touchEvent->pressure);
     }
     if (touchEvent->toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
@@ -1126,7 +1126,8 @@ int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
 Input_Result OH_Input_SetTouchEventPressure(struct Input_TouchEvent* touchEvent, double pressure)
 {
     CALL_DEBUG_ENTER;
-    if (touchEvent == nullptr || pressure < 0 || pressure > 1.0) {
+    if (touchEvent == nullptr || OHOS::MMI::MMI_DOUBLE_LNE(pressure, 0.0) ||
+        OHOS::MMI::MMI_DOUBLE_GNE(pressure, 1.0)) {
         return INPUT_PARAMETER_ERROR;
     }
     touchEvent->pressure = pressure;
