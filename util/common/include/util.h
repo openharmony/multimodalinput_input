@@ -168,26 +168,26 @@ inline bool MMI_LE(float left, float right) //less or equal
 
 inline bool MMI_DOUBLE_LNE(double left, double right) //less not equal
 {
-    constexpr double epsilon = -0.001f;
-    return (left - right) < epsilon;
+    constexpr double epsilon = 1e-9;
+    return left < right - epsilon;
 }
 
 inline bool MMI_DOUBLE_GNE(double left, double right) //great not equal
 {
-    constexpr double epsilon = 0.001f;
-    return (left - right) > epsilon;
+    constexpr double epsilon = 1e-9;
+    return left > right + epsilon;
 }
 
 inline bool MMI_DOUBLE_GE(double left, double right) //great or equal
 {
-    constexpr double epsilon = -0.001f;
-    return (left - right) > epsilon;
+    constexpr double epsilon = 1e-9;
+    return left >= right - epsilon;
 }
 
 inline bool MMI_DOUBLE_LE(double left, double right) //less or equal
 {
-    constexpr double epsilon = 0.001f;
-    return (left - right) < epsilon;
+    constexpr double epsilon = 1e-9;
+    return left <= right + epsilon;
 }
 
 inline constexpr int64_t MS2US(int64_t ms)
