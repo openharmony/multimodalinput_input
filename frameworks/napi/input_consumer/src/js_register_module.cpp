@@ -727,7 +727,10 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
     auto errCode = InputManager::GetInstance()->GetShieldStatus(shieldMode, isShield);
     JsCommon::ThrowError(env, errCode);
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_get_boolean(env, isShield, &result));
+    if ((napi_get_boolean(env, isShield, &result)) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string("GetShieldStatus napi_get_boolean").c_str());
+        return nullptr;
+    }
     return result;
 }
 
@@ -1300,7 +1303,10 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus),
         DECLARE_NAPI_FUNCTION("getAllSystemHotkeys", GetAllSystemHotkeys)
     };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    if ((napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc)) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string("MmiInit napi_define_properties").c_str());
+        return nullptr;
+    }
     if (CreateShieldMode(env, exports) == nullptr) {
         THROWERR(env, "Failed to create shield mode");
         return nullptr;
