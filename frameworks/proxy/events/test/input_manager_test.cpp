@@ -6320,7 +6320,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_004, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), ERROR_REPEAT_INTERCEPTOR);
+    auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE);
+    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
     EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
 }
 
