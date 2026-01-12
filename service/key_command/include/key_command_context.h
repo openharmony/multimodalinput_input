@@ -48,6 +48,7 @@ public:
     std::map<int32_t, int32_t> specialKeys_;
     TwoFingerGesture twoFingerGesture_;
 
+    MultiFingersTap threeFingersTap_;
 public:
     bool IsValid() const
     {

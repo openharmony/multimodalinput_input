@@ -92,7 +92,6 @@ HWTEST_F(InputManagerAncoTest, InputManagerAncoTest_SyncPointerEvent_001, TestSi
     CALL_TEST_DEBUG;
     auto monitor = std::make_shared<AncoMonitor>();
     ASSERT_EQ(InputManager::GetInstance()->AncoAddConsumer(monitor), RET_OK);
-    std::this_thread::sleep_for(std::chrono::minutes(1));
     ASSERT_EQ(InputManager::GetInstance()->AncoRemoveConsumer(monitor), RET_OK);
 }
 

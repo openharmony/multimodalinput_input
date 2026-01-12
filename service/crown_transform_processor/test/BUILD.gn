@@ -34,6 +34,7 @@ ohos_unittest("CrownTransformProcessorTest") {
   include_dirs = [
     "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_path}/test/facility/mock/include",
+    "${mmi_path}/service/common/include",
   ]
 
   sanitize = {

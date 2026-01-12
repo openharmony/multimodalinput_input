@@ -4391,7 +4391,11 @@ HWTEST_F(MMIServerTest, MMIService_SyncKnuckleStatus_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     int32_t ret = mmiService.SyncKnuckleStatus();
+#ifdef OHOS_BUILD_KNUCKLE
     EXPECT_NE(ret, RET_OK);
+#else
+    EXPECT_EQ(ret, RET_OK);
+#endif // OHOS_BUILD_KNUCKLE
 }
 #endif
 

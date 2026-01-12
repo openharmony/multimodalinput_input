@@ -47,7 +47,6 @@ ohos_unittest("JsonParserTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/util:mmi_json_parser"
    ]
 
   external_deps = [

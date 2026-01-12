@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef FINGERSENSE_MANAGER_H
-#define FINGERSENSE_MANAGER_H
-#include "singleton.h"
+#ifndef KNUCKLE_TYPE_H
+#define KNUCKLE_TYPE_H
+
+#include <cstdint>
 
 namespace OHOS {
 namespace MMI {
@@ -32,14 +33,6 @@ struct TouchType {
     int32_t touch_kind { 0 };
     int32_t displayId { 0 };
 };
-
-class FingersenseManager final {
-    DECLARE_DELAYED_SINGLETON(FingersenseManager);
-public:
-    DISALLOW_COPY_AND_MOVE(FingersenseManager);
-    void Init();
-    void KnuckleClassifyTouch(TouchType *rawTouch);
-};
 } // namespace MMI
 } // namespace OHOS
-#endif // FINGERSENSE_MANAGER_H
+#endif // KNUCKLE_TYPE_H

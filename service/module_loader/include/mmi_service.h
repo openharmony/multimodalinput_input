@@ -27,9 +27,6 @@
 #include "input_event_handler.h"
 #include "input_service_context.h"
 #include "json_parser.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "knuckle_drawing_component.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"

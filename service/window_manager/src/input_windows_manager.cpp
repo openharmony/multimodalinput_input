@@ -22,9 +22,9 @@
 #include "event_log_helper.h"
 #include "json_parser.h"
 #include "pixel_map.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "knuckle_drawing_component.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 #include "key_command_handler_util.h"
 #include "libinput.h"
 #include "mmi_matrix3.h"
@@ -2172,16 +2172,12 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
     displayMode_ = mode;
     displayModeMap_[groupId] = mode;
     displayMode = mode;
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
-        MMI_HILOGD("Send fingersense display mode is nullptr");
-        return;
-    }
+#ifdef OHOS_BUILD_KNUCKLE
     MMI_HILOGI("Update fingersense display mode, displayMode:%{public}d", displayMode);
     BytraceAdapter::StartUpdateDisplayMode("display mode change");
-    FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode));
+    KnuckleHandlerComponent::GetInstance().UpdateDisplayMode(static_cast<int32_t>(displayMode));
     BytraceAdapter::StopUpdateDisplayMode();
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -6295,28 +6291,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY) && \
-    defined(OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER)
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    CHKPV(InputHandler->GetKeyCommandHandler());
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem item;
-    if (!pointerEvent->GetPointerItem(pointerId, item)) {
-        MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
-        return;
-    }
-    if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-        auto isInMethodWindow = InputHandler->GetKeyCommandHandler()->CheckInputMethodArea(pointerEvent);
-        if (isInMethodWindow) {
-            // The input method window blocks knuckle event
-            item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
-            pointerEvent->UpdatePointerItem(pointerId, item);
-        } else {
-            KnuckleDrawingComponent::GetInstance().Draw(*physicDisplayInfo, pointerEvent);
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY && OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);

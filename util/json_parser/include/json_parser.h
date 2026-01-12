@@ -42,6 +42,8 @@ private:
 
 public:
     static int32_t ParseInt32(const cJSON *json, const std::string &key, int32_t &value);
+    static int32_t ParseFloat(const cJSON *json, const std::string &key, float &value);
+    static int32_t ParseDouble(const cJSON *json, const std::string &key, double &value);
     static int32_t ParseString(const cJSON *json, const std::string &key, std::string &value);
     static int32_t ParseBool(const cJSON *json, const std::string &key, bool &value);
     static int32_t ParseStringArray(const cJSON *json, const std::string &key, std::vector<std::string> &value,

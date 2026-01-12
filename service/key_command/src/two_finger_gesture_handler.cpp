@@ -30,7 +30,7 @@ namespace {
 constexpr int64_t SCREEN_TIME_OUT { 100 };
 } // namespace
 
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
 void TwoFingerGestureHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -54,7 +54,7 @@ void TwoFingerGestureHandler::HandleFingerGestureDownEvent(const std::shared_ptr
         context_.twoFingerGesture_.touches[num - 1].downTime = item.GetDownTime();
     }
 }
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void TwoFingerGestureHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -82,16 +82,16 @@ void TwoFingerGestureHandler::HandlePointerActionMoveEvent(const std::shared_ptr
     auto dy = std::abs(pos->y - item.GetDisplayY());
     auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
     if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
         MMI_HILOGD("Finger movement distance greater than 20VP, defaultDistance:%{public}d, moveDistance:%{public}f",
             ConvertVPToPX(TOUCH_MAX_THRESHOLD), moveDistance);
         StopTwoFingerGesture();
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
 void TwoFingerGestureHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -189,7 +189,7 @@ bool TwoFingerGestureHandler::CheckTwoFingerGestureAction() const
 
     return true;
 }
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
 
 int32_t TwoFingerGestureHandler::CheckTwoFingerGesture(int32_t pid)
 {

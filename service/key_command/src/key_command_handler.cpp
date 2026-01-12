@@ -24,7 +24,6 @@
 #include "json_parser.h"
 #include "product_name_definition.h"
 #include "event_log_helper.h"
-#include "gesturesense_wrapper.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
@@ -41,6 +40,9 @@
 #include "multimodal_input_plugin_manager.h"
 #include <dlfcn.h>
 #include <iostream>
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -50,28 +52,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr float MOVE_TOLERANCE { 3.0f };
-constexpr float MIN_GESTURE_STROKE_LENGTH { 200.0f };
-constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
-constexpr float MIN_START_GESTURE { 60.0f };
-constexpr int32_t POINTER_NUMBER { 2 };
 constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY { 1000 };
-constexpr int64_t TAP_DOWN_INTERVAL_MILLIS { 550000 };
 constexpr int64_t SOS_DELAY_TIMES { 1000000 };
 constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 constexpr int32_t ANCO_KNUCKLE_POINTER_ID { 15000 };
-const char* WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int64_t POWER_ACTION_INTERVAL { 600 };
 constexpr int64_t SOS_WAIT_TIME { 3000 };
 const char* KEY_ENABLE { "enable" };
 const char* KEY_STATUS { "status" };
-constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
-const std::string SECURE_SETTING_URI_PROXY {
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
 constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
 constexpr int32_t SENSOR_REPORT_INTERVAL = 100000000;
 const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
@@ -168,6 +160,9 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
+#ifdef OHOS_BUILD_KNUCKLE
+    KnuckleHandlerComponent::GetInstance().HandleKnuckleEvent(pointerEvent);
+#endif // OHOS_BUILD_KNUCKLE
     OnHandleTouchEvent(pointerEvent);
     int32_t id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem item;
@@ -179,13 +174,6 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
-
-bool KeyCommandHandler::SkipKnuckleDetect()
-{
-    return ((screenCapturePermission_ & (KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE |
-                                           KNUCKLE_SCREEN_RECORDING)) == 0) ||
-           !(screenshotSwitch_.statusConfigValue || recordSwitch_.statusConfigValue) || gameForbidFingerKnuckle_;
-}
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -223,19 +211,10 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             MMI_HILOGD("Unknown pointer action:%{public}d", touchEvent->GetPointerAction());
             break;
     }
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    HandleKnuckleGestureEvent(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
 
 void KeyCommandHandler::InitializeLongPressConfigurations()
 {
-    if (!isDistanceConfig_) {
-        distanceDefaultConfig_ = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG * VPR_CONFIG;
-        distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
-        SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
-        isDistanceConfig_ = true;
-    }
 }
 
 void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -247,10 +226,8 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     MMI_HILOGD("Pointer tool type:%{public}d", toolType);
-    singleKnuckleGesture_.state = false;
-    doubleKnuckleGesture_.state = false;
     switch (toolType) {
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
         case PointerEvent::TOOL_TYPE_FINGER: {
             twoFingerGestureHandler_->HandleFingerGestureDownEvent(touchEvent);
             if (CheckBundleName(touchEvent)) {
@@ -261,13 +238,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             }
             break;
         }
-        case PointerEvent::TOOL_TYPE_KNUCKLE: {
-            CheckAndUpdateTappingCountAtDown(touchEvent);
-            DfxHisysevent::ReportKnuckleClickEvent();
-            HandleKnuckleGestureDownEvent(touchEvent);
-            break;
-        }
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
         default: {
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
@@ -284,7 +255,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     switch (toolType) {
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
         case PointerEvent::TOOL_TYPE_FINGER: {
             twoFingerGestureHandler_->HandleFingerGestureUpEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
@@ -293,159 +264,16 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             }
             break;
         }
-        case PointerEvent::TOOL_TYPE_KNUCKLE: {
-            HandleKnuckleGestureUpEvent(touchEvent);
-            break;
-        }
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
         default: {
-            MMI_HILOGW("Current touch event tool type:%{public}d", toolType);
+            MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
         }
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    int32_t id = touchEvent->GetPointerId();
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
-    int64_t currentDownTime = item.GetDownTime();
-    if (!lastPointerDownTime_.empty()) {
-        int64_t firstDownTime = lastPointerDownTime_.begin()->second;
-        int64_t lastPointerDownTime = touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ?
-            lastPointerDownTime_[SIMULATE_POINTER_ID] : firstDownTime;
-        int64_t diffTime = currentDownTime - lastPointerDownTime;
-        lastPointerDownTime_[id] = currentDownTime;
-        MMI_HILOGW("Size:%{public}zu, firstDownTime:%{public}" PRId64 ", "
-            "currentDownTime:%{public}" PRId64 ", diffTime:%{public}" PRId64,
-            lastPointerDownTime_.size(), firstDownTime, currentDownTime, diffTime);
-        if (diffTime > TWO_FINGERS_TIME_LIMIT) {
-            MMI_HILOGE("Invalid double knuckle event, pointerId:%{public}d", id);
-            return;
-        }
-    }
-
-    lastPointerDownTime_[id] = currentDownTime;
-    auto items = touchEvent->GetAllPointerItems();
-    MMI_HILOGI("The itemsSize:%{public}zu", items.size());
-    for (const auto &item : items) {
-        if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
-            MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
-            return;
-        }
-    }
-    if (CheckInputMethodArea(touchEvent)) {
-        MMI_HILOGW("Event skipping inputmethod area");
-        return;
-    }
-    size_t pointercnt = touchEvent->GetPointerIds().size();
-    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
-        SingleKnuckleGestureProcesser(touchEvent);
-        isDoubleClick_ = false;
-        knuckleCount_++;
-    } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
-        DoubleKnuckleGestureProcesser(touchEvent);
-        isDoubleClick_ = true;
-    } else {
-        MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
-    }
-}
-
-void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    int32_t id = touchEvent->GetPointerId();
-    auto it = lastPointerDownTime_.find(id);
-    if (it != lastPointerDownTime_.end()) {
-        MMI_HILOGW("lastPointerDownTime_ has been erased, pointerId:%{public}d", id);
-        lastPointerDownTime_.erase(it);
-    }
-
-    previousUpTime_ = touchEvent->GetActionTime();
-    size_t pointercnt = touchEvent->GetPointerIds().size();
-    if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
-        singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
-    } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
-        doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
-    } else {
-        MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
-    }
-}
-
-void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    singleKnuckleGesture_.state = false;
-    KnuckleGestureProcessor(touchEvent, singleKnuckleGesture_, KnuckleType::KNUCKLE_TYPE_SINGLE);
-}
-
-void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    doubleKnuckleGesture_.state = false;
-    KnuckleGestureProcessor(touchEvent, doubleKnuckleGesture_, KnuckleType::KNUCKLE_TYPE_DOUBLE);
-}
-
-void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
-    KnuckleGesture &knuckleGesture, KnuckleType type)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    if (tappingCount_ > MAX_TAP_COUNT) {
-        MMI_HILOGI("Knuckle tapping count more than twice:%{public}d", tappingCount_);
-        return;
-    }
-    if (knuckleGesture.lastPointerDownEvent == nullptr) {
-        MMI_HILOGI("Knuckle gesture first down Event");
-        knuckleGesture.lastPointerDownEvent = touchEvent;
-        UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
-        return;
-    }
-    int64_t intervalTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
-    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
-    float downToPrevDownDistance = AbsDiff(knuckleGesture, touchEvent);
-    bool isDistanceReady = downToPrevDownDistance < downToPrevDownDistanceConfig_;
-    knuckleGesture.downToPrevUpTime = intervalTime;
-    knuckleGesture.doubleClickDistance = downToPrevDownDistance;
-    UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
-    if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
-        MMI_HILOGI("Knuckle gesture start launch ability");
-        knuckleCount_ = 0;
-        if ((type == KnuckleType::KNUCKLE_TYPE_SINGLE && HasScreenCapturePermission(KNUCKLE_SCREENSHOT)) ||
-            (type == KnuckleType::KNUCKLE_TYPE_DOUBLE && HasScreenCapturePermission(KNUCKLE_SCREEN_RECORDING))) {
-            BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
-            LAUNCHER_ABILITY->LaunchAbility(knuckleGesture.ability, NO_DELAY);
-            BytraceAdapter::StopLaunchAbility();
-            if (type == KnuckleType::KNUCKLE_TYPE_SINGLE) {
-                DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
-            } else if (type == KnuckleType::KNUCKLE_TYPE_DOUBLE) {
-                DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
-            }
-            ReportKnuckleScreenCapture(touchEvent);
-        }
-        knuckleGesture.state = true;
-    } else {
-        if (knuckleCount_ > KNUCKLE_KNOCKS) {
-            knuckleCount_ = 0;
-            MMI_HILOGW("Time ready:%{public}d, distance ready:%{public}d", isTimeIntervalReady, isDistanceReady);
-            if (!isTimeIntervalReady) {
-                DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
-            } else if (!isDistanceReady) {
-                DfxHisysevent::ReportFailIfInvalidDistance(touchEvent, downToPrevDownDistance);
-            }
-        }
-    }
-    AdjustDistanceConfigIfNeed(downToPrevDownDistance);
-}
-
+#ifdef OHOS_BUILD_KNUCKLE
 void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -486,366 +314,7 @@ void KeyCommandHandler::SendNotSupportMsg(std::shared_ptr<PointerEvent> touchEve
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     udsServer->SendMsg(fd, pktUp);
 }
-
-void KeyCommandHandler::UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent,
-    KnuckleGesture &knuckleGesture)
-{
-    int32_t id = touchEvent->GetPointerId();
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
-    knuckleGesture.lastDownPointer.x = item.GetDisplayX();
-    knuckleGesture.lastDownPointer.y = item.GetDisplayY();
-    knuckleGesture.lastDownPointer.id = touchEvent->GetId();
-}
-
-void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
-{
-    CALL_DEBUG_ENTER;
-    float newDistanceConfig;
-    MMI_HILOGI("Down to prev down distance:%{public}f, config distance:%{public}f",
-        distance, downToPrevDownDistanceConfig_);
-    if (IsEqual(downToPrevDownDistanceConfig_, distanceDefaultConfig_)) {
-        if (distance < distanceDefaultConfig_ || distance > distanceLongConfig_) {
-            return;
-        }
-        newDistanceConfig = distanceLongConfig_;
-    } else if (IsEqual(downToPrevDownDistanceConfig_, distanceLongConfig_)) {
-        if (distance > distanceDefaultConfig_) {
-            return;
-        }
-        newDistanceConfig = distanceDefaultConfig_;
-    } else {
-        return;
-    }
-    checkAdjustDistanceCount_++;
-    if (checkAdjustDistanceCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
-        return;
-    }
-    MMI_HILOGI("Adjust new double click distance:%{public}f", newDistanceConfig);
-    downToPrevDownDistanceConfig_ = newDistanceConfig;
-    checkAdjustDistanceCount_ = 0;
-}
-
-void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    CHKPV(touchEvent);
-    size_t pointercnt = touchEvent->GetPointerIds().size();
-    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
-        DfxHisysevent::ReportScreenCaptureGesture();
-        return;
-    }
-    MMI_HILOGW("Current touch event pointercnt:%{public}zu", pointercnt);
-}
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    if (!CheckKnuckleCondition(touchEvent)) {
-        return;
-    }
-    CHKPV(touchEvent);
-    int32_t touchAction = touchEvent->GetPointerAction();
-    if (IsValidAction(touchAction)) {
-        switch (touchAction) {
-            case PointerEvent::POINTER_ACTION_CANCEL:
-            case PointerEvent::POINTER_ACTION_UP: {
-                HandleKnuckleGestureTouchUp(touchEvent);
-                break;
-            }
-            case PointerEvent::POINTER_ACTION_MOVE: {
-                HandleKnuckleGestureTouchMove(touchEvent);
-                break;
-            }
-            case PointerEvent::POINTER_ACTION_DOWN: {
-                HandleKnuckleGestureTouchDown(touchEvent);
-                break;
-            }
-            default:
-                MMI_HILOGD("Unknown pointer action:%{public}d", touchAction);
-                break;
-        }
-    }
-}
-
-bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent)
-{
-    CHKPF(touchEvent);
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
-    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
-        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
-        ResetKnuckleGesture();
-        return false;
-    }
-    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
-    if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_) {
-        lastDirection_ = physicDisplayInfo->direction;
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE && !gesturePoints_.empty()) {
-            MMI_HILOGW("The screen has been rotated while knuckle is moving");
-            ResetKnuckleGesture();
-            return false;
-        }
-    }
-    if (CheckInputMethodArea(touchEvent)) {
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
-            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-            MMI_HILOGI("In input method area, skip");
-        }
-        return false;
-    }
-    return true;
-}
-
-bool KeyCommandHandler::IsValidAction(int32_t action)
-{
-    CALL_DEBUG_ENTER;
-    if (action == PointerEvent::POINTER_ACTION_DOWN ||
-        ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP ||
-        action == PointerEvent::POINTER_ACTION_CANCEL) && !gesturePoints_.empty())) {
-        return true;
-    }
-    return false;
-}
-
-std::pair<int32_t, int32_t> KeyCommandHandler::CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
-    PointerEvent::PointerItem pointerItem)
-{
-    CALL_DEBUG_ENTER;
-    double physicalX = pointerItem.GetRawDisplayX();
-    double physicalY = pointerItem.GetRawDisplayY();
-    if (!displayInfo.transform.empty()) {
-        auto displayXY = WIN_MGR->TransformDisplayXY(displayInfo, physicalX, physicalY);
-        physicalX = displayXY.first;
-        physicalY = displayXY.second;
-    }
-    return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
-}
-
-void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    ResetKnuckleGesture();
-    isStartBase_ = false;
-    int32_t id = touchEvent->GetPointerId();
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
-    sessionKey_ = "Base" + std::to_string(item.GetDownTime());
-    auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
-    CHKPV(displayInfo);
-    auto displayXY = CalcDrawCoordinate(*displayInfo, item);
-    gestureLastX_ = displayXY.first;
-    gestureLastY_ = displayXY.second;
-
-    gesturePoints_.emplace_back(gestureLastX_);
-    gesturePoints_.emplace_back(gestureLastY_);
-    gestureTimeStamps_.emplace_back(touchEvent->GetActionTime());
-}
-
-void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
-    auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
-    CHKPV(displayInfo);
-    auto displayXY = CalcDrawCoordinate(*displayInfo, item);
-    float eventX = displayXY.first;
-    float eventY = displayXY.second;
-    float dx = std::abs(eventX - gestureLastX_);
-    float dy = std::abs(eventY - gestureLastY_);
-    if (dx >= MOVE_TOLERANCE || dy >= MOVE_TOLERANCE) {
-        gestureLastX_ = eventX;
-        gestureLastY_ = eventY;
-        gesturePoints_.emplace_back(gestureLastX_);
-        gesturePoints_.emplace_back(gestureLastY_);
-        gestureTimeStamps_.emplace_back(touchEvent->GetActionTime());
-        if (!isStartBase_ && IsMatchedAbility(gesturePoints_, gestureLastX_, gestureLastY_)) {
-            MMI_HILOGI("First time start aility, size:%{public}zu", gesturePoints_.size());
-            ProcessKnuckleGestureTouchUp(NotifyType::REGIONGESTURE);
-            isStartBase_ = true;
-        }
-        if (!isGesturing_) {
-            gestureTrackLength_ += sqrt(dx * dx + dy * dy);
-            if (gestureTrackLength_ > MIN_GESTURE_STROKE_LENGTH) {
-                isGesturing_ = true;
-            }
-        }
-        if (isGesturing_ && !isLetterGesturing_) {
-            auto GetBoundingSquareness = GESTURESENSE_WRAPPER->getBoundingSquareness_;
-            CHKPV(GetBoundingSquareness);
-            auto boundingSquareness = GetBoundingSquareness(gesturePoints_);
-            if (boundingSquareness > MIN_LETTER_GESTURE_SQUARENESS) {
-                isLetterGesturing_ = true;
-            }
-        }
-    }
-}
-
-void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    auto touchUp = GESTURESENSE_WRAPPER->touchUp_;
-    CHKPV(touchUp);
-    MMI_HILOGI("Knuckle gesturePoints size:%{public}zu, isGesturing:%{public}d, isLetterGesturing:%{public}d",
-        gesturePoints_.size(), isGesturing_, isLetterGesturing_);
-    NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
-        isGesturing_, isLetterGesturing_));
-    switch (notifyType) {
-        case NotifyType::REGIONGESTURE: {
-            if (HasScreenCapturePermission(KNUCKLE_ENABLE_AI_BASE)) {
-                ProcessKnuckleGestureTouchUp(notifyType);
-            } else {
-                MMI_HILOGI("knuckle_enable_ai_base is skipped in HandleKnuckleGestureTouchUp, "
-                           "screenCapturePermission_:%{public}d",
-                    screenCapturePermission_);
-            }
-            drawOSuccTimestamp_ = touchEvent->GetActionTime();
-            ReportRegionGesture();
-            break;
-        }
-        case NotifyType::LETTERGESTURE: {
-            if (HasScreenCapturePermission(KNUCKLE_SCROLL_SCREENSHOT)) {
-                ProcessKnuckleGestureTouchUp(notifyType);
-            } else {
-                MMI_HILOGI("knuckle_scroll_screenshot is skipped in HandleKnuckleGestureTouchUp, "
-                           "screenCapturePermission_:%{public}d",
-                    screenCapturePermission_);
-            }
-            drawOFailTimestamp_ = touchEvent->GetActionTime();
-            ReportLetterGesture();
-            break;
-        }
-        default: {
-            MMI_HILOGW("Not a region gesture or letter gesture, notifyType:%{public}d", notifyType);
-            drawOFailTimestamp_ = touchEvent->GetActionTime();
-            ReportIfNeed();
-            break;
-        }
-    }
-    ResetKnuckleGesture();
-}
-
-void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
-{
-    Ability ability;
-    ability.abilityType = EXTENSION_ABILITY;
-    if (type == NotifyType::REGIONGESTURE) {
-        ability.abilityName = WAKEUP_ABILITY_NAME;
-        ability.bundleName = BUNDLE_NAME_PARSER.GetBundleName("AIBASE_BUNDLE_NAME");
-        ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
-        MMI_HILOGI("The isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
-        if (!isStartBase_) {
-            ability.params.emplace(std::make_pair("fingerPath", ""));
-            ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture_pre"));
-        } else {
-            ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
-            ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
-        }
-        ability.params.emplace(std::make_pair("session_id", sessionKey_));
-    } else if (type == NotifyType::LETTERGESTURE) {
-        ability.abilityName = BUNDLE_NAME_PARSER.GetBundleName("SCREENSHOT_ABILITY_NAME");
-        ability.bundleName = BUNDLE_NAME_PARSER.GetBundleName("SCREENSHOT_BUNDLE_NAME");
-        ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
-        ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
-    }
-    LAUNCHER_ABILITY->LaunchAbility(ability, NO_DELAY);
-}
-
-void KeyCommandHandler::ResetKnuckleGesture()
-{
-    gestureLastX_ = 0.0f;
-    gestureLastY_ = 0.0f;
-    isGesturing_ = false;
-    isLetterGesturing_ = false;
-    gestureTrackLength_ = 0.0f;
-    gesturePoints_.clear();
-    gestureTimeStamps_.clear();
-}
-
-std::string KeyCommandHandler::GesturePointsToStr() const
-{
-    int32_t count = static_cast<int32_t>(gesturePoints_.size());
-    if (count % EVEN_NUMBER != 0 || count == 0) {
-        MMI_HILOGE("Invalid gesturePoints_ size");
-        return "";
-    }
-    cJSON *jsonArray = cJSON_CreateArray();
-    CHKFR(jsonArray, "", "Invalid jsonArray");
-    for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
-        cJSON *jsonData = cJSON_CreateObject();
-        CHKPC(jsonData);
-        cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
-        cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
-        cJSON_AddItemToArray(jsonArray, jsonData);
-    }
-    char *jsonString = cJSON_Print(jsonArray);
-    if (jsonString == nullptr) {
-        cJSON_Delete(jsonArray);
-        MMI_HILOGE("Failed to print JSON");
-        return "";
-    }
-    std::string result = std::string(jsonString);
-    cJSON_Delete(jsonArray);
-    cJSON_free(jsonString);
-    return result;
-}
-
-void KeyCommandHandler::ReportIfNeed()
-{
-    if (!isGesturing_) {
-        return;
-    }
-    DfxHisysevent::ReportKnuckleGestureFaildTimes();
-    DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
-    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
-    if (isLastGestureSucceed_) {
-        DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(drawOFailTimestamp_ - drawOSuccTimestamp_);
-    }
-    isLastGestureSucceed_ = false;
-}
-
-void KeyCommandHandler::ReportRegionGesture()
-{
-    DfxHisysevent::ReportSmartShotSuccTimes();
-    ReportGestureInfo();
-}
-
-void KeyCommandHandler::ReportLetterGesture()
-{
-    DfxHisysevent::ReportKnuckleDrawSSuccessTimes();
-    ReportGestureInfo();
-}
-
-void KeyCommandHandler::ReportGestureInfo()
-{
-    DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
-    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
-    if (!isLastGestureSucceed_) {
-        DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(drawOSuccTimestamp_ - drawOFailTimestamp_);
-    }
-    isLastGestureSucceed_ = true;
-}
-
-bool KeyCommandHandler::IsMatchedAbility(std::vector<float> gesturePoints,
-    float gestureLastX, float gestureLastY)
-{
-    if (gesturePoints.size() < POINTER_NUMBER) {
-        MMI_HILOGI("The gesturePoints_ is empty");
-        return false;
-    }
-    float gestureFirstX = gesturePoints[0];
-    float gestureFirstY = gesturePoints[1];
-    float distance = std::min(std::abs(gestureLastX - gestureFirstX), std::abs(gestureLastY - gestureFirstY));
-    return distance >= MIN_START_GESTURE;
-}
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-
+#endif // OHOS_BUILD_KNUCKLE
 void KeyCommandHandler::InitParse()
 {
     if (configParser_ == nullptr) {
@@ -858,13 +327,6 @@ void KeyCommandHandler::InitParse()
             return;
         }
         context_.isParseConfig_ = true;
-    }
-    if (!isKnuckleParseConfig_) {
-        if (!ParseKnuckleConfig()) {
-            MMI_HILOGE("Parse knuckle config failed");
-            return;
-        }
-        isKnuckleParseConfig_ = true;
     }
 }
 
@@ -952,22 +414,6 @@ int32_t KeyCommandHandler::GetRetValue()
     return ret_.load(std::memory_order_relaxed);
 }
 
-bool KeyCommandHandler::ParseKnuckleConfig()
-{
-    const std::string defaultConfig { "/system/etc/multimodalinput/ability_launch_config.json" };
-    const char configName[] { "/etc/multimodalinput/ability_launch_config.json" };
-    char buf[MAX_PATH_LEN] {};
-
-    char *filePath = ::GetOneCfgFile(configName, buf, sizeof(buf));
-    if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
-        MMI_HILOGD("Can not get customization config file");
-        return ParseKnuckleJson(defaultConfig);
-    }
-    std::string customConfig = filePath;
-    MMI_HILOGD("The configuration file path:%{private}s", customConfig.c_str());
-    return ParseKnuckleJson(customConfig) || ParseKnuckleJson(defaultConfig);
-}
-
 void KeyCommandHandler::ParseRepeatKeyMaxCount()
 {
     if (repeatKeys_.empty()) {
@@ -989,38 +435,6 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
     }
     context_.maxCount_ = tempCount;
     context_.intervalTime_ = tempDelay;
-}
-
-bool KeyCommandHandler::ParseKnuckleJson(const std::string &configFile)
-{
-    CALL_DEBUG_ENTER;
-    std::string jsonStr = ReadJsonFile(configFile);
-    if (jsonStr.empty()) {
-        MMI_HILOGE("Read configFile failed");
-        return false;
-    }
-    JsonParser parser(jsonStr.c_str());
-    if (parser.Get() == nullptr) {
-        MMI_HILOGE("parser is nullptr");
-        return false;
-    }
-    if (!cJSON_IsObject(parser.Get())) {
-        MMI_HILOGE("Parser.Get() is not object");
-        return false;
-    }
-
-    bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
-    bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
-    bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
-    screenshotSwitch_.statusConfig = SNAPSHOT_KNUCKLE_SWITCH;
-    screenshotSwitch_.statusConfigValue = true;
-    recordSwitch_.statusConfig = RECORD_KNUCKLE_SWITCH;
-    recordSwitch_.statusConfigValue = true;
-    if (!isParseSingleKnuckleGesture && !isParseDoubleKnuckleGesture && !isParseMultiFingersTap) {
-        MMI_HILOGE("Parse configFile failed");
-        return false;
-    }
-    return true;
 }
 
 bool KeyCommandHandler::IsExcludeKey(const std::shared_ptr<KeyEvent> key)
@@ -1122,7 +536,6 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         }
         MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
-        ptr->OnKunckleSwitchStatusChange(item.statusConfig);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.statusConfig, updateFunc);
@@ -1140,63 +553,6 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
     }
     MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
     item.statusConfigValue = configVlaue;
-}
-
-int32_t KeyCommandHandler::RegisterKnuckleSwitchByUserId(int32_t userId)
-{
-    CALL_DEBUG_ENTER;
-    currentUserId_ = userId;
-    CreateKnuckleConfigObserver(screenshotSwitch_);
-    CreateKnuckleConfigObserver(recordSwitch_);
-    return RET_OK;
-}
-
-bool KeyCommandHandler::GetKnuckleSwitchStatus(const std::string& key, const std::string &strUri, bool defaultValue)
-{
-    std::string strVal;
-    int32_t ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetStringValue(key, strVal, strUri);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get value from setting data fail, the default value=%{public}d", defaultValue);
-        return defaultValue;
-    }
-
-    if (strVal != "1" && strVal != "0") {
-        MMI_HILOGE("Invalid value=%{public}s, the default value=%{public}d", strVal.c_str(), defaultValue);
-        return defaultValue;
-    }
-    return (strVal == "1") ? true : false;
-}
-
-void KeyCommandHandler::CreateKnuckleConfigObserver(KnuckleSwitch &item)
-{
-    CALL_DEBUG_ENTER;
-    char buf[DEFAULT_BUFFER_LENGTH] {};
-    if (sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), currentUserId_) < 0) {
-        MMI_HILOGE("Failed to format URI");
-        return;
-    }
-    std::string strUri(buf);
-    SettingObserver::UpdateFunc updateFunc = [weak = weak_from_this(), &item, strUri](const std::string& key) {
-        auto ptr = weak.lock();
-        if (ptr == nullptr) {
-            MMI_HILOGE("KeyCommandHandler object is nullptr");
-            return;
-        }
-        item.statusConfigValue = ptr->GetKnuckleSwitchStatus(key, strUri, true);
-        MMI_HILOGW("knuckle switch status update, key:%{public}s, value:%{public}d", key.c_str(),
-            item.statusConfigValue);
-        ptr->OnKunckleSwitchStatusChange(item.statusConfig);
-    };
-    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .CreateObserver(item.statusConfig, updateFunc);
-    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver, strUri);
-    if (ret != ERR_OK) {
-        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
-        statusObserver = nullptr;
-    }
-    item.statusConfigValue = GetKnuckleSwitchStatus(item.statusConfig, strUri, true);
-    MMI_HILOGW("knuckle switch status update, key:%s, value:%{public}d", item.statusConfig.c_str(),
-        item.statusConfigValue);
 }
 
 bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
@@ -1306,11 +662,6 @@ void KeyCommandHandler::InitKeyObserver()
         ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
     }
-    if (!isKnuckleSwitchConfig_) {
-        CreateKnuckleConfigObserver(screenshotSwitch_);
-        CreateKnuckleConfigObserver(recordSwitch_);
-        isKnuckleSwitchConfig_ = true;
-    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1412,8 +763,9 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
         MMI_HILOGI("The touchpad trip tap will launch ability");
-        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, threeFingersTap_.ability.bundleName);
-        LAUNCHER_ABILITY->LaunchAbility(threeFingersTap_.ability, NO_DELAY);
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS,
+            context_.threeFingersTap_.ability.bundleName);
+        LAUNCHER_ABILITY->LaunchAbility(context_.threeFingersTap_.ability, NO_DELAY);
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
@@ -1477,42 +829,6 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
 
-KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture() const
-{
-    return singleKnuckleGesture_;
-}
-
-KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture() const
-{
-    return doubleKnuckleGesture_;
-}
-
-void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
-{
-    CALL_DEBUG_ENTER;
-    if (distance <= std::numeric_limits<float>::epsilon()) {
-        MMI_HILOGE("Invalid distance:%{public}f", distance);
-        return;
-    }
-    downToPrevDownDistanceConfig_ = distance;
-}
-
-bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPF(touchEvent);
-    int32_t id = touchEvent->GetPointerId();
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
-    int32_t targetWindowId = item.GetTargetWindowId();
-    int32_t targetDisplayId = touchEvent->GetTargetDisplayId();
-    auto window = WIN_MGR->GetWindowAndDisplayInfo(targetWindowId, targetDisplayId);
-    if (!window || (window->windowType != WINDOW_INPUT_METHOD_TYPE && window->windowType != WINDOW_SCREENSHOT_TYPE)) {
-            return false;
-    }
-    return true;
-}
-
 void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = { {0, "UNKNOWN"},
@@ -1574,20 +890,11 @@ void KeyCommandHandler::PrintGestureInfo(int32_t fd)
     mprintf(fd, "-------------------------- TouchPad Three Fingers Tap Gesture --------------------\t");
     mprintf(fd,
         "TapBundleName: %s | TapAbilityName: %s"
-        "| TapAction: %s \t", threeFingersTap_.ability.bundleName.c_str(),
-        threeFingersTap_.ability.abilityName.c_str(), threeFingersTap_.ability.action.c_str());
-    mprintf(fd, "-------------------------- Knuckle Single Finger Gesture -------------------------\t");
-    mprintf(fd,
-        "GestureState: %s | GestureBundleName: %s | GestureAbilityName: %s"
-        "| GestureAction: %s \t", singleKnuckleGesture_.state ? "true" : "false",
-        singleKnuckleGesture_.ability.bundleName.c_str(), singleKnuckleGesture_.ability.abilityName.c_str(),
-        singleKnuckleGesture_.ability.action.c_str());
-    mprintf(fd, "-------------------------- Knuckle Two Fingers Gesture ---------------------------\t");
-    mprintf(fd,
-        "GestureState: %s | GestureBundleName: %s | GestureAbilityName: %s"
-        "| GestureAction:%s \t", doubleKnuckleGesture_.state ? "true" : "false",
-        doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
-        doubleKnuckleGesture_.ability.action.c_str());
+        "| TapAction: %s \t", context_.threeFingersTap_.ability.bundleName.c_str(),
+        context_.threeFingersTap_.ability.abilityName.c_str(), context_.threeFingersTap_.ability.action.c_str());
+#ifdef OHOS_BUILD_KNUCKLE
+    KnuckleHandlerComponent::GetInstance().Dump(fd);
+#endif // OHOS_BUILD_KNUCKLE
 }
 std::string KeyCommandHandler::ConvertKeyActionToString(int32_t keyAction)
 {
@@ -1612,27 +919,6 @@ std::ostream& operator<<(std::ostream& os, const Sequence& seq)
     }
     os << "]: " << seq.ability.bundleName << ":" << seq.ability.abilityName;
     return os;
-}
-
-void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent)
-{
-    CHKPV(touchEvent);
-    int64_t currentDownTime = touchEvent->GetActionTime();
-    int64_t downIntervalTime = currentDownTime - lastDownTime_;
-    lastDownTime_ = currentDownTime;
-    if (downIntervalTime <= 0 || downIntervalTime >= TAP_DOWN_INTERVAL_MILLIS) {
-        tappingCount_ = 1;
-        return;
-    }
-    tappingCount_++;
-    int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
-    if (timeDiffToPrevKnuckleUpTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
-        if (tappingCount_ == MAX_TAP_COUNT) {
-            DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
-        } else if (tappingCount_ > MAX_TAP_COUNT) {
-            DfxHisysevent::ReportFailIfKnockTooFast();
-        }
-    }
 }
 
 bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
@@ -1697,20 +983,6 @@ bool KeyCommandHandler::CheckBundleName(const std::shared_ptr<PointerEvent> touc
     return true;
 }
 
-void KeyCommandHandler::OnKunckleSwitchStatusChange(const std::string switchName)
-{
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (switchName != SNAPSHOT_KNUCKLE_SWITCH && switchName != RECORD_KNUCKLE_SWITCH) {
-        return;
-    }
-    bool isKnuckleEnable = !SkipKnuckleDetect();
-    int32_t ret = WIN_MGR->SyncKnuckleStatus(isKnuckleEnable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("sync knuckle status error., ret:%{public}d", ret);
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
-}
-
 void KeyCommandHandler::RegisterProximitySensor()
 {
     CALL_INFO_TRACE;
@@ -1739,13 +1011,6 @@ void KeyCommandHandler::RegisterProximitySensor()
         return;
     }
     hasRegisteredSensor_ = true;
-}
-
-int32_t KeyCommandHandler::SetKnuckleSwitch(bool knuckleSwitch)
-{
-    gameForbidFingerKnuckle_ = !knuckleSwitch;
-    MMI_HILOGW("SetKnuckleSwitch is successful in keyCommand handler, knuckleSwitch:%{public}d", knuckleSwitch);
-    return RET_OK;
 }
 
 int32_t KeyCommandHandler::LaunchAiScreenAbility(int32_t pid)
@@ -1781,41 +1046,34 @@ void KeyCommandHandler::UnregisterProximitySensor()
 
 int32_t KeyCommandHandler::SwitchScreenCapturePermission(uint32_t permissionType, bool enable)
 {
-    if (enable) {
-        screenCapturePermission_ |= permissionType;
-    } else {
-        screenCapturePermission_ &= ~permissionType;
+    uint32_t knucklePermissions = permissionType & KNUCKLE_ALL_PERMISSIONS;
+    uint32_t otherPermissions = permissionType & (~KNUCKLE_ALL_PERMISSIONS);
+    if (knucklePermissions != 0) {
+#ifdef OHOS_BUILD_KNUCKLE
+        KnuckleHandlerComponent::GetInstance().SetKnucklePermissions(knucklePermissions, enable);
+#endif // OHOS_BUILD_KNUCKLE
     }
+
+    if (otherPermissions != 0) {
+        if (enable) {
+            screenCapturePermission_ |= otherPermissions;
+        } else {
+            screenCapturePermission_ &= ~otherPermissions;
+        }
+    }
+
     MMI_HILOGW("SwitchScreenCapturePermission is successful in keyCommand handler, "
                "screenCapturePermission_:%{public}d, permissionType:%{public}d, "
-               "enable:%{public}d",
-        screenCapturePermission_,
-        permissionType,
-        enable);
+               "enable:%{public}d", screenCapturePermission_, permissionType, enable);
     return RET_OK;
 }
 
 bool KeyCommandHandler::HasScreenCapturePermission(uint32_t permissionType)
 {
     bool hasScreenCapturePermission = ((screenCapturePermission_ & permissionType) == permissionType);
-    if ((permissionType & (KNUCKLE_SCREENSHOT | KNUCKLE_SCROLL_SCREENSHOT | KNUCKLE_ENABLE_AI_BASE)) != 0) {
-        hasScreenCapturePermission =
-            hasScreenCapturePermission && !gameForbidFingerKnuckle_ && screenshotSwitch_.statusConfigValue;
-    }
-    if ((permissionType & KNUCKLE_SCREEN_RECORDING) != 0) {
-        hasScreenCapturePermission =
-            hasScreenCapturePermission && !gameForbidFingerKnuckle_ && recordSwitch_.statusConfigValue;
-    }
     MMI_HILOGD("HasScreenCapturePermission is successful in keyCommand handler, screenCapturePermission_:%{public}d, "
-               "permissionType:%{public}d, gameForbidFingerKnuckle_:%{public}d, screenshotSwitch_:%{public}d, "
-               "recordSwitch_:%{public}d, "
-               "hasScreenCapturePermission:%{public}d ",
-        screenCapturePermission_,
-        permissionType,
-        gameForbidFingerKnuckle_,
-        screenshotSwitch_.statusConfigValue,
-        recordSwitch_.statusConfigValue,
-        hasScreenCapturePermission);
+               "permissionType:%{public}d, hasScreenCapturePermission:%{public}d ",
+        screenCapturePermission_, permissionType, hasScreenCapturePermission);
     return hasScreenCapturePermission;
 }
 

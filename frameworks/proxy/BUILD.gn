@@ -726,7 +726,10 @@ ohos_unittest("InputManagerFilterManualTest") {
 
 ohos_unittest("KeyEventInputSubscribeManagerTest") {
   module_out_path = module_output_path
-  include_dirs = [ "${mmi_path}/frameworks/proxy/event_handler/include" ]
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/service/common/setting_datashare/include",
+  ]
 
   sources = [ "event_handler/test/key_event_input_subscribe_manager_test.cpp" ]
 

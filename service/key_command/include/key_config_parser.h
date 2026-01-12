@@ -40,6 +40,7 @@ public:
         std::map<int32_t, int32_t>& repeatKeyMaxTimes);
     bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture);
     bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& excludeKeyVec);
+    bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap);
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
@@ -65,6 +66,12 @@ private:
     bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt);
     bool GetRepeatKeyDelay(const cJSON* jsonData, int64_t &delayInt);
     int32_t RegisterSystemKey(const ShortcutKey &shortcutKey, std::function<void(std::shared_ptr<KeyEvent>)> callback);
+
+    bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture, Ability &launchAbility);
+    bool PackageAbility(const cJSON* jsonAbility, Ability &ability);
+    void GetKeyVal(const cJSON* json, const std::string &key, std::string &value);
+    bool GetEntities(const cJSON* jsonAbility, Ability &ability);
+    bool GetParams(const cJSON* jsonAbility, Ability &ability);
 
 private:
     KeyCommandContext& context_;

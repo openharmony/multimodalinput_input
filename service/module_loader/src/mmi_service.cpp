@@ -50,12 +50,9 @@
 #include "event_statistic.h"
 #include "event_log_helper.h"
 #include "ffrt.h"
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-#include "fingersense_wrapper.h"
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-#include "gesturesense_wrapper.h"
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 #ifndef OHOS_BUILD_ENABLE_WATCH
 #include "infrared_emitter_controller.h"
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -493,16 +490,13 @@ void MMIService::OnStart()
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID success");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
-    FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
-    if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
-        MMI_HILOGI("Start enable fingersense");
-        FINGERSENSE_WRAPPER->enableFingersense_();
-    }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#if defined(OHOS_BUILD_KNUCKLE) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
+    MMI_HILOGI("Start enable fingersense");
+    KnuckleHandlerComponent::GetInstance().EnableFingersense();
+#endif // OHOS_BUILD_KNUCKLE && OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_KNUCKLE
+    KnuckleHandlerComponent::GetInstance().Init();
+#endif // OHOS_BUILD_KNUCKLE
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
@@ -556,9 +550,9 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif // OHOS_RSS_CLIENT
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
     RemoveSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
@@ -2397,11 +2391,11 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #endif // OHOS_RSS_CLIENT
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         isCesStart_ = true;
     }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
         APP_OBSERVER_MGR->InitAppStateObserver();
     }
@@ -3109,11 +3103,11 @@ void MMIService::OnThread()
     PreEventLoop();
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
+#if defined(OHOS_BUILD_KNUCKLE) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
         if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
             DISPLAY_MONITOR->InitCommonEventSubscriber();
         }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_KNUCKLE && OHOS_BUILD_ENABLE_KEYBOARD
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         if (libinputAdapter_.HasPendingEvents()) {
@@ -4484,17 +4478,17 @@ ErrCode MMIService::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
     }
-    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
-    CHKPR(eventKeyCommandHandler, RET_ERR);
+#ifdef OHOS_BUILD_KNUCKLE
     ret = delegateTasks_.PostSyncTask(
-        [userId, eventKeyCommandHandler] {
-            return eventKeyCommandHandler->RegisterKnuckleSwitchByUserId(userId);
+        [userId] {
+            return KnuckleHandlerComponent::GetInstance().RegisterKnuckleSwitchByUserId(userId);
         }
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_KNUCKLE
     return RET_OK;
 }
 
@@ -5125,36 +5119,36 @@ ErrCode MMIService::CheckKnuckleEvent(float pointX, float pointY, bool &isKnuckl
         return ERROR_NOT_SYSAPI;
     }
     isKnuckleType = false;
-#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
+#if defined(OHOS_BUILD_KNUCKLE)
     int tryTimes = RETRY_CHECK_TIMES;
     int32_t ret = RET_ERR;
     for (int count = 0; count < tryTimes; ++count) {
-        ret = FINGERSENSE_WRAPPER->CheckKnuckleEvent(pointX, pointY, isKnuckleType);
+        ret = KnuckleHandlerComponent::GetInstance().CheckKnuckleEvent(pointX, pointY, isKnuckleType);
         if (ret == RET_OK) {
             break;
         }
         std::this_thread::sleep_for(std::chrono::microseconds(CHECK_EEVENT_INTERVAL_TIME));
     }
     return ret;
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     return RET_OK;
 }
 
 int32_t MMIService::SyncKnuckleStatus()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_KNUCKLE
     int ret = delegateTasks_.PostSyncTask([] {
-        auto keyHandler = InputHandler->GetKeyCommandHandler();
-        if (keyHandler == nullptr) {
-            return RET_ERR;
-        }
-        bool isKnuckleEnable = !keyHandler->SkipKnuckleDetect();
+        bool isKnuckleEnable = !KnuckleHandlerComponent::GetInstance().SkipKnuckleDetect();
         return WIN_MGR->SyncKnuckleStatus(isKnuckleEnable);
     });
     if (ret != RET_OK) {
         MMI_HILOGE("post sync knuckle status fail, ret:%{public}d", ret);
     }
     return ret;
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_KNUCKLE
 }
 #endif
 
@@ -5163,9 +5157,9 @@ int32_t MMIService::SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t disp
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->SetMultiWindowScreenId(screenId, displayNodeScreenId);
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
-#ifndef OHOS_BUILD_ENABLE_WATCH
-    KnuckleDrawingComponent::GetInstance().SetMultiWindowScreenId(screenId, displayNodeScreenId);
-#endif // OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_KNUCKLE
+    KnuckleHandlerComponent::GetInstance().SetMultiWindowScreenId(screenId, displayNodeScreenId);
+#endif // OHOS_BUILD_KNUCKLE
     return RET_OK;
 }
 
@@ -5199,17 +5193,17 @@ ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
     }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
-    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
-    CHKPR(eventKeyCommandHandler, RET_ERR);
+#ifdef OHOS_BUILD_KNUCKLE
     int32_t ret = delegateTasks_.PostAsyncTask(
-        [knuckleSwitch, eventKeyCommandHandler] {
-            return eventKeyCommandHandler->SetKnuckleSwitch(knuckleSwitch);
+        [knuckleSwitch] {
+            return KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(knuckleSwitch);
         }
         );
     if (ret != RET_OK) {
         MMI_HILOGE("SetKnuckleSwitch failed, return:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_KNUCKLE
     return RET_OK;
 }
 

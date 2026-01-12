@@ -71,7 +71,6 @@ constexpr int32_t WINDOW_SCREENSHOT_TYPE = 2123;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
-const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
 const std::string RECORD_KNUCKLE_SWITCH = "fingersense_screen_recording_enabled";
 const std::string SNAPSHOT_KNUCKLE_SWITCH = "fingersense_smartshot_enabled";
 
@@ -87,17 +86,7 @@ const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
 };
 
 bool IsSpecialType(int32_t keyCode, SpecialType type);
-void GetKeyVal(const cJSON* json, const std::string &key, std::string &value);
-bool GetEntities(const cJSON* jsonAbility, Ability &ability);
-bool GetParams(const cJSON* jsonAbility, Ability &ability);
-bool PackageAbility(const cJSON* jsonAbility, Ability &ability);
 bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt);
-
-bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture, Ability &launchAbility);
-bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, KnuckleGesture &knuckleGesture);
-float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent);
-bool IsEqual(float f1, float f2);
-bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap);
 char* GetProFileAbsPath(const char* fileName, char* buf, int32_t length);
 } // namespace MMI
 } // namespace OHOS
