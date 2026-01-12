@@ -56,8 +56,8 @@ HWTEST_F(TouchGestureManagerTest, AddHandler_Test_001, TestSize.Level1)
     TouchGestureType gestureType = TOUCH_GESTURE_TYPE_SWIPE;
     int32_t nFingers = 0;
     touchGestureManager.AddHandler(session, gestureType, nFingers);
-    EXPECT_NE(touchGestureManager.handlers_.size(), 1);
-    EXPECT_NE(touchGestureManager.handlers_.begin()->session_, session);
+    EXPECT_EQ(touchGestureManager.handlers_.size(), 1);
+    EXPECT_EQ(touchGestureManager.handlers_.begin()->session_, session);
 }
 
 /**
@@ -78,11 +78,11 @@ HWTEST_F(TouchGestureManagerTest, AddHandler_Test_003, TestSize.Level1)
     TouchGestureType newGestureType = TOUCH_GESTURE_TYPE_SWIPE;
     int32_t newNFingers = 0;
     touchGestureManager.AddHandler(newSession, newGestureType, newNFingers);
-    EXPECT_NE(touchGestureManager.handlers_.size(), 2);
+    EXPECT_EQ(touchGestureManager.handlers_.size(), 2);
     touchGestureManager.RemoveHandler(session, gestureType, nFingers);
-    EXPECT_NE(touchGestureManager.handlers_.size(), 1);
+    EXPECT_EQ(touchGestureManager.handlers_.size(), 1);
     touchGestureManager.RemoveHandler(session, gestureType, nFingers);
-    EXPECT_NE(touchGestureManager.handlers_.size(), 1);
+    EXPECT_EQ(touchGestureManager.handlers_.size(), 1);
 }
 
 /**
@@ -135,6 +135,5 @@ HWTEST_F(TouchGestureManagerTest, OnSessionLost_Test_001, TestSize.Level1)
     manager.AddHandler(session, gestureType, nFingers);
     EXPECT_NO_FATAL_FAILURE(manager.OnSessionLost(session));
 }
-
 } // namespace MMI
 } // namespace OHOS

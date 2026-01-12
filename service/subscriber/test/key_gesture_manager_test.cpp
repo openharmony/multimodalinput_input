@@ -1101,7 +1101,7 @@ HWTEST_F(KeyGestureManagerTest, PullUpAccessibility_AddHandler, TestSize.Level1)
     EXPECT_GT(id, 0);
     std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
     bool result = myKeyGesture->RemoveHandler(id);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 /**

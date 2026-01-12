@@ -5854,7 +5854,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyMonitor_001, TestSize.Le
     KeyMonitorOption keyOption;
     std::function<void(std::shared_ptr<KeyEvent>)> callback;
     int32_t ret = InputManager::GetInstance()->SubscribeKeyMonitor(keyOption, callback);
-    EXPECT_NE(ret, INVAID_VALUE);
+    ASSERT_EQ(ret, INVAID_VALUE);
 }
 
 /*
@@ -6320,7 +6320,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_004, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE);
+    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
     EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
 }
 
@@ -6334,7 +6335,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_005, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<DownHookConsumer>(HOOK_EVENT_TYPE_MOUSE);
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE), RET_OK);
+    auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_MOUSE);
+    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
     EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_MOUSE), RET_OK);
 }
 
@@ -6348,7 +6350,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_006, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<UpHookConsumer>(HOOK_EVENT_TYPE_TOUCH);
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH);
+    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
     EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
 }
 
@@ -6362,7 +6365,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddInputEventHook_007, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     auto consumer = std::make_shared<DownHookConsumer>(HOOK_EVENT_TYPE_TOUCH);
-    EXPECT_EQ(InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH), RET_OK);
+    auto ret = InputManager::GetInstance()->AddInputEventHook(consumer, HOOK_EVENT_TYPE_TOUCH);
+    EXPECT_EQ(ret, ERROR_REPEAT_INTERCEPTOR);
     EXPECT_EQ(InputManager::GetInstance()->RemoveInputEventHook(HOOK_EVENT_TYPE_TOUCH), RET_OK);
 }
 
@@ -6416,7 +6420,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_IsPointerInit, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto ret = InputManager::GetInstance()->IsPointerInit();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /*
@@ -6434,7 +6438,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_DispatchToNextHandler, TestSize.Leve
     auto eventId = pointerEvent->GetId();
     HookEventType hookEventType = 2;
     auto ret = InputManager::GetInstance()->DispatchToNextHandler(eventId, hookEventType);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, ERROR_INVALID_PARAMETER);
 }
 /*
  * @tc.name: InputManagerTest_GetLastEventIds

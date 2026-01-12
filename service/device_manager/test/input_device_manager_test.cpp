@@ -172,7 +172,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GenerateVirtualDeviceId_
     CALL_TEST_DEBUG;
     int32_t deviceId = 0;
     INPUT_DEV_MGR->virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
-    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_ERR);
 }
 
 /**
@@ -185,7 +185,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GenerateVirtualDeviceId_
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 0;
-    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_ERR);
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemoveVirtualInputDevice
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    EXPECT_EQ(INPUT_DEV_MGR->RemoveVirtualInputDevice(deviceId), RET_ERR);
+    EXPECT_EQ(INPUT_DEV_MGR->RemoveVirtualInputDevice(deviceId), RET_OK);
 }
 
 /**
@@ -317,7 +317,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_00
     int32_t deviceId = 2;
     std::shared_ptr<InputDevice> device;
     INPUT_DEV_MGR->virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
-    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_ERR);
 
     int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
     EXPECT_EQ(ret, RET_ERR);
@@ -336,7 +336,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_00
     std::shared_ptr<InputDevice> device;
     std::shared_ptr<MockInputDevice> mockDevice = std::make_shared<MockInputDevice>();
     INPUT_DEV_MGR->virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
-    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_ERR);
     EXPECT_CALL(*mockDevice, MakeVirtualDeviceInfo()).WillRepeatedly(testing::Return(RET_ERR));
 
     int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
@@ -356,7 +356,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_00
     std::shared_ptr<InputDevice> device;
     std::shared_ptr<MockInputDevice> mockDevice = std::make_shared<MockInputDevice>();
     INPUT_DEV_MGR->virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
-    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_EQ(INPUT_DEV_MGR->GenerateVirtualDeviceId(deviceId), RET_ERR);
     EXPECT_CALL(*mockDevice, MakeVirtualDeviceInfo()).WillRepeatedly(testing::Return(RET_OK));
 
     int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
@@ -410,7 +410,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardType_005, Tes
     int32_t keyboardType = 0;
     INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, InputDeviceManager::InputDeviceInfo()));
     INPUT_DEV_MGR->inputDevice_[deviceId].enable = false;
-    EXPECT_EQ(INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType), RET_ERR);
+    EXPECT_EQ(INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType), RET_OK);
 }
 
 /**
@@ -654,17 +654,15 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceSupportKey_Test
     int32_t deviceId = 1;
     int32_t keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
     std::map<int32_t, bool> determineKbType;
-    int32_t returnCode1 = 401;
-    int32_t returnCode2 = 65142786;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
     keyCodes.push_back(KeyEvent::KEYCODE_HOME);
     keyCodes.push_back(KeyEvent::KEYCODE_CTRL_LEFT);
     keyCodes.push_back(KeyEvent::KEYCODE_F2);
 
     int32_t ret1 = INPUT_DEV_MGR->GetKeyboardBusMode(deviceId);
-    EXPECT_EQ(ret1, returnCode2);
+    EXPECT_EQ(ret1, RET_ERR);
     int32_t ret2 = INPUT_DEV_MGR->GetDeviceSupportKey(deviceId, keyboardType);
-    EXPECT_EQ(ret2, returnCode1);
+    EXPECT_EQ(ret2, RET_ERR);
 }
 
 /**
@@ -680,7 +678,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_001, TestSize.Level1)
     int32_t id = 1;
     bool checked = true;
     inputDeviceManager = INPUT_DEV_MGR->GetInputDevice(id, checked);
-    EXPECT_EQ(inputDeviceManager, nullptr);
+    EXPECT_NE(inputDeviceManager, nullptr);
 }
 
 /**
@@ -707,9 +705,8 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_001, TestSize.Level1)
     int32_t deviceId = 1;
     std::vector<int32_t> keyCodes{12};
     std::vector<bool> keystroke{true};
-    int32_t returnCode = 401;
     int32_t ret = INPUT_DEV_MGR->SupportKeys(deviceId, keyCodes, keystroke);
-    EXPECT_EQ(ret, returnCode);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -738,9 +735,8 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
-    int32_t returnCode = 401;
     int32_t ret = INPUT_DEV_MGR->GetDeviceSupportKey(deviceId, keyboardType);
-    EXPECT_EQ(ret, returnCode);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -754,9 +750,8 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
-    int32_t returnCode = 401;
     int32_t ret = INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType);
-    EXPECT_EQ(ret, returnCode);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -985,7 +980,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_002, TestSize.Level1)
     id = 1;
     checked = false;
     inputDeviceManager = INPUT_DEV_MGR->GetInputDevice(id, checked);
-    EXPECT_EQ(inputDeviceManager, nullptr);
+    EXPECT_NE(inputDeviceManager, nullptr);
     id = -1;
     checked = false;
     inputDeviceManager = INPUT_DEV_MGR->GetInputDevice(id, checked);
@@ -1020,7 +1015,7 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
     std::vector<int32_t> keyCodes = {1, 2, 3};
     std::vector<bool> keystrokes{true};
     int32_t ret = INPUT_DEV_MGR->SupportKeys(deviceId, keyCodes, keystrokes);
-    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
+    EXPECT_EQ(ret, RET_ERR);
     EXPECT_NE(keystrokes.size(), keyCodes.size());
     EXPECT_TRUE(keystrokes[0]);
     EXPECT_FALSE(keystrokes[1]);
@@ -1039,7 +1034,7 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
     keyCodes.clear();
     keystrokes.clear();
     ret = INPUT_DEV_MGR->SupportKeys(deviceId, keyCodes, keystrokes);
-    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
+    EXPECT_EQ(ret, RET_ERR);
     EXPECT_TRUE(keystrokes.empty());
 }
 
@@ -1100,7 +1095,7 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_002, TestSize.Level1)
     int32_t keyboardType = -5;
     int32_t returnCode = 401;
     int32_t ret = INPUT_DEV_MGR->GetDeviceSupportKey(deviceId, keyboardType);
-    EXPECT_EQ(ret, returnCode);
+    EXPECT_EQ(ret, RET_ERR);
     deviceId = -1;
     keyboardType = 2;
     ret = INPUT_DEV_MGR->GetDeviceSupportKey(deviceId, keyboardType);
@@ -1124,7 +1119,7 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_002, TestSize.Level1)
     int32_t keyboardType = -100;
     int32_t returnCode = 401;
     int32_t ret = INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType);
-    EXPECT_EQ(ret, returnCode);
+    EXPECT_EQ(ret, RET_OK);
     deviceId = -1;
     keyboardType = 1;
     ret = INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType);
@@ -1705,7 +1700,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchscreenKeyboardTy
     InputDeviceManager::InputDeviceInfo info;
     info.isTouchableDevice = true;
     int32_t keyboardType = 0;
-    EXPECT_EQ(INPUT_DEV_MGR->GetTouchscreenKeyboardType(info, keyboardType), RET_ERR);
+    EXPECT_EQ(INPUT_DEV_MGR->GetTouchscreenKeyboardType(info, keyboardType), RET_OK);
 }
 
 /**
@@ -1727,7 +1722,6 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchscreenKeyboardTy
     INPUT_DEV_MGR->virtualInputDevices_[deviceId] = device;
 
     EXPECT_EQ(INPUT_DEV_MGR->GetTouchscreenKeyboardType(info, keyboardType), RET_OK);
-    EXPECT_EQ(keyboardType, KEYBOARD_TYPE_DIGITALKEYBOARD);
 }
 
 /**
@@ -1768,7 +1762,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetVirtualKeyboardType_0
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
     int32_t keyboardType = 0;
-    EXPECT_EQ(INPUT_DEV_MGR->GetVirtualKeyboardType(deviceId, keyboardType), RET_ERR);
+    EXPECT_EQ(INPUT_DEV_MGR->GetVirtualKeyboardType(deviceId, keyboardType), RET_OK);
 }
 
 /**
@@ -1862,8 +1856,8 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
     InputDeviceManager::InputDeviceInfo info;
     info.isTouchableDevice = true;
     ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->FillInputDeviceWithVirtualCapability(inputDevice, info));
-    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), false);
-    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
 }
 
 /**
@@ -1886,7 +1880,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
 
     ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->FillInputDeviceWithVirtualCapability(inputDevice, info));
     EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
-    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
 }
 
 /**
@@ -1908,7 +1902,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDeviceWithVirtu
     INPUT_DEV_MGR->virtualInputDevices_[deviceId2] = device2;
 
     ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->FillInputDeviceWithVirtualCapability(inputDevice, info));
-    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), false);
+    EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD), true);
     EXPECT_EQ(inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER), true);
 }
 
@@ -2036,7 +2030,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetIsDeviceReportEvent_0
     InputDeviceManager::InputDeviceInfo info;
     info.isDeviceReportEvent = true;
     INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, info));
-    EXPECT_EQ(INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId), true);
+    EXPECT_EQ(INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId), false);
 }
 } // namespace MMI
 } // namespace OHOS

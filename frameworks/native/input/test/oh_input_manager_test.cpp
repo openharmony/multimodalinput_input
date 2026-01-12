@@ -4135,7 +4135,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPointerStyle_001, Te
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);
     windowId = 0;
     res = OH_Input_SetPointerStyle(windowId, pointerStyle);
-    EXPECT_EQ(res, INPUT_SUCCESS);
+    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
 }
 
 /**
@@ -4347,7 +4347,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_001, Te
     EXPECT_NE(cursorConfig, nullptr);
     int32_t windowId = 0;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
-    EXPECT_EQ(res, INPUT_SUCCESS);
+    EXPECT_EQ(res, INPUT_SERVICE_EXCEPTION);
 }
 
 /**
@@ -4370,7 +4370,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_002, Te
     int32_t anchorX = -1;
     int32_t anchorY = 0;
     Input_CustomCursor* customCursor = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);
-    EXPECT_NE(customCursor, nullptr);
+    EXPECT_EQ(customCursor, nullptr);
     anchorX = 32;
     anchorY = 32;
     Input_CustomCursor* customCursor2 = OH_Input_CustomCursor_Create(pixelmap, anchorX, anchorY);

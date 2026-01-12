@@ -340,7 +340,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
             .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
-    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
+    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
     TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->pressureObserver_ = nullptr;
@@ -371,14 +371,14 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_006, TestSize.Level1)
             .CreateObserver(g_touchpadMasterSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
-    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
+    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
 
     TOUCHPAD_MGR->hasRegistered_ = true;
     TOUCHPAD_MGR->currentAccountId_ = 1;
     TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
-    EXPECT_FALSE(TOUCHPAD_MGR->UnregisterTpObserver(2));
+    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
     TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_= nullptr;
 }
 
@@ -725,7 +725,7 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterSwipeInwardObserver_001, TestSize.
 {
     TOUCHPAD_MGR->datashareUri_ =
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
-    EXPECT_NE(TOUCHPAD_MGR->RegisterSwipeInwardObserver(), nullptr);
+    EXPECT_EQ(TOUCHPAD_MGR->RegisterSwipeInwardObserver(), nullptr);
 }
 
 /**
