@@ -15,20 +15,18 @@
 
 #include "touch_event_normalize.h"
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "gesture_transform_processor.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 #include "input_device_manager.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TABLET
 #include "tablet_tool_tranform_processor.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_TABLET
 #include "touch_transform_processor.h"
 #include "remote_control_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+#include "gesture_transform_processor.h"
 #include "touchpad_transform_processor.h"
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -110,16 +108,18 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
             processor = std::make_shared<TouchTransformProcessor>(deviceId);
             break;
         }
-        case DeviceType::TABLET_TOOL: {
-            processor = std::make_shared<TabletToolTransformProcessor>(deviceId);
-            break;
-        }
         case DeviceType::REMOTE_CONTROL: {
             processor = std::make_shared<Remote_ControlTransformProcessor>(deviceId);
             break;
         }
 #endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TABLET
+        case DeviceType::TABLET_TOOL: {
+            processor = std::make_shared<TabletToolTransformProcessor>(deviceId);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
         case DeviceType::TOUCH_PAD: {
             processor = std::make_shared<TouchPadTransformProcessor>(deviceId);
             break;
@@ -128,7 +128,7 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
             processor = std::make_shared<GestureTransformProcessor>(deviceId);
             break;
         }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
         default: {
             MMI_HILOGE("Unsupported device type:%{public}d", deviceType);
             break;
@@ -168,7 +168,7 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t devic
     return nullptr;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
 {
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
@@ -228,7 +228,9 @@ int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) 
 {
     return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 bool TouchEventNormalize::IsFingerPressed()
 {
     CALL_DEBUG_ENTER;

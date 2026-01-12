@@ -22,8 +22,9 @@
 #include "key_subscriber_handler.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_settings_handler.h"
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
@@ -125,7 +126,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
                 TOUCH_DRAWING_MGR->Initialize();
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
                 TOUCHPAD_MGR->SyncTouchpadSettingsData();
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
             }
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");

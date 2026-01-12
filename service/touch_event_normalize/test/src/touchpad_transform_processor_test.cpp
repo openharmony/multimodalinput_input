@@ -21,8 +21,9 @@
 #include "general_touchpad.h"
 #include "input_device_manager.h"
 #include "libinput_wrapper.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_transform_processor.h"
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchPadTransformProcessorTest"
 

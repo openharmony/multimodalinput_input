@@ -45,14 +45,16 @@
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
 #ifdef OHOS_BUILD_ENABLE_POINTER
-#include "touchpad_transform_processor.h"
-#include "touchpad_settings_handler.h"
 #include "account_manager.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
 #endif // OHOS_RSS_CLIENT
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+#include "touchpad_settings_handler.h"
+#include "touchpad_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -63,6 +65,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 constexpr int32_t FINGER_NUM { 2 };
 constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
 constexpr int32_t USELIB_ABS_MT_POSITION_X { 0x35 };
@@ -75,15 +78,18 @@ constexpr int32_t BLE_PRODUCT_DEVICE_ID { 4307 };
 constexpr int32_t PHONE_PRODUCT_DEVICE_ID { 4261 };
 constexpr int64_t FREETOUCH_GES_BLOCK_THRETHOLD { MS2US(800) };
 constexpr uint32_t TOUCHPAD_FEATURE_SWIPEINWARD { 1 << 3 };
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 const std::string TOUCHPAD_TYPE = OHOS::system::GetParameter("const.settings.clickpad_type", "0");
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 double g_touchPadDeviceWidth { 1 }; // physic size
 double g_touchPadDeviceHeight { 1 };
 int32_t g_touchPadDeviceAxisX { 1 }; // max axis size
 int32_t g_touchPadDeviceAxisY { 1 };
-bool g_isSwipeInward {false};
-bool g_buttonPressed {false};
 bool g_isLeftEdgeSwipe {false};
 bool g_isRightEdgeSwipe {false};
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
+bool g_isSwipeInward {false};
+bool g_buttonPressed {false};
 int64_t g_lastKeyboardEventTime { 0 };
 constexpr int32_t MT_TOOL_PALM { 2 };
 [[ maybe_unused ]] constexpr double TOUCH_SLOP { 1.0 };
@@ -155,9 +161,11 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
         if (!INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId)) {
             INPUT_DEV_MGR->SetIsDeviceReportEvent(deviceId, true);
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
             if (INPUT_DEV_MGR->HasLocalMouseDevice()) {
                 TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
             }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
         }
     }
     auto manager = InputPluginManager::GetInstance();
@@ -183,7 +191,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         MMI_HILOGD("This touch event is LIBINPUT_EVENT_TOUCH_FRAME type:%{public}d", type);
         return;
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
         (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP)) {
         MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
@@ -195,7 +203,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         }
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
@@ -228,7 +236,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
@@ -250,6 +258,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
+#ifndef OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
         case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
@@ -314,16 +324,16 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     INPUT_DEV_MGR->OnInputDeviceAdded(device);
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     if (INPUT_DEV_MGR->HasLocalMouseDevice()) {
         TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
     }
-#if OHOS_BUILD_ENABLE_POINTER
     if (INPUT_DEV_MGR->IsTouchPadDevice(device)) {
         bool switchFlag = false;
         TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
         TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
     }
-#endif
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -343,9 +353,11 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     INPUT_DEV_MGR->OnInputDeviceRemoved(device);
+#if OHOS_BUILD_ENABLE_TOUCHPAD
     if (!INPUT_DEV_MGR->HasLocalMouseDevice()) {
         TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
     }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -619,7 +631,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(nextHandler_);
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -629,15 +641,14 @@ bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<Pointer
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
     }
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return false;
 }
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
@@ -683,16 +694,11 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     MMI_HILOGD("Button ids count:%{public}d, action:%{public}d",
         static_cast<int32_t>(buttonIds_.size()), pointerEvent->GetPointerAction());
     return RET_OK;
-#else
-    MMI_HILOGW("Pointer device does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER
-    return RET_OK;
 }
 
 int32_t EventNormalizeHandler::HandleTouchPadAction(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -702,16 +708,12 @@ int32_t EventNormalizeHandler::HandleTouchPadAction(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_ACTIVE) {
         pointerEvent->ClearFlag(InputEvent::EVENT_FLAG_NO_MONITOR);
     }
-#else
-    MMI_HILOGW("Pointer device does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
 int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -728,12 +730,9 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
             pointerEvent->Reset();
         }
     }
-#else
-    MMI_HILOGW("Pointer device does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
@@ -877,7 +876,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_TABLET
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package penEvent");
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
@@ -892,7 +891,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #else
     MMI_HILOGW("TableTool device does not support");
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TABLET
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -1080,7 +1079,7 @@ void EventNormalizeHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEvent>
 void EventNormalizeHandler::RestoreTouchPadStatus()
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     auto ids = INPUT_DEV_MGR->GetTouchPadIds();
     for (auto id : ids) {
         MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
@@ -1093,7 +1092,7 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
             mouseEvent->Reset();
         }
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     buttonIds_.clear();
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
@@ -1136,18 +1135,17 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
     enum libinput_event_type type, libinput_event* event)
 {
-#ifdef OHOS_BUILD_ENABLE_POINTER
     if (tpRegisterTryCount_ > 0 && type == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
         tpRegisterTryCount_--;
         if (TOUCHPAD_MGR->GetCommonEventStatus()) {
             TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
         }
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+
     if (!TOUCHPAD_MGR->SupportSwipeInward()) {
         return false;
     }
@@ -1363,6 +1361,7 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     nextHandler_->HandleKeyEvent(keyUpEvent);
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 int32_t EventNormalizeHandler::GetToolType(libinput_event* event)
 {

@@ -73,9 +73,11 @@
 #include "util_ex.h"
 #include "xcollie/xcollie.h"
 #ifdef OHOS_BUILD_ENABLE_POINTER
-#include "touchpad_settings_handler.h"
 #include "account_manager.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+#include "touchpad_settings_handler.h"
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "multimodal_input_plugin_manager.h"
 
 #ifdef OHOS_RSS_CLIENT
@@ -95,7 +97,9 @@
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "input_screen_capture_agent.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
+#ifdef OHOS_BUILD_ENABLE_TABLET
 #include "tablet_subscriber_handler.h"
+#endif // OHOS_BUILD_ENABLE_TABLET
 #include "config_policy_utils.h"
 #include "drag_security_manager.h"
 #undef MMI_LOG_TAG
@@ -517,7 +521,7 @@ void MMIService::OnStart()
         CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-#if OHOS_BUILD_ENABLE_POINTER
+#if OHOS_BUILD_ENABLE_TOUCHPAD
     bool switchFlag = false;
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
     TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
@@ -2443,7 +2447,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         MMI_HILOGI("The systemAbilityId is %{public}d", systemAbilityId);
     }
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         TOUCHPAD_MGR->SetCommonEventReady();
         TOUCHPAD_MGR->RegisterTpObserver(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccountId());
@@ -2785,6 +2789,7 @@ ErrCode MMIService::SubscribeTabletProximity(int32_t subscribeId)
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+#ifdef OHOS_BUILD_ENABLE_TABLET
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2797,6 +2802,7 @@ ErrCode MMIService::SubscribeTabletProximity(int32_t subscribeId)
         MMI_HILOGE("The subscribe tablet event processed failed, ret:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_TABLET
     return RET_OK;
 }
 
@@ -2815,6 +2821,7 @@ ErrCode MMIService::UnsubscribetabletProximity(int32_t subscribeId)
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_TABLET
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2827,6 +2834,7 @@ ErrCode MMIService::UnsubscribetabletProximity(int32_t subscribeId)
         MMI_HILOGE("The unsubscribe tablet event processed failed, ret:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_TABLET
     return RET_OK;
 }
 
@@ -3499,6 +3507,14 @@ int32_t MMIService::ReadTouchpadCDG(TouchpadCDG &touchpadCDG)
     return RET_OK;
 }
 
+int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
+{
+    MouseEventHdr->GetTouchpadRightClickType(type);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 {
     TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
@@ -3508,12 +3524,6 @@ int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
 {
     TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(switchFlag);
-    return RET_OK;
-}
-
-int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
-{
-    MouseEventHdr->GetTouchpadRightClickType(type);
     return RET_OK;
 }
 
@@ -3528,8 +3538,7 @@ int32_t MMIService::ReadTouchpadDoubleTapAndDragState(bool &switchFlag)
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
     return RET_OK;
 }
-
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 ErrCode MMIService::SetTouchpadScrollSwitch(bool switchFlag)
 {
@@ -3782,7 +3791,7 @@ ErrCode MMIService::SetTouchpadPinchSwitch(bool switchFlag)
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
@@ -3792,7 +3801,7 @@ ErrCode MMIService::SetTouchpadPinchSwitch(bool switchFlag)
         MMI_HILOGE("Set touch pad pinch switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -3808,7 +3817,7 @@ ErrCode MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
         return ERROR_NOT_SYSAPI;
     }
     switchFlag = true;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadPinchSwitch(switchFlag);
@@ -3818,7 +3827,7 @@ ErrCode MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
         MMI_HILOGE("Get touch pad pinch switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -3833,7 +3842,7 @@ ErrCode MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
@@ -3843,7 +3852,7 @@ ErrCode MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
         MMI_HILOGE("Set touchpad swipe switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -3859,7 +3868,7 @@ ErrCode MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
         return ERROR_NOT_SYSAPI;
     }
     switchFlag = true;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadSwipeSwitch(switchFlag);
@@ -3869,7 +3878,7 @@ ErrCode MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
         MMI_HILOGE("Get touchpad swipe switch failed, return:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -3951,7 +3960,7 @@ ErrCode MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [rotateSwitch] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
@@ -3961,7 +3970,7 @@ ErrCode MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
         MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -3977,7 +3986,7 @@ ErrCode MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
         return ERROR_NOT_SYSAPI;
     }
     rotateSwitch = true;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rotateSwitch] {
             return this->ReadTouchpadRotateSwitch(rotateSwitch);
@@ -3987,7 +3996,7 @@ ErrCode MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
         MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -4002,7 +4011,7 @@ ErrCode MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadDoubleTapAndDragState(
@@ -4013,7 +4022,7 @@ ErrCode MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
         MMI_HILOGE("Failed to SetTouchpadDoubleTapAndDragState status, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -4029,7 +4038,7 @@ ErrCode MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
         return ERROR_NOT_SYSAPI;
     }
     switchFlag = true;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &switchFlag] {
             return this->ReadTouchpadDoubleTapAndDragState(switchFlag);
@@ -4039,7 +4048,7 @@ ErrCode MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
         MMI_HILOGE("Failed to GetTouchpadDoubleTapAndDragState status, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -4499,7 +4508,7 @@ ErrCode MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         MMI_HILOGE("StubSetTouchpadThreeFingersTapSwitch Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
@@ -4510,7 +4519,7 @@ ErrCode MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -4522,7 +4531,7 @@ ErrCode MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
         return ERROR_NOT_SYSAPI;
     }
     switchFlag = true;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
@@ -4533,7 +4542,7 @@ ErrCode MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
         MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -4669,7 +4678,7 @@ ErrCode MMIService::SetTouchpadScrollRows(int32_t rows)
         return ERROR_NOT_SYSAPI;
     }
     int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [newRows] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(newRows);
@@ -4679,11 +4688,11 @@ ErrCode MMIService::SetTouchpadScrollRows(int32_t rows)
         MMI_HILOGE("Set the number of touchpad scrolling rows failed, return %{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
 {
     // LCOV_EXCL_START
@@ -4691,7 +4700,7 @@ int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
     return RET_OK;
     // LCOV_EXCL_STOP
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 ErrCode MMIService::GetTouchpadScrollRows(int32_t &rows)
 {
@@ -4705,7 +4714,7 @@ ErrCode MMIService::GetTouchpadScrollRows(int32_t &rows)
         return ERROR_NOT_SYSAPI;
     }
     rows = TOUCHPAD_SCROLL_ROWS;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &rows] {
             return this->ReadTouchpadScrollRows(rows);
@@ -4716,7 +4725,7 @@ ErrCode MMIService::GetTouchpadScrollRows(int32_t &rows)
             GetCallingPid());
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     if (rows < MIN_ROWS || rows > MAX_ROWS) {
         MMI_HILOGD("Invalid touchpad scroll rows:%{public}d", rows);
     }

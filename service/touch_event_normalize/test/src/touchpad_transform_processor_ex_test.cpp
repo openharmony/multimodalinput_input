@@ -15,8 +15,9 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "libinput.h"
 
 #undef MMI_LOG_TAG

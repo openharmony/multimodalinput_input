@@ -67,6 +67,8 @@ declare_args() {
   input_ext_feature_anco_game_event_mapping = false
   input_feature_drag_security = false
   input_feature_knuckle = true
+  input_feature_touchpad = true
+  input_feature_tablet = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
@@ -147,7 +149,6 @@ declare_args() {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
-    "event_handler/src/touchpad_settings_handler.cpp",
     "event_hook/src/checker/dispatch_order_checker.cpp",
     "event_hook/src/checker/expiration_checker.cpp",
     "event_hook/src/checker/key_loop_closure_checker.cpp",
@@ -344,6 +345,8 @@ print(
     "input_feature_one_hand_mode_enable = ${input_feature_one_hand_mode_enable}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 print("input_feature_external_screen = ${input_feature_external_screen}")
+print("input_feature_touchpad = ${input_feature_touchpad}")
+print("input_feature_tablet = ${input_feature_tablet}")
 
 input_default_defines = []
 
@@ -493,6 +496,12 @@ if (enable_player_framework) {
       [ "module_loader/src/input_screen_capture_agent.cpp" ]
 }
 
+if (input_feature_touchpad) {
+  libmmi_service_sources += [
+    "event_handler/src/touchpad_settings_handler.cpp",
+  ]
+}
+
 if (input_shortcut_key_rules_enabled) {
   input_shortcut_key_manager_enabled = true
 }
@@ -548,4 +557,12 @@ if (input_ext_feature_anco_game_event_mapping) {
 if (input_feature_knuckle) {
   input_default_defines += [ "OHOS_BUILD_KNUCKLE" ]
   libmmi_service_sources += [ "knuckle/src/knuckle_handler_component.cpp" ]
+}
+
+if (input_feature_touchpad) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCHPAD" ]
+}
+
+if (input_feature_tablet) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TABLET" ]
 }
