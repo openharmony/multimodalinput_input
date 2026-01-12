@@ -69,7 +69,7 @@ ohos_rust_shared_ffi("mmi_rust_key_config") {
 
 ohos_rust_unittest("rust_mmi_key_config_test") {
   module_out_path = module_output_path
-  sources = [ "rust_key/src/lib.rs" ]
+  sources = [ "rust_key/test/lib_test.rs" ]
   deps = [ ":mmi_rust_key_config" ]
   external_deps = [ "hilog:hilog_rust" ]
   subsystem_name = "multimodalinput"
