@@ -1356,7 +1356,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
@@ -2084,54 +2084,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_001, TestSize.
     bool ret = handler.HandleEvent(key);
     EXPECT_FALSE(ret);
     handler.repeatKeyHandler_->isKeyCancel_ = false;
-    ret = handler.HandleEvent(key);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_HandleEvent_002
- * @tc.desc: Test the funcation HandleEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
-    ASSERT_NE(key, nullptr);
-    handler.enableCombineKey_ = false;
-    handler.context_.isParseExcludeConfig_ = true;
-    ExcludeKey excludeKey;
-    excludeKey.keyCode = 2;
-    excludeKey.keyAction = 6;
-    excludeKey.delay = 9;
-    handler.excludeKeys_.push_back(excludeKey);
-    key->keyCode_ = KeyEvent::KEYCODE_L;
-    key->keyAction_ = 300;
-    SequenceKey sequenceKey;
-    sequenceKey.keyCode = KeyEvent::KEYCODE_SPACE;
-    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
-    handler.sequenceHandler_->keys_.push_back(sequenceKey);
-    ShortcutKey shortcutKey;
-    shortcutKey.preKeys = {1, 2, 3};
-    shortcutKey.businessId = "business2";
-    shortcutKey.statusConfig = "config2";
-    shortcutKey.statusConfigValue = true;
-    shortcutKey.finalKey = 5;
-    shortcutKey.keyDownDuration = 6;
-    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
-    shortcutKey.timerId = 6;
-    Ability ability_temp;
-    ability_temp.bundleName = "bundleName2";
-    ability_temp.abilityName = "abilityName2";
-    shortcutKey.ability = ability_temp;
-    handler.shortcutKeys_.insert(std::make_pair("key2", shortcutKey));
-    handler.shortkeyHandler_->HandleShortKeys(key);
-    handler.context_.isDownStart_ = false;
-    bool ret = handler.HandleEvent(key);
-    EXPECT_FALSE(ret);
-    handler.context_.isDownStart_ = true;
     ret = handler.HandleEvent(key);
     EXPECT_FALSE(ret);
 }

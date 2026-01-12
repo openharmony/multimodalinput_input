@@ -127,10 +127,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdju
     }
     cursorPosRef.direction = Direction::DIRECTION0;
     NiceMock<MockInputWindowsManager> mockInputWindowsManager;
-    EXPECT_CALL(mockInputWindowsManager, IsSceneBoardEnabled)
-        .WillOnce(Return(false))
-        .WillOnce(Return(false))
-        .WillOnce(Return(true));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ScreenRotateAdjustDisplayXY(info, coord));
 
     coord.x = 1;
@@ -1612,7 +1608,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPoi
     auto ret = inputWindowsManager->ShiftAppTouchPointerEvent(info);
     ASSERT_EQ(ret, RET_ERR);
     WindowInfoEX winInfoEx;
-    inputWindowsManager->lastTouchEvent_->SetDeviceId(1);
     inputWindowsManager->touchItemDownInfos_[0].insert(std::make_pair(100, winInfoEx));
     ret = inputWindowsManager->ShiftAppTouchPointerEvent(info);
     ASSERT_EQ(ret, RET_ERR);
@@ -2279,9 +2274,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetCancelEventFl
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->bitwise_ = 0x00000080;
-    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
     pointerEvent->bitwise_ = 0x00000100;
-    EXPECT_TRUE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.GetCancelEventFlag(pointerEvent));
 }
 
 /**

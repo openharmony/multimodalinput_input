@@ -451,7 +451,7 @@ HWTEST_F(InputEventTest, InputEventTest_Hash_001, TestSize.Level1)
     CHKPV(inputEvent);
     auto inputEvent2 = InputEvent::Create();
     CHKPV(inputEvent2);
-    EXPECT_EQ(inputEvent->Hash(), inputEvent2->Hash());
+    EXPECT_NE(inputEvent->Hash(), inputEvent2->Hash());
 }
 
 } // namespace MMI

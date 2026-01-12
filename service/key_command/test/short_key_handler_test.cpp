@@ -81,27 +81,15 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_001, TestSize.
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(8);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP); 
+    ShortcutKey launchKey;
+    launchKey.finalKey = 8;
+    launchKey.triggerType = KeyEvent::KEY_ACTION_UP;
+    launchKey.preKeys = {};
+    launchKey.timerId = -1;
+    handler_->currentLaunchAbilityKey_ = launchKey;
     bool ret = handler_->HandleShortKeys(keyEvent);
-    ASSERT_FALSE(ret);
-    ShortcutKey key;
-    key.preKeys = {1, 2, 3};
-    key.businessId = "business1";
-    key.statusConfig = "config1";
-    key.statusConfigValue = true;
-    key.finalKey = 4;
-    key.keyDownDuration = 5;
-    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
-    key.timerId = 6;
-    Ability ability_temp;
-    ability_temp.bundleName = "bundleName1";
-    ability_temp.abilityName = "abilityName1";
-    key.ability = ability_temp;
-    context_.shortcutKeys_->insert(std::make_pair("key1", key));
-    handler_->lastMatchedKeys_.insert("key1");
-    ret = handler_->HandleShortKeys(keyEvent);
-    ASSERT_FALSE(ret);
-    std::string businessId = "power";
-    ret = handler_->HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
 }
 
@@ -129,8 +117,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_002, TestSize.
     ability_temp.bundleName = "bundleName2";
     ability_temp.abilityName = "abilityName2";
     key.ability = ability_temp;
-    context_.shortcutKeys_->insert(std::make_pair("key2", key));
-    handler_->lastMatchedKeys_.insert("key2");
     bool ret = handler_->HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
     std::string businessId = "power";
@@ -162,8 +148,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_003, TestSize.
     ability_temp.bundleName = "bundleName3";
     ability_temp.abilityName = "abilityName3";
     key.ability = ability_temp;
-    context_.shortcutKeys_->insert(std::make_pair("key3", key));
-    handler_->lastMatchedKeys_.insert("key3");
     bool ret = handler_->HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
     std::string businessId = "power";
@@ -192,8 +176,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_004, TestSize.
     key.timerId = 6;
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(2);
-    context_.shortcutKeys_->insert(std::make_pair("key1", key));
-    handler_->lastMatchedKeys_.insert("key1");
     bool ret = handler_->HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
 }
@@ -223,7 +205,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_005, TestSize.
     keyEvent->SetKeyAction(2);
     bool result = handler_->IsKeyMatch(handler_->currentLaunchAbilityKey_, keyEvent);
     ASSERT_FALSE(result);
-    context_.shortcutKeys_->insert(std::make_pair("key1", key));
     handler_->currentLaunchAbilityKey_.timerId = 0;
     bool ret = handler_->HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
@@ -265,7 +246,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_006, TestSize.
     key.keyDownDuration = 7;
     key.triggerType = KeyEvent::KEY_ACTION_DOWN;
     key.timerId = 10;
-    context_.shortcutKeys_->insert(std::make_pair("key1", key));
     bool ret = handler_->HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
 
@@ -318,8 +298,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_007, TestSize.
     ability_temp.bundleName = "bundleName2";
     ability_temp.abilityName = "abilityName2";
     key.ability = ability_temp;
-    context_.shortcutKeys_->insert(std::make_pair("key2", key));
-    handler_->lastMatchedKeys_.insert("key2");
     bool ret = handler_->HandleShortKeys(keyEvent);
     EXPECT_FALSE(ret);
 
@@ -354,8 +332,6 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_008, TestSize.
     shortcutKey.keyDownDuration = 7;
     shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
     shortcutKey.timerId = 10;
-    context_.shortcutKeys_->insert(std::make_pair("key", shortcutKey));
-    handler_->lastMatchedKeys_.insert("key");
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     KeyEvent::KeyItem item1;

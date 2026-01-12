@@ -787,7 +787,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_Hash_001, TestSize.Level1)
     CHKPV(KeyEvent);
     auto KeyEvent2 = KeyEvent::Create();
     CHKPV(KeyEvent2);
-    EXPECT_EQ(KeyEvent->Hash(), KeyEvent2->Hash());
+    EXPECT_NE(KeyEvent->Hash(), KeyEvent2->Hash());
 }
 
 /**

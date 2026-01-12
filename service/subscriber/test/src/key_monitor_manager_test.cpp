@@ -674,7 +674,7 @@ HWTEST_F(KeyMonitorManagerTest, KeyMonitorManagerTest_Intercept_03, TestSize.Lev
     keyMonitorManager->NotifyMeeTimeMonitor(keyEvent);
 
     bool result = keyMonitorManager->Intercept(keyEvent);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 

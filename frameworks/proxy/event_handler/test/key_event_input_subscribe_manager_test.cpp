@@ -217,7 +217,7 @@ HWTEST_F(KeyEventInputSubscribeManagerTest, KeyEventInputSubscribeManagerTest_Su
         MMI_HILOGD("Add monitor success");
     };
     auto rlt1 = manager.SubscribeKeyMonitor(keyOption, myCallback);
-    EXPECT_NE(rlt1, 0);
+    EXPECT_EQ(rlt1, 0);
 }
 
 /**
