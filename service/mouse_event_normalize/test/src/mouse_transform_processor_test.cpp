@@ -179,7 +179,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_DeletePressedB
     processor.buttonMapping_[originButton] = mappedButton;
     ASSERT_NO_FATAL_FAILURE(processor.DeletePressedButton(originButton));
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: MouseTransformProcessorTest_HandleAxisAccelateTouchPad_001
  * @tc.desc: Test HandleAxisAccelateTouchPad
@@ -197,7 +197,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     double ret = processor.HandleAxisAccelateTouchPad(axisValue);
     ASSERT_EQ(ret, 2.0);
 }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: MouseTransformProcessorTest_CheckDeviceType_01
  * @tc.desc: Test CheckDeviceType

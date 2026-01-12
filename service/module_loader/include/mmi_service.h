@@ -265,13 +265,15 @@ protected:
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);
     int32_t ReadTouchpadPointerSpeed(int32_t &speed);
     int32_t ReadTouchpadCDG(TouchpadCDG &touchpadCDG);
+    int32_t ReadTouchpadRightMenuType(int32_t &type);
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t ReadTouchpadPinchSwitch(bool &switchFlag);
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
-    int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t ReadTouchpadDoubleTapAndDragState(bool &switchFlag);
     int32_t ReadTouchpadScrollRows(int32_t &rows);
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
     int32_t OnGetDeviceIds(std::vector<int32_t> &ids);

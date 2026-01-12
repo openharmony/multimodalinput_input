@@ -18,7 +18,9 @@
 
 #include "define_multimodal.h"
 #include "joystick_transform_processor.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touch_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touch_event_normalize.h"
 
 #undef MMI_LOG_TAG
@@ -55,20 +57,24 @@ public:
 
 void TouchEventNormalizeTest::SetUp()
 {
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(prePinchSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 }
 
 void TouchEventNormalizeTest::TearDown()
 {
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(prePinchSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadScrollRows(preScrollRows_);
     TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 }
 
 /**
@@ -112,6 +118,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor
     ASSERT_EQ(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::KNUCKLE), nullptr);
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: TouchEventNormalizeTest_SetTouchpadPinchSwitch_01
  * @tc.desc: Test SetTouchpadPinchSwitch
@@ -229,5 +236,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadScrollRows_
     int32_t newRows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     ASSERT_TRUE(rows == newRows);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace MMI
 } // namespace OHOS

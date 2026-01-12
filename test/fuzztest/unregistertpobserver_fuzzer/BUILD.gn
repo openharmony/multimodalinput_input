@@ -91,9 +91,11 @@ ohos_fuzztest("UnregisterTpObserverFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    ":UnregisterTpObserverFuzzTest",
-  ]
+  if (input_feature_touchpad) {
+    deps += [
+      # deps file
+      ":UnregisterTpObserverFuzzTest",
+    ]
+  }
 }
 ###############################################################################

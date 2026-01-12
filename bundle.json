@@ -50,7 +50,9 @@
       "input_feature_key_hook",
       "input_feature_key_pressed_handler",
       "input_feature_external_screen",
-      "input_feature_knuckle"
+      "input_feature_knuckle",
+      "input_feature_touchpad",
+      "input_feature_tablet"
     ],
     "adapted_system_type": [
       "standard"

@@ -31,8 +31,13 @@ ohos_source_set("touch_event_normalize_mock") {
 
   sources = [
     "src/touch_event_normalize.cpp",
-    "src/touchpad_transform_processor.cpp",
   ]
+
+  if (input_feature_touchpad) {
+    sources += [
+      "src/touchpad_transform_processor.cpp",
+    ]
+  }
 
   public_configs = [ ":touch_event_normalize_mock_public_config" ]
 
