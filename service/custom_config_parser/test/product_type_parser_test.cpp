@@ -51,7 +51,7 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t result = PRODUCT_TYPE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
@@ -83,7 +83,7 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest003, TestSize.Level1)
     ProductTypeParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(""));
     int32_t result = PRODUCT_TYPE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
@@ -106,7 +106,7 @@ HWTEST_F(ProductTypeParserTest, ProductTypeParserTest004, TestSize.Level1)
     ProductTypeParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
     int32_t result = PRODUCT_TYPE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**

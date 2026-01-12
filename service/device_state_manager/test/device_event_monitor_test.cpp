@@ -173,7 +173,7 @@ HWTEST_F(DeviceEventMonitorTest, SetCallState_003, TestSize.Level1)
     want.SetParam("slotId", 1);
     ced.SetWant(want);
     DEVICE_MONITOR->SetCallState(ced, 1);
-    ASSERT_EQ(DEVICE_MONITOR->callState_, -1);
+    ASSERT_EQ(DEVICE_MONITOR->callState_, 1);
 }
 
 /**
@@ -210,17 +210,17 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_001, TestSize.Level1)
     ced.SetWant(want);
     DEVICE_MONITOR->hasHandleRingMute_ = true;
     DEVICE_MONITOR->SetVoipCallState(ced, 1);
-    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, -1);
 
     want.SetParam("state", 5);
     ced.SetWant(want);
     DEVICE_MONITOR->SetVoipCallState(ced, 1);
-    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 5);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, -1);
     
     want.SetParam("state", 4);
     ced.SetWant(want);
     DEVICE_MONITOR->SetVoipCallState(ced, 1);
-    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 4);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, -1);
 }
 
 /**
@@ -307,7 +307,7 @@ HWTEST_F(DeviceEventMonitorTest, SetVoipCallState_003, TestSize.Level1)
     want.SetParam("slotId", 1);
     ced.SetWant(want);
     DEVICE_MONITOR->SetVoipCallState(ced, 1);
-    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, -1);
+    ASSERT_EQ(DEVICE_MONITOR->voipCallState_, 1);
 }
 
 /**

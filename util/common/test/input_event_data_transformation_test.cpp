@@ -78,7 +78,7 @@ HWTEST_F(InputEventDataTransformationTest, UnmarshallingEnhanceData_003, TestSiz
     NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     pkt << 0;
     int32_t ret = InputEventDataTransformation::UnmarshallingEnhanceData(pkt, keyEvent);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**

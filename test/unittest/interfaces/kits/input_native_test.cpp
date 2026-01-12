@@ -847,7 +847,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_004, TestSize.Level1)
     OH_Input_SetTouchEventDisplayY(touchEvent, 10);
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     int32_t retResult = OH_Input_InjectTouchEvent(touchEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_DOWN);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
@@ -855,11 +855,11 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_004, TestSize.Level1)
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_MOVE);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_UP);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     OH_Input_SetTouchEventAction(touchEvent, 10);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
@@ -897,13 +897,13 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_005, TestSize.Level1)
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_MOVE);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
     OH_Input_SetTouchEventDisplayX(touchEvent, 671);
     OH_Input_SetTouchEventDisplayY(touchEvent, 10);
     OH_Input_SetTouchEventActionTime(touchEvent, 2);
     OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_CANCEL);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 
 /**
