@@ -430,6 +430,7 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_RECENT, "KEYCODE_RECENT"},
     {KeyEvent::KEYCODE_FLOATING_BACK, "KEYCODE_FLOATING_BACK"},
 	{KeyEvent::KEYCODE_REMOTE_POWER, "KEYCODE_REMOTE_POWER"},
+    {KeyEvent::KEYCODE_MMX_TOUCH, "KEYCODE_MMX_TOUCH"},
 #else
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
     {KeyEvent::KEYCODE_POWER, "KEYCODE_POWER"},
@@ -836,6 +837,7 @@ const int32_t KeyEvent::KEYCODE_KEY_PEN_END_DOUBLE_CLICK = 3218;
 const int32_t KeyEvent::KEYCODE_AOD_SLIDE_UNLOCK = 3219;
 const int32_t KeyEvent::KEYCODE_DIV = 3220;
 const int32_t KeyEvent::KEYCODE_KEY_PEN_MODE_SWITCH = 3221;
+const int32_t KeyEvent::KEYCODE_MMX_TOUCH = 3222;
 const int32_t KeyEvent::KEYCODE_REMOTE_POWER = 4000;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_DOWN = 10002;

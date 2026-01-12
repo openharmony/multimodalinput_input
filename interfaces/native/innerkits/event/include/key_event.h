@@ -2810,6 +2810,13 @@ public:
     static const int32_t KEYCODE_KEY_PEN_MODE_SWITCH;
 
     /**
+     * KEYCODE_MMX_TOUCH
+     *
+     * @since 24
+     */
+    static const int32_t KEYCODE_MMX_TOUCH;
+
+    /**
      * Left Knob roll-up
      * <p>In contrast to {@link #static const int32_t KEYCODE_LEFT_KNOB_ROLL_DOWN},
      * this key is used to roll the left knob upwards. The knob function is scenario-specific,

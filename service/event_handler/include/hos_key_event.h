@@ -1334,6 +1334,8 @@ enum HosKeyEventEnum {
     HOS_KEYCODE_AOD_SLIDE_UNLOCK = 3219,
     HOS_KEY_DIV = 3220,
 	HOS_KEY_PEN_MODE_SWITCH = 3221,
+    HOS_KEY_MMX_TOUCH = 3222,
+
     /**
      * Left Knob roll-up
      * <p>In contrast to {@link #KEY_LEFT_KNOB_ROLL_DOWN}, it means rolling the left knob upwards. The knob function
