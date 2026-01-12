@@ -82,7 +82,7 @@ HWTEST_F(ShortKeyHandlerTest, ShortKeyHandlerTest_HandleShortKeys_001, TestSize.
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(8);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP); 
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     ShortcutKey launchKey;
     launchKey.finalKey = 8;
     launchKey.triggerType = KeyEvent::KEY_ACTION_UP;

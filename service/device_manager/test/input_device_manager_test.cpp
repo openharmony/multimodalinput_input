@@ -2030,7 +2030,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetIsDeviceReportEvent_0
     InputDeviceManager::InputDeviceInfo info;
     info.isDeviceReportEvent = true;
     INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, info));
-    EXPECT_EQ(INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId), false); 
+    EXPECT_EQ(INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId), false);
 }
 } // namespace MMI
 } // namespace OHOS
