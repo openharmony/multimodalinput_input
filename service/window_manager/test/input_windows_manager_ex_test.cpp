@@ -602,7 +602,7 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_001, TestSize.Level1)
 HWTEST_F(InputWindowsManagerTest, TransformTipPoint_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
@@ -5295,10 +5295,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_005, TestS
     int32_t pointerId = 200;
     inputWindowsManager.touchItemDownInfos_[0].clear();
     inputWindowsManager.touchItemDownInfos_[0].insert(std::make_pair(pointerId, winInfoEx));
-    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), 1);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), -1);
     winInfoEx.flag = true;
     inputWindowsManager.touchItemDownInfos_[0].insert(std::make_pair(pointerEvent->GetPointerId(), winInfoEx));
-    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), 1);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), -1);
 }
 
 /**

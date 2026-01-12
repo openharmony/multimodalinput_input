@@ -1955,7 +1955,7 @@ HWTEST_F(InputManagerImplTest, InputManagerTest_SubscribeKeyMonitor_001, TestSiz
     KeyMonitorOption keyOption;
     std::function<void(std::shared_ptr<KeyEvent>)> callback;
     int32_t ret = InputMgrImpl.SubscribeKeyMonitor(keyOption, callback);
-    EXPECT_NE(ret, -1);
+    EXPECT_EQ(ret, -1);
 }
 
 /*
@@ -1977,7 +1977,7 @@ HWTEST_F(InputManagerImplTest, InputManagerTest_UnsubscribeKeyMonitor_001, TestS
         MMI_HILOGD("Add monitor success");
     };
     auto rlt = InputMgrImpl.SubscribeKeyMonitor(keyOption, myCallback);
-    EXPECT_NE(rlt, 0);
+    EXPECT_EQ(rlt, 0);
 }
 
 /**

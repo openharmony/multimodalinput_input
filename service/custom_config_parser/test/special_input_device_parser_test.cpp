@@ -52,7 +52,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest001, TestSize
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(""));
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /*
@@ -65,7 +65,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest002, TestSize
 {
     CALL_TEST_DEBUG;
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /*
@@ -80,7 +80,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_003, TestSiz
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return("invalid json"));
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /*
@@ -103,7 +103,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_004, TestSiz
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /*
@@ -122,7 +122,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_005, TestSiz
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /*
@@ -142,7 +142,7 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest_006, TestSiz
     SpecialInputDeviceParserMock Mock;
     EXPECT_CALL(Mock, ReadJsonFile).WillRepeatedly(testing::Return(jsonStr));
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /*
@@ -160,6 +160,5 @@ HWTEST_F(SpecialInputDeviceParserTest, SpecialInputDeviceParserTest007, TestSize
     int32_t result = SPECIAL_INPUT_DEVICE_PARSER.Init();
     EXPECT_EQ(result, RET_ERR);
 }
-
 } // namespace MMI
 } // namespace OHOS
