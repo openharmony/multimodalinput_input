@@ -31,11 +31,6 @@ enum KeyCommandType : int32_t {
     TYPE_MULTI_FINGERS = 4,
 };
 
-enum class KnuckleType : int32_t {
-    KNUCKLE_TYPE_SINGLE = 0,
-    KNUCKLE_TYPE_DOUBLE = 1,
-};
-
 enum class NotifyType : int32_t {
     CANCEL,
     INCONSISTENTGESTURE,
@@ -119,20 +114,6 @@ struct TwoFingerGesture {
     } touches[MAX_TOUCH_NUM];
 };
 
-struct KnuckleGesture {
-    std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
-    bool state { false };
-    int64_t lastPointerUpTime { 0 };
-    int64_t downToPrevUpTime { 0 };
-    float doubleClickDistance { 0.0f };
-    Ability ability;
-    struct {
-        int32_t id { 0 };
-        int32_t x { 0 };
-        int32_t y { 0 };
-    } lastDownPointer;
-};
-
 struct RepeatKey {
     int32_t keyCode { -1 };
     int32_t keyAction { 0 };
@@ -147,11 +128,6 @@ struct RepeatKey {
 
 struct MultiFingersTap {
     Ability ability;
-};
-
-struct KnuckleSwitch {
-    std::string statusConfig { "" };
-    bool statusConfigValue { false };
 };
 }  // namespace MMI
 }  // namespace OHOS

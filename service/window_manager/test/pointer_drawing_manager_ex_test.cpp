@@ -23,7 +23,6 @@
 #include "input_device_manager.h"
 #include "input_windows_manager_mock.h"
 #include "i_preference_manager.h"
-#include "knuckle_drawing_manager.h"
 #include "libinput_mock.h"
 #include "mmi_log.h"
 #include "parameters.h"

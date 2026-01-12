@@ -47,14 +47,11 @@ declare_args() {
   input_feature_short_key = true
   input_feature_coverage = false
   input_ext_feature_anco = false
-  input_ext_feature_fingersense = true
-  input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = false
   input_feature_move_event_filters = false
   input_shortcut_key_manager_enabled = true
   input_shortcut_key_rules_enabled = true
-  input_new_knuckle_dynamic_enabled = true
   input_feature_virtual_keyboard = false
   input_feature_dfx_radar_enable = false
   input_feature_one_hand_mode_enable = false
@@ -69,6 +66,7 @@ declare_args() {
   input_feature_external_screen = true
   input_ext_feature_anco_game_event_mapping = false
   input_feature_drag_security = false
+  input_feature_knuckle = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
@@ -130,7 +128,6 @@ declare_args() {
   ]
 
   libmmi_service_sources = [
-    "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "$mmi_path/frameworks/proxy/event_handler/src/scene_board_judgement.cpp",
     "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_interface.cpp",
@@ -159,8 +156,6 @@ declare_args() {
     "event_hook/src/hook/key_event_hook.cpp",
     "event_hook/src/hook/pointer_event_hook.cpp",
     "event_hook/src/input_event_hook_manager.cpp",
-    "key_command/src/setting_datashare.cpp",
-    "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "libinput_adapter/src/property_reader.cpp",
@@ -179,7 +174,6 @@ declare_args() {
     "nap_process/src/nap_process.cpp",
     "permission_helper/src/permission_helper.cpp",
     "subscriber/src/input_active_subscriber_handler.cpp",
-    "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
@@ -316,6 +310,7 @@ declare_args() {
     "socket/src/uds_client.cpp",
     "socket/src/uds_session.cpp",
     "socket/src/uds_socket.cpp",
+    "json_parser/src/json_parser.cpp",
   ]
 }
 
@@ -428,14 +423,6 @@ if (security_component_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
 }
 
-if (input_ext_feature_fingersense) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
-}
-
-if (input_ext_feature_gesturesense) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
-}
-
 if (input_feature_move_event_filters) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS" ]
 }
@@ -473,18 +460,10 @@ if (input_feature_product == "pc") {
 
 if (input_feature_product == "watch") {
   input_default_defines += [ "OHOS_BUILD_ENABLE_WATCH" ]
-  libmmi_service_sources +=
-      [ "fingersense_wrapper/src/fingersense_wrapper.cpp" ]
 } else {
   libmmi_service_sources += [
     "device_config/src/device_config_file_parser.cpp",
-    "fingersense_wrapper/src/fingersense_wrapper.cpp",
-    "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
   ]
-
-  if (input_new_knuckle_dynamic_enabled) {
-    input_default_defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
-  }
 }
 
 if (input_ext_feature_magiccursor) {
@@ -564,4 +543,9 @@ if (input_feature_external_screen) {
 
 if (input_ext_feature_anco_game_event_mapping) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING" ]
+}
+
+if (input_feature_knuckle) {
+  input_default_defines += [ "OHOS_BUILD_KNUCKLE" ]
+  libmmi_service_sources += [ "knuckle/src/knuckle_handler_component.cpp" ]
 }

@@ -33,8 +33,6 @@ ohos_fuzztest("InjecteventSetKeyItemCodeFuzzTest") {
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_dump/include",
-    "${mmi_path}/service/fingersense_wrapper/include",
-    "${mmi_path}/service/gesturesense_wrapper/include",
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
@@ -49,7 +47,6 @@ ohos_fuzztest("InjecteventSetKeyItemCodeFuzzTest") {
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/permission_helper/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/device_state_manager/include",
@@ -65,6 +62,9 @@ ohos_fuzztest("InjecteventSetKeyItemCodeFuzzTest") {
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",

@@ -26,6 +26,9 @@ ohos_fuzztest("WindowManagerSetPointerLocationFuzzTest") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",

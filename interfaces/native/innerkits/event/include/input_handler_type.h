@@ -49,6 +49,10 @@ enum ScreenCapturePermissionType : uint32_t {
     TOUCHPAD_KNUCKLE_SCREEN_RECORDING = 1 << 5,
     SHORTCUT_KEY_SCREENSHOT = 1 << 6,
     SHORTCUT_KEY_SCREEN_RECORDING = 1 << 7,
+    KNUCKLE_ALL_PERMISSIONS = KNUCKLE_SCREENSHOT |
+                              KNUCKLE_SCROLL_SCREENSHOT |
+                              KNUCKLE_ENABLE_AI_BASE |
+                              KNUCKLE_SCREEN_RECORDING,
     DEFAULT_PERMISSIONS = 0XFF,
 };
 

@@ -76,7 +76,7 @@ int32_t JsonParser::ParseInt32(const cJSON *json, const std::string &key, int32_
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("The json is not object");
-        return false;
+        return RET_ERR;
     }
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
@@ -97,11 +97,43 @@ int32_t JsonParser::ParseInt32(const cJSON *json, const std::string &key, int32_
     return RET_OK;
 }
 
+int32_t JsonParser::ParseFloat(const cJSON *json, const std::string &key, float &value)
+{
+    if (!cJSON_IsObject(json)) {
+        MMI_HILOGE("The json is not object");
+        return RET_ERR;
+    }
+    cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
+    CHKPR(jsonNode, RET_ERR);
+    if (!cJSON_IsNumber(jsonNode)) {
+        MMI_HILOGE("value is not number");
+        return RET_ERR;
+    }
+    value = static_cast<float>(jsonNode->valuedouble);
+    return RET_OK;
+}
+
+int32_t JsonParser::ParseDouble(const cJSON *json, const std::string &key, double &value)
+{
+    if (!cJSON_IsObject(json)) {
+        MMI_HILOGE("The json is not object");
+        return RET_ERR;
+    }
+    cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
+    CHKPR(jsonNode, RET_ERR);
+    if (!cJSON_IsNumber(jsonNode)) {
+        MMI_HILOGE("value is not number");
+        return RET_ERR;
+    }
+    value = jsonNode->valuedouble;
+    return RET_OK;
+}
+
 int32_t JsonParser::ParseString(const cJSON *json, const std::string &key, std::string &value)
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("The json is not object");
-        return false;
+        return RET_ERR;
     }
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
@@ -117,7 +149,7 @@ int32_t JsonParser::ParseBool(const cJSON *json, const std::string &key, bool &v
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("The json is not object");
-        return false;
+        return RET_ERR;
     }
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);
@@ -134,7 +166,7 @@ int32_t JsonParser::ParseStringArray(const cJSON *json, const std::string &key, 
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("The json is not object");
-        return false;
+        return RET_ERR;
     }
     cJSON *jsonNode = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
     CHKPR(jsonNode, RET_ERR);

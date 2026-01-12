@@ -731,7 +731,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentCursor
     ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_ERR);
 
     instance_->isLoaded_ = true;
-    ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_ERR);
+    ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_OK);
 }
 
 /**

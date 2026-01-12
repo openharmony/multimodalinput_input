@@ -41,12 +41,14 @@ ohos_fuzztest("StubHandleScrollRowsFuzzTest") {
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/mouse_event_normalize/include",
-    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",
