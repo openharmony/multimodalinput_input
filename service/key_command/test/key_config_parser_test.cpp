@@ -1590,5 +1590,299 @@ HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ParseTwoFingerGesture_001, Tes
     TwoFingerGesture twoFingerGesture;
     EXPECT_FALSE(handler_->ParseTwoFingerGesture(parser, twoFingerGesture));
 }
+
+/**
+ * @tc.name: KeyConfigParserTest_GetKeyVal_001
+ * @tc.desc: Test key does not exist in JSON object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetKeyVal_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string value;
+    handler_->GetKeyVal(nullptr, "key", value);
+    EXPECT_TRUE(value.empty());
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetKeyVal_002
+ * @tc.desc: The value corresponding to the test key is a string type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetKeyVal_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "key", "value");
+    std::string value;
+    handler_->GetKeyVal(json, "key", value);
+    EXPECT_EQ(value, "value");
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetEntities_001
+ * @tc.desc: Testing jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetEntities_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    ASSERT_FALSE(handler_->GetEntities(nullptr, ability));
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetEntities_002
+ * @tc.desc: Test has no entities field
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetEntities_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    ASSERT_TRUE(handler_->GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetEntities_003
+ * @tc.desc: The test entities field exists but is not an array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetEntities_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonAbility, "entities", cJSON_CreateNumber(123));
+    ASSERT_FALSE(handler_->GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetEntities_004
+ * @tc.desc: Test array contains non-string elements
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetEntities_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* entities = cJSON_CreateArray();
+    cJSON_AddItemToArray(entities, cJSON_CreateNumber(123));
+    cJSON_AddItemToObject(jsonAbility, "entities", entities);
+    ASSERT_FALSE(handler_->GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetEntities_005
+ * @tc.desc: Test normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetEntities_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* entities = cJSON_CreateArray();
+    cJSON_AddItemToArray(entities, cJSON_CreateString("entity1"));
+    cJSON_AddItemToArray(entities, cJSON_CreateString("entity2"));
+    cJSON_AddItemToObject(jsonAbility, "entities", entities);
+    ASSERT_TRUE(handler_->GetEntities(jsonAbility, ability));
+    EXPECT_EQ(ability.entities.size(), 2);
+    EXPECT_EQ(ability.entities[0], "entity1");
+    EXPECT_EQ(ability.entities[1], "entity2");
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_001
+ * @tc.desc: Test jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    ASSERT_FALSE(handler_->GetParams(nullptr, ability));
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_002
+ * @tc.desc: Test params are not an array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateString("not an array");
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = handler_->GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(ability.params.empty());
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_003
+ * @tc.desc: Test Params for nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    cJSON_AddItemToArray(params, nullptr);
+    bool result = handler_->GetParams(jsonAbility, ability);
+    EXPECT_TRUE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_004
+ * @tc.desc: Test param is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = handler_->GetParams(jsonAbility, ability);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_005
+ * @tc.desc: The test key is not a string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    const char* jsonStr = R"({"params":[{"key":123,"value":"value"}]})";
+    cJSON* jsonAbility = cJSON_Parse(jsonStr);
+    bool result = handler_->GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_006
+ * @tc.desc: The test value is not a string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    const char* jsonStr = R"({"params":[{"key":"key","value":123}]})";
+    cJSON* jsonAbility = cJSON_Parse(jsonStr);
+    bool result = handler_->GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_GetParams_007
+ * @tc.desc: Test for normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_GetParams_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateArray();
+    cJSON* param1 = cJSON_CreateObject();
+    cJSON* key1 = cJSON_CreateString("key");
+    cJSON* value1 = cJSON_CreateString("value1");
+    cJSON* param2 = cJSON_CreateObject();
+    cJSON* key2 = cJSON_CreateString("key");
+    cJSON* value2 = cJSON_CreateString("value2");
+    cJSON_AddItemToObject(param1, "key", key1);
+    cJSON_AddItemToObject(param1, "value", value1);
+    cJSON_AddItemToObject(param2, "key", key2);
+    cJSON_AddItemToObject(param2, "value", value2);
+    cJSON_AddItemToArray(params, param1);
+    cJSON_AddItemToArray(params, param2);
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = handler_->GetParams(jsonAbility, ability);
+    ASSERT_TRUE(result);
+    ASSERT_EQ(ability.params.size(), 1);
+    ASSERT_EQ(ability.params["key"], "value1");
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_ackageAbility_001
+ * @tc.desc: Test jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ackageAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    ASSERT_FALSE(handler_->PackageAbility(nullptr, ability));
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_ParseMultiFingersTap_001
+ * @tc.desc: Tests when jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ParseMultiFingersTap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    JsonParser parser("");
+    std::string ability;
+    MultiFingersTap mulFingersTap;
+    EXPECT_FALSE(handler_->ParseMultiFingersTap(parser, ability, mulFingersTap));
+}
+
+/**
+ * @tc.name: KeyConfigParserTest_ParseMultiFingersTap_002
+ * @tc.desc: Tests when mulFingersTap gesture failed
+ * @tc.type: FUNC
+ * @tc.require:
+*/
+HWTEST_F(KeyConfigParserTest, KeyConfigParserTest_ParseMultiFingersTap_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string ability;
+    std::string jsonData = R"({"ability": 1})";
+    JsonParser parser(jsonData.c_str());
+    MultiFingersTap mulFingersTap;
+    EXPECT_FALSE(handler_->ParseMultiFingersTap(parser, ability, mulFingersTap));
+}
 } // namespace MMI
 } // namespace OHOS

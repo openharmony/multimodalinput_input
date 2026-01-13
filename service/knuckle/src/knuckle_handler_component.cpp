@@ -45,7 +45,7 @@ bool KnuckleHandlerComponent::Init()
     return Load() != nullptr ? true : false;
 }
 
-void KnuckleHandlerComponent::SetCurrentToolType(struct TouchType touchType, int32_t &toolType)
+void KnuckleHandlerComponent::SetCurrentToolType(const struct TouchType &touchType, int32_t &toolType)
 {
     IKnuckleHandler *impl = Load();
     if (impl == nullptr) {
@@ -155,7 +155,7 @@ int32_t KnuckleHandlerComponent::RegisterKnuckleSwitchByUserId(int32_t userId)
     return impl->RegisterKnuckleSwitchByUserId(userId);
 }
 
-int32_t KnuckleHandlerComponent::SetKnucklePermissions(int32_t permissions, bool enable)
+int32_t KnuckleHandlerComponent::SetKnucklePermissions(uint32_t permissions, bool enable)
 {
     IKnuckleHandler *impl = Load();
     if (impl == nullptr) {
@@ -267,6 +267,14 @@ void KnuckleHandlerComponent::Unload()
     MMI_HILOGI("success to Unload KnuckleHandler");
 }
 
+KnuckleContextImpl::KnuckleContextImpl() : IKnuckleContext()
+{
+}
+
+KnuckleContextImpl::~KnuckleContextImpl()
+{
+}
+
 const OLD::DisplayInfo *KnuckleContextImpl::GetPhysicalDisplay(int32_t id)
 {
     return WIN_MGR->GetPhysicalDisplay(id);
@@ -282,7 +290,7 @@ void KnuckleContextImpl::ReportKnuckleClickEvent()
     DfxHisysevent::ReportKnuckleClickEvent();
 }
 
-void KnuckleContextImpl::ReportFailIfOneSuccTwoFail(const std::shared_ptr<PointerEvent> touchEvent)
+void KnuckleContextImpl::ReportFailIfOneSuccTwoFail(std::shared_ptr<PointerEvent> touchEvent)
 {
     DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
 }
