@@ -2033,6 +2033,7 @@ ohos_unittest("ModuleLoaderTest") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
