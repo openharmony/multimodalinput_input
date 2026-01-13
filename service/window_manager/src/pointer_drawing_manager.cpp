@@ -2390,7 +2390,7 @@ void PointerDrawingManager::OnDisplayInfo(const OLD::DisplayGroupInfo &displayGr
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
-    if (pid_ != info.windowPid) {
+    if (pid_ != info.windowPid || windowId_ != info.windowId) {
         windowId_ = info.windowId;
         pid_ = info.windowPid;
         UpdatePointerVisible();
