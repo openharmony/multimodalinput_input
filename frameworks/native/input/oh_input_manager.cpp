@@ -87,6 +87,11 @@ struct Input_TouchEvent {
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
+    int32_t windowX { 0 };
+    int32_t windowY { 0 };
+    int64_t downTime { 0 };
+    Input_TouchEventToolType toolType { Input_TouchEventToolType::TOOL_TYPE_FINGER };
+    double pressure { 0.0 };
 };
 
 struct Input_AxisEvent {
@@ -891,6 +896,13 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
         item.SetGlobalX(DBL_MAX);
         item.SetGlobalY(DBL_MAX);
     }
+    if (OHOS::MMI::MMI_DOUBLE_GE(touchEvent->pressure, 0) && OHOS::MMI::MMI_DOUBLE_LE(touchEvent->pressure, 1.0)) {
+        item.SetPressure(touchEvent->pressure);
+    }
+    if (touchEvent->toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
+        touchEvent->toolType <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        item.SetToolType(static_cast<int32_t>(touchEvent->toolType));
+    }
     item.SetPointerId(id);
     g_touchEvent->SetPointerId(id);
     g_touchEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -1110,6 +1122,100 @@ int32_t OH_Input_GetTouchEventGlobalY(const struct Input_TouchEvent* touchEvent)
     CALL_DEBUG_ENTER;
     CHKPR(touchEvent, INT32_MAX);
     return touchEvent->globalY;
+}
+
+Input_Result OH_Input_SetTouchEventPressure(struct Input_TouchEvent* touchEvent, double pressure)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr || OHOS::MMI::MMI_DOUBLE_LNE(pressure, 0.0) ||
+        OHOS::MMI::MMI_DOUBLE_GNE(pressure, 1.0)) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    touchEvent->pressure = pressure;
+    return INPUT_SUCCESS;
+}
+
+double OH_Input_GetTouchEventPressure(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return 0.0;
+    }
+    return touchEvent->pressure;
+}
+
+void OH_Input_SetTouchEventWindowX(struct Input_TouchEvent* touchEvent, int32_t windowX)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return;
+    }
+    touchEvent->windowX = windowX;
+}
+
+int32_t OH_Input_GetTouchEventWindowX(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return 0;
+    }
+    return touchEvent->windowX;
+}
+
+void OH_Input_SetTouchEventWindowY(struct Input_TouchEvent* touchEvent, int32_t windowY)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return;
+    }
+    touchEvent->windowY = windowY;
+}
+
+int32_t OH_Input_GetTouchEventWindowY(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return 0;
+    }
+    return touchEvent->windowY;
+}
+
+void OH_Input_SetTouchEventDownTime(struct Input_TouchEvent* touchEvent, int64_t downTime)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return;
+    }
+    touchEvent->downTime = downTime;
+}
+
+int64_t OH_Input_GetTouchEventDownTime(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return 0;
+    }
+    return touchEvent->downTime;
+}
+
+Input_Result OH_Input_SetTouchEventToolType(struct Input_TouchEvent* touchEvent, Input_TouchEventToolType toolType)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr || toolType < Input_TouchEventToolType::TOOL_TYPE_FINGER ||
+        toolType > Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    touchEvent->toolType = toolType;
+    return INPUT_SUCCESS;
+}
+
+Input_TouchEventToolType OH_Input_GetTouchEventToolType(const struct Input_TouchEvent* touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (touchEvent == nullptr) {
+        return Input_TouchEventToolType::TOOL_TYPE_FINGER;
+    }
+    return touchEvent->toolType;
 }
 
 void OH_Input_CancelInjection()
@@ -1542,6 +1648,15 @@ static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
     touchEvent->actionTime = event->GetActionTime();
     touchEvent->windowId = event->GetTargetWindowId();
     touchEvent->displayId = event->GetTargetDisplayId();
+    touchEvent->windowX = item.GetWindowX();
+    touchEvent->windowY = item.GetWindowY();
+    touchEvent->downTime = item.GetDownTime();
+    auto toolType = item.GetToolType();
+    if (toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
+        toolType <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        touchEvent->toolType = static_cast<Input_TouchEventToolType>(toolType);
+    }
+    touchEvent->pressure = item.GetPressure();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_touchMonitorCallbacks) {
         callback(touchEvent);
@@ -1993,6 +2108,15 @@ static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     touchEvent->actionTime = event->GetActionTime();
     touchEvent->windowId = event->GetTargetWindowId();
     touchEvent->displayId = event->GetTargetDisplayId();
+    touchEvent->windowX = item.GetWindowX();
+    touchEvent->windowY = item.GetWindowY();
+    touchEvent->downTime = item.GetDownTime();
+    auto toolType = item.GetToolType();
+    if (toolType >= Input_TouchEventToolType::TOOL_TYPE_FINGER &&
+        toolType <= Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        touchEvent->toolType = static_cast<Input_TouchEventToolType>(toolType);
+    }
+    touchEvent->pressure = item.GetPressure();
     g_pointerInterceptorCallback->touchCallback(touchEvent);
     OH_Input_DestroyTouchEvent(&touchEvent);
 }
@@ -3140,7 +3264,9 @@ static int32_t TransformTouchProperty(const struct Input_TouchEvent *touchEvent,
     item.SetWindowY(windowY);
     item.SetWindowXPos(windowX);
     item.SetWindowYPos(windowY);
-
+    item.SetDownTime(touchEvent->downTime);
+    item.SetToolType(touchEvent->toolType);
+    item.SetPressure(touchEvent->pressure);
     int32_t id = touchEvent->id;
     if (id < 0) {
         MMI_HILOGE("displayId is less 0, can not process");
