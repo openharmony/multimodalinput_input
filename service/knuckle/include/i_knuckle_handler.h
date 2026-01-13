@@ -29,7 +29,7 @@ public:
     IKnuckleHandler() = default;
     virtual ~IKnuckleHandler() = default;
 
-    virtual void SetCurrentToolType(struct TouchType touchType, int32_t &toolType) = 0;
+    virtual void SetCurrentToolType(const struct TouchType &touchType, int32_t &toolType) = 0;
     virtual void NotifyTouchUp(struct TouchType *rawTouch) = 0;
     virtual void EnableFingersense(void) = 0;
     virtual void DisableFingersense(void) = 0;
@@ -40,7 +40,7 @@ public:
     virtual void HandleKnuckleEvent(std::shared_ptr<PointerEvent> touchEvent) = 0;
     virtual void RegisterSwitchObserver() = 0;
     virtual int32_t RegisterKnuckleSwitchByUserId(int32_t userId) = 0;
-    virtual int32_t SetKnucklePermissions(int32_t permissions, bool enable) = 0;
+    virtual int32_t SetKnucklePermissions(uint32_t permissions, bool enable) = 0;
     virtual bool SkipKnuckleDetect() = 0;
     virtual int32_t SetKnuckleSwitch(bool knuckleSwitch) = 0;
     virtual void Dump(int32_t fd) = 0;
@@ -48,6 +48,7 @@ public:
 
 class IKnuckleContext {
 public:
+    IKnuckleContext() = default;
     virtual ~IKnuckleContext() = default;
 
     virtual const OLD::DisplayInfo *GetPhysicalDisplay(int32_t id) = 0;

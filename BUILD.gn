@@ -297,6 +297,10 @@ group("mmi_tests") {
       "service/window_manager:TouchDrawingHandlerTest",
     ]
   }
+
+  if (input_feature_knuckle) {
+    deps += [ "service:KnuckleHandlerComponentTest" ]
+  }
 }
 
 group("examples_group") {

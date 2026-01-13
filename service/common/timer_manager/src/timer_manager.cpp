@@ -35,6 +35,29 @@ constexpr int32_t NONEXISTENT_ID { -1 };
 std::once_flag TimerManager::initFlag_ = std::once_flag();
 std::shared_ptr<TimerManager> TimerManager::instance_ = nullptr;
 
+// The pre declaration here is to avoid including header files and adding compilation dependencies,
+// you can also include "dfx_signal_handler.h" and add 'faultloggerd:dfx_signalhandler' to external dependencies,
+// but this will slightly increase the size of 'libmmi-server-common' library
+extern "C" uintptr_t DFX_SetCrashObj(uint8_t type, uintptr_t addr);
+extern "C" void DFX_ResetCrashObj(uintptr_t crashObj);
+
+struct CrashObjDumper {
+public:
+    explicit CrashObjDumper(const char *str)
+    {
+        if (str == nullptr) {
+            return;
+        }
+        ptr_ = DFX_SetCrashObj(0, reinterpret_cast<uintptr_t>(str));
+    }
+    ~CrashObjDumper()
+    {
+        DFX_ResetCrashObj(ptr_);
+    }
+private:
+    uintptr_t ptr_ = 0;
+};
+
 TimerManager::TimerManager() {}
 TimerManager::~TimerManager() {}
 
