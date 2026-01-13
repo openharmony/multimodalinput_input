@@ -6035,14 +6035,18 @@ bool InputWindowsManager::IsLeaveWindowTriggered(const std::shared_ptr<PointerEv
     return false;
 }
 
-void InputWindowsManager::DispatchLevitateInEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void InputWindowsManager::DispatchLevitateInEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t targetWindowId)
 {
-    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW, pointerEvent->GetTargetDisplayId());
+    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW,
+        pointerEvent->GetTargetDisplayId(), targetWindowId);
 }
 
-void InputWindowsManager::DispatchLevitateOutEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void InputWindowsManager::DispatchLevitateOutEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t targetWindowId)
 {
-    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW, pointerEvent->GetTargetDisplayId());
+    DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW,
+        pointerEvent->GetTargetDisplayId(), targetWindowId);
 }
 
 void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t logicalY,
@@ -6052,6 +6056,7 @@ void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t log
         MMI_HILOG_DISPATCHE("PointerEvent is nullptr");
         return;
     }
+    static int32_t lastLevitateWinId = -1;
     if (auto pointerAction = pointerEvent->GetPointerAction();
         pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_MOVE) {
         if (IsLeaveWindowTriggered(pointerEvent, touchWindow)) {
@@ -6063,6 +6068,7 @@ void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t log
             UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
             DispatchLevitateInEvent(pointerEvent);
         }
+        lastLevitateWinId = pointerEvent->GetTargetWindowId();
     } else if (pointerAction == PointerEvent::POINTER_ACTION_PROXIMITY_IN) {
         MMI_HILOG_DISPATCHI("Levitate in by Z-");
         UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
@@ -6072,7 +6078,7 @@ void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t log
         DispatchLevitateOutEvent(pointerEvent);
     } else if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
         MMI_HILOG_DISPATCHI("Levitate out by Z-");
-        DispatchLevitateOutEvent(pointerEvent);
+        DispatchLevitateOutEvent(pointerEvent, lastLevitateWinId);
     } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
         MMI_HILOG_DISPATCHI("Levitate in by Z+");
         UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
@@ -6097,7 +6103,7 @@ void InputWindowsManager::UpdateStashTouchEventInfo(int32_t logicalX, int32_t lo
     lastTouchEvent_ = pointerEvent;
 }
 
-void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
+void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId, int32_t targetWindowId)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
@@ -6123,7 +6129,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
             if ((item.flags & WindowInputPolicy::FLAG_DRAG_DISABLED) == WindowInputPolicy::FLAG_DRAG_DISABLED) {
                 continue;
             }
-            if (ShouldIgnoreLevitateEvent(lastPointerItem, item.windowInputType)) {
+            if ((lastPointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN && !lastPointerItem.IsPressed()) &&
+                ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) ||
+                (item.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE))) {
                 continue;
             }
             if (IsInHotArea(lastInfo.lastTouchLogicX, lastInfo.lastTouchLogicY, item.defaultHotAreas, item)) {
@@ -6184,6 +6192,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     pointerEvent->SetTargetDisplayId(lastTouchEvent_->GetTargetDisplayId());
     SetPrivacyModeFlag(lastInfo.lastTouchWindowInfo.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(lastInfo.lastTouchWindowInfo.id);
+    if (targetWindowId != -1) {
+        pointerEvent->SetTargetWindowId(targetWindowId);
+    }
     pointerEvent->SetAgentWindowId(lastInfo.lastTouchWindowInfo.agentWindowId);
     pointerEvent->SetPointerId(lastPointerId);
     pointerEvent->AddPointerItem(currentPointerItem);
