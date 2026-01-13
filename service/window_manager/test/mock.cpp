@@ -430,28 +430,6 @@ int32_t MouseEventNormalize::GetDisplayId() const
     return DfsMessageParcel::messageParcel->GetDisplayId();
 }
 
-KnuckleDrawingManager::KnuckleDrawingManager()
-{}
-
-void KnuckleDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
-{}
-
-void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent, int32_t displayId)
-{}
-
-KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
-{}
-
-void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
-{}
-
-void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent,
-    int32_t displayId)
-{}
-
-void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
-{}
-
 SettingDataShare::~SettingDataShare() {}
 
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
@@ -481,10 +459,6 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 {
     return ERR_OK;
 }
-
-FingersenseWrapper::FingersenseWrapper() {}
-
-FingersenseWrapper::~FingersenseWrapper() {}
 
 bool UDSSession::SendMsg(NetPacket &pkt)
 {
@@ -521,14 +495,4 @@ int32_t InputWindowsManager::SyncKnuckleStatus(bool isKnuckleEnable)
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
-
-bool KeyCommandHandler::GetKnuckleSwitchValue()
-{
-    return false;
-}
-
-bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
-{
-    return false;
-}
 } // namespace OHOS

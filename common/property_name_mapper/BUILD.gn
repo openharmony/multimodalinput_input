@@ -42,6 +42,7 @@ ohos_shared_library("mmi_property_name_mapper") {
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server-common",
   ]
 
   external_deps = [
@@ -66,7 +67,7 @@ ohos_source_set("property_name_mapper") {
 
   include_dirs = [
     "include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
   ]
 
   sources = [ "src/property_name_mapper.cpp" ]
@@ -83,6 +84,7 @@ ohos_source_set("property_name_mapper") {
     "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server-common",
   ]
 
   external_deps = [

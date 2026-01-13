@@ -39,7 +39,7 @@ ohos_fuzztest("ConnectManagerSetKnuckleSwitchFuzzTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include/",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/window_manager/include",
   ]
   configs = [

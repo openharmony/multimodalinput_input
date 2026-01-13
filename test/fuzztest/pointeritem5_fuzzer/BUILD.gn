@@ -40,7 +40,7 @@ ohos_fuzztest("PointerItem5FuzzTest") {
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/mouse_event_normalize/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
   ]

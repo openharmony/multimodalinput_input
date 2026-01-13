@@ -22,7 +22,6 @@
 #include "common_event_support.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
-#include "gesturesense_wrapper.h"
 #include "input_event_handler.h"
 #include "input_handler_type.h"
 #include "input_windows_manager.h"

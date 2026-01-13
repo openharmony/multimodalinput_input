@@ -27,6 +27,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
+}
 bool KeyConfigParser::ParseConfig()
 {
     const std::string defaultConfig { "/system/etc/multimodalinput/ability_launch_config.json" };
@@ -65,7 +68,9 @@ bool KeyConfigParser::ParseJson(const std::string &configFile)
     bool isParseSequences = ParseSequences(parser, *context_.sequences_);
     bool isParseTwoFingerGesture = ParseTwoFingerGesture(parser, context_.twoFingerGesture_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, *context_.repeatKeys_, context_.repeatKeyMaxTimes_);
-    if (!isParseShortKeys && !isParseSequences && !isParseRepeatKeys && !isParseTwoFingerGesture) {
+    bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, context_.threeFingersTap_);
+    if (!isParseShortKeys && !isParseSequences && !isParseRepeatKeys && !isParseTwoFingerGesture &&
+        !isParseMultiFingersTap) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -267,6 +272,25 @@ bool KeyConfigParser::ParseExcludeKeys(const JsonParser& parser, std::vector<Exc
             continue;
         }
         excludeKeyVec.push_back(exKey);
+    }
+    return true;
+}
+
+bool KeyConfigParser::ParseMultiFingersTap(const JsonParser &parser, const std::string ability,
+    MultiFingersTap &mulFingersTap)
+{
+    if (!cJSON_IsObject(parser.Get())) {
+        MMI_HILOGE("The parser is not object");
+        return false;
+    }
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.Get(), "TouchPadMultiFingersTap");
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("Multi fingers tap is not object");
+        return false;
+    }
+    if (!IsPackageKnuckleGesture(jsonData, ability, mulFingersTap.ability)) {
+        MMI_HILOGE("Package mulFingersTap gesture failed");
+        return false;
     }
     return true;
 }
@@ -795,6 +819,143 @@ std::string KeyConfigParser::GenerateKey(const ShortcutKey& key)
     ss << key.triggerType << ",";
     ss << key.keyDownDuration;
     return std::string(ss.str());
+}
+
+bool KeyConfigParser::IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture,
+    Ability &launchAbility)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("The jsonData is not object");
+        return false;
+    }
+    cJSON *knuckleGestureData = cJSON_GetObjectItemCaseSensitive(jsonData, knuckleGesture.c_str());
+    if (!cJSON_IsObject(knuckleGestureData)) {
+        MMI_HILOGE("Knuckle gesture data is not object");
+        return false;
+    }
+    if (!cJSON_IsObject(knuckleGestureData)) {
+        MMI_HILOGE("The knuckleGestureData is not object");
+        return false;
+    }
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(knuckleGestureData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("Ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, launchAbility)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    return true;
+}
+
+bool KeyConfigParser::PackageAbility(const cJSON* jsonAbility, Ability &ability)
+{
+    if (!cJSON_IsObject(jsonAbility)) {
+        MMI_HILOGE("The json ability is not object");
+        return false;
+    }
+    GetKeyVal(jsonAbility, "bundleName", ability.bundleName);
+    GetKeyVal(jsonAbility, "abilityName", ability.abilityName);
+    GetKeyVal(jsonAbility, "action", ability.action);
+    GetKeyVal(jsonAbility, "type", ability.type);
+    GetKeyVal(jsonAbility, "deviceId", ability.deviceId);
+    GetKeyVal(jsonAbility, "uri", ability.uri);
+    GetKeyVal(jsonAbility, "abilityType", ability.abilityType);
+    if (!GetEntities(jsonAbility, ability)) {
+        MMI_HILOGE("Get centities failed");
+        return false;
+    }
+    if (!GetParams(jsonAbility, ability)) {
+        MMI_HILOGE("Get params failed");
+        return false;
+    }
+    return true;
+}
+
+void KeyConfigParser::GetKeyVal(const cJSON* json, const std::string &key, std::string &value)
+{
+    if (!cJSON_IsObject(json)) {
+        MMI_HILOGE("The json is not object");
+        return;
+    }
+    cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
+    if (valueJson == nullptr) {
+        MMI_HILOGE("The value json init failed");
+        return;
+    }
+    if (cJSON_IsString(valueJson)) {
+        value = valueJson->valuestring;
+    }
+}
+
+bool KeyConfigParser::GetEntities(const cJSON* jsonAbility, Ability &ability)
+{
+    if (!cJSON_IsObject(jsonAbility)) {
+        MMI_HILOGE("The json ability is not object");
+        return false;
+    }
+    cJSON *entities = cJSON_GetObjectItemCaseSensitive(jsonAbility, "entities");
+    if (entities == nullptr) {
+        return true;
+    }
+    if (!cJSON_IsArray(entities)) {
+        MMI_HILOGE("The entities must be array");
+        return false;
+    }
+    int32_t entitySize = cJSON_GetArraySize(entities);
+    for (int32_t i = 0; i < entitySize; i++) {
+        cJSON* entity = cJSON_GetArrayItem(entities, i);
+        if (entity == nullptr) {
+            MMI_HILOGE("The entity init failed");
+            continue;
+        }
+        if (!cJSON_IsString(entity)) {
+            MMI_HILOGE("The entity is not string");
+            return false;
+        }
+        ability.entities.push_back(entity->valuestring);
+    }
+    return true;
+}
+
+bool KeyConfigParser::GetParams(const cJSON* jsonAbility, Ability &ability)
+{
+    if (!cJSON_IsObject(jsonAbility)) {
+        MMI_HILOGE("The json ability is not object");
+        return false;
+    }
+    cJSON *params = cJSON_GetObjectItemCaseSensitive(jsonAbility, "params");
+    if (params == nullptr) {
+        return true;
+    }
+    if (!cJSON_IsArray(params)) {
+        MMI_HILOGE("The params must be array");
+        return false;
+    }
+    int32_t paramsSize = cJSON_GetArraySize(params);
+    for (int32_t i = 0; i < paramsSize; ++i) {
+        cJSON* param = cJSON_GetArrayItem(params, i);
+        if (!cJSON_IsObject(param)) {
+            MMI_HILOGE("The param must be object");
+            return false;
+        }
+        cJSON* key = cJSON_GetObjectItemCaseSensitive(param, "key");
+        if (!cJSON_IsString(key)) {
+            MMI_HILOGE("The key is not string");
+            return false;
+        }
+        cJSON* value = cJSON_GetObjectItemCaseSensitive(param, "value");
+        if (!cJSON_IsString(value)) {
+            MMI_HILOGE("The value is not string");
+            return false;
+        }
+        auto ret = ability.params.emplace(key->valuestring, value->valuestring);
+        if (!ret.second) {
+            MMI_HILOGW("The key is duplicated");
+        }
+    }
+    return true;
 }
 }  // namespace MMI
 }  // namespace OHOS

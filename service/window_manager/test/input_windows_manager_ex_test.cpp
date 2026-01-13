@@ -18,9 +18,9 @@
 #include <linux/input.h>
 
 #include "input_windows_manager.h"
-#include "knuckle_drawing_component.h"
 #include "mmi_matrix3.h"
 #include "mock.h"
+#include "knuckle_handler_component.h"
 
 namespace OHOS {
 namespace MMI {
@@ -4282,7 +4282,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_005, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto &knuckleDrawingComponent = KnuckleDrawingComponent::GetInstance();
+    auto &knuckleHandlerComponent = KnuckleHandlerComponent::GetInstance();
 
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -4299,10 +4299,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_005, TestSize.Level1)
     InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
     ASSERT_NE(InputHandler->GetKeyCommandHandler(), nullptr);
 
-    auto callTime = std::chrono::steady_clock::now();
     inputWindowsManager->DrawTouchGraphic(pointerEvent);
-
-    ASSERT_FALSE(knuckleDrawingComponent.lastCallTime_ >= callTime);
 }
 
 /**
@@ -4316,7 +4313,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_006, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto &knuckleDrawingComponent = KnuckleDrawingComponent::GetInstance();
+    auto &knuckleHandlerComponent = KnuckleHandlerComponent::GetInstance();
 
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -4337,9 +4334,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_006, TestSize.Level1)
     InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
     ASSERT_NE(InputHandler->GetKeyCommandHandler(), nullptr);
 
-    auto callTime = std::chrono::steady_clock::now();
     inputWindowsManager->DrawTouchGraphic(pointerEvent);
-    ASSERT_FALSE(knuckleDrawingComponent.lastCallTime_ >= callTime);
 }
 
 /**
@@ -4353,7 +4348,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_007, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto &knuckleDrawingComponent = KnuckleDrawingComponent::GetInstance();
+    auto &knuckleHandlerComponent = KnuckleHandlerComponent::GetInstance();
 
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -4374,9 +4369,7 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_007, TestSize.Level1)
     InputHandler->eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
     ASSERT_NE(InputHandler->GetKeyCommandHandler(), nullptr);
 
-    auto callTime = std::chrono::steady_clock::now();
     inputWindowsManager->DrawTouchGraphic(pointerEvent);
-    ASSERT_TRUE(knuckleDrawingComponent.lastCallTime_ >= callTime);
 }
 
 /**

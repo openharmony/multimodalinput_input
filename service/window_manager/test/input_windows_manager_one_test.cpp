@@ -18,7 +18,7 @@
 #include <gmock/gmock.h>
 
 #include "event_filter_handler.h"
-#include "fingersense_wrapper.h"
+#include "knuckle_handler_component.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"

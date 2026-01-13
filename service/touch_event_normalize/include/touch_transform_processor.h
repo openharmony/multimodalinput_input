@@ -17,10 +17,11 @@
 #define TOUCH_TRANSFORM_PROCESSOR_H
 
 #include "aggregator.h"
-#include "fingersense_manager.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
-
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_type.h"
+#endif // OHOS_BUILD_KNUCKLE
 namespace OHOS {
 namespace MMI {
 class TouchTransformProcessor final : public TransformProcessor {
@@ -39,8 +40,10 @@ private:
     bool OnEventTouchCancel(struct libinput_event *event);
     int32_t GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchToolType(struct libinput_device *device);
+#ifdef OHOS_BUILD_KNUCKLE
     void TransformTouchProperties(int32_t displayId, const PointerEvent::PointerItem &pointerItem, TouchType &rawTouch);
     void NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem, int32_t &toolType);
+#endif // OHOS_BUILD_KNUCKLE
     void UpdatePointerItemByTouchInfo(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
     bool DumpInner();
@@ -69,9 +72,9 @@ private:
                 return TimerMgr->RemoveTimer(timerId);
             }
     };
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
     TouchType rawTouch_;
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
 #ifdef OHOS_BUILD_EXTERNAL_SCREEN
     std::list<int32_t> InvalidAreaDownedEvents_;
 #endif // OHOS_BUILD_EXTERNAL_SCREEN

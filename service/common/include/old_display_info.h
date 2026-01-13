@@ -163,7 +163,7 @@ struct DisplayInfo {
      * @since 12
      */
     OHOS::MMI::Direction fixedDirection;
-    
+
     /**
      * The physical width of the screen, in millimeters.
      *
@@ -203,14 +203,14 @@ struct DisplayInfo {
      *
      * @since 21
      */
-    Direction deviceRotation;
+    Direction deviceRotation { Direction::DIRECTION0 };
 
     /**
      * The angle of the rotation correction.
      *
      * @since 21
      */
-    Direction rotationCorrection;
+    Direction rotationCorrection { Direction::DIRECTION0 };
 };
 
 struct DisplayGroupInfo {

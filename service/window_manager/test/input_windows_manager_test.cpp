@@ -20,7 +20,7 @@
 #include "account_manager.h"
 #include "cursor_drawing_component.h"
 #include "event_filter_handler.h"
-#include "fingersense_wrapper.h"
+#include "knuckle_handler_component.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -3239,10 +3239,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayMode, Tes
     }
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
     inputWindowsManager.displayMode_ = DisplayMode::MAIN;
-    FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ = nullptr;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
     inputWindowsManager.displayMode_ = DisplayMode::MAIN;
-    FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ = FingersenseWrapperTest;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
 }
 

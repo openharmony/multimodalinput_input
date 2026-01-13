@@ -13,24 +13,38 @@
  * limitations under the License.
  */
 
-#ifndef I_KNUCKLE_DRAWING_H
-#define I_KNUCKLE_DRAWING_H
-
-#include "pointer_event.h"
-#include "old_display_info.h"
+#include "knuckle_handler_component.h"
 
 namespace OHOS {
 namespace MMI {
-using AddTimerFunc = std::function<int32_t(int, int, std::function<void()>, const std::string&)>;
-class IKnuckleDrawing {
-public:
-    IKnuckleDrawing() = default;
-    virtual ~IKnuckleDrawing() = default;
 
-    virtual void Draw(const OLD::DisplayInfo& displayInfo, const std::shared_ptr<PointerEvent> &touchEvent) = 0;
-    virtual void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) = 0;
-    virtual void RegisterAddTimer(AddTimerFunc addTimerFunc) = 0;
-};
+KnuckleHandlerComponent &KnuckleHandlerComponent::GetInstance()
+{
+    static KnuckleHandlerComponent inst;
+    return inst;
+}
+
+void KnuckleHandlerComponent::SetCurrentToolType(struct TouchType touchType, int32_t &toolType)
+{
+    (void)touchType;
+    (void)toolType;
+}
+
+void KnuckleHandlerComponent::NotifyTouchUp(struct TouchType *rawTouch)
+{
+    (void)rawTouch;
+}
+
+bool KnuckleHandlerComponent::SkipKnuckleDetect()
+{
+    return false;
+}
+
+void KnuckleHandlerComponent::SaveTouchInfo(float pointX, float pointY, int32_t toolType)
+{
+    (void)pointX;
+    (void)pointY;
+    (void)toolType;
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // I_KNUCKLE_DRAWING_H

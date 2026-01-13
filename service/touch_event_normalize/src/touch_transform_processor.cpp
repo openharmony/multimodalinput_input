@@ -20,7 +20,9 @@
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
-#include "fingersense_wrapper.h"
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
 
@@ -133,15 +135,14 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     UpdatePointerItemByTouchInfo(item, touchInfo);
     item.SetDeviceId(deviceId_);
     int32_t toolType = GetTouchToolType(touch, device);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    auto keyHandler = InputHandler->GetKeyCommandHandler();
-    if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect()) &&
+#ifdef OHOS_BUILD_KNUCKLE
+    if (!KnuckleHandlerComponent::GetInstance().SkipKnuckleDetect() &&
         toolType != PointerEvent::TOOL_TYPE_THP_FEATURE) {
         NotifyFingersenseProcess(pointerEvent_->GetTargetDisplayId(), item, toolType);
     } else {
         MMI_HILOGD("Skip fingersense detect");
     }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     item.SetToolType(toolType);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
@@ -167,28 +168,26 @@ void TouchTransformProcessor::UpdatePointerItemByTouchInfo(PointerEvent::Pointer
     item.SetToolHeight(touchInfo.toolRect.height);
 }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
 __attribute__((no_sanitize("cfi")))
 void TouchTransformProcessor::NotifyFingersenseProcess(int32_t displayId, const PointerEvent::PointerItem &pointerItem,
     int32_t &toolType)
 {
     CALL_DEBUG_ENTER;
     TransformTouchProperties(displayId, pointerItem, rawTouch_);
-    if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
-        MMI_HILOGD("Fingersense start classify touch down event");
-        TouchType rawTouchTmp = rawTouch_;
-        int32_t displayX = pointerItem.GetRawDisplayX();
-        int32_t displayY = pointerItem.GetRawDisplayY();
+    MMI_HILOGD("Fingersense start classify touch down event");
+    TouchType rawTouchTmp = rawTouch_;
+    int32_t displayX = pointerItem.GetRawDisplayX();
+    int32_t displayY = pointerItem.GetRawDisplayY();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-        WIN_MGR->ReverseXY(displayX, displayY);
+    WIN_MGR->ReverseXY(displayX, displayY);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-        rawTouchTmp.x = displayX * DRIVER_NUMBER;
-        rawTouchTmp.y = displayY * DRIVER_NUMBER;
-        BytraceAdapter::StartToolType(toolType);
-        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
-        BytraceAdapter::StopToolType();
-        FINGERSENSE_WRAPPER->SaveTouchInfo(rawTouchTmp.x, rawTouchTmp.y, toolType);
-    }
+    rawTouchTmp.x = displayX * DRIVER_NUMBER;
+    rawTouchTmp.y = displayY * DRIVER_NUMBER;
+    BytraceAdapter::StartToolType(toolType);
+    KnuckleHandlerComponent::GetInstance().SetCurrentToolType(rawTouchTmp, toolType);
+    BytraceAdapter::StopToolType();
+    KnuckleHandlerComponent::GetInstance().SaveTouchInfo(rawTouchTmp.x, rawTouchTmp.y, toolType);
 }
 
 void TouchTransformProcessor::TransformTouchProperties(int32_t displayId, const PointerEvent::PointerItem &pointerItem,
@@ -205,7 +204,7 @@ void TouchTransformProcessor::TransformTouchProperties(int32_t displayId, const 
      */
     rawTouch.displayId = displayId;
 }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
 
 bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
@@ -287,28 +286,25 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
         return false;
     }
     item.SetPressed(false);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    auto keyHandler = InputHandler->GetKeyCommandHandler();
-    if (keyHandler != nullptr && (!keyHandler->SkipKnuckleDetect())) {
+#ifdef OHOS_BUILD_KNUCKLE
+    if (!KnuckleHandlerComponent::GetInstance().SkipKnuckleDetect()) {
         TransformTouchProperties(pointerEvent_->GetTargetDisplayId(), item, rawTouch_);
-        if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
-            MMI_HILOGD("Notify fingersense touch up event");
-            TouchType rawTouchTmp = rawTouch_;
-            int32_t displayX = item.GetRawDisplayX();
-            int32_t displayY = item.GetRawDisplayY();
+        MMI_HILOGD("Notify fingersense touch up event");
+        TouchType rawTouchTmp = rawTouch_;
+        int32_t displayX = item.GetRawDisplayX();
+        int32_t displayY = item.GetRawDisplayY();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            WIN_MGR->ReverseXY(displayX, displayY);
+        WIN_MGR->ReverseXY(displayX, displayY);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-            rawTouchTmp.x = displayX * DRIVER_NUMBER;
-            rawTouchTmp.y = displayY * DRIVER_NUMBER;
-            BytraceAdapter::StartTouchUp(item.GetPointerId());
-            FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
-            BytraceAdapter::StopTouchUp();
-        }
+        rawTouchTmp.x = displayX * DRIVER_NUMBER;
+        rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        BytraceAdapter::StartTouchUp(item.GetPointerId());
+        KnuckleHandlerComponent::GetInstance().NotifyTouchUp(&rawTouchTmp);
+        BytraceAdapter::StopTouchUp();
     } else {
         MMI_HILOGD("Skip fingersense detect");
     }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);

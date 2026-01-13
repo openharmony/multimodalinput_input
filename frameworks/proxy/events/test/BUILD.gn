@@ -21,6 +21,13 @@ ohos_unittest("InputManagerAncoTest") {
 
   defines = input_default_defines
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [ "input_manager_anco_test.cpp" ]
 
   configs = [ "${mmi_path}:coverage_flags" ]

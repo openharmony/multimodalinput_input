@@ -61,8 +61,6 @@ config("libmmi_server_config") {
     "key_event_normalize/include",
     "event_handler/include",
     "event_dump/include",
-    "fingersense_wrapper/include",
-    "gesturesense_wrapper/include",
     "monitor/include",
     "interceptor/include",
     "dfx/include",
@@ -73,7 +71,7 @@ config("libmmi_server_config") {
     "touch_event_normalize/include",
     "key_command/include",
     "subscriber/include",
-    "timer_manager/include",
+    "common/timer_manager/include",
     "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/device_state_manager/include",
@@ -98,6 +96,7 @@ config("libmmi_server_config") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/knuckle/include",
   ]
 
   if (input_feature_product != "watch") {
@@ -175,7 +174,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "hardware_cursor_pointer_manager/include",
     "module_loader/include/",
     "mouse_event_normalize/include",
-    "timer_manager/include/",
+    "common/timer_manager/include/",
     "touch_event_normalize/include",
     "key_command/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
@@ -213,10 +212,10 @@ ohos_shared_library("libcursor_drawing_adapter") {
   deps = [
     "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
     "${mmi_path}/intention/prototype:input_service_prototype",
-    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -277,6 +276,53 @@ ohos_shared_library("libcursor_drawing_adapter") {
   if (is_emulator) {
     defines += [ "OHOS_BUILD_EMULATOR" ]
   }
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
+
+config("libmmi_server_common_public_config") {
+  include_dirs = [
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+  ]
+}
+
+ohos_shared_library("libmmi-server-common") {
+  public_configs = [ ":libmmi_server_common_public_config" ]
+
+  sources = [
+    "common/setting_datashare/src/setting_datashare.cpp",
+    "common/setting_datashare/src/setting_observer.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "common/timer_manager/src/timer_manager.cpp",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "data_share:datashare_consumer",
+    "hitrace:hitrace_meter",
+    "c_utils:utils",
+    "samgr:samgr_proxy",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -431,6 +477,7 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
+    ":libmmi-server-common",
   ]
 
   if (input_feature_product != "watch") {
@@ -438,8 +485,6 @@ ohos_shared_library("libmmi-server") {
   }
 
   deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
-
-  deps += [ "${mmi_path}/util:mmi_json_parser" ]
 
   if (input_ext_feature_keyboard_ext_flag) {
     include_dirs += [ "${mmi_ext_path}/keyboard_ext_flag/inc" ]
@@ -527,10 +572,7 @@ ohos_shared_library("libmmi-server") {
   ]
 
   if (input_feature_product != "watch") {
-    sources += [
-      "infrared_emitter/src/infrared_emitter_controller.cpp",
-      "window_manager/src/knuckle_drawing_component.cpp",
-    ]
+    sources += [ "infrared_emitter/src/infrared_emitter_controller.cpp" ]
 
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
 
@@ -571,100 +613,15 @@ ohos_shared_library("libmmi-server") {
   subsystem_name = "multimodalinput"
 }
 
-config("libmmi_knuckle_config") {
-  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
-      enhanced_opt) {
-    cflags = []
-    if (input_feature_enable_pgo && input_feature_product != "default") {
-      cflags += [
-        "-fprofile-use=" +
-            rebase_path("${input_feature_pgo_path}/libmmi-server.profdata",
-                        root_build_dir),
-        "-Wno-error=backend-plugin",
-        "-Wno-profile-instr-out-of-date",
-        "-Wno-profile-instr-unprofiled",
-        "-Oz",
-      ]
-    }
-    if (input_feature_product == "pc" && target_cpu == "arm64") {
-      cflags += [
-        "-moutline-atomics",
-        "-Oz",
-      ]
-    }
-  }
-}
-
-ohos_shared_library("libmmi-knuckle") {
-  include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_service_path}/window_manager/include",
-    "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/service/connect_manager/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/timer_manager/include",
-  ]
-
-  sources = [
-    "window_manager/src/knuckle_divergent_point.cpp",
-    "window_manager/src/knuckle_drawing.cpp",
-    "window_manager/src/knuckle_drawing_manager.cpp",
-    "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
-    "window_manager/src/knuckle_glow_point.cpp",
-    "window_manager/src/knuckle_glow_trace_system.cpp",
-  ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_knuckle_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
-    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
-    "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
-  ]
-
-  if (defined(use_rosen_drawing) && use_rosen_drawing) {
-    defines += [ "USE_ROSEN_DRAWING" ]
-  }
-
-  deps = [
-    "${mmi_path}/intention/prototype:input_service_prototype",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "data_share:datashare_consumer",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "libinput:libinput-third-mmi",
-    "samgr:samgr_proxy",
-    "window_manager:libwm_lite",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  cflags_cc = [ "-Wno-unused-private-field" ]
-
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
 import("//build/test.gni")
 module_output_path = "input/input"
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
-  include_dirs = [ "${mmi_path}/service/event_resample/include" ]
+  include_dirs = [
+    "${mmi_path}/service/event_resample/include",
+    "${mmi_path}/service/common/include",
+  ]
 
   sources = [
     "event_resample/src/event_resample.cpp",
@@ -768,6 +725,7 @@ ohos_unittest("EventFilterDeathRecipientTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -795,6 +753,8 @@ ohos_unittest("EventFilterHandlerTest") {
   include_dirs = [
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/filter/test",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   configs = [
@@ -912,7 +872,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/filter/include",
-    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/knuckle/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/key_command/include",
@@ -924,7 +884,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/subscriber/test/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -965,8 +925,8 @@ ohos_unittest("KeyShortcutManagerTest") {
   deps = [
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/util:mmi_json_parser",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
@@ -1007,8 +967,6 @@ ohos_unittest("KeyShortcutManagerTest") {
 ohos_unittest("TimerManagerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/timer_manager/include" ]
-
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -1019,10 +977,11 @@ ohos_unittest("TimerManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "timer_manager/test/timer_manager_test.cpp" ]
+  sources = [ "common/timer_manager/test/timer_manager_test.cpp" ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -1088,157 +1047,6 @@ ohos_unittest("InputDisplayBindHelperTest") {
   ]
 }
 
-ohos_unittest("KnuckleGlowPointTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  sources = [ "window_manager/test/knuckle_glow_point_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
-    "window_manager:libwsutils",
-  ]
-}
-
-ohos_unittest("KnuckleDivergentPointTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  sources = [ "window_manager/test/knuckle_divergent_point_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
-    "window_manager:libwsutils",
-  ]
-}
-
-ohos_unittest("KnuckleGlowTraceSystemTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  sources = [ "window_manager/test/knuckle_glow_trace_system_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/test/facility/mock:mmi_mock_sources",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:dataobs_manager",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
-    "window_manager:libwsutils",
-  ]
-}
-
 ohos_unittest("PointerDrawingManagerTest") {
   module_out_path = module_output_path
 
@@ -1263,8 +1071,11 @@ ohos_unittest("PointerDrawingManagerTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs =
-      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs = [
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/common/include",
+  ]
+
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
 
   deps = [
@@ -1327,8 +1138,11 @@ ohos_unittest("PointerDrawingManagerExTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs =
-      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs = [
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/common/include",
+  ]
+
   sources = [ "window_manager/test/pointer_drawing_manager_ex_test.cpp" ]
 
   deps = [
@@ -1389,8 +1203,12 @@ ohos_unittest("PointerDrawingManagerSupTest") {
     blocklist = "./ipc_blocklist.txt"
   }
 
-  include_dirs =
-      [ "${mmi_path}/service/hardware_cursor_pointer_manager/include" ]
+  include_dirs = [
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
+  ]
+
   sources = [ "window_manager/test/pointer_drawing_manager_sup_test.cpp" ]
 
   deps = [
@@ -1454,7 +1272,8 @@ ohos_unittest("TouchDrawingManagerTest") {
   include_dirs = [
     "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
-    "${mmi_path}/util/json_parser/include"
+    "${mmi_path}/util/json_parser/include",
+    "${mmi_path}/service/common/include",
   ]
 
   sources = [ "window_manager/test/touch_drawing_manager_test.cpp" ]
@@ -1523,6 +1342,9 @@ ohos_unittest("CursorDrawingComponentTest") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   sources = [
     "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp",
@@ -1603,7 +1425,7 @@ ohos_unittest("PointerDrawingManagerHardCursorTest") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/product_property_config/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
@@ -1624,9 +1446,9 @@ ohos_unittest("PointerDrawingManagerHardCursorTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/hardware_cursor_pointer_manager_mock:hardware_cursor_pointer_manager_mock",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/util:mmi_json_parser",
   ]
  
   external_deps = [
@@ -1647,100 +1469,6 @@ ohos_unittest("PointerDrawingManagerHardCursorTest") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwmutil",
-    "window_manager:libwsutils",
-  ]
-}
-
-ohos_unittest("KnuckleDrawingManagerTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  sources = [ "window_manager/test/knuckle_drawing_manager_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
-    "window_manager:libwsutils",
-  ]
-}
-
-ohos_unittest("KnuckleDynamicDrawingManagerTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  sources = [ "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "graphic_2d:window_animation",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "ipc:ipc_core",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
     "window_manager:libwsutils",
   ]
 }
@@ -1780,9 +1508,9 @@ ohos_unittest("InputWindowsManagerTest") {
   deps = [
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
-    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -1837,18 +1565,18 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/filter/include",
-    "${mmi_path}/service/fingersense_wrapper/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/knuckle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/facility/libinput_interface/include",
@@ -1867,6 +1595,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
@@ -1939,6 +1668,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service:libcursor_drawing_adapter",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
@@ -2007,6 +1737,8 @@ ohos_unittest("AccountManagerTest") {
     "${mmi_path}/service/device_state_manager/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   configs = [
@@ -2059,6 +1791,7 @@ ohos_unittest("SubscriberTest") {
   include_dirs = [
     "${mmi_path}/service/subscriber/include",
     "${mmi_service_path}/device_state_manager/include",
+    "${mmi_path}/service/common/include",
   ]
 
   configs = [
@@ -2130,12 +1863,11 @@ ohos_unittest("KeyGestureManagerEXTest") {
     "${mmi_path}/service/account_manager/include",
     "${mmi_path}/service/app_state_manager/include",
     "${mmi_path}/service/display_state_manager/include",
-    "${mmi_path}/service/fingersense_wrapper/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/subscriber/include",
     "${mmi_path}/service/subscriber/test/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/facility/libinput_interface/include",
     "${mmi_service_path}/connect_manager/include",
@@ -2214,6 +1946,8 @@ ohos_unittest("NapProcessTest") {
 ohos_unittest("MonitorTest") {
   module_out_path = module_output_path
 
+  include_dirs = [ "${mmi_path}/service/common/include" ]
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -2291,6 +2025,7 @@ ohos_unittest("ModuleLoaderTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
@@ -2335,6 +2070,8 @@ ohos_unittest("KeyEventNormalizeTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  include_dirs = [ "${mmi_path}/service/common/include" ]
 
   sources = [ "key_event_normalize/test/key_event_normalize_test.cpp" ]
 
@@ -2396,8 +2133,6 @@ ohos_unittest("KeyEventNormalizeWithMockTest") {
     "${mmi_service_path}/event_handler/include",
     "${mmi_service_path}/event_resample/include",
     "${mmi_service_path}/filter/include",
-    "${mmi_service_path}/fingersense_wrapper/include",
-    "${mmi_service_path}/gesturesense_wrapper/include",
     "${mmi_service_path}/interceptor/include",
     "${mmi_service_path}/joystick/include",
     "${mmi_service_path}/key_command/include",
@@ -2410,9 +2145,10 @@ ohos_unittest("KeyEventNormalizeWithMockTest") {
     "${mmi_service_path}/nap_process/include",
     "${mmi_service_path}/permission_helper/include",
     "${mmi_service_path}/subscriber/include",
-    "${mmi_service_path}/timer_manager/include",
+    "${mmi_service_path}/common/timer_manager/include",
     "${mmi_service_path}/touch_event_normalize/include",
     "${mmi_service_path}/window_manager/include",
+    "${mmi_service_path}/common/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -2537,8 +2273,6 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "key_event_normalize/include",
     "event_handler/include",
     "event_dump/include",
-    "fingersense_wrapper/include",
-    "gesturesense_wrapper/include",
     "monitor/include",
     "interceptor/include",
     "dfx/include",
@@ -2550,7 +2284,7 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "touch_event_normalize/include",
     "key_command/include",
     "subscriber/include",
-    "timer_manager/include",
+    "common/timer_manager/include",
     "permission_helper/include",
     "infrared_emitter/include",
     "${mmi_service_path}/connect_manager/include",
@@ -2576,6 +2310,8 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   configs = [
@@ -2594,7 +2330,6 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [
@@ -2619,7 +2354,12 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
 ohos_unittest("StylusKeyTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+  include_dirs = [
+    "${mmi_path}/test/unittest/common/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -2733,6 +2473,11 @@ ohos_unittest("InterceptorTest") {
   cflags = [
     "-Dprivate=public",
     "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   sources = [ "interceptor/test/event_interceptor_handler_test.cpp" ]
@@ -2854,6 +2599,7 @@ ohos_unittest("EventHandlerTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
@@ -2919,7 +2665,8 @@ ohos_unittest("InputEventHandlerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/facility/mock/include",
@@ -2964,6 +2711,8 @@ ohos_unittest("InputEventHandlerTest") {
 
 ohos_unittest("EventNormalizeHandlerTest") {
   module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/common/include" ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -3024,6 +2773,7 @@ ohos_unittest("EventHandlerEXTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
@@ -3086,8 +2836,6 @@ ohos_unittest("EventDispatchTest") {
     "${mmi_path}/service/display_state_manager/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/fingersense_wrapper/include",
-    "${mmi_path}/service/gesturesense_wrapper/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
@@ -3112,6 +2860,7 @@ ohos_unittest("EventDispatchTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -3179,6 +2928,8 @@ ohos_unittest("LibinputAdapterTest") {
 
 ohos_unittest("ServerMsgHandlerTest") {
   module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/common/include" ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -3282,6 +3033,8 @@ ohos_unittest("PermissionHelperTest") {
 ohos_unittest("DisplayStateManagerTest") {
   module_out_path = module_output_path
 
+  include_dirs = [ "${mmi_path}/service/common/include" ]
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -3383,7 +3136,6 @@ ohos_unittest("DeviceManagerExTest") {
     "mouse_event_normalize/include",
     "nap_process/include",
     "subscriber/include",
-    "timer_manager/include",
     "touch_event_normalize/include",
     "window_manager/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -3391,6 +3143,9 @@ ohos_unittest("DeviceManagerExTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   configs = [
@@ -3586,7 +3341,8 @@ ohos_unittest("EventDumpTest") {
   include_dirs = [
     "${mmi_path}/test/unittest/common/include",
     "${mmi_service_path}/product_property_config/include",
-    "${mmi_service_path}/custom_config_parser/include"
+    "${mmi_service_path}/custom_config_parser/include",
+    "${mmi_path}/service/common/include",
   ]
 
   configs = [
@@ -3736,6 +3492,8 @@ ohos_unittest("KeymapMgrTest") {
     "${mmi_path}/libudev/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_handler/test",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   sources = [
@@ -3769,113 +3527,6 @@ ohos_unittest("KeymapMgrTest") {
   ]
 }
 
-ohos_unittest("KnuckleDrawingComponentTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_service_path}/window_manager/include",
-    "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/service/connect_manager/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/timer_manager/include",
-  ]
-
-  configs = [ "${mmi_path}:coverage_flags" ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  sources = [ "window_manager/test/knuckle_drawing_component_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-  ]
-
-  if (input_new_knuckle_dynamic_enabled) {
-    defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
-  }
-}
-
-ohos_unittest("KnuckleDrawingTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_service_path}/window_manager/include",
-    "${mmi_path}/service/touch_event_normalize/include",
-    "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/service/connect_manager/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/timer_manager/include",
-  ]
-
-  configs = [ "${mmi_path}:coverage_flags" ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    blocklist = "./ipc_blocklist.txt"
-  }
-
-  sources = [ "window_manager/test/knuckle_drawing_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-knuckle",
-    "${mmi_path}/service:libmmi-server",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "googletest:gtest_main",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-  ]
-
-  if (input_new_knuckle_dynamic_enabled) {
-    defines += [ "OHOS_BUILD_ENABLE_NEW_KNUCKLE_DYNAMIC" ]
-  }
-}
-
 ohos_unittest("ProductTypeParserTest") {
   module_out_path = module_output_path
 
@@ -3892,7 +3543,7 @@ ohos_unittest("ProductTypeParserTest") {
     "${mmi_path}/util/json_parser/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
   ]
 
   configs = [
@@ -3947,7 +3598,7 @@ ohos_unittest("SpecialInputDeviceParserTest") {
     "${mmi_path}/util/json_parser/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
   ]
 
   configs = [
@@ -4027,7 +3678,7 @@ ohos_unittest("EventDispatchOrderCheckerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4108,7 +3759,7 @@ ohos_unittest("EventLoopClosureCheckerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4189,7 +3840,6 @@ ohos_unittest("KeyEventHookManagerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/facility/mock/include",
@@ -4197,6 +3847,8 @@ ohos_unittest("KeyEventHookManagerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
   ]
 
   if (input_feature_joystick) {
@@ -4323,7 +3975,6 @@ ohos_unittest("InputEventHookManagerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4332,6 +3983,9 @@ ohos_unittest("InputEventHookManagerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   if (input_feature_joystick) {
@@ -4413,7 +4067,7 @@ ohos_unittest("KeyLoopClosureCheckerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4422,6 +4076,8 @@ ohos_unittest("KeyLoopClosureCheckerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   if (input_feature_joystick) {
@@ -4498,7 +4154,7 @@ ohos_unittest("PointerLoopClosureCheckerTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4507,6 +4163,7 @@ ohos_unittest("PointerLoopClosureCheckerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
   ]
 
   if (input_feature_joystick) {
@@ -4583,7 +4240,7 @@ ohos_unittest("PointerEventHookTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4592,6 +4249,7 @@ ohos_unittest("PointerEventHookTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
   ]
 
   if (input_feature_joystick) {
@@ -4673,7 +4331,7 @@ ohos_unittest("KeyEventHookTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4682,6 +4340,8 @@ ohos_unittest("KeyEventHookTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   if (input_feature_joystick) {
@@ -4763,7 +4423,7 @@ ohos_unittest("InputEventHookTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/service/event_hook/include",
@@ -4772,6 +4432,8 @@ ohos_unittest("InputEventHookTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
 
   if (input_feature_joystick) {
