@@ -24,6 +24,10 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
+
+static constexpr int32_t INT_VAL = 3;
+static constexpr float FLOAT_VAL = 3.14;
+static constexpr double DOUBLE_VAL = 3.141592653;
 } // namespace
 
 class JsonParserTest : public testing::Test {
@@ -127,6 +131,126 @@ HWTEST_F(JsonParserTest, ParseInt_004, TestSize.Level1)
     JsonParser parser(jsonData.c_str());
     int32_t value;
     EXPECT_EQ(JsonParser::ParseInt32(parser.Get(), "integer", value), RET_OK);
+}
+
+/**
+ * @tc.name:ParseFloat_001
+ * @tc.desc:Verify ParseFloat
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseFloat_001, TestSize.Level1)
+{
+    std::string jsonData = R"({"float": 3.14})";
+    JsonParser parser(jsonData.c_str());
+    float value = 0.0f;
+    int32_t ret = JsonParser::ParseFloat(parser.Get(), "float", value);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_FLOAT_EQ(value, FLOAT_VAL);
+}
+
+/**
+ * @tc.name:ParseFloat_002
+ * @tc.desc:Verify ParseFloat
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseFloat_002, TestSize.Level1)
+{
+    std::string jsonData = R"({"float": 3})";
+    JsonParser parser(jsonData.c_str());
+    float value = 0.0f;
+    int32_t ret = JsonParser::ParseFloat(parser.Get(), "float", value);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_FLOAT_EQ(value, static_cast<float>(INT_VAL));
+}
+
+/**
+ * @tc.name:ParseFloat_003
+ * @tc.desc:Verify ParseFloat
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseFloat_003, TestSize.Level1)
+{
+    std::string jsonData = R"({"float": "str"})";
+    JsonParser parser(jsonData.c_str());
+    float value = 0.0f;
+    int32_t ret = JsonParser::ParseFloat(parser.Get(), "float", value);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name:ParseFloat_004
+ * @tc.desc:Verify ParseFloat
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseFloat_004, TestSize.Level1)
+{
+    float value = 0.0f;
+    int32_t ret = JsonParser::ParseFloat(nullptr, "float", value);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name:ParseDouble_001
+ * @tc.desc:Verify ParseDouble
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseDouble_001, TestSize.Level1)
+{
+    std::string jsonData = R"({"double": 3.141592653})";
+    JsonParser parser(jsonData.c_str());
+    double value = 0.0f;
+    int32_t ret = JsonParser::ParseDouble(parser.Get(), "double", value);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_DOUBLE_EQ(value, DOUBLE_VAL);
+}
+
+/**
+ * @tc.name:ParseDouble_002
+ * @tc.desc:Verify ParseDouble
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseDouble_002, TestSize.Level1)
+{
+    std::string jsonData = R"({"double": 3})";
+    JsonParser parser(jsonData.c_str());
+    double value = 0.0f;
+    int32_t ret = JsonParser::ParseDouble(parser.Get(), "double", value);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_DOUBLE_EQ(value, static_cast<double>(INT_VAL));
+}
+
+/**
+ * @tc.name:ParseDouble_003
+ * @tc.desc:Verify ParseDouble
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseDouble_003, TestSize.Level1)
+{
+    std::string jsonData = R"({"double": "str"})";
+    JsonParser parser(jsonData.c_str());
+    double value = 0.0f;
+    int32_t ret = JsonParser::ParseDouble(parser.Get(), "double", value);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name:ParseDouble_004
+ * @tc.desc:Verify ParseDouble
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JsonParserTest, ParseDouble_004, TestSize.Level1)
+{
+    double value = 0.0f;
+    int32_t ret = JsonParser::ParseDouble(nullptr, "double", value);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**

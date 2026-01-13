@@ -31,19 +31,19 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     int32_t LaunchAiScreenAbility(int32_t pid);
     void LaunchTwoFingerAbility(const TwoFingerGesture &twoFinger);
 
 private:
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_KNUCKLE
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#endif // OHOS_BUILD_KNUCKLE
     int32_t CheckTwoFingerGesture(int32_t pid);
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH

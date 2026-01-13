@@ -47,6 +47,7 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
     "${mmi_path}/service/product_property_config/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/service/common/include",
   ]
 
   sources = [
@@ -68,7 +69,6 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
     "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
     "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/util:mmi_json_parser",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
 
@@ -88,6 +88,8 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
 
 ohos_unittest("MouseEventNormalizeTest") {
   module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/common/include" ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -163,8 +165,6 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/filter/include",
-    "${mmi_path}/service/fingersense_wrapper/include",
-    "${mmi_path}/service/gesturesense_wrapper/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_event_normalize/include",
@@ -174,7 +174,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/subscriber/include",
-    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
@@ -193,17 +193,16 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/service/event_dispatch/src/event_dispatch_handler.cpp",
     "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
-    "${mmi_path}/service/fingersense_wrapper/src/fingersense_wrapper.cpp",
     "${mmi_path}/service/interceptor/src/event_interceptor_handler.cpp",
     "${mmi_path}/service/key_command/src/key_command_handler.cpp",
-    "${mmi_path}/service/key_command/src/setting_datashare.cpp",
-    "${mmi_path}/service/key_command/src/setting_observer.cpp",
+    "${mmi_path}/service/common/setting_datashare/src/setting_datashare.cpp",
+    "${mmi_path}/service/common/setting_datashare/src/setting_observer.cpp",
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
-    "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
+    "${mmi_path}/service/common/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
     "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
     "src/mouse_transform_processor_test_withmock.cpp",
@@ -287,7 +286,10 @@ ohos_unittest("MouseTransformProcessorMockTest") {
 ohos_unittest("MouseEventNormalizeEXTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "src/test" ]
+  include_dirs = [
+    "src/test",
+    "${mmi_path}/service/common/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -366,6 +368,7 @@ ohos_unittest("MouseTransformProcessorEXTest") {
   deps = [
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]

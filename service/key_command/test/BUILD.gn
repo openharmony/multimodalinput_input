@@ -57,14 +57,14 @@ ohos_unittest("KeyCommandTest") {
     "key_cmd_sendKeyEvent_test.cpp",
     "key_command_handler_util_test.cpp",
     "pull_throw_subscriber_handler_test.cpp",
-    "setting_datashare_test.cpp",
+    "${mmi_path}/service/common/setting_datashare/test/setting_datashare_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
-    "${mmi_path}/util:mmi_json_parser",
   ]
 
   external_deps = [

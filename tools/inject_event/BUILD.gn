@@ -83,7 +83,6 @@ ohos_executable("uinput") {
   deps = [
     "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
-    "${mmi_path}/util:mmi_json_parser",
     ]
   external_deps = [
     "c_utils:utils",
@@ -124,7 +123,6 @@ ohos_unittest("InjectEventTest") {
     "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
-    "${mmi_path}/util:mmi_json_parser",
   ]
 
   if (input_feature_event_recorder) {

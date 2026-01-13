@@ -49,7 +49,6 @@ ohos_source_set("mmi_custom_config_parser") {
   public_configs = [ ":mmi_custom_config_parser_public_configs" ]
 
   deps = [
-    "${mmi_path}/util:mmi_json_parser",
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [

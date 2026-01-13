@@ -49,7 +49,8 @@
       "input_feature_mistouch_prevention",
       "input_feature_key_hook",
       "input_feature_key_pressed_handler",
-      "input_feature_external_screen"
+      "input_feature_external_screen",
+      "input_feature_knuckle"
     ],
     "adapted_system_type": [
       "standard"
@@ -185,6 +186,19 @@
               "key_event_napi.h"
             ],
             "header_base": "//foundation/multimodalinput/input/util/napi/include"
+          },
+          "type": "so"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/service:libmmi-server-common",
+          "header": {
+            "header_files": [
+              "include/old_display_info.h",
+              "setting_datashare/include/setting_datashare.h",
+              "setting_datashare/include/setting_observer.h",
+              "timer_manager/include/timer_manager.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/service/common"
           },
           "type": "so"
         },

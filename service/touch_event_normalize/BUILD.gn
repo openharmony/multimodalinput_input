@@ -32,6 +32,8 @@ ohos_shared_library("mmi_touch_gesture_manager") {
     "${mmi_path}/intention/prototype/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/common/timer_manager/include",
   ]
 
   sources = [
@@ -73,7 +75,10 @@ ohos_source_set("touch_gesture_manager") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/service/common/include",
+  ]
 
   sources = [ "src/touch_gesture_interface.cpp" ]
 

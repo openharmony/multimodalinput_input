@@ -21,9 +21,6 @@
 
 #include "app_debug_listener.h"
 #include "input_event_handler.h"
-#ifndef OHOS_BUILD_ENABLE_WATCH
-#include "knuckle_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_WATCH
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 

@@ -30,6 +30,9 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -85,20 +88,18 @@ public:
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
             STYLUS_HANDLER->IsLaunchAbility();
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
-            CHKPV(FINGERSENSE_WRAPPER);
-            if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
-                MMI_HILOGI("Start enable fingersense");
-                FINGERSENSE_WRAPPER->enableFingersense_();
-            }
+#ifdef OHOS_BUILD_KNUCKLE
+            MMI_HILOGI("Start enable fingersense");
+            KnuckleHandlerComponent::GetInstance().EnableFingersense();
+#endif // OHOS_BUILD_KNUCKLE
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
-            CHKPV(FINGERSENSE_WRAPPER);
-            if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
-                MMI_HILOGI("Disable fingersense");
-                FINGERSENSE_WRAPPER->disableFingerSense_();
-            }
+#ifdef OHOS_BUILD_KNUCKLE
+            MMI_HILOGI("Disable fingersense");
+            KnuckleHandlerComponent::GetInstance().DisableFingersense();
+#endif // OHOS_BUILD_KNUCKLE
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
             MMI_HILOGD("Display screen locked");
@@ -118,6 +119,9 @@ public:
                 if (keyHandler != nullptr) {
                     keyHandler->InitKeyObserver();
                 }
+#ifdef OHOS_BUILD_KNUCKLE
+                KnuckleHandlerComponent::GetInstance().RegisterSwitchObserver();
+#endif // OHOS_BUILD_KNUCKLE
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
                 TOUCH_DRAWING_MGR->Initialize();
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING

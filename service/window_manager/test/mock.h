@@ -21,12 +21,9 @@
 
 #include "dfx_hisysevent.h"
 #include "event_filter_handler.h"
-#include "fingersense_wrapper.h"
 #include "input_device_manager.h"
 #include "input_display_bind_helper.h"
 #include "input_event_handler.h"
-#include "knuckle_drawing_manager.h"
-#include "knuckle_dynamic_drawing_manager.h"
 #include "libinput_interface.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_input_preferences_manager.h"
