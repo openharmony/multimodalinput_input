@@ -31,6 +31,7 @@ namespace {
 constexpr int32_t DEVICE_TAGS { 1 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
+constexpr int32_t COMMON_PARAMETER_ERROR { -401 };
 } // namespace
 InputHandlerManager::InputHandlerManager()
 {
@@ -114,12 +115,12 @@ int32_t InputHandlerManager::AddGestureMonitor(
             MMI_HILOGE("Add gesture handler:%{public}d to server failed, ret:%{public}d", gestureType, ret);
             uint32_t deviceTags = 0;
             RemoveLocal(handlerId, handlerType, deviceTags);
-            return INVALID_HANDLER_ID;
+            return ret;
         }
         MMI_HILOGI("Finish add gesture handler(%{public}d:%{public}d:%{public}d:%{public}d) to server",
             handlerId, eventType, gestureType, fingers);
     } else {
-        handlerId = INVALID_HANDLER_ID;
+        handlerId = ret;
     }
     return handlerId;
 }
@@ -245,19 +246,11 @@ int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventTyp
 {
     if ((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
         MMI_HILOGE("Illegal type:%{public}d", eventType);
-        return RET_ERR;
+        return COMMON_PARAMETER_ERROR;
     }
     if (!CheckMonitorValid(gestureType, fingers)) {
         MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
-        return RET_ERR;
-    }
-    for (const auto &handler : monitorHandlers_) {
-        if (handler.second.eventType_ == eventType &&
-            handler.second.gestureHandler_.gestureType == gestureType &&
-            handler.second.gestureHandler_.fingers == fingers) {
-            MMI_HILOGE("Gesture(%{public}d) listener already exists", gestureType);
-            return RET_ERR;
-        }
+        return COMMON_PARAMETER_ERROR;
     }
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
