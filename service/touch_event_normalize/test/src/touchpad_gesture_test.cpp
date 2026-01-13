@@ -19,8 +19,9 @@
 #include "define_multimodal.h"
 #include "libinput_mock.h"
 #include "preferences_manager_mock.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_transform_processor.h"
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchPadGestureTest"
 

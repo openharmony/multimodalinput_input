@@ -56,11 +56,20 @@ private:
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_WATCH
+    int32_t HandleTableToolEvent(libinput_event* event);
+#endif // OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t HandleTouchPadEvent(libinput_event* event);
     int32_t HandleTouchPadAction(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
-    int32_t HandleTableToolEvent(libinput_event* event);
-#endif // OHOS_BUILD_ENABLE_WATCH
+    bool JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
+        enum libinput_event_type type, libinput_event* event);
+    void SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent, libinput_event* event);
+    void SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent);
+    void SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent);
+    bool TouchPadKnuckleDoubleClickHandle(libinput_event* event);
+    bool HandleTouchPadEdgeSwipe(libinput_event* event);
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
     int32_t HandleSwitchInputEvent(libinput_event* event);
@@ -69,11 +78,6 @@ private:
     int32_t HandleJoystickAxisEvent(libinput_event *event);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
-    bool JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent,
-        enum libinput_event_type type, libinput_event* event);
-    void SwipeInwardProcess(std::shared_ptr<PointerEvent> pointerEvent, libinput_event* event);
-    void SwipeInwardButtonJudge(std::shared_ptr<PointerEvent> pointerEvent);
-    void SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -83,8 +87,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
     void PointerEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
-    bool TouchPadKnuckleDoubleClickHandle(libinput_event* event);
-    bool HandleTouchPadEdgeSwipe(libinput_event* event);
     int32_t GetToolType(libinput_event* event);
     void ResetRightButtonSource(std::shared_ptr<PointerEvent> pointerEvent);
 

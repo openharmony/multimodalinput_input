@@ -60,7 +60,7 @@ public:
 public:
     DISALLOW_COPY_AND_MOVE(TouchEventNormalize);
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, DeviceType deviceType);
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t SetTouchpadPinchSwitch(bool switchFlag) const;
     void GetTouchpadPinchSwitch(bool &switchFlag) const;
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) const;
@@ -69,6 +69,8 @@ public:
     void GetTouchpadRotateSwitch(bool &rotateSwitch) const;
     int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) const;
     void GetTouchpadDoubleTapAndDragState(bool &switchFlag) const;
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
+#ifdef OHOS_BUILD_ENABLE_POINTER
     bool IsFingerPressed();
 #endif // OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);

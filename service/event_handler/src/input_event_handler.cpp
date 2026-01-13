@@ -37,8 +37,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MT_TOOL_PALM { 2 };
 constexpr int32_t TIMEOUT_MS { 1500 };
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+constexpr int32_t MT_TOOL_PALM { 2 };
 constexpr uint32_t KEY_ESC { 1 };
 constexpr uint32_t KEY_KPASTERISK { 55 };
 constexpr uint32_t KEY_F1 { 59 };
@@ -54,6 +55,7 @@ constexpr uint32_t KEY_TAB { 15 };
 constexpr uint32_t KEY_COMPOSE { 127 };
 constexpr uint32_t KEY_RIGHTMETA { 126 };
 constexpr uint32_t KEY_LEFTMETA { 125 };
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace
 
 InputEventHandler::InputEventHandler()
@@ -92,12 +94,12 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     lastEventBeginTime_ = beginTime;
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
-    
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     UpdateDwtRecord(lpEvent);
     if (IsTouchpadMistouch(lpEvent)) {
         return;
     }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     ResetLogTrace();
     eventNormalizeHandler_->HandleEvent(lpEvent, frameTime);
     int64_t endTime = GetSysClockTime();
@@ -110,6 +112,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 void InputEventHandler::UpdateDwtRecord(libinput_event *event)
 {
     CHKPV(event);
@@ -381,6 +384,7 @@ bool InputEventHandler::IsTouchpadPointerMotionMistouch(libinput_event *event)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 int32_t InputEventHandler::BuildInputHandlerChain()
 {

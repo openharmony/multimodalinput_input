@@ -348,11 +348,13 @@ ohos_shared_library("libmmi-server") {
   sources += [
     "account_manager/src/account_manager.cpp",
     "display_state_manager/src/display_event_monitor.cpp",
-    "subscriber/src/tablet_subscriber_handler.cpp",
     "window_manager/src/cursor_drawing_component.cpp",
     "drag_security/src/drag_security_manager.cpp"
   ]
-
+  if (input_feature_tablet) {
+    sources +=
+      [ "subscriber/src/tablet_subscriber_handler.cpp" ]
+  }
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
@@ -404,7 +406,6 @@ ohos_shared_library("libmmi-server") {
         "mouse_event_normalize/src/mouse_device_state.cpp",
         "mouse_event_normalize/src/mouse_event_normalize.cpp",
         "mouse_event_normalize/src/mouse_transform_processor.cpp",
-        "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
     }
     if (input_feature_touchscreen) {
@@ -426,6 +427,13 @@ ohos_shared_library("libmmi-server") {
       defines += [ "TOUCH_GESTURE_MONITOR_ENABLED" ]
     }
   }
+
+  if (input_feature_touchpad) {
+    sources += [
+      "touch_event_normalize/src/touchpad_transform_processor.cpp",
+    ]
+  }
+
   if (input_feature_joystick) {
     sources += [
       "joystick/src/joystick_event_normalize.cpp",
@@ -576,15 +584,14 @@ ohos_shared_library("libmmi-server") {
 
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
 
-    if (input_feature_mouse || input_feature_touchscreen) {
-      if (input_feature_mouse) {
-        sources +=
-            [ "touch_event_normalize/src/gesture_transform_processor.cpp" ]
-      }
-      if (input_feature_touchscreen) {
-        sources +=
-            [ "touch_event_normalize/src/tablet_tool_tranform_processor.cpp" ]
-      }
+    if (input_feature_tablet) {
+      sources +=
+          [ "touch_event_normalize/src/tablet_tool_tranform_processor.cpp" ]
+    }
+
+    if (input_feature_touchpad) {
+      sources +=
+          [ "touch_event_normalize/src/gesture_transform_processor.cpp" ]
     }
 
     external_deps += [
@@ -2595,8 +2602,13 @@ ohos_unittest("EventHandlerTest") {
     "event_handler/test/event_normalize_handler_test.cpp",
     "event_handler/test/key_auto_repeat_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
-    "event_handler/test/touchpad_settings_handler_test.cpp",
   ]
+
+  if (input_feature_touchpad) {
+    sources += [
+      "event_handler/test/touchpad_settings_handler_test.cpp",
+    ]
+  }
 
   deps = [
     "${mmi_path}/service:libmmi-server",

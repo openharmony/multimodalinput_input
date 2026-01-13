@@ -25,8 +25,9 @@
 #include "input_scene_board_judgement.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_transform_processor.h"
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "libinput-private.h"
 
 namespace OHOS {
@@ -148,6 +149,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
     int64_t frameTime = 10000;
     libinput_event *event = new (std::nothrow) libinput_event;
     ASSERT_NE(event, nullptr);
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     event->type = LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(event));
@@ -163,6 +165,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
     event->type = LIBINPUT_EVENT_GESTURE_PINCH_END;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(event));
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     event->type = LIBINPUT_EVENT_TOUCH_DOWN;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleTouchEvent(event, frameTime));
@@ -911,7 +914,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_0
         event = libinput_.Dispatch();
     }
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdgeSwipe_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -991,6 +994,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchPadEdge
     ASSERT_TRUE(event != nullptr);
     EXPECT_NO_FATAL_FAILURE(handler.HandleTouchPadEdgeSwipe(event));
 }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace MMI
 } // namespace OHOS

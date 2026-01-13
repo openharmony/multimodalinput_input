@@ -123,8 +123,10 @@ private:
     void HandleTouchpadTwoFingerButtonOrLeftButton(struct libinput_event_pointer* data,
         const int32_t eventType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
-    double HandleAxisAccelateTouchPad(double axisValue);
 #endif // OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    double HandleAxisAccelateTouchPad(double axisValue);
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     void CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
     double CalculateProportion(long long key, long &total, std::map<long long, int32_t> &curMap);

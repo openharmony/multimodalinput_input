@@ -34,7 +34,9 @@
 #include "mmi_log.h"
 #include "nap_process.h"
 #include "switch_subscriber_handler.h"
+#ifdef OHOS_BUILD_ENABLE_TABLET
 #include "tablet_subscriber_handler.h"
+#endif // OHOS_BUILD_ENABLE_TABLET
 #include "uds_server.h"
 #include "want.h"
 #include "event_log_helper.h"
@@ -3803,7 +3805,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_005, TestSi
     ASSERT_FALSE(ret);
     ASSERT_FALSE(handler.CloneKeyEvent(keyEvent));
 }
-
+#ifdef OHOS_BUILD_ENABLE_TABLET
 /**
  * @tc.name: TabletSubscriberHandlerTest_SubscribeTabletProximity
  * @tc.desc: Test the function AboutSubscribeTabletProximity
@@ -3862,7 +3864,7 @@ HWTEST_F(KeySubscriberHandlerTest, TabletSubscriberHandlerTest_OnSessionDelete, 
     ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSessionDelete(sess));
     ASSERT_NO_FATAL_FAILURE(tabletSubscriberHandler->OnSessionDelete(sess));
 }
-
+#endif // OHOS_BUILD_ENABLE_TABLET
 /**
  * @tc.name: KeySubscriberHandlerTest_IsPreKeysMatch_002
  * @tc.desc: Test is preKeys match
