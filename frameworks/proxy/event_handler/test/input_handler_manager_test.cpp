@@ -29,6 +29,7 @@ using namespace testing::ext;
 constexpr int32_t TEN_FINGERS { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
+constexpr int32_t COMMON_PARAMETER_ERROR { -401 };
 } // namespace
 
 class InputHandlerManagerTest : public testing::Test {
@@ -923,11 +924,11 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureToLocal_001,
     std::shared_ptr<IInputEventConsumer> consumer = nullptr;
 
     auto ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
 
     eventType = HANDLE_EVENT_TYPE_TOUCH_GESTURE;
     ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
 }
 
 /**

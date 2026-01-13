@@ -125,6 +125,7 @@ constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
 [[ maybe_unused ]] constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
+constexpr int32_t COMMON_USE_SYSAPI_ERROR { -202 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
@@ -2041,7 +2042,7 @@ ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, u
     CALL_INFO_TRACE;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        return COMMON_USE_SYSAPI_ERROR;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
@@ -2056,7 +2057,7 @@ ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, u
     TouchGestureType gType = static_cast<TouchGestureType>(gestureType);
     if (hType != InputHandlerType::MONITOR) {
         MMI_HILOGE("Illegal type:%{public}d", hType);
-        return RET_ERR;
+        return -(COMMON_PARAMETER_ERROR);
     }
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
