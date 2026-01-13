@@ -93,7 +93,7 @@ void TransmitInfrared(int64_t infraredFrequency, ::taihe::array_view<int64_t> pa
     if (ret != RET_OK) {
         int32_t errCode = 0;
         auto errMsg = HandleError(ret, errCode);
-        if (COMMON_USE_SYSAPI_ERROR == errCode || COMMON_PERMISSION_CHECK_ERROR == errCode) {
+        if (errCode == COMMON_USE_SYSAPI_ERROR || errCode == COMMON_PERMISSION_CHECK_ERROR) {
             taihe::set_business_error(errCode, errMsg);
             return;
         }
