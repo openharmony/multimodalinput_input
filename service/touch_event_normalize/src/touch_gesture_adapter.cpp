@@ -165,7 +165,7 @@ bool TouchGestureParameter::LoadTouchGestureParameter(const char *cfgPath)
         MMI_HILOGE("Unexpected size of InputProductConfig");
         return false;
     }
-    std::ifstream ifs(cfgPath);
+    std::ifstream ifs(realPath);
     if (!ifs.is_open()) {
         MMI_HILOGE("Can not open config");
         return false;

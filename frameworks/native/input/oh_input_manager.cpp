@@ -3477,7 +3477,7 @@ Input_CustomCursor* OH_Input_CustomCursor_Create(OH_PixelmapNative* pixelMap, in
     ret &= OH_PixelmapImageInfo_GetWidth(imageInfo, &width) == IMAGE_SUCCESS;
     ret &= OH_PixelmapImageInfo_GetHeight(imageInfo, &height) == IMAGE_SUCCESS;
     OH_PixelmapImageInfo_Release(imageInfo);
-    if (!ret || width > g_pixelMapMaxSize || height > g_pixelMapMaxSize ||
+    if (!ret || width > static_cast<uint32_t>(g_pixelMapMaxSize) || height > static_cast<uint32_t>(g_pixelMapMaxSize) ||
         anchorX > static_cast<int32_t>(width) || anchorX < 0 ||
         anchorY > static_cast<int32_t>(height) || anchorY < 0) {
         return nullptr;
