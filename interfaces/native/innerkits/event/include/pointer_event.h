@@ -2179,7 +2179,7 @@ private:
     FixedMode fixedMode_ { FixedMode::NORMAL };
     RightButtonSource rightButtonSource_ { RightButtonSource::INVALID };
     std::string signature_;
-    uint64_t distributeEventTime_;
+    uint64_t distributeEventTime_ = 0;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

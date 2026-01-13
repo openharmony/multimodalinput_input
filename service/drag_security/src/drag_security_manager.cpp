@@ -70,7 +70,8 @@ void DragSecurityManager::DragSecurityUpdatePointerEvent(std::shared_ptr<Pointer
     CALL_INFO_TRACE;
     auto now = std::chrono::steady_clock::now();
     auto duration = now.time_since_epoch();
-    uint64_t distributeEventTime = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    uint64_t distributeEventTime = static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(duration).count());
     pointerEvent->SetDistributeEventTime(distributeEventTime);
     std::vector<uint8_t> nonceBin = Base64Decode(nonce_);
     std::string signature;
