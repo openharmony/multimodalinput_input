@@ -64,7 +64,7 @@ public:
 
 private:
     int32_t BuildInputHandlerChain();
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     // disable-while-typing
     void UpdateDwtRecord(libinput_event *event);
     void UpdateDwtTouchpadRecord(libinput_event *event);
@@ -77,7 +77,7 @@ private:
     bool IsTouchpadTapMistouch(libinput_event *event);
     bool IsTouchpadMotionMistouch(libinput_event *event);
     bool IsTouchpadPointerMotionMistouch(libinput_event *event);
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     UDSServer *udsServer_ { nullptr };
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };

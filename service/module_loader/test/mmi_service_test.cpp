@@ -2658,7 +2658,7 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadPointerSpeed_001, TestSize.Level1
     int32_t ret = mmiService.ReadTouchpadPointerSpeed(speed);
     EXPECT_EQ(ret, RET_OK);
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: MMIService_ReadTouchpadPinchSwitch_001
  * @tc.desc: Verify ReadTouchpadPinchSwitch returns RET_OK
@@ -2686,7 +2686,7 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadSwipeSwitch_001, TestSize.Level1)
     int32_t ret = mmiService.ReadTouchpadSwipeSwitch(value);
     EXPECT_EQ(ret, RET_OK);
 }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: MMIService_ReadTouchpadRightMenuType_001
  * @tc.desc: Verify ReadTouchpadRightMenuType returns RET_OK
@@ -2700,7 +2700,7 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadRightMenuType_001, TestSize.Level
     int32_t ret = mmiService.ReadTouchpadRightMenuType(type);
     EXPECT_EQ(ret, RET_OK);
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: MMIService_ReadTouchpadRotateSwitch_001
  * @tc.desc: Verify ReadTouchpadRotateSwitch returns RET_OK
@@ -2728,7 +2728,7 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadDoubleTapAndDragState_001, TestSi
     int32_t ret = mmiService.ReadTouchpadDoubleTapAndDragState(value);
     EXPECT_EQ(ret, RET_OK);
 }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: MMIService_SetTouchpadScrollSwitch_001
  * @tc.desc: Verify SetTouchpadScrollSwitch returns RET_OK or ETASKS_POST_SYNCTASK_FAIL

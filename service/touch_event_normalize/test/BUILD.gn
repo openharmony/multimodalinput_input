@@ -54,16 +54,23 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
   sources = [
     "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
-    "${mmi_path}/service/touch_event_normalize/src/gesture_transform_processor.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/touch_event_normalize/src/remote_control_transform_processor.cpp",
-    "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
     "${mmi_path}/service/touch_event_normalize/src/touch_event_normalize.cpp",
     "${mmi_path}/service/touch_event_normalize/src/touch_transform_processor.cpp",
-    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     "src/touch_event_normalize_test_with_mock.cpp",
   ]
-
+  if (input_feature_touchpad) {
+    sources += [
+      "${mmi_path}/service/touch_event_normalize/src/gesture_transform_processor.cpp",
+      "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
+    ]
+  }
+  if (input_feature_tablet) {
+    sources += [
+      "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+    ]
+  }
   deps = [
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
     "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
@@ -125,9 +132,12 @@ ohos_unittest("TouchEventNormalizeTest") {
     "src/touch_event_normalize_test.cpp",
     "src/touch_gesture_detector_test.cpp",
     "src/touch_transform_processor_test.cpp",
-    "src/touchpad_transform_processor_test.cpp",
   ]
-
+  if (input_feature_touchpad) {
+    sources += [
+      "src/touchpad_transform_processor_test.cpp",
+    ]
+  }
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
@@ -410,7 +420,6 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/service/event_handler/src/anr_manager.cpp",
     "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
     "${mmi_path}/service/event_handler/src/key_auto_repeat.cpp",
-    "${mmi_path}/service/event_handler/src/touchpad_settings_handler.cpp",
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
     "${mmi_path}/service/interceptor/src/event_interceptor_handler.cpp",
     "${mmi_path}/service/key_command/src/key_command_handler.cpp",
@@ -458,6 +467,11 @@ ohos_unittest("TabletToolTranformTest") {
     ]
   }
 
+  if (input_feature_touchpad) {
+    sources += [
+      "${mmi_path}/service/event_handler/src/touchpad_settings_handler.cpp",
+    ]
+  }
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines = [ "USE_ROSEN_DRAWING" ]
   }
@@ -1331,8 +1345,12 @@ group("TouchEventNormalizeTests") {
     ":TouchEventNormalizeTest",
     ":TouchGestureAdapterTest",
     ":TouchGestureManagerTest",
-    ":TouchpadTransformProcessorEXTest",
     ":TouchEventNormalizeTestWithMock",
     ":TransformPointTest",
   ]
+  if (input_feature_touchpad) {
+    deps += [
+      ":TouchpadTransformProcessorEXTest",
+    ]
+  }
 }

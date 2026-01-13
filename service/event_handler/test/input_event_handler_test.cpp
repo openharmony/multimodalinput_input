@@ -83,7 +83,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_001, TestSize.Level1)
     inputEventHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     ASSERT_NO_FATAL_FAILURE(inputEventHandler->OnEvent(event, frameTime));
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: InputEventHandler_UpdateDwtRecord_001
  * @tc.desc: Test the function UpdateDwtRecord
@@ -540,5 +540,6 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadPointerMotionMistouc
     inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH + 1;
     EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
 }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace MMI
 } // namespace OHOS

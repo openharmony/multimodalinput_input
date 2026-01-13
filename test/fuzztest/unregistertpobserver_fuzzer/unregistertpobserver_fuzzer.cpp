@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 #include "unregistertpobserver_fuzzer.h"
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_settings_handler.h"
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "fuzzer/FuzzedDataProvider.h"
 #include "input_device_manager.h"
 #include "libinput.h"

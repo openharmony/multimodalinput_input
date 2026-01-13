@@ -186,7 +186,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleEvent_00
     handler.HandleEvent(&event, frameTime);
     EXPECT_EQ(handler.nextHandler_, nullptr);
 }
-
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: EventNormalizeHandlerEXTest_HandleTouchPadAction_001
  * @tc.desc: Test the function TerminateAxis
@@ -238,7 +238,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchPad
     handler.HandleTouchPadAction(&event);
     EXPECT_EQ(event.device->vendor, 1);
 }
-
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: EventNormalizeHandlerEXTest_HandlePointerEvent_001
  * @tc.desc: Test the function TerminateAxis

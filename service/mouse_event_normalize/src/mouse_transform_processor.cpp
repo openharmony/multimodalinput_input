@@ -23,7 +23,9 @@
 #include "mouse_device_state.h"
 #include "pointer_device_manager.h"
 #include "scene_board_judgement.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "product_name_definition.h"
 #include "product_type_parser.h"
 
@@ -728,20 +730,24 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
         pointerEvent_->SetScrollRows(TouchPadTransformProcessor::GetTouchpadScrollRows());
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     } else {
         pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
     }
 #else
     pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
 #endif // OHOS_BUILD_ENABLE_WATCH
-    const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
 #ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+            const int32_t initRows = 3;
             axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
         } else {
             axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
@@ -754,8 +760,11 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
 #ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+            const int32_t initRows = 3;
             axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
         } else {
             axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
@@ -767,7 +776,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     return RET_OK;
 }
 
-#ifndef OHOS_BUILD_ENABLE_WATCH
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
 {
     const int32_t initRows = 3;
@@ -790,7 +799,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     }
     return axisValue;
 }
-#endif // OHOS_BUILD_ENABLE_WATCH
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
 int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *event)
 {
