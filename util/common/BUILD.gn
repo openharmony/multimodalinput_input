@@ -53,6 +53,7 @@ ohos_unittest("UtilCommonTest") {
     "googletest:gtest_main",
     "hilog:libhilog",
     "access_token:libaccesstoken_sdk",
+    "ability_base:configuration",
     "ability_runtime:app_manager",
   ]
 }
