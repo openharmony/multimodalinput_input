@@ -93,6 +93,7 @@ ohos_source_set("intention_socket_session_manager") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_runtime:app_manager",
     "hilog:libhilog",
     "image_framework:image_native",

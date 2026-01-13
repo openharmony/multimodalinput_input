@@ -130,6 +130,7 @@ ohos_shared_library("libmmi-util") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "access_token:libaccesstoken_sdk",
+    "ability_base:configuration",
     "ability_runtime:app_manager",
   ]
 
