@@ -406,6 +406,7 @@ ohos_shared_library("libmmi-server") {
         "mouse_event_normalize/src/mouse_device_state.cpp",
         "mouse_event_normalize/src/mouse_event_normalize.cpp",
         "mouse_event_normalize/src/mouse_transform_processor.cpp",
+        "mouse_event_normalize/src/pointer_motion_acceleration.cpp",
       ]
     }
     if (input_feature_touchscreen) {

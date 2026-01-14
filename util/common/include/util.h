@@ -217,6 +217,20 @@ std::enable_if_t<IsStreamable<T>::value, std::string> DumpSet(const std::set<T> 
     return std::move(sItems).str();
 }
 
+template<typename T>
+std::enable_if_t<IsStreamable<T>::value, std::string> DumpVec(const std::vector<T> &items)
+{
+    std::ostringstream sItems;
+
+    if (auto iter = items.cbegin(); iter != items.cend()) {
+        sItems << *iter;
+        for (++iter; iter != items.cend(); ++iter) {
+            sItems << "," << *iter;
+        }
+    }
+    return std::move(sItems).str();
+}
+
 bool IsInteger(const char *target);
 } // namespace MMI
 } // namespace OHOS
