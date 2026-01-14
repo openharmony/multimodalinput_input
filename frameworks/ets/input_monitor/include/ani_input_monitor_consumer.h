@@ -46,9 +46,6 @@ enum class MONITORFUNTYPE: int32_t {
     ON_SWIPEINWARD,
     ON_TOUCHSCREENSWIPE_FINGERS,
     ON_TOUCHSCREENPINCH_FINGERS,
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-    ON_X_KEY,
-#endif // OHOS_BUILD_ENABLE_X_KEY
     ON_KEYPRESSED_KEYS,
 };
 class AniInputMonitorConsumer;
@@ -111,9 +108,6 @@ protected:
     bool IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent) const;
     bool IsLocatedWithinRect(std::shared_ptr<PointerEvent> pointerEvent, std::vector<Rect> hotRectArea) const;
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-    bool IsXKey(const std::shared_ptr<PointerEvent> pointerEvent) const;
-#endif // OHOS_BUILD_ENABLE_X_KEY
     void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void MarkConsumed(int32_t eventId);
 
@@ -133,9 +127,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     void OnSwipeInwardCallback(std::shared_ptr<PointerEvent> pointerEvent);
     void OnTouchScreenPinchCallback(std::shared_ptr<PointerEvent> pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-    void OnXkeyCallback(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_X_KEY
     MONITORFUNTYPE funType_;
     int32_t fingers_ { 0 };
     std::vector<int32_t> keys_;
