@@ -365,22 +365,21 @@ void TabletToolTransformProcessor::DrawTouchGraphicIdle()
 void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
 {
     CHKPV(pointerEvent_);
-    bool originalPressedStatus = false;
+    int32_t pointerId = pointerEvent_->GetPointerId();
     PointerEvent::PointerItem pointerItem;
-    bool isPointerItemExist = pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
+    bool isPointerItemExist = pointerEvent_->GetPointerItem(pointerId, pointerItem);
+    bool originalPressedStatus = pointerItem.IsPressed();
     auto pointerAction = pointerEvent_->GetPointerAction();
+    if (isPointerItemExist && !originalPressedStatus) {
+        pointerItem.SetPressed(true);
+        pointerEvent_->UpdatePointerItem(pointerId, pointerItem);
+    }
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_MOVE:
-        case PointerEvent::POINTER_ACTION_LEVITATE_MOVE: {
-            if (isPointerItemExist) {
-                originalPressedStatus = pointerItem.IsPressed();
-                pointerItem.SetPressed(true);
-                pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
-            }
-            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-            break;
-        }
-        case PointerEvent::POINTER_ACTION_UP: {
+        case PointerEvent::POINTER_ACTION_PULL_MOVE:
+        case PointerEvent::POINTER_ACTION_LEVITATE_MOVE:
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
             break;
         }
@@ -388,8 +387,6 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
             auto pointerEvent = std::make_shared<PointerEvent>(*pointerEvent_);
             PointerEvent::PointerItem item {};
             if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-                item.SetPressed(true);
-                pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                 WIN_MGR->DrawTouchGraphic(pointerEvent);
             }
@@ -400,6 +397,10 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
             break;
         }
         default: {
+            if (isPointerItemExist && !originalPressedStatus) {
+                pointerItem.SetPressed(originalPressedStatus);
+                pointerEvent_->UpdatePointerItem(pointerId, pointerItem);
+            }
             return;
         }
     }
@@ -407,7 +408,7 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
     pointerEvent_->SetPointerAction(pointerAction);
     if (isPointerItemExist) {
         pointerItem.SetPressed(originalPressedStatus);
-        pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
+        pointerEvent_->UpdatePointerItem(pointerId, pointerItem);
     }
 }
 } // namespace MMI
