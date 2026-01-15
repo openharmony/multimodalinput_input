@@ -3905,6 +3905,48 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveTouchEventMonitor
 }
 
 /**
+ * @tc.name: OHInputManagerTest_OH_Input_TouchEventMonitor_CallbackTest
+ * @tc.desc: Test RemoveTouchEventMonitor get output value after adding callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_TouchEventMonitor_CallbackTest, TestSize.Level3)
+{
+    CALL_TEST_DEBUG;
+    auto callback = [](const Input_TouchEvent* event) {
+        EXPECT_TRUE(event != nullptr);
+        EXPECT_TRUE(event->toolType == Input_TouchEventToolType::TOOL_TYPE_FINGER);
+        EXPECT_TRUE(event->downTime == 20);
+        EXPECT_TRUE(event->pressure == 0.5);
+        EXPECT_TRUE(event->windowX == 200);
+        EXPECT_TRUE(event->windowY == 300);
+    };
+    Input_Result addResult = OH_Input_AddTouchEventMonitor(callback);
+    EXPECT_EQ(addResult, INPUT_SUCCESS);
+
+    OHOS::MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(100);
+    item.SetDisplayY(100);
+    item.SetDownTime(20);
+    item.SetToolType(0);
+    item.SetWindowX(200);
+    item.SetWindowY(300);
+    item.SetPressure(0.5);
+    auto event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->AddPointerItem(item);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    auto result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
+        true, OHOS::MMI::PointerEvent::GLOBAL_COORDINATE);
+    EXPECT_EQ(result, INPUT_PERMISSION_DENIED);
+
+    Input_Result removeResult = OH_Input_RemoveTouchEventMonitor(callback);
+    EXPECT_EQ(removeResult, INPUT_SUCCESS);
+}
+
+/**
  * @tc.name: OHInputManagerTest_OH_Input_RemoveMouseEventMonitor_001
  * @tc.desc: Test RemoveMouseEventMonitor with nullptr callback
  * @tc.type: FUNC
