@@ -3186,7 +3186,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_003, TestSize
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
 
     Input_TouchEventToolType invalidType2 = static_cast<Input_TouchEventToolType>(-1);
-    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, invalidType2);
+    ret = OH_Input_SetTouchEventToolType(&touchEvent, invalidType2);
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
 
     auto retTool = OH_Input_GetTouchEventToolType(&touchEvent);
