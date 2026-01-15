@@ -357,6 +357,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   sources = [
     "event_handler/src/input_active_subscribe_manager.cpp",
     "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/long_press_event_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
     "event_handler/src/tablet_event_input_subscribe_manager.cpp",
