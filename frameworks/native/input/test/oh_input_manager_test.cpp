@@ -25,6 +25,7 @@
 #include "pointer_event.h"
 #include "image/pixelmap_native.h"
 #include "mmi_log.h"
+#include "input_manager_impl.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManagerTest"
@@ -78,6 +79,11 @@ struct Input_TouchEvent {
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
+    int32_t windowX { 0 };
+    int32_t windowY { 0 };
+    int64_t downTime { 0 };
+    Input_TouchEventToolType toolType { Input_TouchEventToolType::TOOL_TYPE_FINGER };
+    double pressure { 0.0 };
 };
 
 struct Input_AxisEvent {
@@ -2572,6 +2578,54 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
 }
 
 /**
+ * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_004
+ * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventInterceptor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchCallback = [](const Input_TouchEvent* event) {
+        EXPECT_TRUE(event != nullptr);
+        EXPECT_TRUE(event->toolType == Input_TouchEventToolType::TOOL_TYPE_FINGER);
+        EXPECT_TRUE(event->downTime == 20);
+        EXPECT_TRUE(event->pressure == 0.5);
+        EXPECT_TRUE(event->windowX == 200);
+        EXPECT_TRUE(event->windowY == 300);
+    };
+
+    Input_InterceptorEventCallback callback;
+    callback.mouseCallback = MouseEventCallback;
+    callback.touchCallback = touchCallback;
+    callback.axisCallback = AxisEventCallback;
+
+    EXPECT_NO_FATAL_FAILURE(OH_Input_RemoveInputEventInterceptor());
+
+    Input_InterceptorOptions *option = nullptr;
+    Input_Result ret = OH_Input_AddInputEventInterceptor(&callback, option);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+
+    OHOS::MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(100);
+    item.SetDisplayY(100);
+    item.SetDownTime(20);
+    item.SetToolType(0);
+    item.SetWindowX(200);
+    item.SetWindowY(300);
+    item.SetPressure(0.5);
+    std::shared_ptr<OHOS::MMI::PointerEvent> event = OHOS::MMI::PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->AddPointerItem(item);
+    event->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    event->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    auto result = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SimulateInputEvent(event,
+        true, OHOS::MMI::PointerEvent::GLOBAL_COORDINATE);
+    EXPECT_EQ(result, INPUT_PERMISSION_DENIED);
+}
+
+/**
  * @tc.name: OHInputManagerTest_PointerEventMonitorCallback_001
  * @tc.desc: Test the function PointerEventMonitorCallback
  * @tc.type: FUNC
@@ -2950,69 +3004,185 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventGlobalCoordinates, Tes
     int32_t globalY = OH_Input_GetTouchEventGlobalY(&touchEvent);
     EXPECT_TRUE((globalX == DEFAULT_GLOBAL_X) && (globalY == DEFAULT_GLOBAL_Y));
 }
+/*
+ * @tc.name: OHInputManagerTest_TouchEventPressure_001
+ * @tc.desc: Test the function OH_Input_GetTouchEventPressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure_001, TestSize.Level1)
+{
+    struct Input_TouchEvent* touchEvent = nullptr;
+    auto ret = OH_Input_GetTouchEventPressure(touchEvent);
+    EXPECT_EQ(ret, 0.0);
+
+    ret = OH_Input_SetTouchEventPressure(touchEvent, 0.0f);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
 
 /*
- * @tc.name: OHInputManagerTest_TouchEventPressure
+ * @tc.name: OHInputManagerTest_TouchEventPressure_002
  * @tc.desc: Test the function OH_Input_SetTouchEventPressure OH_Input_GetTouchEventPressure
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure_002, TestSize.Level1)
 {
     Input_TouchEvent touchEvent;
-    double pressure = 0.5;
-    OH_Input_SetTouchEventPressure(&touchEvent, pressure);
-    auto ret = OH_Input_GetTouchEventPressure(&touchEvent);
-    EXPECT_EQ(ret, pressure);
+    auto retPressure = OH_Input_GetTouchEventPressure(&touchEvent); // default value
+    EXPECT_EQ(retPressure, 0.0);
+
+    double pressure = -0.1;
+    auto ret = OH_Input_SetTouchEventPressure(&touchEvent, pressure); // invalid val
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+
+    pressure = 1.1;
+    ret = OH_Input_SetTouchEventPressure(&touchEvent, pressure); // invalid val
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+
+    pressure = 0.5;
+    ret = OH_Input_SetTouchEventPressure(&touchEvent, pressure); // valid val
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+
+    retPressure = OH_Input_GetTouchEventPressure(&touchEvent);
+    EXPECT_EQ(retPressure, pressure);
 }
 
 /*
- * @tc.name: OHInputManagerTest_TouchEventWindowCoordinates
+ * @tc.name: OHInputManagerTest_TouchEventWindowCoordinates_001
  * @tc.desc: Test the function OH_Input_SetTouchEventWindowX OH_Input_SetTouchEventWindowY
  * OH_Input_GetTouchEventWindowX OH_Input_GetTouchEventWindowY
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventWindowCoordinates, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventWindowCoordinates_001, TestSize.Level1)
+{
+    struct Input_TouchEvent* touchEvent = nullptr;
+    auto windowX = 100;
+    auto windowY = 100;
+    OH_Input_SetTouchEventWindowX(touchEvent, windowX);
+
+    OH_Input_SetTouchEventWindowY(touchEvent, windowY);
+
+    auto ret = OH_Input_GetTouchEventWindowX(touchEvent);
+    EXPECT_EQ(ret, 0);
+
+    ret = OH_Input_GetTouchEventWindowY(touchEvent);
+    EXPECT_EQ(ret, 0);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventWindowCoordinates_002
+ * @tc.desc: Test the function OH_Input_SetTouchEventWindowX OH_Input_SetTouchEventWindowY
+ * OH_Input_GetTouchEventWindowX OH_Input_GetTouchEventWindowY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventWindowCoordinates_002, TestSize.Level1)
 {
     Input_TouchEvent touchEvent;
     auto windowX = 100;
     auto windowY = 100;
     OH_Input_SetTouchEventWindowX(&touchEvent, windowX);
+    EXPECT_EQ(touchEvent.windowX, windowX);
+
     OH_Input_SetTouchEventWindowY(&touchEvent, windowY);
+    EXPECT_EQ(touchEvent.windowY, windowY);
+
     auto retX = OH_Input_GetTouchEventWindowX(&touchEvent);
+    EXPECT_EQ(retX, windowX);
+
     auto retY = OH_Input_GetTouchEventWindowY(&touchEvent);
-    EXPECT_TRUE((retX == windowX) && (retY == windowY));
+    EXPECT_EQ(retY, windowY);
 }
 
 /*
- * @tc.name: OHInputManagerTest_TouchEventDownTime
+ * @tc.name: OHInputManagerTest_TouchEventDownTime_001
  * @tc.desc: Test the function OH_Input_SetTouchEventDownTime OH_Input_GetTouchEventDownTime
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventDownTime, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventDownTime_001, TestSize.Level1)
+{
+    Input_TouchEvent *touchEvent = nullptr;
+    int64_t downTime = 100;
+    OH_Input_SetTouchEventDownTime(touchEvent, downTime);
+
+    auto ret = OH_Input_GetTouchEventDownTime(touchEvent);
+    EXPECT_EQ(ret, 0);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventDownTime_002
+ * @tc.desc: Test the function OH_Input_SetTouchEventDownTime OH_Input_GetTouchEventDownTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventDownTime_002, TestSize.Level1)
 {
     Input_TouchEvent touchEvent;
     int64_t downTime = 100;
     OH_Input_SetTouchEventDownTime(&touchEvent, downTime);
+    EXPECT_EQ(touchEvent.downTime, downTime);
+
     auto ret = OH_Input_GetTouchEventDownTime(&touchEvent);
     EXPECT_EQ(ret, downTime);
 }
 
 /*
- * @tc.name: OHInputManagerTest_TouchEventToolType
+ * @tc.name: OHInputManagerTest_TouchEventToolType_001
  * @tc.desc: Test the function OH_Input_SetTouchEventToolType OH_Input_GetTouchEventToolType
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_001, TestSize.Level1)
+{
+    struct Input_TouchEvent* touchEvent = nullptr;
+
+    auto ret = OH_Input_SetTouchEventToolType(touchEvent, Input_TouchEventToolType::TOOL_TYPE_FINGER);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+
+    auto retTool = OH_Input_GetTouchEventToolType(touchEvent);
+    EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_FINGER);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventToolType_002
+ * @tc.desc: Test the function OH_Input_SetTouchEventToolType OH_Input_GetTouchEventToolType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_002, TestSize.Level1)
 {
     Input_TouchEvent touchEvent;
-    Input_TouchEventToolType toolType = Input_TouchEventToolType::TOOL_TYPE_FINGER;
-    OH_Input_SetTouchEventToolType(&touchEvent, toolType);
-    auto ret = OH_Input_GetTouchEventToolType(&touchEvent);
-    EXPECT_EQ(ret, toolType);
+
+    touchEvent.toolType = Input_TouchEventToolType::TOOL_TYPE_PENCIL;
+    Input_TouchEventToolType retTool = OH_Input_GetTouchEventToolType(&touchEvent);
+    EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_PENCIL);
+
+    Input_TouchEventToolType toolType = Input_TouchEventToolType::TOOL_TYPE_PEN;
+    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, toolType);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+
+    retTool = OH_Input_GetTouchEventToolType(&touchEvent);
+    EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_PEN);
+}
+
+/*
+ * @tc.name: OHInputManagerTest_TouchEventToolType_003
+ * @tc.desc: Test the function OH_Input_SetTouchEventToolType OH_Input_GetTouchEventToolType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_003, TestSize.Level1)
+{
+    Input_TouchEvent touchEvent;
+    Input_TouchEventToolType toolType = static_cast<Input_TouchEventToolType>(100);
+    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, toolType);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+
+    auto retTool = OH_Input_GetTouchEventToolType(&touchEvent);
+    EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_FINGER);
 }
 
 /*
