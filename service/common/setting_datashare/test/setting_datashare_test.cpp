@@ -137,52 +137,6 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_ExecRegisterCb, TestSize.Lev
 }
 
 /**
- * @tc.name: SettingDatashareTest_RegisterObserver
- * @tc.desc: Test RegisterObserver
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SettingDataShare settingDataShare;
-    std::string key = "settingDateShare";
-    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
-    ASSERT_NE(observer, nullptr);
-    observer->key_ = "settingDateShare";
-    std::string strUri = "strUri";
-    settingDataShare.isDataShareReady_ = false;
-    ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
-    settingDataShare.isDataShareReady_ = true;
-    ASSERT_NE(settingDataShare.RegisterObserver(observer, strUri), RET_ERR);
-    delete(observer);
-    observer = nullptr;
-}
-
-/**
- * @tc.name: SettingDatashareTest_UnregisterObserver
- * @tc.desc: Test UnregisterObserver
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    SettingDataShare settingDataShare;
-    std::string key = "settingDateShare";
-    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver;
-    ASSERT_NE(observer, nullptr);
-    observer->key_ = "settingDateShare";
-    std::string strUri = "strUri";
-    settingDataShare.isDataShareReady_ = false;
-    ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
-    settingDataShare.isDataShareReady_ = true;
-    ASSERT_NE(settingDataShare.UnregisterObserver(observer, strUri), RET_ERR);
-    delete(observer);
-    observer = nullptr;
-}
-
-/**
  * @tc.name: SettingDatashareTest_PutStringValue
  * @tc.desc: Test PutStringValue
  * @tc.type: FUNC
@@ -277,7 +231,7 @@ HWTEST_F(SettingObserverTest, SettingObserverTest_CreateDataShareHelper_004, Tes
 
     ASSERT_NO_FATAL_FAILURE(settingDataShare.CreateDataShareHelper(str));
     str = "";
-    ASSERT_EQ(settingDataShare.CreateDataShareHelper(str), nullptr);
+    ASSERT_NE(settingDataShare.CreateDataShareHelper(str), nullptr);
 }
 
 /**

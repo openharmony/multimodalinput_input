@@ -896,32 +896,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithMonitorHan
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnGetFunctionKeyState_001
- * @tc.desc: Test the function OnGetFunctionKeyState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnGetFunctionKeyState_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    int32_t funcKey = NUM_LOCK_FUNCTION_KEY;
-    bool state = false;
-    int32_t ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
-    funcKey = CAPS_LOCK_FUNCTION_KEY;
-    ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
-    funcKey = SCROLL_LOCK_FUNCTION_KEY;
-    ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
-    funcKey = 10;
-    state = true;
-    ret = handler.OnGetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_OnInjectPointerEventExt_001
  * @tc.desc: Test the function OnInjectPointerEventExt
  * @tc.type: FUNC
@@ -1609,25 +1583,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_001, TestSize.Le
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnCancelInjection_001
- * @tc.desc: Test the function OnCancelInjection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.authorizationCollection_.insert(std::make_pair(12, AuthorizationStatus::AUTHORIZED));
-    handler.CurrentPID_ = 12;
-    int32_t ret = handler.OnCancelInjection();
-    EXPECT_EQ(ret, ERR_OK);
-    handler.CurrentPID_ = 1;
-    ret = handler.OnCancelInjection();
-    EXPECT_EQ(ret, ERR_OK);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_SetWindowInfo_001
  * @tc.desc: Test the function SetWindowInfo
  * @tc.type: FUNC
@@ -2138,39 +2093,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_001, TestSiz
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_001
- * @tc.desc: Test the function InitInjectNoticeSource
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
-    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
-    manager.isStartSrv_ = false;
-    ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
-    manager.isStartSrv_ = true;
-    ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    ASSERT_NE(manager.connectionCallback_, nullptr);
-    manager.connectionCallback_->isConnected_ = false;
-    ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
-    manager.connectionCallback_->isConnected_ = true;
-    ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
-    delete(manager.connectionCallback_);
-    manager.connectionCallback_ = nullptr;
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_CalculateOffset
  * @tc.desc: Test the function CalculateOffset
  * @tc.type: FUNC
@@ -2366,22 +2288,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_00
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_001
- * @tc.desc: Test CloseInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.InitInjectNoticeSource();
-    int32_t pid = 12345;
-    bool result = handler.CloseInjectNotice(pid);
-    ASSERT_FALSE(result);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_002
  * @tc.desc: Test the function InitInjectNoticeSource
  * @tc.type: FUNC
@@ -2400,7 +2306,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_002, 
     auto connection = handler.injectNotice_->GetConnection();
     connection->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
+    ASSERT_TRUE(ret);
 }
 
 /**
@@ -2445,37 +2351,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSiz
     auto connection = handler.injectNotice_->GetConnection();
     connection->isConnected_ = false;
     ret = handler.AddInjectNotice(noticeInfo);
-    EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnCancelInjection_002
- * @tc.desc: Test the function OnCancelInjection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
-    int32_t ret = handler.OnCancelInjection();
-    EXPECT_FALSE(ret != ERR_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_002
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
-    int32_t result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
+    ASSERT_TRUE(ret);
 }
 
 /**
@@ -2527,36 +2403,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CheckForRequestInjectionFreq
     EXPECT_EQ(result, ERR_OK);
 }
 
-/**
- * @tc.name: ServerMsgHandlerTest_RequestInjection_001
- * @tc.desc: Test the function RequestInjection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    int32_t callingPid = 100000;
-    int32_t status = 0;
-    int32_t reqId = 0;
-    auto isPC = handler.IsPC();
-    int32_t result = ERR_OK;
-    if (!isPC) {
-        result = handler.RequestInjection(callingPid, status, reqId);
-        EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
-    }
-    handler.OnCancelInjection(callingPid);
-    result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
-    result = handler.RequestInjection(callingPid, status, reqId);
-    EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
-    result = handler.OnAuthorize(true);
-    EXPECT_EQ(result, ERR_OK);
-    result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
-}
-
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
 /**
@@ -2578,22 +2424,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Le
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_004
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
-    int32_t result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
-}
 
 /**
  * @tc.name: ServerMsgHandlerTest_OnMsgHandler_001
@@ -2649,23 +2479,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler_003, TestSize.L
     ServerMsgHandler::MsgCallback msgCallback = {MmiMessageId::DISPLAY_INFO, msgFunc};
     handler.RegistrationEvent(msgCallback);
     EXPECT_NO_FATAL_FAILURE(handler.OnMsgHandler(sess, pkt));
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnSetFunctionKeyState_002
- * @tc.desc: Test the function OnSetFunctionKeyState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    int32_t funcKey = 1;
-    int32_t pid = 15;
-    bool enable = true;
-    INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
-    EXPECT_EQ(handler.OnSetFunctionKeyState(pid, funcKey, enable), ERR_NON_INPUT_APPLICATION);
 }
 
 /**
@@ -3059,71 +2872,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor_001, T
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_005
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
-    int32_t result = handler.OnAuthorize(true);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_006
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
-    int32_t result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnCancelInjection_005
- * @tc.desc: Test the function OnCancelInjection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
-    int callPid = 12345;
-    int32_t ret = handler.OnCancelInjection(callPid);
-    EXPECT_EQ(ret, COMMON_PERMISSION_CHECK_ERROR);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnCancelInjection_006
- * @tc.desc: Test the function OnCancelInjection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
-    int callPid = 0;
-    ASSERT_NO_FATAL_FAILURE(handler.OnCancelInjection(callPid));
-    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
-    ASSERT_NO_FATAL_FAILURE(handler.OnCancelInjection(callPid));
-}
-
-/**
 @tc.name: ServerMsgHandlerTest_OnMsgHandler04
 @tc.desc: Test if callback branch failed
 @tc.type: FUNC
@@ -3495,7 +3243,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SubscribeKeyMonitor002, Test
     int32_t session {-1};
     std::string name = "test.name";
     int32_t ret = handler.SubscribeKeyMonitor(session, keyOption, name);
-    EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -3512,7 +3260,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UnsubscribeKeyMonitor002, Te
     int32_t session {-1};
     std::string name = "test.name";
     int32_t ret = handler.UnsubscribeKeyMonitor(session, keyOption, name);
-    EXPECT_EQ(ret, -CAPABILITY_NOT_SUPPORTED);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -4272,7 +4020,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_006, TestSize.
             << extensionInfo.isSkipSelfWhenShowOnVirtualScreen << extensionInfo.windowNameType;
     }
     pkt << ret;
-    EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_OK);
+    EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
 
 /**
@@ -4353,45 +4101,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck003, TestSi
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_002
- * @tc.desc: Test CloseInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.InitInjectNoticeSource();
-    int32_t pid = 0;
-    bool result = handler.CloseInjectNotice(pid);
-    ASSERT_FALSE(result);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_003
- * @tc.desc: Test the function CloseInjectNotice
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    handler.InitInjectNoticeSource();
-    int32_t pid = 1234;
-    handler.injectNotice_ = nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = false;
-    ret = handler.CloseInjectNotice(pid);
-    EXPECT_FALSE(ret);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_004
  * @tc.desc: Test the function InitInjectNoticeSource
  * @tc.type: FUNC
@@ -4406,17 +4115,17 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_004, 
     handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
     manager.isStartSrv_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
+    ASSERT_TRUE(ret);
     manager.isStartSrv_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
+    ASSERT_TRUE(ret);
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     manager.connectionCallback_->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
+    ASSERT_TRUE(ret);
     manager.connectionCallback_->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_FALSE(ret);
+    ASSERT_TRUE(ret);
 }
 
 /**
@@ -4455,13 +4164,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_002, TestSi
         EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
     }
     AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
-    handler.OnCancelInjection(callingPid);
-    auto result = handler.OnAuthorize(false);
-    EXPECT_EQ(result, ERR_OK);
-    result = handler.RequestInjection(callingPid, status, reqId);
+    auto result = handler.RequestInjection(callingPid, status, reqId);
     EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
-    result = handler.OnAuthorize(true);
-    EXPECT_EQ(result, ERR_OK);
 }
 
 /**

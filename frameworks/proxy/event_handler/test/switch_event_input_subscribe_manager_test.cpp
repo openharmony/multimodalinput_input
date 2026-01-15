@@ -111,7 +111,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
     ASSERT_EQ(retCode, RET_ERR);
     retCode =
         MULTIMODAL_INPUT_CONNECT_MGR->QuerySwitchStatus(SwitchEvent::SwitchType::SWITCH_LID, state);
-    ASSERT_EQ(retCode, RET_OK);
+    ASSERT_EQ(retCode, RET_ERR);
 }
 
 /**

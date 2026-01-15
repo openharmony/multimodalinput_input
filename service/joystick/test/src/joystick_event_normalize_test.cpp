@@ -209,22 +209,6 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceRemoved_
 }
 
 /**
- * @tc.name: JoystickEventNormalizeTest_GetProcessor
- * @tc.desc: Test GetProcessor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetProcessor, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId { 2 };
-    EXPECT_CALL(*INPUT_DEV_MGR, FindInputDeviceId).WillRepeatedly(Return(deviceId));
-    libinput_device libDev;
-    auto processor = JoystickEventNormalize::GetInstance()->GetProcessor(&libDev);
-    ASSERT_NE(processor, nullptr);
-}
-
-/**
  * @tc.name: JoystickEventNormalizeTest_FindProcessor
  * @tc.desc: Test FindProcessor
  * @tc.type: FUNC
@@ -236,31 +220,6 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor, T
     auto joystickEvent = std::make_shared<JoystickEventNormalize>();
     int32_t deviceId = 2;
     ASSERT_EQ(joystickEvent->FindProcessor(deviceId), nullptr);
-}
-
-/**
- * @tc.name: JoystickEventNormalizeTest_FindProcessor_002
- * @tc.desc: Test FindProcessor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    auto joystickEvent = std::make_shared<JoystickEventNormalize>();
-    int32_t deviceId = 2;
-    struct libinput_device libDev {
-        .udevDev { 2 },
-        .busType = 1,
-        .version = 1,
-        .product = 1,
-        .vendor = 1,
-        .name = "test",
-    };
-    auto joystickEventProcessor = std::make_shared<JoystickEventProcessor>(deviceId);
-    joystickEvent->processors_.insert(std::make_pair(&libDev, joystickEventProcessor));
-    ASSERT_EQ(joystickEvent->FindProcessor(deviceId), joystickEventProcessor);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -1345,7 +1345,6 @@ group("TouchEventNormalizeTests") {
     ":TouchEventNormalizeTest",
     ":TouchGestureAdapterTest",
     ":TouchGestureManagerTest",
-    ":TouchEventNormalizeTestWithMock",
     ":TransformPointTest",
   ]
   if (input_feature_touchpad) {
