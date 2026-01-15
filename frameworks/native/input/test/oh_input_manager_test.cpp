@@ -3016,7 +3016,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure_001, TestSize
     auto ret = OH_Input_GetTouchEventPressure(touchEvent);
     EXPECT_EQ(ret, 0.0);
 
-    ret = OH_Input_SetTouchEventPressure(touchEvent, 0.0f);
+    ret = OH_Input_SetTouchEventPressure(touchEvent, 0.0);
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
 }
 
@@ -3160,12 +3160,15 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_002, TestSize
     Input_TouchEventToolType retTool = OH_Input_GetTouchEventToolType(&touchEvent);
     EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_PENCIL);
 
-    Input_TouchEventToolType toolType = Input_TouchEventToolType::TOOL_TYPE_PEN;
-    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, toolType);
-    EXPECT_EQ(ret, INPUT_SUCCESS);
+   for (int32_t type = static_cast<int32_t>(Input_TouchEventToolType::TOOL_TYPE_FINGER);
+       type <= Input_TouchEventToolType::TOOL_TYPE_LENS; ++type) {
+       Input_TouchEventToolType toolType = static_cast<Input_TouchEventToolType>(type);
+       auto ret = OH_Input_SetTouchEventToolType(&touchEvent, toolType);
+       EXPECT_EQ(ret, INPUT_SUCCESS);
 
-    retTool = OH_Input_GetTouchEventToolType(&touchEvent);
-    EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_PEN);
+       retTool = OH_Input_GetTouchEventToolType(&touchEvent);
+       EXPECT_EQ(retTool, toolType);
+   }
 }
 
 /*
@@ -3177,8 +3180,13 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_002, TestSize
 HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_003, TestSize.Level1)
 {
     Input_TouchEvent touchEvent;
-    Input_TouchEventToolType toolType = static_cast<Input_TouchEventToolType>(100);
-    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, toolType);
+    Input_TouchEventToolType invalidType1 = static_cast<Input_TouchEventToolType>(
+        static_cast<int32_t>(Input_TouchEventToolType::TOOL_TYPE_LENS) + 1);
+    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, invalidType1);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+
+    Input_TouchEventToolType invalidType2 = static_cast<Input_TouchEventToolType>(-1);
+    auto ret = OH_Input_SetTouchEventToolType(&touchEvent, invalidType2);
     EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
 
     auto retTool = OH_Input_GetTouchEventToolType(&touchEvent);
