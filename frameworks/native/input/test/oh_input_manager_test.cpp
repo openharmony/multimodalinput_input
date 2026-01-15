@@ -3161,7 +3161,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventToolType_002, TestSize
     EXPECT_EQ(retTool, Input_TouchEventToolType::TOOL_TYPE_PENCIL);
 
    for (int32_t type = static_cast<int32_t>(Input_TouchEventToolType::TOOL_TYPE_FINGER);
-       type <= Input_TouchEventToolType::TOOL_TYPE_LENS; ++type) {
+       type < static_cast<int32_t>(Input_TouchEventToolType::TOOL_TYPE_LENS) + 1; ++type) {
        Input_TouchEventToolType toolType = static_cast<Input_TouchEventToolType>(type);
        auto ret = OH_Input_SetTouchEventToolType(&touchEvent, toolType);
        EXPECT_EQ(ret, INPUT_SUCCESS);
