@@ -1203,6 +1203,7 @@ Input_Result OH_Input_SetTouchEventToolType(struct Input_TouchEvent* touchEvent,
     CALL_DEBUG_ENTER;
     if (touchEvent == nullptr || toolType < Input_TouchEventToolType::TOOL_TYPE_FINGER ||
         toolType > Input_TouchEventToolType::TOOL_TYPE_LENS) {
+        MMI_HILOGE("invalid tool type:%{public}d", toolType);
         return INPUT_PARAMETER_ERROR;
     }
     touchEvent->toolType = toolType;
