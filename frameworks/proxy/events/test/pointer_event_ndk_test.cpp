@@ -229,7 +229,7 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     inputTouchEvent.displayY = 200;
     inputTouchEvent.windowX = 500;
     inputTouchEvent.windowY = 600;
-    inputTouchEvent.pressure = 0.5f;
+    inputTouchEvent.pressure = 0.5;
     inputTouchEvent.toolType = Input_TouchEventToolType::TOOL_TYPE_PENCIL;
     inputTouchEvent.downTime = 100;
     int32_t windowX = 10;
