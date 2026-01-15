@@ -2300,7 +2300,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_007, T
     inputTouchEvent.displayX = 300;
     inputTouchEvent.displayY = 300;
     inputTouchEvent.action = TOUCH_ACTION_UP;
-    EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), 0);
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&inputTouchEvent), INPUT_SUCCESS);
 }
 
 /**
@@ -2579,7 +2579,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventIntercepto
 
 /**
  * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_004
- * @tc.desc: Test the funcation OH_Input_AddInputEventInterceptor
+ * @tc.desc: Test the function OH_Input_AddInputEventInterceptor
  * @tc.type: FUNC
  * @tc.require:
  */
