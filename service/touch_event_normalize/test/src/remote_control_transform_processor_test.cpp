@@ -63,23 +63,23 @@ void RemoteControlTransformProcessorTest::TearDownTestCase(void)
 void RemoteControlTransformProcessorTest::SetupUwbRemoteControl()
 {
     if (!vUwbRemoteControl_.SetUp()) {
- 	    GTEST_SKIP();
- 	}
- 	std::cout << "device node name: " << vUwbRemoteControl_.GetDevPath() << std::endl;
- 	if (!libinput_.AddPath(vUwbRemoteControl_.GetDevPath())) {
- 	    GTEST_SKIP();
- 	}
- 	libinput_event *event = libinput_.Dispatch();
- 	if (!event) {
- 	    GTEST_SKIP();
- 	}
- 	if (libinput_event_get_type(event) != LIBINPUT_EVENT_DEVICE_ADDED) {
- 	    GTEST_SKIP();
- 	}
- 	struct libinput_device *device = libinput_event_get_device(event);
- 	if (!device) {
- 	    GTEST_SKIP();
- 	}
+        GTEST_SKIP();
+    }
+    std::cout << "device node name: " << vUwbRemoteControl_.GetDevPath() << std::endl;
+    if (!libinput_.AddPath(vUwbRemoteControl_.GetDevPath())) {
+        GTEST_SKIP();
+    }
+    libinput_event *event = libinput_.Dispatch();
+    if (!event) {
+        GTEST_SKIP();
+    }
+    if (libinput_event_get_type(event) != LIBINPUT_EVENT_DEVICE_ADDED) {
+        GTEST_SKIP();
+    }
+    struct libinput_device *device = libinput_event_get_device(event);
+    if (!device) {
+        GTEST_SKIP();
+    }
 }
 
 
