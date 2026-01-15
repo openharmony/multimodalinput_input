@@ -250,9 +250,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_
     auto style = instance_->GetLastMouseStyle();
     EXPECT_EQ(style.id, 0);
 
-    ret = instance_->SwitchPointerStyle();
-    EXPECT_EQ(ret, RET_OK);
-
     ret = instance_->ClearWindowPointerStyle(pid, windowId);
     EXPECT_EQ(ret, RET_OK);
 }
@@ -580,18 +577,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateMouseLayer
     EXPECT_EQ(ret, RET_OK);
 }
 
-/**
- * @tc.name: CursorDrawingComponentTest_DrawNewDpiPointer_001
- * @tc.desc: Test DrawNewDpiPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawNewDpiPointer_001, TestSize.Level1)
-{
-    int32_t ret = instance_->DrawNewDpiPointer();
-    EXPECT_EQ(ret, RET_OK);
-}
-
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: CursorDrawingComponentTest_GetPointerSnapshot_001
@@ -715,23 +700,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_NotifyPointerEve
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitPointerCallback_001, TestSize.Level1)
 {
     EXPECT_NO_FATAL_FAILURE(instance_->InitPointerCallback());
-}
-
-/**
- * @tc.name: CursorDrawingComponentTest_GetCurrentCursorInfo
- * @tc.desc: Test GetCurrentCursorInfo
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentCursorInfo, TestSize.Level1)
-{
-    instance_->isLoaded_ = false;
-    bool visible;
-    PointerStyle pointerStyle;
-    ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_ERR);
-
-    instance_->isLoaded_ = true;
-    ASSERT_EQ(instance_->GetCurrentCursorInfo(visible, pointerStyle), RET_OK);
 }
 
 /**

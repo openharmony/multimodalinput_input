@@ -1041,6 +1041,15 @@ ohos_unittest("PointerEventNdkTest") {
     "events/test/pointer_event_ndk_test.cpp",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/frameworks/proxy:libmmi_test_util",

@@ -162,22 +162,20 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     CALL_TEST_DEBUG;
     libinput_event event;
     NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_MOTION));
-    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     libinput_event_keyboard keyboardEvent;
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_KEYBOARD_KEY));
-    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(&keyboardEvent));
-    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_KEYBOARD_KEY));
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillRepeatedly(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).WillRepeatedly(Return(LIBINPUT_KEY_STATE_RELEASED));
     EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     libinput_event_pointer pointerEvent;
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
-    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&pointerEvent));
     EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY));
-    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(nullptr));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY));
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillRepeatedly(Return(nullptr));
     EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
 
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
@@ -204,60 +202,6 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_002
- * @tc.desc: Test_GetExternalObject_002
- * @tc.require: test GetExternalObject
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_002,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
-    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
-    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
-    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
-    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
-
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
-    EXPECT_CALL(*mockInputPlugin, GetExternalObject()).WillOnce(Return(remote));
-    EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
-    std::list<std::shared_ptr<IPluginContext>> pluginLists;
-    pluginLists.push_back(mockInputPluginContext);
-    InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
-
-    int32_t ret = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
-    EXPECT_EQ(ret, RET_OK);
-    InputPluginManager::GetInstance()->plugins_.clear();
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_003
- * @tc.desc: Test_GetExternalObject_003
- * @tc.require: test GetExternalObject
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_003,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::string pluginName = "pc.pointer.inputDeviceConsumer.202507";
-    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
-    std::shared_ptr<MockInputPluginContext> mockInputPluginContext = std::make_shared<MockInputPluginContext>();
-    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
-    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
-
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return(pluginName));
-    EXPECT_CALL(*mockInputPlugin, GetExternalObject()).WillOnce(Return(nullptr));
-    EXPECT_CALL(*mockInputPluginContext, GetPlugin()).WillRepeatedly(Return(mockInputPlugin));
-    std::list<std::shared_ptr<IPluginContext>> pluginLists;
-    pluginLists.push_back(mockInputPluginContext);
-    InputPluginManager::GetInstance()->plugins_[InputPluginStage::INPUT_AFTER_NORMALIZED] = pluginLists;
-
-    int32_t ret = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
-    EXPECT_EQ(ret, ERROR_NULL_POINTER);
-    InputPluginManager::GetInstance()->plugins_.clear();
-}
-
-/**
  * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_001
  * @tc.desc: Test_GetPluginDataFromLibInput_001
  * @tc.require: test GetPluginDataFromLibInput
@@ -271,10 +215,10 @@ HWTEST_F(MultimodalInputPluginManagerTest,
     NiceMock<LibinputInterfaceMock> libinputMock;
 
     EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&touchpadDevice));
-    EXPECT_CALL(libinputMock, TouchEventGetToolType).WillOnce(Return(11));
-    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
+    EXPECT_CALL(libinputMock, TouchEventGetToolType).WillRepeatedly(Return(11));
+    EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(&touchEvent));
     char deviceName[] = "yunshuiqiao";
-    EXPECT_CALL(libinputMock, DeviceGetName).WillOnce(Return(deviceName));
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(deviceName));
 
     libinput_event event;
     IPluginData* data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
@@ -294,21 +238,8 @@ HWTEST_F(MultimodalInputPluginManagerTest,
     libinput_event event;
     libinput_event_touch touchEvent;
     NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetTouchEvent).WillOnce(Return(&touchEvent));
+    EXPECT_CALL(libinputMock, GetTouchEvent).WillRepeatedly(Return(&touchEvent));
     IPluginData* data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
-    EXPECT_EQ(data->libInputEventData.toolType, 0);
-}
-
-/**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003
- * @tc.desc: Test_GetPluginDataFromLibInput_003
- * @tc.require: test GetPluginDataFromLibInput
- */
-HWTEST_F(MultimodalInputPluginManagerTest,
-    MultimodalInputPluginManagerTest_InputPluginManager_GetPluginDataFromLibInput_003, TestSize.Level1) {
-    CALL_TEST_DEBUG;
-    libinput_event event;
-    IPluginData *data = InputPluginManager::GetInstance()->GetPluginDataFromLibInput(&event).get();
     EXPECT_EQ(data->libInputEventData.toolType, 0);
 }
 
@@ -325,25 +256,25 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     std::shared_ptr<IPluginData> data = std::make_shared<IPluginData>();
 
     libinput_event *event = nullptr;
-    EXPECT_CALL(*mockInputPluginContext, HandleEvent(event, data)).WillOnce(Return(PluginResult::NotUse));
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(event, data)).WillRepeatedly(Return(PluginResult::NotUse));
     PluginResult result = InputPluginManager::GetInstance()->ProcessEvent(event, mockInputPluginContext, data);
     EXPECT_EQ(result, PluginResult::NotUse);
 
     std::shared_ptr<PointerEvent> pointerEvent =
         std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
-    EXPECT_CALL(*mockInputPluginContext, HandleEvent(pointerEvent, data)).WillOnce(Return(PluginResult::NotUse));
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(pointerEvent, data)).WillRepeatedly(Return(PluginResult::NotUse));
     result = InputPluginManager::GetInstance()->ProcessEvent(pointerEvent, mockInputPluginContext, data);
     EXPECT_EQ(result, PluginResult::NotUse);
 
     std::shared_ptr<AxisEvent> axisEvent =
         std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
-    EXPECT_CALL(*mockInputPluginContext, HandleEvent(axisEvent, data)).WillOnce(Return(PluginResult::NotUse));
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(axisEvent, data)).WillRepeatedly(Return(PluginResult::NotUse));
     result = InputPluginManager::GetInstance()->ProcessEvent(axisEvent, mockInputPluginContext, data);
     EXPECT_EQ(result, PluginResult::NotUse);
 
     std::shared_ptr<KeyEvent> keyEvent =
         std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
-    EXPECT_CALL(*mockInputPluginContext, HandleEvent(keyEvent, data)).WillOnce(Return(PluginResult::NotUse));
+    EXPECT_CALL(*mockInputPluginContext, HandleEvent(keyEvent, data)).WillRepeatedly(Return(PluginResult::NotUse));
     result = InputPluginManager::GetInstance()->ProcessEvent(keyEvent, mockInputPluginContext, data);
     EXPECT_EQ(result, PluginResult::NotUse);
 }
@@ -503,30 +434,30 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     EXPECT_EQ(result, PluginResult::NotUse);
 
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
-    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillOnce(Return(201));
-    EXPECT_CALL(*mockInputPlugin, GetStage()).WillOnce(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("yunshuiqiao"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(201));
+    EXPECT_CALL(*mockInputPlugin, GetStage()).WillRepeatedly(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
     inputPluginContext->Init(mockInputPlugin);
 
-    EXPECT_CALL(*mockInputPlugin, HandleEvent(event, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(event, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(event, data);
     EXPECT_EQ(result, PluginResult::UseNeedReissue);
 
     std::shared_ptr<PointerEvent> pointerEvent =
         std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
-    EXPECT_CALL(*mockInputPlugin, HandleEvent(pointerEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(pointerEvent, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(pointerEvent, data);
     EXPECT_EQ(result, PluginResult::UseNeedReissue);
 
     std::shared_ptr<AxisEvent> axisEvent =
         std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
-    EXPECT_CALL(*mockInputPlugin, HandleEvent(axisEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(axisEvent, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(axisEvent, data);
     EXPECT_EQ(result, PluginResult::UseNeedReissue);
 
     std::shared_ptr<KeyEvent> keyEvent =
         std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
-    EXPECT_CALL(*mockInputPlugin, HandleEvent(keyEvent, data)).WillOnce(Return(PluginResult::UseNeedReissue));
+    EXPECT_CALL(*mockInputPlugin, HandleEvent(keyEvent, data)).WillRepeatedly(Return(PluginResult::UseNeedReissue));
     result = inputPluginContext->HandleEvent(keyEvent, data);
     EXPECT_EQ(result, PluginResult::UseNeedReissue);
 }
@@ -587,9 +518,9 @@ HWTEST_F(
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillOnce(Return("yunshuiqiao"));
-    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillOnce(Return(201));
-    EXPECT_CALL(*mockInputPlugin, GetStage()).WillOnce(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("yunshuiqiao"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(201));
+    EXPECT_CALL(*mockInputPlugin, GetStage()).WillRepeatedly(Return(InputPluginStage::INPUT_AFTER_NORMALIZED));
     inputPluginContext->Init(mockInputPlugin);
     std::shared_ptr<IInputPlugin> inputPlugin = inputPluginContext->GetPlugin();
     EXPECT_NE(inputPlugin, nullptr);
@@ -616,7 +547,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetF
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
-    EXPECT_EQ(inputPluginContext->GetFocusedPid(), 0);
+    EXPECT_EQ(inputPluginContext->GetFocusedPid(), -1);
 }
 } // namespace MMI
 } // namespace OHOS

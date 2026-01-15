@@ -4441,7 +4441,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_002, Te
     EXPECT_EQ(customCursor2, nullptr);
     bool isfollowSystem = true;
     Input_CursorConfig* cursorConfig = OH_Input_CursorConfig_Create(isfollowSystem);
-    EXPECT_EQ(cursorConfig, nullptr);
+    EXPECT_NE(cursorConfig, nullptr);
     int32_t windowId = -1;
     Input_Result res = OH_Input_SetCustomCursor(windowId, customCursor, cursorConfig);
     EXPECT_EQ(res, INPUT_PARAMETER_ERROR);

@@ -26,3 +26,4 @@ src:*foundation/multimodalinput/input/service/key_event_normalize/test/*
 src:*foundation/multimodalinput/input/service/message_handle/test/*
 src:*foundation/multimodalinput/input/service/subscriber/test/*
 src:*foundation/multimodalinput/input/service/device_manager/test/*
+src:*foundation/multimodalinput/input/service/module_loader/test/*

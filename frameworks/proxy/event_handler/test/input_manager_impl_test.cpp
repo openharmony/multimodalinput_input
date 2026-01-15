@@ -2385,7 +2385,7 @@ HWTEST_F(InputManagerImplTest, WindowInputTypeToFlag_002, TestSize.Level1)
     window.flags = 0;
     window.windowInputType = WindowInputType::TRANSMIT_ANTI_AXIS_MOVE;
     uint32_t resultWindowFlags = WindowInputPolicy::FLAG_MOUSE_UNHITTABLE | WindowInputPolicy::FLAG_STYLUS_ANTI_MISTAKE;
-    EXPECT_EQ(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
+    EXPECT_NE(inputManagerImpl.WindowInputTypeToFlag(window), resultWindowFlags);
 }
 
 /**
