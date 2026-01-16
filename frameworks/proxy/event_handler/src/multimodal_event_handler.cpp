@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 #ifdef OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_event_hook_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
+ #include "long_press_event_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
@@ -72,6 +73,7 @@ void OnConnected(const IfMMIClient& client)
     KEY_EVENT_HOOK_HANDLER.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
     INPUT_EVENT_HOOK_HANDLER.OnConnected();
+    LONG_PRESS_EVENT_SUBSCRIBE_MGR.OnConnected();
 }
 
 void OnDisconnected(const IfMMIClient &client)
