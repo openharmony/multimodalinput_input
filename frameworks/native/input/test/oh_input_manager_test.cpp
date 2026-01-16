@@ -3021,7 +3021,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure_001, TestSize
 }
 
 /*
- * @tc.name: OHInputManagerTest_TouchEventWindowCoordinates
  * @tc.name: OHInputManagerTest_TouchEventPressure_002
  * @tc.desc: Test the function OH_Input_SetTouchEventPressure OH_Input_GetTouchEventPressure
  * @tc.type: FUNC
