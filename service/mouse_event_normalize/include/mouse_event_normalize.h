@@ -18,6 +18,7 @@
 
 #include "device_observer.h"
 #include "mouse_transform_processor.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {

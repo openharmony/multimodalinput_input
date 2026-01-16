@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
+#include "input_service_context.h"
 #include "joystick_event_processor.h"
 #include "joystick_layout_map_builder.h"
 #include "libinput_mock.h"
@@ -66,6 +67,8 @@ private:
     std::unique_ptr<cJSON, std::function<void(cJSON *)>> BuildAxisMap002();
     std::unique_ptr<cJSON, std::function<void(cJSON *)>> BuildAxisMap003();
     std::unique_ptr<cJSON, std::function<void(cJSON *)>> BuildAxisMap004();
+
+    InputServiceContext env_ {};
 };
 
 void JoystickLayoutMapTest::SetUpTestCase()
@@ -105,7 +108,7 @@ HWTEST_F(JoystickLayoutMapTest, Load_001, TestSize.Level1)
         .vendor = 0x54c,
         .product = 0x5c4,
     };
-    auto layout = JoystickLayoutMap::Load(&device);
+    auto layout = JoystickLayoutMap::Load(&env_, &device);
 
     if (::access(CONFIG_NAME, F_OK) == 0) {
         EXPECT_NE(layout, nullptr);
@@ -139,7 +142,7 @@ HWTEST_F(JoystickLayoutMapTest, Load_001, TestSize.Level1)
 HWTEST_F(JoystickLayoutMapTest, Load_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto layout = JoystickLayoutMap::Load(g_cfgName);
+    auto layout = JoystickLayoutMap::Load(&env_, g_cfgName);
     EXPECT_EQ(layout, nullptr);
 }
 
@@ -165,7 +168,7 @@ HWTEST_F(JoystickLayoutMapTest, Load_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     BuildJoystickLayoutMap103();
-    auto layout = JoystickLayoutMap::Load(g_cfgName);
+    auto layout = JoystickLayoutMap::Load(&env_, g_cfgName);
     EXPECT_EQ(layout, nullptr);
 }
 
@@ -189,7 +192,7 @@ HWTEST_F(JoystickLayoutMapTest, Load_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     BuildJoystickLayoutMap104();
-    auto layout = JoystickLayoutMap::Load(g_cfgName);
+    auto layout = JoystickLayoutMap::Load(&env_, g_cfgName);
     EXPECT_EQ(layout, nullptr);
 }
 
@@ -207,11 +210,11 @@ HWTEST_F(JoystickLayoutMapTest, Load_005, TestSize.Level1)
         .axis_ = PointerEvent::AXIS_TYPE_ABS_GAS,
         .flatOverride_ = 4096,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.axes_.emplace(rawCode, axisInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    auto layout = JoystickLayoutMap::Load(g_cfgName);
+    auto layout = JoystickLayoutMap::Load(&env_, g_cfgName);
     EXPECT_NE(layout, nullptr);
     if (layout != nullptr) {
         auto tAxisInfo = layout->MapAxis(rawCode);
@@ -243,11 +246,11 @@ HWTEST_F(JoystickLayoutMapTest, Load_006, TestSize.Level1)
         .splitValue_ = splitValue,
         .flatOverride_ = flatOverride,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.axes_.emplace(rawCode, axisInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    auto layout = JoystickLayoutMap::Load(g_cfgName);
+    auto layout = JoystickLayoutMap::Load(&env_, g_cfgName);
     EXPECT_NE(layout, nullptr);
     if (layout != nullptr) {
         auto tAxisInfo = layout->MapAxis(rawCode);
@@ -276,11 +279,11 @@ HWTEST_F(JoystickLayoutMapTest, Load_007, TestSize.Level1)
     JoystickLayoutMap::Key keyInfo {
         .keyCode_ = KeyEvent::KEYCODE_BUTTON_THUMBL,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.keys_.emplace(rawCode, keyInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    auto layout = JoystickLayoutMap::Load(g_cfgName);
+    auto layout = JoystickLayoutMap::Load(&env_, g_cfgName);
     EXPECT_NE(layout, nullptr);
     if (layout != nullptr) {
         auto tKeyInfo = layout->MapKey(rawCode);
@@ -409,7 +412,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadKeyItem_001, TestSize.Level1)
     auto jsonKey = JoystickLayoutMapTest::BuildKeyMap001();
     ASSERT_NE(jsonKey, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadKeyItem(jsonKey.get(), index);
@@ -449,7 +452,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadKeyItem_002, TestSize.Level1)
     auto jsonKey = JoystickLayoutMapTest::BuildKeyMap002();
     ASSERT_NE(jsonKey, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadKeyItem(jsonKey.get(), index);
@@ -497,7 +500,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadKeyItem_003, TestSize.Level1)
     auto jsonKey = JoystickLayoutMapTest::BuildKeyMap003();
     ASSERT_NE(jsonKey, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadKeyItem(jsonKey.get(), index);
@@ -529,7 +532,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadAxisItem_001, TestSize.Level1)
     auto jsonAxisItem = JoystickLayoutMapTest::BuildAxisMap001();
     ASSERT_NE(jsonAxisItem, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadAxisItem(jsonAxisItem.get(), index);
@@ -569,7 +572,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadAxisItem_002, TestSize.Level1)
     auto jsonAxisItem = JoystickLayoutMapTest::BuildAxisMap002();
     ASSERT_NE(jsonAxisItem, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadAxisItem(jsonAxisItem.get(), index);
@@ -625,7 +628,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadAxisItem_003, TestSize.Level1)
     auto jsonAxisItem = JoystickLayoutMapTest::BuildAxisMap003();
     ASSERT_NE(jsonAxisItem, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadAxisItem(jsonAxisItem.get(), index);
@@ -681,7 +684,7 @@ HWTEST_F(JoystickLayoutMapTest, LoadAxisItem_004, TestSize.Level1)
     auto jsonAxisItem = JoystickLayoutMapTest::BuildAxisMap004();
     ASSERT_NE(jsonAxisItem, nullptr);
 
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.OnLoading();
     int32_t index { 66 };
     layoutMap.LoadAxisItem(jsonAxisItem.get(), index);

@@ -21,6 +21,7 @@
 #include "gtest/gtest.h"
 
 #include "input_device_manager.h"
+#include "input_service_context.h"
 #include "joystick_event_processor.h"
 #include "joystick_layout_map_builder.h"
 #include "key_event_value_transformation.h"
@@ -48,6 +49,9 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+private:
+    InputServiceContext env_ {};
 };
 
 void JoystickEventProcessorTest::SetUpTestCase()
@@ -92,7 +96,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnButtonEvent_00
     EXPECT_CALL(*KeyMapMgr, TransferDefaultKeyValue).WillOnce(Return(KeyEvent::KEYCODE_BUTTON_A));
 
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     libinput_event event {};
     auto keyEvent = joystick.OnButtonEvent(&event);
     EXPECT_NE(keyEvent, nullptr);
@@ -116,24 +120,27 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnButtonEvent_00
     JoystickLayoutMap::Key keyInfo {
         .keyCode_ = KeyEvent::KEYCODE_BUTTON_THUMBL,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.keys_.emplace(rawCode, keyInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    struct libinput_device device {};
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    struct libinput_device rawDev {};
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
+
     struct libinput_event_joystick_button buttonEvent {};
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(g_deviceName));
-    EXPECT_CALL(libinputMock, DeviceHasCapability).WillOnce(Return(true));
-    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&device));
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&rawDev));
     EXPECT_CALL(libinputMock, JoystickGetButtonEvent).WillRepeatedly(Return(&buttonEvent));
     EXPECT_CALL(libinputMock, JoystickButtonGetKey).WillRepeatedly(Return(BTN_THUMBL));
     EXPECT_CALL(libinputMock, JoystickButtonGetKeyState).WillRepeatedly(Return(LIBINPUT_BUTTON_STATE_PRESSED));
-    EXPECT_CALL(*INPUT_DEV_MGR, GetLibinputDevice).WillRepeatedly(Return(&device));
     EXPECT_CALL(*KeyMapMgr, TransferDefaultKeyValue).WillRepeatedly(Return(KeyEvent::KEYCODE_BUTTON_A));
 
-    int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+
+    JoystickEventProcessor joystick(&env_, deviceId);
     libinput_event event {};
     auto keyEvent = joystick.OnButtonEvent(&event);
     EXPECT_NE(keyEvent, nullptr);
@@ -152,12 +159,14 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnButtonEvent_00
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    struct libinput_device device {};
-    EXPECT_CALL(*INPUT_DEV_MGR, GetLibinputDevice).WillRepeatedly(Return(&device));
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    struct libinput_device rawDev {};
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(g_deviceName));
-    EXPECT_CALL(libinputMock, DeviceHasCapability).WillOnce(Return(true));
     EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
     EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillOnce(Return(65535)).WillRepeatedly(Return(0));
     struct libinput_event_joystick_axis axisEvent {};
@@ -168,8 +177,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_001,
     };
     EXPECT_CALL(libinputMock, JoystickAxisGetAbsInfo).WillRepeatedly(Return(&absInfo));
 
-    int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     libinput_event event {};
     auto pointerEvent = joystick.OnAxisEvent(&event);
     EXPECT_NE(pointerEvent, nullptr);
@@ -195,16 +203,18 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_002,
         .highAxis_ = PointerEvent::AXIS_TYPE_ABS_GAS,
         .splitValue_ = splitValue,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.axes_.emplace(ABS_X, axisInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    struct libinput_device device {};
-    EXPECT_CALL(*INPUT_DEV_MGR, GetLibinputDevice).WillRepeatedly(Return(&device));
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    struct libinput_device rawDev {};
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(g_deviceName));
-    EXPECT_CALL(libinputMock, DeviceHasCapability).WillOnce(Return(true));
     EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
     EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillOnce(Return(65535)).WillRepeatedly(Return(0));
     struct libinput_event_joystick_axis axisEvent {};
@@ -215,8 +225,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_002,
     };
     EXPECT_CALL(libinputMock, JoystickAxisGetAbsInfo).WillRepeatedly(Return(&absInfo));
 
-    int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     libinput_event event {};
     auto pointerEvent = joystick.OnAxisEvent(&event);
     EXPECT_NE(pointerEvent, nullptr);
@@ -240,16 +249,18 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_003,
         .mode_ = JoystickLayoutMap::AxisMode::AXIS_MODE_INVERT,
         .axis_ = PointerEvent::AXIS_TYPE_ABS_BRAKE,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.axes_.emplace(ABS_X, axisInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    struct libinput_device device {};
-    EXPECT_CALL(*INPUT_DEV_MGR, GetLibinputDevice).WillRepeatedly(Return(&device));
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    struct libinput_device rawDev {};
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(g_deviceName));
-    EXPECT_CALL(libinputMock, DeviceHasCapability).WillOnce(Return(true));
     EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
     EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillOnce(Return(65535)).WillRepeatedly(Return(0));
     struct libinput_event_joystick_axis axisEvent {};
@@ -260,8 +271,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_003,
     };
     EXPECT_CALL(libinputMock, JoystickAxisGetAbsInfo).WillRepeatedly(Return(&absInfo));
 
-    int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     libinput_event event {};
     auto pointerEvent = joystick.OnAxisEvent(&event);
     EXPECT_NE(pointerEvent, nullptr);
@@ -285,16 +295,18 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_004,
         .mode_ = JoystickLayoutMap::AxisMode::AXIS_MODE_INVERT,
         .axis_ = PointerEvent::AXIS_TYPE_ABS_BRAKE,
     };
-    JoystickLayoutMap layoutMap { g_cfgName };
+    JoystickLayoutMap layoutMap { &env_, g_cfgName };
     layoutMap.axes_.emplace(ABS_X, axisInfo);
     JoystickLayoutMapBuilder::BuildJoystickLayoutMap(layoutMap, g_cfgName);
 
-    struct libinput_device device {};
-    EXPECT_CALL(*INPUT_DEV_MGR, GetLibinputDevice).WillRepeatedly(Return(&device));
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    struct libinput_device rawDev {};
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(g_deviceName));
-    EXPECT_CALL(libinputMock, DeviceHasCapability).WillOnce(Return(true));
     EXPECT_CALL(libinputMock, DeviceGetAxisMin).WillRepeatedly(Return(0));
     EXPECT_CALL(libinputMock, DeviceGetAxisMax).WillOnce(Return(65535)).WillRepeatedly(Return(0));
     struct libinput_event_joystick_axis axisEvent {};
@@ -302,8 +314,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_OnAxisEvent_004,
     EXPECT_CALL(libinputMock, JoystickAxisValueIsChanged).WillRepeatedly(Return(true));
     EXPECT_CALL(libinputMock, JoystickAxisGetAbsInfo).WillRepeatedly(Return(nullptr));
 
-    int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     libinput_event event {};
     auto pointerEvent = joystick.OnAxisEvent(&event);
     EXPECT_EQ(pointerEvent, nullptr);
@@ -319,7 +330,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention, 
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     std::shared_ptr<PointerEvent> pointerEvent;
     ASSERT_NO_FATAL_FAILURE(
         joystick.CheckIntention(pointerEvent, [=] (std::shared_ptr<OHOS::MMI::KeyEvent>) { return; }));
@@ -334,7 +345,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
@@ -355,7 +366,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_0
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
@@ -376,7 +387,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_0
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
@@ -397,7 +408,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_0
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckIntention_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -419,7 +430,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X, Test
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     ASSERT_NO_FATAL_FAILURE(joystick.CheckHAT0X(pointerEvent, buttonEvents));
@@ -434,7 +445,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X, Test
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_SCROLL_VERTICAL;
     std::vector<KeyEvent::KeyItem> buttonEvents;
@@ -450,7 +461,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_002, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
@@ -471,7 +482,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_003, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
@@ -492,7 +503,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_004, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
@@ -510,7 +521,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_005, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
@@ -529,7 +540,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_006, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0X_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0X;
@@ -549,7 +560,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y, Test
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     ASSERT_NO_FATAL_FAILURE(joystick.CheckHAT0Y(pointerEvent, buttonEvents));
@@ -564,7 +575,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y, Test
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_SCROLL_VERTICAL;
     std::vector<KeyEvent::KeyItem> buttonEvents;
@@ -580,7 +591,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_002, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
@@ -601,7 +612,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_003, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
@@ -622,7 +633,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_004, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto JoystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
@@ -640,7 +651,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_005, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
@@ -659,7 +670,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_006, 
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CheckHAT0Y_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     std::vector<KeyEvent::KeyItem> buttonEvents;
     pointerEvent->axes_ = PointerEvent::AXIS_TYPE_ABS_HAT0Y;
@@ -679,7 +690,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     KeyEvent::KeyItem keyItem {};
     ASSERT_NO_FATAL_FAILURE(joystick.UpdateButtonState(keyItem));
 }
@@ -693,7 +704,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonState_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     KeyEvent::KeyItem keyItem {};
     keyItem.SetPressed(true);
     keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
@@ -710,7 +721,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonStat
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_UpdateButtonState_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     KeyEvent::KeyItem keyItem {};
     keyItem.SetPressed(false);
     keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
@@ -733,7 +744,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_FormatButtonEven
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     KeyEvent::KeyItem keyItem {};
     EXPECT_NE(joystick.FormatButtonEvent(keyItem), nullptr);
 }
@@ -747,7 +758,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_FormatButtonEven
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_FormatButtonEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     KeyEvent::KeyItem keyItem {};
     keyItem.SetPressed(true);
     keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
@@ -768,7 +779,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_FormatButtonEven
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_FormatButtonEvent_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     KeyEvent::KeyItem keyItem {};
     keyItem.SetPressed(false);
     keyItem.SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
@@ -790,7 +801,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CleanUpKeyEvent_
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     EXPECT_NE(joystick.CleanUpKeyEvent(), nullptr);
 }
 
@@ -819,7 +830,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CleanUpKeyEvent_
     keyEvent->AddKeyItem(item2);
 
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     joystick.keyEvent_ = keyEvent;
     auto event = joystick.CleanUpKeyEvent();
     EXPECT_EQ(event, keyEvent);
@@ -844,7 +855,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_CleanUpKeyEvent_
 HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_DumpJoystickAxisEvent_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto joystickEvent = std::make_shared<JoystickEventProcessor>(2);
+    auto joystickEvent = std::make_shared<JoystickEventProcessor>(&env_, 2);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -866,7 +877,7 @@ HWTEST_F(JoystickEventProcessorTest, JoystickEventProcessorTest_DumpJoystickAxis
 {
     CALL_TEST_DEBUG;
     int32_t deviceId { 2 };
-    JoystickEventProcessor joystick(deviceId);
+    JoystickEventProcessor joystick(&env_, deviceId);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(joystick.DumpJoystickAxisEvent(pointerEvent), "");
 }

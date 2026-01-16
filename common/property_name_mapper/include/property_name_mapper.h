@@ -34,8 +34,8 @@ public:
         UNLOAD_AUTOMATICALLY_WITH_DELAY,
     };
 
-    static std::shared_ptr<PropertyNameMapper> Load(UnloadOption option);
-    static void Unload(UnloadOption option);
+    static std::shared_ptr<PropertyNameMapper> Load(IInputServiceContext *env, UnloadOption option);
+    static void Unload(IInputServiceContext *env, UnloadOption option);
 
     PropertyNameMapper() = default;
     ~PropertyNameMapper() = default;
@@ -45,6 +45,7 @@ public:
     PointerEvent::AxisType MapAxis(const std::string &name) const override;
 
 private:
+    static std::shared_ptr<ITimerManager> GetTimerManager(IInputServiceContext *env);
     void LoadPropertyNameMap();
 
     static std::shared_mutex mutex_;

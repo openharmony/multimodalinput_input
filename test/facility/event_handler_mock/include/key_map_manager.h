@@ -19,28 +19,13 @@
 #include <vector>
 #include <gmock/gmock.h>
 
+#include "i_key_map_manager.h"
 #include "key_event_value_transformation.h"
 #include "libinput.h"
 #include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
-class IKeyMapManager {
-public:
-    IKeyMapManager() = default;
-    virtual ~IKeyMapManager() = default;
-
-    virtual void GetConfigKeyValue(const std::string&, int32_t) = 0;
-    virtual void ParseDeviceConfigFile(struct libinput_device*) = 0;
-    virtual void RemoveKeyValue(struct libinput_device*) = 0;
-    virtual std::string GetProFilePath(const std::string&) const = 0;
-    virtual std::string GetKeyEventFileName(struct libinput_device*) = 0;
-    virtual int32_t GetDefaultKeyId() = 0;
-    virtual int32_t TransferDefaultKeyValue(int32_t) = 0;
-    virtual int32_t TransferDeviceKeyValue(struct libinput_device*, int32_t) = 0;
-    virtual std::vector<int32_t> InputTransferKeyValue(int32_t, int32_t) = 0;
-};
-
 class KeyMapManager final : public IKeyMapManager {
 public:
     static std::shared_ptr<KeyMapManager> GetInstance();
@@ -59,6 +44,8 @@ public:
     MOCK_METHOD(int32_t, TransferDefaultKeyValue, (int32_t));
     MOCK_METHOD(int32_t, TransferDeviceKeyValue, (struct libinput_device*, int32_t));
     MOCK_METHOD(std::vector<int32_t>, InputTransferKeyValue, (int32_t, int32_t));
+    MOCK_METHOD(uint32_t, KeyCodeToUnicode, (int32_t, std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(int32_t, KeyItemsTransKeyIntention, (const std::vector<KeyEvent::KeyItem>&));
 
 private:
     static std::shared_ptr<KeyMapManager> instance_;

@@ -15,6 +15,8 @@
 
 #include "input_service_context.h"
 #include "input_event_handler.h"
+#include "input_device_manager.h"
+#include "key_map_manager.h"
 #include "timer_manager.h"
 
 namespace OHOS {
@@ -47,6 +49,16 @@ std::shared_ptr<ITimerManager> InputServiceContext::GetTimerManager() const
 std::shared_ptr<IInputWindowsManager> InputServiceContext::GetInputWindowsManager() const
 {
     return WIN_MGR;
+}
+
+std::shared_ptr<IInputDeviceManager> InputServiceContext::GetDeviceManager() const
+{
+    return INPUT_DEV_MGR;
+}
+
+std::shared_ptr<IKeyMapManager> InputServiceContext::GetKeyMapManager() const
+{
+    return KeyMapMgr;
 }
 
 void InputServiceContext::AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate)

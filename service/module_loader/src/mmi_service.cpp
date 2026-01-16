@@ -58,6 +58,9 @@
 #endif // OHOS_BUILD_ENABLE_WATCH
 #include "ipc_skeleton.h"
 #include "i_preference_manager.h"
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+#include "joystick_event_interface.h"
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #include "key_auto_repeat.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
@@ -3174,6 +3177,9 @@ void MMIService::SetMmiServicePriority(int32_t tid)
 void MMIService::PreEventLoop()
 {
     // LCOV_EXCL_START
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    JOYSTICK_NORMALIZER->AttachInputServiceContext(serviceContext_);
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     AddSessionObserver();
 #endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)

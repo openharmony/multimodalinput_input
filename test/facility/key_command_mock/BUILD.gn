@@ -14,7 +14,10 @@
 import("../../../multimodalinput_mini.gni")
 
 config("key_command_mock_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/test/facility/event_handler_mock/include",
+  ]
 }
 
 ohos_source_set("key_command_mock") {

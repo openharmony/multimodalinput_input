@@ -21,7 +21,9 @@ ohos_prebuilt_etc("input_joystick_layout") {
 }
 
 group("input_joystick_etc") {
-  deps = [
-    ":input_joystick_layout",
-  ]
+  if (input_feature_joystick) {
+    deps = [
+      ":input_joystick_layout",
+    ]
+  }
 }

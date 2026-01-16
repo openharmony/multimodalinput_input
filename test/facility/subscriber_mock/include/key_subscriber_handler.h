@@ -30,8 +30,10 @@ public:
     IKeySubscriberHandler() = default;
     virtual ~IKeySubscriberHandler() = default;
 
+    virtual void InitDataShareListener() = 0;
     virtual int32_t SubscribeKeyEvent(SessionPtr, int32_t, const std::shared_ptr<KeyOption>) = 0;
     virtual int32_t UnsubscribeKeyEvent(SessionPtr, int32_t) = 0;
+    virtual void ResetSkipPowerKeyUpFlag() = 0;
 };
 
 class KeySubscriberHandler : public IKeySubscriberHandler {
@@ -39,11 +41,13 @@ public:
     KeySubscriberHandler() = default;
     virtual ~KeySubscriberHandler() override = default;
 
+    MOCK_METHOD(void, InitDataShareListener, ());
     MOCK_METHOD(void, HandleKeyEvent, (const std::shared_ptr<KeyEvent>));
     MOCK_METHOD(void, HandlePointerEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, SubscribeKeyEvent, (SessionPtr, int32_t, const std::shared_ptr<KeyOption>));
     MOCK_METHOD(int32_t, UnsubscribeKeyEvent, (SessionPtr, int32_t));
+    MOCK_METHOD(void, ResetSkipPowerKeyUpFlag, ());
 };
 } // namespace MMI
 } // namespace OHOS
