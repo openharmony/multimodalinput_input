@@ -133,8 +133,8 @@ void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
         MMI_HILOGE("The windowId is negative number and no system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "windowId is negative number and no system applications use system API");
- 	    return;
- 	}
+        return;
+    }
     if (ret != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
@@ -187,8 +187,8 @@ void SetPointerStyleSyncImpl(int32_t windowId, TaihePointerStyle pointerStyle)
         MMI_HILOGE("The windowId is negative number and no system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "windowId is negative number and no system applications use system API");
- 	    return;
- 	}
+        return;
+    }
     if (ret != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
