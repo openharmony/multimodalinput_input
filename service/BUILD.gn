@@ -131,10 +131,6 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_EMULATOR" ]
   }
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_service_path}/joystick/include" ]
-  }
-
   if (input_feature_key_hook) {
     include_dirs += [ "${mmi_service_path}/event_hook/include" ]
   }
@@ -435,13 +431,6 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (input_feature_joystick) {
-    sources += [
-      "joystick/src/joystick_event_normalize.cpp",
-      "joystick/src/joystick_event_processor.cpp",
-      "joystick/src/joystick_layout_map.cpp",
-    ]
-  }
   if (input_feature_monitor) {
     sources += [
       "monitor/src/event_monitor_handler.cpp",
@@ -479,7 +468,6 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":mmi_device_config.ini",
     ":mmi_rust",
-    "${mmi_path}/common/property_name_mapper:property_name_mapper",
     "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/intention/prototype:input_service_prototype",
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
@@ -505,6 +493,10 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_touchscreen && input_feature_monitor) {
     deps += [ "${mmi_path}/service/touch_event_normalize:touch_gesture_manager" ]
+  }
+
+  if (input_feature_joystick) {
+    deps += [ "${mmi_path}/service/joystick:joystick_event_normalization" ]
   }
 
   external_deps = [
@@ -902,10 +894,6 @@ ohos_unittest("KeyShortcutManagerTest") {
 
   if (input_ext_feature_anco) {
     include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
-  }
-
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
   }
 
   sources = [
@@ -1594,10 +1582,6 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "${mmi_path}/service/event_hook/include/checker",
     "window_manager/test",
   ]
-
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
 
   sources = [ "window_manager/test/input_windows_manager_one_test.cpp" ]
 
@@ -2697,10 +2681,6 @@ ohos_unittest("InputEventHandlerTest") {
     "${mmi_path}/service/event_hook/include/checker",
   ]
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
-
   sources = [ "event_handler/test/input_event_handler_test.cpp" ]
 
   deps = [
@@ -2798,6 +2778,10 @@ ohos_unittest("EventHandlerEXTest") {
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
   ]
+
+  if (input_feature_joystick) {
+    deps += [ "${mmi_path}/service/joystick:joystick_event_normalization" ]
+  }
 
   external_deps = [
     "cJSON:cjson",
@@ -3707,10 +3691,6 @@ ohos_unittest("EventDispatchOrderCheckerTest") {
     "${mmi_path}/util/common/include",
   ]
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
-
   sources = [ "event_hook/test/event_dispatch_order_checker_test.cpp" ]
 
   deps = [
@@ -3787,10 +3767,6 @@ ohos_unittest("EventLoopClosureCheckerTest") {
     "${mmi_path}/test/facility/mock/include",
     "${mmi_path}/util/common/include",
   ]
-
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
 
   sources = [ "event_hook/test/event_loop_closure_checker_test.cpp" ]
 
@@ -3871,10 +3847,6 @@ ohos_unittest("KeyEventHookManagerTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/timer_manager/include",
   ]
-
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
 
   sources = [ "event_hook/test/key_event_hook_manager_test.cpp" ]
 
@@ -4009,10 +3981,6 @@ ohos_unittest("InputEventHookManagerTest") {
     "${mmi_path}/service/common/setting_datashare/include",
   ]
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
-
   sources = [
     "event_hook/test/input_event_hook_manager_test.cpp",
     "event_hook/src/hook/input_event_hook.cpp",
@@ -4101,10 +4069,6 @@ ohos_unittest("KeyLoopClosureCheckerTest") {
     "${mmi_path}/service/common/setting_datashare/include",
   ]
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
-
   sources = [ "event_hook/test/key_loop_closure_checker_test.cpp" ]
 
   deps = [
@@ -4187,10 +4151,6 @@ ohos_unittest("PointerLoopClosureCheckerTest") {
     "${mmi_path}/service/common/include",
   ]
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
-
   sources = [ "event_hook/test/pointer_loop_closure_checker_test.cpp" ]
 
   deps = [
@@ -4272,10 +4232,6 @@ ohos_unittest("PointerEventHookTest") {
     "${mmi_path}/service/event_hook/include/checker",
     "${mmi_path}/service/common/include",
   ]
-
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
 
   sources = [
     "event_hook/test/pointer_event_hook_test.cpp",
@@ -4365,10 +4321,6 @@ ohos_unittest("KeyEventHookTest") {
     "${mmi_path}/service/common/setting_datashare/include",
   ]
 
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
-
   sources = [
     "event_hook/test/key_event_hook_test.cpp",
     "event_hook/src/hook/input_event_hook.cpp",
@@ -4456,10 +4408,6 @@ ohos_unittest("InputEventHookTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/setting_datashare/include",
   ]
-
-  if (input_feature_joystick) {
-    include_dirs += [ "${mmi_path}/service/joystick/include" ]
-  }
 
   sources = [
     "event_hook/test/input_event_hook_test.cpp",

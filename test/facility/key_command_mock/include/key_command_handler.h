@@ -17,6 +17,7 @@
 #define MMI_KEY_COMMAND_HANDLER_MOCK_H
 
 #include <gmock/gmock.h>
+#include "i_input_event_handler.h"
 #include "key_event.h"
 #include "pointer_event.h"
 
@@ -34,7 +35,7 @@ struct Sequence {
     std::vector<SequenceKey> sequenceKeys;
 };
 
-class IKeyCommandHandler {
+class IKeyCommandHandler : public IInputEventHandler {
 public:
     IKeyCommandHandler() = default;
     virtual ~IKeyCommandHandler() = default;
@@ -49,6 +50,8 @@ public:
     virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     virtual bool SkipKnuckleDetect() = 0;
+    virtual void InitKeyObserver() = 0;
+    virtual int32_t SetIsFreezePowerKey(const std::string) = 0;
 };
 
 class KeyCommandHandler : public IKeyCommandHandler {
@@ -66,6 +69,8 @@ public:
     MOCK_METHOD(void, HandleTouchEvent, (const std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_TOUCH
     MOCK_METHOD(bool, SkipKnuckleDetect, ());
+    MOCK_METHOD(void, InitKeyObserver, ());
+    MOCK_METHOD(int32_t, SetIsFreezePowerKey, (const std::string));
 };
 } // namespace MMI
 } // namespace OHOS

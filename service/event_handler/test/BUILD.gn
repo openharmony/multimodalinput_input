@@ -43,6 +43,7 @@ ohos_unittest("EventNormalizeHandlerTestWithMock") {
     "${mmi_path}/service/account_manager/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/crown_transform_processor/include",
+    "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/dfx/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/event_handler/include",
@@ -68,6 +69,7 @@ ohos_unittest("EventNormalizeHandlerTestWithMock") {
   deps = [
     "${mmi_path}/common/property_name_mapper:property_name_mapper",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
     "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
     "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",

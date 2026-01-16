@@ -21,11 +21,12 @@
 #include <memory>
 #include <mutex>
 
-#include <singleton.h>
+#include "i_timer_manager.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
-class TimerManager final {
+class TimerManager final : public ITimerManager {
 public:
     static std::shared_ptr<TimerManager> GetInstance();
 
@@ -34,8 +35,10 @@ public:
     DISALLOW_COPY_AND_MOVE(TimerManager);
 
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
+        const std::string &name = std::string()) override;
+    int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
         const std::string &name = std::string());
-    int32_t RemoveTimer(int32_t timerId);
+    int32_t RemoveTimer(int32_t timerId, const std::string &name = std::string()) override;
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);
 

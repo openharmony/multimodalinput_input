@@ -101,6 +101,10 @@ group("multimodalinput_mmi_service") {
     "util/screen_capture:libmmi-screen_capture",
     "service:libmmi-server-common",
   ]
+
+  if (input_feature_joystick) {
+    deps += [ "${mmi_path}/service/joystick:mmi_joystick_event_normalization" ]
+  }
 }
 
 group("input-third-mmi") {

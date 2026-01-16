@@ -16,7 +16,9 @@
 #ifndef JOYSTICK_EVENT_PROCESSOR_H
 #define JOYSTICK_EVENT_PROCESSOR_H
 
-#include "linux/input.h"
+#include <linux/input.h>
+
+#include "i_input_service_context.h"
 #include "joystick_layout_map.h"
 
 namespace OHOS {
@@ -43,7 +45,7 @@ public:
     static std::string MapAxisName(PointerEvent::AxisType axis);
     static bool IsCentrosymmetric(PointerEvent::AxisType axis);
 
-    explicit JoystickEventProcessor(int32_t deviceId);
+    JoystickEventProcessor(IInputServiceContext *env, int32_t deviceId);
     ~JoystickEventProcessor() = default;
     DISALLOW_COPY_AND_MOVE(JoystickEventProcessor);
 
@@ -55,6 +57,7 @@ public:
 
 private:
     void Initialize();
+    void InitializeFrom(const IInputDeviceManager::IInputDevice &dev);
     void InitializeAxisInfo(struct libinput_device *device, const char *name, AxisInfo &axisInfo) const;
     int32_t MapKey(struct libinput_device *device, int32_t rawCode) const;
     void PressButton(int32_t button);
@@ -74,6 +77,7 @@ private:
     static const std::unordered_map<PointerEvent::AxisType, std::string> axisNames_;
     static const std::set<PointerEvent::AxisType> centrosymmetricAxes_;
 
+    IInputServiceContext *env_ { nullptr };
     const int32_t deviceId_ { -1 };
     std::set<int32_t> pressedButtons_;
     std::shared_ptr<JoystickLayoutMap> layout_ { nullptr };
