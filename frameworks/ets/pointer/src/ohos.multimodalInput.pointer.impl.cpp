@@ -84,6 +84,14 @@ const static std::map<int32_t, TaihePointerStyle> POINTER_STYLE_TRANSFORMATION =
     { LOADING_IMPL,                                 TaihePointerStyle::key_t::LOADING },
     { RUNNING_IMPL,                                 TaihePointerStyle::key_t::RUNNING },
     { MIDDLE_BTN_EAST_WEST_IMPL,                    TaihePointerStyle::key_t::MIDDLE_BTN_EAST_WEST },
+    { RUNNING_LEFT_IMPL,                            TaihePointerStyle::key_t::RUNNING_LEFT },
+    { RUNNING_RIGHT_IMPL,                           TaihePointerStyle::key_t::RUNNING_RIGHT },
+    { AECH_DEVELOPER_DEFINED_ICON_IMPL,             TaihePointerStyle::key_t::AECH_DEVELOPER_DEFINED_ICON },
+    { SCREENRECORDER_CURSOR_IMPL,                   TaihePointerStyle::key_t::SCREENRECORDER_CURSOR },
+    { LASER_CURSOR_IMPL,                            TaihePointerStyle::key_t::LASER_CURSOR },
+    { LASER_CURSOR_DOT_IMPL,                        TaihePointerStyle::key_t::LASER_CURSOR_DOT },
+    { LASER_CURSOR_DOT_RED_IMPL,                    TaihePointerStyle::key_t::LASER_CURSOR_DOT_RED },
+    { DEVELOPER_DEFINED_ICON_IMPL,                  TaihePointerStyle::key_t::DEVELOPER_DEFINED_ICON },
 };
 
 bool CheckCustomCursor(OHOS::MMI::CustomCursor &cursor)
