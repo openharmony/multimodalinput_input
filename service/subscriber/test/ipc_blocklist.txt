@@ -12,5 +12,4 @@
 # limitations under the License.
 
 [cfi]
-src:*foundation/multimodalinput/input/service/key_command/test/*
-src:*foundation/multimodalinput/input/service/common/setting_datashare/test/*
+src:*foundation/multimodalinput/input/service/subscriber/test/*
