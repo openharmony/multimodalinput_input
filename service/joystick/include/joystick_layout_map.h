@@ -52,11 +52,11 @@ public:
     };
 
     static void AddConfigBasePath(const std::string &basePath);
-    static std::shared_ptr<JoystickLayoutMap> Load(struct libinput_device *device);
+    static std::shared_ptr<JoystickLayoutMap> Load(IInputServiceContext *env, struct libinput_device *device);
     static std::string MapAxisModeName(AxisMode mode);
 
-    JoystickLayoutMap(const std::string &filePath);
-    ~JoystickLayoutMap() = default;
+    JoystickLayoutMap(IInputServiceContext *env, const std::string &filePath);
+    ~JoystickLayoutMap();
     DISALLOW_COPY_AND_MOVE(JoystickLayoutMap);
 
     std::string GetFilePath() const;
@@ -66,7 +66,7 @@ public:
 private:
     static std::string FormatConfigName(struct libinput_device *device);
     static std::string FormatConfigPath(const std::string &name);
-    static std::shared_ptr<JoystickLayoutMap> Load(const std::string &filePath);
+    static std::shared_ptr<JoystickLayoutMap> Load(IInputServiceContext *env, const std::string &filePath);
 
     void OnLoading();
     void OnLoaded();
@@ -81,7 +81,9 @@ private:
 
     static std::vector<std::filesystem::path> configBasePaths_;
     static const std::unordered_map<AxisMode, std::string> axisModeNames_;
+    IInputServiceContext *env_ { nullptr };
     const std::string filePath_;
+    int32_t mapperTimerId_ { -1 };
     std::shared_ptr<PropertyNameMapper> mapper_;
     std::unordered_map<int32_t, Key> keys_;
     std::unordered_map<int32_t, AxisInfo> axes_;

@@ -63,7 +63,13 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount,
     return RET_OK;
 }
 
-int32_t TimerManager::RemoveTimer(int32_t timerId)
+int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount,
+    std::function<void()> callback, const std::string &name)
+{
+    return RET_ERR;
+}
+
+int32_t TimerManager::RemoveTimer(int32_t timerId, const std::string &name)
 {
     running_.store(false);
     return RET_OK;

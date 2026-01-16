@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "aggregator.h"
+#include "singleton.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
 

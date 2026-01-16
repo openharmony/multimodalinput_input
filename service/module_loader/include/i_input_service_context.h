@@ -17,8 +17,10 @@
 #define I_INPUT_SERVICE_CONTEXT_H
 
 #include "i_delegate_interface.h"
+#include "i_input_device_manager.h"
 #include "i_input_event_handler.h"
 #include "i_input_windows_manager.h"
+#include "i_key_map_manager.h"
 #include "i_timer_manager.h"
 #include "i_uds_server.h"
 
@@ -35,6 +37,8 @@ public:
     virtual std::shared_ptr<IInputEventHandler> GetMonitorHandler() const = 0;
     virtual std::shared_ptr<ITimerManager> GetTimerManager() const = 0;
     virtual std::shared_ptr<IInputWindowsManager> GetInputWindowsManager() const = 0;
+    virtual std::shared_ptr<IInputDeviceManager> GetDeviceManager() const = 0;
+    virtual std::shared_ptr<IKeyMapManager> GetKeyMapManager() const = 0;
 };
 } // namespace MMI
 } // namespace OHOS

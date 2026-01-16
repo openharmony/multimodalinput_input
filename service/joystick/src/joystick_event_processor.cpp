@@ -17,10 +17,7 @@
 
 #include <iomanip>
 
-#include "i_input_windows_manager.h"
-#include "input_device_manager.h"
-#include "key_map_manager.h"
-#include "key_unicode_transformation.h"
+#include "joystick_event_normalize.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -107,8 +104,8 @@ bool JoystickEventProcessor::IsCentrosymmetric(PointerEvent::AxisType axis)
     return (centrosymmetricAxes_.find(axis) != centrosymmetricAxes_.cend());
 }
 
-JoystickEventProcessor::JoystickEventProcessor(int32_t deviceId)
-    : deviceId_(deviceId)
+JoystickEventProcessor::JoystickEventProcessor(IInputServiceContext *env, int32_t deviceId)
+    : env_(env), deviceId_(deviceId)
 {
     Initialize();
 }
@@ -176,7 +173,14 @@ std::shared_ptr<PointerEvent> JoystickEventProcessor::OnAxisEvent(struct libinpu
         return nullptr;
     }
     pointerEvent_->UpdateId();
-    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto winMgr = JoystickEventNormalize::GetInputWindowsManager(env_);
+    if (winMgr == nullptr) {
+        MMI_HILOGE("No windows manager");
+        return nullptr;
+    }
+    winMgr->UpdateTargetPointer(pointerEvent_);
+#endif // OHOS_BUILD_ENABLE_POINTER
     MMI_HILOGI("Joystick_axis_event, %{public}s", DumpJoystickAxisEvent(pointerEvent_).c_str());
     return pointerEvent_;
 }
@@ -207,7 +211,20 @@ void JoystickEventProcessor::CheckIntention(std::shared_ptr<PointerEvent> pointe
 
 void JoystickEventProcessor::Initialize()
 {
-    auto inputDev = INPUT_DEV_MGR->GetLibinputDevice(deviceId_);
+    auto devMgr = JoystickEventNormalize::GetDeviceManager(env_);
+    if (devMgr == nullptr) {
+        MMI_HILOGE("No device manager");
+        return;
+    }
+    devMgr->ForDevice(deviceId_,
+        [this](const IInputDeviceManager::IInputDevice &dev) {
+            InitializeFrom(dev);
+        });
+}
+
+void JoystickEventProcessor::InitializeFrom(const IInputDeviceManager::IInputDevice &dev)
+{
+    auto inputDev = dev.GetRawDevice();
     if (inputDev == nullptr) {
         MMI_HILOGW("No libinput-device attached to device(%{public}d)", deviceId_);
         return;
@@ -215,11 +232,7 @@ void JoystickEventProcessor::Initialize()
     const char *name = libinput_device_get_name(inputDev);
     const char *devName = (name != nullptr ? name : EMPTY_NAME);
 
-    if (!libinput_device_has_capability(inputDev, LIBINPUT_DEVICE_CAP_JOYSTICK)) {
-        MMI_HILOGI("[%{public}s:%{private}d] Not joystick", devName, deviceId_);
-        return;
-    }
-    layout_ = JoystickLayoutMap::Load(inputDev);
+    layout_ = JoystickLayoutMap::Load(env_, inputDev);
     if (layout_ == nullptr) {
         MMI_HILOGI("[%{public}s:%{private}d] No layout config", devName, deviceId_);
     }
@@ -304,7 +317,12 @@ int32_t JoystickEventProcessor::MapKey(struct libinput_device *device, int32_t r
             return key->keyCode_;
         }
     }
-    return KeyMapMgr->TransferDefaultKeyValue(rawCode);
+    auto keyMapper = JoystickEventNormalize::GetKeyMapManager(env_);
+    if (keyMapper == nullptr) {
+        MMI_HILOGE("No key mapper");
+        return KeyEvent::KEYCODE_UNKNOWN;
+    }
+    return keyMapper->TransferDefaultKeyValue(rawCode);
 }
 
 void JoystickEventProcessor::CheckHAT0X(std::shared_ptr<PointerEvent> pointerEvent,
@@ -372,6 +390,11 @@ void JoystickEventProcessor::UpdateButtonState(const KeyEvent::KeyItem &keyItem)
 
 std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEvent::KeyItem &button)
 {
+    auto keyMapper = JoystickEventNormalize::GetKeyMapManager(env_);
+    if (keyMapper == nullptr) {
+        MMI_HILOGE("No key mapper");
+        return nullptr;
+    }
     auto keyEvent = CleanUpKeyEvent();
     CHKPP(keyEvent);
     int64_t time = GetSysClockTime();
@@ -391,7 +414,7 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEve
     keyItem.SetKeyCode(button.GetKeyCode());
     keyItem.SetDeviceId(deviceId_);
     keyItem.SetPressed(button.IsPressed());
-    keyItem.SetUnicode(KeyCodeToUnicode(button.GetKeyCode(), keyEvent));
+    keyItem.SetUnicode(keyMapper->KeyCodeToUnicode(button.GetKeyCode(), keyEvent));
 
     if (!keyItem.IsPressed()) {
         auto tItem = keyEvent->GetKeyItem(keyItem.GetKeyCode());
@@ -401,8 +424,7 @@ std::shared_ptr<KeyEvent> JoystickEventProcessor::FormatButtonEvent(const KeyEve
         keyEvent->RemoveReleasedKeyItems(keyItem);
     }
     keyEvent->AddPressedKeyItems(keyItem);
-    keyEvent->SetKeyIntention(
-        KeyItemsTransKeyIntention({ keyItem }));
+    keyEvent->SetKeyIntention(keyMapper->KeyItemsTransKeyIntention({ keyItem }));
     keyEvent->UpdateId();
     return keyEvent;
 }

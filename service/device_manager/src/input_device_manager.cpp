@@ -86,6 +86,80 @@ std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
     return instance_;
 }
 
+InputDeviceManager::HiddenInputDevice::HiddenInputDevice(const InputDeviceInfo &devInfo)
+    : devInfo_(devInfo) {}
+
+struct libinput_device* InputDeviceManager::HiddenInputDevice::GetRawDevice() const
+{
+    return devInfo_.inputDeviceOrigin;
+}
+
+std::string InputDeviceManager::HiddenInputDevice::GetName() const
+{
+    auto inputDev = devInfo_.inputDeviceOrigin;
+    if (inputDev == nullptr) {
+        return std::string("null");
+    }
+    auto name = libinput_device_get_name(inputDev);
+    return std::string((name != nullptr) ? name : "null");
+}
+
+bool InputDeviceManager::HiddenInputDevice::IsJoystick() const
+{
+    auto inputDev = devInfo_.inputDeviceOrigin;
+    if (inputDev == nullptr) {
+        return false;
+    }
+    return libinput_device_has_capability(inputDev, LIBINPUT_DEVICE_CAP_JOYSTICK);
+}
+
+bool InputDeviceManager::CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const
+{
+    if (!pred) {
+        return false;
+    }
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.cend()) {
+        return false;
+    }
+    return pred(HiddenInputDevice(iter->second));
+}
+
+void InputDeviceManager::ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const
+{
+    if (!callback) {
+        return;
+    }
+    for (const auto &[deviceId, dev] : inputDevice_) {
+        callback(deviceId, HiddenInputDevice(dev));
+    }
+}
+
+void InputDeviceManager::ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const
+{
+    if (!callback) {
+        return;
+    }
+    if (auto iter = inputDevice_.find(deviceId); iter != inputDevice_.cend()) {
+        callback(HiddenInputDevice(iter->second));
+    }
+}
+
+void InputDeviceManager::ForOneDevice(std::function<bool(int32_t, const IInputDevice&)> pred,
+    std::function<void(int32_t, const IInputDevice&)> callback) const
+{
+    if (!pred || !callback) {
+        return;
+    }
+    for (const auto &[deviceId, dev] : inputDevice_) {
+        HiddenInputDevice inputDev { dev };
+        if (pred(deviceId, inputDev)) {
+            callback(deviceId, inputDev);
+            break;
+        }
+    }
+}
+
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
     CALL_DEBUG_ENTER;
@@ -1187,12 +1261,10 @@ int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> d
     // LCOV_EXCL_START
     CALL_INFO_TRACE;
     CHKPR(device, ERROR_NULL_POINTER);
-    deviceInfo = {
-        .isRemote = false,
-        .isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER),
-        .isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH),
-        .enable = true,
-    };
+    deviceInfo.isRemote = false;
+    deviceInfo.isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    deviceInfo.isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    deviceInfo.enable = true;
     return RET_OK;
     // LCOV_EXCL_STOP
 }

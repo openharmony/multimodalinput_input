@@ -28,18 +28,17 @@ namespace OHOS {
 namespace MMI {
 class IJoystickEventNormalize {
 public:
-    static std::shared_ptr<IJoystickEventNormalize> GetInstance();
-
     IJoystickEventNormalize() = default;
     virtual ~IJoystickEventNormalize() = default;
 
+    virtual void OnDeviceAdded(int32_t deviceId) = 0;
+    virtual void OnDeviceRemoved(int32_t deviceId) = 0;
+    virtual bool HasJoystick() const = 0;
     virtual std::shared_ptr<KeyEvent> OnButtonEvent(struct libinput_event *event) = 0;
     virtual std::shared_ptr<PointerEvent> OnAxisEvent(struct libinput_event *event) = 0;
     virtual void CheckIntention(std::shared_ptr<PointerEvent> pointerEvent,
         std::function<void(std::shared_ptr<KeyEvent>)> handler) = 0;
 };
-
-#define JOYSTICK_NORMALIZER OHOS::MMI::IJoystickEventNormalize::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // I_JOYSTICK_EVENT_NORMALIZE_H

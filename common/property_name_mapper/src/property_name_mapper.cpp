@@ -17,7 +17,6 @@
 
 #include "component_manager.h"
 #include "key_event.h"
-#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -30,18 +29,20 @@ namespace {
 constexpr char LIB_PROPERTY_NAME_MAPPER_NAME[] { "libmmi_property_name_mapper.z.so" };
 constexpr int32_t DEFAULT_UNLOAD_DELAY_TIME { 30000 };
 constexpr int32_t REPEAT_ONCE { 1 };
-}
+} // namespace
 
 std::shared_mutex PropertyNameMapper::mutex_ {};
 std::shared_ptr<PropertyNameMapper> PropertyNameMapper::instance_ { nullptr };
 int32_t PropertyNameMapper::timerId_ { -1 };
 
-std::shared_ptr<PropertyNameMapper> PropertyNameMapper::Load(UnloadOption option)
+std::shared_ptr<PropertyNameMapper> PropertyNameMapper::Load(IInputServiceContext *env, UnloadOption option)
 {
     std::unique_lock guard { mutex_ };
-    TimerMgr->RemoveTimer(timerId_);
-    timerId_ = -1;
-
+    auto timerMgr = PropertyNameMapper::GetTimerManager(env);
+    if (timerMgr != nullptr) {
+        timerMgr->RemoveTimer(timerId_);
+        timerId_ = -1;
+    }
     if (instance_ == nullptr) {
         instance_ = std::make_shared<PropertyNameMapper>();
         if (instance_ == nullptr) {
@@ -58,33 +59,40 @@ std::shared_ptr<PropertyNameMapper> PropertyNameMapper::Load(UnloadOption option
     if (option != UnloadOption::UNLOAD_AUTOMATICALLY_WITH_DELAY) {
         return instance_;
     }
-
-    timerId_ = TimerMgr->AddTimer(
-        DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
-        []() {
-            PropertyNameMapper::Unload(UnloadOption::UNLOAD_AUTOMATICALLY);
-        });
+    if (timerMgr != nullptr) {
+        timerId_ = timerMgr->AddTimer(
+            DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
+            []() {
+                PropertyNameMapper::timerId_ = -1;
+                PropertyNameMapper::Unload(nullptr, UnloadOption::UNLOAD_AUTOMATICALLY);
+            });
+    }
     return instance_;
 }
 
-void PropertyNameMapper::Unload(UnloadOption option)
+void PropertyNameMapper::Unload(IInputServiceContext *env, UnloadOption option)
 {
     std::unique_lock guard { mutex_ };
     if (instance_ == nullptr) {
         return;
     }
-    TimerMgr->RemoveTimer(timerId_);
-    timerId_ = -1;
-
+    auto timerMgr = PropertyNameMapper::GetTimerManager(env);
+    if (timerMgr != nullptr) {
+        timerMgr->RemoveTimer(timerId_);
+        timerId_ = -1;
+    }
     if (option != UnloadOption::UNLOAD_AUTOMATICALLY_WITH_DELAY) {
         instance_ = nullptr;
         return;
     }
-    timerId_ = TimerMgr->AddTimer(
-        DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
-        []() {
-            PropertyNameMapper::Unload(UnloadOption::UNLOAD_AUTOMATICALLY);
-        });
+    if (timerMgr != nullptr) {
+        timerId_ = timerMgr->AddTimer(
+            DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
+            []() {
+                PropertyNameMapper::timerId_ = -1;
+                PropertyNameMapper::Unload(nullptr, UnloadOption::UNLOAD_AUTOMATICALLY);
+            });
+    }
 }
 
 int32_t PropertyNameMapper::MapKey(const std::string &name) const
@@ -100,6 +108,15 @@ PointerEvent::AxisType PropertyNameMapper::MapAxis(const std::string &name) cons
 {
     CHKPR(mapper_, PointerEvent::AXIS_TYPE_UNKNOWN);
     return mapper_->MapAxis(name);
+}
+
+std::shared_ptr<ITimerManager> PropertyNameMapper::GetTimerManager(IInputServiceContext *env)
+{
+    if (env == nullptr) {
+        MMI_HILOGE("Env is null");
+        return nullptr;
+    }
+    return env->GetTimerManager();
 }
 
 void PropertyNameMapper::LoadPropertyNameMap()

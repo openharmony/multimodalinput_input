@@ -65,6 +65,9 @@ public:
         IComponent *instance_ { nullptr };
     };
 
+    template<typename IComponent>
+    using Handle = std::unique_ptr<IComponent, Component<IComponent>>;
+
     ComponentManager() = default;
     ~ComponentManager() = default;
     DISALLOW_COPY_AND_MOVE(ComponentManager);
