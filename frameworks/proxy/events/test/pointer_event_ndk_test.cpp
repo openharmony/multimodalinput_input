@@ -32,6 +32,11 @@ struct Input_TouchEvent {
     int64_t actionTime { -1 };
     int32_t windowId { -1 };
     int32_t displayId { -1 };
+    int32_t windowX { 0 };
+    int32_t windowY { 0 };
+    int64_t downTime { 0 };
+    Input_TouchEventToolType toolType { Input_TouchEventToolType::TOOL_TYPE_FINGER };
+    double pressure { 0.0 };
 };
 
 namespace OHOS {
@@ -205,6 +210,45 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
     std::shared_ptr<OHOS::MMI::PointerEvent> result
         = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
     EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_ValidWindowX
+ * @tc.desc: Test the function OH_Input_TouchEventToPointerEvent with valid windowX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent inputTouchEvent;
+    inputTouchEvent.actionTime = 100;
+    inputTouchEvent.action = TOUCH_ACTION_DOWN;
+    inputTouchEvent.id = 1;
+    inputTouchEvent.displayX = 100;
+    inputTouchEvent.displayY = 200;
+    inputTouchEvent.windowX = 500;
+    inputTouchEvent.windowY = 600;
+    inputTouchEvent.pressure = 0.5;
+    inputTouchEvent.toolType = Input_TouchEventToolType::TOOL_TYPE_PENCIL;
+    inputTouchEvent.downTime = 100;
+    int32_t windowX = 10;
+    int32_t windowY = 1;
+
+    std::shared_ptr<OHOS::MMI::PointerEvent> result
+        = OH_Input_TouchEventToPointerEvent(&inputTouchEvent, windowX, windowY);
+    EXPECT_NE(result, nullptr);
+
+
+    OHOS::MMI::PointerEvent::PointerItem item;
+    auto ret = result->GetPointerItem(result->GetPointerId(), item);
+    EXPECT_TRUE(ret);
+
+    EXPECT_EQ(item.GetWindowX(), windowX);
+    EXPECT_EQ(item.GetWindowY(), windowY);
+    EXPECT_EQ(item.GetToolType(), inputTouchEvent.toolType);
+    EXPECT_EQ(item.GetPressure(), inputTouchEvent.pressure);
+    EXPECT_EQ(item.GetDownTime(), inputTouchEvent.downTime);
 }
 } // namespace MMI
 } // namespace OHOS
