@@ -68,10 +68,10 @@ bool DelegateTasks::Init()
         return false;
     }
     if (fds_[0] >= 0) {
-        fdsan_exchange_owner_tag(fd_[0], 0, TAG);
+        fdsan_exchange_owner_tag(fds_[0], 0, TAG);
     }
     if (fds_[1] >= 0) {
-        fdsan_exchange_owner_tag(fd_[1], 0, TAG);
+        fdsan_exchange_owner_tag(fds_[1], 0, TAG);
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl read failed, errno:%{public}d", errno);
