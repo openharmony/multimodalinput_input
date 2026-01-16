@@ -100,9 +100,9 @@
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "input_screen_capture_agent.h"
 #endif // PLAYER_FRAMEWORK_EXISTS
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
 #include "tablet_subscriber_handler.h"
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
 #include "config_policy_utils.h"
 #include "drag_security_manager.h"
 #undef MMI_LOG_TAG
@@ -2792,7 +2792,7 @@ ErrCode MMIService::SubscribeTabletProximity(int32_t subscribeId)
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2805,7 +2805,7 @@ ErrCode MMIService::SubscribeTabletProximity(int32_t subscribeId)
         MMI_HILOGE("The subscribe tablet event processed failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
     return RET_OK;
 }
 
@@ -2824,7 +2824,7 @@ ErrCode MMIService::UnsubscribetabletProximity(int32_t subscribeId)
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
     }
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
@@ -2837,7 +2837,7 @@ ErrCode MMIService::UnsubscribetabletProximity(int32_t subscribeId)
         MMI_HILOGE("The unsubscribe tablet event processed failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
     return RET_OK;
 }
 

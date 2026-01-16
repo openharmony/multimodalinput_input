@@ -222,16 +222,25 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
         case LIBINPUT_EVENT_POINTER_BUTTON:
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
         case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD:
         case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN:
-        case LIBINPUT_EVENT_POINTER_AXIS:
         case LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END:
         case LIBINPUT_EVENT_POINTER_TAP:
-        case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
+        case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD:
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
+        case LIBINPUT_EVENT_POINTER_AXIS: {
             if (g_isSwipeInward &&
                 type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
                 break;
             }
+#ifndef OHOS_BUILD_ENABLE_TOUCHPAD
+            auto id = INPUT_DEV_MGR->FindInputDeviceId(device);
+            auto ids = INPUT_DEV_MGR->GetTouchPadIds();
+            if (std::find(ids.begin(), ids.end(), id) != ids.end()) {
+                break;
+            }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
             HandleMouseEvent(event);
             DfxHisysevent::CalcPointerDispTimes();
             break;
@@ -876,7 +885,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package penEvent");
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
@@ -891,7 +900,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #else
     MMI_HILOGW("TableTool device does not support");
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_WATCH

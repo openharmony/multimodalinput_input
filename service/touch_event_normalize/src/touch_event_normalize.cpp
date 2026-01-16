@@ -17,9 +17,9 @@
 
 #include "input_device_manager.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
 #include "tablet_tool_tranform_processor.h"
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
 #include "touch_transform_processor.h"
 #include "remote_control_transform_processor.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -113,12 +113,12 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
             break;
         }
 #endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
         case DeviceType::TABLET_TOOL: {
             processor = std::make_shared<TabletToolTransformProcessor>(deviceId);
             break;
         }
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
         case DeviceType::TOUCH_PAD: {
             processor = std::make_shared<TouchPadTransformProcessor>(deviceId);

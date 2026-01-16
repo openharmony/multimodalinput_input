@@ -347,7 +347,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/cursor_drawing_component.cpp",
     "drag_security/src/drag_security_manager.cpp"
   ]
-  if (input_feature_tablet) {
+  if (input_feature_pen) {
     sources +=
       [ "subscriber/src/tablet_subscriber_handler.cpp" ]
   }
@@ -577,7 +577,7 @@ ohos_shared_library("libmmi-server") {
 
     deps += [ "${mmi_path}/etc/mouse_icon:input_mouse_icon" ]
 
-    if (input_feature_tablet) {
+    if (input_feature_pen) {
       sources +=
           [ "touch_event_normalize/src/tablet_tool_tranform_processor.cpp" ]
     }

@@ -68,7 +68,7 @@ declare_args() {
   input_feature_drag_security = false
   input_feature_knuckle = true
   input_feature_touchpad = true
-  input_feature_tablet = true
+  input_feature_pen = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
@@ -346,7 +346,7 @@ print(
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 print("input_feature_external_screen = ${input_feature_external_screen}")
 print("input_feature_touchpad = ${input_feature_touchpad}")
-print("input_feature_tablet = ${input_feature_tablet}")
+print("input_feature_pen = ${input_feature_pen}")
 
 input_default_defines = []
 
@@ -563,6 +563,6 @@ if (input_feature_touchpad) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCHPAD" ]
 }
 
-if (input_feature_tablet) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_TABLET" ]
+if (input_feature_pen) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_PEN" ]
 }
