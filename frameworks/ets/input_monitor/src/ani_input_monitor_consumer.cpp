@@ -57,9 +57,6 @@ std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
     { "rotate", HANDLE_EVENT_TYPE_ROTATE },
     { "threeFingersTap", HANDLE_EVENT_TYPE_THREEFINGERSTAP },
     { "fingerprint", HANDLE_EVENT_TYPE_FINGERPRINT },
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-    { "xKey", HANDLE_EVENT_TYPE_X_KEY },
-#endif // OHOS_BUILD_ENABLE_X_KEY
 };
 
 std::map<std::string, int32_t> TO_HANDLE_PRE_EVENT_TYPE = {
@@ -106,9 +103,6 @@ void AniInputMonitorConsumer::initFuncInfo()
             {"touchscreenSwipe", &AniInputMonitorConsumer::OnTouchScreenPinchCallback}},
         { MONITORFUNTYPE::ON_TOUCHSCREENPINCH_FINGERS,
             {"touchscreenPinch", &AniInputMonitorConsumer::OnTouchScreenPinchCallback}},
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-       { MONITORFUNTYPE::ON_X_KEY, {"xKey",  &AniInputMonitorConsumer::OnXkeyCallback}},
-#endif // OHOS_BUILD_ENABLE_X_KEY
         { MONITORFUNTYPE::ON_KEYPRESSED_KEYS, {"keyPressed", std::monostate{}}},
     };
 }
@@ -656,21 +650,6 @@ bool AniInputMonitorConsumer::IsFingerprint(std::shared_ptr<PointerEvent> pointe
     return false;
 }
 
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-bool AniInputMonitorConsumer::IsXKey(std::shared_ptr<PointerEvent> pointerEvent) const
-{
-    if (!pointerEvent) {
-        MMI_HILOGE("pointerEvent is null");
-        return false;
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_X_KEY) {
-        return true;
-    }
-    MMI_HILOGD("Not X-key event.");
-    return false;
-}
-#endif // OHOS_BUILD_ENABLE_X_KEY
-
 void AniInputMonitorConsumer::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1005,26 +984,6 @@ void AniInputMonitorConsumer::OnTouchScreenPinchCallback(std::shared_ptr<Pointer
     func(result);
 }
 
-#ifdef OHOS_BUILD_ENABLE_X_KEY
-void AniInputMonitorConsumer::OnXkeyCallback(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_DEBUG_ENTER;
-    if (!pointerEvent) {
-        MMI_HILOGE("pointerEvent is null.");
-        return;
-    }
-    if (!aniCallback_) {
-        MMI_HILOGE("Callback object is null");
-        return;
-    }
-    if (!IsXKey(pointerEvent)) {
-        MMI_HILOGE("Not Xkey.");
-        return;
-    }
-    // [static] The definition is not found in the interface.
-}
-#endif // OHOS_BUILD_ENABLE_X_KEY
-
 void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1062,8 +1021,7 @@ void AniInputMonitorConsumer::OnPerPointerEvent(std::shared_ptr<PointerEvent> po
     bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
         typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
         typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward" ||
-        typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE ||
-        typeName == "xKey";
+        typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE;
     if (typeNameFlag) {
         if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
             pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
