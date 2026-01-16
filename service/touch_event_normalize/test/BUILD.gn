@@ -66,7 +66,7 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
       "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     ]
   }
-  if (input_feature_tablet) {
+  if (input_feature_pen) {
     sources += [
       "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
     ]
