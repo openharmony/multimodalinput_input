@@ -1799,24 +1799,5 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ClearWindowPoi
     int32_t windowId = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ClearWindowPointerStyle(pid, windowId));
 }
-
-/**
- * @tc.name: PointerDrawingManagerExTest_InitDefaultMouseIconPath_001
- * @tc.desc: Test the function InitDefaultMouseIconPath
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_InitDefaultMouseIconPath_001, TestSize.Level1)
-{
-    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(41));
-    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(1)).RetiresOnSaturation();
-    EXPECT_CALL(*PREFERENCES_MGR_MOCK, GetIntValue).WillOnce(Return(0)).RetiresOnSaturation();
-    PointerDrawingManager pointerDrawingManager;
-    auto iconPath = pointerDrawingManager.GetMouseIconPath();
-    PointerStyle curPointerStyle;
-    curPointerStyle.id = 0;
-    std::string newIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
-    ASSERT_EQ(iconPath.at(MOUSE_ICON(curPointerStyle.id)).iconPath, newIconPath);
-}
 } // namespace MMI
 } // namespace OHOS

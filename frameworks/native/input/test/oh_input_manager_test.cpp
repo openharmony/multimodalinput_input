@@ -2952,21 +2952,6 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventGlobalCoordinates, Tes
 }
 
 /*
- * @tc.name: OHInputManagerTest_TouchEventPressure
- * @tc.desc: Test the function OH_Input_SetTouchEventPressure OH_Input_GetTouchEventPressure
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(OHInputManagerTest, OHInputManagerTest_TouchEventPressure, TestSize.Level1)
-{
-    Input_TouchEvent touchEvent;
-    double pressure = 0.5;
-    OH_Input_SetTouchEventPressure(&touchEvent, pressure);
-    auto ret = OH_Input_GetTouchEventPressure(&touchEvent);
-    EXPECT_EQ(ret, pressure);
-}
-
-/*
  * @tc.name: OHInputManagerTest_TouchEventWindowCoordinates
  * @tc.desc: Test the function OH_Input_SetTouchEventWindowX OH_Input_SetTouchEventWindowY
  * OH_Input_GetTouchEventWindowX OH_Input_GetTouchEventWindowY

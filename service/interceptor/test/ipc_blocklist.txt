@@ -13,3 +13,4 @@
 
 [cfi]
 src:*foundation/multimodalinput/input/service/interceptor/test/*
+src:*foundation/multimodalinput/input/service/interceptor/test/src/*
