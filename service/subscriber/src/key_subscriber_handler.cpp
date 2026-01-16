@@ -37,9 +37,9 @@
 #include "setting_datashare.h"
 #include "util_ex.h"
 #include "want.h"
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
 #include "tablet_subscriber_handler.h"
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
 #include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -117,9 +117,9 @@ void KeySubscriberHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent
 void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_TABLET
+#ifdef OHOS_BUILD_ENABLE_PEN
     TABLET_SCRIBER_HANDLER->HandleTabletEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TABLET
+#endif // OHOS_BUILD_ENABLE_PEN
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
