@@ -3212,11 +3212,11 @@ bool MMIService::InitSignalHandler()
         MMI_HILOGE("Signal fd failed:%{public}d", errno);
         return false;
     }
-
+    fdsan_exchange_owner_tag(fdSignal, 0, TAG);
     retCode = AddEpoll(EPOLL_EVENT_SIGNAL, fdSignal);
     if (retCode < 0) {
         MMI_HILOGE("AddEpoll signalFd failed:%{public}d", retCode);
-        close(fdSignal);
+        fdsan_close_with_tag(fdSignal, TAG);
         return false;
     }
     return true;

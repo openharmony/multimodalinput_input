@@ -38,7 +38,7 @@ void UDSServer::UdsStop()
     if (epollFd_ != -1) {
         int32_t tmpFd = epollFd_;
         epollFd_ = -1;
-        close(tmpFd);
+        fdsan_close_with_tag(tmpFd, TAG);
     }
     auto tmpMap = GetSessionMapCopy();
     for (const auto &item : tmpMap) {

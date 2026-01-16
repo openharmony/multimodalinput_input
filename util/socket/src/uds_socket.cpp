@@ -35,6 +35,7 @@ int32_t UDSSocket::EpollCreate(int32_t size)
         MMI_HILOGE("Epoll create failed, epollFd:%{public}d", epollFd_);
     } else {
         MMI_HILOGI("Epoll create successfully, epollFd:%{public}d", epollFd_);
+        fdsan_exchange_owner_tag(epollFd_, 0, TAG);
     }
     return epollFd_;
 }
@@ -127,7 +128,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCall
 void UDSSocket::EpollClose()
 {
     if (epollFd_ >= 0) {
-        close(epollFd_);
+        fdsan_close_with_tag(epollFd_, TAG);
         epollFd_ = -1;
     }
 }

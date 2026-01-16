@@ -155,6 +155,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         for (int32_t i = 0; i < MAX_RETRY_COUNT; i++) {
             fd = open(realPath, flags);
             if (fd >= 0) {
+                fdsan_exchange_owner_tag(fd, 0, TAG);
                 break;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
@@ -179,7 +180,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             return;
         }
         MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
-        close(fd);
+        fdsan_close_with_tag(fd, TAG);
     },
 };
 
@@ -292,10 +293,6 @@ void LibinputAdapter::Stop()
 {
     CALL_DEBUG_ENTER;
     hotplugDetector_.Stop();
-    if (fd_ >= 0) {
-        close(fd_);
-        fd_ = -1;
-    }
     if (input_ != nullptr) {
         libinput_unref(input_);
         input_ = nullptr;
