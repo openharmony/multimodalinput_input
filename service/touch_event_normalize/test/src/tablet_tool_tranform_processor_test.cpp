@@ -18,10 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
+#include "input_device_manager.h"
+#include "input_windows_manager_mock.h"
 #include "libinput_mock.h"
 #include "tablet_tool_tranform_processor.h"
-
-#include "input_device_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TabletToolTranformProcessorTest"
@@ -553,19 +553,19 @@ HWTEST_F(TabletToolTranformProcessorTest, DrawTouchGraphicDrawing_006, TestSize.
     EXPECT_CALL(*WIN_MGR_MOCK, DrawTouchGraphic).Times(Exactly(2));
     int32_t deviceId { 2 };
     TabletToolTransformProcessor processor(deviceId);
-    processor.pointerevent_ = PointerEvent::Create();
-    ASSERT_NE(processor.pointerevent_, nullptr);
-    processor.pointerevent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE)
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicDrawing());
 
     int32_t pointerId = 1;
     PointerEvent::PointerItem item {};
     item.SetPressed(false);
     item.SetPointerId(pointerId);
-    processor.pointerevent_->RemoveAllPointerItems();
-    processor.pointerevent_->UpdatePointerItem(pointerId, item);
+    processor.pointerEvent_->RemoveAllPointerItems();
+    processor.pointerEvent_->UpdatePointerItem(pointerId, item);
     EXPECT_NO_FATAL_FAILURE(processor.DrawTouchGraphicDrawing());
-    EXPECT_EQ(processor.pointerevent_->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_EQ(processor.pointerEvent_->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
     InputWindowsManagerMock::ReleaseInstance();
 }
 

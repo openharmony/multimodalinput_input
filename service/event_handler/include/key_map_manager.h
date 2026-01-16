@@ -18,13 +18,14 @@
 
 #include <map>
 
+#include "i_key_map_manager.h"
 #include "key_event_value_transformation.h"
 #include "libinput.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-class KeyMapManager final {
+class KeyMapManager final : public IKeyMapManager {
     DECLARE_DELAYED_SINGLETON(KeyMapManager);
 public:
     DISALLOW_COPY_AND_MOVE(KeyMapManager);
@@ -34,9 +35,12 @@ public:
     std::string GetProFilePath(const std::string &fileName) const;
     std::string GetKeyEventFileName(struct libinput_device *device);
     int32_t GetDefaultKeyId();
-    int32_t TransferDefaultKeyValue(int32_t inputKey);
+    int32_t TransferDefaultKeyValue(int32_t inputKey) override;
     int32_t TransferDeviceKeyValue(struct libinput_device *device, int32_t inputKey);
     std::vector<int32_t> InputTransferKeyValue(int32_t deviceId, int32_t keyCode);
+    uint32_t KeyCodeToUnicode(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items) override;
+
 private:
     std::map<int32_t, std::map<int32_t, int32_t>> configKeyValue_;
     int32_t defaultKeyId_ { -1 };

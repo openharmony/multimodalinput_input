@@ -18,13 +18,14 @@
 
 #include "device_config_file_parser.h"
 #include "device_observer.h"
+#include "i_input_device_manager.h"
 #include "input_device.h"
 #include "uds_session.h"
 #include <shared_mutex>
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager final {
+class InputDeviceManager final : public IInputDeviceManager {
 private:
     struct InputDeviceInfo {
         struct libinput_device *inputDeviceOrigin { nullptr };
@@ -40,11 +41,33 @@ private:
         VendorConfig vendorConfig;
     };
 
+    class HiddenInputDevice final : public IInputDevice {
+    public:
+        HiddenInputDevice(const InputDeviceInfo &devInfo);
+        HiddenInputDevice(const HiddenInputDevice &other) = default;
+        HiddenInputDevice(HiddenInputDevice &&other) = default;
+        ~HiddenInputDevice() = default;
+        HiddenInputDevice& operator=(const HiddenInputDevice &other) = default;
+        HiddenInputDevice& operator=(HiddenInputDevice &&other) = default;
+
+        struct libinput_device* GetRawDevice() const override;
+        std::string GetName() const override;
+        bool IsJoystick() const override;
+
+    private:
+        InputDeviceInfo devInfo_ {};
+    };
+
 public:
     InputDeviceManager() = default;
     ~InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
 
+    bool CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const override;
+    void ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const override;
+    void ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const override;
+    void ForOneDevice(std::function<bool(int32_t, const IInputDevice&)> pred,
+        std::function<void(int32_t, const IInputDevice&)> callback) const override;
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);

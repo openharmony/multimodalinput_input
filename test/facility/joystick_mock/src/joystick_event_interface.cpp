@@ -13,26 +13,21 @@
  * limitations under the License.
  */
 
-#include "joystick_event_normalize.h"
+#include "joystick_event_interface.h"
 
 namespace OHOS {
 namespace MMI {
-std::shared_ptr<JoystickEventNormalize> JoystickEventNormalize::instance_ = nullptr;
+std::shared_ptr<JoystickEventInterface> JoystickEventInterface::instance_ = nullptr;
 
-std::shared_ptr<IJoystickEventNormalize> IJoystickEventNormalize::GetInstance()
-{
-    return JoystickEventNormalize::GetInstance();
-}
-
-std::shared_ptr<JoystickEventNormalize> JoystickEventNormalize::GetInstance()
+std::shared_ptr<JoystickEventInterface> JoystickEventInterface::GetInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = std::make_shared<JoystickEventNormalize>();
+        instance_ = std::make_shared<JoystickEventInterface>();
     }
     return instance_;
 }
 
-void JoystickEventNormalize::ReleaseInstance()
+void JoystickEventInterface::ReleaseInstance()
 {
     instance_.reset();
 }

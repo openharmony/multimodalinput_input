@@ -16,50 +16,36 @@
 #ifndef JOYSTICK_EVENT_NORMALIZE_H
 #define JOYSTICK_EVENT_NORMALIZE_H
 
-#include "device_observer.h"
 #include "i_joystick_event_normalize.h"
 #include "joystick_event_processor.h"
 
 namespace OHOS {
 namespace MMI {
 class JoystickEventNormalize final : public IJoystickEventNormalize {
-private:
-    class InputDeviceObserver final : public IDeviceObserver {
-    public:
-        InputDeviceObserver(std::shared_ptr<JoystickEventNormalize> parent);
-        ~InputDeviceObserver() override = default;
-        DISALLOW_COPY_AND_MOVE(InputDeviceObserver);
-
-        void OnDeviceAdded(int32_t deviceId) override;
-        void OnDeviceRemoved(int32_t deviceId) override;
-        void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
-
-    private:
-        std::weak_ptr<JoystickEventNormalize> parent_;
-    };
-
 public:
-    static std::shared_ptr<JoystickEventNormalize> GetInstance();
-
-    JoystickEventNormalize() = default;
-    ~JoystickEventNormalize();
+    explicit JoystickEventNormalize(IInputServiceContext *env);
+    ~JoystickEventNormalize() = default;
     DISALLOW_COPY_AND_MOVE(JoystickEventNormalize);
 
+    void OnDeviceAdded(int32_t deviceId) override;
+    void OnDeviceRemoved(int32_t deviceId) override;
+    bool HasJoystick() const override;
     std::shared_ptr<KeyEvent> OnButtonEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> OnAxisEvent(struct libinput_event *event) override;
     void CheckIntention(std::shared_ptr<PointerEvent> pointerEvent,
         std::function<void(std::shared_ptr<KeyEvent>)> handler) override;
 
+    static std::shared_ptr<ITimerManager> GetTimerManager(IInputServiceContext *env);
+    static std::shared_ptr<IInputWindowsManager> GetInputWindowsManager(IInputServiceContext *env);
+    static std::shared_ptr<IInputDeviceManager> GetDeviceManager(IInputServiceContext *env);
+    static std::shared_ptr<IKeyMapManager> GetKeyMapManager(IInputServiceContext *env);
+
 private:
-    void SetUpDeviceObserver(std::shared_ptr<JoystickEventNormalize> self);
-    void TearDownDeviceObserver();
-    void OnDeviceAdded(int32_t deviceId);
-    void OnDeviceRemoved(int32_t deviceId);
     std::shared_ptr<JoystickEventProcessor> GetProcessor(struct libinput_device *inputDev);
     std::shared_ptr<JoystickEventProcessor> FindProcessor(int32_t deviceId) const;
 
 private:
-    std::shared_ptr<IDeviceObserver> inputDevObserver_;
+    IInputServiceContext *env_ { nullptr };
     std::map<struct libinput_device*, std::shared_ptr<JoystickEventProcessor>> processors_;
 };
 } // namespace MMI

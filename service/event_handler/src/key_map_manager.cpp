@@ -17,6 +17,7 @@
 
 #include "input_device_manager.h"
 #include "key_command_handler_util.h"
+#include "key_unicode_transformation.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -157,6 +158,16 @@ std::vector<int32_t> KeyMapManager::InputTransferKeyValue(int32_t deviceId, int3
         return sysKey;
     }
     return sysKey;
+}
+
+uint32_t KeyMapManager::KeyCodeToUnicode(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent)
+{
+    return MMI::KeyCodeToUnicode(keyCode, keyEvent);
+}
+
+int32_t KeyMapManager::KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
+{
+    return MMI::KeyItemsTransKeyIntention(items);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -20,7 +20,7 @@
 
 #include "event_normalize_handler.h"
 #include "input_device_manager.h"
-#include "joystick_event_normalize.h"
+#include "joystick_event_interface.h"
 #include "libinput_mock.h"
 
 namespace OHOS {
@@ -48,7 +48,7 @@ void EventNormalizeHandlerTestWithMock::SetUp()
 void EventNormalizeHandlerTestWithMock::TearDown()
 {
     InputDeviceManagerMock::ReleaseInstance();
-    JoystickEventNormalize::ReleaseInstance();
+    JoystickEventInterface::ReleaseInstance();
 }
 
 struct InputEventHandlerMock : public IInputEventHandler {
@@ -87,6 +87,7 @@ void InputEventHandlerMock::HandlePointerEvent(const std::shared_ptr<PointerEven
     pointerEvents_.push_back(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
 
 HWTEST_F(EventNormalizeHandlerTestWithMock, HandleJoystickButtonEvent_001, TestSize.Level1)
 {
@@ -96,7 +97,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock, HandleJoystickButtonEvent_001, TestS
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_BUTTON_A);
 
-    EXPECT_CALL(*JoystickEventNormalize::GetInstance(), OnButtonEvent).WillRepeatedly(Return(keyEvent));
+    EXPECT_CALL(*JOYSTICK_NORMALIZER, OnButtonEvent).WillRepeatedly(Return(keyEvent));
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -122,7 +123,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock, HandleJoystickAxisEvent_001, TestSiz
     double axisValue { 0.1 };
     pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ABS_X, axisValue);
 
-    EXPECT_CALL(*JoystickEventNormalize::GetInstance(), OnAxisEvent).WillRepeatedly(Return(pointerEvent));
+    EXPECT_CALL(*JOYSTICK_NORMALIZER, OnAxisEvent).WillRepeatedly(Return(pointerEvent));
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -138,5 +139,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock, HandleJoystickAxisEvent_001, TestSiz
         EXPECT_TRUE(pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_ABS_X));
     }
 }
+
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 } // namespace MMI
 } // namespace OHOS
