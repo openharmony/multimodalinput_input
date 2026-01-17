@@ -19,10 +19,10 @@
 #include <functional>
 #include <memory>
 
-#include "libinput.h"
-
 #include "key_event.h"
 #include "pointer_event.h"
+
+struct libinput_event;
 
 namespace OHOS {
 namespace MMI {
