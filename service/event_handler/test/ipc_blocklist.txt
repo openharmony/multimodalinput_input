@@ -12,4 +12,4 @@
 # limitations under the License.
 
 [cfi]
-src:*foundation/multimodalinput/input/service/event_handler/test/*
+src:*foundation/multimodalinput/input/service/event_handler/*

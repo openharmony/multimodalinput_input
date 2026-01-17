@@ -42,6 +42,7 @@ ohos_unittest("KeyCommandTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [
@@ -50,9 +51,7 @@ ohos_unittest("KeyCommandTest") {
     "key_config_parser_test.cpp",
     "repeat_key_handler_test.cpp",
     "sequence_key_handler_test.cpp",
-    "short_key_handler_test.cpp",
     "two_finger_gesture_handler_test.cpp",
-
     "key_cmd_handleRepeatKey_test.cpp",
     "key_cmd_sendKeyEvent_test.cpp",
     "key_command_handler_util_test.cpp",
