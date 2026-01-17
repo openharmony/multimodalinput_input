@@ -129,12 +129,22 @@ TaihePointerStyle ConvertPointerStyle(int32_t pointerStyle)
 
 void SetPointerStyleAsync(int32_t windowId, TaihePointerStyle pointerStyle)
 {
+    if (windowId < 0 && windowId != GLOBAL_WINDOW_ID) {
+        MMI_HILOGE("Invalid windowid");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Windowid is invalid");
+ 	    return;
+ 	}
     OHOS::MMI::PointerStyle style;
     style.id = pointerStyle;
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
-    if (ret == COMMON_PARAMETER_ERROR) {
-        taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
-        MMI_HILOGE("failed to get default SetPointerStyle!");
+    if (ret == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("The windowId is negative number and no system applications use system API");
+        taihe::set_business_error(
+            COMMON_USE_SYSAPI_ERROR, "windowId is negative number and no system applications use system API");
+        return;
+    }
+    if (ret != RET_OK) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
 }
 
@@ -173,13 +183,7 @@ TaihePointerStyle GetPointerStyleSyncImpl(int32_t windowId)
 
 void SetPointerStyleSyncImpl(int32_t windowId, TaihePointerStyle pointerStyle)
 {
-    OHOS::MMI::PointerStyle style;
-    style.id = pointerStyle;
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->SetPointerStyle(windowId, style);
-    if (ret == COMMON_PARAMETER_ERROR) {
-        taihe::set_business_error(ret, "failed to get default SetPointerStyle!");
-        MMI_HILOGE("failed to get default SetPointerStyle!");
-    }
+    return SetPointerStyleAsync(windowId, pointerStyle);
 }
 
 void SetPointerVisibleAsync(bool visible)
