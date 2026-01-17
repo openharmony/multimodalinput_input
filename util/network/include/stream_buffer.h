@@ -163,7 +163,7 @@ template<typename T>
 StreamBuffer &StreamBuffer::operator>>(T &data)
 {
     if (!Read(data)) {
-        MMI_HILOGW("Read data failed");
+        MMI_HILOGD("Read data failed");
     }
     return *this;
 }
