@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "mmi_log.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -41,6 +42,7 @@ void KLogOpenLogDevice(void)
 #endif
     if (fd >= 0) {
         g_fd = fd;
+        fdsan_exchange_owner_tag(g_fd, 0, TAG);
     }
     return;
 }
@@ -59,7 +61,7 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     char tmpFmt[MAX_LOG_SIZE];
     if (vsnprintf_s(tmpFmt, MAX_LOG_SIZE, MAX_LOG_SIZE - 1, fmt, vargs) == -1) {
         va_end(vargs);
-        close(g_fd);
+        fdsan_close_with_tag(g_fd, TAG);
         g_fd = -1;
         return;
     }
@@ -69,14 +71,14 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
         "%s[dm=%08X][pid=%d][%s:%d][%s][%s] %s",
         kLevel, 0x0D002800, getpid(), fileName, line, "klog", "info", tmpFmt) == -1) {
         va_end(vargs);
-        close(g_fd);
+        fdsan_close_with_tag(g_fd, TAG);
         g_fd = -1;
         return;
     }
     va_end(vargs);
 
     if (write(g_fd, logInfo, strlen(logInfo)) < 0) {
-        close(g_fd);
+        fdsan_close_with_tag(g_fd, TAG);
         g_fd = -1;
     }
     return;

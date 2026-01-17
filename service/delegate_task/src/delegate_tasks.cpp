@@ -51,11 +51,11 @@ void DelegateTasks::Task::ProcessTask()
 DelegateTasks::~DelegateTasks()
 {
     if (fds_[0] >= 0) {
-        close(fds_[0]);
+        fdsan_close_with_tag(fds_[0], TAG);
         fds_[0] = -1;
     }
     if (fds_[1] >= 0) {
-        close(fds_[1]);
+        fdsan_close_with_tag(fds_[1], TAG);
         fds_[1] = -1;
     }
 }
@@ -67,14 +67,20 @@ bool DelegateTasks::Init()
         MMI_HILOGE("The pipe create failed, errno:%{public}d", errno);
         return false;
     }
+    if (fds_[0] >= 0) {
+        fdsan_exchange_owner_tag(fds_[0], 0, TAG);
+    }
+    if (fds_[1] >= 0) {
+        fdsan_exchange_owner_tag(fds_[1], 0, TAG);
+    }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl read failed, errno:%{public}d", errno);
-        close(fds_[0]);
+        fdsan_close_with_tag(fds_[0], TAG);
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl write failed, errno:%{public}d", errno);
-        close(fds_[1]);
+        fdsan_close_with_tag(fds_[1], TAG);
         return false;
     }
     return true;
