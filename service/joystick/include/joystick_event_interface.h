@@ -25,7 +25,6 @@
 #include "device_observer.h"
 #include "i_joystick_event_normalize.h"
 #include "key_event.h"
-#include "libinput.h"
 #include "pointer_event.h"
 
 namespace OHOS {
