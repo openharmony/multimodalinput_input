@@ -106,10 +106,12 @@ function GetDeviceIdsAsync(): Array<i32>;
 @gen_promise("getDevice")
 function GetDeviceAsync(deviceId: i32): InputDeviceData;
 
+function GetDeviceInfoSync(deviceId: i32): InputDeviceData;
 @gen_async("getDeviceInfo")
 @gen_promise("getDeviceInfo")
 function GetDeviceInfoAsync(deviceId: i32): InputDeviceData;
 
+function SupportKeysSync(deviceId: i32, keys: Array<KeyCode>): Array<bool>;
 @gen_async("supportKeys")
 @gen_promise("supportKeys")
 function SupportKeysAsync(deviceId: i32, keys: Array<KeyCode>): Array<bool>;
@@ -146,10 +148,6 @@ function GetKeyboardTypeSync(deviceId: i32): KeyboardType;
 @gen_async("getKeyboardType")
 @gen_promise("getKeyboardType")
 function GetKeyboardTypeSyncWrapper(deviceId: i32): KeyboardType;
-
-function SupportKeysSync(deviceId: i32, keys: Array<KeyCode>): Array<bool>;
-
-function GetDeviceInfoSync(deviceId: i32): InputDeviceData;
 
 @!sts_inject("""
     function on(type: 'change', callback: (info: DeviceListener) => void) {
