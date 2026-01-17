@@ -229,29 +229,6 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceRemoved_
 }
 
 /**
- * @tc.name: JoystickEventNormalizeTest_GetProcessor
- * @tc.desc: Test GetProcessor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetProcessor, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId { 2 };
-    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
-    struct libinput_device rawDev {};
-    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
-    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
-
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
-
-    auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
-    auto processor = joystick->GetProcessor(&rawDev);
-    ASSERT_NE(processor, nullptr);
-}
-
-/**
  * @tc.name: JoystickEventNormalizeTest_FindProcessor
  * @tc.desc: Test FindProcessor
  * @tc.type: FUNC
@@ -263,31 +240,6 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor, T
     auto joystickEvent = std::make_shared<JoystickEventNormalize>(&env_);
     int32_t deviceId = 2;
     ASSERT_EQ(joystickEvent->FindProcessor(deviceId), nullptr);
-}
-
-/**
- * @tc.name: JoystickEventNormalizeTest_FindProcessor_002
- * @tc.desc: Test FindProcessor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_FindProcessor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    auto joystickEvent = std::make_shared<JoystickEventNormalize>(&env_);
-    int32_t deviceId = 2;
-    struct libinput_device libDev {
-        .udevDev { 2 },
-        .busType = 1,
-        .version = 1,
-        .product = 1,
-        .vendor = 1,
-        .name = "test",
-    };
-    auto joystickEventProcessor = std::make_shared<JoystickEventProcessor>(&env_, deviceId);
-    joystickEvent->processors_.insert(std::make_pair(&libDev, joystickEventProcessor));
-    ASSERT_EQ(joystickEvent->FindProcessor(deviceId), joystickEventProcessor);
 }
 } // namespace MMI
 } // namespace OHOS

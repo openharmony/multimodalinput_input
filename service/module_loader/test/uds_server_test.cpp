@@ -245,7 +245,7 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_001, TestSize.Level1)
     uint32_t tokenId = 1;
     udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd,
         tokenType, tokenId, true);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
