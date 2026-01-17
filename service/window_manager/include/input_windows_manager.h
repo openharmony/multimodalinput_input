@@ -434,13 +434,13 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     bool IsTabletToolEvent(const PointerEvent::PointerItem &pointerItem);
     bool IsEnterWindowTriggered(const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     bool IsLeaveWindowTriggered(const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
-    void DispatchLevitateInEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-    void DispatchLevitateOutEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    void DispatchLevitateInEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t targetWindowId = -1);
+    void DispatchLevitateOutEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t targetWindowId = -1);
     void HandleLevitateInOutEvent(int32_t logicalX, int32_t logicalY, const std::shared_ptr<PointerEvent> pointerEvent,
         const WindowInfo* touchWindow);
     void UpdateStashTouchEventInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
-    void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
+    void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID, int32_t targetWindowId = -1);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
         const OLD::DisplayInfo& info, EventTouch& touchInfo, bool isNeedClear = false,
