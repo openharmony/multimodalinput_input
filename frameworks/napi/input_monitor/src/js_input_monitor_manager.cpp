@@ -365,6 +365,10 @@ void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
     int32_t errorCode = -code;
     if (errorCode == MONITOR_REGISTER_EXCEED_MAX) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
+    } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "monitor", "Non system applications use system API");
+    } else if (errorCode == COMMON_PARAMETER_ERROR) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "monitor", "Parameter error.");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "monitor", "ohos.permission.INPUT_MONITORING");
     } else {
