@@ -180,6 +180,7 @@ public:
     virtual int32_t FindDisplayUserId(int32_t displayId) const = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
+    virtual void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
     virtual void CleanShellWindowIds() = 0;

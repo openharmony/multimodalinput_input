@@ -4726,7 +4726,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (MouseTargetIsInAnco(logicalX, logicalY, pointerEvent, touchWindow, *this)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         pointerEvent->SetAncoDeal(true);
-        SimulatePointerExt(pointerEvent);
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
