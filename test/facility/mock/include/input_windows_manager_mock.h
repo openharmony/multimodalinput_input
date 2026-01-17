@@ -144,6 +144,7 @@ public:
     MOCK_METHOD(int32_t, FindDisplayUserId, (int32_t), (const));
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco() override {}
+    void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) override {}
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(void, CleanShellWindowIds, ());
