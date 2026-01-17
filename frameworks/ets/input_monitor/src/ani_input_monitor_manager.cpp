@@ -237,6 +237,10 @@ void AniInputMonitorManager::ThrowError(int32_t code)
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "ohos.permission.INPUT_MONITORING");
+    } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+    } else if (errorCode == COMMON_PARAMETER_ERROR) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     } else {
         MMI_HILOGE("Add monitor failed");
     }
