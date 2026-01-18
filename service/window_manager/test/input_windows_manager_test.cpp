@@ -13362,7 +13362,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(0);
-    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
+    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent, item));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
 
@@ -13385,7 +13385,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
+    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent, item));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
 
@@ -13411,7 +13411,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
+    ASSERT_FALSE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent, item));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
 
@@ -13438,7 +13438,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsHitFirstTouchWindow_
     pointerEvent->SetDeviceId(0);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_TRUE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent));
+    ASSERT_TRUE(inputWindowsManager.IsFollowFirstTouchWindow(pointerEvent, item));
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
  
