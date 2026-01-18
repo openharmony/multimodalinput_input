@@ -525,12 +525,14 @@ private:
     void RotateScreen90(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void RotateScreen0(const OLD::DisplayInfo& info, PhysicalCoordinate& coord) const;
     void InitDisplayGroupInfo(OLD::DisplayGroupInfo &displayGroupInfo);
-    bool IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent,
+        const PointerEvent::PointerItem& pointerItem);
     bool IsFindFirstTouchFlagWindow(const WindowInfo &item, std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEvent> pointerEvent,
         const PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
     void ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
         PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
+    bool IsFirstTouch(int32_t pointerId, int32_t itemSize);
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
