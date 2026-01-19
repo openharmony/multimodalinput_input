@@ -118,6 +118,24 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_ERR;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+bool InputDeviceManager::HasPointerDevice()
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
+    return DfsMessageParcel::messageParcel->HasPointerDevice();
+}
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return nullptr;
+    }
+    return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
+}
+
 TimerManager::TimerManager() {}
 
 TimerManager::~TimerManager() {}
