@@ -333,6 +333,11 @@ void PointerDrawingManager::ClearResources()
     }
     INPUT_DEV_MGR->Detach(self_);
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(nullptr);
+    ResetMoveRetryTimer();
+    if (initLoadingAndLoadingRightPixelTimerId_ != DEFAULT_VALUE) {
+        TimerMgr->RemoveTimer(initLoadingAndLoadingRightPixelTimerId_);
+        initLoadingAndLoadingRightPixelTimerId_ = DEFAULT_VALUE;
+    }
     isCleared_ = true;
     MMI_HILOGI("resources of PointerDrawingManager is cleared");
 }

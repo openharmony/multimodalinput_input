@@ -58,6 +58,7 @@ const std::string DEFAULT_ICON_PATH = IMAGE_POINTER_DEFAULT_PATH + "Default.svg"
 constexpr int32_t AECH_DEVELOPER_DEFINED_STYLE { 47 };
 constexpr int32_t AECH_DEVELOPER_DEFINED { 4 };
 std::atomic<bool> g_isRsRestart;
+constexpr int32_t DEFAULT_VALUE { -1 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -3837,6 +3838,40 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenScalesAndPadding_002, TestSize.L
     EXPECT_EQ(mainSp->GetDPI(), 1.0);
     EXPECT_EQ(mirrorSp->GetRotation(), mainScreen->GetRotation());
     EXPECT_EQ(mirrorSp->GetDPI(), mainScreen->GetVirtualPixelRatio());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ClearResources_001
+ * @tc.desc: Test Init
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_ClearResources_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    bool isSucess = pointerDrawingManager->Init();
+    EXPECT_EQ(isSucess, true);
+    pointerDrawingManager->isCleared_ = true;
+    pointerDrawingManager->ClearResources();
+    EXPECT_NE(pointerDrawingManager->initLoadingAndLoadingRightPixelTimerId_, DEFAULT_VALUE);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ClearResources_002
+ * @tc.desc: Test Init
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_ClearResources_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    bool isSucess = pointerDrawingManager->Init();
+    EXPECT_EQ(isSucess, true);
+    pointerDrawingManager->isCleared_ = false;
+    pointerDrawingManager->ClearResources();
+    EXPECT_EQ(pointerDrawingManager->initLoadingAndLoadingRightPixelTimerId_, DEFAULT_VALUE);
 }
 } // namespace MMI
 } // namespace OHOS
