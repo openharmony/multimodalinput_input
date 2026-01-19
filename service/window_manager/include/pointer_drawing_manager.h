@@ -365,7 +365,7 @@ private:
     std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ { nullptr };
     bool isCleared_ { false };
     std::mutex isClearedMtx_;
-    uint64_t workerThreadId_ { 0 };
+    std::atomic<uint64_t> workerThreadId_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

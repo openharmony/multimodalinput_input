@@ -98,7 +98,7 @@ public:
     void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem);
     void SetWorkerThreadId(uint64_t tid)
     {
-        workerThreadId_ = tid;
+        workerThreadId_.store(tid);
     }
 private:
     CursorDrawingComponent();
@@ -117,7 +117,7 @@ private:
     IPointerDrawingManager* pointerInstance_ { nullptr };
     int32_t timerId_ { -1 };
     std::chrono::time_point<std::chrono::steady_clock> lastCallTime_ { std::chrono::steady_clock::now() };
-    uint64_t workerThreadId_ { 0 };
+    std::atomic<uint64_t> workerThreadId_ { 0 };
 };
 } // namespace OHOS::MMI
 
