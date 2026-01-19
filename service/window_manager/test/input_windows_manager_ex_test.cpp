@@ -5434,10 +5434,14 @@ HWTEST_F(InputWindowsManagerTest, IsWritePen_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     inputDevice->SetBus(BUS_USB);
+    EXPECT_CALL(*messageParcelMock_, GetInputDevice(_, _)).WillOnce(Return(inputDevice));
+
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    PointerEvent::PointerItem pointerItem;
+    PointerEvent::PointerItem pointerItem {};
+    int32_t deviceId { 666 };
+    pointerItem.SetDeviceId(deviceId);
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
     EXPECT_FALSE(inputWindowsManager->IsWritePen(pointerItem));
 }
