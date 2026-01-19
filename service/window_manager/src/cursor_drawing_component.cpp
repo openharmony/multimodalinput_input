@@ -492,7 +492,8 @@ void CursorDrawingComponent::DrawScreenCenterPointer(const PointerStyle &pointer
 void CursorDrawingComponent::SubscribeScreenModeChange()
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->SubscribeScreenModeChange(workerThreadId_);
+    uint64_t workerThreadId = workerThreadId_.load();
+    pointerInstance_->SubscribeScreenModeChange(workerThreadId);
 }
 
 void CursorDrawingComponent::UnSubscribeScreenModeChange()
