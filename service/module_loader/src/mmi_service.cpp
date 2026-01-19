@@ -2234,7 +2234,6 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
 #else
     return RET_OK;
