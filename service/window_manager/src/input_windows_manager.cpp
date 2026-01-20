@@ -120,6 +120,7 @@ constexpr int32_t ENABLE_OUT_SCREEN_TOUCH { 1 };
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 constexpr int64_t SIMULATE_EVENT_LATENCY { 5 };
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+constexpr int32_t SIMULATE_POINTERID_REMAINDER { 100 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -5299,7 +5300,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             ClearActiveWindow();
         }
     }
-    bool isFollowFirstTouch = IsFollowFirstTouchWindow(pointerEvent);
+    bool isFollowFirstTouch = IsFollowFirstTouchWindow(pointerEvent, pointerItem);
     for (auto &item : windowsInfo) {
         if (isFollowFirstTouch) {
             if (IsFindFirstTouchFlagWindow(item, pointerEvent)) {
@@ -5774,8 +5775,15 @@ void InputWindowsManager::ProcessOtherTouchHit(std::shared_ptr<PointerEvent> poi
         !(touchWindow->flags & WindowInputPolicy::FLAG_FIRST_TOUCH_HIT)) {
         return;
     }
+    // Mouse event injected as touch event will carry the flag. 
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GESTURE_SUPPLEMENT)) {
+        return;
+    }
+    if (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_FINGER) {
+        return;
+    }
     int32_t currentPointerId = pointerEvent->GetPointerId();
-    if (currentPointerId % SIMULATE_POINTER_ID == FIRST_TOUCH) {
+    if (IsFirstTouch(currentPointerId, pointerEvent->GetPointerCount())) {
         return;
     }
     if (pointerItem.GetPointerId() != currentPointerId) {
@@ -5790,12 +5798,20 @@ void InputWindowsManager::ProcessOtherTouchHit(std::shared_ptr<PointerEvent> poi
     return;
 }
 
-bool InputWindowsManager::IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent)
+bool InputWindowsManager::IsFollowFirstTouchWindow(std::shared_ptr<PointerEvent> pointerEvent,
+    const PointerEvent::PointerItem& pointerItem)
 {
     if (pointerEvent == nullptr) {
         return false;
     }
-    if (pointerEvent->GetPointerId() % SIMULATE_POINTER_ID == FIRST_TOUCH) {
+    // Mouse event injected as touch event will carry the flag. 
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GESTURE_SUPPLEMENT)) {
+        return false;
+    }
+    if (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_FINGER) {
+        return false;
+    }
+    if (IsFirstTouch(pointerEvent->GetPointerId(), pointerEvent->GetPointerCount())) {
         return false;
     }
     auto deviceId = pointerEvent->GetDeviceId();
@@ -5844,8 +5860,15 @@ void InputWindowsManager::UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEve
     if (pointerEvent == nullptr || touchWindow == nullptr) {
         return;
     }
+    // Mouse event injected as touch event will carry the flag. 
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_GESTURE_SUPPLEMENT)) {
+        return;
+    }
+    if (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_FINGER) {
+        return;
+    }
     int32_t deviceId = pointerEvent->GetDeviceId();
-    if ((pointerEvent->GetPointerId() % SIMULATE_POINTER_ID) == FIRST_TOUCH) {
+    if (IsFirstTouch(pointerEvent->GetPointerId(), pointerEvent->GetPointerCount())) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
             firstTouchWindowInfos_[deviceId].displayId = touchWindow->displayId;
             firstTouchWindowInfos_[deviceId].windowId = touchWindow->id;
@@ -5856,9 +5879,7 @@ void InputWindowsManager::UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEve
             return;
         }
         bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER &&
-            (extraData_.pointerId % SIMULATE_POINTER_ID) == FIRST_TOUCH) ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+            (extraData_.pointerId % SIMULATE_POINTERID_REMAINDER) == FIRST_TOUCH;
         if (checkExtraData) {
             firstTouchWindowInfos_[deviceId].displayId = touchWindow->displayId;
             firstTouchWindowInfos_[deviceId].windowId = touchWindow->id;
@@ -5869,6 +5890,14 @@ void InputWindowsManager::UpdateFirstTouchWindowInfos(std::shared_ptr<PointerEve
             return;
         }
     }
+}
+
+bool InputWindowsManager::IsFirstTouch(int32_t pointerId, int32_t itemSize)
+{
+    if (pointerId % SIMULATE_POINTERID_REMAINDER == FIRST_TOUCH && itemSize == SINGLE_TOUCH) {
+        return true;
+    }
+    return false;
 }
 
 void InputWindowsManager::ClearFirstTouchWindowInfos(int32_t deviceId)
