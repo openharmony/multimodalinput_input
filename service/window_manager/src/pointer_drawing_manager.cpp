@@ -2550,6 +2550,7 @@ bool PointerDrawingManager::Init()
     }
     initLoadingAndLoadingRightPixelTimerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         InitPixelMaps();
+        initLoadingAndLoadingRightPixelTimerId_ = DEFAULT_VALUE;
     }, "PointerDrawingManager-Init");
     return true;
 }
