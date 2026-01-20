@@ -26,9 +26,11 @@ class InputMonitorManager final : public InputHandlerManager {
 public:
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddGestureMonitor(std::shared_ptr<IInputEventConsumer> consumer,
         TouchGestureType type, int32_t fingers);
     int32_t RemoveGestureMonitor(int32_t monitorId);
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
         HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
     int32_t RemoveMonitor(int32_t monitorId);

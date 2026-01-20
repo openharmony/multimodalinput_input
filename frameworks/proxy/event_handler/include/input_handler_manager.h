@@ -51,9 +51,11 @@ public:
     std::vector<int32_t> GetActionsType() const;
 
 protected:
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddGestureMonitor(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType);
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_KP, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
@@ -85,8 +87,10 @@ private:
         return false;
     }
     bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count);
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
         TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer);
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, std::vector<int32_t> actionsType,

@@ -1096,31 +1096,31 @@ int32_t InputManagerImpl::RemoveMonitor(int32_t monitorId)
 int32_t InputManagerImpl::AddGestureMonitor(
     std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
 {
-#ifdef OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return IMonitorMgr.AddGestureMonitor(consumer, type, fingers);
-#else
+#else // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     MMI_HILOGI("Monitor function does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_MONITOR
+    return -CAPABILITY_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 }
 
 int32_t InputManagerImpl::RemoveGestureMonitor(int32_t monitorId)
 {
-#ifdef OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return IMonitorMgr.RemoveGestureMonitor(monitorId);
-#else
+#else // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     MMI_HILOGI("Monitor function does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_MONITOR
+    return -CAPABILITY_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)

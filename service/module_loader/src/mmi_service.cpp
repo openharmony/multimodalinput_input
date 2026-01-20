@@ -70,9 +70,9 @@
 #include "product_name_definition.h"
 #include "cursor_drawing_component.h"
 #include "touch_event_normalize.h"
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
 #include "touch_gesture_interface.h"
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 #include "util_ex.h"
 #include "xcollie/xcollie.h"
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -2045,6 +2045,7 @@ ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, u
         MMI_HILOGE("Verify system APP failed");
         return COMMON_USE_SYSAPI_ERROR;
     }
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -2060,7 +2061,6 @@ ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, u
         MMI_HILOGE("Illegal type:%{public}d", hType);
         return -(COMMON_PARAMETER_ERROR);
     }
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, hType, eType, gType, fingers]() -> int32_t {
@@ -2080,8 +2080,11 @@ ErrCode MMIService::AddGestureMonitor(int32_t handlerType, uint32_t eventType, u
         MMI_HILOGE("Add gesture handler failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
+#else // OHOS_BUILD_ENABLE_TOUCH_GESTURE
+    MMI_HILOGE("Does not support touch-gesture");
+    return CAPABILITY_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 }
 
 ErrCode MMIService::RemoveGestureMonitor(int32_t handlerType, uint32_t eventType, uint32_t gestureType, int32_t fingers)
@@ -2091,6 +2094,7 @@ ErrCode MMIService::RemoveGestureMonitor(int32_t handlerType, uint32_t eventType
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -2106,7 +2110,6 @@ ErrCode MMIService::RemoveGestureMonitor(int32_t handlerType, uint32_t eventType
         MMI_HILOGE("Illegal type:%{public}d", hType);
         return RET_ERR;
     }
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, hType, eType, gType, fingers]() -> int32_t {
@@ -2124,8 +2127,11 @@ ErrCode MMIService::RemoveGestureMonitor(int32_t handlerType, uint32_t eventType
         MMI_HILOGE("Remove gesture handler failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
+#else // OHOS_BUILD_ENABLE_TOUCH_GESTURE
+    MMI_HILOGE("Does not support touch-gesture");
+    return CAPABILITY_NOT_SUPPORTED;
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 }
 
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -3181,9 +3187,9 @@ void MMIService::PreEventLoop()
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     JOYSTICK_NORMALIZER->AttachInputServiceContext(serviceContext_);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     AddSessionObserver();
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     libinputAdapter_.ProcessPendingEvents();
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
     TOUCH_DRAWING_MGR->Initialize();
@@ -4954,7 +4960,7 @@ int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>>
     return ERROR_UNSUPPORT;
 }
 
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
 void MMIService::AddSessionObserver()
 {
     AddSessionDeletedCallback([this](SessionPtr session) {
@@ -4999,7 +5005,7 @@ void MMIService::RemoveGestureHandlerSync(int32_t session, TouchGestureType gest
             touchGestureMgr_ = nullptr;
         });
 }
-#endif // defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 int32_t MMIService::SetInputDeviceEnable(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr sess)
 {
