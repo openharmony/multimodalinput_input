@@ -109,6 +109,7 @@ void KeyCommandHandler::InitHandlers()
     sequenceHandler_ = std::make_unique<SequenceKeyHandler>(context_, *this);
     repeatKeyHandler_ = std::make_unique<RepeatKeyHandler>(context_, *this);
     twoFingerGestureHandler_ = std::make_unique<TwoFingerGestureHandler>(context_, *this);
+    screenCapturePermission_ = DEFAULT_PERMISSIONS & ~(KNUCKLE_ALL_PERMISSIONS);
     LAUNCHER_ABILITY->SetKeyCommandService(this);
 }
 
