@@ -334,7 +334,7 @@ ohos_unittest("GestureTransformTest") {
   }
 }
 
-ohos_unittest("TabletToolTranformTest") {
+ohos_unittest("TabletToolTransformTest") {
   module_out_path = module_output_path
 
   configs = [
