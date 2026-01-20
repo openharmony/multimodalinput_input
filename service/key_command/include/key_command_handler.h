@@ -152,7 +152,7 @@ private:
     int64_t sosLaunchTime_ { -1 };
     int64_t powerUpTime_ { 0 };
     bool hasRegisteredSensor_ { false };
-    uint32_t screenCapturePermission_ { ScreenCapturePermissionType::DEFAULT_PERMISSIONS };
+    uint32_t screenCapturePermission_;
     void *mistouchLibHandle_ {nullptr};
     IMistouchPrevention *mistouchPrevention_ {nullptr};
     std::atomic<int32_t> ret_ { 5 };
