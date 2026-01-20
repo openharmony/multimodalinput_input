@@ -95,8 +95,6 @@ group("multimodalinput_mmi_service") {
     "etc/joystick:input_joystick_etc",
     "service:libcursor_drawing_adapter",
     "service:libmmi-server",
-    "service/touch_event_normalize:mmi_touch_gesture_manager",
-    "service/window_manager:mmi_touch_drawing_handler",
     "tools/inject_event:uinput",
     "util/screen_capture:libmmi-screen_capture",
     "service:libmmi-server-common",
@@ -104,6 +102,14 @@ group("multimodalinput_mmi_service") {
 
   if (input_feature_joystick) {
     deps += [ "${mmi_path}/service/joystick:mmi_joystick_event_normalization" ]
+  }
+
+  if (input_feature_touch_drawing) {
+    deps += [ "${mmi_path}/service/window_manager:mmi_touch_drawing_handler" ]
+  }
+
+  if (input_feature_touch_gesture) {
+    deps += [ "${mmi_path}/service/touch_event_normalize:mmi_touch_gesture_manager" ]
   }
 }
 
