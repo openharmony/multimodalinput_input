@@ -24,27 +24,6 @@
 #include "util.h"
 
 namespace OHOS {
-
-extern "C" uintptr_t DFX_SetCrashObj(uint8_t type, uintptr_t addr);
-extern "C" void DFX_ResetCrashObj(uintptr_t crashObj);
-
-struct CrashObjDumper {
-public:
-    explicit CrashObjDumper(const char *str)
-    {
-        if (str == nullptr) {
-            return;
-        }
-        ptr_ = DFX_SetCrashObj(0, reinterpret_cast<uintptr_t>(str));
-    }
-    ~CrashObjDumper()
-    {
-        DFX_ResetCrashObj(ptr_);
-    }
-private:
-    uintptr_t ptr_ = 0;
-};
-
 namespace MMI {
 class TimerManager final : public ITimerManager {
 public:

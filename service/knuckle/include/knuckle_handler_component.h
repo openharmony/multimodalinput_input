@@ -25,7 +25,7 @@ public:
     static KnuckleHandlerComponent &GetInstance();
     bool Init();
 
-    void SetCurrentToolType(struct TouchType touchType, int32_t &toolType);
+    void SetCurrentToolType(const struct TouchType &touchType, int32_t &toolType);
     void NotifyTouchUp(struct TouchType *rawTouch);
     void EnableFingersense(void);
     void DisableFingersense(void);
@@ -36,7 +36,7 @@ public:
     void HandleKnuckleEvent(std::shared_ptr<PointerEvent> touchEvent);
     void RegisterSwitchObserver();
     int32_t RegisterKnuckleSwitchByUserId(int32_t userId);
-    int32_t SetKnucklePermissions(int32_t permissions, bool enable);
+    int32_t SetKnucklePermissions(uint32_t permissions, bool enable);
     bool SkipKnuckleDetect();
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
     void Dump(int32_t fd);
@@ -61,7 +61,8 @@ private:
 
 class KnuckleContextImpl : public IKnuckleContext {
 public:
-    ~KnuckleContextImpl() = default;
+    KnuckleContextImpl();
+    ~KnuckleContextImpl() override;
 
     const OLD::DisplayInfo *GetPhysicalDisplay(int32_t id) override;
     std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) override;

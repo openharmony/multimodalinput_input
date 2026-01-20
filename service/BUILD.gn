@@ -4607,3 +4607,52 @@ ohos_unittest("DragSecurityManagerTest") {
     "openssl:libssl_shared"
   ]
 }
+
+ohos_unittest("KnuckleHandlerComponentTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_service_path}/window_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/knuckle/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  sources = [ "knuckle/test/knuckle_handler_component_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+  ]
+}
