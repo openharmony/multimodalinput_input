@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef KEYEVENT_FUZZER
-#define KEYEVENT_FUZZER
+#ifndef KEYMONITOROPTION_FUZZER
+#define KEYMONITOROPTION_FUZZER
 
-#define FUZZ_PROJECT_NAME "keyevent_fuzzer"
+#define FUZZ_PROJECT_NAME "keymonitoroption_fuzzer"
 
-#endif // KEYEVENT_FUZZER
+#endif // KEYMONITOROPTION_FUZZER
