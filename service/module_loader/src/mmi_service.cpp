@@ -525,7 +525,7 @@ void MMIService::OnStart()
         CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-#if OHOS_BUILD_ENABLE_TOUCHPAD
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     bool switchFlag = false;
     TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
     TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
