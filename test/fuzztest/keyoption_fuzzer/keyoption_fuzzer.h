@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef KEYEVENT_FUZZER
-#define KEYEVENT_FUZZER
+#ifndef KEYOPTION_FUZZER
+#define KEYOPTION_FUZZER
 
-#define FUZZ_PROJECT_NAME "keyevent_fuzzer"
+#define FUZZ_PROJECT_NAME "keyoption_fuzzer"
 
-#endif // KEYEVENT_FUZZER
+#endif // KEYOPTION_FUZZER

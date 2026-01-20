@@ -362,7 +362,7 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     INPUT_DEV_MGR->OnInputDeviceRemoved(device);
-#if OHOS_BUILD_ENABLE_TOUCHPAD
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     if (!INPUT_DEV_MGR->HasLocalMouseDevice()) {
         TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
     }
