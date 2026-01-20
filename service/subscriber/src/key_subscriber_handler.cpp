@@ -1484,11 +1484,6 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-    int32_t callType = DEVICE_MONITOR->GetCallType();
-    if (callType == -1) {
-        MMI_HILOGE("callType is false");
-        return false;
-    }
     if (!callBahaviorState_) {
         MMI_HILOGD("CallBehaviorState is false");
         return false;
@@ -1507,13 +1502,8 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGI("The current screen is not on, so not allow end call");
         return false;
     }
-    int32_t ret = -1;
-    if (callType == VOIP_CALL) {
-        ret = DEVICE_MONITOR->GetVoipCallState();
-    } else {
-        ret = DEVICE_MONITOR->GetCallState();
-    }
-    MMI_HILOGI("HandleCallEnded, The callType:%{public}d", ret);
+    int32_t ret = DEVICE_MONITOR->GetCallState();
+    MMI_HILOGI("HandleCallEnded, The callState:%{public}d", ret);
 
     switch (ret) {
         case StateType::CALL_STATUS_HOLDING:
