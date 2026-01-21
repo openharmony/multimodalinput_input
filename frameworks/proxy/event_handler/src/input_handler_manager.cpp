@@ -109,15 +109,19 @@ int32_t InputHandlerManager::AddGestureMonitor(
     CHKFR((handlerId != INVALID_HANDLER_ID), INVALID_HANDLER_ID,
         "Exceeded limit of 32-bit maximum number of integers");
     CHKFR((eventType != HANDLE_EVENT_TYPE_NONE), INVALID_HANDLER_ID, "Invalid event type");
+    const auto isNew = IsNewToService(gestureType, fingers);
     int32_t ret = AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
     if (ret == RET_OK) {
-        const HandleEventType newType = GetEventType();
-        ret = MULTIMODAL_INPUT_CONNECT_MGR->AddGestureMonitor(handlerType, newType, gestureType, fingers);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Add gesture handler:%{public}d to server failed, ret:%{public}d", gestureType, ret);
-            uint32_t deviceTags = 0;
-            RemoveLocal(handlerId, handlerType, deviceTags);
-            return ret;
+        if (isNew) {
+            MMI_HILOGI("Add TouchGesture(%{public}d, %{public}d) to service", gestureType, fingers);
+            ret = MULTIMODAL_INPUT_CONNECT_MGR->AddGestureMonitor(
+                InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_TOUCH_GESTURE, gestureType, fingers);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Add gesture handler:%{public}d to server failed, ret:%{public}d", gestureType, ret);
+                uint32_t deviceTags = 0;
+                RemoveLocal(handlerId, handlerType, deviceTags);
+                return ret;
+            }
         }
         MMI_HILOGI("Finish add gesture handler(%{public}d:%{public}d:%{public}d:%{public}d) to server",
             handlerId, eventType, gestureType, fingers);
@@ -171,18 +175,22 @@ int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandle
     }
     const auto gestureHandler = iter->second.gestureHandler_;
     monitorHandlers_.erase(iter);
-    const HandleEventType newType = GetEventType();
 
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveGestureMonitor(handlerType, newType,
-        gestureHandler.gestureType, gestureHandler.fingers);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Remove gesture handler:%{public}d to server failed, ret:%{public}d",
-            gestureHandler.gestureType, ret);
-    } else {
-        MMI_HILOGI("Finish remove gesture handler:%{public}d:%{public}d:%{public}d,(%{public}d,%{public}d)",
-            handlerType, newType, handlerId, gestureHandler.gestureType, gestureHandler.fingers);
+    if (IsNewToService(gestureHandler.gestureType, gestureHandler.fingers)) {
+        MMI_HILOGI("Remove TouchGesture(%{public}d, %{public}d) from service",
+            gestureHandler.gestureType, gestureHandler.fingers);
+        auto ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveGestureMonitor(
+            InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_TOUCH_GESTURE,
+            gestureHandler.gestureType, gestureHandler.fingers);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Remove gesture handler:%{public}d to server failed, ret:%{public}d",
+                gestureHandler.gestureType, ret);
+            return ret;
+        }
     }
-    return ret;
+    MMI_HILOGI("Finish remove gesture handler:%{public}d:%{public}d,(%{public}d,%{public}d)",
+        handlerType, handlerId, gestureHandler.gestureType, gestureHandler.fingers);
+    return RET_OK;
 }
 
 #endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
@@ -262,6 +270,15 @@ int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventTyp
         MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
         return COMMON_PARAMETER_ERROR;
     }
+    for (const auto &[id, handler] : monitorHandlers_) {
+        if ((handler.eventType_ == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
+            ((handler.gestureHandler_.gestureType & gestureType) == gestureType) &&
+            ((handler.gestureHandler_.fingers == ALL_FINGER_COUNT) || (handler.gestureHandler_.fingers == fingers)) &&
+            (handler.consumer_ == consumer)) {
+            MMI_HILOGW("Duplicate monitor of TouchGesture(%{public}u, %{puglic}d)", gestureType, fingers);
+            return RET_ERR;
+        }
+    }
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = InputHandlerType::MONITOR,
@@ -280,6 +297,18 @@ int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventTyp
     return RET_OK;
 }
 
+bool InputHandlerManager::IsNewToService(TouchGestureType gestureType, int32_t fingers) const
+{
+    return std::all_of(monitorHandlers_.cbegin(), monitorHandlers_.cend(),
+        [gestureType, fingers](const auto &item) {
+            const auto &handler = item.second;
+            const auto &gestureHandler = handler.gestureHandler_;
+            return ((handler.eventType_ != HANDLE_EVENT_TYPE_TOUCH_GESTURE) ||
+                    ((gestureHandler.gestureType & gestureType) != gestureType) ||
+                    ((gestureHandler.fingers != ALL_FINGER_COUNT) &&
+                     (gestureHandler.fingers != fingers)));
+        });
+}
 #endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
