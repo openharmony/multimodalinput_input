@@ -4052,6 +4052,7 @@ void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerIte
     pointerItem.SetSizeLevel(GetPointerSize());
     pointerItem.SetColor(static_cast<uint32_t>(GetPointerColor()));
 }
+
 void PointerDrawingManager::AllPointerDeviceRemoved()
 {
     UnsubScribeScreenModeChange();
