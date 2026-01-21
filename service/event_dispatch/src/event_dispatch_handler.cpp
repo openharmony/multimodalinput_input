@@ -322,6 +322,11 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (point->GetAncoDeal() && point->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        WIN_MGR->SimulatePointerExt(point);
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     int32_t pointerId = point->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!point->GetPointerItem(pointerId, pointerItem)) {
