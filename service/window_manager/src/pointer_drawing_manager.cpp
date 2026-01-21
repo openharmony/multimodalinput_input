@@ -321,7 +321,7 @@ void PointerDrawingManager::ClearResources()
             commonEventSubscriber_ = nullptr;
         }
         initDisplayStatusReceiverFlag_ = false;
-        UnsubScribeScreenModeChange();
+        UnsubscribeScreenModeChange();
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
         if (surfaceNodePtr != nullptr) {
@@ -3076,7 +3076,7 @@ void PointerDrawingManager::SubscribeScreenModeChange(uint64_t tid)
     MMI_HILOGI("SubscribeScreenModeChange success");
 }
 
-void PointerDrawingManager::UnsubScribeScreenModeChange()
+void PointerDrawingManager::UnsubscribeScreenModeChange()
 {
     CHKPV(screenModeChangeListener_);
     auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().UnregisterScreenModeChangeListener(
@@ -4055,7 +4055,7 @@ void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerIte
 
 void PointerDrawingManager::AllPointerDeviceRemoved()
 {
-    UnsubScribeScreenModeChange();
+    UnsubscribeScreenModeChange();
     ClearScreenPointer();
 }
 } // namespace MMI
