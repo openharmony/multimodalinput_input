@@ -48,6 +48,58 @@ public:
 };
 
 /**
+ * @tc.name: HiddenInputDevice_GetRawDevice_001
+ * @tc.desc: Test the function HiddenInputDevice::GetRawDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, HiddenInputDevice_GetRawDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    InputDeviceManager::HiddenInputDevice inputDev { devInfo };
+    EXPECT_EQ(inputDev.GetRawDevice(), &rawDev);
+}
+
+/**
+ * @tc.name: HiddenInputDevice_GetName_001
+ * @tc.desc: Test the function HiddenInputDevice::GetName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, HiddenInputDevice_GetName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char devName[] { "D1" };
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(devName));
+
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    InputDeviceManager::HiddenInputDevice inputDev { devInfo };
+    EXPECT_EQ(inputDev.GetName(), std::string(devName));
+}
+
+/**
+ * @tc.name: HiddenInputDevice_GetName_002
+ * @tc.desc: Test the function HiddenInputDevice::GetName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, HiddenInputDevice_GetName_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    InputDeviceManager::HiddenInputDevice inputDev { devInfo };
+    EXPECT_EQ(inputDev.GetName(), std::string("null"));
+}
+
+/**
  * @tc.name: InputDeviceManager_001
  * @tc.desc: Test the function InputDeviceManager::InputDeviceManager
  * @tc.type: FUNC
@@ -60,41 +112,162 @@ HWTEST_F(InputDeviceManagerTestWithMock, InputDeviceManager_001, TestSize.Level1
 }
 
 /**
- * @tc.name: GetLibinputDevice_001
- * @tc.desc: Test the function InputDeviceManager::GetLibinputDevice
+ * @tc.name: CheckDevice_001
+ * @tc.desc: Test the function InputDeviceManager::CheckDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputDeviceManagerTestWithMock, GetLibinputDevice_001, TestSize.Level1)
+HWTEST_F(InputDeviceManagerTestWithMock, CheckDevice_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
     int32_t deviceId { 888 };
-    auto dev = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
-    EXPECT_EQ(dev, nullptr);
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    auto isJoystick = INPUT_DEV_MGR->CheckDevice(deviceId,
+        [](const IInputDeviceManager::IInputDevice &dev) {
+            return dev.IsJoystick();
+        });
+    EXPECT_TRUE(isJoystick);
 }
 
 /**
- * @tc.name: GetLibinputDevice_002
- * @tc.desc: Test the function InputDeviceManager::GetLibinputDevice
+ * @tc.name: CheckDevice_002
+ * @tc.desc: Test the function InputDeviceManager::CheckDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputDeviceManagerTestWithMock, GetLibinputDevice_002, TestSize.Level1)
+HWTEST_F(InputDeviceManagerTestWithMock, CheckDevice_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    char sysName[] { "event1" };
+    int32_t deviceId { 888 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    auto isJoystick = INPUT_DEV_MGR->CheckDevice(deviceId,
+        [](const IInputDeviceManager::IInputDevice &dev) {
+            return dev.IsJoystick();
+        });
+    EXPECT_FALSE(isJoystick);
+}
+
+/**
+ * @tc.name: CheckDevice_003
+ * @tc.desc: Test the function InputDeviceManager::CheckDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, CheckDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 888 };
+    auto isJoystick = INPUT_DEV_MGR->CheckDevice(deviceId,
+        [](const IInputDeviceManager::IInputDevice &dev) {
+            return dev.IsJoystick();
+        });
+    EXPECT_FALSE(isJoystick);
+}
+
+/**
+ * @tc.name: CheckDevice_004
+ * @tc.desc: Test the function InputDeviceManager::CheckDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, CheckDevice_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 888 };
+    auto isJoystick = INPUT_DEV_MGR->CheckDevice(deviceId, nullptr);
+    EXPECT_FALSE(isJoystick);
+}
+
+/**
+ * @tc.name: ForEachDevice_001
+ * @tc.desc: Test the function InputDeviceManager::ForEachDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, ForEachDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
     NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(sysName));
-    EXPECT_CALL(libinputMock, DeviceGetSysname).WillRepeatedly(Return(sysName));
-    EXPECT_CALL(*KeyMapMgr, InputTransferKeyValue).WillRepeatedly(Return(std::vector<int32_t>()));
-    EXPECT_CALL(*KeyRepeat, GetDeviceConfig).WillRepeatedly(Return(std::map<int32_t, DeviceConfig>()));
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
 
-    libinput_device rawDev {};
-    INPUT_DEV_MGR->OnInputDeviceAdded(&rawDev);
+    int32_t deviceId { 888 };
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
 
-    int32_t deviceId { 1 };
-    auto dev = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
-    EXPECT_EQ(dev, &rawDev);
+    bool isJoystick { false };
+    INPUT_DEV_MGR->ForEachDevice(
+        [deviceId, &isJoystick](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
+            isJoystick = dev.IsJoystick();
+        });
+    EXPECT_TRUE(isJoystick);
+}
+
+/**
+ * @tc.name: ForDevice_001
+ * @tc.desc: Test the function InputDeviceManager::ForDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, ForDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    int32_t deviceId { 888 };
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    bool isJoystick { false };
+    INPUT_DEV_MGR->ForDevice(deviceId,
+        [&isJoystick](const IInputDeviceManager::IInputDevice &dev) {
+            isJoystick = dev.IsJoystick();
+        });
+    EXPECT_TRUE(isJoystick);
+}
+
+/**
+ * @tc.name: ForOneDevice_001
+ * @tc.desc: Test the function InputDeviceManager::ForOneDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, ForOneDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    int32_t deviceId { 888 };
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    bool isJoystick { false };
+    INPUT_DEV_MGR->ForOneDevice(
+        [deviceId](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
+            return (deviceId == id);
+        },
+        [&isJoystick](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
+            isJoystick = dev.IsJoystick();
+        });
+    EXPECT_TRUE(isJoystick);
 }
 
 /**

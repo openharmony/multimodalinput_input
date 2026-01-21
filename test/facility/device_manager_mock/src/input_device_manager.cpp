@@ -44,6 +44,16 @@ void InputDeviceManagerMock::RemoveInputDevice(int32_t deviceId)
     devices_.erase(deviceId);
 }
 
+bool InputDeviceManagerMock::CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const
+{
+    if (auto iter = devices_.find(deviceId); iter != devices_.cend()) {
+        if (pred && (iter->second != nullptr)) {
+            return pred(*iter->second);
+        }
+    }
+    return false;
+}
+
 void InputDeviceManagerMock::ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const
 {
     for (const auto &[deviceId, dev] : devices_) {
