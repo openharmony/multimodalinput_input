@@ -207,6 +207,60 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceAdded_00
 }
 
 /**
+ * @tc.name: JoystickEventNormalizeTest_OnDeviceAdded_003
+ * @tc.desc: Test JoystickEventNormalize::OnDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceAdded_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto joystick = std::make_shared<JoystickEventNormalize>(nullptr);
+    int32_t deviceId { 2 };
+    joystick->OnDeviceAdded(deviceId);
+    EXPECT_TRUE(joystick->processors_.empty());
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_OnDeviceAdded_004
+ * @tc.desc: Test JoystickEventNormalize::OnDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceAdded_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    EXPECT_CALL(*inputDev, IsJoystick).WillRepeatedly(Return(false));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
+
+    auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
+    joystick->OnDeviceAdded(deviceId);
+    EXPECT_TRUE(joystick->processors_.empty());
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_OnDeviceAdded_005
+ * @tc.desc: Test JoystickEventNormalize::OnDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceAdded_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    EXPECT_CALL(*inputDev, IsJoystick).WillRepeatedly(Return(true));
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(nullptr));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
+
+    auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
+    joystick->OnDeviceAdded(deviceId);
+    EXPECT_TRUE(joystick->processors_.empty());
+}
+
+/**
  * @tc.name: JoystickEventNormalizeTest_OnDeviceRemoved_001
  * @tc.desc: Test JoystickEventNormalize::OnDeviceRemoved
  * @tc.type: FUNC
@@ -226,6 +280,81 @@ HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_OnDeviceRemoved_
 
     const auto &processors =joystick->processors_;
     EXPECT_EQ(processors.find(&rawDev), processors.cend());
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_GetTimerManager_001
+ * @tc.desc: Test GetTimerManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetTimerManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto timerMgr = JoystickEventNormalize::GetTimerManager(nullptr);
+    EXPECT_EQ(timerMgr, nullptr);
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_GetInputWindowsManager_001
+ * @tc.desc: Test GetInputWindowsManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetInputWindowsManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = JoystickEventNormalize::GetInputWindowsManager(nullptr);
+    EXPECT_EQ(winMgr, nullptr);
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_GetDeviceManager_001
+ * @tc.desc: Test GetDeviceManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetDeviceManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto devMgr = JoystickEventNormalize::GetDeviceManager(nullptr);
+    EXPECT_EQ(devMgr, nullptr);
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_GetKeyMapManager_001
+ * @tc.desc: Test GetKeyMapManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetKeyMapManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyMapMgr = JoystickEventNormalize::GetKeyMapManager(nullptr);
+    EXPECT_EQ(keyMapMgr, nullptr);
+}
+
+/**
+ * @tc.name: JoystickEventNormalizeTest_GetProcessor
+ * @tc.desc: Test GetProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventNormalizeTest, JoystickEventNormalizeTest_GetProcessor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 2 };
+    auto inputDev = std::make_shared<NiceMock<InputDeviceManagerMock::HiddenInputDevice>>();
+    struct libinput_device rawDev {};
+    EXPECT_CALL(*inputDev, GetRawDevice).WillRepeatedly(Return(&rawDev));
+    INPUT_DEV_MGR->AddInputDevice(deviceId, inputDev);
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(nullptr));
+
+    auto joystick = std::make_shared<JoystickEventNormalize>(&env_);
+    auto processor = joystick->GetProcessor(&rawDev);
+    ASSERT_NE(processor, nullptr);
 }
 
 /**
