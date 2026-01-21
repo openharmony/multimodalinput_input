@@ -321,7 +321,7 @@ void PointerDrawingManager::ClearResources()
             commonEventSubscriber_ = nullptr;
         }
         initDisplayStatusReceiverFlag_ = false;
-        UnSubscribeScreenModeChange();
+        UnsubscribeScreenModeChange();
     } else {
         auto surfaceNodePtr = GetSurfaceNode();
         if (surfaceNodePtr != nullptr) {
@@ -3076,7 +3076,7 @@ void PointerDrawingManager::SubscribeScreenModeChange(uint64_t tid)
     MMI_HILOGI("SubscribeScreenModeChange success");
 }
 
-void PointerDrawingManager::UnSubscribeScreenModeChange()
+void PointerDrawingManager::UnsubscribeScreenModeChange()
 {
     CHKPV(screenModeChangeListener_);
     auto ret = OHOS::Rosen::ScreenManagerLite::GetInstance().UnregisterScreenModeChangeListener(
@@ -3672,6 +3672,12 @@ bool PointerDrawingManager::DeleteScreenPointer(uint64_t screenId)
     return (result == 1);
 }
 
+void PointerDrawingManager::ClearScreenPointer()
+{
+    std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
+    screenPointers_.clear();
+}
+
 void PointerDrawingManager::ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds)
 {
     std::unique_lock<std::shared_mutex> lock(screenPointersMtx_);
@@ -4045,6 +4051,12 @@ void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerIte
     pointerItem.SetStyle(lastMouseStyle_.id);
     pointerItem.SetSizeLevel(GetPointerSize());
     pointerItem.SetColor(static_cast<uint32_t>(GetPointerColor()));
+}
+
+void PointerDrawingManager::AllPointerDeviceRemoved()
+{
+    UnsubscribeScreenModeChange();
+    ClearScreenPointer();
 }
 } // namespace MMI
 } // namespace OHOS
