@@ -900,6 +900,23 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSi
 }
 
 /**
+ * @tc.name: EventDispatchTest_NotifyPointerEventToRS_002
+ * @tc.desc: Test the function NotifyPointerEventToRS
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_002, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t action = 6;
+    std::string name = "ExampleProgram";
+    uint32_t processId = 12345;
+    int32_t touchCnt = 0;
+    int32_t sourceType = 1;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(action, name, processId, touchCnt, sourceType));
+}
+
+/**
  * @tc.name: EventDispatchTest_HandlePointerEventInner_001
  * @tc.desc: Test the function HandlePointerEventInner
  * @tc.type: FUNC
@@ -2288,7 +2305,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_002, TestSize.Level
     EXPECT_EQ(keyEvent, nullptr);
     keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    
+
     InputHandler->udsServer_ = nullptr;
     dispatch.HandleKeyEvent(keyEvent);
     EXPECT_EQ(InputHandler->udsServer_, nullptr);
