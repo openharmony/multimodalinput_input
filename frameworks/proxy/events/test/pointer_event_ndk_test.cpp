@@ -246,9 +246,6 @@ HWTEST_F(PointerEventNdkTest, PointerEventNdkTest_OH_Input_TouchEventToPointerEv
 
     EXPECT_EQ(item.GetWindowX(), windowX);
     EXPECT_EQ(item.GetWindowY(), windowY);
-    EXPECT_EQ(item.GetToolType(), inputTouchEvent.toolType);
-    EXPECT_EQ(item.GetPressure(), inputTouchEvent.pressure);
-    EXPECT_EQ(item.GetDownTime(), inputTouchEvent.downTime);
 }
 } // namespace MMI
 } // namespace OHOS

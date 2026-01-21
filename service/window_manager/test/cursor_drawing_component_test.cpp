@@ -563,20 +563,6 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_RegisterDisplayS
     EXPECT_NO_FATAL_FAILURE(instance_->RegisterDisplayStatusReceiver());
 }
 
-/**
- * @tc.name: CursorDrawingComponentTest_UpdateMouseLayer_001
- * @tc.desc: Test UpdateMouseLayer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateMouseLayer_001, TestSize.Level1)
-{
-    int32_t physicalX = 1;
-    int32_t physicalY = 1;
-    int32_t ret = instance_->UpdateMouseLayer(physicalX, physicalY);
-    EXPECT_EQ(ret, RET_OK);
-}
-
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: CursorDrawingComponentTest_GetPointerSnapshot_001

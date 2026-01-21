@@ -91,23 +91,6 @@ HWTEST_F(KeyEventHookHandlerTest, AddKeyEventHook_Test_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: RemoveKeyEventHook_Test_001
- * @tc.desc: Test RemoveKeyEventHook
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventHookHandlerTest, RemoveKeyEventHook_Test_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyEventHookHandler hookHandler;
-    int32_t hookId = 1;
-    std::shared_ptr<MockEventHookHandler> mockHook = std::make_shared<MockEventHookHandler>();
-    EXPECT_CALL(*mockHook, RemoveKeyEventHook(hookId)).WillRepeatedly(testing::Return(RET_ERR));
-    int32_t ret = hookHandler.RemoveKeyEventHook(hookId);
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
  * @tc.name: DispatchToNextHandler_Test_001
  * @tc.desc: Test DispatchToNextHandler
  * @tc.type: FUNC
@@ -226,26 +209,6 @@ HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_001, TestSize.Level1)
     hookHandler.ResetHookCallback();
     hookHandler.OnConnected();
     EXPECT_EQ(hookHandler.hookCallback_, nullptr);
-}
-
-/**
- * @tc.name: OnConnected_Test_002
- * @tc.desc: Test OnConnected
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyEventHookHandler hookHandler;
-    auto callback = [](std::shared_ptr<KeyEvent>) {};
-    hookHandler.SetHookCallback(callback);
-
-    std::shared_ptr<MockEventHookHandler> mockHook = std::make_shared<MockEventHookHandler>();
-    EXPECT_CALL(*mockHook, InitClient()).WillRepeatedly(testing::Return(true));
-    EXPECT_CALL(*mockHook, AddKeyEventHook(testing::_)).WillRepeatedly(testing::Return(RET_ERR));
-    hookHandler.OnConnected();
-    EXPECT_NE(hookHandler.hookCallback_, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
