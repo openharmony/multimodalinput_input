@@ -3841,12 +3841,12 @@ HWTEST_F(PointerDrawingManagerTest, UpdateScreenScalesAndPadding_002, TestSize.L
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_ClearResources_001
+ * @tc.name: PointerDrawingManagerTest_ClearResources_001
  * @tc.desc: Test Init
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_ClearResources_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearResources_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
@@ -3858,12 +3858,12 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_ClearResources_001, 
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_ClearResources_002
+ * @tc.name: PointerDrawingManagerTest_ClearResources_002
  * @tc.desc: Test Init
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_ClearResources_002, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearResources_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
@@ -3872,6 +3872,36 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_ClearResources_002, 
     pointerDrawingManager->isCleared_ = false;
     pointerDrawingManager->ClearResources();
     EXPECT_EQ(pointerDrawingManager->initLoadingAndLoadingRightPixelTimerId_, DEFAULT_VALUE);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
+ * @tc.desc: Test ClearScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    pointerDrawingManager.ClearScreenPointer();
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_AllPointerDeviceRemoved_001
+ * @tc.desc: Test AllPointerDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AllPointerDeviceRemoved_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.AllPointerDeviceRemoved();
+    ASSERT_EQ(pointerDrawingManager.screenModeChangeListener_, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

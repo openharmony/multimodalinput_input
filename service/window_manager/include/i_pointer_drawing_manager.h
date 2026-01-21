@@ -166,7 +166,6 @@ public:
     virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
     virtual void SubscribeScreenModeChange(uint64_t tid = 0) {}
-    virtual void UnSubscribeScreenModeChange() {}
     virtual void RegisterDisplayStatusReceiver() {}
     virtual void InitDefaultMouseIconPath() {}
     virtual int32_t UpdateMouseLayer(int32_t physicalX, int32_t physicalY)
@@ -199,6 +198,7 @@ public:
         return 0;
     }
     virtual void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) {}
+    virtual void AllPointerDeviceRemoved() {}
     virtual void ClearResources() {};
 };
 } // namespace MMI

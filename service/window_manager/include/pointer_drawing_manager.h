@@ -124,7 +124,6 @@ public:
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
     void SubscribeScreenModeChange(uint64_t tid = 0) override;
-    void UnSubscribeScreenModeChange() override;
     void RegisterDisplayStatusReceiver() override;
     OLD::DisplayInfo GetCurrentDisplayInfo() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -155,7 +154,7 @@ public:
     void RecordCursorIdAndImageAddress();
     void RecordCursorVisibleStatus(bool status);
     void UpdatePointerItemCursorInfo(PointerEvent::PointerItem& pointerItem) override;
-
+    void AllPointerDeviceRemoved() override;
 private:
     struct PixelMapInfo {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
@@ -250,6 +249,7 @@ private:
     std::pair<ScreenPointersIter, bool> UpdateScreenPointer(uint64_t screenId,
         std::shared_ptr<ScreenPointer> screenPointer);
     bool DeleteScreenPointer(uint64_t screenId);
+    void ClearScreenPointer();
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
     void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
     Direction CalculateRenderDirection(bool isHard);
@@ -277,6 +277,7 @@ private:
         int32_t &physicalY);
     bool GetHardCursorEnabled() override;
     bool IsHardCursorEnabled();
+    void UnsubscribeScreenModeChange();
     void ClearResources() override;
     void ClearRunnerAndHandler();
 private:
