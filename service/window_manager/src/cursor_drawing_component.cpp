@@ -496,10 +496,10 @@ void CursorDrawingComponent::SubscribeScreenModeChange()
     pointerInstance_->SubscribeScreenModeChange(workerThreadId);
 }
 
-void CursorDrawingComponent::UnSubscribeScreenModeChange()
+void CursorDrawingComponent::AllPointerDeviceRemoved()
 {
     CHK_IS_LOADV(isLoaded_, pointerInstance_)
-    pointerInstance_->UnSubscribeScreenModeChange();
+    pointerInstance_->AllPointerDeviceRemoved();
 }
 
 void CursorDrawingComponent::RegisterDisplayStatusReceiver()
