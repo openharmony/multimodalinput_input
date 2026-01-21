@@ -127,11 +127,6 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ScreenRotateAdju
         cursorPosRef = it->second;
     }
     cursorPosRef.direction = Direction::DIRECTION0;
-    NiceMock<MockInputWindowsManager> mockInputWindowsManager;
-    EXPECT_CALL(mockInputWindowsManager, IsSceneBoardEnabled)
-        .WillOnce(Return(false))
-        .WillOnce(Return(false))
-        .WillOnce(Return(true));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ScreenRotateAdjustDisplayXY(info, coord));
 
     coord.x = 1;
