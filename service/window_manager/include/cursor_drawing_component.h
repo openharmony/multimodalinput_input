@@ -80,7 +80,7 @@ public:
     void DestroyPointerWindow();
     void DrawScreenCenterPointer(const PointerStyle &pointerStyle);
     void SubscribeScreenModeChange();
-    void UnSubscribeScreenModeChange();
+    void AllPointerDeviceRemoved();
     void RegisterDisplayStatusReceiver();
     void InitDefaultMouseIconPath();
     int32_t UpdateMouseLayer(int32_t physicalX, int32_t physicalY);

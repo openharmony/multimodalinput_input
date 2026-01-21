@@ -738,7 +738,7 @@ void InputDeviceManager::ScanPointerDevice()
     }
     if (!existEnabledNoEventReportedPointerDevice && POINTER_DEV_MGR.isInit) {
         POINTER_DEV_MGR.isInit = false;
-        CursorDrawingComponent::GetInstance().UnSubscribeScreenModeChange();
+        CursorDrawingComponent::GetInstance().AllPointerDeviceRemoved();
         CursorDrawingComponent::GetInstance().ResetUnloadTimer(UNLOAD_DELAY_MS, CHECK_PERIOD_MS);
     }
     // LCOV_EXCL_STOP
