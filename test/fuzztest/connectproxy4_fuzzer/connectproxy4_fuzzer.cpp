@@ -46,15 +46,23 @@ void UnsubscribeHotkeyFuzz(FuzzedDataProvider &fdp)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-void SubscribeKeyMonitorFuzz()
+void SubscribeKeyMonitorFuzz(FuzzedDataProvider &fdp)
 {
-    KeyMonitorOption keyOption;
+    KeyMonitorOption keyOption {};
+    keyOption.key_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.action_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.isRepeat_ = fdp.ConsumeBool();
+
     MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyMonitor(keyOption);
 }
 
-void UnsubscribeKeyMonitorFuzz()
+void UnsubscribeKeyMonitorFuzz(FuzzedDataProvider &fdp)
 {
-    KeyMonitorOption keyOption;
+    KeyMonitorOption keyOption {};
+    keyOption.key_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.action_ = fdp.ConsumeIntegral<int32_t>();
+    keyOption.isRepeat_ = fdp.ConsumeBool();
+
     MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeKeyMonitor(keyOption);
 }
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
@@ -71,8 +79,8 @@ void ConnectProxy4FuzzTest(const uint8_t *data, size_t size)
     SubscribeHotkeyFuzz(fdp);
     UnsubscribeHotkeyFuzz(fdp);
 #ifdef OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
-    SubscribeKeyMonitorFuzz();
-    UnsubscribeKeyMonitorFuzz();
+    SubscribeKeyMonitorFuzz(fdp);
+    UnsubscribeKeyMonitorFuzz(fdp);
 #endif // OHOS_BUILD_ENABLE_KEY_PRESSED_HANDLER
     GetTouchpadScrollDirectionFuzz(fdp);
 }
