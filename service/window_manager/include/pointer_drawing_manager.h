@@ -124,7 +124,6 @@ public:
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
     void SubscribeScreenModeChange(uint64_t tid = 0) override;
-    void UnsubScribeScreenModeChange();
     void RegisterDisplayStatusReceiver() override;
     OLD::DisplayInfo GetCurrentDisplayInfo() override;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -278,6 +277,7 @@ private:
         int32_t &physicalY);
     bool GetHardCursorEnabled() override;
     bool IsHardCursorEnabled();
+    void UnsubscribeScreenModeChange();
     void ClearResources() override;
     void ClearRunnerAndHandler();
 private:
