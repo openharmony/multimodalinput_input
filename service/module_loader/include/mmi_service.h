@@ -355,6 +355,11 @@ private:
     bool AddGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
     void RemoveGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
 #endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    void RegisterForCommonEventService();
+    void RegisterForRenderService(int32_t systemAbilityId);
+    void RegisterForDisplayManagerService(int32_t systemAbilityId);
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
