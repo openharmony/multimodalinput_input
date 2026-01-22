@@ -2423,19 +2423,13 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         WIN_MGR->InitializeAnco();
 #endif // OHOS_BUILD_ENABLE_ANCO
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!POINTER_DEV_MGR.isFirstAddCommonEventService) {
-        CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
-    }
+        RegisterForCommonEventService();
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (systemAbilityId == RENDER_SERVICE && !POINTER_DEV_MGR.isFirstAddRenderService) {
-        CursorDrawingComponent::GetInstance().InitPointerCallback();
-    }
-    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID && !POINTER_DEV_MGR.isFirstAddDisplayManagerService) {
-        CursorDrawingComponent::GetInstance().InitScreenInfo();
-        CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
-    }
+    RegisterForRenderService(systemAbilityId);
+
+    RegisterForDisplayManagerService(systemAbilityId);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         WIN_MGR->SetFoldState();
@@ -5839,5 +5833,41 @@ ErrCode MMIService::DeliverNonce(const std::string &nonce)
     }
     return RET_OK;
 }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+void MMIService::RegisterForCommonEventService()
+{
+    delegateTasks_.PostAsyncTask([] {
+        if (!POINTER_DEV_MGR.isFirstAddCommonEventService) {
+            CursorDrawingComponent::GetInstance().RegisterDisplayStatusReceiver();
+        }
+        return RET_OK;
+    });
+}
+
+void MMIService::RegisterForRenderService(int32_t systemAbilityId)
+{
+    if (systemAbilityId == RENDER_SERVICE) {
+        delegateTasks_.PostAsyncTask([] {
+            if (!POINTER_DEV_MGR.isFirstAddRenderService) {
+                CursorDrawingComponent::GetInstance().InitPointerCallback();
+            }
+            return RET_OK;
+        });
+    }
+}
+
+void MMIService::RegisterForDisplayManagerService(int32_t systemAbilityId)
+{
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        delegateTasks_.PostAsyncTask([] {
+            if (!POINTER_DEV_MGR.isFirstAddDisplayManagerService) {
+                CursorDrawingComponent::GetInstance().InitScreenInfo();
+                CursorDrawingComponent::GetInstance().SubscribeScreenModeChange();
+            }
+            return RET_OK;
+        });
+    }
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 } // namespace MMI
 } // namespace OHOS
