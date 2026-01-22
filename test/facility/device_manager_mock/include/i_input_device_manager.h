@@ -35,6 +35,7 @@ public:
         virtual bool IsJoystick() const = 0;
     };
 
+    virtual bool CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const = 0;
     virtual void ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const = 0;
     virtual void ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const = 0;
     virtual void ForOneDevice(std::function<bool(int32_t, const IInputDevice&)> pred,

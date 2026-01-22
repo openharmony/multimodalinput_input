@@ -51,11 +51,13 @@ ohos_unittest("JoystickLayoutMapTest") {
   ]
 
   sources = [
+    "${mmi_path}/service/joystick/src/joystick_event_interface.cpp",
     "${mmi_path}/service/joystick/src/joystick_event_normalize.cpp",
     "${mmi_path}/service/joystick/src/joystick_event_processor.cpp",
     "${mmi_path}/service/joystick/src/joystick_layout_map.cpp",
     "${mmi_path}/service/common/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/module_loader/src/input_service_context.cpp",
+    "src/joystick_event_interface_test.cpp",
     "src/joystick_event_normalize_test.cpp",
     "src/joystick_event_processor_test.cpp",
     "src/joystick_layout_map_builder.cpp",
@@ -82,6 +84,7 @@ ohos_unittest("JoystickLayoutMapTest") {
   external_deps = [
     "c_utils:utils",
     "cJSON:cjson",
+    "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
