@@ -19,6 +19,7 @@
 #include "taihe_pointer_utils.h"
 #include "input_manager.h"
 #include "struct_multimodal.h"
+#include "permission_helper.h"
 #include "pixel_map_taihe_ani.h"
 
 #undef MMI_LOG_TAG
@@ -207,12 +208,22 @@ void SetPointerSpeedAsync(int32_t speed)
     } else if (speed > MAX_SPEED) {
         speed = MAX_SPEED;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+            "Permission denied, non-system application called system api.");
+ 	    return;
+ 	}
     auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
+    if (errorCode != RET_OK) {
+        MMI_HILOGE("failed to SetPointerSpeed errCode:%{public}d!", errorCode);
+        return;
+    }
     if (errorCode == COMMON_PARAMETER_ERROR) {
-        MMI_HILOGE("failed to SetPointerSpeed!");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to SetPointerSpeed!");
+    } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+ 	             "Permission denied, non-system application called system api.");
     } else if (errorCode != RET_OK) {
-        MMI_HILOGE("SetPointerSpeed failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
 }
@@ -221,12 +232,22 @@ int32_t GetPointerSpeedAsync()
 {
     CALL_DEBUG_ENTER;
     int32_t pointerSpeed = 0;
+    if (!PER_HELPER->VerifySystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+            "Permission denied, non-system application called system api.");
+ 	    return pointerSpeed;
+ 	}
     auto errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
+    if (errorCode != RET_OK) {
+        MMI_HILOGE("failed to GetPointerSpeed errCode:%{public}d!", errorCode);
+        return pointerSpeed;
+    }
     if (errorCode == COMMON_PARAMETER_ERROR) {
-        MMI_HILOGE("failed to GetPointerSpeed!");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to GetPointerSpeed!");
+    } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+ 	             "Permission denied, non-system application called system api.");
     } else if (errorCode != RET_OK) {
-        MMI_HILOGE("GetPointerSpeed failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
     return pointerSpeed;
@@ -384,9 +405,7 @@ void SetCustomCursorAsync(int32_t windowId, ::ohos::multimodalInput::pointer::Cu
 int32_t GetPointerSpeedSyncImpl()
 {
     CALL_DEBUG_ENTER;
-    int32_t pointerSpeed = 0;
-    InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
-    return pointerSpeed;
+    return GetPointerSpeedAsync();
 }
 
 ::ohos::multimodalInput::pointer::RightClickType GetTouchpadRightClickTypeAsync()
@@ -767,20 +786,7 @@ void SetPointerColorAsync(int32_t color)
 void SetPointerSpeedSyncImpl(int32_t speed)
 {
     CALL_DEBUG_ENTER;
-    if (speed < MIN_SPEED) {
-        speed = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        speed = MAX_SPEED;
-    }
-    auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
-    if (errorCode != RET_OK) {
-        TaiheError codeMsg;
-        if (!TaiheConverter::GetApiError(errorCode, codeMsg)) {
-            codeMsg.msg = "Parameter error.Unknown error";
-            MMI_HILOGE("Error code %{public}d not found", errorCode);
-        }
-        taihe::set_business_error(errorCode, codeMsg.msg);
-    }
+    return SetPointerSpeedAsync(speed);
 }
 
 bool IsPointerVisibleSyncImpl()
