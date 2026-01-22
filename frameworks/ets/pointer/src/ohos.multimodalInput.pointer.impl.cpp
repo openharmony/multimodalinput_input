@@ -211,7 +211,7 @@ void SetPointerSpeedAsync(int32_t speed)
     if (!PER_HELPER->VerifySystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
- 	    return;
+        return;
     }
     auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
     if (errorCode != RET_OK) {
