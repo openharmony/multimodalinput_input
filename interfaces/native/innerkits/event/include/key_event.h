@@ -3197,6 +3197,13 @@ public:
      * @since 24
      */
     static const int32_t KEYCODE_MOUSE_INTELLIGENCE_SELECTION;
+
+    /**
+     * Aod Single Click
+     *
+     * @since 24
+     */
+    static const int32_t KEYCODE_AOD_SINGLE_CLICK;
 public:
     class KeyItem {
     public:
