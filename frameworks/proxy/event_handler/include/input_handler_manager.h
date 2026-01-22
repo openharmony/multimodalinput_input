@@ -90,6 +90,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
         TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer);
+    bool IsNewToService(TouchGestureType gestureType, int32_t fingers) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);

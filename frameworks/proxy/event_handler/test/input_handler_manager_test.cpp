@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "i_input_event_consumer.h"
-#include "input_handler_manager.h"
+#include "input_monitor_manager.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -36,7 +36,17 @@ class InputHandlerManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    void SetUp();
+    void TearDown();
 };
+
+void InputHandlerManagerTest::SetUp()
+{}
+
+void InputHandlerManagerTest::TearDown()
+{
+    InputMonitorManager::GetInstance().monitorHandlers_.clear();
+}
 
 class MyInputHandlerManager : public InputHandlerManager {
 public:
@@ -66,6 +76,13 @@ private:
     {
         return true;
     }
+};
+
+class InputEventConsumer : public IInputEventConsumer {
+public:
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {}
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override {}
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
 };
 
 /**
@@ -893,6 +910,48 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckIfNeedAddToConsum
 #endif
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddGestureMonitor_001
+ * @tc.desc: Test the function AddGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureMonitor_001, TestSize.Level1)
+{
+    auto consumer = std::make_shared<InputEventConsumer>();
+    TouchGestureType gestureType { TOUCH_GESTURE_TYPE_PINCH };
+    int32_t fingers { 5 };
+    auto handlerId = InputMonitorManager::GetInstance().AddGestureMonitor(consumer, gestureType, fingers);
+    EXPECT_GE(handlerId, 0);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddGestureMonitor_002
+ * @tc.desc: Test the function AddGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureMonitor_002, TestSize.Level1)
+{
+    int32_t handlerId1 { 1 };
+    TouchGestureType gestureType { TOUCH_GESTURE_TYPE_PINCH };
+    int32_t fingers { 5 };
+    InputMonitorManager::GetInstance().monitorHandlers_.emplace(handlerId1,
+        InputHandlerManager::Handler {
+            .handlerType_ = InputHandlerType::MONITOR,
+            .eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE,
+            .gestureHandler_ = InputHandlerManager::GestureHandler {
+                .gestureType = gestureType,
+                .fingers = fingers,
+            },
+        });
+    auto consumer = std::make_shared<InputEventConsumer>();
+    auto handlerId = InputMonitorManager::GetInstance().AddGestureMonitor(consumer, gestureType, fingers);
+    EXPECT_GE(handlerId, 0);
+}
+
 /**
  * @tc.name: InputHandlerManagerTest_RemoveGestureMonitor_001
  * @tc.desc: Test the function RemoveGestureMonitor
@@ -906,6 +965,54 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveGestureMonitor_0
     InputHandlerType handlerType = InputHandlerType::MONITOR;
     auto ret = manager.RemoveGestureMonitor(handlerId, handlerType);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RemoveGestureMonitor_002
+ * @tc.desc: Test the function RemoveGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveGestureMonitor_002, TestSize.Level1)
+{
+    int32_t handlerId { 1 };
+    int32_t fingers { 5 };
+    InputMonitorManager::GetInstance().monitorHandlers_.emplace(handlerId,
+        InputHandlerManager::Handler {
+            .handlerType_ = InputHandlerType::MONITOR,
+            .eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE,
+            .gestureHandler_ = InputHandlerManager::GestureHandler {
+                .gestureType = TOUCH_GESTURE_TYPE_PINCH,
+                .fingers = fingers,
+            },
+        });
+    auto ret = InputMonitorManager::GetInstance().RemoveGestureMonitor(handlerId);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RemoveGestureMonitor_003
+ * @tc.desc: Test the function RemoveGestureMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RemoveGestureMonitor_003, TestSize.Level1)
+{
+    int32_t handlerId1 { 1 };
+    int32_t fingers { 5 };
+    InputHandlerManager::Handler handler {
+        .handlerType_ = InputHandlerType::MONITOR,
+        .eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE,
+        .gestureHandler_ = InputHandlerManager::GestureHandler {
+            .gestureType = TOUCH_GESTURE_TYPE_PINCH,
+            .fingers = fingers,
+        },
+    };
+    InputMonitorManager::GetInstance().monitorHandlers_.emplace(handlerId1, handler);
+    int32_t handlerId2 { 2 };
+    InputMonitorManager::GetInstance().monitorHandlers_.emplace(handlerId2, handler);
+    auto ret = InputMonitorManager::GetInstance().RemoveGestureMonitor(handlerId1);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -966,6 +1073,36 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddGestureToLocal_002,
     ret = manager.AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputHandlerManagerTest_IsNewToService_001
+ * @tc.desc: Test the function IsNewToService
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_IsNewToService_001, TestSize.Level1)
+{
+    TouchGestureType gestureType { TOUCH_GESTURE_TYPE_PINCH };
+    int32_t fingers1 { 5 };
+
+    EXPECT_TRUE(InputMonitorManager::GetInstance().IsNewToService(gestureType, fingers1));
+
+    int32_t handlerId { 1 };
+    InputMonitorManager::GetInstance().monitorHandlers_.emplace(handlerId,
+        InputHandlerManager::Handler {
+            .eventType_ = HANDLE_EVENT_TYPE_TOUCH_GESTURE,
+            .gestureHandler_ = InputHandlerManager::GestureHandler {
+                .gestureType = TOUCH_GESTURE_TYPE_PINCH,
+                .fingers = fingers1,
+            },
+        });
+    EXPECT_FALSE(InputMonitorManager::GetInstance().IsNewToService(gestureType, fingers1));
+
+    int32_t fingers2 { 4 };
+    EXPECT_TRUE(InputMonitorManager::GetInstance().IsNewToService(gestureType, fingers2));
+}
+
+#endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
 
 /**
  * @tc.name: InputHandlerManagerTest_AddLocal_001
