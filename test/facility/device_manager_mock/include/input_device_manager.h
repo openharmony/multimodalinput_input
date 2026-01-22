@@ -40,6 +40,7 @@ public:
 
     void AddInputDevice(int32_t deviceId, std::shared_ptr<IInputDevice> dev);
     void RemoveInputDevice(int32_t deviceId);
+    bool CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const;
     void ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const;
     void ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const;
     void ForOneDevice(std::function<bool(int32_t, const IInputDevice&)> pred,
