@@ -212,7 +212,7 @@ void SetPointerSpeedAsync(int32_t speed)
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
  	    return;
- 	}
+    }
     auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
     if (errorCode != RET_OK) {
         MMI_HILOGE("failed to SetPointerSpeed errCode:%{public}d!", errorCode);
@@ -235,8 +235,8 @@ int32_t GetPointerSpeedAsync()
     if (!PER_HELPER->VerifySystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
- 	    return pointerSpeed;
- 	}
+        return pointerSpeed;
+    }
     auto errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
     if (errorCode != RET_OK) {
         MMI_HILOGE("failed to GetPointerSpeed errCode:%{public}d!", errorCode);
