@@ -221,8 +221,8 @@ void SetPointerSpeedAsync(int32_t speed)
     if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to SetPointerSpeed!");
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
- 	             "Permission denied, non-system application called system api.");
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+            "Permission denied, non-system application called system api.");
     } else if (errorCode != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
@@ -245,8 +245,8 @@ int32_t GetPointerSpeedAsync()
     if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to GetPointerSpeed!");
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
-         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
- 	             "Permission denied, non-system application called system api.");
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
+            "Permission denied, non-system application called system api.");
     } else if (errorCode != RET_OK) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     }
