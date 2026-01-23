@@ -210,7 +210,7 @@ const char *StreamBuffer::Data() const
 const char *StreamBuffer::ReadBuf() const
 {
     if (static_cast<size_t>(rPos_) >= sizeof(szBuff_)) {
-        MMI_HILOGE("Read position out of bounds, rPos_:%{public}d, szBuff_.size():%{public}zu", rPos_, sizeof(szBuff_));
+        MMI_HILOGE("Read position out of bounds, rPos:%{public}d, size():%{public}zu", rPos_, sizeof(szBuff_));
         return nullptr;
     }
     return &szBuff_[rPos_];
