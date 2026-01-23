@@ -216,7 +216,6 @@ void SetPointerSpeedAsync(int32_t speed)
     auto errorCode = InputManager::GetInstance()->SetPointerSpeed(speed);
     if (errorCode != RET_OK) {
         MMI_HILOGE("failed to SetPointerSpeed errCode:%{public}d!", errorCode);
-        return;
     }
     if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to SetPointerSpeed!");
@@ -240,7 +239,6 @@ int32_t GetPointerSpeedAsync()
     auto errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
     if (errorCode != RET_OK) {
         MMI_HILOGE("failed to GetPointerSpeed errCode:%{public}d!", errorCode);
-        return pointerSpeed;
     }
     if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "failed to GetPointerSpeed!");
