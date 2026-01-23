@@ -56,6 +56,7 @@ taihe_shared_library("Pointer") {
     "hilog:libhilog",
     "image_framework:image_native",
     "image_framework:image_taihe",
+    "ipc:ipc_single",
   ]
   sources += [
     "${mmi_path}/frameworks/ets/common/src/ani_common.cpp",
