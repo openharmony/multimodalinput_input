@@ -44,6 +44,7 @@ public:
 
     bool CheckKeyCode(const int32_t keycode);
     void ThrowError(int32_t code);
+    static bool IsSystemApp();
 private:
     AniInputMonitorManager() = default;
 private:

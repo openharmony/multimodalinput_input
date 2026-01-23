@@ -16,8 +16,10 @@
 
 #include <algorithm>
 
+#include "ipc_skeleton.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "tokenid_kit.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AniInputMonitorManager"
@@ -163,6 +165,10 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "EventType is invalid");
         return false;
     }
+    if (!IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return false;
+    }
     std::shared_ptr<AniInputMonitorConsumer> consumer = AniInputMonitorConsumer::CreateAniInputMonitorConsumer(
         funType, param, std::move(cb), opq);
     if (!consumer) {
@@ -170,13 +176,12 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
         return false;
     }
     int32_t retStart = consumer->Start();
-    if (retStart < 0 || retStart == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("ani monitor startup failed");
+    MMI_HILOGD("ani monitor startup retStart %{public}d", retStart);
+    if (retStart < 0) {
         ThrowError(retStart);
         return false;
     }
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("retStart:%{public}d", retStart);
     monitors_.emplace(retStart, consumer);
     return true;
 }
@@ -244,6 +249,15 @@ void AniInputMonitorManager::ThrowError(int32_t code)
     } else {
         MMI_HILOGE("Add monitor failed");
     }
+}
+
+bool AniInputMonitorManager::IsSystemApp()
+{
+    static bool isSystemApp = []() {
+        uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+        return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    }();
+    return isSystemApp;
 }
 } // namespace MMI
 } // namespace OHOS
