@@ -66,9 +66,21 @@ bool StreamBuffer::Read(std::string &buf)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    buf = ReadBuf();
+    const char *readPtr = ReadBuf();
+    if (readPtr == nullptr) {
+        MMI_HILOGE("ReadBuf returned nullptr, errCode:%{public}d", PACKET_READ_FAIL);
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
+        return false;
+    }
+    const char *terminator = strchr(readPtr, '\0');
+    if (terminator == nullptr) {
+        MMI_HILOGE("Incomplete string in buffer, errCode:%{public}d", MEM_NOT_ENOUGH);
+        rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
+        return false;
+    }
+    buf.assign(readPtr, terminator);
     rPos_ += static_cast<int32_t>(buf.length()) + 1;
-    return (buf.length() > 0);
+    return true;
 }
 
 bool StreamBuffer::Write(const std::string &buf)
@@ -197,6 +209,10 @@ const char *StreamBuffer::Data() const
 
 const char *StreamBuffer::ReadBuf() const
 {
+    if (static_cast<size_t>(rPos_) >= sizeof(szBuff_)) {
+        MMI_HILOGE("Read position out of bounds, rPos_:%{public}d, szBuff_.size():%{public}zu", rPos_, sizeof(szBuff_));
+        return nullptr;
+    }
     return &szBuff_[rPos_];
 }
 
