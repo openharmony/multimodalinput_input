@@ -25,8 +25,7 @@ config("pointer_config") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/frameworks/ets/pointer/include",
-    "${mmi_path}/service/permission_helper/include",
+    "${mmi_path}/frameworks/ets/pointer/include"
   ]
 }
 subsystem_name = "multimodalinput"
@@ -52,6 +51,7 @@ taihe_shared_library("Pointer") {
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -65,7 +65,6 @@ taihe_shared_library("Pointer") {
   ]
   deps = [
     ":run_taihe",
-    "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]

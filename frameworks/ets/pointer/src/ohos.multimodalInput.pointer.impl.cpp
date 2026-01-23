@@ -16,10 +16,11 @@
 #include "ohos.multimodalInput.pointer.impl.h"
 #include "mmi_log.h"
 
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 #include "taihe_pointer_utils.h"
 #include "input_manager.h"
 #include "struct_multimodal.h"
-#include "permission_helper.h"
 #include "pixel_map_taihe_ani.h"
 
 #undef MMI_LOG_TAG
@@ -208,7 +209,7 @@ void SetPointerSpeedAsync(int32_t speed)
     } else if (speed > MAX_SPEED) {
         speed = MAX_SPEED;
     }
-    if (!PER_HELPER->VerifySystemApp()) {
+    if (!TaihePointerUtils::IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
         return;
@@ -231,7 +232,7 @@ int32_t GetPointerSpeedAsync()
 {
     CALL_DEBUG_ENTER;
     int32_t pointerSpeed = 0;
-    if (!PER_HELPER->VerifySystemApp()) {
+    if (!TaihePointerUtils::IsSystemApp()) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR,
             "Permission denied, non-system application called system api.");
         return pointerSpeed;
