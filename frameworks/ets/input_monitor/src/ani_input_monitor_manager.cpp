@@ -170,7 +170,7 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
         return false;
     }
     int32_t retStart = consumer->Start();
-    if (retStart < 0) {
+    if (retStart < 0 || retStart == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("ani monitor startup failed");
         ThrowError(retStart);
         return false;
