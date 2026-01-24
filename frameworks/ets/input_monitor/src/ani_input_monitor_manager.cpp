@@ -15,9 +15,14 @@
 #include "ani_input_monitor_manager.h"
 
 #include <algorithm>
+#include <sstream>
+#include <iostream>
 
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 #include "define_multimodal.h"
 #include "input_manager.h"
+#include "tokenid_kit.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AniInputMonitorManager"
@@ -26,6 +31,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
+const std::string HAP_MONITOR_PERMISSION_NAME = "ohos.permission.INPUT_MONITORING";
+const std::string MODULE_NAME = "monitor";
 } // namespace
 
 static const std::vector<int32_t> supportedKeyCodes = {
@@ -163,6 +170,10 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "EventType is invalid");
         return false;
     }
+    if (!IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return false;
+    }
     std::shared_ptr<AniInputMonitorConsumer> consumer = AniInputMonitorConsumer::CreateAniInputMonitorConsumer(
         funType, param, std::move(cb), opq);
     if (!consumer) {
@@ -170,13 +181,12 @@ bool AniInputMonitorManager::AddMonitor(MONITORFUNTYPE funType,
         return false;
     }
     int32_t retStart = consumer->Start();
+    MMI_HILOGD("ani monitor startup retStart %{public}d", retStart);
     if (retStart < 0) {
-        MMI_HILOGE("ani monitor startup failed");
         ThrowError(retStart);
         return false;
     }
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("retStart:%{public}d", retStart);
     monitors_.emplace(retStart, consumer);
     return true;
 }
@@ -186,6 +196,15 @@ bool AniInputMonitorManager::RemoveMonitor(MONITORFUNTYPE funType, taihe::option
     CALL_DEBUG_ENTER;
     if (!AniInputMonitorConsumer::IsOnFunc(funType)) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "EventType is invalid");
+        return false;
+    }
+    if (!IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return false;
+    }
+    if (!CheckPermission(HAP_MONITOR_PERMISSION_NAME)) {
+        std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, HAP_MONITOR_PERMISSION_NAME);
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
         return false;
     }
     std::lock_guard guard(mutex_);
@@ -236,13 +255,56 @@ void AniInputMonitorManager::ThrowError(int32_t code)
     if (errorCode == MONITOR_REGISTER_EXCEED_MAX) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "ohos.permission.INPUT_MONITORING");
+        std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, HAP_MONITOR_PERMISSION_NAME);
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode == COMMON_PARAMETER_ERROR) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
     } else {
         MMI_HILOGE("Add monitor failed");
+    }
+}
+
+std::string AniInputMonitorManager::MakePermissionCheckErrMsg(const std::string &moduleName,
+    const std::string &permissionName)
+{
+    std::stringstream ss;
+    ss << "Permission denied. An attempt was made to "
+    << moduleName << "forbidden by permission " <<  permissionName << ".";
+    return ss.str();
+}
+
+bool AniInputMonitorManager::IsSystemApp()
+{
+    static bool isSystemApp = []() {
+        uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+        return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    }();
+    return isSystemApp;
+}
+
+bool AniInputMonitorManager::CheckPermission(const std::string &permissionCode)
+{
+    CALL_DEBUG_ENTER;
+    uint64_t tokenId = IPCSkeleton::GetSelfTokenID();
+    using OHOS::Security::AccessToken::AccessTokenID;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(static_cast<AccessTokenID>(tokenId));
+    if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
+        (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+        int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
+        if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+            MMI_HILOGE("Check permission failed ret:%{public}d permission:%{public}s", ret, permissionCode.c_str());
+            return false;
+        }
+        MMI_HILOGD("Check interceptor permission success permission:%{public}s", permissionCode.c_str());
+        return true;
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGI("Token type is shell");
+        return true;
+    } else {
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
+        return false;
     }
 }
 } // namespace MMI
