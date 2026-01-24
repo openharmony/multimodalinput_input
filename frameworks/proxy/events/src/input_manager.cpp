@@ -1074,5 +1074,10 @@ int32_t InputManager::DeliverNonce(const std::string &nonce)
 {
     return InputMgrImpl.DeliverNonce(nonce);
 }
+
+int32_t InputManager::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    return InputMgrImpl.RedispatchInputEvent(pointerEvent);
+}
 } // namespace MMI
 } // namespace OHOS

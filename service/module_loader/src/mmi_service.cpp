@@ -5833,6 +5833,7 @@ ErrCode MMIService::DeliverNonce(const std::string &nonce)
     }
     return RET_OK;
 }
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void MMIService::RegisterForCommonEventService()
 {
@@ -5869,5 +5870,35 @@ void MMIService::RegisterForDisplayManagerService(int32_t systemAbilityId)
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
+    if (pointerEventPtr == nullptr) {
+        MMI_HILOGE("pointerEvent is null");
+        return RET_ERR;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInjectPermission()) {
+        MMI_HILOGE("Verify Inject Permission failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t ret = delegateTasks_.PostSyncTask([pointerEventPtr] {
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("PostSyncTask RedispatchInputEvent failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

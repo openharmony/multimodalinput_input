@@ -1356,6 +1356,15 @@ public:
     */
     int32_t DeliverNonce(const std::string &nonce);
 
+    /**
+     * @brief Redispatch a touchpad input event, touchscreen input event, or mouse device input event.
+     * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
+     * or mouse device input event to redispatch.
+     * @return Return <b>0</b> if successful; returns a non-0 value otherwise.
+     * @since 23
+     */
+    int32_t RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

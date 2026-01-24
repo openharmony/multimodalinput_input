@@ -149,6 +149,14 @@ public:
     static constexpr uint32_t EVENT_FLAG_DISABLE_PULL_THROW = 0x00020000;
 
     static constexpr uint32_t EVENT_FLAG_DISABLE_USER_ACTION = 0x00040000;
+
+    /**
+     * The multimodal input event from redispatch.
+     *
+     * @since 23
+     */
+    static constexpr uint32_t EVENT_FLAG_REDISPATCH = 0x00100000;
+
     /**
      * The multimodal input event for the device to enable the intercom mode flag.
      *
