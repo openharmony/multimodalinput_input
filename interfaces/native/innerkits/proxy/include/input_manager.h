@@ -1361,7 +1361,7 @@ public:
      * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
      * or mouse device input event to redispatch.
      * @return Return <b>0</b> if successful; returns a non-0 value otherwise.
-     * @since 23
+     * @since 24
      */
     int32_t RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 

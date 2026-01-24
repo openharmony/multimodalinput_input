@@ -153,7 +153,7 @@ public:
     /**
      * The multimodal input event from redispatch.
      *
-     * @since 23
+     * @since 24
      */
     static constexpr uint32_t EVENT_FLAG_REDISPATCH = 0x00100000;
 
