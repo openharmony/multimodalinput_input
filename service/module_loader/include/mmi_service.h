@@ -236,6 +236,7 @@ public:
     ErrCode GetCurrentCursorInfo(bool& visible, PointerStyle& pointerStyle) override;
     ErrCode GetUserDefinedCursorPixelMap(std::shared_ptr<PixelMap>& pixelMap) override;
     ErrCode DeliverNonce(const std::string &nonce) override;
+    ErrCode RedispatchInputEvent(const PointerEvent &pointerEvent) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     ErrCode ControlMouseEventToAnco(int32_t windowId, bool enable) override;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
