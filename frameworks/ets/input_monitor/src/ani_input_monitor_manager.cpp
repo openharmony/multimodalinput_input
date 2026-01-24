@@ -204,7 +204,7 @@ bool AniInputMonitorManager::RemoveMonitor(MONITORFUNTYPE funType, taihe::option
     }
     if (!CheckPermission(HAP_MONITOR_PERMISSION_NAME)) {
         std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, HAP_MONITOR_PERMISSION_NAME);
- 	    taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
         return false;
     }
     std::lock_guard guard(mutex_);
@@ -256,7 +256,7 @@ void AniInputMonitorManager::ThrowError(int32_t code)
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
         std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, HAP_MONITOR_PERMISSION_NAME);
- 	    taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
     } else if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode == COMMON_PARAMETER_ERROR) {
