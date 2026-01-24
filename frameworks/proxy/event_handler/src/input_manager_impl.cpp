@@ -3161,5 +3161,24 @@ int32_t InputManagerImpl::DeliverNonce(const std::string &nonce)
     }
     return ret;
 }
+
+int32_t InputManagerImpl::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("pointerEvent is null");
+        return RET_ERR;
+    }
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RedispatchInputEvent(pointerEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Redispatch pointerEvent failed, ret: %{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer and touchscreen device does not support");
+    return RET_ERR;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
 } // namespace MMI
 } // namespace OHOS

@@ -195,4 +195,5 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void IsPointerInit([out] boolean status);
     [macrodef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING] void ControlMouseEventToAnco([in] int windowId, [in] boolean enable);
     void DeliverNonce([in] String nonce);
+    void RedispatchInputEvent([in] PointerEvent pointerEvent);
 }

@@ -1341,5 +1341,16 @@ int32_t MultimodalInputConnectManager::DeliverNonce(const std::string &nonce)
     }
     return multimodalInputConnectService_->DeliverNonce(nonce);
 }
+
+int32_t MultimodalInputConnectManager::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("MultimodalInputConnectService_ is nullptr");
+        return INVALID_HANDLER_ID;
+    }
+    return multimodalInputConnectService_->RedispatchInputEvent(*pointerEvent);
+}
 } // namespace MMI
 } // namespace OHOS
