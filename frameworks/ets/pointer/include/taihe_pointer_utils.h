@@ -26,6 +26,7 @@ class TaihePointerUtils {
 public:
     static CustomCursor ConvertToCustomCursor(const ohos::multimodalInput::pointer::CustomCursor &value);
     static CursorOptions ConvertToCursorConfig(const ohos::multimodalInput::pointer::CursorConfig &value);
+    static bool IsSystemApp();
 };
 
 } // namespace MMI

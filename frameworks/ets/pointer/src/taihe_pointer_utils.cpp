@@ -14,9 +14,12 @@
  */
 
 #include "taihe_pointer_utils.h"
+
+#include "ipc_skeleton.h"
 #include "define_multimodal.h"
 #include "mmi_log.h"
 #include "pixel_map_taihe_ani.h"
+#include "tokenid_kit.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TaihePointerUtils"
@@ -62,5 +65,13 @@ CursorOptions TaihePointerUtils::ConvertToCursorConfig(const ohos::multimodalInp
     return opts;
 }
 
+bool TaihePointerUtils::IsSystemApp()
+{
+    static bool isSystemApp = []() {
+        uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+        return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    }();
+    return isSystemApp;
+}
 } // namespace MMI
 } // namespace OHOS

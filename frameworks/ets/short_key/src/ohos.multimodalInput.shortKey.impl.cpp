@@ -17,7 +17,6 @@
 #include "ohos.multimodalInput.shortKey.impl.hpp"
 #include "stdexcept"
 
-
 namespace {
 // To be implemented.
 }  // namespace

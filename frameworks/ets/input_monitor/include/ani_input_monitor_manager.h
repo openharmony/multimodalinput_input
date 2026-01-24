@@ -43,7 +43,10 @@ public:
     bool RemoveMonitor(MONITORFUNTYPE funType, taihe::optional_view<uintptr_t> opq, int32_t fingers = 0);
 
     bool CheckKeyCode(const int32_t keycode);
+    std::string MakePermissionCheckErrMsg(const std::string &moduleName, const std::string &permissionName);
     void ThrowError(int32_t code);
+    static bool IsSystemApp();
+    static bool CheckPermission(const std::string &permissionCode);
 private:
     AniInputMonitorManager() = default;
 private:
