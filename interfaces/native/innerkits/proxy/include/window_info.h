@@ -260,7 +260,7 @@ enum WindowInputPolicy : uint32_t {
     /**
      * Axis scroll event redispatch
      *
-     * @since 23
+     * @since 24
      */
     FLAG_TOUCHPAD_AXIS_SCROLL_REDISPATCH = 1 << 11,
 };
