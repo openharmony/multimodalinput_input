@@ -257,6 +257,12 @@ enum WindowInputPolicy : uint32_t {
      * @since 23
      */
     FLAG_DRAG_DISABLED = 1 << 10,
+    /**
+     * Axis scroll event redispatch
+     *
+     * @since 24
+     */
+    FLAG_TOUCHPAD_AXIS_SCROLL_REDISPATCH = 1 << 11,
 };
 
 struct WindowInfo {
