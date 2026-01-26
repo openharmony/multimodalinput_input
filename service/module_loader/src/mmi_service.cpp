@@ -5892,6 +5892,7 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
         return ERROR_NOT_SYSAPI;
     }
     int32_t ret = delegateTasks_.PostSyncTask([pointerEventPtr] {
+
         return RET_OK;
     });
     if (ret != RET_OK) {
