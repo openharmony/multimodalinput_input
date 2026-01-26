@@ -152,6 +152,7 @@ public:
         bool isUiExtension = false) const;
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindowId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
+    void DispatchPointerDispatch(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate();
     bool HasMouseHideFlag();
@@ -518,6 +519,8 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
     void RemoveActiveWindow(std::shared_ptr<PointerEvent> pointerEvent);
     void ClearActiveWindow();
     void UpdateWindowInfoFlag(uint32_t flag, std::shared_ptr<InputEvent> event);
+    bool IsTouchPadScrollAxis(const WindowInfo &window, const std::shared_ptr<PointerEvent> pointerEvent);
+    bool AbandonRedispatch(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     int32_t FindDisplayGroupId(int32_t displayId) const;
     const OLD::DisplayGroupInfo& FindDisplayGroupInfo(int32_t displayId) const;
@@ -653,6 +656,9 @@ private:
     mutable std::pair<int32_t, int32_t> currentDisplayXY_ { 0, 0 };
     WindowInfo pointerLockedWindow_;
     Coordinate2D pointerLockedCursorPos_ = { 0.0, 0.0 };
+    std::map<float, std::optional<WindowInfo>> axisBeginWindowInfoMap_;
+    std::map<int32_t, int32_t> windowLastEventIdMap_;
+    std::shared_ptr<PointerEvent> lastPointerEventRedispatch_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

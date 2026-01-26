@@ -13743,5 +13743,183 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearFirstTouchWindowI
     ASSERT_EQ(0, inputWindowsManager.firstTouchWindowInfos_.size());
     inputWindowsManager.firstTouchWindowInfos_.clear();
 }
+
+ /**
+ * @tc.name: InputWindowsManagerTest_IsTouchPadScrollAxis_001
+ * @tc.desc: Test branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTouchPadScrollAxis_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo touchWindow;
+    touchWindow.flags = 0;
+    auto result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    touchWindow.flags = WindowInputPolicy::FLAG_TOUCHPAD_AXIS_SCROLL_REDISPATCH;
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerEvent->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(pointerItem);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_FALSE(result);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent->AddPointerItem(pointerItem);
+    result = inputWindowsManager->IsTouchPadScrollAxis(touchWindow, pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+ /**
+ * @tc.name: InputWindowsManagerTest_AbandonRedispatch_001
+ * @tc.desc: Test branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AbandonRedispatch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t eventId = 2000;
+    int32_t targetWindowId = 1;
+    pointerEvent->SetTargetWindowId(targetWindowId);
+    auto result = inputWindowsManager->AbandonRedispatch(pointerEvent);
+    EXPECT_FALSE(result);
+    inputWindowsManager->windowLastEventIdMap_[targetWindowId] = eventId;
+    pointerEvent->SetId(eventId);
+    result = inputWindowsManager->AbandonRedispatch(pointerEvent);
+    EXPECT_TRUE(result);
+    pointerEvent->SetId(eventId + 1);
+    result = inputWindowsManager->AbandonRedispatch(pointerEvent);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchPointerDispatch_001
+ * @tc.desc: Test branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerDispatch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    int32_t windowId = 1;
+    inputWindowsManager->DispatchPointerDispatch(pointerAction, windowId);
+    EXPECT_EQ(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    inputWindowsManager->lastPointerEventRedispatch_ = pointerEvent;
+    inputWindowsManager->DispatchPointerDispatch(pointerAction, windowId);
+    EXPECT_NE(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    inputWindowsManager->lastPointerEventRedispatch_->AddPointerItem(item);
+    inputWindowsManager->lastPointerEventRedispatch_->SetPointerId(0);
+    EXPECT_NE(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_014
+ * @tc.desc: Test axisBeginWindowInfoMap_[zOrder] && axisBeginWindowInfoMap_[zOrder]->agentPid != -1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_REDISPATCH);
+    pointerEvent->SetZOrder(0);
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(inputWindowsManager.axisBeginWindowInfoMap_[0], std::nullopt);
+    WindowInfo windowInfo;
+    windowInfo.agentPid = -1;
+    inputWindowsManager.axisBeginWindowInfoMap_[0] = std::make_optional(windowInfo);
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_NE(inputWindowsManager.axisBeginWindowInfoMap_[0], std::nullopt);
+    windowInfo.agentPid = 1;
+    inputWindowsManager.axisBeginWindowInfoMap_[0] = std::make_optional(windowInfo);
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(inputWindowsManager.axisBeginWindowInfoMap_[0], std::nullopt);
+    windowInfo.agentPid = 1;
+    inputWindowsManager.axisBeginWindowInfoMap_[0] = std::make_optional(windowInfo);
+    windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(inputWindowsManager.axisBeginWindowInfoMap_[0], std::nullopt);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_015
+ * @tc.desc: Test axisBeginWindowInfo_ && axisBeginWindowInfo_->agentPid != -1
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(inputWindowsManager.axisBeginWindowInfo_, std::nullopt);
+    WindowInfo windowInfo;
+    windowInfo.agentPid = -1;
+    inputWindowsManager.axisBeginWindowInfo_ = std::make_optional(windowInfo);
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_NE(inputWindowsManager.axisBeginWindowInfo_, std::nullopt);
+    windowInfo.agentPid = 1;
+    inputWindowsManager.axisBeginWindowInfo_ = std::make_optional(windowInfo);
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(inputWindowsManager.axisBeginWindowInfo_, std::nullopt);
+    windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+    windowInfo.agentPid = 1;
+    inputWindowsManager.axisBeginWindowInfo_ = std::make_optional(windowInfo);
+    inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(inputWindowsManager.axisBeginWindowInfo_, std::nullopt);
+}
 } // namespace MMI
 } // namespace OHOS

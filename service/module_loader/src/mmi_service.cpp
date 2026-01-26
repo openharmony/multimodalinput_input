@@ -5879,6 +5879,10 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
         MMI_HILOGE("pointerEvent is null");
         return RET_ERR;
     }
+    if (pointerEventPtr->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
+        MMI_HILOGD("Unsupported sourceType");
+        return RET_ERR;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -5892,7 +5896,20 @@ ErrCode MMIService::RedispatchInputEvent(const PointerEvent &pointerEvent)
         return ERROR_NOT_SYSAPI;
     }
     int32_t ret = delegateTasks_.PostSyncTask([pointerEventPtr] {
-
+        pointerEventPtr->SetTargetWindowId(-1);
+        pointerEventPtr->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_REDISPATCH);
+        WIN_MGR->UpdateTargetPointer(pointerEventPtr);
+        if (WIN_MGR->AbandonRedispatch(pointerEventPtr)) {
+            return RET_ERR;
+        }
+        LogTracer lt(pointerEventPtr->GetId(), pointerEventPtr->GetEventType(), pointerEventPtr->GetPointerAction());
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        if (eventDispatchHandler == nullptr) {
+            MMI_HILOGE("eventDispatchHandler is null");
+            return RET_ERR;
+        }
+        eventDispatchHandler->HandlePointerEvent(pointerEventPtr);
+        MMI_HILOGD("Redispatch directly, id:%{public}d", pointerEventPtr->GetId());
         return RET_OK;
     });
     if (ret != RET_OK) {
