@@ -133,6 +133,7 @@ public:
     int32_t GetWindowStateNotifyPid(int32_t userId) override { return 0; }
     int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
     int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) override { return 0; }
+    bool AbandonRedispatch(std::shared_ptr<PointerEvent> pointerEvent) override { return false; }
     std::pair<int32_t, int32_t> CalcDrawCoordinate(const OLD::DisplayInfo& displayInfo,
         PointerEvent::PointerItem pointerItem) override { return { 0, 0 }; }
     bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
