@@ -41,8 +41,8 @@ ohos_shared_library("mmi_joystick_event_normalization") {
 
   deps = [
     "${mmi_path}/common/property_name_mapper:property_name_mapper",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
     "${mmi_path}/intention/prototype:input_service_prototype",
+    "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
 

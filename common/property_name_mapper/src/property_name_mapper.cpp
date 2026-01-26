@@ -113,7 +113,6 @@ PointerEvent::AxisType PropertyNameMapper::MapAxis(const std::string &name) cons
 std::shared_ptr<ITimerManager> PropertyNameMapper::GetTimerManager(IInputServiceContext *env)
 {
     if (env == nullptr) {
-        MMI_HILOGE("Env is null");
         return nullptr;
     }
     return env->GetTimerManager();

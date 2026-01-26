@@ -55,83 +55,87 @@ void MouseEventInterface::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
 
 bool MouseEventInterface::HasMouse()
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return false;
     }
-    return mouse_->HasMouse();
+    return mouse->HasMouse();
 }
 
 int32_t MouseEventInterface::OnEvent(struct libinput_event *event)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->OnEvent(event);
+    return mouse->OnEvent(event);
 }
 
 std::shared_ptr<PointerEvent> MouseEventInterface::GetPointerEvent()
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return nullptr;
     }
-    return mouse_->GetPointerEvent();
+    return mouse->GetPointerEvent();
 }
 
 std::shared_ptr<PointerEvent> MouseEventInterface::GetPointerEvent(int32_t deviceId)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return nullptr;
     }
-    return mouse_->GetPointerEvent(deviceId);
+    return mouse->GetPointerEvent(deviceId);
 }
 
 void MouseEventInterface::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
-    mouse_->Dump(fd, args);
+    mouse->Dump(fd, args);
 }
 
 int32_t MouseEventInterface::NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->NormalizeRotateEvent(event, type, angle);
+    return mouse->NormalizeRotateEvent(event, type, angle);
 }
 
 bool MouseEventInterface::CheckAndPackageAxisEvent(libinput_event* event)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return false;
     }
-    return mouse_->CheckAndPackageAxisEvent(event);
+    return mouse->CheckAndPackageAxisEvent(event);
 }
 
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
 bool MouseEventInterface::CheckFilterMouseEvent(struct libinput_event *event)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return false;
     }
-    return mouse_->CheckFilterMouseEvent(event);
+    return mouse->CheckFilterMouseEvent(event);
 }
 
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
@@ -139,73 +143,70 @@ bool MouseEventInterface::CheckFilterMouseEvent(struct libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool MouseEventInterface::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return false;
     }
-    return mouse_->NormalizeMoveMouse(offsetX, offsetY);
+    return mouse->NormalizeMoveMouse(offsetX, offsetY);
 }
 
 void MouseEventInterface::OnDisplayLost(int32_t displayId)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
-    mouse_->OnDisplayLost(displayId);
+    mouse->OnDisplayLost(displayId);
 }
 
-int32_t MouseEventInterface::GetDisplayId() const
+int32_t MouseEventInterface::GetDisplayId()
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->GetDisplayId();
+    return mouse->GetDisplayId();
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t MouseEventInterface::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->SetPointerLocation(x, y, displayId);
+    return mouse->SetPointerLocation(x, y, displayId);
 }
 
 int32_t MouseEventInterface::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->GetPointerLocation(displayId, displayX, displayY);
+    return mouse->GetPointerLocation(displayId, displayX, displayY);
 }
 
 int32_t MouseEventInterface::SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->SetMouseAccelerateMotionSwitch(deviceId, enable);
+    return mouse->SetMouseAccelerateMotionSwitch(deviceId, enable);
 }
 
 int32_t MouseEventInterface::SetMouseScrollRows(int32_t rows)
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -215,11 +216,7 @@ int32_t MouseEventInterface::SetMouseScrollRows(int32_t rows)
 
 int32_t MouseEventInterface::GetMouseScrollRows() const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -229,11 +226,7 @@ int32_t MouseEventInterface::GetMouseScrollRows() const
 
 int32_t MouseEventInterface::SetMousePrimaryButton(int32_t primaryButton)
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -243,11 +236,7 @@ int32_t MouseEventInterface::SetMousePrimaryButton(int32_t primaryButton)
 
 int32_t MouseEventInterface::GetMousePrimaryButton() const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -257,29 +246,25 @@ int32_t MouseEventInterface::GetMousePrimaryButton() const
 
 int32_t MouseEventInterface::SetPointerSpeed(int32_t speed)
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
     auto ret = MousePreferenceAccessor::SetPointerSpeed(*env, speed);
-    if (ret == RET_OK && mouse_ != nullptr) {
-        mouse_->SetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        return ret;
     }
-    return ret;
+    auto mouse = GetMouse();
+    if (mouse != nullptr) {
+        mouse->SetPointerSpeed(speed);
+    }
+    return RET_OK;
 }
 
 int32_t MouseEventInterface::GetPointerSpeed() const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -289,11 +274,7 @@ int32_t MouseEventInterface::GetPointerSpeed() const
 
 int32_t MouseEventInterface::GetTouchpadSpeed() const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -303,32 +284,28 @@ int32_t MouseEventInterface::GetTouchpadSpeed() const
 
 int32_t MouseEventInterface::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
     auto ret = MousePreferenceAccessor::SetTouchpadScrollSwitch(*env, pid, switchFlag);
-    {
-        std::lock_guard guard { mutex_ };
-        if (ret == RET_OK && mouse_ != nullptr && !switchFlag) {
-            mouse_->SetScrollSwitchSetterPid(pid);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MousePref SetTouchpadScrollSwitch fail");
+        return ret;
+    }
+    if (!switchFlag) {
+        auto mouse = GetMouse();
+        if (mouse != nullptr) {
+            mouse->SetScrollSwitchSetterPid(pid);
         }
     }
-    return ret;
+    return RET_OK;
 }
 
 void MouseEventInterface::GetTouchpadScrollSwitch(bool &switchFlag) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
@@ -338,11 +315,7 @@ void MouseEventInterface::GetTouchpadScrollSwitch(bool &switchFlag) const
 
 int32_t MouseEventInterface::SetTouchpadScrollDirection(bool state) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -352,11 +325,7 @@ int32_t MouseEventInterface::SetTouchpadScrollDirection(bool state) const
 
 void MouseEventInterface::GetTouchpadScrollDirection(bool &state) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
@@ -366,11 +335,7 @@ void MouseEventInterface::GetTouchpadScrollDirection(bool &state) const
 
 int32_t MouseEventInterface::SetTouchpadTapSwitch(bool switchFlag) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -380,11 +345,7 @@ int32_t MouseEventInterface::SetTouchpadTapSwitch(bool switchFlag) const
 
 void MouseEventInterface::GetTouchpadTapSwitch(bool &switchFlag) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
@@ -394,11 +355,7 @@ void MouseEventInterface::GetTouchpadTapSwitch(bool &switchFlag) const
 
 int32_t MouseEventInterface::SetTouchpadRightClickType(int32_t type) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -408,11 +365,7 @@ int32_t MouseEventInterface::SetTouchpadRightClickType(int32_t type) const
 
 void MouseEventInterface::GetTouchpadRightClickType(int32_t &type) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
@@ -422,11 +375,7 @@ void MouseEventInterface::GetTouchpadRightClickType(int32_t &type) const
 
 int32_t MouseEventInterface::SetTouchpadPointerSpeed(int32_t speed) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
@@ -436,11 +385,7 @@ int32_t MouseEventInterface::SetTouchpadPointerSpeed(int32_t speed) const
 
 void MouseEventInterface::GetTouchpadPointerSpeed(int32_t &speed) const
 {
-    std::shared_ptr<IInputServiceContext> env;
-    {
-        std::lock_guard guard { mutex_ };
-        env = env_.lock();
-    }
+    auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
@@ -450,82 +395,85 @@ void MouseEventInterface::GetTouchpadPointerSpeed(int32_t &speed) const
 
 void  MouseEventInterface::ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
 }
 
-int32_t MouseEventInterface::GetMouseCoordsX() const
+int32_t MouseEventInterface::GetMouseCoordsX()
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->GetMouseCoordsX();
+    return mouse->GetMouseCoordsX();
 }
 
-int32_t MouseEventInterface::GetMouseCoordsY() const
+int32_t MouseEventInterface::GetMouseCoordsY()
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->GetMouseCoordsY();
+    return mouse->GetMouseCoordsY();
 }
 
 void MouseEventInterface::SetMouseCoords(int32_t x, int32_t y)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
-    mouse_->SetMouseCoords(x, y);
+    mouse->SetMouseCoords(x, y);
 }
 
 bool MouseEventInterface::IsLeftBtnPressed()
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return false;
     }
-    return mouse_->IsLeftBtnPressed();
+    return mouse->IsLeftBtnPressed();
 }
 
 void MouseEventInterface::GetPressedButtons(std::vector<int32_t>& pressedButtons)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
-    mouse_->GetPressedButtons(pressedButtons);
+    mouse->GetPressedButtons(pressedButtons);
 }
 
 void MouseEventInterface::MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    LoadMouse();
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
-
-    mouse_->MouseBtnStateCounts(btnCode, btnState);
+    mouse->MouseBtnStateCounts(btnCode, btnState);
 }
 
 int32_t MouseEventInterface::LibinputChangeToPointer(const uint32_t keyValue)
 {
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return RET_ERR;
     }
-    return mouse_->LibinputChangeToPointer(keyValue);
+    return mouse->LibinputChangeToPointer(keyValue);
 }
 
 std::shared_ptr<MouseEventInterface> MouseEventInterface::GetInstance()
@@ -543,22 +491,30 @@ std::shared_ptr<MouseEventInterface> MouseEventInterface::GetInstance()
 MouseEventInterface::~MouseEventInterface()
 {
     TearDownDeviceObserver();
-    if (unloadTimerId_ >= 0) {
-        TimerMgr->RemoveTimer(unloadTimerId_);
-        unloadTimerId_ = -1;
-    }
+    RemoveUnloadingTimer();
 }
 
 void MouseEventInterface::AttachInputServiceContext(std::shared_ptr<IInputServiceContext> env)
 {
-    {
-        std::lock_guard guard { mutex_ };
-        env_ = env;
-    }
+    std::lock_guard guard { mutex_ };
+    env_ = env;
+}
+
+std::shared_ptr<IInputServiceContext> MouseEventInterface::GetEnv() const
+{
+    std::lock_guard guard { mutex_ };
+    return env_.lock();
+}
+
+ComponentManager::Handle<IMouseEventNormalize> MouseEventInterface::GetMouse() const
+{
+    std::lock_guard guard { mutex_ };
+    return mouse_;
 }
 
 void MouseEventInterface::SetUpDeviceObserver(std::shared_ptr<MouseEventInterface> self)
 {
+    std::lock_guard guard { mutex_ };
     if (inputDevObserver_ == nullptr) {
         inputDevObserver_ = std::make_shared<InputDeviceObserver>(self);
         INPUT_DEV_MGR->Attach(inputDevObserver_);
@@ -567,6 +523,7 @@ void MouseEventInterface::SetUpDeviceObserver(std::shared_ptr<MouseEventInterfac
 
 void MouseEventInterface::TearDownDeviceObserver()
 {
+    std::lock_guard guard { mutex_ };
     if (inputDevObserver_ != nullptr) {
         INPUT_DEV_MGR->Detach(inputDevObserver_);
         inputDevObserver_ = nullptr;
@@ -583,16 +540,15 @@ void MouseEventInterface::OnDeviceAdded(std::shared_ptr<MouseEventInterface> sel
         MMI_HILOGI("Device[%{private}d] Not mouse", deviceId);
         return;
     }
-    std::lock_guard guard { mutex_ };
-    if (unloadTimerId_ >= 0) {
-        TimerMgr->RemoveTimer(unloadTimerId_);
-        unloadTimerId_ = -1;
-    }
-    if (mouse_ != nullptr) {
-        mouse_->OnDeviceAdded(deviceId);
-    } else {
+    RemoveUnloadingTimer();
+    auto mouse = GetMouse();
+    if (mouse != nullptr) {
+        mouse->OnDeviceAdded(deviceId);
+    } else if (!loading_.load()) {
+        loading_.store(true);
         ffrt::submit([self]() {
             self->LoadMouse();
+            self->loading_.store(false);
         });
     }
 }
@@ -600,36 +556,34 @@ void MouseEventInterface::OnDeviceAdded(std::shared_ptr<MouseEventInterface> sel
 void MouseEventInterface::OnDeviceRemoved(std::shared_ptr<MouseEventInterface> self, int32_t deviceId)
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard { mutex_ };
-    if (mouse_ != nullptr) {
-        mouse_->OnDeviceRemoved(deviceId);
-        if (!mouse_->HasMouse() && unloadTimerId_ < 0) {
-            MMI_HILOGI("Schedule unloading Mouse");
-            unloadTimerId_ = TimerMgr->AddLongTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
-                [self]() {
-                    self->unloadTimerId_ = -1;
-                    self->UnloadMouse();
-                }, std::string("UnloadMouse"));
-        } else {
-            MMI_HILOGI("Mouse existed yet, do not unload");
-        }
-    } else {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGI("Mouse is nullptr");
+        return;
     }
+    mouse->OnDeviceRemoved(deviceId);
+    if (mouse->HasMouse()) {
+        MMI_HILOGI("Mouse existed yet, do not unload");
+        return;
+    }
+    ScheduleUnloadingTimer();
 }
 
 void MouseEventInterface::LoadMouse()
 {
-    MMI_HILOGI("Start loading Mouse");
-    std::shared_ptr<IInputServiceContext> env;
+    std::shared_ptr<IInputServiceContext> env {};
     {
         std::lock_guard guard { mutex_ };
+        if (mouse_ != nullptr) {
+            return;
+        }
         env = env_.lock();
     }
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
     }
+    MMI_HILOGI("Start loading Mouse");
     auto mouse = ComponentManager::LoadLibrary<IMouseEventNormalize>(
         env.get(), LIB_MOUSE_EVENT_NORMALIZATION_NAME);
     if (mouse == nullptr) {
@@ -647,48 +601,36 @@ void MouseEventInterface::LoadMouse()
 void MouseEventInterface::LoadMouseExplicitly()
 {
     CALL_INFO_TRACE;
-    {
-        std::lock_guard guard { mutex_ };
-        if (mouse_!= nullptr) {
-            MMI_HILOGI("Mouse loaded already");
-            if (unloadTimerId_ >= 0) {
-                TimerMgr->ResetTimer(unloadTimerId_);
-            }
-            return;
-        }
-        TimerMgr->RemoveTimer(unloadTimerId_);
-        unloadTimerId_ = -1;
+    auto mouse = GetMouse();
+    if (mouse != nullptr) {
+        ResetUnloadingTimer();
+        return;
     }
+    RemoveUnloadingTimer();
     LoadMouse();
-    {
-        std::lock_guard guard { mutex_ };
-        if (mouse_== nullptr) {
-            MMI_HILOGE("Load mouse failed");
-            return;
-        }
-        if (!mouse_->HasMouse()) {
-            MMI_HILOGI("Schedule unloading Mouse");
-            unloadTimerId_ = TimerMgr->AddLongTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
-                [this] () {
-                    this->unloadTimerId_ = -1;
-                    this->UnloadMouse();
-                }, std::string("UnloadMouse"));
-        }
+    mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGE("Load mouse failed");
+        return;
     }
+    if (mouse->HasMouse()) {
+        return;
+    }
+    ScheduleUnloadingTimer();
 }
 
 void MouseEventInterface::OnMouseLoaded()
 {
     CALL_INFO_TRACE;
-    std::lock_guard guard { mutex_ };
-    if (mouse_ == nullptr) {
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
     INPUT_DEV_MGR->ForEachDevice(
-        [this](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
+        [mouse](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
             if (dev.IsMouse()) {
-                mouse_->OnDeviceAdded(id);
+                mouse->OnDeviceAdded(id);
             }
         });
 }
@@ -699,6 +641,62 @@ void MouseEventInterface::UnloadMouse()
     std::lock_guard guard { mutex_ };
     unloadTimerId_ = -1;
     mouse_ = { nullptr, ComponentManager::Component<IMouseEventNormalize>() };
+}
+
+void MouseEventInterface::ScheduleUnloadingTimer()
+{
+    {
+        std::lock_guard guard { mutex_ };
+        if (unloadTimerId_ >= 0) {
+            return;
+        }
+    }
+    MMI_HILOGI("Schedule unloading Mouse");
+    auto timerId = TimerMgr->AddLongTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
+        [this]() {
+            this->UnloadMouse();
+        }, std::string("UnloadMouse"));
+    if (timerId < 0) {
+        MMI_HILOGE("AddLongTimer fail");
+        return;
+    }
+    {
+        std::lock_guard guard { mutex_ };
+        if (unloadTimerId_ < 0) {
+            unloadTimerId_ = timerId;
+            timerId = -1;
+        }
+    }
+    if (timerId >= 0) {
+        TimerMgr->RemoveTimer(timerId);
+    }
+}
+
+void MouseEventInterface::RemoveUnloadingTimer()
+{
+    int32_t timerId { -1 };
+
+    {
+        std::lock_guard guard { mutex_ };
+        timerId = unloadTimerId_;
+        unloadTimerId_ = -1;
+    }
+    if (timerId >= 0) {
+        TimerMgr->RemoveTimer(timerId);
+    }
+}
+
+void MouseEventInterface::ResetUnloadingTimer()
+{
+    int32_t timerId { -1 };
+
+    {
+        std::lock_guard guard { mutex_ };
+        timerId = unloadTimerId_;
+    }
+    if (timerId >= 0) {
+        TimerMgr->ResetTimer(timerId);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

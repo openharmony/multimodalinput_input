@@ -234,7 +234,7 @@ void JoystickLayoutMap::OnLoaded()
     auto timerMgr = JoystickEventNormalize::GetTimerManager(env_);
     if (timerMgr == nullptr) {
         MMI_HILOGE("TimerMgr is nullptr");
-    } else {
+    } else if (mapperTimerId_ < 0) {
         mapperTimerId_ = timerMgr->AddTimer(
             DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
             [this]() {
