@@ -637,10 +637,14 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     }
 }
 
-bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t type)
 {
     CHKPF(nextHandler_);
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_MOTION ||
+        type == LIBINPUT_EVENT_TOUCHPAD_UP) {
+        return false;
+    }
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -673,7 +677,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     EventStatistic::PushPointerEvent(pointerEvent);
-    if (HandleTouchPadTripleTapEvent(pointerEvent)) {
+    if (HandleTouchPadTripleTapEvent(pointerEvent, type)) {
         return RET_OK;
     }
     buttonIds_.insert(seatSlot);

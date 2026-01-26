@@ -54,7 +54,7 @@ private:
     int32_t OnEventDeviceRemoved(libinput_event *event);
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
-    bool HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t type);
 #ifndef OHOS_BUILD_ENABLE_WATCH
     int32_t HandleTableToolEvent(libinput_event* event);
 #endif // OHOS_BUILD_ENABLE_WATCH
