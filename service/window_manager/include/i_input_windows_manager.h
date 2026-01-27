@@ -212,6 +212,7 @@ public:
     virtual int32_t ControlMouseEventToAnco(int32_t windowId, bool enable, const std::string &callingTokenName) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
     virtual const OLD::DisplayGroupInfo& GetDefaultDisplayGroupInfo() = 0;
+    virtual bool AbandonRedispatch(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     static std::mutex mutex_;
     static std::shared_ptr<IInputWindowsManager> instance_;
