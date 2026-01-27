@@ -545,5 +545,16 @@ void BytraceAdapter::StopHardPointerMove()
 {
     FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT);
 }
+
+void BytraceAdapter::StartForegroundAppData(const std::string& type, size_t size)
+{
+    std::string traceInfo = type + ", size:" + std::to_string(size);
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT, traceInfo.c_str(), "");
+}
+ 
+void BytraceAdapter::StopForegroundAppData()
+{
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_MULTIMODALINPUT);
+}
 } // namespace MMI
 } // namespace OHOS
