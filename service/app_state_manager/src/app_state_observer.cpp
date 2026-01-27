@@ -15,6 +15,8 @@
 
 #include "app_state_observer.h"
 
+#include "bytrace_adapter.h"
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
@@ -31,7 +33,6 @@ AppObserverManager::~AppObserverManager() {}
 void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &processData)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     MMI_HILOGI("Process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
         processData.bundleName.c_str(),
         processData.uid,
@@ -73,16 +74,21 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 std::vector<AppExecFwk::AppStateData> AppObserverManager::GetForegroundAppData()
 {
     CALL_DEBUG_ENTER;
+    BytraceAdapter::StartForegroundAppData("GetForegroundAppData", foregroundAppData_.size());
     std::lock_guard<std::mutex> guard(mutex_);
     MMI_HILOGD("The foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
+    BytraceAdapter::StopForegroundAppData();
     return foregroundAppData_;
 }
 
 void AppObserverManager::SetForegroundAppData(const std::vector<AppExecFwk::AppStateData> &list)
 {
     CALL_DEBUG_ENTER;
+    BytraceAdapter::StartForegroundAppData("SetForegroundAppData", list.size());
+    std::lock_guard<std::mutex> guard(mutex_);
     foregroundAppData_ = list;
     MMI_HILOGI("The foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
+    BytraceAdapter::StopForegroundAppData();
 }
 
 void AppObserverManager::InitAppStateObserver()
