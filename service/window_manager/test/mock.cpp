@@ -198,15 +198,6 @@ bool PointerDrawingManager::Init()
 {
     return true;
 }
-void PointerDrawingManager::DeletePointerVisible(int32_t pid) {}
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
-{
-    return 0;
-}
-bool PointerDrawingManager::GetPointerVisible(int32_t pid)
-{
-    return true;
-}
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     return 0;
@@ -224,16 +215,7 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
 {
     return 0;
 }
-int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
-    bool isUiExtension)
-{
-    return 0;
-}
 void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle) {}
-bool PointerDrawingManager::IsPointerVisible()
-{
-    return false;
-}
 void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t displayId) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
@@ -245,10 +227,6 @@ bool PointerDrawingManager::GetMouseDisplayState() const
 }
 int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap, int32_t pid, int32_t windowId,
     int32_t focusX, int32_t focusY)
-{
-    return 0;
-}
-int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
 {
     return 0;
 }
@@ -268,14 +246,10 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 {
     return {};
 }
+void PointerDrawingManager::SetLastMouseStyle(PointerStyle style) {}
 IconStyle PointerDrawingManager::GetIconStyle(const MOUSE_ICON mouseStyle)
 {
     return {};
-}
-const std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIconPath()
-{
-    static std::map<MOUSE_ICON, IconStyle> emptyMap;
-    return emptyMap;
 }
 int32_t PointerDrawingManager::SwitchPointerStyle()
 {
@@ -303,8 +277,12 @@ void PointerDrawingManager::InitPointerCallback()
 {}
 void PointerDrawingManager::InitPointerObserver()
 {}
-void PointerDrawingManager::OnSessionLost(int pid)
-{}
+void PointerDrawingManager::DeleteSurfaceNode() {}
+void PointerDrawingManager::UpdatePointerVisible() {}
+int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
+{
+    return 0;
+}
 int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
 {
     return 0;
