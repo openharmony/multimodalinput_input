@@ -125,6 +125,9 @@ public:
     static void MMIServiceTraceStart(int32_t type, const std::string& msg);
     static void MMIServiceTraceStop();
 
+    static void StartForegroundAppData(const std::string& type, size_t size);
+    static void StopForegroundAppData();
+
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);
