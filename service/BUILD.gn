@@ -817,6 +817,7 @@ ohos_unittest("ApplicationStateObserverTest") {
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "${mmi_path}/service/app_state_manager/test/app_state_observer_test.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
   ]
 
   deps = [
