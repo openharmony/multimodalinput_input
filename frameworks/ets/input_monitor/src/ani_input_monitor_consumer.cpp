@@ -97,6 +97,8 @@ void AniInputMonitorConsumer::initFuncInfo()
             {"threeFingersTap", &AniInputMonitorConsumer::OnThreeFingersTapCallback}},
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
         { MONITORFUNTYPE::ON_FINGERPRINT, {"fingerprint", &AniInputMonitorConsumer::OnFingerprintCallback}},
+#else
+        { MONITORFUNTYPE::ON_FINGERPRINT, {"fingerprint", std::monostate{}}},
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
         { MONITORFUNTYPE::ON_SWIPEINWARD, {"swipeInward", &AniInputMonitorConsumer::OnSwipeInwardCallback}},
         { MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS,
