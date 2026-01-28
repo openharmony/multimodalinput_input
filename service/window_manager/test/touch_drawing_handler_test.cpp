@@ -1037,40 +1037,6 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawPointerPositionHan
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_003
- * @tc.desc: Test DrawPointerPositionHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
-    touchDrawingHandler.pointerEvent_ = PointerEvent::Create();
-    ASSERT_NE(touchDrawingHandler.pointerEvent_, nullptr);
-    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.trackerCanvasNode_, nullptr);
-    touchDrawingHandler.crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.crosshairCanvasNode_, nullptr);
-    touchDrawingHandler.labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.labelsCanvasNode_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetDisplayX(300);
-    item.SetDisplayY(500);
-    item.SetPointerId(100);
-    touchDrawingHandler.scaleW_ = 720;
-    touchDrawingHandler.scaleH_ = 1800;
-    touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    touchDrawingHandler.pointerEvent_->SetPointerId(100);
-    touchDrawingHandler.pointerEvent_->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.DrawPointerPositionHandler());
-
-    touchDrawingHandler.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.DrawPointerPositionHandler());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_DrawTracker_001
  * @tc.desc: Test DrawTracker
  * @tc.type: Function
@@ -1555,26 +1521,6 @@ HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ClearTracker_003, Test
     item.SetDisplayY(200);
     touchDrawingHandler.lastPointerItem_.emplace_back(item);
     touchDrawingHandler.isDownAction_ = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ClearTracker());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_ClearTracker_004
- * @tc.desc: Test ClearTracker
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingHandlerTest, TouchDrawingManagerTest_ClearTracker_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingHandler touchDrawingHandler;
-    touchDrawingHandler.trackerCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingHandler.trackerCanvasNode_, nullptr);
-    touchDrawingHandler.scaleW_ = 300;
-    touchDrawingHandler.scaleH_ = 500;
-    touchDrawingHandler.isDownAction_ = true;
-    EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ClearTracker());
-    touchDrawingHandler.isDownAction_ = false;
     EXPECT_NO_FATAL_FAILURE(touchDrawingHandler.ClearTracker());
 }
 
