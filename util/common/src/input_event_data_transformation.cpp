@@ -534,11 +534,13 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     PointerEvent::PointerItem pointerItem;
     if (!event->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        pkt << uint32_t(0U);
         return RET_ERR;
     }
     SecCompPointEvent *secCompPointEvent = static_cast<SecCompPointEvent*>(malloc(sizeof(SecCompPointEvent)));
     if (secCompPointEvent == NULL) {
         MMI_HILOGE("Malloc failed");
+        pkt << uint32_t(0U);
         return RET_ERR;
     }
     if (event->GetFixedMode() == PointerEvent::FixedMode::AUTO) {
@@ -556,7 +558,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(secCompPointEvent,
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
-        pkt << 0;
+        pkt << uint32_t(0U);
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
         return RET_ERR;
