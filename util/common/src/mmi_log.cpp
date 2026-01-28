@@ -15,7 +15,6 @@
 
 #include "mmi_log.h"
 
-#include "dlfcn.h"
 #include "axis_event.h"
 #include "key_event.h"
 #include "pointer_event.h"
@@ -23,40 +22,15 @@
 #define MMI_LOG_TAG "MMILog"
 namespace OHOS {
 namespace MMI {
-static void *g_selfSoHandler = nullptr;
-static std::mutex g_initMutex;
-// LCOV_EXCL_START
-extern "C" __attribute__((constructor)) void InitUtilSo()
-{
-    std::lock_guard<std::mutex> lock(g_initMutex);
-    if (g_selfSoHandler == nullptr) {
-        Dl_info info;
-        // dladdr func return value description
-        // On success, these functions return a nonzero value.
-        // If the address specified in addr could not be matched to a shared object, then these functions return 0
-        int ret = dladdr(reinterpret_cast<void *>(InitUtilSo), &info);
-        if (ret == 0) {
-            MMI_HILOGE("dladdr func call failed");
-            return;
-        }
-        g_selfSoHandler = dlopen(info.dli_fname, RTLD_NOW);
-        if (g_selfSoHandler == nullptr) {
-            const char *error = dlerror();
-            MMI_HILOGE("dlopen failed, dlerror:%{public}s", error != nullptr ? error : "unknown");
-        }
-    }
-}
-// LCOV_EXCL_STOP
-
 struct LogTraceKey {
     int64_t traceId;
     int32_t action;
     int32_t evtType;
 };
 
-thread_local std::vector<LogTraceKey> g_traceIds;
-thread_local std::unordered_map<int64_t, size_t> g_traceIdToIdx;
-thread_local std::string g_traceStr;
+__attribute__((no_destroy)) thread_local std::vector<LogTraceKey> g_traceIds;
+__attribute__((no_destroy)) thread_local std::unordered_map<int64_t, size_t> g_traceIdToIdx;
+__attribute__((no_destroy)) thread_local std::string g_traceStr;
 
 std::string_view Action2Str(int32_t eventType, int32_t action)
 {
