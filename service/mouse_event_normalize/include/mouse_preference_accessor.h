@@ -12,3 +12,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef MOUSE_PREFERENCE_ACCESSOR_H
+#define MOUSE_PREFERENCE_ACCESSOR_H
+
+#include "i_input_service_context.h"
+#include "pointer_event.h"
+#include "struct_multimodal.h"
+
+#include <atomic>
+#include <memory>
+#include <shared_mutex>
+
+namespace OHOS {
+namespace MMI {
+class MousePreferenceAccessor final {
+public:
+    MousePreferenceAccessor() = default;
+    ~MousePreferenceAccessor() = default;
+ 
+    static int32_t SetMouseScrollRows(IInputServiceContext &env, int32_t rows);
+    static int32_t GetMouseScrollRows(IInputServiceContext &env);
+    static int32_t SetMousePrimaryButton(IInputServiceContext &env,int32_t primaryButton);
+    static int32_t GetMousePrimaryButton(IInputServiceContext &env);
+    static int32_t SetPointerSpeed(IInputServiceContext &env, int32_t speed);
+    static int32_t GetPointerSpeed(IInputServiceContext &env);
+    static int32_t GetTouchpadSpeed(IInputServiceContext &env);
+    static int32_t SetTouchpadScrollSwitch(IInputServiceContext &env, int32_t pid, bool switchFlag);
+    static void GetTouchpadScrollSwitch(IInputServiceContext &env, bool &switchFlag);
+    static int32_t SetTouchpadScrollDirection(IInputServiceContext &env, bool state);
+    static void GetTouchpadScrollDirection(IInputServiceContext &env, bool &state);
+    static int32_t SetTouchpadTapSwitch(IInputServiceContext &env, bool switchFlag);
+    static void GetTouchpadTapSwitch(IInputServiceContext &env, bool &switchFlag);
+    static int32_t SetTouchpadRightClickType(IInputServiceContext &env, int32_t type);
+    static void GetTouchpadRightClickType(IInputServiceContext &env, int32_t &type);
+    static int32_t SetTouchpadPointerSpeed(IInputServiceContext &env, int32_t speed);
+    static void GetTouchpadPointerSpeed(IInputServiceContext &env, int32_t &speed);
+    static int32_t GetTouchpadScrollRows(IInputServiceContext &env);
+
+private:
+    static int32_t PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
+        const std::string &setFile, bool value);
+    static void GetConfigDataFromDatabase(IInputServiceContext &env, const std::string &key, bool &value);
+    static int32_t PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
+        const std::string &setFile, int32_t value);
+    static void GetConfigDataFromDatabase(IInputServiceContext &env, const std::string &key, int32_t &value);
+};
+} // namespace MMI
+} // namespace OHOS
+#endif // MOUSE_PREFERENCE_ACCESSOR_H
