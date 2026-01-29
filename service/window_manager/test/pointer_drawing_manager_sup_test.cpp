@@ -657,7 +657,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetMouseHotS
     int32_t hotSpotX = 3;
     int32_t hotSpotY = 4;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     inputWindowsManager->globalStyle_.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY));
 }
@@ -677,7 +677,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetMouseHotS
     int32_t hotSpotX = 3;
     int32_t hotSpotY = 4;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     inputWindowsManager->globalStyle_.id = MOUSE_ICON::DEFAULT;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY));
 }
@@ -697,10 +697,12 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_LoadCursorSv
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
-    pointerDrawingManager.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
+    CursorDrawingInformation& infomation = CursorDrawingInformation::GetInstance();
+    infomation.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
     pointerDrawingManager.tempPointerColor_ = -1;
     int32_t color = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.LoadCursorSvgWithColor(MOUSE_ICON::DEVELOPER_DEFINED_ICON, color));
+    infomation.mouseIcons_.clear();
 }
 
 /**
@@ -718,10 +720,12 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_LoadCursorSv
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
-    pointerDrawingManager.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
+    CursorDrawingInformation& infomation = CursorDrawingInformation::GetInstance();
+    infomation.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
     pointerDrawingManager.tempPointerColor_ = 1;
     int32_t color = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.LoadCursorSvgWithColor(MOUSE_ICON::DEVELOPER_DEFINED_ICON, color));
+    infomation.mouseIcons_.clear();
 }
 
 /**
@@ -739,10 +743,12 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_LoadCursorSv
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
-    pointerDrawingManager.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
+    CursorDrawingInformation& infomation = CursorDrawingInformation::GetInstance();
+    infomation.mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id), iconStyle));
     pointerDrawingManager.tempPointerColor_ = -1;
     int32_t color = MAX_POINTER_COLOR;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.LoadCursorSvgWithColor(MOUSE_ICON::DEVELOPER_DEFINED_ICON, color));
+    infomation.mouseIcons_.clear();
 }
 
 /**
@@ -973,16 +979,9 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DetachAllSur
 HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DeletePointerVisible_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
+    CursorDrawingInformation& infomation = CursorDrawingInformation::GetInstance();
     int32_t pid = 1;
-    pointerDrawingManager.InitPointerCallback();
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
+    ASSERT_NO_FATAL_FAILURE(infomation.DeletePointerVisible(pid));
 }
 
 /**
@@ -994,16 +993,15 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_DeletePointe
 HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_OnSessionLost_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.pidInfos_.clear();
+    CursorDrawingInformation::GetInstance().pidInfos_.clear();
     int32_t pid = 1;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     for (int32_t i = 1; i < 3; i++) {
         pidInfo.pid = 3 - i;
         pidInfo.visible = false;
-        pointerDrawingManager.hapPidInfos_.push_back(pidInfo);
+        CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
     }
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.OnSessionLost(pid));
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().OnSessionLost(pid));
 }
 
 /**
@@ -1015,16 +1013,15 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_OnSessionLos
 HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_OnSessionLost_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.pidInfos_.clear();
+    CursorDrawingInformation::GetInstance().pidInfos_.clear();
     int32_t pid = 10;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     for (int32_t i = 1; i < 3; i++) {
         pidInfo.pid = 3 - i;
         pidInfo.visible = false;
-        pointerDrawingManager.hapPidInfos_.push_back(pidInfo);
+        CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
     }
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.OnSessionLost(pid));
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().OnSessionLost(pid));
 }
 
 /**
@@ -1415,7 +1412,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_GetUserIconC
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     pointerDrawingManager.followSystem_ = true;
     pointerDrawingManager.cursorWidth_ = 300;
     pointerDrawingManager.cursorHeight_ = 300;
@@ -1435,7 +1432,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_GetUserIconC
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     pointerDrawingManager.followSystem_ = false;
     pointerDrawingManager.cursorWidth_ = 300;
     pointerDrawingManager.cursorHeight_ = 300;

@@ -38,15 +38,6 @@ public:
     {
         return true;
     }
-    virtual void DeletePointerVisible(int32_t pid) {}
-    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
-    {
-        return 0;
-    }
-    virtual bool GetPointerVisible(int32_t pid)
-    {
-        return true;
-    }
     virtual int32_t SetPointerColor(int32_t color)
     {
         return 0;
@@ -64,16 +55,7 @@ public:
     {
         return 0;
     }
-    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
-        bool isUiExtension = false)
-    {
-        return 0;
-    }
     virtual void DrawPointerStyle(const PointerStyle& pointerStyle) {}
-    virtual bool IsPointerVisible()
-    {
-        return false;
-    }
     virtual void SetPointerLocation(int32_t x, int32_t y, uint64_t rsId) {}
     virtual void SetMouseDisplayState(bool state) {}
     virtual bool GetMouseDisplayState() const
@@ -86,10 +68,6 @@ public:
         return 0;
     }
     virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options)
-    {
-        return 0;
-    }
-    virtual int32_t SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
     {
         return 0;
     }
@@ -120,11 +98,7 @@ public:
     {
         return {};
     }
-    virtual const std::map<MOUSE_ICON, IconStyle>& GetMouseIconPath()
-    {
-        static std::map<MOUSE_ICON, IconStyle> emptyMap;
-        return emptyMap;
-    }
+    virtual void SetLastMouseStyle(PointerStyle style) {}
     virtual int32_t SwitchPointerStyle()
     {
         return 0;
@@ -153,7 +127,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual void ForceClearPointerVisibleStatus() {}
     virtual void InitPointerObserver() {}
-    virtual void OnSessionLost(int32_t pid) {}
+    virtual void DeleteSurfaceNode() {}
+    virtual void UpdatePointerVisible() {}
+    virtual int32_t InitLayer(const MOUSE_ICON mouseStyle)
+    {
+        return 0;
+    }
     virtual int32_t SkipPointerLayer(bool isSkip)
     {
         return 0;
@@ -167,7 +146,6 @@ public:
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
     virtual void SubscribeScreenModeChange(uint64_t tid = 0) {}
     virtual void RegisterDisplayStatusReceiver() {}
-    virtual void InitDefaultMouseIconPath() {}
     virtual int32_t UpdateMouseLayer(int32_t physicalX, int32_t physicalY)
     {
         return 0;
