@@ -3166,7 +3166,7 @@ Input_Result OH_Input_GetPointerLocation(int32_t *displayId, double *displayX, d
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetPointerLocation(tmpDisplayId, tmpX, tmpY);
     if (ret != RET_OK) {
         MMI_HILOGE("Query pointer location failed, error:%{public}d", ret);
-        if (ret == OHOS::MMI::ERROR_DEVICE_NO_POINTER) {
+        if (ret == OHOS::MMI::ERROR_DEVICE_NO_POINTER || ret == OHOS::MMI::ERROR_UNSUPPORT) {
             MMI_HILOGE("The device has no pointer");
             return INPUT_DEVICE_NO_POINTER;
         }
