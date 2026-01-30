@@ -335,8 +335,7 @@ void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
     if (ret != RET_OK) {
         if (abs(ret) == ERROR_NOT_SYSAPI) {
             taihe::set_business_error(ERROR_NOT_SYSAPI, "Permission denied, non-system application called system api.");
-        }
-        else if (ret == ERROR_NO_PERMISSION) {
+        } else if (ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(-ret, "Permission denied.");
         } else {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
