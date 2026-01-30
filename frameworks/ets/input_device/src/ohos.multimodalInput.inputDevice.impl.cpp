@@ -45,7 +45,7 @@ constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
 constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
 constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
 constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
-constexpr int32_t REQUST_CALLBACK_OVERTIME { 100 };
+constexpr int32_t REQUEST_CALLBACK_OVERTIME { 100 };
 const std::string CHANGED_TYPE = "change";
 
 ::taihe::array<int32_t> GetDeviceIdsAsync()
@@ -344,7 +344,7 @@ void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
     }
     MMI_HILOGI("begin wait_for!!");
     std::unique_lock<std::mutex> lck(mtx);
-    auto status = cv.wait_for(lck, std::chrono::milliseconds(REQUST_CALLBACK_OVERTIME));
+    auto status = cv.wait_for(lck, std::chrono::milliseconds(REQUEST_CALLBACK_OVERTIME));
     MMI_HILOGI("wait_for end status:%{public}d!!", static_cast<int32_t>(status));
     if (status == std::cv_status::timeout) {
         MMI_HILOGE("callback overtime!!");
