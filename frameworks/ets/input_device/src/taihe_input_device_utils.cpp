@@ -16,6 +16,8 @@
 #include "taihe_input_device_utils.h"
 
 #include "define_multimodal.h"
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TaiheInputDeviceUtils"
@@ -196,5 +198,13 @@ ani_ref TaiheInputDeviceUtils::CreateBusinessError(ani_env* env, ani_int code, c
     return reinterpret_cast<ani_ref>(obj);
 }
 
+bool TaiheInputDeviceUtils::IsSystemApp()
+{
+    static bool isSystemApp = []() {
+        uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+        return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    }();
+    return isSystemApp;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -18,15 +18,9 @@
 #include <mutex>
 
 #include "ani_common.h"
-#include "define_multimodal.h"
 #include "input_device.h"
-#include "input_manager.h"
-#include "ohos.multimodalInput.inputDevice.proj.hpp"
-#include "ohos.multimodalInput.inputDevice.impl.hpp"
 #include "ohos.multimodalInput.inputDevice.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
-#include "stdexcept"
-#include "taihe/runtime.hpp"
 #include "taihe_event.h"
 #include "taihe_input_device_utils.h"
 
@@ -51,6 +45,7 @@ constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
 constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
 constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
 constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
+constexpr int32_t REQUST_CALLBACK_OVERTIME { 100 };
 const std::string CHANGED_TYPE = "change";
 
 ::taihe::array<int32_t> GetDeviceIdsAsync()
@@ -166,6 +161,10 @@ InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
 void SetKeyboardRepeatDelayAsync(int32_t delay)
 {
     CALL_DEBUG_ENTER;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return;
+    }
     if (delay < MIN_KEY_REPEAT_DELAY) {
         delay = MIN_KEY_REPEAT_DELAY;
     } else if (delay > MAX_KEY_REPEAT_DELAY) {
@@ -173,13 +172,12 @@ void SetKeyboardRepeatDelayAsync(int32_t delay)
     }
     int32_t ret = InputManager_t::GetInstance()->SetKeyboardRepeatDelay(delay);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d", ret);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set keyboard repeat delay, code:%{public}d message: %{public}s",
-            ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
         return;
     }
 }
@@ -188,16 +186,19 @@ int32_t GetKeyboardRepeatDelayAsync()
 {
     CALL_DEBUG_ENTER;
     int32_t delay = -1;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return delay;
+    }
     auto callback = [&delay] (int32_t tmpDelay) { delay = tmpDelay; };
     int32_t ret = InputManager_t::GetInstance()->GetKeyboardRepeatDelay(callback);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d,delay:%{public}d", ret, delay);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return delay;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to get keyboard repeat delay, code:%{public}d message: %{public}s",
-            ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
     }
     return delay;
 }
@@ -205,6 +206,10 @@ int32_t GetKeyboardRepeatDelayAsync()
 void SetKeyboardRepeatRateAsync(int32_t rate)
 {
     CALL_DEBUG_ENTER;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return;
+    }
     if (rate < MIN_KEY_REPEAT_RATE) {
         rate = MIN_KEY_REPEAT_RATE;
     } else if (rate > MAX_KEY_REPEAT_RATE) {
@@ -212,12 +217,12 @@ void SetKeyboardRepeatRateAsync(int32_t rate)
     }
     int32_t ret = InputManager_t::GetInstance()->SetKeyboardRepeatRate(rate);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d", ret);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set keyboard repeat rate, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
     }
 }
 
@@ -225,15 +230,19 @@ int32_t GetKeyboardRepeatRateAsync()
 {
     CALL_DEBUG_ENTER;
     int32_t rate = -1;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return rate;
+    }
     auto callback = [&rate] (int32_t tmpRate) { rate = tmpRate; };
     int32_t ret = InputManager_t::GetInstance()->GetKeyboardRepeatRate(callback);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d, rate:%{public}d", ret, rate);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return rate;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to get keyboard repeat rate, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
     }
     return rate;
 }
@@ -308,7 +317,8 @@ bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
     return resultState;
 }
 
-void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled) {
+void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
+{
     CALL_DEBUG_ENTER;
     std::mutex mtx;
     std::condition_variable cv;
@@ -333,15 +343,16 @@ void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled) {
         }
         return;
     }
-    MMI_HILOGE("ztw begin wait_for!!");
+    MMI_HILOGI("begin wait_for!!");
     std::unique_lock<std::mutex> lck(mtx);
-    auto status = cv.wait_for(lck, std::chrono::milliseconds(100));
-    MMI_HILOGE("ztw wait_for end status:%{public}d!!", static_cast<int32_t>(status));
+    auto status = cv.wait_for(lck, std::chrono::milliseconds(REQUST_CALLBACK_OVERTIME));
+    MMI_HILOGI("wait_for end status:%{public}d!!", static_cast<int32_t>(status));
     if (status == std::cv_status::timeout) {
         MMI_HILOGE("callback overtime!!");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Overtime!");
         return;
     }
+    MMI_HILOGI("Wait_for end return,ret:%{public}d", cbCode);
     if (cbCode != RET_OK) {
         if (cbCode == COMMON_DEVICE_NOT_EXIST) {
             taihe::set_business_error(COMMON_DEVICE_NOT_EXIST, "The specified device does not exist.");
