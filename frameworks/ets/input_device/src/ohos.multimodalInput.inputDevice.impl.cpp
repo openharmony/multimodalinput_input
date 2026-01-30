@@ -12,19 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <chrono>
+#include <condition_variable>
+#include <map>
+#include <mutex>
 
+#include "ani_common.h"
+#include "define_multimodal.h"
+#include "input_device.h"
+#include "input_manager.h"
 #include "ohos.multimodalInput.inputDevice.proj.hpp"
 #include "ohos.multimodalInput.inputDevice.impl.hpp"
-#include "taihe/runtime.hpp"
-#include "stdexcept"
-#include "input_device.h"
-#include "define_multimodal.h"
-#include "input_manager.h"
-#include "ani_common.h"
-#include <map>
-#include <ani.h>
 #include "ohos.multimodalInput.inputDevice.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
+#include "stdexcept"
+#include "taihe/runtime.hpp"
 #include "taihe_event.h"
 #include "taihe_input_device_utils.h"
 
@@ -306,80 +308,47 @@ bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
     return resultState;
 }
 
-bool ANIPromiseVoidCallback(ani_env* env, ani_resolver deferred, int32_t errCode)
-{
+void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled) {
     CALL_DEBUG_ENTER;
-    ani_status status = ANI_OK;
-    if (errCode != RET_OK) {
-        TaiheError  codeMsg;
-        if (!TaiheConverter::GetApiError(errCode, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", errCode);
-            return false;
-        }
-        auto callResult = TaiheInputDeviceUtils::CreateBusinessError(env, static_cast<ani_int>(errCode), codeMsg.msg);
-        if (callResult == nullptr) {
-            MMI_HILOGE("The callResult is nullptr");
-            return false;
-        }
-        if ((status = env->PromiseResolver_Reject(deferred, static_cast<ani_error>(callResult))) != ANI_OK) {
-            MMI_HILOGE("create promise object failed, status = %{public}d", status);
-            return false;
-        }
-        return true;
-    }
-    ani_ref promiseResult;
-    if ((status = env->GetUndefined(&promiseResult)) != ANI_OK) {
-        MMI_HILOGE("get undefined value failed, status = %{public}d", status);
-        return false;
-    }
-    if ((status = env->PromiseResolver_Resolve(deferred, promiseResult)) != ANI_OK) {
-        MMI_HILOGE("PromiseResolver_Resolve failed, status = %{public}d", status);
-        return false;
-    }
-    return true;
-}
-
-uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
-{
-    if (deviceId < 0) {
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid deviceId!");
-        MMI_HILOGE("Invalid deviceId");
-        return 0;
-    }
-    ani_env *env = taihe::get_env();
-    if (!env) {
-        MMI_HILOGE("env is null");
-        return 0;
-    }
-    ani_status status = ANI_OK;
-    ani_object promise;
-    ani_resolver deferred = nullptr;
-    if ((status = env->Promise_New(&deferred, &promise)) != ANI_OK) {
-        MMI_HILOGE("create promise object failed, status = %{public}d", status);
-        return reinterpret_cast<uintptr_t>(promise);
-    }
-    std::function<void(int32_t)> callback = [env, deferred](int32_t errcode) {
+    std::mutex mtx;
+    std::condition_variable cv;
+    int32_t cbCode = RET_ERR;
+    std::function<void(int32_t)> callback = [&cbCode, &mtx, &cv](int32_t errcode) {
         CALL_DEBUG_ENTER;
-        ani_env* etsEnv = env;
-        ANIPromiseVoidCallback(etsEnv, deferred, errcode);
+        std::unique_lock<std::mutex> lck(mtx);
+        cbCode = errcode;
+        MMI_HILOGI("Callback exec,:%{public}d", cbCode);
+        cv.notify_all();
     };
     int32_t ret = InputManager_t::GetInstance()->SetInputDeviceEnabled(deviceId, enabled, callback);
+    MMI_HILOGI("ret code:%{public}d", ret);
     if (ret != RET_OK) {
-        if (ret == ERROR_NO_PERMISSION) {
+        if (abs(ret) == ERROR_NOT_SYSAPI) {
+            taihe::set_business_error(ERROR_NOT_SYSAPI, "Permission denied, non-system application called system api.");
+        }
+        else if (ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(-ret, "Permission denied.");
-            return 0;
-        }
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        } else {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
-            return 0;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set functionKey state, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
-        return 0;
+        return;
     }
-    return reinterpret_cast<uintptr_t>(promise);
+    MMI_HILOGE("ztw begin wait_for!!");
+    std::unique_lock<std::mutex> lck(mtx);
+    auto status = cv.wait_for(lck, std::chrono::milliseconds(100));
+    MMI_HILOGE("ztw wait_for end status:%{public}d!!", static_cast<int32_t>(status));
+    if (status == std::cv_status::timeout) {
+        MMI_HILOGE("callback overtime!!");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Overtime!");
+        return;
+    }
+    if (cbCode != RET_OK) {
+        if (cbCode == COMMON_DEVICE_NOT_EXIST) {
+            taihe::set_business_error(COMMON_DEVICE_NOT_EXIST, "The specified device does not exist.");
+            return;
+        }
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Service return error!");
+    }
 }
 
 TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
@@ -437,7 +406,7 @@ TH_EXPORT_CPP_API_GetKeyboardRepeatRateAsync(GetKeyboardRepeatRateAsync);
 TH_EXPORT_CPP_API_GetIntervalSinceLastInputAsync(GetIntervalSinceLastInputAsync);
 TH_EXPORT_CPP_API_SetFunctionKeyEnabledAsync(SetFunctionKeyEnabledAsync);
 TH_EXPORT_CPP_API_IsFunctionKeyEnabledAsync(IsFunctionKeyEnabledAsync);
-TH_EXPORT_CPP_API_SetInputDeviceEnablePromise(SetInputDeviceEnablePromise);
+TH_EXPORT_CPP_API_SetInputDeviceEnableSyncImpl(SetInputDeviceEnableSyncImpl);
 TH_EXPORT_CPP_API_GetKeyboardTypeSyncWrapper(GetKeyboardTypeSyncWrapper);
 TH_EXPORT_CPP_API_GetKeyboardTypeSync(GetKeyboardTypeSync);
 TH_EXPORT_CPP_API_onKeyImpl(onKeyImpl);
