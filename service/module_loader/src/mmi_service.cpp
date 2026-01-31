@@ -105,6 +105,11 @@
 #endif // OHOS_BUILD_ENABLE_PEN
 #include "config_policy_utils.h"
 #include "drag_security_manager.h"
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+#include "mouse_event_interface.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -784,7 +789,7 @@ ErrCode MMIService::SetMouseScrollRows(int32_t rows)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [rows] {
-            return :MouseEventHdr->SetMouseScrollRows(rows);
+            return MouseEventHdr->SetMouseScrollRows(rows);
         }
         );
     if (ret != RET_OK) {
@@ -1096,7 +1101,7 @@ ErrCode MMIService::SetMousePrimaryButton(int32_t primaryButton)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [primaryButton] {
-            return :MouseEventHdr->SetMousePrimaryButton(primaryButton);
+            return MouseEventHdr->SetMousePrimaryButton(primaryButton);
         }
         );
     if (ret != RET_OK) {
@@ -1295,7 +1300,7 @@ ErrCode MMIService::SetPointerSpeed(int32_t speed)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
-            return :MouseEventHdr->SetPointerSpeed(speed);
+            return MouseEventHdr->SetPointerSpeed(speed);
         }
         );
     if (ret != RET_OK) {
@@ -2308,6 +2313,8 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
     auto pointerEventPtr = std::make_shared<PointerEvent>(pointerEvent);
     CHKPR(pointerEventPtr, ERROR_NULL_POINTER);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    // Dynamic load mouse module Sync.
+    MouseEventHdr->LoadMouseExplicitly();
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
@@ -3047,7 +3054,7 @@ ErrCode MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [x, y, displayId] {
-            return :MouseEventHdr->SetPointerLocation(x, y, displayId);
+            return MouseEventHdr->SetPointerLocation(x, y, displayId);
         }
         );
     if (ret != RET_OK) {
@@ -3077,7 +3084,7 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
             if (!WIN_MGR->CheckAppFocused(clientPid)) {
                 return ERROR_APP_NOT_FOCUSED;
             }
-            return :MouseEventHdr->GetPointerLocation(displayId,
+            return MouseEventHdr->GetPointerLocation(displayId,
                 displayX, displayY);
         });
     if (ret != RET_OK) {
@@ -3180,6 +3187,11 @@ void MMIService::PreEventLoop()
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     JOYSTICK_NORMALIZER->AttachInputServiceContext(serviceContext_);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    MouseEventHdr->AttachInputServiceContext(serviceContext_);
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     AddSessionObserver();
 #endif // OHOS_BUILD_ENABLE_TOUCH_GESTURE
@@ -3561,7 +3573,7 @@ ErrCode MMIService::SetTouchpadScrollSwitch(bool switchFlag)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, switchFlag] {
-            return :MouseEventHdr->SetTouchpadScrollSwitch(clientPid,
+            return MouseEventHdr->SetTouchpadScrollSwitch(clientPid,
                 switchFlag);
         }
         );
@@ -3613,7 +3625,7 @@ ErrCode MMIService::SetTouchpadScrollDirection(bool state)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [state] {
-            return :MouseEventHdr->SetTouchpadScrollDirection(state);
+            return MouseEventHdr->SetTouchpadScrollDirection(state);
         }
         );
     if (ret != RET_OK) {
@@ -3664,7 +3676,7 @@ ErrCode MMIService::SetTouchpadTapSwitch(bool switchFlag)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
-            return :MouseEventHdr->SetTouchpadTapSwitch(switchFlag);
+            return MouseEventHdr->SetTouchpadTapSwitch(switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3720,7 +3732,7 @@ ErrCode MMIService::SetTouchpadPointerSpeed(int32_t speed)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
-            return :MouseEventHdr->SetTouchpadPointerSpeed(speed);
+            return MouseEventHdr->SetTouchpadPointerSpeed(speed);
         }
         );
     if (ret != RET_OK) {
@@ -3918,7 +3930,7 @@ ErrCode MMIService::SetTouchpadRightClickType(int32_t type)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [type] {
-            return :MouseEventHdr->SetTouchpadRightClickType(type);
+            return MouseEventHdr->SetTouchpadRightClickType(type);
         }
         );
     if (ret != RET_OK) {

@@ -83,7 +83,7 @@ public:
 
 public:
     DISALLOW_COPY_AND_MOVE(MouseTransformProcessor);
-    explicit MouseTransformProcessor(int32_t deviceId);
+    explicit MouseTransformProcessor(IInputServiceContext *env, int32_t deviceId);
     ~MouseTransformProcessor();
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
@@ -196,16 +196,16 @@ private:
     std::map<int32_t, int32_t> buttonMapping_;
     static TouchpadCDG touchpadOption_;
     Aggregator aggregator_ {
-            [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
-                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+            [this](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+                return env_->GetTimerManager()->AddTimer(intervalMs, repeatCount, std::move(callback));
             },
-            [](int32_t timerId) -> int32_t
+            [this](int32_t timerId) -> int32_t
             {
-                return TimerMgr->ResetTimer(timerId);
+                return env_->GetTimerManager()->ResetTimer(timerId);
             },
-            [](int32_t timerId) -> int32_t
+            [this](int32_t timerId) -> int32_t
             {
-                return TimerMgr->RemoveTimer(timerId);
+                return env_->GetTimerManager()->RemoveTimer(timerId);
             }
     };
     bool enableMouseAleaccelerateBool_ { true };

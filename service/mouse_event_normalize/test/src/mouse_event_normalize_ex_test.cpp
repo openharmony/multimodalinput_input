@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "mmi_log.h"
-#include "mouse_event_normalize.h"
+#include "mouse_event_interface.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseEventNormalizeEXTest"
@@ -43,10 +43,7 @@ HWTEST_F(MouseEventNormalizeEXTest, MouseEventNormalizeEXTest_GetPointerLocation
     int32_t displayId = 0;
     double displayX = 0.0;
     double displayY = 0.0;
-    EXPECT_EQ(MouseEventHdr->GetPointerLocation(displayId, displayX, displayY), RET_OK);
-    EXPECT_EQ(displayId, -1);
-    EXPECT_EQ(displayX, 0);
-    EXPECT_EQ(displayY, 0);
+    EXPECT_EQ(MouseEventHdr->GetPointerLocation(displayId, displayX, displayY), RET_ERR);
 }
 }
 }

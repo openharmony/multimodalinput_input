@@ -54,6 +54,11 @@ ohos_unittest("EventNormalizeHandlerTestWithMock") {
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/service/common/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/intention/scheduler/component_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/delegate_task/include",
   ]
 
   sources = [

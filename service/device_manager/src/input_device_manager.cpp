@@ -89,6 +89,18 @@ std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
 InputDeviceManager::HiddenInputDevice::HiddenInputDevice(const InputDeviceInfo &devInfo)
     : devInfo_(devInfo) {}
 
+InputDeviceManager::HiddenInputDevice::HiddenInputDevice(const std::shared_ptr<InputDevice> device)
+{
+    if (!device) {
+        MMI_HILOGE("Device is nullptr");
+        return;
+    }
+    devInfo_.isRemote = false;
+    devInfo_.isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    devInfo_.isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    devInfo_.enable = true;
+}
+
 struct libinput_device* InputDeviceManager::HiddenInputDevice::GetRawDevice() const
 {
     return devInfo_.inputDeviceOrigin;
@@ -113,16 +125,23 @@ bool InputDeviceManager::HiddenInputDevice::IsJoystick() const
     return libinput_device_has_capability(inputDev, LIBINPUT_DEVICE_CAP_JOYSTICK);
 }
 
+bool InputDeviceManager::HiddenInputDevice::IsMouse() const
+{
+    return devInfo_.isPointerDevice;
+}
+
 bool InputDeviceManager::CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const
 {
     if (!pred) {
         return false;
     }
-    auto iter = inputDevice_.find(deviceId);
-    if (iter == inputDevice_.cend()) {
-        return false;
+    if (auto iter = inputDevice_.find(deviceId); iter != inputDevice_.cend()) {
+        return pred(HiddenInputDevice(iter->second));
     }
-    return pred(HiddenInputDevice(iter->second));
+    if (auto iter = virtualInputDevices_.find(deviceId); iter != virtualInputDevices_.cend()) {
+        return pred(HiddenInputDevice(iter->second));
+    }
+    return false;
 }
 
 void InputDeviceManager::ForEachDevice(std::function<void(int32_t, const IInputDevice&)> callback) const
@@ -133,6 +152,9 @@ void InputDeviceManager::ForEachDevice(std::function<void(int32_t, const IInputD
     for (const auto &[deviceId, dev] : inputDevice_) {
         callback(deviceId, HiddenInputDevice(dev));
     }
+    for (const auto &[deviceId, dev] : virtualInputDevices_) {
+        callback(deviceId, HiddenInputDevice(dev));
+    }
 }
 
 void InputDeviceManager::ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const
@@ -141,6 +163,9 @@ void InputDeviceManager::ForDevice(int32_t deviceId, std::function<void(const II
         return;
     }
     if (auto iter = inputDevice_.find(deviceId); iter != inputDevice_.cend()) {
+        callback(HiddenInputDevice(iter->second));
+    }
+    if (auto iter = virtualInputDevices_.find(deviceId); iter != virtualInputDevices_.cend()) {
         callback(HiddenInputDevice(iter->second));
     }
 }
@@ -155,7 +180,14 @@ void InputDeviceManager::ForOneDevice(std::function<bool(int32_t, const IInputDe
         HiddenInputDevice inputDev { dev };
         if (pred(deviceId, inputDev)) {
             callback(deviceId, inputDev);
-            break;
+            return;
+        }
+    }
+    for (const auto &[deviceId, dev] : virtualInputDevices_) {
+        HiddenInputDevice inputDev { dev };
+        if (pred(deviceId, inputDev)) {
+            callback(deviceId, inputDev);
+            return;
         }
     }
 }
@@ -410,7 +442,6 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
     devListeners_.remove(sess);
 }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
     // LCOV_EXCL_START
@@ -423,6 +454,8 @@ bool InputDeviceManager::HasPointerDevice()
     return false;
     // LCOV_EXCL_STOP
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 bool InputDeviceManager::HasVirtualPointerDevice()
 {

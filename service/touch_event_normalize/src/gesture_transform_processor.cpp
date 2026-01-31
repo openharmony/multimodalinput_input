@@ -16,7 +16,7 @@
 #include "gesture_transform_processor.h"
 
 #include "mmi_log.h"
-#include "mouse_device_state.h"
+#include "mouse_event_interface.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -39,20 +39,20 @@ void GestureTransformProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture
 
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
-    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
-    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
-    pointerItem.SetDisplayXPos(MouseState->GetMouseCoordsX());
-    pointerItem.SetDisplayYPos(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseEventHdr->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseEventHdr->GetMouseCoordsY());
+    pointerItem.SetDisplayXPos(MouseEventHdr->GetMouseCoordsX());
+    pointerItem.SetDisplayYPos(MouseEventHdr->GetMouseCoordsY());
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(defaultPointerId);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
-    pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetPressed(MouseEventHdr->IsLeftBtnPressed());
     pointerEvent_->AddPointerItem(pointerItem);
 
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
+    MouseEventHdr->GetPressedButtons(pressedButtons);
     for (const auto &item : pressedButtons) {
         pointerEvent_->SetButtonPressed(item);
     }
@@ -74,16 +74,16 @@ void GestureTransformProcessor::OnEventTouchPadPinchUpdate(libinput_event_gestur
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
-    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
-    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
-    pointerItem.SetDisplayXPos(MouseState->GetMouseCoordsX());
-    pointerItem.SetDisplayYPos(MouseState->GetMouseCoordsY());
-    pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetDisplayX(MouseEventHdr->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseEventHdr->GetMouseCoordsY());
+    pointerItem.SetDisplayXPos(MouseEventHdr->GetMouseCoordsX());
+    pointerItem.SetDisplayYPos(MouseEventHdr->GetMouseCoordsY());
+    pointerItem.SetPressed(MouseEventHdr->IsLeftBtnPressed());
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
+    MouseEventHdr->GetPressedButtons(pressedButtons);
     for (const auto &item : pressedButtons) {
         pointerEvent_->SetButtonPressed(item);
     }
@@ -101,16 +101,16 @@ void GestureTransformProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
-    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
-    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
-    pointerItem.SetDisplayXPos(MouseState->GetMouseCoordsX());
-    pointerItem.SetDisplayYPos(MouseState->GetMouseCoordsY());
-    pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetDisplayX(MouseEventHdr->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseEventHdr->GetMouseCoordsY());
+    pointerItem.SetDisplayXPos(MouseEventHdr->GetMouseCoordsX());
+    pointerItem.SetDisplayYPos(MouseEventHdr->GetMouseCoordsY());
+    pointerItem.SetPressed(MouseEventHdr->IsLeftBtnPressed());
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
+    MouseEventHdr->GetPressedButtons(pressedButtons);
     for (const auto &item : pressedButtons) {
         pointerEvent_->SetButtonPressed(item);
     }

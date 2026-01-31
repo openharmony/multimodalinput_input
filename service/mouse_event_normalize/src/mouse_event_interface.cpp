@@ -65,7 +65,6 @@ bool MouseEventInterface::HasMouse()
 
 int32_t MouseEventInterface::OnEvent(struct libinput_event *event)
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -76,7 +75,6 @@ int32_t MouseEventInterface::OnEvent(struct libinput_event *event)
 
 std::shared_ptr<PointerEvent> MouseEventInterface::GetPointerEvent()
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -117,7 +115,6 @@ int32_t MouseEventInterface::NormalizeRotateEvent(struct libinput_event *event, 
 
 bool MouseEventInterface::CheckAndPackageAxisEvent(libinput_event* event)
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -129,7 +126,6 @@ bool MouseEventInterface::CheckAndPackageAxisEvent(libinput_event* event)
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
 bool MouseEventInterface::CheckFilterMouseEvent(struct libinput_event *event)
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -161,9 +157,8 @@ void MouseEventInterface::OnDisplayLost(int32_t displayId)
     mouse_->OnDisplayLost(displayId);
 }
 
-int32_t MouseEventInterface::GetDisplayId()
+int32_t MouseEventInterface::GetDisplayId() const
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -453,9 +448,18 @@ void MouseEventInterface::GetTouchpadPointerSpeed(int32_t &speed) const
     MousePreferenceAccessor::GetTouchpadPointerSpeed(*env, speed);
 }
 
-int32_t MouseEventInterface::GetMouseCoordsX()
+void  MouseEventInterface::GetTouchpadCDG(TouchpadCDG &touchpadCDG) const
 {
-    LoadMouse();
+    std::lock_guard guard { mutex_ };
+    if (mouse_ == nullptr) {
+        MMI_HILOGE("Mouse module not loaded");
+        return RET_ERR;
+    }
+    mouse_->GetTouchpadCDG(touchpadCDG);
+}
+
+int32_t MouseEventInterface::GetMouseCoordsX() const
+{
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -464,9 +468,8 @@ int32_t MouseEventInterface::GetMouseCoordsX()
     return mouse_->GetMouseCoordsX();
 }
 
-int32_t MouseEventInterface::GetMouseCoordsY()
+int32_t MouseEventInterface::GetMouseCoordsY() const
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -477,7 +480,6 @@ int32_t MouseEventInterface::GetMouseCoordsY()
 
 void MouseEventInterface::SetMouseCoords(int32_t x, int32_t y)
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -508,7 +510,6 @@ void MouseEventInterface::GetPressedButtons(std::vector<int32_t>& pressedButtons
 
 void MouseEventInterface::MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState)
 {
-    LoadMouse();
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
@@ -624,10 +625,6 @@ void MouseEventInterface::LoadMouse()
     std::shared_ptr<IInputServiceContext> env;
     {
         std::lock_guard guard { mutex_ };
-        if (mouse_ != nullptr) {
-            MMI_HILOGI("Mouse loaded already");
-            return;
-        }
         env = env_.lock();
     }
     if (env == nullptr) {

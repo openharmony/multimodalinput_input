@@ -22,6 +22,7 @@
 
 #include "input_device_manager.h"
 #include "input_service_context.h"
+#include "input_device_manager.h"
 #include "joystick_event_processor.h"
 #include "joystick_layout_map_builder.h"
 #include "key_event_value_transformation.h"

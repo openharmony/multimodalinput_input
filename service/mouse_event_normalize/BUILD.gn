@@ -25,10 +25,6 @@ sanitize = {
 
 defines = input_default_defines
 
-  if (is_emulator) {
-    defines += [ "OHOS_BUILD_EMULATOR" ]
-  }
-
 include_dirs = [
     "${mmi_path}/intention/prototype/include",
     "${mmi_path}/service/mouse_event_normalize/include",
@@ -166,6 +162,7 @@ external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "preferences:native_preferences",
+    "ipc:ipc_single",
 ]
 
 part_name = "${mmi_part_name}"

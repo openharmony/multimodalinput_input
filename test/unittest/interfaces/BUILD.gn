@@ -82,6 +82,7 @@ ohos_unittest("InputNativeHotkeyTest") {
     "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
   ]
 
   external_deps = [

@@ -22,6 +22,7 @@
 #include "key_command_handler_util.h"
 #include "key_unicode_transformation.h"
 #include "misc_product_type_parser.h"
+#include "timer_manager.h"
 #include "libinput_adapter.h"
 #include "key_auto_repeat.h"
 #include "libinput_adapter.h"

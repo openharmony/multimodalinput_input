@@ -21,7 +21,7 @@
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
-#include "mouse_device_state.h"
+#include "mouse_event_interface.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -410,7 +410,7 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     avgCoord /= fingerCount;
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
-    pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetPressed(MouseEventHdr->IsLeftBtnPressed());
     pointerItem.SetDownTime(time);
     pointerItem.SetDisplayX(avgCoord.x);
     pointerItem.SetDisplayY(avgCoord.y);
@@ -507,7 +507,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
 {
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
-    pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetPressed(MouseEventHdr->IsLeftBtnPressed());
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
@@ -530,7 +530,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent
     CALL_DEBUG_ENTER;
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
-    MouseState->GetPressedButtons(pressedButtons);
+    MouseEventHdr->GetPressedButtons(pressedButtons);
     for (const auto &item : pressedButtons) {
         pointerEvent_->SetButtonPressed(item);
     }
