@@ -1133,12 +1133,12 @@ void JsInputConsumer::OnSubscribeKeyMonitor(size_t keyMonitorId, std::shared_ptr
     work->work_.data = work.get();
     work->keyEvent_ = keyEvent;
 
-    auto ret = uv_queue_work_with_qos(
+    auto ret = uv_queue_work_with_qos_internal(
         loop, &work->work_,
         [](uv_work_t *work) {
             MMI_HILOGD("uv_queue_work callback function is called");
         },
-        JsInputConsumer::HandleKeyMonitor, uv_qos_user_initiated);
+        JsInputConsumer::HandleKeyMonitor, uv_qos_user_initiated, "onKeyPressed");
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos fail, error:%{public}d", ret);
         return;

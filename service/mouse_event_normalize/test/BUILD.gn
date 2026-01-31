@@ -85,6 +85,7 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
     "cJSON:cjson",
     "googletest:gmock_main",
     "googletest:gtest_main",
+    "graphic_2d:librender_service_base",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "init:libbegetutil",

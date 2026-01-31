@@ -884,7 +884,6 @@ int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& cu
         MMI_HILOGE("Check pid permission failed");
         return ret;
     }
-    CursorDrawingComponent::GetInstance();
     ret = delegateTasks_.PostSyncTask(std::bind(
         [pid, windowId, curPixelMap] {
             return CursorDrawingComponent::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
@@ -1159,7 +1158,6 @@ ErrCode MMIService::SetPointerVisible(bool visible, int32_t priority)
         isHap = true;
     }
     int32_t clientPid = GetCallingPid();
-    CursorDrawingComponent::GetInstance();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, visible, priority, isHap] {
             if (!POINTER_DEV_MGR.isInit) {
@@ -1382,7 +1380,6 @@ ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointe
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
-    CursorDrawingComponent::GetInstance();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, pointerStyle, isUiExtension] {
             if (!POINTER_DEV_MGR.isInit) {
@@ -1435,7 +1432,6 @@ ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
-    CursorDrawingComponent::GetInstance();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, windowId, &pointerStyle, isUiExtension] {
             if (!POINTER_DEV_MGR.isInit) {

@@ -97,6 +97,8 @@ void AniInputMonitorConsumer::initFuncInfo()
             {"threeFingersTap", &AniInputMonitorConsumer::OnThreeFingersTapCallback}},
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
         { MONITORFUNTYPE::ON_FINGERPRINT, {"fingerprint", &AniInputMonitorConsumer::OnFingerprintCallback}},
+#else
+        { MONITORFUNTYPE::ON_FINGERPRINT, {"fingerprint", std::monostate{}}},
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
         { MONITORFUNTYPE::ON_SWIPEINWARD, {"swipeInward", &AniInputMonitorConsumer::OnSwipeInwardCallback}},
         { MONITORFUNTYPE::ON_TOUCHSCREENSWIPE_FINGERS,
@@ -350,11 +352,11 @@ void AniInputMonitorConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointer
             return;
         }
         MMI_HILOGD("the loop status %{public}d", loop->stop_flag);
-        int32_t ret = uv_queue_work_with_qos(
+        int32_t ret = uv_queue_work_with_qos_internal(
             loop, work,
             executeCallback,
             AniInputMonitorConsumer::AniWorkCallback,
-            uv_qos_user_initiated);
+            uv_qos_user_initiated, "PointerEventByMonitor");
         if (ret != 0) {
             MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
             CleanData(&monitorInfo, &work);

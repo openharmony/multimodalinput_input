@@ -46,6 +46,7 @@ ohos_fuzztest("WindowManagerSetPointerLocationFuzzTest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:librender_service_base",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]

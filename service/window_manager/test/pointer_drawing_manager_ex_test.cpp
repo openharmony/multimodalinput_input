@@ -267,7 +267,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DestroyPointerWind
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     bool isUiExtension = true;
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
@@ -276,9 +275,9 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
 
     int32_t pid = 1;
     int32_t windowId = 2;
-    bool ret1 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
+    bool ret1 = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret1);
-    int32_t ret2 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
     int32_t ret3 = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret3, RET_OK);
@@ -292,7 +291,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_00
     EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(windowId));
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif //OHOS_BUILD_ENABLE_POINTER
-    int32_t ret4 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret4 = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret4, RET_OK);
 }
 
@@ -345,14 +344,14 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPointerStyle_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     int32_t pid = 1;
     int32_t windowId = 2;
     EXPECT_TRUE(windowId != GLOBAL_WINDOW_ID);
     PointerStyle pointerStyle;
     bool isUiExtension = true;
     pointerStyle.id = 1;
-    int32_t ret1 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret1 =
+        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret1, RET_OK);
 
     PointerStyle style;
@@ -360,16 +359,19 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPoint
     EXPECT_FALSE(windowId != GLOBAL_WINDOW_ID);
     pointerStyle.id = 2;
     style.id = 3;
-    int32_t ret2 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret2 =
+        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret2, RET_OK);
 
     pointerStyle.id = MOUSE_ICON::DEFAULT;
-    int32_t ret3 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret3 =
+        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret3, RET_OK);
 
     pointerStyle.id = 3;
     EXPECT_TRUE(pointerStyle.id == style.id);
-    int32_t ret4 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret4 =
+        CursorDrawingInformation::GetInstance().UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret4, RET_OK);
 }
 
@@ -382,16 +384,20 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPoint
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.mouseIcons_[DEFAULT] = {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
-    pointerDrawingManager.mouseIcons_[EAST] = {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
-    pointerDrawingManager.mouseIcons_[WEST] = {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
-    pointerDrawingManager.mouseIcons_[SOUTH] = {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
-    pointerDrawingManager.mouseIcons_[NORTH] = {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[DEFAULT] =
+        {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[EAST] =
+        {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[WEST] =
+        {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[SOUTH] =
+        {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[NORTH] =
+        {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
 
     MOUSE_ICON mouseStyle = EAST;
     std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateIconPath(mouseStyle, iconPath));
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().UpdateIconPath(mouseStyle, iconPath));
 }
 
 /**
@@ -403,16 +409,20 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_01,
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.mouseIcons_[DEFAULT] = {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
-    pointerDrawingManager.mouseIcons_[EAST] = {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
-    pointerDrawingManager.mouseIcons_[WEST] = {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
-    pointerDrawingManager.mouseIcons_[SOUTH] = {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
-    pointerDrawingManager.mouseIcons_[NORTH] = {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[DEFAULT] =
+        {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[EAST] =
+        {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[WEST] =
+        {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[SOUTH] =
+        {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
+    CursorDrawingInformation::GetInstance().mouseIcons_[NORTH] =
+        {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
 
     MOUSE_ICON mouseStyle = WEST_EAST;
     std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateIconPath(mouseStyle, iconPath));
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().UpdateIconPath(mouseStyle, iconPath));
 }
 
 /**
@@ -424,19 +434,18 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_02,
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_IsPointerStyleParamValid_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     int32_t windowId = 2;
     PointerStyle pointerStyle;
     pointerStyle.id = -2;
-    bool ret1 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
+    bool ret1 = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret1);
 
     pointerStyle.id = 46;
-    bool ret2 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
+    bool ret2 = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret2);
 
     windowId = -3;
-    bool ret3 = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
+    bool ret3 = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret3);
 }
 
@@ -672,7 +681,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPointerStyle_0
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     bool isUiExtension = false;
 
     PointerStyle pointerStyle;
@@ -682,10 +690,10 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01
 
     int32_t pid = 1;
     int32_t windowId = -2;
-    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
+    bool ret = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_FALSE(ret);
 
-    int32_t ret2 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret2, RET_ERR);
 }
 
@@ -698,7 +706,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_01
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     bool isUiExtension = true;
 
     PointerStyle pointerStyle;
@@ -708,10 +715,10 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_02
 
     int32_t pid = 1;
     int32_t windowId = GLOBAL_WINDOW_ID;
-    bool ret = pointerDrawingManager.IsPointerStyleParamValid(windowId, pointerStyle);
+    bool ret = CursorDrawingInformation::GetInstance().IsPointerStyleParamValid(windowId, pointerStyle);
     EXPECT_TRUE(ret);
 
-    int32_t ret2 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret2, RET_OK);
 }
 
@@ -724,7 +731,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_02
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStylePreference_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
     pointerStyle.color = 1;
@@ -734,7 +740,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStylePre
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
     EXPECT_EQ(ret, RET_OK);
 
-    int32_t ret2 = pointerDrawingManager.SetPointerStylePreference(pointerStyle);
+    int32_t ret2 = CursorDrawingInformation::GetInstance().SetPointerStylePreference(pointerStyle);
     EXPECT_EQ(ret2, RET_OK);
 }
 
@@ -808,7 +814,8 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseHotSpot_04
     EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
     int32_t hotSpotX = -3;
     int32_t hotSpotY = -4;
-    pointerDrawingManager.userIcon_ = nullptr;
+    CursorDrawingInformation& information = CursorDrawingInformation::GetInstance();
+    information.userIcon_ = nullptr;
     int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -867,11 +874,10 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseHotSpot_06
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     int32_t pid = -1;
     int32_t windowId = -2;
     CursorPixelMap curPixelMap;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
+    int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -884,11 +890,10 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_01, T
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     int32_t pid = 1;
     int32_t windowId = -2;
     CursorPixelMap curPixelMap;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
+    int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -901,15 +906,14 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_02, T
 HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseIcon_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
     int32_t pid = 1;
     int32_t windowId = 2;
     PointerStyle style;
-    int32_t ret1 = pointerDrawingManager.SetPointerStyle(pid, windowId, style);
+    int32_t ret1 = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, style);
     EXPECT_EQ(ret1, RET_OK);
 
     CursorPixelMap curPixelMap;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, curPixelMap);
+    int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -1062,7 +1066,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPixelmap_001, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     OHOS::Rosen::Drawing::Canvas canvas;
     MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPixelmap(canvas, mouseStyle));
@@ -1078,7 +1082,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPixelmap_002, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     OHOS::Rosen::Drawing::Canvas canvas;
     MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPixelmap(canvas, mouseStyle));
@@ -1094,7 +1098,7 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPixelmap_003, 
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation::GetInstance().userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     OHOS::Rosen::Drawing::Canvas canvas;
     MOUSE_ICON mouseStyle = MOUSE_ICON::WEST_EAST;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPixelmap(canvas, mouseStyle));
@@ -1377,16 +1381,16 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DeletePointerV
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     int32_t pid = 100;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     pidInfo.pid = 50;
-    pointerDrawMgr.pidInfos_.push_back(pidInfo);
+    CursorDrawingInformation::GetInstance().pidInfos_.push_back(pidInfo);
     pidInfo.pid = 100;
-    pointerDrawMgr.pidInfos_.push_back(pidInfo);
+    CursorDrawingInformation::GetInstance().pidInfos_.push_back(pidInfo);
     pidInfo.pid = 300;
     pidInfo.visible = true;
-    pointerDrawMgr.hapPidInfos_.push_back(pidInfo);
+    CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
     pointerDrawMgr.pid_ = 300;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DeletePointerVisible(pid));
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().DeletePointerVisible(pid));
 }
 
 /**
@@ -1400,13 +1404,13 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DeletePointerV
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     int32_t pid = 100;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     pidInfo.pid = 100;
-    pointerDrawMgr.pidInfos_.push_back(pidInfo);
+    CursorDrawingInformation::GetInstance().pidInfos_.push_back(pidInfo);
     pidInfo.visible = false;
-    pointerDrawMgr.hapPidInfos_.push_back(pidInfo);
+    CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
     pointerDrawMgr.pid_ = 100;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DeletePointerVisible(pid));
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().DeletePointerVisible(pid));
 }
 
 /**
@@ -1418,12 +1422,11 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DeletePointerV
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DeletePointerVisible_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawMgr;
     int32_t pid = 100;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     pidInfo.pid = 500;
-    pointerDrawMgr.pidInfos_.push_back(pidInfo);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.DeletePointerVisible(pid));
+    CursorDrawingInformation::GetInstance().pidInfos_.push_back(pidInfo);
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().DeletePointerVisible(pid));
 }
 
 /**
@@ -1435,14 +1438,13 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_DeletePointerV
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_OnSessionLost, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawMgr;
     int32_t pid = 100;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     pidInfo.pid = 200;
-    pointerDrawMgr.hapPidInfos_.push_back(pidInfo);
+    CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
     pidInfo.pid = 100;
-    pointerDrawMgr.hapPidInfos_.push_back(pidInfo);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.OnSessionLost(pid));
+    CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
+    ASSERT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().OnSessionLost(pid));
 }
 
 /**
@@ -1457,7 +1459,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_GetIconStyle, 
     PointerDrawingManager pointerDrawMgr;
     MOUSE_ICON mouseStyle = CURSOR_MOVE;
     IconStyle iconStyle;
-    pointerDrawMgr.mouseIcons_.insert(std::make_pair(mouseStyle, iconStyle));
+    CursorDrawingInformation::GetInstance().mouseIcons_.insert(std::make_pair(mouseStyle, iconStyle));
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.GetIconStyle(mouseStyle));
     mouseStyle = static_cast<MOUSE_ICON>(100);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.GetIconStyle(mouseStyle));
@@ -1478,7 +1480,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
     int32_t priority = 0;
     bool isHap = true;
     int32_t count = 101;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1486,12 +1488,12 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
     ASSERT_NE(pointerDrawMgr.surfaceNode_, nullptr);
     for (int32_t i = 0; i < count; ++i) {
         pidInfo.pid = i;
-        pointerDrawMgr.hapPidInfos_.push_back(pidInfo);
+        CursorDrawingInformation::GetInstance().hapPidInfos_.push_back(pidInfo);
     }
-    ASSERT_EQ(pointerDrawMgr.SetPointerVisible(pid, visible, priority, isHap), RET_OK);
+    ASSERT_EQ(CursorDrawingInformation::GetInstance().SetPointerVisible(pid, visible, priority, isHap), RET_OK);
     pid = 5;
-    pointerDrawMgr.hapPidInfos_.pop_front();
-    ASSERT_EQ(pointerDrawMgr.SetPointerVisible(pid, visible, priority, isHap), RET_OK);
+    CursorDrawingInformation::GetInstance().hapPidInfos_.pop_front();
+    ASSERT_EQ(CursorDrawingInformation::GetInstance().SetPointerVisible(pid, visible, priority, isHap), RET_OK);
 }
 
 /**
@@ -1509,7 +1511,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
     int32_t priority = 50;
     bool isHap = false;
     int32_t count = 105;
-    PointerDrawingManager::PidInfo pidInfo;
+    PidInfo pidInfo;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1517,9 +1519,9 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
     ASSERT_NE(pointerDrawMgr.surfaceNode_, nullptr);
     for (int32_t i = 0; i < count; ++i) {
         pidInfo.pid = i;
-        pointerDrawMgr.pidInfos_.push_back(pidInfo);
+        CursorDrawingInformation::GetInstance().pidInfos_.push_back(pidInfo);
     }
-    ASSERT_EQ(pointerDrawMgr.SetPointerVisible(pid, visible, priority, isHap), RET_OK);
+    ASSERT_EQ(CursorDrawingInformation::GetInstance().SetPointerVisible(pid, visible, priority, isHap), RET_OK);
 }
 
 /**
@@ -1531,13 +1533,12 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseIcon, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawMgr;
     std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
     int32_t pid = 50;
     int32_t windowId = -1;
     CursorPixelMap curPixelMap;
     curPixelMap.pixelMap = (void *)pixelMapPtr.get();
-    EXPECT_EQ(pointerDrawMgr.SetMouseIcon(pid, windowId, curPixelMap), RET_ERR);
+    EXPECT_EQ(CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap), RET_ERR);
 }
 
 /**
@@ -1594,7 +1595,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpo
     int32_t windowId = 100;
     int32_t hotSpotX = 100;
     int32_t hotSpotY = 100;
-    pointerDrawMgr.userIcon_ = nullptr;
+    CursorDrawingInformation& information = CursorDrawingInformation::GetInstance();
+    information.userIcon_ = nullptr;
     EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
 }
 
@@ -1616,7 +1618,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpo
     int32_t windowId = 100;
     int32_t hotSpotX = 100;
     int32_t hotSpotY = 100;
-    pointerDrawMgr.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
+    CursorDrawingInformation& information = CursorDrawingInformation::GetInstance();
+    information.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
 }
 

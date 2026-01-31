@@ -24,10 +24,22 @@
 #include "i_cursor_drawing_component.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "pixel_map.h"
 #include "struct_multimodal.h"
 
 namespace OHOS::MMI {
-class CursorDrawingComponent : public ICursorDrawingComponent {
+
+struct PidInfo {
+    int32_t pid { 0 };
+    bool visible { false };
+};
+
+struct isMagicCursor {
+    std::string name;
+    bool isShow { false };
+};
+
+class CursorDrawingComponent {
 public:
     static CursorDrawingComponent& GetInstance();
     void SetPointerLocation(int32_t x, int32_t y, uint64_t displayId) override;
@@ -75,7 +87,6 @@ public:
     void InitPointerObserver();
     void OnSessionLost(int32_t pid);
     int32_t SkipPointerLayer(bool isSkip);
-
     void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy);
     std::shared_ptr<DelegateInterface> GetDelegateProxy();
     void DestroyPointerWindow();
@@ -101,6 +112,7 @@ public:
     {
         workerThreadId_.store(tid);
     }
+    IPointerDrawingManager* GetPointerInstance();
 private:
     CursorDrawingComponent();
     ~CursorDrawingComponent();
@@ -120,6 +132,61 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> lastCallTime_ { std::chrono::steady_clock::now() };
     std::atomic<uint64_t> workerThreadId_ { 0 };
 };
+
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+class CursorDrawingInformation {
+public:
+    CursorDrawingInformation();
+    ~CursorDrawingInformation();
+    static CursorDrawingInformation& GetInstance();
+
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false);
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false);
+    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap);
+    bool GetPointerVisible(int32_t pid);
+    void DeletePointerVisible(int32_t pid);
+    bool IsPointerVisible();
+    void OnSessionLost(int32_t pid);
+    ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap);
+    int32_t SetPointerStylePreference(PointerStyle pointerStyle);
+    bool IsPointerStyleParamValid(int32_t windowId, PointerStyle pointerStyle);
+    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
+    void InitStyle();
+    bool HasMagicCursor();
+    void CheckMouseIconPath();
+    void InitDefaultMouseIconPath();
+    const std::map<MOUSE_ICON, IconStyle>& GetMouseIconPath();
+    void UpdateIconPath(const MOUSE_ICON mouseStyle, const std::string& iconPath);
+    std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
+
+    const std::list<PidInfo>& GetPidInfos() const;
+    void ClearPidInfos();
+    std::shared_ptr<OHOS::Media::PixelMap> GetUserIconPixelMap();
+    void SetUserIconPixelMap(const OHOS::Media::PixelMap *curPixelMap);
+    bool GetMouseIconUpdate();
+    void SetMouseIconUpdate(const bool mouseIconUpdate);
+    int32_t GetCurPid();
+    void SetCurPid(int32_t pid);
+    std::map<MOUSE_ICON, IconStyle> GetMouseIconsMap();
+    void SetMouseIcons(std::map<MOUSE_ICON, IconStyle> mouseIcons);
+    isMagicCursor GetHasMagicCursor();
+    PointerStyle GetLastMouseStyle();
+
+private:
+    std::map<MOUSE_ICON, IconStyle> mouseIcons_;
+    std::list<PidInfo> pidInfos_;
+    std::list<PidInfo> hapPidInfos_;
+    std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
+    std::mutex userIconMtx_;
+    bool mouseIconUpdate_ { false };
+    isMagicCursor hasMagicCursor_;
+    int32_t pid_ { 0 };
+    PointerStyle lastMouseStyle_ {};
+};
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 } // namespace OHOS::MMI
 
 #endif // CURSOR_DRAWING_COMPONENT_H

@@ -20,6 +20,7 @@
 #include "transaction/rs_interfaces.h"
 
 #include "common_event_manager.h"
+#include "cursor_drawing_component.h"
 #include "device_observer.h"
 #include "hardware_cursor_pointer_manager.h"
 #include "dm_common.h"
@@ -37,11 +38,6 @@ constexpr float HARDWARE_CANVAS_SIZE { 512.0f };
 } // namespace
 
 using ScreenPointersIter = std::unordered_map<uint64_t, std::shared_ptr<ScreenPointer>>::iterator;
-
-struct isMagicCursor {
-    std::string name;
-    bool isShow { false };
-};
 
 struct PixelMapReleaseContext {
     explicit PixelMapReleaseContext(std::shared_ptr<Media::PixelMap> pixelMap) : pixelMap_(pixelMap) {}
@@ -88,20 +84,14 @@ public:
     bool Init() override;
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
-    void DeletePointerVisible(int32_t pid) override;
-    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap) override;
-    bool GetPointerVisible(int32_t pid) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
         bool isUiExtension = false) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
-        bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
     void GetPointerImageSize(int32_t &width, int32_t &height) override;
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
-    bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y, uint64_t rsId) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
@@ -109,10 +99,9 @@ public:
     int32_t SetCustomCursor(CursorPixelMap curPixelMap,
         int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options) override;
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
-    const std::map<MOUSE_ICON, IconStyle>& GetMouseIconPath() override;
+    void SetLastMouseStyle(PointerStyle style) override;
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
@@ -131,7 +120,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void InitPointerCallback() override;
     void InitPointerObserver() override;
-    void OnSessionLost(int32_t pid) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) override
     {
@@ -141,6 +129,7 @@ public:
     {
         return delegateProxy_;
     }
+    void UpdatePointerVisible() override;
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
@@ -177,13 +166,8 @@ private:
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> LoadCursorSvgWithColor(MOUSE_ICON type, int32_t color);
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(MOUSE_ICON type);
-    void UpdatePointerVisible();
-    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
-    void CheckMouseIconPath();
-    void InitDefaultMouseIconPath() override;
-    void InitStyle();
-    int32_t InitLayer(const MOUSE_ICON mouseStyle);
-    int32_t SetPointerStylePreference(PointerStyle pointerStyle);
+    void DeleteSurfaceNode() override;
+    int32_t InitLayer(const MOUSE_ICON mouseStyle) override;
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(CursorPixelMap curPixelMap, const int32_t &focusX, const int32_t &focusY);
     int32_t UpdateCursorProperty(CustomCursor cursor);
@@ -199,9 +183,6 @@ private:
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
-    bool IsPointerStyleParamValid(int32_t windowId, PointerStyle pointerStyle);
-    std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
-    void UpdateIconPath(const MOUSE_ICON mouseStyle, const std::string& iconPath);
     std::shared_ptr<Rosen::Drawing::ColorSpace> ConvertToColorSpace(Media::ColorSpace colorSpace);
     Rosen::Drawing::ColorType PixelFormatToColorType(Media::PixelFormat pixelFormat);
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
@@ -217,7 +198,6 @@ private:
     void CreateCanvasNode();
     bool SetCursorLocation(int32_t physicalX, int32_t physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> GetUserIconCopy(bool setSurfaceNode = true);
-    ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
     void SetSurfaceNodeBounds();
     int32_t DrawNewDpiPointer() override;
     bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
@@ -281,14 +261,9 @@ private:
     void ClearResources() override;
     void ClearRunnerAndHandler();
 private:
-    struct PidInfo {
-        int32_t pid { 0 };
-        bool visible { false };
-    };
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
     bool mouseDisplayState_ { false };
-    bool mouseIconUpdate_ { false };
     bool hasInitObserver_ { false };
     bool isInit_ { false };
     bool userIconFollowSystem_ { false };
@@ -309,11 +284,6 @@ private:
     int32_t canvasHeight_ = 64;
     int32_t cursorWidth_ { 0 };
     int32_t cursorHeight_ { 0 };
-    std::map<MOUSE_ICON, IconStyle> mouseIcons_;
-    std::list<PidInfo> pidInfos_;
-    std::list<PidInfo> hapPidInfos_;
-    std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
-    std::mutex userIconMtx_;
     uint64_t screenId_ { 0 };
     std::mutex surfaceNodeMutex_;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
@@ -324,7 +294,6 @@ private:
     int32_t originSetColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
-    isMagicCursor hasMagicCursor_;
     int32_t frameCount_ { DEFAULT_FRAME_RATE };
     int32_t currentFrame_ { 0 };
     uint64_t displayId_ { 0 };

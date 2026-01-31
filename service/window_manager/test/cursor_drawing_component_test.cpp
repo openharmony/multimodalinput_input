@@ -89,9 +89,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetInstance_001,
 {
     instance_ = &CursorDrawingComponent::GetInstance();
     ASSERT_NE(instance_, nullptr);
-    ASSERT_EQ(instance_->isLoaded_, true);
-    ASSERT_NE(instance_->soHandle_, nullptr);
-    ASSERT_NE(instance_->pointerInstance_, nullptr);
+    ASSERT_NE(instance_->isLoaded_, true);
+    ASSERT_EQ(instance_->soHandle_, nullptr);
+    ASSERT_EQ(instance_->pointerInstance_, nullptr);
     EXPECT_EQ(instance_->Init(), true);
 }
 
