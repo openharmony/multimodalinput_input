@@ -35,7 +35,6 @@ public:
     void RemoveTimers(SessionPtr sess);
     void RemoveTimersByType(SessionPtr sess, int32_t type);
     void HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTime);
-    int64_t GetInputTimeout();
 private:
     int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ { nullptr };

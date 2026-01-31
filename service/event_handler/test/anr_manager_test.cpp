@@ -35,7 +35,7 @@ constexpr int32_t MODULE_TYPE { 1 };
 constexpr int32_t UDS_FD { 1 };
 constexpr int32_t UDS_UID { 100 };
 constexpr int32_t UDS_PID { 100 };
-constexpr int64_t INPUT_UI_TIMEOUT_TIME { 5 * 1000000 };
+constexpr int64_t INPUT_UI_TIMEOUT_TIME { 8 * 1000000 };
 constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 } // namespace
 
@@ -498,18 +498,6 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_HandleAnrState_005, TestSize.Level1)
     ANRMgr->HandleAnrState(sess, type, currentTime);
     auto resultEvents = sess->GetEventsByType(type);
     ASSERT_EQ(resultEvents.size(), 0);
-}
-
-/**
-* @tc.name  : AnrManagerTest_GetInputTimeout_001
-* @tc.desc  : Test input timeout.
-* @tc.type: FUNC
-* @tc.require:
-*/
-HWTEST_F(AnrManagerTest, AnrManagerTest_GetInputTimeout_001, TestSize.Level1)
-{
-    int64_t ret = ANRMgr->GetInputTimeout();
-    ASSERT_TRUE(ret >= 5 * 1000000);
 }
 } // namespace MMI
 } // namespace OHOS
