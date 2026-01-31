@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "cursor_drawing_component.h"
 #include "pointer_device_manager.h"
 #include "pointer_drawing_manager.h"
 
@@ -123,13 +124,13 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     pointerDrawingManager.currentMouseStyle_.id = 43;
     pointerDrawingManager.mouseDisplayState_ = true;
-    pointerDrawingManager.mouseIconUpdate_ = true;
+    CursorDrawingInformation::GetInstance().mouseIconUpdate_ = true;
  
     pointerDrawingManager.OnVsync(100000);
     usleep(SLEEP_TIME_IN_US);  // wait for async OnVsync
     pointerDrawingManager.currentMouseStyle_.id = 0;
     pointerDrawingManager.ClearRunnerAndHandler();
-    EXPECT_EQ(pointerDrawingManager.mouseIconUpdate_, false);
+    EXPECT_EQ(CursorDrawingInformation::GetInstance().mouseIconUpdate_, false);
 }
 
 /**
