@@ -20,6 +20,7 @@
 #include "dfx_hisysevent.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "timer_manager.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN

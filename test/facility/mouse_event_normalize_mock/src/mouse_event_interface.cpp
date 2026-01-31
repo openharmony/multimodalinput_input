@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#include "mouse_event_normalize.h"
+#include "mouse_event_interface.h"
 
 namespace OHOS {
 namespace MMI {
-std::shared_ptr<MouseEventNormalize> MouseEventNormalize::instance_ = nullptr;
+std::shared_ptr<MouseEventInterface> MouseEventInterface::instance_ = nullptr;
 
-std::shared_ptr<MouseEventNormalize> MouseEventNormalize::GetInstance()
+std::shared_ptr<MouseEventInterface> MouseEventInterface::GetInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = std::make_shared<MouseEventNormalize>();
+        instance_ = std::make_shared<MouseEventInterface>();
     }
     return instance_;
 }
 
-void MouseEventNormalize::ReleaseInstance()
+void MouseEventInterface::ReleaseInstance()
 {
     instance_.reset();
 }

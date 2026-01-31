@@ -49,6 +49,13 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/knuckle/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/intention/scheduler/component_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/product_property_config/include",
+    "${mmi_path}/service/custom_config_parser/include",
+    "${mmi_path}/test/facility/device_manager_mock/include",
   ]
 
   sources = [
@@ -86,6 +93,9 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
     "${mmi_path}/test/facility/timer_manager_mock:timer_manager_mock",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/service/mouse_event_normalize:mouse_event_normalizer",
+    "${mmi_path}/service/mouse_event_normalize:mmi_mouse_event_normalizer",
+    "${mmi_path}/service:libmmi-server",
   ]
 
   external_deps = [
@@ -98,6 +108,7 @@ ohos_unittest("TouchEventNormalizeTestWithMock") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "preferences:native_preferences",
+    "ability_runtime:ability_manager",
   ]
 
   if (hitrace_enabled) {
@@ -159,6 +170,9 @@ ohos_unittest("TouchEventNormalizeTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "ability_runtime:ability_manager",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
   ]
 }
 
@@ -281,6 +295,7 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service/custom_config_parser:mmi_custom_config_parser",
+    "${mmi_path}/service/mouse_event_normalize:mouse_event_normalizer",
   ]
 
   external_deps = [
@@ -316,6 +331,7 @@ ohos_unittest("GestureTransformTest") {
     "sensor:sensor_interface_native",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "libinput:libinput-third-mmi",
   ]
 
   if (call_manager_service_enabled) {
@@ -383,6 +399,7 @@ ohos_unittest("TabletToolTransformTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/setting_datashare/include",
     "${mmi_path}/service/knuckle/include",
+    "${mmi_path}/service/device_manager/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -819,6 +836,7 @@ ohos_unittest("TouchpadGestureTest") {
   deps = [
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service/mouse_event_normalize:mouse_event_normalizer",
   ]
 
   external_deps = [
@@ -853,6 +871,7 @@ ohos_unittest("TouchpadGestureTest") {
     "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "libinput:libinput-third-mmi",
   ]
 
   if (hitrace_enabled) {
@@ -1052,6 +1071,11 @@ ohos_unittest("TouchGestureAdapterTest") {
   include_dirs = [
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/intention/scheduler/component_manager/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/common/timer_manager/include",
+    "${mmi_path}/service/device_config/include",
   ]
 
   sources = [
@@ -1078,6 +1102,8 @@ ohos_unittest("TouchGestureAdapterTest") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
   ]
 
   if (enable_player_framework) {
@@ -1143,6 +1169,8 @@ ohos_unittest("TouchGestureManagerTest") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "samgr:samgr_proxy",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
   ]
 
   if (enable_player_framework) {

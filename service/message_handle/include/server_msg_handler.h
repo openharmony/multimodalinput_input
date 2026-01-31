@@ -22,7 +22,7 @@
 #include "inject_notice_manager.h"
 #include "key_option.h"
 #include "long_press_event.h"
-#include "mouse_event_normalize.h"
+#include "mouse_event_interface.h"
 #include "msg_handler.h"
 #include "pixel_map.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

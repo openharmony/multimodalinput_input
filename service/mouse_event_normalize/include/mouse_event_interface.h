@@ -1,28 +1,29 @@
 /*
- * Copyright (c) 2026 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright (c) 2026 Huawei Device Co., Ltd.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 #ifndef MOUSE_EVENT_INTERFACE_H
 #define MOUSE_EVENT_INTERFACE_H
 
 #include <functional>
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 
 #include "component_manager.h"
 #include "device_observer.h"
 #include "i_mouse_event_normalizer.h"
+#include "touchpad_control_display_gain.h"
 #include "key_event.h"
 #include "libinput.h"
 #include "pointer_event.h"
@@ -68,7 +69,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY) ;
     void OnDisplayLost(int32_t displayId) ;
-    int32_t GetDisplayId() ;
+    int32_t GetDisplayId() const ;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1) ;
     int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY) ;
@@ -91,10 +92,11 @@ public:
     void GetTouchpadRightClickType(int32_t &type) const ;
     int32_t SetTouchpadPointerSpeed(int32_t speed) const ;
     void GetTouchpadPointerSpeed(int32_t &speed) const ;
+    void ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const;
 
     // MouseDeviceState Interface
-    int32_t GetMouseCoordsX();
-    int32_t GetMouseCoordsY();
+    int32_t GetMouseCoordsX() const;
+    int32_t GetMouseCoordsY() const;
     void SetMouseCoords(int32_t x, int32_t y);
     bool IsLeftBtnPressed();
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
@@ -110,7 +112,7 @@ private:
     void OnMouseLoaded();
     void UnloadMouse();
 
-    mutable std::recursive_mutex mutex_;
+    mutable std::mutex mutex_;
     std::weak_ptr<IInputServiceContext> env_;
     std::shared_ptr<IDeviceObserver> inputDevObserver_;
     int32_t unloadTimerId_ { -1 };

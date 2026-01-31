@@ -18,6 +18,7 @@
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "timer_manager.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN

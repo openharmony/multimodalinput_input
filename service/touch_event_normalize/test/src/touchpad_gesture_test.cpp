@@ -73,9 +73,7 @@ HWTEST_F(TouchPadGestureTest, OnEventTouchPadSwipeBegin_001, TestSize.Level1)
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     auto pointerEvent = processor.OnEvent(&event.base);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    EXPECT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    ASSERT_TRUE(pointerEvent == nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

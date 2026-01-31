@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 #include "mock.h"
+#include "input_service_context.h"
+#include "mouse_event_normalize.h"
 
 namespace OHOS {
 using namespace OHOS::MMI;
@@ -395,15 +397,6 @@ std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() con
 void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {}
 #endif // OHOS_BUILD_ENABLE_POINTER
-
-MouseEventNormalize::MouseEventNormalize() {}
-
-MouseEventNormalize::~MouseEventNormalize() {}
-
-int32_t MouseEventNormalize::GetDisplayId() const
-{
-    return DfsMessageParcel::messageParcel->GetDisplayId();
-}
 
 SettingDataShare::~SettingDataShare() {}
 

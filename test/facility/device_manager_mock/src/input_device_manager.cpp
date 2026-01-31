@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "input_device_manager.h"
 #include "define_multimodal.h"
+#include "input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
