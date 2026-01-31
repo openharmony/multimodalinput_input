@@ -1208,12 +1208,15 @@ ErrCode MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
         return MMISERVICE_NOT_RUNNING;
     }
     CHKPR(ANRMgr, RET_ERR);
+    std::string msg = "MarkProcessed,eventType:" + std::to_string(eventType) + ",eventId:" + std::to_string(eventId);
+    BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, eventType, eventId] {
             return ::OHOS::DelayedSingleton<ANRManager>::GetInstance()->MarkProcessed(clientPid, eventType, eventId);
         }
         );
+    BytraceAdapter::MMIServiceTraceStop();
     if (ret != RET_OK) {
         MMI_HILOGD("Mark event processed failed, ret:%{public}d", ret);
         return ret;

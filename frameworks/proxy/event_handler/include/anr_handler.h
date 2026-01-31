@@ -35,7 +35,8 @@ public:
     void SetLastDispatchedEventId(int32_t eventId);
     void SetLastProcessEventId(int32_t eventId);
     void GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_t &dispatchedEventId);
-
+private:
+    void MarkProcessedPendingEvents(int32_t eventType, int32_t eventId);
 private:
     struct ANREvent {
         bool sendStatus { false };
@@ -50,6 +51,7 @@ private:
     std::mutex mutex_;
     std::atomic<int32_t> lastDispatchedEventId_ { 0 };
     std::atomic<int32_t> lastProcessedEventId_ { 0 };
+    std::unordered_map<int32_t, int32_t> pendingEvents_;
 };
 
 #define ANRHDL ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()

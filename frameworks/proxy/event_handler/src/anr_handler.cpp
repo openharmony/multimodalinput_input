@@ -43,6 +43,10 @@ ANRHandler::~ANRHandler() {}
 void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
+    if (eventId < 0) {
+        MMI_HILOGD("eventId:%{public}d", eventId);
+        return;
+    }
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64, eventType, eventId,
         actionTime);
     processedCount_++;
@@ -73,6 +77,55 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+    MarkProcessedPendingEvents(eventType, eventId);
+
+    bool hasNewEvent = false;
+    int32_t newEventId = -1;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        if (pendingEvents_[eventType] != -1) {
+            hasNewEvent = true;
+            newEventId = pendingEvents_[eventType];
+            pendingEvents_[eventType] = -1; // 消费
+        }
+    }
+ 
+    if (hasNewEvent) {
+        // 重新提交任务处理新事件
+        auto task = [this, eventType, newEventId] {
+            MarkProcessed(eventType, newEventId);
+        };
+        ffrt::submit(task, {}, {}, ffrt::task_attr().qos(ffrt_qos_deadline_request));
+    }
+}
+
+void ANRHandler::MarkProcessedPendingEvents(int32_t eventType, int32_t eventId)
+{
+    std::vector<std::pair<int32_t, int32_t>> pendingToProcess; // {eventType, eventId}
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        for (auto& kv : pendingEvents_) {
+            int32_t type = kv.first;
+            int32_t id = kv.second;
+            if (id != -1) {
+                pendingToProcess.emplace_back(type, id);
+                kv.second = -1;
+            }
+        }
+    }
+    for (const auto& [type, id] : pendingToProcess) {
+        if (type == eventType && id == eventId) {
+            continue;
+        }
+        BytraceAdapter::StartMarkedTracker(id);
+        int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(type, id);
+        BytraceAdapter::StopMarkedTracker();
+ 
+        if (ret != 0) {
+            MMI_HILOGE("Send pending event (type:%{public}d, id:%{public}d) to server failed, ret:%{public}d",
+                type, id, ret);
+        }
+    }
 }
 
 void ANRHandler::SetLastDispatchedEventId(int32_t eventId)
@@ -102,10 +155,25 @@ void ANRHandler::GetLastEventIds(int32_t &markedId, int32_t &processedId, int32_
 void ANRHandler::SendEvent(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    auto task = [this, eventType, eventId] {
-        MarkProcessed(eventType, eventId);
-    };
-    ffrt::submit(task, {}, {}, ffrt::task_attr().qos(ffrt_qos_deadline_request));
+    bool shouldSubmit = false;
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        if (pendingEvents_.count(eventType) && pendingEvents_[eventType] != -1) {
+            if (eventId > pendingEvents_[eventType]) {
+                pendingEvents_[eventType] = eventId;
+            }
+            return;
+        } else {
+            pendingEvents_[eventType] = eventId;
+            shouldSubmit = true;
+        }
+    }
+    if (shouldSubmit) {
+        auto task = [this, eventType, eventId] {
+            MarkProcessed(eventType, eventId);
+        };
+        ffrt::submit(task, {}, {}, ffrt::task_attr().qos(ffrt_qos_deadline_request));
+    }
 }
 
 void ANRHandler::ResetAnrArray()

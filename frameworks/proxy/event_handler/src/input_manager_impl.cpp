@@ -2578,6 +2578,10 @@ void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher
 int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
+    if (eventId < 0) {
+        MMI_HILOGD("eventId:%{public}d", eventId);
+        return RET_OK;
+    }
     ANRHDL->SetLastProcessedEventId(EVENT_TYPE, eventId, actionTime);
     return RET_OK;
 }
