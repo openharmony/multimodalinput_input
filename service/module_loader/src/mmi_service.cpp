@@ -784,7 +784,7 @@ ErrCode MMIService::SetMouseScrollRows(int32_t rows)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [rows] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetMouseScrollRows(rows);
+            return :MouseEventHdr->SetMouseScrollRows(rows);
         }
         );
     if (ret != RET_OK) {
@@ -1096,7 +1096,7 @@ ErrCode MMIService::SetMousePrimaryButton(int32_t primaryButton)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [primaryButton] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetMousePrimaryButton(primaryButton);
+            return :MouseEventHdr->SetMousePrimaryButton(primaryButton);
         }
         );
     if (ret != RET_OK) {
@@ -1295,7 +1295,7 @@ ErrCode MMIService::SetPointerSpeed(int32_t speed)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerSpeed(speed);
+            return :MouseEventHdr->SetPointerSpeed(speed);
         }
         );
     if (ret != RET_OK) {
@@ -3047,7 +3047,7 @@ ErrCode MMIService::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [x, y, displayId] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerLocation(x, y, displayId);
+            return :MouseEventHdr->SetPointerLocation(x, y, displayId);
         }
         );
     if (ret != RET_OK) {
@@ -3077,7 +3077,7 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
             if (!WIN_MGR->CheckAppFocused(clientPid)) {
                 return ERROR_APP_NOT_FOCUSED;
             }
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->GetPointerLocation(displayId,
+            return :MouseEventHdr->GetPointerLocation(displayId,
                 displayX, displayY);
         });
     if (ret != RET_OK) {
@@ -3561,7 +3561,7 @@ ErrCode MMIService::SetTouchpadScrollSwitch(bool switchFlag)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [clientPid, switchFlag] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadScrollSwitch(clientPid,
+            return :MouseEventHdr->SetTouchpadScrollSwitch(clientPid,
                 switchFlag);
         }
         );
@@ -3613,7 +3613,7 @@ ErrCode MMIService::SetTouchpadScrollDirection(bool state)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [state] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadScrollDirection(state);
+            return :MouseEventHdr->SetTouchpadScrollDirection(state);
         }
         );
     if (ret != RET_OK) {
@@ -3664,7 +3664,7 @@ ErrCode MMIService::SetTouchpadTapSwitch(bool switchFlag)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadTapSwitch(switchFlag);
+            return :MouseEventHdr->SetTouchpadTapSwitch(switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3720,7 +3720,7 @@ ErrCode MMIService::SetTouchpadPointerSpeed(int32_t speed)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [speed] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadPointerSpeed(speed);
+            return :MouseEventHdr->SetTouchpadPointerSpeed(speed);
         }
         );
     if (ret != RET_OK) {
@@ -3918,7 +3918,7 @@ ErrCode MMIService::SetTouchpadRightClickType(int32_t type)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [type] {
-            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetTouchpadRightClickType(type);
+            return :MouseEventHdr->SetTouchpadRightClickType(type);
         }
         );
     if (ret != RET_OK) {
