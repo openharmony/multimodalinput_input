@@ -499,7 +499,7 @@ void JsInputMonitorManager::EmitJsQueryTouchEvents(sptr<JsInputMonitor::Callback
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
     int32_t ret = -1;
-    ret = uv_queue_work_with_qos(
+    ret = uv_queue_work_with_qos_internal(
         loop,
         work,
         [](uv_work_t *work) {
@@ -507,7 +507,7 @@ void JsInputMonitorManager::EmitJsQueryTouchEvents(sptr<JsInputMonitor::Callback
             JsInputMonitor::CallJsQueryTouchEventsTask(work);
         },
         JsInputMonitor::CallJsQueryTouchEventsPromise,
-        uv_qos_user_initiated);
+        uv_qos_user_initiated, "queryTouchEvents");
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
         cb->DecStrongRef(nullptr);
