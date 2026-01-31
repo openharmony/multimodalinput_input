@@ -1583,12 +1583,12 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             CleanData(&monitorInfo, &work);
             return;
         }
-        int32_t ret = uv_queue_work_with_qos(
+        int32_t ret = uv_queue_work_with_qos_internal(
             loop, work,
             [](uv_work_t *work) {
                 MMI_HILOGD("uv_queue_work callback function is called");
             },
-            &JsInputMonitor::JsCallback, uv_qos_user_initiated);
+            &JsInputMonitor::JsCallback, uv_qos_user_initiated, "OnPointerEventByMonitor");
         if (ret != 0) {
             MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
             CleanData(&monitorInfo, &work);
@@ -1963,12 +1963,12 @@ void JsInputMonitor::OnKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
             CleanData(&monitorInfo, &work);
             return;
         }
-        int32_t ret = uv_queue_work_with_qos(
+        int32_t ret = uv_queue_work_with_qos_internal(
             loop,
             work,
             [](uv_work_t *work) { MMI_HILOGD("uv_queue_work callback function is called"); },
             &JsInputMonitor::JsPreCallback,
-            uv_qos_user_initiated);
+            uv_qos_user_initiated, "OnKeyEventByMonitor");
         if (ret != 0) {
             MMI_HILOGE("Add uv_queue failed, ret is %{public}d", ret);
             CleanData(&monitorInfo, &work);
