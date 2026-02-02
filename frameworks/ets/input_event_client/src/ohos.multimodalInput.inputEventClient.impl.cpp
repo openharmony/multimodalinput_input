@@ -16,10 +16,13 @@
 
 #include <thread>
 #include <chrono>
+#include <sstream>
+#include <iostream>
 
 #include "define_multimodal.h"
 #include "input_manager.h"
 #include "input_event.h"
+#include "ipc_skeleton.h"
 #include "key_event.h"
 #include "mmi_log.h"
 #include "oh_input_manager.h"
@@ -28,6 +31,9 @@
 #include "pointer_event.h"
 #include "stdexcept"
 #include "taihe/runtime.hpp"
+#include "accesstoken_kit.h"
+#include "tokenid_kit.h"
+#include "ani_common.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "aniInputEventClient"
@@ -37,6 +43,65 @@ using namespace ohos::multimodalInput::inputEventClient;
 using namespace OHOS::MMI;
 
 namespace {
+
+const std::string INJECT_INPUT_PERMISSION_NAME = "ohos.permission.INJECT_INPUT_EVENT";
+const std::string MODULE_NAME = "inputEventClient";
+
+std::string MakePermissionCheckErrMsg(const std::string &moduleName,
+    const std::string &permissionName)
+{
+    std::stringstream ss;
+    ss << "Permission denied. An attempt was made to " <<
+        moduleName << "forbidden by permission " <<
+        permissionName << ".";
+    return ss.str();
+}
+
+bool IsSystemApp()
+{
+    static bool isSystemApp = []() {
+        uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+        return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+    }();
+    return isSystemApp;
+}
+ 	 
+bool CheckPermission(const std::string &permissionCode)
+{
+    uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
+    using OHOS::Security::AccessToken::AccessTokenID;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(static_cast<AccessTokenID>(tokenId));
+    if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
+        (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+        int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
+        if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+            MMI_HILOGE("Check permission failed ret:%{public}d permission:%{public}s", ret, permissionCode.c_str());
+            return false;
+        }
+        MMI_HILOGD("Check interceptor permission success permission:%{public}s", permissionCode.c_str());
+        return true;
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGI("Token type is shell");
+        return true;
+    } else {
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
+        return false;
+    }
+}
+
+bool CheckInputEventClentPermission()
+{
+    if (!IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return false;
+    }
+    if (!CheckPermission(INJECT_INPUT_PERMISSION_NAME)) {
+        std::string errMsg = MakePermissionCheckErrMsg(MODULE_NAME, INJECT_INPUT_PERMISSION_NAME);
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, errMsg);
+        return false;
+    }
+    return  true;
+}
 
 static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
     { JS_MOUSE_BUTTON_LEFT, PointerEvent::MOUSE_BUTTON_LEFT },
@@ -53,6 +118,16 @@ static std::unordered_map<int32_t, int32_t> THMouseButton2Native = {
 void GetInjectionEventDataNative(Input_KeyEvent* keyEventNative,
     ::ohos::multimodalInput::inputEventClient::KeyEvent const& thKeyEvent)
 {
+    if (thKeyEvent.keyCode < 0) {
+        set_business_error(INPUT_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+        return;
+    }
+    if (thKeyEvent.keyDownDuration < 0) {
+        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", thKeyEvent.keyDownDuration);
+        set_business_error(INPUT_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+        return;
+    }
+
     auto keyAction = thKeyEvent.isPressed ? Input_KeyEventAction::KEY_ACTION_DOWN : Input_KeyEventAction::KEY_ACTION_UP;
     OH_Input_SetKeyEventAction(keyEventNative, keyAction);
     OH_Input_SetKeyEventKeyCode(keyEventNative, thKeyEvent.keyCode);
@@ -97,6 +172,9 @@ void GetInjectionEventData(std::shared_ptr<OHOS::MMI::KeyEvent> keyEventNative,
 
 void InjectKeyEventSync(::ohos::multimodalInput::inputEventClient::KeyEventData const& keyEvent)
 {
+    if (!CheckInputEventClentPermission()) {
+        return;
+    }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
     GetInjectionEventDataNative(keyEventNative, keyEvent.keyEvent);
@@ -109,6 +187,9 @@ void InjectKeyEventSync(::ohos::multimodalInput::inputEventClient::KeyEventData 
 
 void InjectEventSync(::ohos::multimodalInput::inputEventClient::KeyEventInfo const& keyEvent)
 {
+    if (!CheckInputEventClentPermission()) {
+        return;
+    }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     Input_KeyEvent* keyEventNative = OH_Input_CreateKeyEvent();
     GetInjectionEventDataNative(keyEventNative, keyEvent.KeyEvent);
@@ -127,6 +208,10 @@ void HandleMouseButton(::ohos::multimodalInput::mouseEvent::MouseEvent mouseEven
         return;
     }
     int32_t button = static_cast<int32_t>(mouseEvent.button.get_value());
+    if (button < 0) {
+        MMI_HILOGE("button:%{public}d is less 0, can not process", button);
+        set_business_error(INPUT_PARAMETER_ERROR, "button must be greater than or equal to 0");
+    }
     if (THMouseButton2Native.find(button) != THMouseButton2Native.end()) {
         button = THMouseButton2Native[button];
     } else {
@@ -188,6 +273,10 @@ void HandleMousePropertyInt32(::ohos::multimodalInput::mouseEvent::MouseEvent mo
     int32_t screenX = mouseEvent.screenX;
     int32_t screenY = mouseEvent.screenY;
     int32_t toolType = mouseEvent.toolType.get_value();
+    if (toolType < 0) {
+        MMI_HILOGE("toolType:%{public}d is less 0, can not process", toolType);
+        ::taihe::set_business_error(INPUT_PARAMETER_ERROR, "toolType must be greater than or equal to 0");
+    }
     double globalX = INT32_MAX;
     if (mouseEvent.globalX.has_value()) {
         globalX = mouseEvent.globalX.value();
@@ -245,6 +334,9 @@ void HandleMousePressedButtons(::ohos::multimodalInput::mouseEvent::MouseEvent m
 
 void InjectMouseEventSync(::ohos::multimodalInput::inputEventClient::MouseEventData const& mouseEvent)
 {
+    if (!CheckInputEventClentPermission()) {
+        return;
+    }
     auto pointerEvent = PointerEvent::Create();
     if (pointerEvent == nullptr) {
         MMI_HILOGE("pointerEvent is null");
@@ -397,6 +489,9 @@ bool HandleTouchPropertyInt32(::ohos::multimodalInput::touchEvent::TouchEvent to
 
 void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventData const& touchEvent)
 {
+    if (!CheckInputEventClentPermission()) {
+        return;
+    }
     auto pointerEvent = PointerEvent::Create();
     if (pointerEvent == nullptr) {
         MMI_HILOGE("pointerEvent is null");
@@ -433,6 +528,9 @@ void InjectTouchEventSync(::ohos::multimodalInput::inputEventClient::TouchEventD
 
 void PermitInjectionSync(bool result)
 {
+    if (!CheckInputEventClentPermission()) {
+        return;
+    }
     InputManager::GetInstance()->Authorize(result);
 }
 } // namespace
