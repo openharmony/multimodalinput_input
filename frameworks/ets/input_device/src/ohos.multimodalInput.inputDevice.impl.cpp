@@ -320,15 +320,15 @@ bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
 void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
 {
     CALL_DEBUG_ENTER;
-    std::mutex mtx;
-    std::condition_variable cv;
+    std::shared_ptr<std::mutex> mtx = std::make_shared<std::mutex>();
+    std::shared_ptr<std::condition_variable> cv = std::make_shared<std::condition_variable>();
     int32_t cbCode = RET_ERR;
-    std::function<void(int32_t)> callback = [&cbCode, &mtx, &cv](int32_t errcode) {
+    std::function<void(int32_t)> callback = [&cbCode, mtx, cv](int32_t errcode) {
         CALL_DEBUG_ENTER;
-        std::unique_lock<std::mutex> lck(mtx);
+        std::unique_lock<std::mutex> lck(*mtx);
         cbCode = errcode;
         MMI_HILOGI("Callback exec,:%{public}d", cbCode);
-        cv.notify_all();
+        cv->notify_all();
     };
     int32_t ret = InputManager_t::GetInstance()->SetInputDeviceEnabled(deviceId, enabled, callback);
     MMI_HILOGI("ret code:%{public}d", ret);
@@ -343,8 +343,8 @@ void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
         return;
     }
     MMI_HILOGI("begin wait_for!!");
-    std::unique_lock<std::mutex> lck(mtx);
-    auto status = cv.wait_for(lck, std::chrono::milliseconds(REQUEST_CALLBACK_OVERTIME));
+    std::unique_lock<std::mutex> lck(*mtx);
+    auto status = cv->wait_for(lck, std::chrono::milliseconds(REQUEST_CALLBACK_OVERTIME));
     MMI_HILOGI("wait_for end status:%{public}d!!", static_cast<int32_t>(status));
     if (status == std::cv_status::timeout) {
         MMI_HILOGE("callback overtime!!");
