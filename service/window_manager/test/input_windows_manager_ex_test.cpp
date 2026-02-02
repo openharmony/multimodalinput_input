@@ -1136,7 +1136,6 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_004, TestSize.Level1)
 HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetBoolValue(_, _)).WillOnce(Return(false));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
