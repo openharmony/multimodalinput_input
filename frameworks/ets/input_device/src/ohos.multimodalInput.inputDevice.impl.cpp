@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <chrono>
-#include <condition_variable>
 #include <map>
 #include <mutex>
 
@@ -45,7 +43,6 @@ constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
 constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
 constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
 constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
-constexpr int32_t REQUEST_CALLBACK_OVERTIME { 100 };
 const std::string CHANGED_TYPE = "change";
 
 ::taihe::array<int32_t> GetDeviceIdsAsync()
@@ -317,18 +314,63 @@ bool IsFunctionKeyEnabledAsync(TaiheFunctionKey functionKey)
     return resultState;
 }
 
-void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
+bool ANIPromiseVoidCallback(ani_env* env, ani_resolver deferred, int32_t errCode)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<std::mutex> mtx = std::make_shared<std::mutex>();
-    std::shared_ptr<std::condition_variable> cv = std::make_shared<std::condition_variable>();
-    int32_t cbCode = RET_ERR;
-    std::function<void(int32_t)> callback = [&cbCode, mtx, cv](int32_t errcode) {
+    ani_status status = ANI_OK;
+    if (errCode != RET_OK) {
+        TaiheError  codeMsg;
+        if (!TaiheConverter::GetApiError(errCode, codeMsg)) {
+            MMI_HILOGE("Error code %{public}d not found", errCode);
+            errCode = COMMON_PARAMETER_ERROR;
+            codeMsg.msg = "Parameter error.unknown error";
+        }
+        auto callResult = TaiheInputDeviceUtils::CreateBusinessError(env, static_cast<ani_int>(errCode), codeMsg.msg);
+        if (callResult == nullptr) {
+            MMI_HILOGE("The callResult is nullptr");
+            return false;
+        }
+        if ((status = env->PromiseResolver_Reject(deferred, static_cast<ani_error>(callResult))) != ANI_OK) {
+            MMI_HILOGE("create promise object failed, status = %{public}d", status);
+            return false;
+        }
+        return true;
+    }
+    ani_ref promiseResult;
+    if ((status = env->GetUndefined(&promiseResult)) != ANI_OK) {
+        MMI_HILOGE("get undefined value failed, status = %{public}d", status);
+        return false;
+    }
+    if ((status = env->PromiseResolver_Resolve(deferred, promiseResult)) != ANI_OK) {
+        MMI_HILOGE("PromiseResolver_Resolve failed, status = %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
+{
+    if (deviceId < 0) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Invalid deviceId!");
+        MMI_HILOGE("Invalid deviceId");
+        return 0;
+    }
+    ani_env *env = taihe::get_env();
+    if (!env) {
+        MMI_HILOGE("env is null");
+        return 0;
+    }
+    ani_status status = ANI_OK;
+    ani_object promise;
+    ani_resolver deferred = nullptr;
+    if ((status = env->Promise_New(&deferred, &promise)) != ANI_OK) {
+        MMI_HILOGE("create promise object failed, status = %{public}d", status);
+        return reinterpret_cast<uintptr_t>(promise);
+    }
+    std::function<void(int32_t)> callback = [env, deferred](int32_t errcode) {
         CALL_DEBUG_ENTER;
-        std::unique_lock<std::mutex> lck(*mtx);
-        cbCode = errcode;
-        MMI_HILOGI("Callback exec,:%{public}d", cbCode);
-        cv->notify_all();
+        ani_env* etsEnv = env;
+        ANIPromiseVoidCallback(etsEnv, deferred, errcode);
     };
     int32_t ret = InputManager_t::GetInstance()->SetInputDeviceEnabled(deviceId, enabled, callback);
     MMI_HILOGI("ret code:%{public}d", ret);
@@ -340,25 +382,9 @@ void SetInputDeviceEnableSyncImpl(int32_t deviceId, bool enabled)
         } else {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
         }
-        return;
+        return 0;
     }
-    MMI_HILOGI("begin wait_for!!");
-    std::unique_lock<std::mutex> lck(*mtx);
-    auto status = cv->wait_for(lck, std::chrono::milliseconds(REQUEST_CALLBACK_OVERTIME));
-    MMI_HILOGI("wait_for end status:%{public}d!!", static_cast<int32_t>(status));
-    if (status == std::cv_status::timeout) {
-        MMI_HILOGE("callback overtime!!");
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Overtime!");
-        return;
-    }
-    MMI_HILOGI("Wait_for end return,ret:%{public}d", cbCode);
-    if (cbCode != RET_OK) {
-        if (cbCode == COMMON_DEVICE_NOT_EXIST) {
-            taihe::set_business_error(COMMON_DEVICE_NOT_EXIST, "The specified device does not exist.");
-            return;
-        }
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Service return error!");
-    }
+    return reinterpret_cast<uintptr_t>(promise);
 }
 
 TaiheKeyboardType GetKeyboardTypeSync(int32_t deviceId)
@@ -416,7 +442,7 @@ TH_EXPORT_CPP_API_GetKeyboardRepeatRateAsync(GetKeyboardRepeatRateAsync);
 TH_EXPORT_CPP_API_GetIntervalSinceLastInputAsync(GetIntervalSinceLastInputAsync);
 TH_EXPORT_CPP_API_SetFunctionKeyEnabledAsync(SetFunctionKeyEnabledAsync);
 TH_EXPORT_CPP_API_IsFunctionKeyEnabledAsync(IsFunctionKeyEnabledAsync);
-TH_EXPORT_CPP_API_SetInputDeviceEnableSyncImpl(SetInputDeviceEnableSyncImpl);
+TH_EXPORT_CPP_API_SetInputDeviceEnablePromise(SetInputDeviceEnablePromise);
 TH_EXPORT_CPP_API_GetKeyboardTypeSyncWrapper(GetKeyboardTypeSyncWrapper);
 TH_EXPORT_CPP_API_GetKeyboardTypeSync(GetKeyboardTypeSync);
 TH_EXPORT_CPP_API_onKeyImpl(onKeyImpl);

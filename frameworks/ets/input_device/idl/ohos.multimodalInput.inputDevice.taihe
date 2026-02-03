@@ -141,8 +141,8 @@ function SetFunctionKeyEnabledAsync(functionKey: FunctionKey, enabled: bool): vo
 @gen_promise("isFunctionKeyEnabled")
 function IsFunctionKeyEnabledAsync(functionKey: FunctionKey): bool;
 
-@gen_promise("setInputDeviceEnabled")
-function SetInputDeviceEnableSyncImpl(deviceId: i32, enabled: bool): void;
+@rename("setInputDeviceEnabled")
+function SetInputDeviceEnablePromise(deviceId: i32, enabled: bool):@sts_type("Promise<void>") Opaque;
 
 function GetKeyboardTypeSync(deviceId: i32): KeyboardType;
 @gen_async("getKeyboardType")
