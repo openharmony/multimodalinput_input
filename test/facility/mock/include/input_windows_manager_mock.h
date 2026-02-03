@@ -155,6 +155,10 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(int32_t, ShiftAppPointerEvent, (const ShiftWindowParam&, bool));
     MOCK_METHOD(Direction, GetDisplayDirection, (const OLD::DisplayInfo *));
+    MOCK_METHOD(void, SetDelayLevitateEventStatus, (bool));
+    MOCK_METHOD(bool, GetDelayLevitateEventStatus, ());
+    MOCK_METHOD(void, SaveDelayLevitateEvent, (const std::shared_ptr<PointerEvent>));
+    MOCK_METHOD(std::shared_ptr<PointerEvent>, GetDelayLevitateEvent, ());
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     MOCK_METHOD(void, AttachTouchGestureMgr, (std::shared_ptr<ITouchGestureManager>));

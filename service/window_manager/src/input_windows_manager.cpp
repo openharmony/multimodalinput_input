@@ -6177,6 +6177,27 @@ bool InputWindowsManager::IsLeaveWindowTriggered(const std::shared_ptr<PointerEv
     return false;
 }
 
+void InputWindowsManager::SetDelayLevitateEventStatus(bool needDelay)
+{
+    isDelayLevitateEvent_ = needDelay;
+}
+
+bool InputWindowsManager::GetDelayLevitateEventStatus()
+{
+    return isDelayLevitateEvent_;
+}
+
+void InputWindowsManager::SaveDelayLevitateEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    delayedLevitateEvent_ = pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputWindowsManager::GetDelayLevitateEvent()
+{
+    SetDelayLevitateEventStatus(false);
+    return delayedLevitateEvent_;
+}
+
 void InputWindowsManager::DispatchLevitateInEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     DispatchTouch(PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW, pointerEvent->GetTargetDisplayId());
@@ -6208,6 +6229,7 @@ void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t log
     } else if (pointerAction == PointerEvent::POINTER_ACTION_PROXIMITY_IN) {
         MMI_HILOG_DISPATCHI("Levitate in by Z-");
         UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
+        SetDelayLevitateEventStatus(true);
         DispatchLevitateInEvent(pointerEvent);
     } else if (pointerAction == PointerEvent::POINTER_ACTION_PROXIMITY_OUT) {
         MMI_HILOG_DISPATCHI("Levitate out by Z+");
@@ -6218,6 +6240,7 @@ void InputWindowsManager::HandleLevitateInOutEvent(int32_t logicalX, int32_t log
     } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
         MMI_HILOG_DISPATCHI("Levitate in by Z+");
         UpdateStashTouchEventInfo(logicalX, logicalY, pointerEvent, touchWindow);
+        SetDelayLevitateEventStatus(true);
         DispatchLevitateInEvent(pointerEvent);
     }
 }
@@ -6354,6 +6377,10 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     }
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
+    if (GetDelayLevitateEventStatus()) {
+        SaveDelayLevitateEvent(pointerEvent);
+        return;
+    }
     auto filter = InputHandler->GetFilterHandler();
     CHKPV(filter);
     filter->HandlePointerEvent(pointerEvent);
