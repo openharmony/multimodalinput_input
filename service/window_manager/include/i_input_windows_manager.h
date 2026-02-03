@@ -190,6 +190,10 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown) = 0;
     virtual Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo) = 0;
+    virtual void SetDelayLevitateEventStatus(bool needDelay) = 0;
+    virtual bool GetDelayLevitateEventStatus() = 0;
+    virtual void SaveDelayLevitateEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual std::shared_ptr<PointerEvent> GetDelayLevitateEvent() = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     virtual void AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr) = 0;
