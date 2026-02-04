@@ -631,6 +631,9 @@ ErrCode MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, processName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType,
             tokenId, isRealProcessName] {
+            if (GetSessionByPid(pid) != nullptr) {
+                MMI_HILOGW("%{public}d has session already", pid);
+            }
             return this->AddSocketPairInfo(processName, moduleType, uid, pid, serverFd, toReturnClientFd,
                 tokenType, tokenId, isRealProcessName);
         }
