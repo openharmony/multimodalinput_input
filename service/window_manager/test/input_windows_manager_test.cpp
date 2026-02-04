@@ -13844,5 +13844,48 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerDispatc
     inputWindowsManager->lastPointerEventRedispatch_->SetPointerId(0);
     EXPECT_NE(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ClearPointerDeviceId_001
+ * @tc.desc: Test branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearPointerDeviceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    PointerEvent::PointerItem item;
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetPointerId(150);
+    pointerEvent->SetDeviceId(1);
+    item.SetDeviceId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    item.SetPointerId(150);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->bitwise_ = 0x00000080;
+    auto pointerId = 150;
+    WindowInfoEX winEx;
+    winEx.flag = true;
+    winEx.window = winInfo;
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+    item.SetToolType(PointerEvent::TOOL_TYPE_THP_FEATURE);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+    pointerEvent->bitwise_ = 0x00000100;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->bitwise_ = 0x00000000;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+    pointerId = 200;
+    inputWindowsMgr.touchItemDownInfos_[pointerEvent->GetDeviceId()].insert(std::make_pair(pointerId, winEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.ClearPointerDeviceId(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
