@@ -4611,6 +4611,60 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_002, T
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_AddActiveWindow_003
+ * @tc.desc: Test AddActiveWindow when GetWindowInfoById returns nullopt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    int32_t windowId = 999;
+    int32_t pointerId = 1;
+
+    inputWindowsManager->AddActiveWindow(windowId, pointerId);
+
+    auto it = inputWindowsManager->activeTouchWinTypes_.find(windowId);
+    EXPECT_EQ(it, inputWindowsManager->activeTouchWinTypes_.end());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AddActiveWindow_004
+ * @tc.desc: Test AddActiveWindow when GetWindowInfoById returns valid window info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddActiveWindow_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    inputWindowsManager->activeTouchWinTypes_.clear();
+
+    int32_t windowId = 1;
+    int32_t pointerId = 0;
+
+    inputWindowsManager->activeTouchWinTypes_.emplace(
+        windowId, InputWindowsManager::ActiveTouchWin{
+            WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, { pointerId }
+        });
+
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AddActiveWindow(windowId, pointerId));
+
+    auto iter = inputWindowsManager->activeTouchWinTypes_.find(windowId);
+    ASSERT_NE(iter, inputWindowsManager->activeTouchWinTypes_.end());
+    EXPECT_EQ(iter->second.windowInputType, WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE);
+    EXPECT_EQ(iter->second.pointerSet.size(), 1U);
+    EXPECT_NE(iter->second.pointerSet.find(pointerId), iter->second.pointerSet.end());
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_001
  * @tc.desc: Test the function RemoveActiveWindow_001
  * @tc.type: FUNC

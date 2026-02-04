@@ -8394,6 +8394,116 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_005, 
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_006
+ * @tc.desc: Test AdjustFingerFlag when pointerItem retrieval fails
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    pointerEvent->SetPointerId(999);
+
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_007
+ * @tc.desc: Test AdjustFingerFlag when pointerItem is pressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetToolType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_008
+ * @tc.desc: Test AdjustFingerFlag when tool type is not pen or pencil
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    item.SetToolType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustFingerFlag_009
+ * @tc.desc: Test AdjustFingerFlag when all conditions are met (pen hover)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustFingerFlag_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = true;
+    WIN_MGR->touchItemDownInfos_[pointerEvent->GetDeviceId()][pointerEvent->GetPointerId()] = windowInfoEX;
+
+    bool result = WIN_MGR->AdjustFingerFlag(pointerEvent);
+
+    EXPECT_FALSE(result);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_GetClientFd_007
  * @tc.desc: Test GetClientFd
  * @tc.type: FUNC
@@ -10872,6 +10982,67 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEven
 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ReissueCancelTouchEvent(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_ReissueCancelTouchEvent_005
+ * @tc.desc: Test ReissueCancelTouchEvent when touchItemDownInfos_ does not contain the device ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(100);
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+
+    WIN_MGR->touchItemDownInfos_.clear();
+
+    WIN_MGR->ReissueCancelTouchEvent(pointerEvent);
+
+    EXPECT_TRUE(WIN_MGR->touchItemDownInfos_.empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ReissueCancelTouchEvent_006
+ * @tc.desc: Test ReissueCancelTouchEvent when touchItemDownInfos_ contains the device ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    int32_t deviceId = 100;
+    int32_t pointerId = 1;
+    item.SetDeviceId(deviceId);
+    item.SetPointerId(pointerId);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+
+    WIN_MGR->touchItemDownInfos_.clear();
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = true;
+    WIN_MGR->touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
+
+    WIN_MGR->ReissueCancelTouchEvent(pointerEvent);
+
+    auto iter = WIN_MGR->touchItemDownInfos_.find(deviceId);
+    ASSERT_NE(iter, WIN_MGR->touchItemDownInfos_.end());
+    auto innerIter = iter->second.find(pointerId);
+    ASSERT_NE(innerIter, iter->second.end());
+    EXPECT_TRUE(innerIter->second.flag);
+}
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 /**
@@ -11331,6 +11502,27 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DestroyInstance_001, T
     CALL_TEST_DEBUG;
     WIN_MGR->DestroyInstance();
     EXPECT_EQ(WIN_MGR, nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DestroyInstance_002
+ * @tc.desc: Test DestroyInstance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DestroyInstance_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto instance = IInputWindowsManager::GetInstance();
+    ASSERT_NE(instance, nullptr);
+
+    IInputWindowsManager::DestroyInstance();
+
+    auto newInstance = IInputWindowsManager::GetInstance();
+    EXPECT_NE(newInstance, nullptr);
+    EXPECT_NE(instance, newInstance);
+
+    IInputWindowsManager::DestroyInstance();
 }
 
 /**
