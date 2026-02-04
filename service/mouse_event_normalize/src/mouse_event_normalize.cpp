@@ -153,7 +153,6 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         processor = std::make_shared<MouseTransformProcessor>(env_, deviceId);
         [[ maybe_unused ]] auto [tIter, isOk] = processors_.emplace(deviceId, processor);
     }
-    CHKPR(processor, RET_ERR);
     return processor->Normalize(event);
 }
 
@@ -218,7 +217,6 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
         processor = std::make_shared<MouseTransformProcessor>(env_, deviceId);
         [[ maybe_unused ]] auto [tIter, isOk] = processors_.emplace(deviceId, processor);
     }
-    CHKPR(processor, RET_ERR);
     return processor->NormalizeRotateEvent(event, type, angle);
 }
 
@@ -250,99 +248,20 @@ bool MouseEventNormalize::CheckAndPackageAxisEvent(libinput_event* event)
     return processor->CheckAndPackageAxisEvent();
 }
 
-int32_t MouseEventNormalize::SetMouseScrollRows(int32_t rows)
-{
-    return MouseTransformProcessor::SetMouseScrollRows(rows);
-}
-
-int32_t MouseEventNormalize::GetMouseScrollRows() const
-{
-    return MouseTransformProcessor::GetMouseScrollRows();
-}
-
-int32_t MouseEventNormalize::SetMousePrimaryButton(int32_t primaryButton)
-{
-    return MouseTransformProcessor::SetMousePrimaryButton(primaryButton);
-}
-
-int32_t MouseEventNormalize::GetMousePrimaryButton() const
-{
-    return MouseTransformProcessor::GetMousePrimaryButton();
-}
-
-int32_t MouseEventNormalize::SetPointerSpeed(int32_t speed)
-{
-    return MouseTransformProcessor::SetPointerSpeed(speed);
-}
-
-int32_t MouseEventNormalize::GetPointerSpeed() const
-{
-    return MouseTransformProcessor::GetPointerSpeed();
-}
-
 int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
 {
-    return MouseTransformProcessor::SetPointerLocation(x, y, displayId);
+    if (env_ == nullptr) {
+        return RET_ERR;
+    }
+    return MouseTransformProcessor::SetPointerLocation(*env_, x, y, displayId);
 }
 
 int32_t MouseEventNormalize::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
 {
-    return MouseTransformProcessor::GetPointerLocation(displayId, displayX, displayY);
-}
-
-int32_t MouseEventNormalize::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const
-{
-    return MouseTransformProcessor::SetTouchpadScrollSwitch(pid, switchFlag);
-}
-
-void MouseEventNormalize::GetTouchpadScrollSwitch(bool &switchFlag) const
-{
-    MouseTransformProcessor::GetTouchpadScrollSwitch(switchFlag);
-}
-
-int32_t MouseEventNormalize::SetTouchpadScrollDirection(bool state) const
-{
-    return MouseTransformProcessor::SetTouchpadScrollDirection(state);
-}
-
-void MouseEventNormalize::GetTouchpadScrollDirection(bool &switchFlag) const
-{
-    MouseTransformProcessor::GetTouchpadScrollDirection(switchFlag);
-}
-
-int32_t MouseEventNormalize::SetTouchpadTapSwitch(bool switchFlag) const
-{
-    return MouseTransformProcessor::SetTouchpadTapSwitch(switchFlag);
-}
-
-void MouseEventNormalize::GetTouchpadTapSwitch(bool &switchFlag) const
-{
-    MouseTransformProcessor::GetTouchpadTapSwitch(switchFlag);
-}
-
-int32_t MouseEventNormalize::SetTouchpadPointerSpeed(int32_t speed) const
-{
-    return MouseTransformProcessor::SetTouchpadPointerSpeed(speed);
-}
-
-void MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
-{
-    MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
-}
-
-void MouseEventNormalize::GetTouchpadCDG(TouchpadCDG &touchpadCDG) const
-{
-    MouseTransformProcessor::GetTouchpadCDG(touchpadCDG);
-}
-
-int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
-{
-    return MouseTransformProcessor::SetTouchpadRightClickType(type);
-}
-
-void MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
-{
-    MouseTransformProcessor::GetTouchpadRightClickType(type);
+    if (env_ == nullptr) {
+        return RET_ERR;
+    }
+    return MouseTransformProcessor::GetPointerLocation(*env_, displayId, displayX, displayY);
 }
 
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE

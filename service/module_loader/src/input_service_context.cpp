@@ -75,7 +75,9 @@ std::shared_ptr<IPreferenceManager> InputServiceContext::GetPreferenceManager() 
 
 ICursorDrawingComponent* InputServiceContext::GetCursorDrawingComponent() const
 {
-    return &CursorDrawingComponent::GetInstance();
+    return nullptr;
+    // WLD 待修改
+    // return &CursorDrawingComponent::GetInstance();
 }
 
 void InputServiceContext::AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate)

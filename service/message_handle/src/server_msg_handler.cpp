@@ -552,17 +552,17 @@ int32_t ServerMsgHandler::AccelerateMotionTouchpad(std::shared_ptr<PointerEvent>
         return RET_ERR;
     }
     if (pointerEvent->GetPointerAction() == POINTER_ACTION_MOVE) {
-        ret = PointerMotionAcceleration::DynamicAccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
-            touchpadSpeed, displaySize, touchpadSize, touchpadPPi, frequency,
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+        ret = HandleMotionDynamicAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, touchpadSpeed, displaySize,
+            touchpadSize, touchpadPPi, frequency)
     }
     MMI_HILOGE("DeltaTime after HandleMotionDynamicAccelerateTouchpad: %{public}PRId64 ms", deltaTime);
     MMI_HILOGE("Hidumper after HandleMotionDynamicAccelerateTouchpad");
     preTime = currentTime;
 #else
-    ret = PointerMotionAcceleration::AccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
-        MouseTransformProcessor::GetTouchpadSpeed(), DeviceType::DEVICE_PC,
-        cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseEventHdr->GetTouchpadSpeed(),
+            static_cast<int32_t>(DeviceType::DEVICE_PC));
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);

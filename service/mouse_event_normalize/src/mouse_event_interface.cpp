@@ -448,14 +448,13 @@ void MouseEventInterface::GetTouchpadPointerSpeed(int32_t &speed) const
     MousePreferenceAccessor::GetTouchpadPointerSpeed(*env, speed);
 }
 
-void  MouseEventInterface::GetTouchpadCDG(TouchpadCDG &touchpadCDG) const
+void  MouseEventInterface::ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const
 {
     std::lock_guard guard { mutex_ };
     if (mouse_ == nullptr) {
         MMI_HILOGE("Mouse module not loaded");
-        return RET_ERR;
+        return;
     }
-    mouse_->GetTouchpadCDG(touchpadCDG);
 }
 
 int32_t MouseEventInterface::GetMouseCoordsX() const
