@@ -38,7 +38,7 @@ public:
     std::shared_ptr<IInputDeviceManager> GetDeviceManager() const override;
     std::shared_ptr<IKeyMapManager> GetKeyMapManager() const override;
     std::shared_ptr<IPreferenceManager> GetPreferenceManager() const override;
-    ICursorDrawingComponent* GetCursorDrawingComponent() const override;
+    ICursorDrawingComponent& GetCursorDrawingComponent() const override;
 
     void AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate);
 

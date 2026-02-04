@@ -33,7 +33,7 @@ public:
  
     static int32_t SetMouseScrollRows(IInputServiceContext &env, int32_t rows);
     static int32_t GetMouseScrollRows(IInputServiceContext &env);
-    static int32_t SetMousePrimaryButton(IInputServiceContext &env,int32_t primaryButton);
+    static int32_t SetMousePrimaryButton(IInputServiceContext &env, int32_t primaryButton);
     static int32_t GetMousePrimaryButton(IInputServiceContext &env);
     static int32_t SetPointerSpeed(IInputServiceContext &env, int32_t speed);
     static int32_t GetPointerSpeed(IInputServiceContext &env);

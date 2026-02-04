@@ -225,7 +225,7 @@ int32_t MousePreferenceAccessor::GetTouchpadScrollRows(IInputServiceContext &env
     int32_t rows = DEFAULT_ROWS;
     GetConfigDataFromDatabase(env, name, rows);
     MMI_HILOGD("Get touchpad scroll rows successfully, rows:%{public}d", rows);
-    return rows; 
+    return rows;
 }
 
 int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
