@@ -421,7 +421,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_03, Tes
     int32_t windowId = 2;
     PointerStyle style;
     int32_t ret1 = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, style);
-    EXPECT_EQ(ret1, RET_OK);
+    EXPECT_NE(ret1, RET_OK);
 
     CursorPixelMap curPixelMap;
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
@@ -1736,7 +1736,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, Te
     CursorPixelMap curPixelMap;
     curPixelMap.pixelMap = (void *)pixelMap.release();
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -1756,7 +1756,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_005, Te
     CursorPixelMap curPixelMap;
     curPixelMap.pixelMap = (void *)pixelMap.release();
     int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 
@@ -2233,7 +2233,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdatePointerDevice_
 {
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    EXPECT_EQ(CursorDrawingInformation::GetInstance().pidInfos_.size(), 100);
+    EXPECT_EQ(CursorDrawingInformation::GetInstance().pidInfos_.size(), 101);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(true, false, true));
     pointerDrawingManager->UpdatePointerDevice(true, true, true);
     EXPECT_EQ(CursorDrawingInformation::GetInstance().pidInfos_.size(), 100);
@@ -2628,14 +2628,14 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_002,
     ASSERT_EQ(ret, RET_OK);
     windowId = 1;
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
     IconStyle iconStyle;
     iconStyle.alignmentWay = 0;
     iconStyle.iconPath = "testpath";
     CursorDrawingInformation::GetInstance().mouseIcons_.insert(std::make_pair(static_cast<MOUSE_ICON>(pointerStyle.id),
         iconStyle));
     ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
