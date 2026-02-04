@@ -78,6 +78,7 @@ const char *POINTER_SIZE = "pointerSize";
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
+ffrt::mutex g_loadSoMutex;
 }
 
 CursorDrawingComponent& CursorDrawingComponent::GetInstance()
@@ -100,7 +101,7 @@ CursorDrawingComponent::~CursorDrawingComponent()
 void CursorDrawingComponent::Load()
 {
     {
-        std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
+        std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
         lastCallTime_ = std::chrono::steady_clock::now();
         if (isLoaded_ && (soHandle_ != nullptr)) {
             return;
@@ -191,7 +192,7 @@ bool CursorDrawingComponent::ResetUnloadTimer(int32_t unloadTime, int32_t checkI
 
 void CursorDrawingComponent::UnLoad()
 {
-    std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
+    std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
     if (!isLoaded_ || (soHandle_ == nullptr)) {
         MMI_HILOGI("%{public}s has been UnLoaded", MULTIMODAL_PATH_NAME);
         return;
@@ -607,7 +608,7 @@ void CursorDrawingComponent::UpdatePointerItemCursorInfo(PointerEvent::PointerIt
 
 IPointerDrawingManager* CursorDrawingComponent::GetPointerInstance()
 {
-    std::lock_guard<std::mutex> lockGuard(loadSoMutex_);
+    std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
     lastCallTime_ = std::chrono::steady_clock::now();
     return pointerInstance_;
 }

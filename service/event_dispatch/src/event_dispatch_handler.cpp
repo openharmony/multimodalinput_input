@@ -81,6 +81,10 @@ void EventDispatchHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> 
 {
     CHKPV(pointerEvent);
     HandlePointerEventInner(pointerEvent);
+    if (WIN_MGR->GetDelayLevitateEventStatus()) {
+        std::shared_ptr<PointerEvent> pointer = WIN_MGR->GetDelayLevitateEvent();
+        HandlePointerEventInner(pointer);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

@@ -123,7 +123,6 @@ private:
     using GetPointerInstanceFunc = void* (*)();
     GetPointerInstanceFunc getPointerInstance_;
 
-    std::mutex loadSoMutex_;
     std::atomic<bool> exitFlag_ { false };
     std::atomic<bool> isLoaded_ { false };
     void *soHandle_ { nullptr };

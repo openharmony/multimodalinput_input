@@ -261,6 +261,10 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
+    void SetDelayLevitateEventStatus(bool needDelay);
+    bool GetDelayLevitateEventStatus();
+    void SaveDelayLevitateEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    std::shared_ptr<PointerEvent> GetDelayLevitateEvent();
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     void AttachTouchGestureMgr(std::shared_ptr<ITouchGestureManager> touchGestureMgr);
@@ -553,6 +557,8 @@ private:
     WindowInfo mouseDownInfo_;
     PointerStyle globalStyle_;
     WindowInfo lastLevitateInWindowInfo_;
+    bool isDelayLevitateEvent_ { false };
+    std::shared_ptr<PointerEvent> delayedLevitateEvent_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::map<LastTouch, LastTouchInfo> LastTouchInfos_;
