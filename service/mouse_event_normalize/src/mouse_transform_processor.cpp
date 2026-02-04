@@ -309,15 +309,14 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
         ret = PointerMotionAcceleration::AccelerateTouchpad(offset,
-           winMgr->GetMouseIsCaptureMode(),
+            winMgr->GetMouseIsCaptureMode(),
             MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
-        ret = PointerMotionAcceleration::AccelerateTouchpad(offset,
-            winMgr->GetMouseIsCaptureMode(),
-           MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+        ret = PointerMotionAcceleration::AccelerateTouchpad(offset, winMgr->GetMouseIsCaptureMode(),
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
@@ -1312,11 +1311,8 @@ int32_t MouseTransformProcessor::SetPointerLocation(IInputServiceContext &env, i
     env.GetInputWindowsManager()->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x,
         cursorPos.cursorPos.y, false);
     cursorPos = env.GetInputWindowsManager()->GetCursorPos();
-    auto cursorDrawer = env.GetCursorDrawingComponent();
-    if (cursorDrawer == nullptr) {
-        return RET_ERR;
-    }
-    cursorDrawer->SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    env.GetCursorDrawingComponent().SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        cursorPos.displayId);
 
     MMI_HILOGI("CursorPosX:%f, cursorPosY:%f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     return RET_OK;

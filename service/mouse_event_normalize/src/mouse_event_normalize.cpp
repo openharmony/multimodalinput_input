@@ -299,7 +299,7 @@ int32_t MouseEventNormalize::GetMouseCoordsY() const
 
 void MouseEventNormalize::SetMouseCoords(int32_t x, int32_t y)
 {
-   MouseState->SetMouseCoords(x, y);
+    MouseState->SetMouseCoords(x, y);
 }
 
 bool MouseEventNormalize::IsLeftBtnPressed()
@@ -309,12 +309,12 @@ bool MouseEventNormalize::IsLeftBtnPressed()
 
 void MouseEventNormalize::GetPressedButtons(std::vector<int32_t>& pressedButtons)
 {
-   MouseState->GetPressedButtons(pressedButtons);
+    MouseState->GetPressedButtons(pressedButtons);
 }
 
 void MouseEventNormalize::MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState)
 {
-   MouseState->MouseBtnStateCounts(btnCode, btnState);
+    MouseState->MouseBtnStateCounts(btnCode, btnState);
 }
 
 int32_t MouseEventNormalize::LibinputChangeToPointer(const uint32_t keyValue)

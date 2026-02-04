@@ -39,7 +39,7 @@ struct isMagicCursor {
     bool isShow { false };
 };
 
-class CursorDrawingComponent {
+class CursorDrawingComponent : public ICursorDrawingComponent {
 public:
     static CursorDrawingComponent& GetInstance();
     void SetPointerLocation(int32_t x, int32_t y, uint64_t displayId);

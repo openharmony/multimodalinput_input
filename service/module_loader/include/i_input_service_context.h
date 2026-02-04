@@ -44,7 +44,7 @@ public:
     virtual std::shared_ptr<IInputDeviceManager> GetDeviceManager() const = 0;
     virtual std::shared_ptr<IKeyMapManager> GetKeyMapManager() const = 0;
     virtual std::shared_ptr<IPreferenceManager> GetPreferenceManager() const = 0;
-    virtual ICursorDrawingComponent* GetCursorDrawingComponent() const = 0;
+    virtual ICursorDrawingComponent& GetCursorDrawingComponent() const = 0;
 };
 } // namespace MMI
 } // namespace OHOS
