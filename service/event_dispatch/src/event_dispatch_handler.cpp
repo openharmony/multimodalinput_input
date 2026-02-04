@@ -367,6 +367,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
     DispatchPointerEventInner(point, fd);
     ResetDisplayXY(point);
+    WIN_MGR->ClearPointerDeviceId(point);
 }
 
 int32_t EventDispatchHandler::GetClientFd(int32_t pid, std::shared_ptr<PointerEvent> point)
