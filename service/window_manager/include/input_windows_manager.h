@@ -445,6 +445,9 @@ void HandleOneHandMode(const OLD::DisplayInfo &displayInfo, std::shared_ptr<Poin
         const WindowInfo* touchWindow);
     void UpdateStashTouchEventInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    void ErasePointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent,
+        std::map<int32_t, std::map<int32_t, WindowInfoEX>> &touchItemDownInfos);
+    void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent);
     void DispatchTouch(int32_t pointerAction, int32_t groupId = DEFAULT_GROUP_ID);
     const OLD::DisplayInfo *FindPhysicalDisplayInfo(const std::string& uniq) const;
     bool GetPhysicalDisplayCoord(int32_t deviceId, struct libinput_event_touch* touch,
