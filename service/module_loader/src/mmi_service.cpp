@@ -3520,7 +3520,7 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::ReadTouchpadCDG(TouchpadCDG &touchpadCDG)
 {
-    MouseEventHdr->GetTouchpadCDG(touchpadCDG);
+    MouseEventHdr->ReadTouchpadCDG(touchpadCDG);
     return RET_OK;
 }
 

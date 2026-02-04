@@ -23,8 +23,9 @@
 #include "component_manager.h"
 #include "device_observer.h"
 #include "key_event.h"
-#include "libinput.h"
 #include "pointer_event.h"
+
+struct libinput_event;
 
 extern "C" {
     struct Offset {

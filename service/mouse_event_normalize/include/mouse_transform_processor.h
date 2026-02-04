@@ -18,32 +18,16 @@
 
 #include "aggregator.h"
 #include "device_type_definition.h"
+#include "i_input_service_context.h"
 #include "libinput.h"
 #include "timer_manager.h"
 #include "pointer_event.h"
-#include "touchpad_control_display_gain.h"
 #include "old_display_info.h"
+#include "i_mouse_event_normalizer.h"
+
 #include <preferences_value.h>
 
 namespace OHOS {
-
-extern "C" {
-    struct Offset {
-        double dx;
-        double dy;
-    };
-
-    int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed, int32_t deviceType);
-    int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed, int32_t deviceType);
-    int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType);
-    int32_t HandleMotionDynamicAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed, uint64_t delta_time, double display_ppi, double factor);
-    int32_t HandleMotionDynamicAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed, double display_size, double touchpad_size, double touchpad_ppi, int32_t frequency);
-}
-
 namespace MMI {
 struct AccelerateCurve {
     std::vector<int32_t> speeds;
@@ -149,42 +133,29 @@ private:
     static void GetVirtualTouchpadRightClickType(int32_t &type);
     static int32_t GetVirtualTouchpadPrimaryButton();
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    static int32_t PutConfigDataToDatabase(std::string &key, bool value);
-    static void GetConfigDataFromDatabase(std::string &key, bool &value);
-    static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
-    static void GetConfigDataFromDatabase(std::string &key, int32_t &value);
 
 public:
-    static void OnDisplayLost(int32_t displayId);
-    static int32_t GetDisplayId();
-    static int32_t SetMousePrimaryButton(int32_t primaryButton);
-    static int32_t GetMousePrimaryButton();
-    static int32_t SetMouseScrollRows(int32_t rows);
-    static int32_t GetMouseScrollRows();
-    static int32_t SetPointerSpeed(int32_t speed);
-    static int32_t GetPointerSpeed();
-    static int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId);
-    static int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
-    static int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag);
-    static void GetTouchpadScrollSwitch(bool &switchFlag);
-    static int32_t SetTouchpadScrollDirection(bool state);
-    static void GetTouchpadScrollDirection(bool &state);
-    static int32_t SetTouchpadTapSwitch(bool switchFlag);
-    static void GetTouchpadTapSwitch(bool &switchFlag);
-    static int32_t SetTouchpadRightClickType(int32_t type);
-    static void GetTouchpadRightClickType(int32_t &type);
-    static int32_t SetTouchpadPointerSpeed(int32_t speed);
-    static void GetTouchpadPointerSpeed(int32_t &speed);
-    static void GetTouchpadCDG(TouchpadCDG &touchpadCDG);
-    static void UpdateTouchpadCDG(double touchpadPPi, double touchpadSize, int32_t frequency);
-    static int32_t GetTouchpadSpeed();
+    static void OnDisplayLost(IInputServiceContext &env, int32_t displayId);
+    static int32_t GetDisplayId(IInputServiceContext &env);
+    static int32_t SetPointerLocation(IInputServiceContext &env, int32_t x, int32_t y, int32_t displayId);
+    static int32_t GetPointerLocation(IInputServiceContext &env, int32_t &displayId,
+        double &displayX, double &displayY);
+    static void SetPointerSpeed(int32_t speed);
+    static void SetScrollSwitchSetterPid(int32_t pid);
+    std::shared_ptr<IInputEventHandler> GetEventNormalizeHandler() const;
+    std::shared_ptr<IInputEventHandler> GetDispatchHandler() const;
+    std::shared_ptr<ITimerManager> GetTimerManager() const;
+    std::shared_ptr<IInputWindowsManager> GetInputWindowsManager() const;
+    std::shared_ptr<IInputDeviceManager> GetDeviceManager() const;
+    std::shared_ptr<IPreferenceManager> GetPreferenceManager() const;
 
 private:
+    IInputServiceContext *env_ { nullptr };
+    static std::atomic_int32_t globalPointerSpeed_;
+    static std::atomic_int32_t globalScrollSwitchPid_;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static std::atomic_bool isVirtualDeviceEvent_;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    static int32_t globalPointerSpeed_;
-    static int32_t scrollSwitchPid_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
@@ -194,7 +165,6 @@ private:
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
     std::map<int32_t, int32_t> buttonMapping_;
-    static TouchpadCDG touchpadOption_;
     Aggregator aggregator_ {
             [this](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return env_->GetTimerManager()->AddTimer(intervalMs, repeatCount, std::move(callback));
