@@ -143,6 +143,7 @@ public:
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
     MOCK_METHOD(int32_t, FindDisplayUserId, (int32_t), (const));
+    void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent) override {}
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitializeAnco() override {}
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) override {}

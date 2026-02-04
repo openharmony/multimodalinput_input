@@ -5353,6 +5353,44 @@ void InputWindowsManager::ProcessInjectEventGlobalXY(std::shared_ptr<PointerEven
     }
 }
 
+void InputWindowsManager::ErasePointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent,
+    std::map<int32_t, std::map<int32_t, WindowInfoEX>> &touchItemDownInfos)
+{
+    int32_t deviceId = pointerEvent->GetDeviceId();
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (touchItemDownInfos.find(deviceId) == touchItemDownInfos.end()) {
+        MMI_HILOG_DISPATCHE("get deviceId fail, deviceid=%{public}d", deviceId);
+        return;
+    }
+    if (touchItemDownInfos[deviceId].find(pointerId) != touchItemDownInfos[deviceId].end()) {
+        auto it = touchItemDownInfos[deviceId].find(pointerId);
+        touchItemDownInfos[deviceId].erase(it);
+    }
+    return;
+}
+
+void InputWindowsManager::ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent == nullptr) {
+        MMI_HILOG_DISPATCHE("pointerEvent is nullptr");
+        return;
+    }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+            MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+            return;
+        }
+        if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_THP_FEATURE) {
+            ErasePointerDeviceId(pointerEvent, thpFeatureTouchDownInfos_);
+        } else {
+            ErasePointerDeviceId(pointerEvent, touchItemDownInfos_);
+        }
+    }
+    return;
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -5735,8 +5773,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             windowInfoEX.window = *touchWindow;
             windowInfoEX.flag = true;
             if (thpFeatureTouchDownInfos_.find(pointerEvent->GetDeviceId()) == thpFeatureTouchDownInfos_.end()) {
-                MMI_HILOG_DISPATCHI("get deviceId fail, deviceId=%{public}d", pointerEvent->GetDeviceId());
-                return RET_ERR;
+                thpFeatureTouchDownInfos_[pointerEvent->GetDeviceId()] = {};
             }
             thpFeatureTouchDownInfos_[pointerEvent->GetDeviceId()][pointerId] = windowInfoEX;
         }
@@ -5862,8 +5899,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
         if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
-            MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
-            return RET_ERR;
+            touchItemDownInfos_[deviceId] = {};
         }
         touchItemDownInfos_[deviceId][pointerId] = windowInfoEX;
         MMI_HILOGD("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);

@@ -178,6 +178,7 @@ public:
     virtual int32_t GetPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
     virtual int32_t GetAgentPidByDisplayIdAndWindowId(int32_t displayId, int32_t windowId) = 0;
     virtual int32_t FindDisplayUserId(int32_t displayId) const = 0;
+    virtual void ClearPointerDeviceId(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual void InitializeAnco() = 0;
     virtual void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent) = 0;
