@@ -18,67 +18,55 @@
 
 #include "device_observer.h"
 #include "mouse_transform_processor.h"
-#include "singleton.h"
+#include "i_mouse_event_normalizer.h"
+#include "i_input_service_context.h"
 
 namespace OHOS {
 namespace MMI {
-class MouseEventNormalize final : public std::enable_shared_from_this<MouseEventNormalize> {
-    class InputDeviceObserver final : public IDeviceObserver {
-    public:
-        InputDeviceObserver() = default;
-        ~InputDeviceObserver() override = default;
-        void OnDeviceAdded(int32_t deviceId) override {}
-        void OnDeviceRemoved(int32_t deviceId) override;
-        void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
-    };
-
-    DECLARE_DELAYED_SINGLETON(MouseEventNormalize);
-
+class MouseEventNormalize final : public IMouseEventNormalize {
+public:
+    explicit MouseEventNormalize(IInputServiceContext *env);
+    ~MouseEventNormalize();
 public:
     DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
-    std::shared_ptr<PointerEvent> GetPointerEvent();
-    std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
-    int32_t OnEvent(struct libinput_event *event);
-    void Dump(int32_t fd, const std::vector<std::string> &args);
-    int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
-    bool CheckAndPackageAxisEvent(libinput_event* event);
+    void OnDeviceAdded(int32_t deviceId) override;
+    void OnDeviceRemoved(int32_t deviceId) override;
+    bool HasMouse() override;
+    int32_t OnEvent(struct libinput_event *event) override;
+
+    std::shared_ptr<PointerEvent> GetPointerEvent() override;
+    std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId) override;
+    void Dump(int32_t fd, const std::vector<std::string> &args) override;
+    int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle) override;
+    bool CheckAndPackageAxisEvent(libinput_event* event) override;
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
-    bool CheckFilterMouseEvent(struct libinput_event *event);
+    bool CheckFilterMouseEvent(struct libinput_event *event) override;
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
-    void OnDisplayLost(int32_t displayId);
-    int32_t GetDisplayId() const;
+    bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY) override;
+    void OnDisplayLost(int32_t displayId) override;
+    int32_t GetDisplayId() const override;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t SetMouseScrollRows(int32_t rows);
-    int32_t GetMouseScrollRows() const;
-    int32_t SetMousePrimaryButton(int32_t primaryButton);
-    int32_t GetMousePrimaryButton() const;
-    int32_t SetPointerSpeed(int32_t speed);
-    int32_t GetPointerSpeed() const;
-    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t dispiayId);
-    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
-    int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const;
-    void GetTouchpadScrollSwitch(bool &switchFlag) const;
-    int32_t SetTouchpadScrollDirection(bool state) const;
-    void GetTouchpadScrollDirection(bool &state) const;
-    int32_t SetTouchpadTapSwitch(bool switchFlag) const;
-    void GetTouchpadTapSwitch(bool &switchFlag) const;
-    int32_t SetTouchpadRightClickType(int32_t type) const;
-    void GetTouchpadRightClickType(int32_t &type) const;
-    int32_t SetTouchpadPointerSpeed(int32_t speed) const;
-    void GetTouchpadPointerSpeed(int32_t &speed) const;
-    void GetTouchpadCDG(TouchpadCDG &touchpadCDG) const;
-    int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
+    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1) override;
+    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY) override;
+    int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) override;
+
+    // MouseDeviceState Interface
+    int32_t GetMouseCoordsX() const override;
+    int32_t GetMouseCoordsY() const override;
+    void SetMouseCoords(int32_t x, int32_t y) override;
+    bool IsLeftBtnPressed() override;
+    void GetPressedButtons(std::vector<int32_t>& pressedButtons) override;
+    void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState) override;
+    int32_t LibinputChangeToPointer(const uint32_t keyValue) override;
+    int32_t SetPointerSpeed(int32_t speed) override;
+    int32_t SetScrollSwitchSetterPid(int32_t pid) override;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;
     std::shared_ptr<MouseTransformProcessor> GetCurrentProcessor() const;
     void SetCurrentDeviceId(int32_t deviceId);
     int32_t GetCurrentDeviceId() const;
-    void SetUpDeviceObserver();
-    void TearDownDeviceObserver();
-    void OnDeviceRemoved(int32_t deviceId);
 
 private:
     int32_t buttonId_ { -1 };
@@ -86,9 +74,8 @@ private:
     bool isPressed_ { false };
     std::map<int32_t, std::shared_ptr<MouseTransformProcessor>> processors_;
     std::shared_ptr<IDeviceObserver> inputDevObserver_;
+    IInputServiceContext *env_ { nullptr };
 };
-
-#define MouseEventHdr :MouseEventHdr
 } // namespace MMI
 } // namespace OHOS
 #endif // MOUSE_EVENT_NORMALIZE_H
