@@ -524,11 +524,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         KeyRepeat->SetRepeatKeyCode(INVALID_KEY_CODE);
         MMI_HILOGD("repeatKey:%{private}d", KeyRepeat->GetRepeatKeyCode());
     }
-    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
-    } else {
-        MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
-    }
+    MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
