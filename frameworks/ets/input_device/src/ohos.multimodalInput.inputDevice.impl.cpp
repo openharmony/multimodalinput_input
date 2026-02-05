@@ -12,17 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "ohos.multimodalInput.inputDevice.proj.hpp"
-#include "ohos.multimodalInput.inputDevice.impl.hpp"
-#include "taihe/runtime.hpp"
-#include "stdexcept"
-#include "input_device.h"
-#include "define_multimodal.h"
-#include "input_manager.h"
-#include "ani_common.h"
 #include <map>
-#include <ani.h>
+#include <mutex>
+
+#include "ani_common.h"
+#include "input_device.h"
 #include "ohos.multimodalInput.inputDevice.impl.h"
 #include "ohos.multimodalInput.keyCode.impl.h"
 #include "taihe_event.h"
@@ -164,6 +158,10 @@ InputDeviceData GetDeviceInfoAsync(int32_t deviceId)
 void SetKeyboardRepeatDelayAsync(int32_t delay)
 {
     CALL_DEBUG_ENTER;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return;
+    }
     if (delay < MIN_KEY_REPEAT_DELAY) {
         delay = MIN_KEY_REPEAT_DELAY;
     } else if (delay > MAX_KEY_REPEAT_DELAY) {
@@ -171,13 +169,12 @@ void SetKeyboardRepeatDelayAsync(int32_t delay)
     }
     int32_t ret = InputManager_t::GetInstance()->SetKeyboardRepeatDelay(delay);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d", ret);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set keyboard repeat delay, code:%{public}d message: %{public}s",
-            ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
         return;
     }
 }
@@ -186,16 +183,19 @@ int32_t GetKeyboardRepeatDelayAsync()
 {
     CALL_DEBUG_ENTER;
     int32_t delay = -1;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return delay;
+    }
     auto callback = [&delay] (int32_t tmpDelay) { delay = tmpDelay; };
     int32_t ret = InputManager_t::GetInstance()->GetKeyboardRepeatDelay(callback);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d,delay:%{public}d", ret, delay);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return delay;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to get keyboard repeat delay, code:%{public}d message: %{public}s",
-            ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
     }
     return delay;
 }
@@ -203,6 +203,10 @@ int32_t GetKeyboardRepeatDelayAsync()
 void SetKeyboardRepeatRateAsync(int32_t rate)
 {
     CALL_DEBUG_ENTER;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return;
+    }
     if (rate < MIN_KEY_REPEAT_RATE) {
         rate = MIN_KEY_REPEAT_RATE;
     } else if (rate > MAX_KEY_REPEAT_RATE) {
@@ -210,12 +214,12 @@ void SetKeyboardRepeatRateAsync(int32_t rate)
     }
     int32_t ret = InputManager_t::GetInstance()->SetKeyboardRepeatRate(rate);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d", ret);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set keyboard repeat rate, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
     }
 }
 
@@ -223,15 +227,19 @@ int32_t GetKeyboardRepeatRateAsync()
 {
     CALL_DEBUG_ENTER;
     int32_t rate = -1;
+    if (!TaiheInputDeviceUtils::IsSystemApp()) {
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return rate;
+    }
     auto callback = [&rate] (int32_t tmpRate) { rate = tmpRate; };
     int32_t ret = InputManager_t::GetInstance()->GetKeyboardRepeatRate(callback);
     if (ret != RET_OK) {
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        MMI_HILOGE("ret:%{public}d, rate:%{public}d", ret, rate);
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+            return rate;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to get keyboard repeat rate, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error");
     }
     return rate;
 }
@@ -314,7 +322,8 @@ bool ANIPromiseVoidCallback(ani_env* env, ani_resolver deferred, int32_t errCode
         TaiheError  codeMsg;
         if (!TaiheConverter::GetApiError(errCode, codeMsg)) {
             MMI_HILOGE("Error code %{public}d not found", errCode);
-            return false;
+            errCode = COMMON_PARAMETER_ERROR;
+            codeMsg.msg = "Parameter error.unknown error";
         }
         auto callResult = TaiheInputDeviceUtils::CreateBusinessError(env, static_cast<ani_int>(errCode), codeMsg.msg);
         if (callResult == nullptr) {
@@ -364,19 +373,15 @@ uintptr_t SetInputDeviceEnablePromise(int32_t deviceId, bool enabled)
         ANIPromiseVoidCallback(etsEnv, deferred, errcode);
     };
     int32_t ret = InputManager_t::GetInstance()->SetInputDeviceEnabled(deviceId, enabled, callback);
+    MMI_HILOGI("ret code:%{public}d", ret);
     if (ret != RET_OK) {
-        if (ret == ERROR_NO_PERMISSION) {
+        if (abs(ret) == ERROR_NOT_SYSAPI) {
+            taihe::set_business_error(ERROR_NOT_SYSAPI, "Permission denied, non-system application called system api.");
+        } else if (ret == ERROR_NO_PERMISSION) {
             taihe::set_business_error(-ret, "Permission denied.");
-            return 0;
-        }
-        TaiheError_t codeMsg;
-        if (!TaiheConverter::GetApiError(ret, codeMsg)) {
-            MMI_HILOGE("Error code %{public}d not found", ret);
+        } else {
             taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Unknown error!");
-            return 0;
         }
-        taihe::set_business_error(ret, codeMsg.msg);
-        MMI_HILOGE("failed to set functionKey state, code:%{public}d message: %{public}s", ret, codeMsg.msg.c_str());
         return 0;
     }
     return reinterpret_cast<uintptr_t>(promise);

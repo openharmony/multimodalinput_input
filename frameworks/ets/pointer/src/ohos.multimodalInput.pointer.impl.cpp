@@ -413,13 +413,15 @@ int32_t GetPointerSpeedSyncImpl()
     int32_t type = 1;
     auto errorCode = InputManager::GetInstance()->GetTouchpadRightClickType(type);
     ohos::multimodalInput::pointer::RightClickType clickType =
-        static_cast<ohos::multimodalInput::pointer::RightClickType::key_t>(type);
+        ohos::multimodalInput::pointer::RightClickType::from_value(type);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetTouchpadRightClickType failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+    } else if (!clickType.is_valid()) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Return value invalid");
     }
     return clickType;
 }
@@ -673,13 +675,15 @@ void SetHoverScrollStateAsync(bool state)
     int32_t primaryButton = 0;
     auto errorCode = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
     ohos::multimodalInput::pointer::PrimaryButton button =
-        static_cast<ohos::multimodalInput::pointer::PrimaryButton::key_t>(primaryButton);
+        ohos::multimodalInput::pointer::PrimaryButton::from_value(primaryButton);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode != RET_OK) {
         MMI_HILOGE("GetMousePrimaryButton failed");
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+    } else if (!button.is_valid()) {
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.Return value invalid");
     }
     return button;
 }

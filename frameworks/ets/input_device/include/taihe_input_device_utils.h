@@ -49,6 +49,7 @@ public:
     static TaiheInputDeviceData ConverterInputDevice(std::shared_ptr<InputDevice> &device);
     static ani_object WrapBusinessError(ani_env* env, const std::string& msg);
     static ani_ref CreateBusinessError(ani_env* env, ani_int code, const std::string& msg);
+    static bool IsSystemApp();
 };
 
 } // namespace MMI
