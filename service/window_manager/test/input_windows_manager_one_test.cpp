@@ -3329,6 +3329,140 @@ HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_008, TestSize.Level1)
 }
 
 /**
+ * @tc.name: EnsureMouseEventCycle_009
+ * @tc.desc: Test EnsureMouseEventCycle when source type is not mouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN); // Not mouse
+    EXPECT_NO_FATAL_FAILURE(winMgr->EnsureMouseEventCycle(event));
+}
+
+/**
+ * @tc.name: EnsureMouseEventCycle_010
+ * @tc.desc: Test EnsureMouseEventCycle when mouse dragging is active
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+
+    ExtraData extraData {};
+    extraData.appended = true;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    winMgr->AppendExtraData(extraData);
+
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    event->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+
+    EXPECT_NO_FATAL_FAILURE(winMgr->EnsureMouseEventCycle(event));
+}
+
+/**
+ * @tc.name: EnsureMouseEventCycle_011
+ * @tc.desc: Test EnsureMouseEventCycle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    event->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+
+    EXPECT_NO_FATAL_FAILURE(winMgr->EnsureMouseEventCycle(event));
+}
+
+/**
+ * @tc.name: EnsureMouseEventCycle_012
+ * @tc.desc: Test EnsureMouseEventCycle when pointer action is not button up
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE); // Not button up
+    event->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+
+    EXPECT_NO_FATAL_FAILURE(winMgr->EnsureMouseEventCycle(event));
+}
+
+/**
+ * @tc.name: EnsureMouseEventCycle_013
+ * @tc.desc: Test EnsureMouseEventCycle when mouseDownInfo.id is less than 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+
+    winMgr->mouseDownInfo_.id = -1; // Invalid window ID
+
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    event->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+
+    EXPECT_NO_FATAL_FAILURE(winMgr->EnsureMouseEventCycle(event));
+}
+
+/**
+ * @tc.name: EnsureMouseEventCycle_014
+ * @tc.desc: Test EnsureMouseEventCycle when target window ID matches mouseDownInfo.id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, EnsureMouseEventCycle_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+
+    int32_t windowId { 37 };
+    winMgr->mouseDownInfo_.id = windowId;
+
+    auto event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    event->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    event->SetTargetWindowId(windowId);
+
+    EXPECT_NO_FATAL_FAILURE(winMgr->EnsureMouseEventCycle(event));
+}
+
+/**
  * @tc.name: CleanMouseEventCycle_001
  * @tc.desc: Test CleanMouseEventCycle
  * @tc.type: FUNC
