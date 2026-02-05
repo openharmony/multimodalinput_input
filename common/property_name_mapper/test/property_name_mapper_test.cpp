@@ -38,6 +38,8 @@ public:
     MOCK_METHOD(int32_t, AddTimer, (int32_t intervalMs, int32_t repeatCount,
         std::function<void()> callback, const std::string &name), (override));
     MOCK_METHOD(int32_t, RemoveTimer, (int32_t timerId, const std::string &name), (override));
+    MOCK_METHOD(bool, IsExist, (int32_t timerId), (override));
+    MOCK_METHOD(int32_t, ResetTimer, (int32_t timerId), (override));
 };
 
 // Mock for IInputServiceContext
@@ -54,6 +56,9 @@ public:
     MOCK_METHOD(std::shared_ptr<IInputWindowsManager>, GetInputWindowsManager, (), (const, override));
     MOCK_METHOD(std::shared_ptr<IInputDeviceManager>, GetDeviceManager, (), (const, override));
     MOCK_METHOD(std::shared_ptr<IKeyMapManager>, GetKeyMapManager, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<IPreferenceManager>, GetPreferenceManager, (), (const, override));
+    MOCK_METHOD(ICursorDrawingComponent&, GetCursorDrawingComponent, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<IInputEventHandler>, GetDispatchHandler, (), (const, override));
 };
 
 class PropertyNameMapperTest : public testing::Test {

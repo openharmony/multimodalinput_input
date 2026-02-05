@@ -20,13 +20,14 @@
 #include "libinput.h"
 #include "nocopyable.h"
 #include "pointer_event.h"
+#include "mouse_event_interface.h"
 
 namespace OHOS {
 namespace MMI {
-class IMouseEventNormalize {
+class IMouseEventInterface {
 public:
-    IMouseEventNormalize() = default;
-    virtual ~IMouseEventNormalize() = default;
+    IMouseEventInterface() = default;
+    virtual ~IMouseEventInterface() = default;
 
     virtual bool CheckAndPackageAxisEvent(libinput_event*) = 0;
     virtual bool CheckFilterMouseEvent(struct libinput_event*) = 0;
@@ -35,14 +36,14 @@ public:
     virtual int32_t OnEvent(struct libinput_event*) = 0;
 };
 
-class MouseEventNormalize final : public IMouseEventNormalize {
+class MouseEventInterface final : public IMouseEventInterface {
 public:
-    static std::shared_ptr<MouseEventNormalize> GetInstance();
+    static std::shared_ptr<MouseEventInterface> GetInstance();
     static void ReleaseInstance();
 
-    MouseEventNormalize() = default;
-    ~MouseEventNormalize() override = default;
-    DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
+    MouseEventInterface() = default;
+    ~MouseEventInterface() override = default;
+    DISALLOW_COPY_AND_MOVE(MouseEventInterface);
 
     MOCK_METHOD(bool, CheckAndPackageAxisEvent, (struct libinput_event*));
     MOCK_METHOD(bool, CheckFilterMouseEvent, (struct libinput_event*));
@@ -51,10 +52,10 @@ public:
     MOCK_METHOD(int32_t, OnEvent, (struct libinput_event*));
 
 private:
-    static std::shared_ptr<MouseEventNormalize> instance_;
+    static std::shared_ptr<MouseEventInterface> instance_;
 };
 
-#define MouseEventHdr MouseEventNormalize::GetInstance()
+#define MouseEventHdr MouseEventInterface::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MMI_MOUSE_EVENT_NORMALIZE_MOCK_H

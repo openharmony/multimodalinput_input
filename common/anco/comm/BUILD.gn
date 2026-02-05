@@ -26,6 +26,7 @@ config("mmi_anco_channel_config") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${target_gen_dir}",
+    "${mmi_path}/intention/scheduler/component_manager/include",
   ]
 
   if (input_ext_feature_anco) {

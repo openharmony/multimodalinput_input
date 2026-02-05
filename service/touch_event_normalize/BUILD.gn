@@ -56,6 +56,7 @@ ohos_shared_library("mmi_touch_gesture_manager") {
     "config_policy:configpolicy_util",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "preferences:native_preferences",
   ]
 
   part_name = "${mmi_part_name}"
@@ -101,6 +102,7 @@ ohos_source_set("touch_gesture_manager") {
     "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "preferences:native_preferences",
   ]
 
   part_name = "${mmi_part_name}"

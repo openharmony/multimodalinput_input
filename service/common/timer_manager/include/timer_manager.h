@@ -35,8 +35,8 @@ public:
     int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,
         const std::string &name = "");
     int32_t RemoveTimer(int32_t timerId, const std::string &name = "") override;
-    int32_t ResetTimer(int32_t timerId);
-    bool IsExist(int32_t timerId);
+    int32_t ResetTimer(int32_t timerId) override;
+    bool IsExist(int32_t timerId) override;
     int32_t CalcNextDelay();
     void ProcessTimers();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback,

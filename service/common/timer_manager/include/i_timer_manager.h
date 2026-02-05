@@ -30,6 +30,8 @@ public:
     virtual int32_t AddTimer(int32_t intervalMs, int32_t repeatCount,
         std::function<void()> callback, const std::string &name = "") = 0;
     virtual int32_t RemoveTimer(int32_t timerId, const std::string &name = "") = 0;
+    virtual bool IsExist(int32_t timerId);
+    virtual int32_t ResetTimer(int32_t timerId);
 };
 } // namespace MMI
 } // namespace OHOS

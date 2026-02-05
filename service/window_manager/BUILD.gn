@@ -53,6 +53,7 @@ ohos_shared_library("mmi_touch_drawing_handler") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "init:libbegetutil",
+    "preferences:native_preferences",
   ]
 
   if (hitrace_enabled) {
@@ -117,6 +118,7 @@ ohos_unittest("TouchDrawingHandlerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "init:libbegetutil",
+    "preferences:native_preferences",
   ]
 
   if (hitrace_enabled) {

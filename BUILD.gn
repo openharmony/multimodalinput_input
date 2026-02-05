@@ -111,6 +111,10 @@ group("multimodalinput_mmi_service") {
   if (input_feature_touch_gesture) {
     deps += [ "${mmi_path}/service/touch_event_normalize:mmi_touch_gesture_manager" ]
   }
+  
+  if (input_feature_mouse) {
+    deps += [ "${mmi_path}/service/mouse_event_normalize:mmi_mouse_event_normalizer" ]
+  }
 }
 
 group("input-third-mmi") {

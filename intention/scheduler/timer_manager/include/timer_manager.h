@@ -36,9 +36,9 @@ public:
 
     int32_t Init(IContext *context);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) override;
-    int32_t ResetTimer(int32_t timerId);
+    int32_t ResetTimer(int32_t timerId) override;
     int32_t RemoveTimer(int32_t timerId) override;
-    bool IsExist(int32_t timerId) const;
+    bool IsExist(int32_t timerId) const override;
     void ProcessTimers();
     int32_t GetTimerFd() const;
 

@@ -25,7 +25,7 @@
 #include "input_display_bind_helper.h"
 #include "input_event_handler.h"
 #include "libinput_interface.h"
-#include "mouse_event_normalize.h"
+#include "mouse_event_interface.h"
 #include "multimodal_input_preferences_manager.h"
 #include "pointer_drawing_manager.h"
 #include "scene_board_judgement.h"

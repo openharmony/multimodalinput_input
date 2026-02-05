@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,8 +19,8 @@
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
-#include "input_event_handler.h"
 #include "mouse_device_state.h"
+#include "mouse_preference_accessor.h"
 #include "pointer_device_manager.h"
 #include "pointer_motion_acceleration.h"
 #include "scene_board_judgement.h"
@@ -29,7 +29,6 @@
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #include "product_name_definition.h"
 #include "product_type_parser.h"
-
 #include "util_ex.h"
 #include "linux/input.h"
 
@@ -41,18 +40,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MIN_SPEED { 1 };
-constexpr int32_t MAX_SPEED { 20 };
-constexpr int32_t DEFAULT_SPEED { 10 };
-constexpr int32_t MAX_TOUCHPAD_SPEED { 11 };
-constexpr int32_t DEFAULT_TOUCHPAD_SPEED { 6 };
-constexpr int32_t DEFAULT_ROWS { 3 };
-constexpr int32_t MIN_ROWS { 1 };
-constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
 constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
-constexpr int32_t RIGHT_CLICK_TYPE_MAX { 5 };
-[[ maybe_unused ]] constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
 constexpr int32_t HARD_PC_PRO_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_PC_PRO_DEVICE_HEIGHT { 1920 };
@@ -60,10 +49,7 @@ constexpr int32_t SOFT_PC_PRO_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_PC_PRO_DEVICE_HEIGHT { 2080 };
 constexpr int32_t TABLET_DEVICE_WIDTH { 2880 };
 constexpr int32_t TABLET_DEVICE_HEIGHT { 1920 };
-
 const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
-const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
 constexpr int32_t ANGLE_90 { 90 };
 constexpr int32_t ANGLE_360 { 360 };
 constexpr int32_t FINE_CALCULATE { 20 };
@@ -76,7 +62,6 @@ constexpr int32_t SCREEN_DIAGONAL_8 { 8 };
 constexpr int32_t SCREEN_DIAGONAL_18 { 18 };
 constexpr int32_t SCREEN_DIAGONAL_27 { 27 };
 constexpr int32_t SCREEN_DIAGONAL_55 { 55 };
-constexpr int32_t RIGHT_MENU_TYPE_INDEX_V2 { 1 };
 constexpr float FACTOR_0 { 1.0f };
 constexpr float FACTOR_8 { 0.7f };
 constexpr float FACTOR_18 { 1.0f };
@@ -87,25 +72,37 @@ constexpr double CONST_HALF { 0.5 };
 constexpr int32_t CONST_TWO { 2 };
 constexpr double CONST_DOUBLE_ZERO { 0.0 };
 constexpr double CONST_DOUBLE_ONE { 1.0 };
+constexpr int32_t DEFAULT_SPEED { 10 };
 } // namespace
 
-int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
-int32_t MouseTransformProcessor::scrollSwitchPid_ = -1;
-TouchpadCDG MouseTransformProcessor::touchpadOption_;
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 std::atomic_bool MouseTransformProcessor::isVirtualDeviceEvent_ = false;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
-MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
-    : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
+std::atomic_int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
+std::atomic_int32_t MouseTransformProcessor::globalScrollSwitchPid_ = -1;
+
+MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int32_t deviceId)
+    : env_(env), deviceId_(deviceId)
 {
-    globalPointerSpeed_ = GetPointerSpeed();
+    pointerEvent_ = PointerEvent::Create();
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return;
+    }
+    globalPointerSpeed_.store(MousePreferenceAccessor::GetPointerSpeed(*env_));
 }
 
 MouseTransformProcessor::~MouseTransformProcessor()
 {
-    if (TimerMgr->IsExist(timerId_)) {
-        TimerMgr->RemoveTimer(timerId_);
+    CALL_INFO_TRACE;
+    auto timerMgr = GetTimerManager();
+    if (timerMgr == nullptr) {
+        MMI_HILOGE("timerMgr is nullptr");
+        return;
+    }
+    if (timerMgr->IsExist(timerId_)) {
+        timerMgr->RemoveTimer(timerId_);
     }
 }
 
@@ -170,8 +167,16 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifndef OHOS_BUILD_ENABLE_WATCH
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
-
-    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return RET_ERR;
+    }
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return RET_ERR;
+    }
+    CursorPosition cursorPos = winMgr->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -180,7 +185,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     unaccelerated_.dy = libinput_event_pointer_get_dy_unaccelerated(data);
 
     Offset offset { unaccelerated_.dx, unaccelerated_.dy };
-    auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+    auto displayInfo = winMgr->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
     CalculateMouseResponseTimeProbability(event);
     const int32_t type = libinput_event_get_type(event);
@@ -203,7 +208,8 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #ifdef OHOS_BUILD_EMULATOR
     cursorPos.cursorPos = CalculateCursorPosFromOffset(offset, *displayInfo);
 #endif // OHOS_BUILD_EMULATOR
-    WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    winMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId,
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
@@ -229,6 +235,11 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
         MMI_HILOGD("Skip mouse acceleration motion");
         return ret;
     }
+    auto winMgr = GetInputWindowsManager();
+        if (winMgr == nullptr) {
+            MMI_HILOGE("winMgr is nullptr");
+            return RET_ERR;
+        }
     if (displayInfo->ppi > static_cast<float>(CONST_DOUBLE_ZERO)) {
         double displaySize = sqrt(pow(displayInfo->width, CONST_TWO) + pow(displayInfo->height, CONST_TWO));
         double diagonalMm = sqrt(pow(displayInfo->physicalWidth, CONST_TWO)
@@ -256,14 +267,21 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
         }
         int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
         float factor = ScreenFactor(diagonalInch);
-        ret = PointerMotionAcceleration::DynamicAccelerateMouse(offset,  WIN_MGR->GetMouseIsCaptureMode(),
-            globalPointerSpeed_, dalta_time, displayPpi, static_cast<double>(factor), abs_x, abs_y);
+        if (env_ == nullptr) {
+            MMI_HILOGE("Env is nullptr");
+            return RET_ERR;
+        }
+        ret = PointerMotionAcceleration::DynamicAccelerateMouse(offset,
+            winMgr->GetMouseIsCaptureMode(),
+            globalPointerSpeed_.load(), dalta_time, displayPpi, static_cast<double>(factor),
+                abs_x, abs_y);
         return ret;
     } else {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
-        ret = PointerMotionAcceleration::AccelerateMouse(offset, WIN_MGR->GetMouseIsCaptureMode(),
-            globalPointerSpeed_, static_cast<DeviceType>(deviceType), abs_x, abs_y);
+        ret = PointerMotionAcceleration::AccelerateMouse(offset,
+            winMgr->GetMouseIsCaptureMode(),
+            globalPointerSpeed_.load(), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     }
 }
@@ -276,19 +294,29 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
     CalculateOffset(displayInfo, offset);
     struct libinput_device *device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return RET_ERR;
+    }
     const std::string devName = libinput_device_get_name(device);
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return RET_ERR;
+    }
     if (displayInfo->width == static_cast<int32_t>(CONST_DOUBLE_ZERO) ||
         displayInfo->height == static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
-        ret = PointerMotionAcceleration::AccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
-            GetTouchpadSpeed(), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+        ret = PointerMotionAcceleration::AccelerateTouchpad(offset,
+            winMgr->GetMouseIsCaptureMode(),
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
-        ret = PointerMotionAcceleration::AccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
-            GetTouchpadSpeed(), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+        ret = PointerMotionAcceleration::AccelerateTouchpad(offset, winMgr->GetMouseIsCaptureMode(),
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
@@ -312,9 +340,10 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         if (touchpadPPi < CONST_DOUBLE_ONE || touchpadSize < CONST_DOUBLE_ONE || frequency < CONST_DOUBLE_ONE) {
             return RET_ERR;
         }
-        UpdateTouchpadCDG(touchpadPPi, touchpadSize, frequency);
-        ret = PointerMotionAcceleration::DynamicAccelerateTouchpad(offset, WIN_MGR->GetMouseIsCaptureMode(),
-            GetTouchpadSpeed(), displaySize, touchpadSize, touchpadPPi, frequency, abs_x, abs_y);
+        ret = PointerMotionAcceleration::DynamicAccelerateTouchpad(offset,
+            winMgr->GetMouseIsCaptureMode(),
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_), displaySize, touchpadSize, touchpadPPi, frequency,
+                abs_x, abs_y);
         return ret;
     }
 }
@@ -326,7 +355,7 @@ void MouseTransformProcessor::CalculateMouseResponseTimeProbability(struct libin
     CHKPV(dev);
     const std::string mouseName = libinput_device_get_name(dev);
     const int32_t devType = static_cast<int32_t>(libinput_device_get_id_bustype(dev));
-    MMI_HILOGI("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
+    MMI_HILOGD("mouseName:%{public}s, devType:%{public}d", mouseName.c_str(), devType);
     if (devType != BUS_USB && devType != BUS_BLUETOOTH) {
         return;
     }
@@ -413,16 +442,18 @@ void MouseTransformProcessor::HandleReportMouseResponseTime(
     }
 }
 
-double MouseTransformProcessor::CalculateProportion(long long key, long &total, std::map<long long, int32_t> &curMap)
+double MouseTransformProcessor::CalculateProportion(long long key, long &total,
+    std::map<long long, int32_t> &curMap)
 {
-    bool isUsed = (curMap.find(key) != curMap.end()) && (total != 0);
-    return isUsed ? (1.0 * curMap.find(key)->second / total) : 0;
+    auto iter = curMap.find(key);
+    bool isUsed = (iter != curMap.end()) && (total != 0);
+    return isUsed ? (1.0 * iter->second / total) : 0;
 }
 
 Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *displayInfo)
 {
+    Direction displayDirection = DIRECTION0;
     CHKPR(displayInfo, DIRECTION0);
-    Direction displayDirection = displayInfo->direction;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         displayDirection = static_cast<Direction>((
             ((displayInfo->direction - displayInfo->displayDirection) * ANGLE_90 + ANGLE_360) % ANGLE_360) / ANGLE_90);
@@ -433,6 +464,7 @@ Direction MouseTransformProcessor::GetDisplayDirection(const OLD::DisplayInfo *d
 void MouseTransformProcessor::CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset)
 {
 #ifndef OHOS_BUILD_EMULATOR
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         Direction direction = GetDisplayDirection(displayInfo);
         std::negate<double> neg;
         if (direction == DIRECTION90) {
@@ -447,6 +479,7 @@ void MouseTransformProcessor::CalculateOffset(const OLD::DisplayInfo* displayInf
             offset.dx = neg(offset.dy);
             offset.dy = tmp;
         }
+    }
 #endif // OHOS_BUILD_EMULATOR
 }
 
@@ -456,6 +489,10 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return RET_ERR;
+    }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
@@ -463,7 +500,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     uint32_t originButton = button;
     const int32_t type = libinput_event_get_type(event);
     bool tpTapSwitch = true;
-    GetTouchpadTapSwitch(tpTapSwitch);
+    MousePreferenceAccessor::GetTouchpadTapSwitch(*env_, tpTapSwitch);
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
@@ -519,15 +556,21 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         buttonMapping_[originButton] = buttonId;
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
-        CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+        auto winMgr = GetInputWindowsManager();
+        if (winMgr == nullptr) {
+            MMI_HILOGE("winMgr is nullptr");
+            return RET_ERR;
+        }
+        CursorPosition cursorPos = winMgr->GetCursorPos();
         if (cursorPos.displayId < 0) {
             MMI_HILOGE("No display");
             return RET_ERR;
         }
-        auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+        auto displayInfo = winMgr->GetPhysicalDisplay(cursorPos.displayId);
         CHKPR(displayInfo, ERROR_NULL_POINTER);
         if (cursorPos.direction != displayInfo->direction) {
-            WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+            winMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId,
+                cursorPos.cursorPos.x, cursorPos.cursorPos.y);
         }
     } else {
         MMI_HILOGE("Unknown state, state:%{public}u", state);
@@ -576,8 +619,17 @@ void MouseTransformProcessor::HandleTouchPadButton(enum libinput_button_state st
     pointerEvent_->ClearButtonPressed();
     CHKPV(cancelPointerEvent);
     cancelPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    WIN_MGR->UpdateTargetPointer(cancelPointerEvent);
-    auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return;
+    }
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return;
+    }
+    winMgr->UpdateTargetPointer(cancelPointerEvent);
+    auto eventDispatchHandler = GetDispatchHandler();
     CHKPV(eventDispatchHandler);
     eventDispatchHandler->HandlePointerEvent(cancelPointerEvent);
 }
@@ -604,7 +656,16 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     }
 
     std::string name = "primaryButton";
-    int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return RET_ERR;
+    }
+    auto prefMgr = GetPreferenceManager();
+    if (prefMgr == nullptr) {
+        MMI_HILOGE("prefMgr is nullptr");
+        return RET_ERR;
+    }
+    int32_t primaryButton = prefMgr->GetIntValue(name, 0);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
         primaryButton = GetVirtualTouchpadPrimaryButton();
@@ -627,35 +688,16 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
-{
-    CALL_DEBUG_ENTER;
-    if (rows < MIN_ROWS) {
-        rows = MIN_ROWS;
-    } else if (rows > MAX_ROWS) {
-        rows = MAX_ROWS;
-    }
-    std::string name = "rows";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, rows);
-    MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
-    return ret;
-}
-
-int32_t MouseTransformProcessor::GetMouseScrollRows()
-{
-    CALL_DEBUG_ENTER;
-    std::string name = "rows";
-    int32_t rows = PREFERENCES_MGR->GetIntValue(name, DEFAULT_ROWS);
-    MMI_HILOGD("Get mouse scroll rows successfully, rows:%{public}d", rows);
-    return rows;
-}
-
 void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_source source,
     int32_t& direction, bool& tpScrollSwitch)
 {
     bool scrollDirectionState = true;
-    GetTouchpadScrollSwitch(tpScrollSwitch);
-    GetTouchpadScrollDirection(scrollDirectionState);
+    if (env_ == nullptr) {
+        MMI_HILOGD("Env is nullptr");
+        return;
+    }
+    MousePreferenceAccessor::GetTouchpadScrollSwitch(*env_, tpScrollSwitch);
+    MousePreferenceAccessor::GetTouchpadScrollDirection(*env_, scrollDirectionState);
     if (scrollDirectionState == true && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         direction = -1;
     }
@@ -666,14 +708,13 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
-
     bool tpScrollSwitch = true;
     int32_t tpScrollDirection = 1;
 
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
     HandleTouchPadAxisState(source, tpScrollDirection, tpScrollSwitch);
     if (!tpScrollSwitch && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGE("TouchPad axis event is disable,pid:%{public}d Set false", scrollSwitchPid_);
+        MMI_HILOGE("TouchPad axis event is disable,pid:%{public}d Set false", globalScrollSwitchPid_.load());
         return RET_ERR;
     }
 
@@ -686,15 +727,20 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
     } else {
-        if (TimerMgr->IsExist(timerId_)) {
+        auto timerMgr = GetTimerManager();
+        if (timerMgr == nullptr) {
+            MMI_HILOGD("timerMgr is nullptr");
+            return RET_ERR;
+        }
+        if (timerMgr->IsExist(timerId_)) {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
             pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
-            TimerMgr->ResetTimer(timerId_);
+            timerMgr->ResetTimer(timerId_);
             MMI_HILOGD("Axis update");
         } else {
-            static constexpr int32_t TIMEOUT = 100;
+            static constexpr int32_t timeout = 100;
             std::weak_ptr<MouseTransformProcessor> weakPtr = shared_from_this();
-            timerId_ = TimerMgr->AddTimer(TIMEOUT, 1, [weakPtr]() {
+            timerId_ = timerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;
                 auto sharedPtr = weakPtr.lock();
                 CHKPV(sharedPtr);
@@ -708,7 +754,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0);
                 pointerEvent->UpdateId();
                 LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-                auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+                auto inputEventNormalizeHandler = sharedPtr->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             }, "MouseTransformProcessor");
@@ -716,44 +762,52 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
             pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
             MMI_HILOGD("Axis begin");
-            CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+            auto winMgr = GetInputWindowsManager();
+            if (winMgr == nullptr) {
+                MMI_HILOGE("winMgr is nullptr");
+                return RET_ERR;
+            }
+            CursorPosition cursorPos = winMgr->GetCursorPos();
             if (cursorPos.displayId < 0) {
                 MMI_HILOGE("No display");
                 return RET_ERR;
             }
-            auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+            auto displayInfo = winMgr->GetPhysicalDisplay(cursorPos.displayId);
             CHKPR(displayInfo, ERROR_NULL_POINTER);
             if (cursorPos.direction != displayInfo->direction) {
-                WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId,
+                winMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId,
                     cursorPos.cursorPos.x, cursorPos.cursorPos.y);
             }
         }
     }
+    if (env_ == nullptr) {
+        return ERROR_NULL_POINTER;
+    }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-        pointerEvent_->SetScrollRows(TouchPadTransformProcessor::GetTouchpadScrollRows());
+        pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetTouchpadScrollRows(*env_));
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     } else {
-        pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
+        pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetMouseScrollRows(*env_));
     }
 #else
-    pointerEvent_->SetScrollRows(MouseTransformProcessor::GetMouseScrollRows());
+    pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetMouseScrollRows(*env_));
 #endif // OHOS_BUILD_ENABLE_WATCH
+    const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
 #ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-            const int32_t initRows = 3;
-            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
+            axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_) * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
         } else {
-            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
+            axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
         }
 #else
-        axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
+        axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_WATCH
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
@@ -762,15 +816,14 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 #ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-            const int32_t initRows = 3;
-            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
+            axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_) * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
         } else {
-            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
+            axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
         }
 #else
-        axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
+        axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_WATCH
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
@@ -784,7 +837,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     DeviceType deviceType = DeviceType::DEVICE_PC;
     std::string productType = SYS_PRODUCT_TYPE;
     if (PRODUCT_TYPE_PARSER.GetProductType(productType, deviceType) != RET_OK) {
-        MMI_HILOGW("GetProductType failed, productTYpe:%{public}s", productType.c_str());
+        MMI_HILOGW("GetProductType failed, productType:%{public}s", productType.c_str());
     }
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
@@ -793,10 +846,20 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         axisValue = axisValue * speedAdjustCoef;
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
-    if (HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType)) !=
-        RET_OK) {
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return RET_ERR;
+    }
+    if (HandleAxisAccelerateTouchpad(winMgr->GetMouseIsCaptureMode(),
+        &axisValue, static_cast<int32_t>(deviceType))
+        != RET_OK) {
         MMI_HILOGW("Fail accelerate axis");
-        axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
+        if (env_ == nullptr) {
+            MMI_HILOGE("Env is nullptr");
+            return axisValue;
+        }
+        axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_) * (axisValue / initRows);
     }
     return axisValue;
 }
@@ -866,7 +929,12 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return;
+    }
+    auto mouseInfo = winMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
@@ -905,7 +973,12 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
-    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return false;
+    }
+    auto mouseInfo = winMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
@@ -966,7 +1039,12 @@ bool MouseTransformProcessor::CheckAndPackageAxisEvent()
     isAxisBegin_ = false;
     PointerEvent::PointerItem item;
     HandleAxisPostInner(item);
-    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return false;
+    }
+    winMgr->UpdateTargetPointer(pointerEvent_);
     return true;
 }
 
@@ -1011,22 +1089,23 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
             return RET_ERR;
     }
     if (result == RET_ERR) {
+        MMI_HILOGE("Handle LIBINPUT_MOUSE_EVENT failed, type:%{public}d", type);
         return result;
     }
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), pointerItem);
-    if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
-        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
-    } else if (type == LIBINPUT_EVENT_POINTER_MOTION || type == LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE) {
-        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
-    }
     if (type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN || type == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
         CHKPL(pointerEvent_);
         return RET_ERR;
     }
-    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return RET_ERR;
+    }
+    winMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return result;
 }
@@ -1042,12 +1121,17 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return RET_ERR;
+    }
     if (!HandlePostInner(data, pointerItem)) {
-        WIN_MGR->UpdateTargetPointer(pointerEvent_);
+        winMgr->UpdateTargetPointer(pointerEvent_);
         DumpInner();
         return ERROR_NULL_POINTER;
     }
-    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    winMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return RET_OK;
 }
@@ -1057,31 +1141,43 @@ void MouseTransformProcessor::HandleMotionMoveMouse(int32_t offsetX, int32_t off
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return;
+    }
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    CursorPosition cursorPos = winMgr->GetCursorPos();
     cursorPos.cursorPos.x += offsetX;
     cursorPos.cursorPos.y += offsetY;
-    WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    winMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x,
+        cursorPos.cursorPos.y);
 }
 
-void MouseTransformProcessor::OnDisplayLost(int32_t displayId)
+void MouseTransformProcessor::OnDisplayLost(IInputServiceContext &env, int32_t displayId)
 {
-    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    CursorPosition cursorPos = env.GetInputWindowsManager()->GetCursorPos();
     if (cursorPos.displayId != displayId) {
-        cursorPos = WIN_MGR->ResetCursorPos();
-        WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+        cursorPos = env.GetInputWindowsManager()->ResetCursorPos();
+        env.GetInputWindowsManager()->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x,
+            cursorPos.cursorPos.y);
     }
 }
 
-int32_t MouseTransformProcessor::GetDisplayId()
+int32_t MouseTransformProcessor::GetDisplayId(IInputServiceContext &env)
 {
-    return WIN_MGR->GetCursorPos().displayId;
+    return env.GetInputWindowsManager()->GetCursorPos().displayId;
 }
 
 void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
     CALL_DEBUG_ENTER;
-    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    auto winMgr = GetInputWindowsManager();
+    if (winMgr == nullptr) {
+        MMI_HILOGE("winMgr is nullptr");
+        return;
+    }
+    auto mouseInfo = winMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
@@ -1118,7 +1214,12 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
-    bool bHasPointerDevice = INPUT_DEV_MGR->HasPointerDevice();
+    auto devMgr = GetDeviceManager();
+    if (devMgr == nullptr) {
+        MMI_HILOGE("devMgr is nullptr");
+        return RET_ERR;
+    }
+    bool bHasPointerDevice = devMgr->HasPointerDevice();
     if (!bHasPointerDevice) {
         MMI_HILOGE("There hasn't any pointer device");
         return false;
@@ -1138,7 +1239,12 @@ void MouseTransformProcessor::DumpInner()
     static std::string lastDeviceName("default");
     auto nowId = pointerEvent_->GetDeviceId();
     if (lastDeviceId != nowId) {
-        auto device = INPUT_DEV_MGR->GetInputDevice(nowId);
+        auto devMgr = GetDeviceManager();
+        if (devMgr == nullptr) {
+            MMI_HILOGE("devMgr is nullptr");
+            return;
+        }
+        auto device = devMgr->GetInputDevice(nowId);
         CHKPV(device);
         lastDeviceId = nowId;
         lastDeviceName = device->GetName();
@@ -1157,12 +1263,12 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             ret = DeviceType::DEVICE_HARD_PC_PRO;
         } else if (width == SOFT_PC_PRO_DEVICE_WIDTH && height == SOFT_PC_PRO_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_PC_PRO;
-        } else {
-            MMI_HILOGD("Undefined width:%{public}d, height:%{public}d", width, height);
+        } else if (EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGD("Undefined width:%{private}d, height:%{private}d", width, height);
         }
-        MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
+        MMI_HILOGD("Device width:%{private}d, height:%{private}d", width, height);
     }
-    if (SYS_PRODUCT_TYPE == DEVICE_TYPE_TABLET) {
+    if (SYS_PRODUCT_TYPE == DEVICE_TYPE_TABLET || SYS_PRODUCT_TYPE == DEVICE_TYPE_TABLET_P) {
         if (width == TABLET_DEVICE_WIDTH && height == TABLET_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_TABLET;
         }
@@ -1180,7 +1286,8 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     CHKPV(pointerEvent_);
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
     mprintf(fd, "Mouse device state information:\t");
-    mprintf(fd, "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
+    mprintf(fd,
+            "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
             "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
@@ -1188,59 +1295,10 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     PointerMotionAcceleration::Dump(fd, args);
 }
 
-int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
-{
-    CALL_DEBUG_ENTER;
-    MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    std::string name = "primaryButton";
-    PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, primaryButton);
-    return RET_OK;
-}
-
-int32_t MouseTransformProcessor::GetMousePrimaryButton()
-{
-    CALL_DEBUG_ENTER;
-    std::string name = "primaryButton";
-    int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
-    MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    return primaryButton;
-}
-
-int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
-{
-    CALL_DEBUG_ENTER;
-    if (speed < MIN_SPEED) {
-        speed = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        speed = MAX_SPEED;
-    }
-    globalPointerSpeed_ = speed;
-    std::string name = "speed";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, speed);
-    MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
-    return ret;
-}
-
-int32_t MouseTransformProcessor::GetPointerSpeed()
-{
-    std::string name = "speed";
-    int32_t speed = PREFERENCES_MGR->GetIntValue(name, DEFAULT_SPEED);
-    MMI_HILOGD("Pointer speed:%{public}d", speed);
-    return speed;
-}
-
-int32_t MouseTransformProcessor::GetTouchpadSpeed()
-{
-    int32_t speed = DEFAULT_TOUCHPAD_SPEED;
-    GetTouchpadPointerSpeed(speed);
-    MMI_HILOGD("TouchPad pointer speed:%{public}d", speed);
-    return speed;
-}
-
-int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_t displayId)
+int32_t MouseTransformProcessor::SetPointerLocation(IInputServiceContext &env, int32_t x, int32_t y, int32_t displayId)
 {
     MMI_HILOGI("SetPointerLocation x:%d, y:%d, displayId:%d", x, y, displayId);
-    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    CursorPosition cursorPos = env.GetInputWindowsManager()->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
         return RET_ERR;
@@ -1250,24 +1308,89 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y, int32_
     if (displayId >= 0) {
         cursorPos.displayId = displayId;
     }
-    WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y, false);
-    cursorPos = WIN_MGR->GetCursorPos();
-    if (POINTER_DEV_MGR.isInit) {
-        CursorDrawingComponent::GetInstance().SetPointerLocation(
-            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
-    }
+    env.GetInputWindowsManager()->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x,
+        cursorPos.cursorPos.y, false);
+    cursorPos = env.GetInputWindowsManager()->GetCursorPos();
+    env.GetCursorDrawingComponent().SetPointerLocation(cursorPos.cursorPos.x, cursorPos.cursorPos.y,
+        cursorPos.displayId);
+
     MMI_HILOGI("CursorPosX:%f, cursorPosY:%f", cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::GetPointerLocation(int32_t &displayId, double &displayX, double &displayY)
+int32_t MouseTransformProcessor::GetPointerLocation(IInputServiceContext &env, int32_t &displayId,
+    double &displayX, double &displayY)
 {
-    auto mouseInfo = WIN_MGR->GetMouseInfo();
+    auto mouseInfo = env.GetInputWindowsManager()->GetMouseInfo();
     displayId = mouseInfo.displayId;
     displayX = mouseInfo.physicalX;
     displayY = mouseInfo.physicalY;
-    MMI_HILOGD("Cursor {%{public}d, %{private}f, %{private}f}", displayId, displayX, displayY);
+    MMI_HILOGD("Cursor {%{public}d,%{private}f,%{private}f}", displayId, displayX, displayY);
     return RET_OK;
+}
+
+void MouseTransformProcessor::SetPointerSpeed(int32_t speed)
+{
+    globalPointerSpeed_.store(speed);
+}
+
+void MouseTransformProcessor::SetScrollSwitchSetterPid(int32_t pid)
+{
+    globalScrollSwitchPid_.store(pid);
+}
+
+std::shared_ptr<IInputEventHandler> MouseTransformProcessor::GetEventNormalizeHandler() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetEventNormalizeHandler();
+}
+
+std::shared_ptr<IInputEventHandler> MouseTransformProcessor::GetDispatchHandler() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetDispatchHandler();
+}
+
+std::shared_ptr<ITimerManager> MouseTransformProcessor::GetTimerManager() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetTimerManager();
+}
+
+std::shared_ptr<IInputWindowsManager> MouseTransformProcessor::GetInputWindowsManager() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetInputWindowsManager();
+}
+
+std::shared_ptr<IInputDeviceManager> MouseTransformProcessor::GetDeviceManager() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetDeviceManager();
+}
+
+std::shared_ptr<IPreferenceManager> MouseTransformProcessor::GetPreferenceManager() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetPreferenceManager();
 }
 
 #ifndef OHOS_BUILD_ENABLE_WATCH
@@ -1385,11 +1508,15 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrLeftButton(struct l
     HandleTouchpadLeftButton(data, eventType, button);
 }
 
-void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t eventType,
+void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
-    GetTouchpadRightClickType(switchTypeData);
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return;
+    }
+    MousePreferenceAccessor::GetTouchpadRightClickType(*env_, switchTypeData);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
         GetVirtualTouchpadRightClickType(switchTypeData);
@@ -1397,36 +1524,36 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
     RightClickType switchType = RightClickType(switchTypeData);
-    if (eventType != LIBINPUT_EVENT_POINTER_TAP && eventType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+    if (evenType != LIBINPUT_EVENT_POINTER_TAP && evenType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         MMI_HILOGD("Event not from touchpad");
         return;
     }
-    MMI_HILOGD("Transform right button event, eventType:%d, switchType:%d, button:%d", eventType, switchType, button);
+    MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
     uint32_t btn = button;
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         button = pressedButton_;
         if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
-            MMI_HILOGE("button release from:%{public}d to :%{public}d, eventType:%{public}d, switchType:%{public}d",
-                button, btn, eventType, switchType);
+            MMI_HILOGE("button release from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
+                button, btn, evenType, switchType);
         }
         return;
     }
     switch (switchType) {
         case RightClickType::TP_RIGHT_BUTTON:
-            HandleTouchpadRightButton(data, eventType, button);
+            HandleTouchpadRightButton(data, evenType, button);
             break;
         case RightClickType::TP_LEFT_BUTTON:
-            HandleTouchpadLeftButton(data, eventType, button);
+            HandleTouchpadLeftButton(data, evenType, button);
             break;
         case RightClickType::TP_TWO_FINGER_TAP:
-            HandleTouchpadTwoFingerButton(data, eventType, button);
+            HandleTouchpadTwoFingerButton(data, evenType, button);
             break;
         case RightClickType::TP_TWO_FINGER_TAP_OR_RIGHT_BUTTON:
-            HandleTouchpadTwoFingerButtonOrRightButton(data, eventType, button);
+            HandleTouchpadTwoFingerButtonOrRightButton(data, evenType, button);
             break;
         case RightClickType::TP_TWO_FINGER_TAP_OR_LEFT_BUTTON:
-            HandleTouchpadTwoFingerButtonOrLeftButton(data, eventType, button);
+            HandleTouchpadTwoFingerButtonOrLeftButton(data, evenType, button);
             break;
         default:
             MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
@@ -1435,158 +1562,12 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pressedButton_ = button;
         if (button < MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE) {
-            MMI_HILOGE("button press from:%{public}d to :%{public}d, eventType:%{public}d, switchType:%{public}d",
-                button, btn, eventType, switchType);
+            MMI_HILOGE("button press from:%{public}d to :%{public}d, evenType:%{public}d, switchType:%{public}d",
+                button, btn, evenType, switchType);
         }
     }
 }
 #endif // OHOS_BUILD_ENABLE_WATCH
-
-int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag)
-{
-    std::string name = "scrollSwitch";
-    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll switch flag to mem, name:%s, switchFlag:%{public}d", name.c_str(), switchFlag);
-        return RET_ERR;
-    }
-    if (!switchFlag) {
-        scrollSwitchPid_ = pid;
-    }
-    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_SETTING,
-        switchFlag);
-
-    return RET_OK;
-}
-
-void MouseTransformProcessor::GetTouchpadScrollSwitch(bool &switchFlag)
-{
-    std::string name = "scrollSwitch";
-    GetConfigDataFromDatabase(name, switchFlag);
-}
-
-int32_t MouseTransformProcessor::SetTouchpadScrollDirection(bool state)
-{
-    std::string name = "scrollDirection";
-    if (PutConfigDataToDatabase(name, state) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
-        return RET_ERR;
-    }
-
-    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_DIR_SETTING,
-        state);
-
-    return RET_OK;
-}
-
-void MouseTransformProcessor::GetTouchpadScrollDirection(bool &state)
-{
-    std::string name = "scrollDirection";
-    GetConfigDataFromDatabase(name, state);
-}
-
-int32_t MouseTransformProcessor::SetTouchpadTapSwitch(bool switchFlag)
-{
-    std::string name = "touchpadTap";
-    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
-        return RET_ERR;
-    }
-
-    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_TAP_SETTING,
-        switchFlag);
-
-    return RET_OK;
-}
-
-void MouseTransformProcessor::GetTouchpadTapSwitch(bool &switchFlag)
-{
-    std::string name = "touchpadTap";
-    GetConfigDataFromDatabase(name, switchFlag);
-}
-
-int32_t MouseTransformProcessor::SetTouchpadPointerSpeed(int32_t speed)
-{
-    std::string name = "touchPadPointerSpeed";
-    if (PutConfigDataToDatabase(name, speed) != RET_OK) {
-        MMI_HILOGE("Failed to set touch pad pointer speed to mem");
-        return RET_ERR;
-    }
-
-    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_POINTER_SPEED_SETTING,
-        speed);
-
-    return RET_OK;
-}
-
-void MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
-{
-    std::string name = "touchPadPointerSpeed";
-    GetConfigDataFromDatabase(name, speed);
-    speed = speed == 0 ? DEFAULT_TOUCHPAD_SPEED : speed;
-    speed = speed < MIN_SPEED ? MIN_SPEED : speed;
-    speed = speed > MAX_TOUCHPAD_SPEED ? MAX_TOUCHPAD_SPEED : speed;
-}
-
-void MouseTransformProcessor::GetTouchpadCDG(TouchpadCDG &touchpadCDG)
-{
-    touchpadCDG = touchpadOption_;
-}
-
-void MouseTransformProcessor::UpdateTouchpadCDG(double touchpadPPi, double touchpadSize, int32_t frequency)
-{
-    touchpadOption_.ppi = touchpadPPi;
-    touchpadOption_.size = touchpadSize;
-    touchpadOption_.speed = GetTouchpadSpeed();
-    touchpadOption_.frequency = frequency;
-}
-
-int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
-{
-    std::string name = "rightMenuSwitch";
-    std::vector<uint8_t> switchType {TOUCHPAD_RIGHT_BUTTON, type}; // index0: v1.0, index1: v2.0
-    std::string filePath = "";
-    PREFERENCES_MGR->UpdatePreferencesMap(name, TOUCHPAD_FILE_NAME, type, filePath);
-    switchType = static_cast<std::vector<uint8_t>>(PREFERENCES_MGR->GetPreValue(name, switchType));
-    switchType[RIGHT_MENU_TYPE_INDEX_V2] = type;
-    if (PREFERENCES_MGR->SetPreValue(name, filePath, switchType) != RET_OK) {
-        MMI_HILOGE("Failed to set touch pad right click type to mem");
-        return RET_ERR;
-    }
-    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_RIGHT_CLICK_SETTING,
-        type);
-    return RET_OK;
-}
-
-void MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
-{
-    std::string name = "rightMenuSwitch";
-    GetConfigDataFromDatabase(name, type);
-
-    if (type < RIGHT_CLICK_TYPE_MIN || type > RIGHT_CLICK_TYPE_MAX) {
-        type = RIGHT_CLICK_TYPE_MIN;
-    }
-}
-
-int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
-{
-    return PREFERENCES_MGR->SetBoolValue(key, MOUSE_FILE_NAME, value);
-}
-
-void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
-{
-    value = PREFERENCES_MGR->GetBoolValue(key, true);
-}
-
-int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
-{
-    return PREFERENCES_MGR->SetIntValue(key, MOUSE_FILE_NAME, value);
-}
-
-void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)
-{
-    int32_t defaultValue = value;
-    value = PREFERENCES_MGR->GetIntValue(key, defaultValue);
-}
 
 int32_t MouseTransformProcessor::SetMouseAccelerateMotionSwitch(bool enable)
 {

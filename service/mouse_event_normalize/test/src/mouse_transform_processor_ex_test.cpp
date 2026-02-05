@@ -22,6 +22,7 @@
 #include "mouse_transform_processor.h"
 #include "parameters.h"
 #include "input_windows_manager.h"
+#include "input_service_context.h"
 #include "i_input_windows_manager.h"
 #include "libinput_mock.h"
 
@@ -40,7 +41,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-
+    InputServiceContext env_ {};
     static inline std::shared_ptr<MessageParcelMock> messageParcelMock_ = nullptr;
 };
 
@@ -69,7 +70,7 @@ void MouseTransformProcessorExTest::TearDown() {}
 HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetDisplayDirection_001, TestSize.Level1)
 {
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     OLD::DisplayInfo displayInfo;
     displayInfo.direction = DIRECTION0;
     displayInfo.displayDirection = DIRECTION90;
@@ -102,7 +103,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
     EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillOnce(Return(1));
     EXPECT_CALL(libinputMock, PointerGetButtonArea).WillOnce(Return(280));
     int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     struct libinput_event_pointer* data = nullptr;
     int32_t eventType = 1;
     uint32_t button = 272;
@@ -122,7 +123,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
     EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillOnce(Return(1));
     EXPECT_CALL(libinputMock, PointerGetButtonArea).WillOnce(Return(273));
     int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     struct libinput_event_pointer* data = nullptr;
     int32_t eventType = 1;
     uint32_t button = 272;
@@ -139,11 +140,11 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_HandleTouchp
 HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_GetPointerLocation_001, TestSize.Level1)
 {
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     int32_t displayId = 0;
     double displayX = 0.0;
     double displayY = 0.0;
-    int32_t ret = processor.GetPointerLocation(displayId, displayX, displayY);
+    int32_t ret = processor.GetPointerLocation(env_, displayId, displayX, displayY);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(displayId, -1);
     EXPECT_EQ(displayX, 0);
@@ -160,7 +161,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_Normalize_00
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event event {};
     libinput_event_pointer pointer {};
     NiceMock<LibinputInterfaceMock> libinputMock;
@@ -180,7 +181,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorTest_Normalize_00
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     libinput_event event {};
     libinput_event_pointer pointer {};
     NiceMock<LibinputInterfaceMock> libinputMock;
@@ -202,7 +203,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
     processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -225,7 +226,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
     processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -248,7 +249,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
     processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -271,7 +272,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
     processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -294,7 +295,7 @@ HWTEST_F(MouseTransformProcessorExTest, MouseTransformProcessorExTest_SetPointer
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 1;
-    MouseTransformProcessor processor(deviceId);
+    MouseTransformProcessor processor(&env_, deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_NE(processor.pointerEvent_, nullptr);
     processor.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
