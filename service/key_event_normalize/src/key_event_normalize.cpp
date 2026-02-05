@@ -184,10 +184,8 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
 
 void KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
 {
-#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     CHKPV(device);
-    if (INPUT_DEV_MGR->IsKeyboardDevice(device) &&
-        INPUT_DEV_MGR->IsVirtualKeyboardDeviceEverConnected() && libinput_has_event_led_type(device)) {
+    if (INPUT_DEV_MGR->IsKeyboardDevice(device) && libinput_has_event_led_type(device)) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
@@ -202,7 +200,6 @@ void KeyEventNormalize::SyncLedStateFromKeyEvent(struct libinput_device* device)
         }
         MMI_HILOGI("Sync led state of added device from keyEvent");
     }
-#endif // OHOS_BUILD_ENABLE_VKEYBOARD
 }
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
