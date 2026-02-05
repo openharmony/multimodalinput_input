@@ -48,6 +48,7 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/service/common/include",
+    "${mmi_path}/service/device_config/include",
   ]
 
   sources = [
@@ -62,6 +63,7 @@ ohos_unittest("JoystickLayoutMapTest") {
     "src/joystick_event_processor_test.cpp",
     "src/joystick_layout_map_builder.cpp",
     "src/joystick_layout_map_test.cpp",
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
   ]
 
   deps = [
@@ -79,6 +81,8 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
     "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
     "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/service:libmmi-server-common",
   ]
 
   external_deps = [
@@ -89,6 +93,9 @@ ohos_unittest("JoystickLayoutMapTest") {
     "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "preferences:native_preferences",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
   ]
 }
 

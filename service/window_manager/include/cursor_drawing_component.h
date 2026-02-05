@@ -21,6 +21,7 @@
 
 #include "delegate_interface.h"
 #include "i_pointer_drawing_manager.h"
+#include "i_cursor_drawing_component.h"
 #include "pointer_style.h"
 #include "window_info.h"
 #include "pixel_map.h"
@@ -38,9 +39,10 @@ struct isMagicCursor {
     bool isShow { false };
 };
 
-class CursorDrawingComponent {
+class CursorDrawingComponent : public ICursorDrawingComponent {
 public:
     static CursorDrawingComponent& GetInstance();
+    void SetPointerLocation(int32_t x, int32_t y, uint64_t displayId);
     void Load();
     bool ResetUnloadTimer(int32_t unloadTime = -1, int32_t checkInterval = -1);
     void DrawPointer(uint64_t displayId, int32_t physicalX, int32_t physicalY,
@@ -60,7 +62,6 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension);
     void DrawPointerStyle(const PointerStyle &pointerStyle);
     bool IsPointerVisible();
-    void SetPointerLocation(int32_t x, int32_t y, uint64_t displayId);
     void SetMouseDisplayState(bool state);
     bool GetMouseDisplayState();
     int32_t SetCustomCursor(CursorPixelMap curPixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY);

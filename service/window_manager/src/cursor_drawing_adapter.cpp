@@ -16,6 +16,10 @@
 #include "mmi_log.h"
 #include "i_pointer_drawing_manager.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_CURSOR
+#undef MMI_LOG_TAG
+
 #define MMI_LOG_TAG "CursorDrawingAdapter"
 void* GetPointerInstance()
 {

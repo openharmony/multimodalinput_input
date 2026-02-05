@@ -47,6 +47,7 @@
 #include "product_name_definition.h"
 #include "product_type_parser.h"
 #include "bundle_name_parser.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW

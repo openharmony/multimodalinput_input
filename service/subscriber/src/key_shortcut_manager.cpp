@@ -18,6 +18,7 @@
 #include "app_state_observer.h"
 #include "json_parser.h"
 #include "key_command_handler_util.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER

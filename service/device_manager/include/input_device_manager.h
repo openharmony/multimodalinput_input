@@ -44,6 +44,7 @@ private:
     class HiddenInputDevice final : public IInputDevice {
     public:
         HiddenInputDevice(const InputDeviceInfo &devInfo);
+        HiddenInputDevice(const std::shared_ptr<InputDevice>);
         HiddenInputDevice(const HiddenInputDevice &other) = default;
         HiddenInputDevice(HiddenInputDevice &&other) = default;
         ~HiddenInputDevice() = default;
@@ -53,6 +54,7 @@ private:
         struct libinput_device* GetRawDevice() const override;
         std::string GetName() const override;
         bool IsJoystick() const override;
+        bool IsMouse() const override;
 
     private:
         InputDeviceInfo devInfo_ {};
@@ -68,15 +70,16 @@ public:
     void ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const override;
     void ForOneDevice(std::function<bool(int32_t, const IInputDevice&)> pred,
         std::function<void(int32_t, const IInputDevice&)> callback) const override;
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const override;
+    int32_t FindInputDeviceId(struct libinput_device* inputDevice) override;
+    bool HasPointerDevice() override;
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     std::vector<int32_t> GetInputDeviceIds() const;
-    std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const;
     struct libinput_device* GetLibinputDevice(int32_t deviceId) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
-    int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
     int32_t GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType);
@@ -97,7 +100,6 @@ public:
     struct libinput_device* GetKeyboardDevice() const;
     void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    bool HasPointerDevice();
     bool HasVirtualPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD

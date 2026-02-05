@@ -18,6 +18,8 @@
 #include "input_device_manager.h"
 #include "key_map_manager.h"
 #include "timer_manager.h"
+#include "cursor_drawing_component.h"
+#include "input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -41,14 +43,14 @@ std::shared_ptr<IInputEventHandler> InputServiceContext::GetMonitorHandler() con
     return InputHandler->GetMonitorHandler();
 }
 
+std::shared_ptr<IInputEventHandler> InputServiceContext::GetDispatchHandler() const
+{
+    return InputHandler->GetEventDispatchHandler();
+}
+
 std::shared_ptr<ITimerManager> InputServiceContext::GetTimerManager() const
 {
     return TimerMgr;
-}
-
-std::shared_ptr<IInputWindowsManager> InputServiceContext::GetInputWindowsManager() const
-{
-    return WIN_MGR;
 }
 
 std::shared_ptr<IInputDeviceManager> InputServiceContext::GetDeviceManager() const
@@ -56,9 +58,24 @@ std::shared_ptr<IInputDeviceManager> InputServiceContext::GetDeviceManager() con
     return INPUT_DEV_MGR;
 }
 
+std::shared_ptr<IInputWindowsManager> InputServiceContext::GetInputWindowsManager() const
+{
+    return WIN_MGR;
+}
+
 std::shared_ptr<IKeyMapManager> InputServiceContext::GetKeyMapManager() const
 {
     return KeyMapMgr;
+}
+
+std::shared_ptr<IPreferenceManager> InputServiceContext::GetPreferenceManager() const
+{
+    return PREFERENCES_MGR;
+}
+
+ICursorDrawingComponent& InputServiceContext::GetCursorDrawingComponent() const
+{
+    return CursorDrawingComponent::GetInstance();
 }
 
 void InputServiceContext::AttachDelegateInterface(std::shared_ptr<IDelegateInterface> delegate)

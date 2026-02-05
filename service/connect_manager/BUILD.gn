@@ -47,6 +47,7 @@ config("mmi_connect_manager_config") {
     "${mmi_path}/service/product_property_config/include",
     "${mmi_path}/service/custom_config_parser/include",
     "${target_gen_dir}",
+    "${mmi_path}/intention/scheduler/component_manager/include",
   ]
 }
 

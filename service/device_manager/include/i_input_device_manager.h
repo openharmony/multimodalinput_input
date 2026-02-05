@@ -20,6 +20,8 @@
 #include <functional>
 #include <string>
 
+#include "input_device.h"
+
 struct libinput_device;
 
 namespace OHOS {
@@ -31,6 +33,7 @@ public:
         virtual struct libinput_device* GetRawDevice() const = 0;
         virtual std::string GetName() const = 0;
         virtual bool IsJoystick() const = 0;
+        virtual bool IsMouse() const = 0;
     };
 
     virtual bool CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const = 0;
@@ -38,6 +41,9 @@ public:
     virtual void ForDevice(int32_t deviceId, std::function<void(const IInputDevice&)> callback) const = 0;
     virtual void ForOneDevice(std::function<bool(int32_t, const IInputDevice&)> pred,
         std::function<void(int32_t, const IInputDevice&)> callback) const = 0;
+    virtual int32_t FindInputDeviceId(struct libinput_device *device) = 0;
+    virtual bool HasPointerDevice() = 0;
+    virtual std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const = 0;
 };
 } // namespace MMI
 } // namespace OHOS

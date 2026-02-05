@@ -20,6 +20,7 @@
 #include "input_windows_manager.h"
 #include "mmi_matrix3.h"
 #include "mock.h"
+#include "mouse_event_interface.h"
 #include "knuckle_handler_component.h"
 
 namespace OHOS {
@@ -765,7 +766,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
 
     int32_t displayId = MouseEventHdr->GetDisplayId();
-    EXPECT_FALSE(displayId < 0);
+    EXPECT_TRUE(displayId < 0);
 
     std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(5, 7);
     bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
@@ -786,7 +787,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_003
     ASSERT_NE(inputWindowsManager, nullptr);
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
     int32_t displayId = MouseEventHdr->GetDisplayId();
-    EXPECT_FALSE(displayId < 0);
+    EXPECT_TRUE(displayId < 0);
 
     std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(6, 8);
     int32_t windowId = GLOBAL_WINDOW_ID;

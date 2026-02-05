@@ -26,7 +26,7 @@
 #include "dm_common.h"
 #include "screen_manager_lite.h"
 #include "i_pointer_drawing_manager.h"
-#include "mouse_event_normalize.h"
+#include "mouse_event_interface.h"
 #include "screen_pointer.h"
 
 namespace OHOS {

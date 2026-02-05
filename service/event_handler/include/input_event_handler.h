@@ -28,7 +28,7 @@
 #include "key_subscriber_handler.h"
 #include "input_event_hook_manager.h"
 #ifdef OHOS_BUILD_ENABLE_POINTER
-#include "mouse_event_normalize.h"
+#include "mouse_event_interface.h"
 #endif // OHOS_BUILD_ENABLE_POINTER
 // #ifdef OHOS_BUILD_ENABLE_SWITCH
 #include "switch_subscriber_handler.h"

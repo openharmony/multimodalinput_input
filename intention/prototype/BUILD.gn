@@ -23,6 +23,7 @@ config("input_service_prototype_configs") {
     "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",

@@ -54,6 +54,7 @@ ohos_shared_library("mmi_joystick_event_normalization") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
   ]
 
   part_name = "${mmi_part_name}"
@@ -102,6 +103,7 @@ ohos_source_set("joystick_event_normalization") {
     "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "preferences:native_preferences",
   ]
 
   part_name = "${mmi_part_name}"
