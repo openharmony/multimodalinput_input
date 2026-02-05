@@ -62,7 +62,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetLastMouseStyle_NotLoaded_001, Te
     CursorDrawingComponent component;
     auto *instance = &component;
     auto style = instance->GetLastMouseStyle();
-    EXPECT_EQ(style.id, defaultId); 
+    EXPECT_EQ(style.id, defaultId);
 }
 
 /**
@@ -109,7 +109,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetCurrentDisplayInfo_NotLoaded_001
     CursorDrawingComponent component;
     auto *instance = &component;
     auto displayInfo = instance->GetCurrentDisplayInfo();
-    EXPECT_EQ(displayInfo.id, defaultId); 
+    EXPECT_EQ(displayInfo.id, defaultId);
 }
 
 /**
@@ -159,7 +159,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerVisible_NotLoaded_001, Te
     CursorDrawingComponent component;
     auto *instance = &component;
     auto ret = instance->SetPointerVisible(windowId, true, defaultId, false);
-    EXPECT_EQ(ret, RET_OK); 
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -176,9 +176,9 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerVisible_NotLoaded_001, Te
     auto *instance = &component;
     auto ret = instance->GetPointerVisible(windowId);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    EXPECT_EQ(ret, true); 
+    EXPECT_EQ(ret, true);
 #else
-    EXPECT_GE(ret, false); 
+    EXPECT_GE(ret, false);
 #endif
 }
 
@@ -195,7 +195,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, IsPointerVisible_NotLoaded_001, Tes
     auto *instance = &component;
     auto ret = instance->IsPointerVisible();
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    EXPECT_EQ(ret, false); 
+    EXPECT_EQ(ret, false);
 #else
     EXPECT_GE(ret, false);
 #endif
@@ -219,9 +219,9 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerStyle_NotLoaded_001, Test
     style.id = defaultId;
     auto ret = instance->SetPointerStyle(windowId, displayId, style, false);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    EXPECT_EQ(ret, RET_OK); 
+    EXPECT_EQ(ret, RET_OK);
 #else
-    EXPECT_GE(ret, RET_ERR); 
+    EXPECT_GE(ret, RET_ERR);
 #endif
 }
 
@@ -241,9 +241,9 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerStyle_NotLoaded_001, Test
     PointerStyle style;
     auto ret = instance->GetPointerStyle(windowId, displayId, style, false);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    EXPECT_EQ(ret, RET_OK); 
+    EXPECT_EQ(ret, RET_OK);
 #else
-    EXPECT_GE(ret, RET_ERR); 
+    EXPECT_GE(ret, RET_ERR);
 #endif
 }
 
@@ -264,9 +264,9 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetMouseIcon_NotLoaded_001, TestSiz
     pixelMap.pixelMap = nullptr;
     auto ret = instance->SetMouseIcon(windowId, displayId, pixelMap);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    EXPECT_EQ(ret, RET_OK); 
+    EXPECT_EQ(ret, RET_OK);
 #else
-    EXPECT_EQ(ret, RET_ERR); 
+    EXPECT_EQ(ret, RET_ERR);
 #endif
 }
 
@@ -411,7 +411,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, Init_NotLoaded_001, TestSize.Level1
     auto *instance = &component;
     auto ret = instance->Init();
 
-    EXPECT_GE(ret, true); 
+    EXPECT_GE(ret, true);
 }
 
 /**
@@ -428,7 +428,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerColor_NotLoaded_001, Test
     auto *instance = &component;
     auto ret = instance->SetPointerColor(colorWhite);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -444,7 +444,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerColor_NotLoaded_001, Test
     auto *instance = &component;
     auto ret = instance->GetPointerColor();
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -460,7 +460,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, ClearWindowPointerStyle_NotLoaded_0
     auto *instance = &component;
     auto ret = instance->ClearWindowPointerStyle(100, 1);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -478,7 +478,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetCustomCursor_NotLoaded_001, Test
     auto *instance = &component;
     CursorPixelMap pixelMap;
     auto ret = instance->SetCustomCursor(pixelMap, windowId, displayId, 0, 0);
-    EXPECT_EQ(ret, RET_ERR); 
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -495,7 +495,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetMouseHotSpot_NotLoaded_001, Test
     CursorDrawingComponent component;
     auto *instance = &component;
     auto ret = instance->SetMouseHotSpot(windowId, displayId, 0, 0);
-    EXPECT_EQ(ret, RET_ERR); 
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -511,7 +511,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerSize_NotLoaded_001, TestS
     auto *instance = &component;
     auto ret = instance->SetPointerSize(1);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -527,7 +527,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerSize_NotLoaded_001, TestS
     auto *instance = &component;
     auto ret = instance->GetPointerSize();
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -544,7 +544,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetCursorSurfaceId_NotLoaded_001, T
     uint64_t surfaceId = 0;
     auto ret = instance->GetCursorSurfaceId(surfaceId);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -644,7 +644,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, EnableHardwareCursorStats_NotLoaded
     auto *instance = &component;
     auto ret = instance->EnableHardwareCursorStats(windowId, true);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -663,7 +663,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetHardwareCursorStats_NotLoaded_00
     uint32_t vsyncCount = 0;
     auto ret = instance->GetHardwareCursorStats(windowId, frameCount, vsyncCount);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -824,7 +824,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, UpdateMouseLayer_NotLoaded_001, Tes
     CursorDrawingComponent component;
     auto *instance = &component;
     auto ret = instance->UpdateMouseLayer(100, 200);
-    EXPECT_EQ(ret, RET_ERR); 
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -839,7 +839,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, DrawNewDpiPointer_NotLoaded_001, Te
     CursorDrawingComponent component;
     auto *instance = &component;
     auto ret = instance->DrawNewDpiPointer();
-    EXPECT_EQ(ret, RET_ERR); 
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -891,7 +891,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetCurrentCursorInfo_NotLoaded_001,
     PointerStyle pointerStyle;
     auto ret = instance->GetCurrentCursorInfo(visible, pointerStyle);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
@@ -910,4 +910,4 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetUserDefinedCursorPixelMap_NotLoa
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
-} // namespace OHOS 
+} // namespace OHOS
