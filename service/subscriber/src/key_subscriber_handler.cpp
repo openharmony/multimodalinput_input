@@ -80,11 +80,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
 #endif // OHOS_BUILD_EMULATOR
             keyEvent->SetFourceMonitorFlag(false);
         }
-        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Subscribe keyEvent filter success:%{private}d", keyEvent->GetKeyCode());
-        } else {
-            MMI_HILOGD("Subscribe keyEvent filter success:%{private}d", keyEvent->GetKeyCode());
-        }
+        MMI_HILOGD("Subscribe keyEvent filter success:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         DfxHisysevent::ReportKeyEvent("subcriber");
         return;
@@ -493,11 +489,7 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT ||
         keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
-        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Subscriber mulit swipe:%{private}d", keyEvent->GetKeyCode());
-        } else {
-            MMI_HILOGD("Subscriber mulit swipe:%{private}d", keyEvent->GetKeyCode());
-        }
+        MMI_HILOGD("Subscriber mulit swipe:%{private}d", keyEvent->GetKeyCode());
         return IsEnableCombineKeySwipe(keyEvent);
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_R) {
@@ -694,13 +686,8 @@ bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
-    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("code:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
-            KeyEvent::ActionToString(keyAction));
-    } else {
-        MMI_HILOGD("code:%{private}d, keyAction:%{public}s",
-            keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
-    }
+    MMI_HILOGD("code:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
+        KeyEvent::ActionToString(keyAction));
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("Skip power key up");
@@ -708,11 +695,7 @@ bool KeySubscriberHandler::ProcessKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         return true;
     }
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
-        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("Pressed:%{private}d", keyCode);
-        } else {
-            MMI_HILOGD("Pressed:%{private}d", keyCode);
-        }
+        MMI_HILOGD("Pressed:%{private}d", keyCode);
     }
     bool handled = false;
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {

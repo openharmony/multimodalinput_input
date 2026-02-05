@@ -52,11 +52,7 @@ bool ShortKeyHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
         return false;
     }
     if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
-        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
-        } else {
-            MMI_HILOGD("repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
-        }
+        MMI_HILOGD("repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
         return true;
     }
     DfxHisysevent::GetComboStartTime();
