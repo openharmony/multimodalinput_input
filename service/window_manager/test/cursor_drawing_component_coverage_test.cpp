@@ -711,7 +711,7 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SkipPointerLayer_NotLoaded_001, Tes
     auto *instance = &component;
     auto ret = instance->SkipPointerLayer(true);
 
-    EXPECT_GE(ret, RET_OK); 
+    EXPECT_GE(ret, RET_OK);
 }
 
 /**
