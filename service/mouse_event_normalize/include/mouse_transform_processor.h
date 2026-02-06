@@ -109,7 +109,7 @@ private:
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
 #endif // OHOS_BUILD_ENABLE_WATCH
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    double HandleAxisAccelateTouchPad(double axisValue);
+    double HandleAxisAccelateTouchPad(int32_t userId, double axisValue);
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     void CalculateOffset(const OLD::DisplayInfo* displayInfo, Offset &offset);
     Direction GetDisplayDirection(const OLD::DisplayInfo *displayInfo);
@@ -140,7 +140,6 @@ public:
     static int32_t SetPointerLocation(IInputServiceContext &env, int32_t x, int32_t y, int32_t displayId);
     static int32_t GetPointerLocation(IInputServiceContext &env, int32_t &displayId,
         double &displayX, double &displayY);
-    static void SetPointerSpeed(int32_t speed);
     static void SetScrollSwitchSetterPid(int32_t pid);
     std::shared_ptr<IInputEventHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<IInputEventHandler> GetDispatchHandler() const;
@@ -148,6 +147,7 @@ public:
     std::shared_ptr<IInputWindowsManager> GetInputWindowsManager() const;
     std::shared_ptr<IInputDeviceManager> GetDeviceManager() const;
     std::shared_ptr<IPreferenceManager> GetPreferenceManager() const;
+    std::shared_ptr<ISettingManager> GetSettingManager() const;
 
 private:
     IInputServiceContext *env_ { nullptr };

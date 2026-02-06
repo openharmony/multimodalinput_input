@@ -968,7 +968,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_001, TestSi
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -992,7 +993,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_002, TestSi
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1016,7 +1018,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_003, TestSi
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1040,7 +1043,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_004, TestSi
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1064,7 +1068,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_005, TestSi
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1709,22 +1714,23 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     InjectionTouch touch{
         .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
+    int32_t userId = 100;
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_OK);
 }
 
 /**
@@ -3020,6 +3026,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectTouchPadEventExt, Te
     ServerMsgHandler msgHandler;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    int32_t userId = 100;
     int32_t pid = 0;
     bool isNativeInject = true;
     OHOS::MMI::TouchpadCDG touchpadCDG;
@@ -3030,7 +3037,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectTouchPadEventExt, Te
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    int32_t result = msgHandler.OnInjectTouchPadEventExt(pointerEvent, touchpadCDG, false);
+    int32_t result = msgHandler.OnInjectTouchPadEventExt(userId, pointerEvent, touchpadCDG, false);
     EXPECT_EQ(result, ERROR_NULL_POINTER);
 }
 
@@ -3054,7 +3061,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_006, TestSi
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -3080,7 +3088,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_008, TestSi
     item.SetRawDy(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(1);
-    int32_t ret = handler.AccelerateMotion(pointerEvent);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -3128,7 +3137,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotionTouchpad, Te
     displayInfo.id = -1;
     OHOS::MMI::TouchpadCDG touchpadCDG;
     touchpadCDG.frequency = 1;
-    int32_t ret = handler.AccelerateMotionTouchpad(pointerEvent, touchpadCDG);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotionTouchpad(userId, pointerEvent, touchpadCDG);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -3331,22 +3341,23 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, 
     InjectionTouch touch{
         .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    int32_t userId = 100;
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
 }
 
 /**

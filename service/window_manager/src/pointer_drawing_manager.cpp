@@ -29,6 +29,7 @@
 #include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
+#include "account_manager.h"
 #include "bytrace_adapter.h"
 #include "cursor_drawing_component.h"
 #include "define_multimodal.h"
@@ -46,6 +47,7 @@
 #include "render/rs_pixel_map_util.h"
 #include "scene_board_judgement.h"
 #include "setting_datashare.h"
+#include "i_setting_manager.h"
 #include "util.h"
 #include "dfx_hisysevent.h"
 #include "timer_manager.h"
@@ -134,6 +136,7 @@ bool g_isReStartVsync { false };
 float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
 std::atomic<bool> g_isRsRestart { false };
+constexpr int32_t INVALID_USER { -1 };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -553,7 +556,7 @@ void PointerDrawingManager::UpdateMouseStyle()
 {
     CALL_DEBUG_ENTER;
     PointerStyle curPointerStyle;
-    CursorDrawingInformation::GetInstance().GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    CursorDrawingInformation::GetInstance().GetPointerStyle(GetCurrentUser(), pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
         lastMouseStyle_.id = curPointerStyle.id;
         if (WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, lastMouseStyle_) != RET_OK) {
@@ -566,7 +569,7 @@ void PointerDrawingManager::UpdateMouseStyle()
 int32_t PointerDrawingManager::SwitchPointerStyle()
 {
     CALL_DEBUG_ENTER;
-    int32_t size = GetPointerSize();
+    int32_t size = GetPointerSize(GetCurrentUser());
     if (size < MIN_POINTER_SIZE) {
         size = MIN_POINTER_SIZE;
     } else if (size > MAX_POINTER_SIZE) {
@@ -1041,8 +1044,8 @@ void PointerDrawingManager::HardwareCursorDynamicRender(MOUSE_ICON mouseStyle)
         .style_ = mouseStyle,
         .align_ = CursorDrawingInformation::GetInstance().MouseIcon2IconType(mouseStyle),
         .path_ = mouseIcons[mouseStyle].iconPath,
-        .color = GetPointerColor(),
-        .size = GetPointerSize(),
+        .color = GetPointerColor(GetCurrentUser()),
+        .size = GetPointerSize(GetCurrentUser()),
         .direction = displayInfo_.direction,
         .isHard = true,
         .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
@@ -1109,8 +1112,8 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
             .style_ = mouseStyle,
             .align_ = CursorDrawingInformation::GetInstance().MouseIcon2IconType(mouseStyle),
             .path_ = mouseIcons[mouseStyle].iconPath,
-            .color = GetPointerColor(),
-            .size = GetPointerSize(),
+            .color = GetPointerColor(GetCurrentUser()),
+            .size = GetPointerSize(GetCurrentUser()),
             .isHard = false,
             .rotationAngle = currentFrame_ * DYNAMIC_ROTATION_ANGLE,
         };
@@ -1852,8 +1855,8 @@ int32_t PointerDrawingManager::GetCurrentCursorInfo(bool& visible, PointerStyle&
         return RET_OK;
     }
     pointerStyle.id = lastMouseStyle_.id;
-    pointerStyle.size = GetPointerSize();
-    pointerStyle.color = GetPointerColor();
+    pointerStyle.size = GetPointerSize(GetCurrentUser());
+    pointerStyle.color = GetPointerColor(GetCurrentUser());
     return RET_OK;
 }
 
@@ -1939,7 +1942,7 @@ int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
         PointerStyle style;
         style.id = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
         lastMouseStyle_ = style;
-        ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, style);
+        ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style);
         if (ret != RET_OK) {
             MMI_HILOGE("SetPointerStyle is failed");
         }
@@ -1959,7 +1962,7 @@ int32_t PointerDrawingManager::SetCustomCursor(CursorPixelMap curPixelMap,
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     lastMouseStyle_ = style;
 
-    ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, style);
+    ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
@@ -1983,7 +1986,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(CursorPixelMap curPixelMap,
     newFocusY = focusY < 0 ? 0 : focusY;
     newFocusX = newFocusX > newPixelMap->GetWidth() ? newPixelMap->GetWidth() : newFocusX;
     newFocusY = newFocusY > newPixelMap->GetHeight() ? newPixelMap->GetHeight() : newFocusY;
-    int32_t cursorSize = GetPointerSize();
+    int32_t cursorSize = GetPointerSize(GetCurrentUser());
     cursorWidth_ =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     cursorHeight_ =
@@ -2068,7 +2071,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
         .width = imageWidth_,
         .height = imageHeight_
     };
-    int32_t pointerColor = GetPointerColor();
+    int32_t pointerColor = GetPointerColor(GetCurrentUser());
     if (tempPointerColor_ != DEFAULT_VALUE && type != AECH_DEVELOPER_DEFINED_STYLE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
         if (color == MAX_POINTER_COLOR) {
@@ -2084,7 +2087,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::LoadCursorSvgWithC
 std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(MOUSE_ICON type)
 {
     CALL_DEBUG_ENTER;
-    auto pointerColor = GetPointerColor();
+    auto pointerColor = GetPointerColor(GetCurrentUser());
     std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
     auto pixelInfo = mousePixelMap_.find(type);
     // 目前只缓存了两个光标
@@ -2131,10 +2134,10 @@ int32_t PointerDrawingManager::ReloadPixelMaps(
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::SetPointerColor(int32_t color)
+int32_t PointerDrawingManager::SetPointerColor(int32_t userId, int32_t color)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("PointerColor:%{public}x", color);
+    MMI_HILOGI("PointerColor:%{public}x, userId:%{private}d", color, userId);
     originSetColor_ = color;
     // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
     // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
@@ -2142,12 +2145,13 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     color = static_cast<int32_t>(static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR));
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
-    if (ret != RET_OK) {
+    bool isSuccess = INPUT_SETTING_MANAGER->SetIntValue(userId, MOUSE_KEY_SETTING, name, color);
+    if (!isSuccess) {
         MMI_HILOGE("Set pointer color failed, color:%{public}d", color);
-        return ret;
+        return RET_ERR;
     }
     MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
+    int32_t ret = -1;
     if (!WIN_MGR->GetExtraData().drawCursor) {
         auto surfaceNodePtr = GetSurfaceNode();
         if (surfaceNodePtr != nullptr) {
@@ -2178,12 +2182,13 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerColor()
+int32_t PointerDrawingManager::GetPointerColor(int32_t userId)
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
-    int32_t pointerColor = PREFERENCES_MGR->GetIntValue(name, DEFAULT_VALUE);
+    int32_t pointerColor = DEFAULT_VALUE;
+    INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, name, pointerColor);
     tempPointerColor_ = pointerColor;
     if (pointerColor == DEFAULT_VALUE) {
         pointerColor = MIN_POINTER_COLOR;
@@ -2213,7 +2218,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const OLD::DisplayInfo &displayInf
         mouseDirectionUpdate_ = true;
     }
     displayInfo_ = displayInfo;
-    int32_t size = GetPointerSize();
+    int32_t size = GetPointerSize(GetCurrentUser());
     if (lastMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
         imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
@@ -2242,7 +2247,7 @@ int32_t PointerDrawingManager::GetIndependentPixels()
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-int32_t PointerDrawingManager::SetPointerSize(int32_t size)
+int32_t PointerDrawingManager::SetPointerSize(int32_t userId, int32_t size)
 {
     CALL_DEBUG_ENTER;
     if (size < MIN_POINTER_SIZE) {
@@ -2252,10 +2257,10 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     }
     std::string name = POINTER_SIZE;
     GetPreferenceKey(name);
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, size);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer size failed, code:%{public}d", ret);
-        return ret;
+    bool isSuccess = INPUT_SETTING_MANAGER->SetIntValue(userId, MOUSE_KEY_SETTING, name, size);
+    if (!isSuccess) {
+        MMI_HILOGE("Set pointer size failed, size:%{public}d", size);
+        return RET_ERR;
     }
     MMI_HILOGI("Set pointer size successfully, size:%{public}d", size);
 
@@ -2291,12 +2296,13 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerSize()
+int32_t PointerDrawingManager::GetPointerSize(int32_t userId)
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_SIZE;
     GetPreferenceKey(name);
-    int32_t pointerSize = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_SIZE);
+    int32_t pointerSize = DEFAULT_POINTER_SIZE;
+    INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, name, pointerSize);
     MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
     return pointerSize;
 }
@@ -2305,6 +2311,19 @@ void PointerDrawingManager::GetPointerImageSize(int32_t &width, int32_t &height)
 {
     width = imageWidth_;
     height = imageHeight_;
+}
+
+int32_t PointerDrawingManager::GetCurrentUser()
+{
+    int32_t userId = INVALID_USER;
+    auto pointer = WIN_MGR->GetLastPointerEvent();
+    if (pointer != nullptr) {
+        userId = WIN_MGR->FindDisplayUserId(pointer->GetTargetDisplayId());
+    }
+    if (userId < 0) {
+        userId = ACCOUNT_MGR->QueryCurrentAccountId();
+    }
+    return userId > 0 ? userId : DEFAULT_USER_ID;
 }
 
 int32_t PointerDrawingManager::GetCursorSurfaceId(uint64_t &surfaceId)
@@ -2494,7 +2513,7 @@ void PointerDrawingManager::DrawManager()
 
 void PointerDrawingManager::InitPixelMaps()
 {
-    auto pointerColor = GetPointerColor();
+    auto pointerColor = GetPointerColor(GetCurrentUser());
     std::lock_guard<std::mutex> guard(mousePixelMapMutex_);
     mousePixelMap_[MOUSE_ICON::LOADING];
     mousePixelMap_[MOUSE_ICON::RUNNING];
@@ -3046,8 +3065,8 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.style_ = mouseStyle;
     cfg.align_ = CursorDrawingInformation::GetInstance().MouseIcon2IconType(mouseStyle);
     cfg.path_ = mouseIcons[mouseStyle].iconPath;
-    cfg.color = static_cast<uint32_t>(GetPointerColor());
-    cfg.size = static_cast<uint32_t>(GetPointerSize());
+    cfg.color = static_cast<uint32_t>(GetPointerColor(GetCurrentUser()));
+    cfg.size = static_cast<uint32_t>(GetPointerSize(GetCurrentUser()));
     cfg.isHard = isHard;
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
@@ -3449,7 +3468,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::GetUserIconCopy(bo
     int32_t cursorSize = 1;
     float axis = 1.0f;
     if (followSystem_) {
-        cursorSize = GetPointerSize();
+        cursorSize = GetPointerSize(GetCurrentUser());
         cursorWidth_ = pow(INCREASE_RATIO, cursorSize - 1) * imageInfo.size.width;
         cursorHeight_ = pow(INCREASE_RATIO, cursorSize - 1) * imageInfo.size.height;
         int32_t maxValue = imageInfo.size.width > imageInfo.size.height ? cursorWidth_ : cursorHeight_;
@@ -3509,7 +3528,7 @@ int32_t PointerDrawingManager::SetCustomCursor(int32_t pid, int32_t windowId, Cu
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     lastMouseStyle_ = style;
-    ret = CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, style);
+    ret = CursorDrawingInformation::GetInstance().SetPointerStyle(GetCurrentUser(), pid, windowId, style);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
@@ -3648,8 +3667,9 @@ void PointerDrawingManager::UpdatePointerItemCursorInfo(PointerEvent::PointerIte
         return;
     }
     pointerItem.SetStyle(lastMouseStyle_.id);
-    pointerItem.SetSizeLevel(GetPointerSize());
-    pointerItem.SetColor(static_cast<uint32_t>(GetPointerColor()));
+    int32_t userId = GetCurrentUser();
+    pointerItem.SetSizeLevel(GetPointerSize(userId));
+    pointerItem.SetColor(static_cast<uint32_t>(GetPointerColor(userId)));
 }
 
 void PointerDrawingManager::AllPointerDeviceRemoved()

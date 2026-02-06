@@ -48,7 +48,7 @@
 #include "product_type_parser.h"
 #include "bundle_name_parser.h"
 #include "timer_manager.h"
-
+#include "i_setting_manager.h"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_WINDOW
 #undef MMI_LOG_TAG
@@ -4449,19 +4449,24 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     lastWindowInfo_ = touchWindow;
 }
 
-int32_t InputWindowsManager::SetHoverScrollState(bool state)
+int32_t InputWindowsManager::SetHoverScrollState(int32_t userId, bool state)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
-    std::string name = "isEnableHoverScroll";
-    return PREFERENCES_MGR->SetBoolValue(name, MOUSE_FILE_NAME, state);
+    bool isSuccess = INPUT_SETTING_MANAGER->SetBoolValue(userId, MOUSE_KEY_SETTING,
+        FIELD_MOUSE_HOVER_SCROLL_STATE, state);
+    if (!isSuccess) {
+        MMI_HILOGE("Set mouse hover scroll state:%{public}d", state);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
-bool InputWindowsManager::GetHoverScrollState() const
+bool InputWindowsManager::GetHoverScrollState(int32_t userId) const
 {
     CALL_DEBUG_ENTER;
-    std::string name = "isEnableHoverScroll";
-    bool state = PREFERENCES_MGR->GetBoolValue(name, true);
+    bool state = true;
+    INPUT_SETTING_MANAGER->GetBoolValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_HOVER_SCROLL_STATE, state);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
@@ -4684,7 +4689,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END;
     if (checkFlag) {
         int32_t focusWindowId = GetFocusWindowId(groupId);
-        if ((!GetHoverScrollState()) && (focusWindowId != touchWindow->id)) {
+        if ((!GetHoverScrollState(FindDisplayUserId(pointerEvent->GetTargetDisplayId()))) &&
+            (focusWindowId != touchWindow->id)) {
             MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
             return RET_OK;
         }

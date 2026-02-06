@@ -82,5 +82,10 @@ void InputServiceContext::AttachDelegateInterface(std::shared_ptr<IDelegateInter
 {
     delegate_ = delegate;
 }
+
+std::shared_ptr<ISettingManager> InputServiceContext::GetSettingManager() const
+{
+    return INPUT_SETTING_MANAGER;
+}
 } // namespace MMI
 } // namespace OHOS

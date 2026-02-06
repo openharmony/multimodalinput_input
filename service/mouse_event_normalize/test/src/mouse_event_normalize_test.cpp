@@ -97,27 +97,29 @@ void MouseEventNormalizeTest::CloseMouse()
 
 void MouseEventNormalizeTest::SetUp()
 {
-    prePointerSpeed_ = MouseEventHdr->GetPointerSpeed();
-    prePrimaryButton_ = MouseEventHdr->GetMousePrimaryButton();
-    preScrollRows_ = MouseEventHdr->GetMouseScrollRows();
-    MouseEventHdr->GetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
-    MouseEventHdr->GetTouchpadRightClickType(preRightClickType_);
-    MouseEventHdr->GetTouchpadScrollSwitch(preScrollSwitch_);
-    MouseEventHdr->GetTouchpadScrollDirection(preScrollDirection_);
-    MouseEventHdr->GetTouchpadTapSwitch(preTapSwitch_);
+    int32_t userId = 100;
+    prePointerSpeed_ = MouseEventHdr->GetPointerSpeed(userId);
+    prePrimaryButton_ = MouseEventHdr->GetMousePrimaryButton(userId);
+    preScrollRows_ = MouseEventHdr->GetMouseScrollRows(userId);
+    MouseEventHdr->GetTouchpadPointerSpeed(userId, preTouchpadPointerSpeed_);
+    MouseEventHdr->GetTouchpadRightClickType(userId, preRightClickType_);
+    MouseEventHdr->GetTouchpadScrollSwitch(userId, preScrollSwitch_);
+    MouseEventHdr->GetTouchpadScrollDirection(userId, preScrollDirection_);
+    MouseEventHdr->GetTouchpadTapSwitch(userId, preTapSwitch_);
 }
 
 void MouseEventNormalizeTest::TearDown()
 {
-    MouseEventHdr->SetPointerSpeed(prePointerSpeed_);
-    MouseEventHdr->SetMousePrimaryButton(prePrimaryButton_);
-    MouseEventHdr->SetMouseScrollRows(preScrollRows_);
-    MouseEventHdr->SetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
-    MouseEventHdr->SetTouchpadRightClickType(preRightClickType_);
+    int32_t userId = 100;
+    MouseEventHdr->SetPointerSpeed(userId, prePointerSpeed_);
+    MouseEventHdr->SetMousePrimaryButton(userId, prePrimaryButton_);
+    MouseEventHdr->SetMouseScrollRows(userId, preScrollRows_);
+    MouseEventHdr->SetTouchpadPointerSpeed(userId, preTouchpadPointerSpeed_);
+    MouseEventHdr->SetTouchpadRightClickType(userId, preRightClickType_);
     int32_t pid = 1;
-    MouseEventHdr->SetTouchpadScrollSwitch(pid, preScrollSwitch_);
-    MouseEventHdr->SetTouchpadScrollDirection(preScrollDirection_);
-    MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch_);
+    MouseEventHdr->SetTouchpadScrollSwitch(userId, pid, preScrollSwitch_);
+    MouseEventHdr->SetTouchpadScrollDirection(userId, preScrollDirection_);
+    MouseEventHdr->SetTouchpadTapSwitch(userId, preTapSwitch_);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -252,7 +254,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerSpeed_006, T
 {
     int32_t idNames = 0;
     int32_t speed = 2;
-    ASSERT_EQ(MouseEventHdr->SetPointerSpeed(speed), idNames);
+    int32_t userId = 100;
+    ASSERT_EQ(MouseEventHdr->SetPointerSpeed(userId, speed), idNames);
 }
 
 /**
@@ -264,9 +267,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerSpeed_006, T
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, TestSize.Level1)
 {
     int32_t speed = 2;
-    MouseEventHdr->SetPointerSpeed(speed);
+    int32_t userId = 100;
+    MouseEventHdr->SetPointerSpeed(userId, speed);
     int32_t idNames = 2;
-    ASSERT_EQ(MouseEventHdr->GetPointerSpeed(), idNames);
+    ASSERT_EQ(MouseEventHdr->GetPointerSpeed(userId), idNames);
 }
 
 /**
@@ -293,7 +297,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMousePrimaryButton_009, TestSize.Level1)
 {
     int32_t primaryButton = 1;
-    ASSERT_TRUE(MouseEventHdr->SetMousePrimaryButton(primaryButton) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetMousePrimaryButton(userId, primaryButton) == RET_OK);
 }
 
 /**
@@ -305,9 +310,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMousePrimaryButton_
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMousePrimaryButton_010, TestSize.Level1)
 {
     int32_t primaryButton = 1;
-    MouseEventHdr->SetMousePrimaryButton(primaryButton);
+    int32_t userId = 100;
+    MouseEventHdr->SetMousePrimaryButton(userId, primaryButton);
     int32_t primaryButtonRes = 1;
-    ASSERT_TRUE(MouseEventHdr->GetMousePrimaryButton() == primaryButtonRes);
+    ASSERT_TRUE(MouseEventHdr->GetMousePrimaryButton(userId) == primaryButtonRes);
 }
 
 /**
@@ -319,7 +325,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMousePrimaryButton_
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollRows_011, TestSize.Level1)
 {
     int32_t rows = 1;
-    ASSERT_TRUE(MouseEventHdr->SetMouseScrollRows(rows) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetMouseScrollRows(userId, rows) == RET_OK);
 }
 
 /**
@@ -331,9 +338,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollRows_011
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollRows_012, TestSize.Level1)
 {
     int32_t rows = 50;
-    MouseEventHdr->SetMouseScrollRows(rows);
+    int32_t userId = 100;
+    MouseEventHdr->SetMouseScrollRows(userId, rows);
     int32_t newRows = 50;
-    ASSERT_TRUE(MouseEventHdr->GetMouseScrollRows() == newRows);
+    ASSERT_TRUE(MouseEventHdr->GetMouseScrollRows(userId) == newRows);
 }
 
 /**
@@ -346,7 +354,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollSwitc
 {
     int32_t pid = 1;
     bool flag = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(pid, flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(userId, pid, flag) == RET_OK);
 }
 
 /**
@@ -359,11 +368,12 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitc
 {
     int32_t pid = 1;
     bool flag = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(pid, flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(userId, pid, flag) == RET_OK);
     flag = true;
-    MouseEventHdr->SetTouchpadScrollSwitch(pid, flag);
+    MouseEventHdr->SetTouchpadScrollSwitch(userId, pid, flag);
     bool newFlag = true;
-    MouseEventHdr->GetTouchpadScrollSwitch(newFlag);
+    MouseEventHdr->GetTouchpadScrollSwitch(userId, newFlag);
 }
 
 /**
@@ -375,7 +385,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitc
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollDirection_015, TestSize.Level1)
 {
     bool state = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(state) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(userId, state) == RET_OK);
 }
 
 /**
@@ -387,11 +398,12 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollDirec
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirection_016, TestSize.Level1)
 {
     bool state = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(state) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(userId, state) == RET_OK);
     state = true;
-    MouseEventHdr->SetTouchpadScrollDirection(state);
+    MouseEventHdr->SetTouchpadScrollDirection(userId, state);
     bool newState = true;
-    MouseEventHdr->GetTouchpadScrollDirection(newState);
+    MouseEventHdr->GetTouchpadScrollDirection(userId, newState);
 }
 
 /**
@@ -403,7 +415,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirec
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadTapSwitch_017, TestSize.Level1)
 {
     bool flag = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(userId, flag) == RET_OK);
 }
 
 /**
@@ -415,11 +428,12 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadTapSwitch_0
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_018, TestSize.Level1)
 {
     bool flag = false;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(userId, flag) == RET_OK);
     flag = true;
-    MouseEventHdr->SetTouchpadTapSwitch(flag);
+    MouseEventHdr->SetTouchpadTapSwitch(userId, flag);
     bool newFlag = true;
-    MouseEventHdr->GetTouchpadTapSwitch(newFlag);
+    MouseEventHdr->GetTouchpadTapSwitch(userId, newFlag);
 }
 
 /**
@@ -431,7 +445,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_0
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpeed_019, TestSize.Level1)
 {
     int32_t speed = 3;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(speed) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(userId, speed) == RET_OK);
 }
 
 /**
@@ -443,9 +458,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpee
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpeed_020, TestSize.Level1)
 {
     int32_t speed = 8;
-    MouseEventHdr->SetTouchpadPointerSpeed(speed);
+    int32_t userId = 100;
+    MouseEventHdr->SetTouchpadPointerSpeed(userId, speed);
     int32_t newSpeed = 4;
-    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
+    MouseEventHdr->GetTouchpadPointerSpeed(userId, newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -458,7 +474,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpeed_021, TestSize.Level1)
 {
     int32_t speed = 3;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(speed) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(userId, speed) == RET_OK);
 }
 
 /**
@@ -470,9 +487,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpee
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpeed_022, TestSize.Level1)
 {
     int32_t speed = 8;
-    MouseEventHdr->SetTouchpadPointerSpeed(speed);
+    int32_t userId = 100;
+    MouseEventHdr->SetTouchpadPointerSpeed(userId, speed);
     int32_t newSpeed = 4;
-    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
+    MouseEventHdr->GetTouchpadPointerSpeed(userId, newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -485,7 +503,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadRightClickType_023, TestSize.Level1)
 {
     int32_t type = 3;
-    ASSERT_TRUE(MouseEventHdr->SetTouchpadRightClickType(type) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadRightClickType(userId, type) == RET_OK);
 }
 
 /**
@@ -497,9 +516,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadRightClickT
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickType_024, TestSize.Level1)
 {
     int32_t type = 1;
-    MouseEventHdr->SetTouchpadRightClickType(type);
+    int32_t userId = 100;
+    MouseEventHdr->SetTouchpadRightClickType(userId, type);
     int32_t newType = 2;
-    MouseEventHdr->GetTouchpadRightClickType(newType);
+    MouseEventHdr->GetTouchpadRightClickType(userId, newType);
     ASSERT_TRUE(type == newType);
 }
 

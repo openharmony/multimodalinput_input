@@ -100,20 +100,22 @@ void TouchPadTransformProcessorTest::CloseTouchpad()
 
 void TouchPadTransformProcessorTest::SetUp()
 {
-    g_processor_.GetTouchpadPinchSwitch(prePinchSwitch_);
-    g_processor_.GetTouchpadSwipeSwitch(preSwipeSwitch_);
-    g_processor_.GetTouchpadRotateSwitch(preRotateSwitch_);
-    g_processor_.GetTouchpadScrollRows();
-    g_processor_.GetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
+    int32_t userId = 100;
+    g_processor_.GetTouchpadPinchSwitch(userId, prePinchSwitch_);
+    g_processor_.GetTouchpadSwipeSwitch(userId, preSwipeSwitch_);
+    g_processor_.GetTouchpadRotateSwitch(userId, preRotateSwitch_);
+    g_processor_.GetTouchpadScrollRows(userId);
+    g_processor_.GetTouchpadDoubleTapAndDragState(userId, preDoubleTapDragSwitch_);
 }
 
 void TouchPadTransformProcessorTest::TearDown()
 {
-    g_processor_.SetTouchpadPinchSwitch(prePinchSwitch_);
-    g_processor_.SetTouchpadSwipeSwitch(preSwipeSwitch_);
-    g_processor_.SetTouchpadRotateSwitch(preRotateSwitch_);
-    g_processor_.SetTouchpadScrollRows(preScrollRows_);
-    g_processor_.SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
+    int32_t userId = 100;
+    g_processor_.SetTouchpadPinchSwitch(userId, prePinchSwitch_);
+    g_processor_.SetTouchpadSwipeSwitch(userId, preSwipeSwitch_);
+    g_processor_.SetTouchpadRotateSwitch(userId, preRotateSwitch_);
+    g_processor_.SetTouchpadScrollRows(userId, preScrollRows_);
+    g_processor_.SetTouchpadDoubleTapAndDragState(userId, preDoubleTapDragSwitch_);
 }
 
 /**
@@ -128,7 +130,8 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadPinchSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadPinchSwitch(userId, flag) == RET_OK);
 }
 
 /**
@@ -143,9 +146,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadPinchSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadPinchSwitch(userId, flag) == RET_OK);
     bool newFlag = false;
-    processor.GetTouchpadPinchSwitch(newFlag);
+    processor.GetTouchpadPinchSwitch(userId, newFlag);
 }
 
 /**
@@ -160,7 +164,8 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(userId, flag) == RET_OK);
 }
 
 /**
@@ -175,9 +180,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(userId, flag) == RET_OK);
     bool newFlag = false;
-    processor.GetTouchpadSwipeSwitch(newFlag);
+    processor.GetTouchpadSwipeSwitch(userId, newFlag);
 }
 
 /**
@@ -192,7 +198,8 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool rotateSwitch = false;
-    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(userId, rotateSwitch) == RET_OK);
 }
 
 /**
@@ -207,9 +214,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool rotateSwitch = false;
-    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(userId, rotateSwitch) == RET_OK);
     bool newRotateSwitch = false;
-    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(userId, newRotateSwitch) == RET_OK);
 }
 
 /**
@@ -225,7 +233,8 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadDoubleTapAndDragState(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadDoubleTapAndDragState(userId, flag) == RET_OK);
 }
 
 /**
@@ -241,9 +250,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
-    processor.SetTouchpadDoubleTapAndDragState(flag);
+    int32_t userId = 100;
+    processor.SetTouchpadDoubleTapAndDragState(userId, flag);
     bool newFlag = false;
-    processor.GetTouchpadDoubleTapAndDragState(newFlag);
+    processor.GetTouchpadDoubleTapAndDragState(userId, newFlag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -351,8 +361,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_PutConfi
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
+    std::string field = "testField";
     bool value = true;
-    int32_t ret = processor.PutConfigDataToDatabase(key, value);
+    int32_t userId = 100;
+    int32_t ret = processor.PutConfigDataToDatabase(userId, key, field, value);
     ASSERT_EQ(ret, RET_OK);
 }
 
@@ -368,8 +380,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_PutConfi
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
+    std::string field = "testField";
     bool value = false;
-    int32_t ret = processor.PutConfigDataToDatabase(key, value);
+    int32_t userId = 100;
+    int32_t ret = processor.PutConfigDataToDatabase(userId, key, field, value);
     ASSERT_EQ(ret, RET_OK);
 }
 
@@ -385,8 +399,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetConfi
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
+    std::string field = "testField";
     bool value = false;
-    ASSERT_NO_FATAL_FAILURE(processor.GetConfigDataFromDatabase(key, value));
+    int32_t userId = 100;
+    ASSERT_NO_FATAL_FAILURE(processor.GetConfigDataFromDatabase(userId, key, field, value));
 }
 
 /**
@@ -401,8 +417,10 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetConfi
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
-    bool value = true;
-    ASSERT_NO_FATAL_FAILURE(processor.GetConfigDataFromDatabase(key, value));
+    std::string field = "testField";
+    bool value = false;
+    int32_t userId = 100;
+    ASSERT_NO_FATAL_FAILURE(processor.GetConfigDataFromDatabase(userId, key, field, value));
 }
 
 /**
@@ -1026,8 +1044,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     }
     ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
     int32_t deviceId = iter->first;
+    int32_t userId = 100;
     TouchPadTransformProcessor processor(deviceId);
-    processor.SetTouchpadSwipeSwitch(false);
+    processor.SetTouchpadSwipeSwitch(userId, false);
     int32_t action = PointerEvent::POINTER_ACTION_SWIPE_BEGIN;
     ASSERT_NO_FATAL_FAILURE(processor.SetTouchPadSwipeData(event, action));
 }
@@ -1058,8 +1077,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     }
     ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
     int32_t deviceId = iter->first;
+    int32_t userId = 100;
     TouchPadTransformProcessor processor(deviceId);
-    processor.SetTouchpadSwipeSwitch(true);
+    processor.SetTouchpadSwipeSwitch(userId, true);
     int32_t action = PointerEvent::POINTER_ACTION_SWIPE_BEGIN;
     ASSERT_NO_FATAL_FAILURE(processor.SetTouchPadSwipeData(event, action));
 }
@@ -1283,7 +1303,8 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     int32_t deviceId = 1;
     TouchPadTransformProcessor processor(deviceId);
     int32_t rows = 1;
-    ASSERT_TRUE(processor.SetTouchpadScrollRows(rows) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(processor.SetTouchpadScrollRows(userId, rows) == RET_OK);
 }
 
 /**
@@ -1298,8 +1319,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t deviceId = 1;
     TouchPadTransformProcessor processor(deviceId);
     int32_t rows = 1;
-    processor.SetTouchpadScrollRows(rows);
-    int32_t newRows = processor.GetTouchpadScrollRows();
+    int32_t userId = 100;
+    processor.SetTouchpadScrollRows(userId, rows);
+    int32_t newRows = processor.GetTouchpadScrollRows(userId);
     ASSERT_TRUE(rows == newRows);
 }
 } // namespace MMI

@@ -31,21 +31,21 @@ public:
     void SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent);
     void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
-    int32_t GetIntervalTime(int32_t deviceId);
+    int32_t GetIntervalTime(int32_t userId, int32_t deviceId);
     std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
     void RemoveTimer();
-    int32_t SetKeyboardRepeatDelay(int32_t delay);
-    int32_t SetKeyboardRepeatRate(int32_t rate);
-    int32_t GetKeyboardRepeatDelay(int32_t &delay);
-    int32_t GetKeyboardRepeatRate(int32_t &rate);
+    int32_t SetKeyboardRepeatDelay(int32_t userId, int32_t delay);
+    int32_t SetKeyboardRepeatRate(int32_t userId, int32_t rate);
+    int32_t GetKeyboardRepeatDelay(int32_t userId, int32_t &delay);
+    int32_t GetKeyboardRepeatRate(int32_t userId, int32_t &rate);
     int32_t GetRepeatKeyCode() const;
     void SetRepeatKeyCode(int32_t code);
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
     DeviceConfig GetAutoSwitch(int32_t deviceId);
-    int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
-    int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
-    int32_t GetDelayTime();
+    int32_t PutConfigDataToDatabase(int32_t userId, std::string &key, int32_t value);
+    int32_t GetConfigDataFromDatabase(int32_t userId, std::string &key, int32_t &value);
+    int32_t GetDelayTime(int32_t userId);
     int32_t GetKeyboardRepeatTime(int32_t deviceId, bool isDelay);
 
 private:

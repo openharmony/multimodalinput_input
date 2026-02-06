@@ -27,7 +27,9 @@ ohos_source_set("joystick_mock") {
 
   testonly = true
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+  ]
 
   sources = [ "src/joystick_event_interface.cpp" ]
 

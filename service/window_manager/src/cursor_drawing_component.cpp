@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <securec.h>
 
+#include "account_manager.h"
 #include "ffrt.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
@@ -25,6 +26,7 @@
 #include "mmi_log.h"
 #include "pointer_device_manager.h"
 #include "timer_manager.h"
+#include "i_setting_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "CursorDrawingComponent"
@@ -279,23 +281,23 @@ bool CursorDrawingComponent::GetPointerVisible(int32_t pid)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-int32_t CursorDrawingComponent::SetPointerColor(int32_t color)
+int32_t CursorDrawingComponent::SetPointerColor(int32_t userId, int32_t color)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->SetPointerColor(color);
+    return pointerInstance_->SetPointerColor(userId, color);
 }
 
-int32_t CursorDrawingComponent::GetPointerColor()
+int32_t CursorDrawingComponent::GetPointerColor(int32_t userId)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->GetPointerColor();
+    return pointerInstance_->GetPointerColor(userId);
 }
 
 int32_t CursorDrawingComponent::SetPointerStyle(
-    int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
+    int32_t userId, int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return CursorDrawingInformation::GetInstance().SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    return CursorDrawingInformation::GetInstance().SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -308,10 +310,10 @@ int32_t CursorDrawingComponent::ClearWindowPointerStyle(int32_t pid, int32_t win
 }
 
 int32_t CursorDrawingComponent::GetPointerStyle(
-    int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
+    int32_t userId, int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return CursorDrawingInformation::GetInstance().GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    return CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -364,10 +366,10 @@ int32_t CursorDrawingComponent::SetCustomCursor(
     return pointerInstance_->SetCustomCursor(pid, windowId, cursor, options);
 }
 
-int32_t CursorDrawingComponent::SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
+int32_t CursorDrawingComponent::SetMouseIcon(int32_t userId, int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
+    return CursorDrawingInformation::GetInstance().SetMouseIcon(userId, pid, windowId, curPixelMap);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -379,16 +381,16 @@ int32_t CursorDrawingComponent::SetMouseHotSpot(int32_t pid, int32_t windowId, i
     return pointerInstance_->SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
 }
 
-int32_t CursorDrawingComponent::SetPointerSize(int32_t size)
+int32_t CursorDrawingComponent::SetPointerSize(int32_t userId, int32_t size)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->SetPointerSize(size);
+    return pointerInstance_->SetPointerSize(userId, size);
 }
 
-int32_t CursorDrawingComponent::GetPointerSize()
+int32_t CursorDrawingComponent::GetPointerSize(int32_t userId)
 {
     CHK_IS_LOADR(isLoaded_, pointerInstance_)
-    return pointerInstance_->GetPointerSize();
+    return pointerInstance_->GetPointerSize(userId);
 }
 
 void CursorDrawingComponent::GetPointerImageSize(int32_t &width, int32_t &height)
@@ -712,7 +714,7 @@ bool CursorDrawingInformation::HasMagicCursor()
 void CursorDrawingInformation::InitDefaultMouseIconPath()
 {
     PointerStyle curPointerStyle;
-    GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    GetPointerStyle(GetCurrentUser(), pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (curPointerStyle.id == CURSOR_CIRCLE_STYLE || curPointerStyle.id == AECH_DEVELOPER_DEFINED_STYLE) {
         auto iconPath = GetMouseIconPath();
         auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
@@ -855,6 +857,18 @@ bool CursorDrawingInformation::IsPointerVisible()
     return info.visible;
 }
 
+int32_t CursorDrawingInformation::GetCurrentUser()
+{
+    int32_t userId = DEFAULT_USER_ID;
+    auto pointer = WIN_MGR->GetLastPointerEvent();
+    if (pointer != nullptr) {
+        userId = WIN_MGR->FindDisplayUserId(pointer->GetTargetDisplayId());
+    } else {
+        userId = ACCOUNT_MGR->GetCurrentAccountId();
+    }
+    return userId > 0 ? userId : DEFAULT_USER_ID;
+}
+
 void CursorDrawingInformation::DeletePointerVisible(int32_t pid)
 {
     if (!pidInfos_.empty()) {
@@ -971,8 +985,8 @@ bool CursorDrawingInformation::IsPointerStyleParamValid(int32_t windowId, Pointe
         pointerStyle.id > MOUSE_ICON::LASER_CURSOR_DOT_RED);
 }
 
-int32_t CursorDrawingInformation::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
-    bool isUiExtension)
+int32_t CursorDrawingInformation::SetPointerStyle(int32_t userId, int32_t pid, int32_t windowId,
+    PointerStyle pointerStyle, bool isUiExtension)
 {
     if (!IsPointerStyleParamValid(windowId, pointerStyle)) {
         MMI_HILOGE("PointerStyle param is invalid");
@@ -1020,16 +1034,16 @@ int32_t CursorDrawingInformation::SetPointerStyle(int32_t pid, int32_t windowId,
     return RET_OK;
 }
 
-int32_t CursorDrawingInformation::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
-    bool isUiExtension)
+int32_t CursorDrawingInformation::GetPointerStyle(int32_t userId, int32_t pid, int32_t windowId,
+    PointerStyle &pointerStyle, bool isUiExtension)
 {
     if (windowId == GLOBAL_WINDOW_ID) {
-        std::string name = POINTER_COLOR;
-        pointerStyle.color = PREFERENCES_MGR->GetIntValue(name, DEFAULT_VALUE);
-        name = POINTER_SIZE;
-        pointerStyle.size = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_SIZE);
-        name = "pointerStyle";
-        int32_t style = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_STYLE);
+        pointerStyle.color = DEFAULT_VALUE;
+        INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_COLOR, pointerStyle.color);
+        pointerStyle.size = DEFAULT_POINTER_SIZE;
+        INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_SIZE, pointerStyle.size);
+        int32_t style = DEFAULT_POINTER_STYLE;
+        INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_STYLE, style);
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE || style == AECH_DEVELOPER_DEFINED_STYLE) {
             pointerStyle.id = style;
@@ -1041,7 +1055,8 @@ int32_t CursorDrawingInformation::GetPointerStyle(int32_t pid, int32_t windowId,
     return RET_OK;
 }
 
-int32_t CursorDrawingInformation::SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap)
+int32_t CursorDrawingInformation::SetMouseIcon(int32_t userId, int32_t pid, int32_t windowId,
+    CursorPixelMap curPixelMap)
 {
     if (pid == DEFAULT_VALUE) {
         MMI_HILOGE("pid is invalid return -1");
@@ -1066,7 +1081,7 @@ int32_t CursorDrawingInformation::SetMouseIcon(int32_t pid, int32_t windowId, Cu
     mouseIconUpdate_ = true;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    int32_t ret = SetPointerStyle(pid, windowId, style);
+    int32_t ret = SetPointerStyle(userId, pid, windowId, style);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle return RET_ERR here");
     }

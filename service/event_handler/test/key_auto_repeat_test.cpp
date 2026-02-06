@@ -20,6 +20,7 @@
 #include "key_auto_repeat.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
+#include "i_setting_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyAutoRepeatTest"
@@ -107,9 +108,10 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetIntervalTime_001, TestSize.Leve
     KeyAutoRepeat keyAutoRepeat;
     int32_t deviceId = 1;
     int32_t expected = DEFAULT_KEY_REPEAT_RATE;
-    EXPECT_EQ(keyAutoRepeat.GetIntervalTime(deviceId), expected);
+    int32_t userId = 100;
+    EXPECT_EQ(keyAutoRepeat.GetIntervalTime(userId, deviceId), expected);
     int32_t unexpected = 0;
-    EXPECT_NE(keyAutoRepeat.GetIntervalTime(deviceId), unexpected);
+    EXPECT_NE(keyAutoRepeat.GetIntervalTime(userId, deviceId), unexpected);
 }
 
 /**
@@ -122,7 +124,8 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetDelayTime_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
-    int32_t delayTime = keyAutoRepeat.GetDelayTime();
+    int32_t userId = 100;
+    int32_t delayTime = keyAutoRepeat.GetDelayTime(userId);
     EXPECT_EQ(delayTime, DEFAULT_KEY_REPEAT_DELAY);
 }
 
@@ -175,14 +178,15 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatDelay_001, TestSi
     CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t delay = 500;
+    int32_t userId = 100;
     int32_t expectedResult = RET_OK;
-    int32_t result = keyAutoRepeat.SetKeyboardRepeatDelay(delay);
+    int32_t result = keyAutoRepeat.SetKeyboardRepeatDelay(userId, delay);
     EXPECT_EQ(result, expectedResult);
     delay = 100;
-    result = keyAutoRepeat.SetKeyboardRepeatDelay(delay);
+    result = keyAutoRepeat.SetKeyboardRepeatDelay(userId, delay);
     EXPECT_EQ(result, expectedResult);
     delay = 2000;
-    result = keyAutoRepeat.SetKeyboardRepeatDelay(delay);
+    result = keyAutoRepeat.SetKeyboardRepeatDelay(userId, delay);
     EXPECT_EQ(result, expectedResult);
 }
 
@@ -198,16 +202,17 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatRate_001, TestSiz
     KeyAutoRepeat keyAutoRepeat;
     int32_t rate = 500;
     int32_t expectedResult = RET_OK;
-    int32_t result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
+    int32_t userId = 100;
+    int32_t result = keyAutoRepeat.SetKeyboardRepeatRate(userId, rate);
     EXPECT_EQ(result, expectedResult);
     rate = 30;
-    result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
+    result = keyAutoRepeat.SetKeyboardRepeatRate(userId, rate);
     EXPECT_EQ(result, expectedResult);
     rate = 101;
-    result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
+    result = keyAutoRepeat.SetKeyboardRepeatRate(userId, rate);
     EXPECT_EQ(result, expectedResult);
     rate = -1;
-    result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
+    result = keyAutoRepeat.SetKeyboardRepeatRate(userId, rate);
     EXPECT_EQ(result, expectedResult);
 }
 
@@ -223,10 +228,11 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatDelay_001, TestSi
     KeyAutoRepeat keyAutoRepeat;
     int32_t delay = 0;
     int32_t expectedDelay = 1000;
-    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatDelay(delay), RET_OK);
+    int32_t userId = 100;
+    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatDelay(userId, delay), RET_OK);
     EXPECT_EQ(delay, expectedDelay);
     delay = 100;
-    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatDelay(delay), RET_OK);
+    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatDelay(userId, delay), RET_OK);
     EXPECT_EQ(delay, expectedDelay);
 }
 
@@ -241,14 +247,15 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatRate_001, TestSiz
     CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t rate = 0;
-    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(rate), RET_OK);
+    int32_t userId = 100;
+    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(userId, rate), RET_OK);
     int32_t expectedRate = MIN_KEY_REPEAT_RATE;
-    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(rate), RET_OK);
+    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(userId, rate), RET_OK);
     EXPECT_EQ(rate, expectedRate);
-    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(rate), RET_OK);
+    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(userId, rate), RET_OK);
     EXPECT_EQ(rate, expectedRate);
     rate = 500;
-    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(rate), RET_OK);
+    EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(userId, rate), RET_OK);
     EXPECT_EQ(rate, expectedRate);
 }
 

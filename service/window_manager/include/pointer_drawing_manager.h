@@ -82,13 +82,13 @@ public:
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
-    int32_t SetPointerColor(int32_t color) override;
-    int32_t GetPointerColor() override;
+    int32_t SetPointerColor(int32_t userId, int32_t color) override;
+    int32_t GetPointerColor(int32_t userId) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
         bool isUiExtension = false) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
-    int32_t SetPointerSize(int32_t size) override;
-    int32_t GetPointerSize() override;
+    int32_t SetPointerSize(int32_t userId, int32_t size) override;
+    int32_t GetPointerSize(int32_t userId) override;
     void GetPointerImageSize(int32_t &width, int32_t &height) override;
     int32_t GetCursorSurfaceId(uint64_t &surfaceId) override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
@@ -169,6 +169,7 @@ private:
     void DeleteSurfaceNode() override;
     int32_t InitLayer(const MOUSE_ICON mouseStyle) override;
     void UpdateMouseStyle();
+    int32_t GetCurrentUser();
     int32_t UpdateCursorProperty(CursorPixelMap curPixelMap, const int32_t &focusX, const int32_t &focusY);
     int32_t UpdateCursorProperty(CustomCursor cursor);
     void RotateDegree(Direction direction);
