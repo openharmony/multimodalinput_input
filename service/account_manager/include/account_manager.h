@@ -70,15 +70,18 @@ public:
 
     static std::shared_ptr<AccountManager> GetInstance();
 
-    AccountManager();
-    ~AccountManager();
     DISALLOW_COPY_AND_MOVE(AccountManager);
 
     void Initialize();
     AccountSetting GetCurrentAccountSetting();
     void AccountManagerUnregister();
     int32_t GetCurrentAccountId();
+    int32_t GetAccountIdFromUid(int32_t uid);
+    std::vector<int32_t> QueryAllCreatedOsAccounts();
+    int32_t QueryCurrentAccountId();
 
+    AccountManager();
+    ~AccountManager();
 private:
 #ifdef SCREENLOCK_MANAGER_ENABLED
     void InitializeScreenLockStatus();
@@ -90,6 +93,7 @@ private:
     void OnAddUser(const EventFwk::CommonEventData &data);
     void OnRemoveUser(const EventFwk::CommonEventData &data);
     void OnSwitchUser(const EventFwk::CommonEventData &data);
+    void OnDataShareReady(const EventFwk::CommonEventData &data);
 
     static std::shared_ptr<AccountManager> instance_;
     static std::mutex mutex_;

@@ -61,23 +61,23 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchEventNormalize);
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, DeviceType deviceType);
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    int32_t SetTouchpadPinchSwitch(bool switchFlag) const;
-    void GetTouchpadPinchSwitch(bool &switchFlag) const;
-    int32_t SetTouchpadSwipeSwitch(bool switchFlag) const;
-    void GetTouchpadSwipeSwitch(bool &switchFlag) const;
-    int32_t SetTouchpadRotateSwitch(bool rotateSwitch) const;
-    void GetTouchpadRotateSwitch(bool &rotateSwitch) const;
-    int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag) const;
-    void GetTouchpadDoubleTapAndDragState(bool &switchFlag) const;
+    int32_t SetTouchpadPinchSwitch(int32_t userId, bool switchFlag) const;
+    void GetTouchpadPinchSwitch(int32_t userId, bool &switchFlag) const;
+    int32_t SetTouchpadSwipeSwitch(int32_t userId, bool switchFlag) const;
+    void GetTouchpadSwipeSwitch(int32_t userId, bool &switchFlag) const;
+    int32_t SetTouchpadRotateSwitch(int32_t userId, bool rotateSwitch) const;
+    void GetTouchpadRotateSwitch(int32_t userId, bool &rotateSwitch) const;
+    int32_t SetTouchpadDoubleTapAndDragState(int32_t userId, bool switchFlag) const;
+    void GetTouchpadDoubleTapAndDragState(int32_t userId, bool &switchFlag) const;
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     bool IsFingerPressed();
 #endif // OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
-    int32_t SetTouchpadScrollRows(int32_t rows);
-    int32_t GetTouchpadScrollRows() const;
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) const;
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadScrollRows(int32_t userId, int32_t rows);
+    int32_t GetTouchpadScrollRows(int32_t userId) const;
+    int32_t SetTouchpadThreeFingersTapSwitch(int32_t userId, bool switchFlag) const;
+    int32_t GetTouchpadThreeFingersTapSwitch(int32_t userId, bool &switchFlag) const;
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(

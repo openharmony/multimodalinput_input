@@ -30,33 +30,35 @@ class MousePreferenceAccessor final {
 public:
     MousePreferenceAccessor() = default;
     ~MousePreferenceAccessor() = default;
- 
-    static int32_t SetMouseScrollRows(IInputServiceContext &env, int32_t rows);
-    static int32_t GetMouseScrollRows(IInputServiceContext &env);
-    static int32_t SetMousePrimaryButton(IInputServiceContext &env, int32_t primaryButton);
-    static int32_t GetMousePrimaryButton(IInputServiceContext &env);
-    static int32_t SetPointerSpeed(IInputServiceContext &env, int32_t speed);
-    static int32_t GetPointerSpeed(IInputServiceContext &env);
-    static int32_t GetTouchpadSpeed(IInputServiceContext &env);
-    static int32_t SetTouchpadScrollSwitch(IInputServiceContext &env, int32_t pid, bool switchFlag);
-    static void GetTouchpadScrollSwitch(IInputServiceContext &env, bool &switchFlag);
-    static int32_t SetTouchpadScrollDirection(IInputServiceContext &env, bool state);
-    static void GetTouchpadScrollDirection(IInputServiceContext &env, bool &state);
-    static int32_t SetTouchpadTapSwitch(IInputServiceContext &env, bool switchFlag);
-    static void GetTouchpadTapSwitch(IInputServiceContext &env, bool &switchFlag);
-    static int32_t SetTouchpadRightClickType(IInputServiceContext &env, int32_t type);
-    static void GetTouchpadRightClickType(IInputServiceContext &env, int32_t &type);
-    static int32_t SetTouchpadPointerSpeed(IInputServiceContext &env, int32_t speed);
-    static void GetTouchpadPointerSpeed(IInputServiceContext &env, int32_t &speed);
-    static int32_t GetTouchpadScrollRows(IInputServiceContext &env);
+
+    static int32_t SetMouseScrollRows(IInputServiceContext &env, int32_t userId, int32_t rows);
+    static int32_t GetMouseScrollRows(IInputServiceContext &env, int32_t userId);
+    static int32_t SetMousePrimaryButton(IInputServiceContext &env, int32_t userId, int32_t primaryButton);
+    static int32_t GetMousePrimaryButton(IInputServiceContext &env, int32_t userId);
+    static int32_t SetPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t speed);
+    static int32_t GetPointerSpeed(IInputServiceContext &env, int32_t userId);
+    static int32_t GetTouchpadSpeed(IInputServiceContext &env, int32_t userId);
+    static int32_t SetTouchpadScrollSwitch(IInputServiceContext &env, int32_t userId, int32_t pid, bool switchFlag);
+    static void GetTouchpadScrollSwitch(IInputServiceContext &env, int32_t userId, bool &switchFlag);
+    static int32_t SetTouchpadScrollDirection(IInputServiceContext &env, int32_t userId, bool state);
+    static void GetTouchpadScrollDirection(IInputServiceContext &env, int32_t userId, bool &state);
+    static int32_t SetTouchpadTapSwitch(IInputServiceContext &env, int32_t userId, bool switchFlag);
+    static void GetTouchpadTapSwitch(IInputServiceContext &env, int32_t userId, bool &switchFlag);
+    static int32_t SetTouchpadRightClickType(IInputServiceContext &env, int32_t userId, int32_t type);
+    static void GetTouchpadRightClickType(IInputServiceContext &env, int32_t userId, int32_t &type);
+    static int32_t SetTouchpadPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t speed);
+    static void GetTouchpadPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t &speed);
+    static int32_t GetTouchpadScrollRows(IInputServiceContext &env, int32_t userId);
 
 private:
-    static int32_t PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
-        const std::string &setFile, bool value);
-    static void GetConfigDataFromDatabase(IInputServiceContext &env, const std::string &key, bool &value);
-    static int32_t PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
-        const std::string &setFile, int32_t value);
-    static void GetConfigDataFromDatabase(IInputServiceContext &env, const std::string &key, int32_t &value);
+    static int32_t PutConfigDataToDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,
+        const std::string &field, bool value);
+    static void GetConfigDataFromDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,
+        const std::string &field, bool &value);
+    static int32_t PutConfigDataToDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,
+        const std::string &field, int32_t value);
+    static void GetConfigDataFromDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,
+        const std::string &field, int32_t &value);
 };
 } // namespace MMI
 } // namespace OHOS

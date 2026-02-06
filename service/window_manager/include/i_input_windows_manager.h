@@ -118,11 +118,11 @@ public:
     virtual void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData = true) = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    virtual int32_t SetHoverScrollState(bool state) = 0;
+    virtual int32_t SetHoverScrollState(int32_t userId, bool state) = 0;
     virtual int32_t GetFocusWindowId(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
     virtual int32_t GetFocusPid(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
     virtual int32_t GetMainDisplayId(int32_t groupId = DEFAULT_GROUP_ID) const = 0;
-    virtual bool GetHoverScrollState() const = 0;
+    virtual bool GetHoverScrollState(int32_t userId) const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId,
@@ -161,6 +161,7 @@ public:
     virtual bool UpdateDisplayId(int32_t& displayId) = 0;
     virtual void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual std::shared_ptr<PointerEvent> GetLastPointerEvent() = 0;
     virtual const OLD::DisplayInfo *GetPhysicalDisplay(int32_t id) const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 

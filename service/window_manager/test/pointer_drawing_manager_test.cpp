@@ -604,8 +604,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_002,
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
-    pointerDrawingManager->SetPointerColor(16777216);
-    int32_t color = pointerDrawingManager->GetPointerColor();
+    int32_t userId = 100;
+    pointerDrawingManager->SetPointerColor(userId, 16777216);
+    int32_t color = pointerDrawingManager->GetPointerColor(userId);
     EXPECT_EQ(color, RET_OK);
 }
 
@@ -723,7 +724,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001,
     bool isUiExtension = true;
     PointerStyle pointerStyle;
     EXPECT_CALL(*winmgrmock, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
-    int32_t ret = CursorDrawingInformation::GetInstance().GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t userId = 100; 
+    int32_t ret = CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_OK);
     testing::Mock::AllowLeak(winmgrmock.get());
 }
@@ -1268,9 +1270,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_001,
     CALL_TEST_DEBUG;
     PointerStyle pointerStyle;
     pointerStyle.id = 0;
-    CursorDrawingInformation::GetInstance().SetPointerStyle(1, -1, pointerStyle);
+    int32_t userId = 100;
+    CursorDrawingInformation::GetInstance().SetPointerStyle(userId, 1, -1, pointerStyle);
     PointerStyle pointerStyleTmp;
-    CursorDrawingInformation::GetInstance().GetPointerStyle(1, -1, pointerStyleTmp);
+    CursorDrawingInformation::GetInstance().GetPointerStyle(userId, 1, -1, pointerStyleTmp);
     EXPECT_EQ(pointerStyleTmp.id, pointerStyle.id);
 }
 
@@ -1420,10 +1423,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_001, Te
     int32_t pid = -1;
     int32_t windowId = 1;
     CursorPixelMap curPixelMap;
-    int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
+    int32_t userId = 100;
+    int32_t ret = CursorDrawingInformation::GetInstance().SetMouseIcon(userId, pid, windowId, curPixelMap);
     EXPECT_EQ(ret, RET_ERR);
     pid = 1;
-    ret = CursorDrawingInformation::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
+    ret = CursorDrawingInformation::GetInstance().SetMouseIcon(userId, pid, windowId, curPixelMap);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -3377,8 +3381,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AoutPointer_001, Tes
 {
     CALL_TEST_DEBUG;
     auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
-    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerColor(MIN_POINTER_COLOR));
-    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerSize(1));
+    int32_t userId = 100;
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerColor(userId, MIN_POINTER_COLOR));
+    EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->SetPointerSize(userId, 1));
     EXPECT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(true, true, false));
     CursorDrawingInformation::GetInstance().pidInfos_.clear();
     EXPECT_NO_FATAL_FAILURE(CursorDrawingInformation::GetInstance().DeletePointerVisible(0));

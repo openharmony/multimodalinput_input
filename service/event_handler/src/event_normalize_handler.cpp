@@ -339,8 +339,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     }
     if (INPUT_DEV_MGR->IsTouchPadDevice(device)) {
         bool switchFlag = false;
-        TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
-        TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
+        int32_t userId = ACCOUNT_MGR->GetCurrentAccountId();
+        TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(userId, switchFlag);
+        TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(userId, switchFlag);
     }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     KeyMapMgr->ParseDeviceConfigFile(device);
@@ -636,6 +637,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t type)
 {
     CHKPF(nextHandler_);
+    CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_MOTION ||
         type == LIBINPUT_EVENT_TOUCHPAD_UP) {
@@ -643,7 +645,8 @@ bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<Pointer
     }
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
-        TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
+        int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent->GetTargetDisplayId());
+        TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(userId, threeFingerSwitch);
         if (!threeFingerSwitch) {
             return true;
         }
@@ -985,7 +988,8 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);
         UpdateKeyEventHandlerChain(keyEvent);
-        int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
+        int32_t userId = WIN_MGR->FindDisplayUserId(keyEvent->GetTargetDisplayId());
+        int32_t triggerTime = KeyRepeat->GetIntervalTime(userId, keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     }, "EventNormalizeHandler");

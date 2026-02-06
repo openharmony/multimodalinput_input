@@ -397,7 +397,8 @@ HWTEST_F(MMIServerTest, ReadMouseScrollRows_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     int32_t rows = 1;
-    int32_t ret = mmiService.ReadMouseScrollRows(rows);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadMouseScrollRows(userId, rows);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -428,7 +429,8 @@ HWTEST_F(MMIServerTest, ReadMousePrimaryButton_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     int32_t primaryButton = 1;
-    int32_t ret = mmiService.ReadMousePrimaryButton(primaryButton);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadMousePrimaryButton(userId, primaryButton);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -495,7 +497,8 @@ HWTEST_F(MMIServerTest, ReadPointerColor_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     int32_t color = 1;
-    int32_t ret = mmiService.ReadPointerColor(color);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadPointerColor(userId, color);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -556,7 +559,8 @@ HWTEST_F(MMIServerTest, ReadHoverScrollState_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     MMIService mmiService;
     bool state = true;
-    int32_t ret = mmiService.ReadHoverScrollState(state);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadHoverScrollState(userId, state);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -1736,7 +1740,8 @@ HWTEST_F(MMIServerTest, MMIServerTest_CheckInjectPointerEvent_001, TestSize.Leve
     bool isNativeInject = true;
     bool isShell = false;
     int32_t useCoordinate = 0;
-    int32_t ret = mmiService.CheckInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell, useCoordinate);
+    int32_t userId = 100;
+    int32_t ret = mmiService.CheckInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, isShell, useCoordinate);
     MMI_HILOGI("CheckInjectPointerEvent_001 return: %{public}d", ret);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
 }
@@ -1760,7 +1765,8 @@ HWTEST_F(MMIServerTest, MMIServerTest_CheckInjectPointerEvent_002, TestSize.Leve
     bool isNativeInject = true;
     bool isShell = false;
     int32_t useCoordinate = 0;
-    int32_t ret = mmiService.CheckInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell, useCoordinate);
+    int32_t userId = 100;
+    int32_t ret = mmiService.CheckInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, isShell, useCoordinate);
     MMI_HILOGI("CheckInjectPointerEvent_002 return: %{public}d", ret);
     EXPECT_NE(ret, RET_OK);
 }
@@ -1826,7 +1832,8 @@ HWTEST_F(MMIServerTest, MMIServerTest_InjectPointerEventExt_001, TestSize.Level1
     pointerEvent->SetPointerId(pointerId);
     pointerEvent->AddPointerItem(pointerItem);
     pointerEvent->AddFlag(EVENT_FLAG_HMOS);
-    mmiService.InjectPointerEventExt(pointerEvent, 0, true, true);
+    int32_t userId = 100;
+    mmiService.InjectPointerEventExt(userId, pointerEvent, 0, true, true);
     pointerEvent->GetPointerItem(originPointerId, pointerItem);
     EXPECT_EQ(pointerItem.GetPointerId(), originPointerId);
     EXPECT_EQ(pointerEvent->GetPointerId(), originPointerId);
@@ -2614,7 +2621,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadScrollSwich_001, TestSize.Level1)
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadScrollSwich(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadScrollSwich(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -2628,7 +2636,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadScrollDirection_001, TestSize.Lev
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadScrollDirection(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadScrollDirection(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -2642,7 +2651,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadTapSwitch_001, TestSize.Level1)
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadTapSwitch(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadTapSwitch(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -2656,7 +2666,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadPointerSpeed_001, TestSize.Level1
 {
     MMIService mmiService;
     int32_t speed = -1;
-    int32_t ret = mmiService.ReadTouchpadPointerSpeed(speed);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadPointerSpeed(userId, speed);
     EXPECT_EQ(ret, RET_OK);
 }
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
@@ -2670,7 +2681,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadPinchSwitch_001, TestSize.Level1)
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadPinchSwitch(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadPinchSwitch(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -2684,7 +2696,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadSwipeSwitch_001, TestSize.Level1)
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadSwipeSwitch(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadSwipeSwitch(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
@@ -2698,7 +2711,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadRightMenuType_001, TestSize.Level
 {
     MMIService mmiService;
     int32_t type = -1;
-    int32_t ret = mmiService.ReadTouchpadRightMenuType(type);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadRightMenuType(userId, type);
     EXPECT_EQ(ret, RET_OK);
 }
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
@@ -2712,7 +2726,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadRotateSwitch_001, TestSize.Level1
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadRotateSwitch(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadRotateSwitch(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -2726,7 +2741,8 @@ HWTEST_F(MMIServerTest, MMIService_ReadTouchpadDoubleTapAndDragState_001, TestSi
 {
     MMIService mmiService;
     bool value = false;
-    int32_t ret = mmiService.ReadTouchpadDoubleTapAndDragState(value);
+    int32_t userId = 100;
+    int32_t ret = mmiService.ReadTouchpadDoubleTapAndDragState(userId, value);
     EXPECT_EQ(ret, RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD

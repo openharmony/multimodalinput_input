@@ -18,6 +18,7 @@
 #include "define_multimodal.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
+#include "setting_types.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -37,12 +38,9 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
 constexpr int32_t RIGHT_CLICK_TYPE_MAX { 5 };
-const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const std::string TOUCHPAD_FILE_NAME { "touchpad_settings.xml" };
-constexpr int32_t RIGHT_MENU_TYPE_INDEX_V2 { 1 };
 } // namespace
 
-int32_t MousePreferenceAccessor::SetMouseScrollRows(IInputServiceContext &env, int32_t rows)
+int32_t MousePreferenceAccessor::SetMouseScrollRows(IInputServiceContext &env, int32_t userId, int32_t rows)
 {
     CALL_DEBUG_ENTER;
     if (rows < MIN_ROWS) {
@@ -50,46 +48,41 @@ int32_t MousePreferenceAccessor::SetMouseScrollRows(IInputServiceContext &env, i
     } else if (rows > MAX_ROWS) {
         rows = MAX_ROWS;
     }
-    if (int32_t ret = PutConfigDataToDatabase(env, "rows", MOUSE_FILE_NAME, rows); ret != RET_OK) {
-        MMI_HILOGE("Set mouse scroll rows failed, code:%{public}d", ret);
-        return ret;
-    } else {
-        MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
+    if (PutConfigDataToDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_SCROLL_ROWS, rows) != RET_OK) {
+        MMI_HILOGE("Set mouse scroll rows failed, rows:%{public}d", rows);
+        return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t MousePreferenceAccessor::GetMouseScrollRows(IInputServiceContext &env)
+int32_t MousePreferenceAccessor::GetMouseScrollRows(IInputServiceContext &env, int32_t userId)
 {
     CALL_DEBUG_ENTER;
     int32_t rows = DEFAULT_ROWS;
-    GetConfigDataFromDatabase(env, "rows", rows);
+    GetConfigDataFromDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_SCROLL_ROWS, rows);
     return rows;
 }
 
-int32_t MousePreferenceAccessor::SetMousePrimaryButton(IInputServiceContext &env, int32_t primaryButton)
+int32_t MousePreferenceAccessor::SetMousePrimaryButton(IInputServiceContext &env, int32_t userId, int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    std::string name = "primaryButton";
-    if (int32_t ret = PutConfigDataToDatabase(env, "primaryButton", MOUSE_FILE_NAME, primaryButton); ret != RET_OK) {
-        MMI_HILOGE("Set mouse primary button failed, code:%{public}d", ret);
-        return ret;
-    } else {
-        MMI_HILOGD("Set mouse primary button success, primaryButton:%{public}d", primaryButton);
+    if (PutConfigDataToDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_PRIMARY_BUTTON, primaryButton) != RET_OK) {
+        MMI_HILOGE("Set mouse primary button failed, primaryButton:%{public}d", primaryButton);
+        return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t MousePreferenceAccessor::GetMousePrimaryButton(IInputServiceContext &env)
+int32_t MousePreferenceAccessor::GetMousePrimaryButton(IInputServiceContext &env, int32_t userId)
 {
     CALL_DEBUG_ENTER;
     int32_t primaryButton = 0;
-    GetConfigDataFromDatabase(env, "primaryButton", primaryButton);
+    GetConfigDataFromDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_PRIMARY_BUTTON, primaryButton);
     return primaryButton;
 }
 
-int32_t MousePreferenceAccessor::SetPointerSpeed(IInputServiceContext &env, int32_t speed)
+int32_t MousePreferenceAccessor::SetPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t speed)
 {
     CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
@@ -97,180 +90,167 @@ int32_t MousePreferenceAccessor::SetPointerSpeed(IInputServiceContext &env, int3
     } else if (speed > MAX_SPEED) {
         speed = MAX_SPEED;
     }
-    if (int32_t ret = PutConfigDataToDatabase(env, "speed", MOUSE_FILE_NAME, speed); ret != RET_OK) {
-        MMI_HILOGE("SetPointerSpeed, code:%{public}d", ret);
-        return ret;
-    } else {
-        MMI_HILOGD("SetPointerSpeed success, speed:%{public}d", speed);
+    if (PutConfigDataToDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_SPEED, speed) != RET_OK) {
+        MMI_HILOGE("SetPointerSpeed failed, speed:%{public}d", speed);
+        return RET_ERR;
     }
+    MMI_HILOGD("SetPointerSpeed success, speed:%{public}d", speed);
     return RET_OK;
 }
 
-int32_t MousePreferenceAccessor::GetPointerSpeed(IInputServiceContext &env)
+int32_t MousePreferenceAccessor::GetPointerSpeed(IInputServiceContext &env, int32_t userId)
 {
     CALL_DEBUG_ENTER;
     int32_t speed = DEFAULT_SPEED;
-    GetConfigDataFromDatabase(env, "speed", speed);
+    GetConfigDataFromDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_SPEED, speed);
     return speed;
 }
 
-int32_t MousePreferenceAccessor::GetTouchpadSpeed(IInputServiceContext &env)
+int32_t MousePreferenceAccessor::GetTouchpadSpeed(IInputServiceContext &env, int32_t userId)
 {
     int32_t speed = DEFAULT_TOUCHPAD_SPEED;
-    GetTouchpadPointerSpeed(env, speed);
+    GetTouchpadPointerSpeed(env, userId, speed);
     MMI_HILOGD("TouchPad pointer speed:%{public}d", speed);
     return speed;
 }
 
-int32_t MousePreferenceAccessor::SetTouchpadScrollSwitch(IInputServiceContext &env, int32_t pid, bool switchFlag)
+int32_t MousePreferenceAccessor::SetTouchpadScrollSwitch(IInputServiceContext &env, int32_t userId, int32_t pid, bool switchFlag)
 {
-    std::string name = "scrollSwitch";
-    if (PutConfigDataToDatabase(env, name, MOUSE_FILE_NAME, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll switch flag to mem, name:%s, switchFlag:%{public}d", name.c_str(), switchFlag);
+    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_SWITCH, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set scroll switch flag, switchFlag:%{public}d", switchFlag);
         return RET_ERR;
     }
     return RET_OK;
 }
 
-void MousePreferenceAccessor::GetTouchpadScrollSwitch(IInputServiceContext &env, bool &switchFlag)
+void MousePreferenceAccessor::GetTouchpadScrollSwitch(IInputServiceContext &env, int32_t userId, bool &switchFlag)
 {
-    std::string name = "scrollSwitch";
-    GetConfigDataFromDatabase(env, name, switchFlag);
+    GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_SWITCH, switchFlag);
 }
 
-int32_t MousePreferenceAccessor::SetTouchpadScrollDirection(IInputServiceContext &env, bool state)
+int32_t MousePreferenceAccessor::SetTouchpadScrollDirection(IInputServiceContext &env, int32_t userId, bool state)
 {
-    std::string name = "scrollDirection";
-    if (PutConfigDataToDatabase(env, name, MOUSE_FILE_NAME, state) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
+    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_DIRECTION, state) != RET_OK) {
+        MMI_HILOGE("Failed to set scroll direction flag");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-void MousePreferenceAccessor::GetTouchpadScrollDirection(IInputServiceContext &env, bool &state)
+void MousePreferenceAccessor::GetTouchpadScrollDirection(IInputServiceContext &env, int32_t userId, bool &state)
 {
-    std::string name = "scrollDirection";
-    GetConfigDataFromDatabase(env, name, state);
+    GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_DIRECTION, state);
 }
 
-int32_t MousePreferenceAccessor::SetTouchpadTapSwitch(IInputServiceContext &env, bool switchFlag)
+int32_t MousePreferenceAccessor::SetTouchpadTapSwitch(IInputServiceContext &env, int32_t userId, bool switchFlag)
 {
-    std::string name = "touchpadTap";
-    if (PutConfigDataToDatabase(env, name, MOUSE_FILE_NAME, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
+    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_TAP_SWITCH, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad tap switch");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-void MousePreferenceAccessor::GetTouchpadTapSwitch(IInputServiceContext &env, bool &switchFlag)
+void MousePreferenceAccessor::GetTouchpadTapSwitch(IInputServiceContext &env, int32_t userId, bool &switchFlag)
 {
-    std::string name = "touchpadTap";
-    GetConfigDataFromDatabase(env, name, switchFlag);
+    GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_TAP_SWITCH, switchFlag);
 }
 
-int32_t MousePreferenceAccessor::SetTouchpadRightClickType(IInputServiceContext &env, int32_t type)
+int32_t MousePreferenceAccessor::SetTouchpadRightClickType(IInputServiceContext &env, int32_t userId, int32_t type)
 {
-    auto preferenceMgr = env.GetPreferenceManager();
-    if (preferenceMgr == nullptr) {
-        MMI_HILOGE("PreferenceMgr is nullptr");
-        return RET_ERR;
-    }
-    std::string name = "rightMenuSwitch";
-    std::vector<uint8_t> switchType {TOUCHPAD_RIGHT_BUTTON, type}; // index0: v1.0, index1: v2.0
-    std::string filePath = "";
-    preferenceMgr->UpdatePreferencesMap(name, TOUCHPAD_FILE_NAME, type, filePath);
-    switchType = static_cast<std::vector<uint8_t>>(preferenceMgr->GetPreValue(name, switchType));
-    switchType[RIGHT_MENU_TYPE_INDEX_V2] = type;
-    if (preferenceMgr->SetPreValue(name, filePath, switchType) != RET_OK) {
-        MMI_HILOGE("Failed to set touch pad right click type to mem");
+    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_RIGHT_CLICK_TYPE, type) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad right click type");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-void MousePreferenceAccessor::GetTouchpadRightClickType(IInputServiceContext &env, int32_t &type)
+void MousePreferenceAccessor::GetTouchpadRightClickType(IInputServiceContext &env, int32_t userId, int32_t &type)
 {
-    std::string name = "rightMenuSwitch";
-    GetConfigDataFromDatabase(env, name, type);
+    GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_RIGHT_CLICK_TYPE, type);
     if (type < RIGHT_CLICK_TYPE_MIN || type > RIGHT_CLICK_TYPE_MAX) {
         type = RIGHT_CLICK_TYPE_MIN;
     }
 }
 
-int32_t MousePreferenceAccessor::SetTouchpadPointerSpeed(IInputServiceContext &env, int32_t speed)
+int32_t MousePreferenceAccessor::SetTouchpadPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t speed)
 {
-    std::string name = "touchPadPointerSpeed";
-    if (PutConfigDataToDatabase(env, name, MOUSE_FILE_NAME, speed) != RET_OK) {
-        MMI_HILOGE("Failed to set touch pad pointer speed to mem");
+    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_POINTER_SPEED, speed) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad pointer speed");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-void MousePreferenceAccessor::GetTouchpadPointerSpeed(IInputServiceContext &env, int32_t &speed)
+void MousePreferenceAccessor::GetTouchpadPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t &speed)
 {
-    std::string name = "touchPadPointerSpeed";
-    GetConfigDataFromDatabase(env, name, speed);
+    GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_POINTER_SPEED, speed);
     speed = speed == 0 ? DEFAULT_TOUCHPAD_SPEED : speed;
     speed = speed < MIN_SPEED ? MIN_SPEED : speed;
     speed = speed > MAX_TOUCHPAD_SPEED ? MAX_TOUCHPAD_SPEED : speed;
 }
 
-int32_t MousePreferenceAccessor::GetTouchpadScrollRows(IInputServiceContext &env)
+int32_t MousePreferenceAccessor::GetTouchpadScrollRows(IInputServiceContext &env, int32_t userId)
 {
     CALL_DEBUG_ENTER;
-    std::string name = "touchpadScrollRows";
     int32_t rows = DEFAULT_ROWS;
-    GetConfigDataFromDatabase(env, name, rows);
+    GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_ROWS, rows);
     MMI_HILOGD("Get touchpad scroll rows successfully, rows:%{public}d", rows);
     return rows;
 }
 
-int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
-    const std::string &setFile, bool value)
+int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext &env, int32_t userId,
+    const std::string &key, const std::string &field, bool value)
 {
-    auto preferenceMgr = env.GetPreferenceManager();
-    if (preferenceMgr == nullptr) {
-        MMI_HILOGE("PreferenceMgr is nullptr");
+    auto settingManager = env.GetSettingManager();
+    if (settingManager == nullptr) {
+        MMI_HILOGE("settingManager is nullptr");
         return RET_ERR;
     }
-    return preferenceMgr->SetBoolValue(key, setFile, value);
-}
-
-void MousePreferenceAccessor::GetConfigDataFromDatabase(IInputServiceContext &env, const std::string &key, bool &value)
-{
-    auto preferenceMgr = env.GetPreferenceManager();
-    if (preferenceMgr == nullptr) {
-        MMI_HILOGE("PreferenceMgr is nullptr");
-        return;
-    }
-    bool defaultValue = true;
-    value = preferenceMgr->GetBoolValue(key, defaultValue);
-}
-
-int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext &env, const std::string &key,
-    const std::string &setFile, int32_t value)
-{
-    auto preferenceMgr = env.GetPreferenceManager();
-    if (preferenceMgr == nullptr) {
-        MMI_HILOGE("PreferenceMgr is nullptr");
+    if (!settingManager->SetBoolValue(userId, key, field, value)) {
+        MMI_HILOGE("SetBoolValue failed, key:%{public}s, value:%{public}d", key.c_str(), int32_t(value));
         return RET_ERR;
     }
-    return preferenceMgr->SetIntValue(key, setFile, value);
+    return RET_OK;
 }
 
-void MousePreferenceAccessor::GetConfigDataFromDatabase(IInputServiceContext &env, const std::string &key,
-    int32_t &value)
+void MousePreferenceAccessor::GetConfigDataFromDatabase(IInputServiceContext &env, int32_t userId,
+    const std::string &key, const std::string &field, bool &value)
 {
-    auto preferenceMgr = env.GetPreferenceManager();
-    if (preferenceMgr == nullptr) {
-        MMI_HILOGE("PreferenceMgr is nullptr");
+    auto settingManager = env.GetSettingManager();
+    if (settingManager == nullptr) {
+        MMI_HILOGE("settingManager is nullptr");
         return;
     }
-    int32_t defaultValue = value;
-    value = preferenceMgr->GetIntValue(key, defaultValue);
+    bool defaultVal = true;
+    settingManager->GetBoolValue(userId, key, field, defaultVal);
+    value = defaultVal;
+}
+
+int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,
+    const std::string &field, int32_t value)
+{
+    auto settingManager = env.GetSettingManager();
+    if (settingManager == nullptr) {
+        MMI_HILOGE("settingManager is nullptr");
+        return RET_ERR;
+    }
+    if (!settingManager->SetIntValue(userId, key, field, value)) {
+        MMI_HILOGE("SetBoolValue failed, key:%{public}s, value:%{public}d", key.c_str(), value);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void MousePreferenceAccessor::GetConfigDataFromDatabase(IInputServiceContext &env, int32_t userId,
+    const std::string &key, const std::string &field, int32_t &value)
+{
+    auto settingManager = env.GetSettingManager();
+    if (settingManager == nullptr) {
+        MMI_HILOGE("settingManager is nullptr");
+        return;
+    }
+    settingManager->GetIntValue(userId, key, field, value);
 }
 } // namespace MMI
 } // namespace OHOS

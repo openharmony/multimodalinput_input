@@ -142,8 +142,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const OLD::DisplayGroupInfo GetDisplayGroupInfo(int32_t groupId = DEFAULT_GROUP_ID);
-    int32_t SetHoverScrollState(bool state);
-    bool GetHoverScrollState() const;
+    int32_t SetHoverScrollState(int32_t userId, bool state);
+    bool GetHoverScrollState(int32_t userId) const;
     bool SelectPointerChangeArea(int32_t windowId, int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

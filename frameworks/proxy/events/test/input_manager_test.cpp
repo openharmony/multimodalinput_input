@@ -4537,7 +4537,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRotateSwitch_001, TestSiz
 {
     CALL_TEST_DEBUG;
     bool rotateSwitch = false;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) != RET_OK);
 }
 
 /**

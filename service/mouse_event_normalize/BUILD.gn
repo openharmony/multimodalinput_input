@@ -148,7 +148,7 @@ include_dirs = [
 
 sources = [
     "src/mouse_preference_accessor.cpp"
- ]
+]
 
 configs = [ "${mmi_path}/common/anco/comm:mmi_anco_channel_config" ]
 

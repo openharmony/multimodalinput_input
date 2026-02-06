@@ -34,6 +34,7 @@ public:
     {
         return true;
     }
+    MOCK_METHOD(std::shared_ptr<PointerEvent>, GetLastPointerEvent, ());
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(int32_t, GetClientFd, (std::shared_ptr<PointerEvent>, int32_t));
     MOCK_METHOD(bool, AdjustFingerFlag, (std::shared_ptr<PointerEvent>));
@@ -79,8 +80,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
-    MOCK_METHOD(bool, GetHoverScrollState, (), (const));
+    MOCK_METHOD(int32_t, SetHoverScrollState, (int32_t, bool));
+    MOCK_METHOD(bool, GetHoverScrollState, (int32_t), (const));
     MOCK_METHOD(int32_t, GetFocusWindowId, (int32_t), (const));
     MOCK_METHOD(int32_t, GetFocusPid, (int32_t), (const));
     MOCK_METHOD(int32_t, GetMainDisplayId, (int32_t), (const));

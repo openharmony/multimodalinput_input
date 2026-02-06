@@ -44,8 +44,8 @@ void InjectionFuzzTest(FuzzedDataProvider &fdp)
         bool isNativeInject = fdp.ConsumeBool();
         bool isShell = fdp.ConsumeBool();
         int32_t useCoordinate = fdp.ConsumeIntegral<int32_t>();
-
-        MMIService::GetInstance()->CheckInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell, useCoordinate);
+        int32_t userId = 100;
+        MMIService::GetInstance()->CheckInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, isShell, useCoordinate);
     }
 }
 

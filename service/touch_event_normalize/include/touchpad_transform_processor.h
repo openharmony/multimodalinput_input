@@ -16,6 +16,7 @@
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
+#include <atomic>
 #include <deque>
 #include <mutex>
 
@@ -113,22 +114,28 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
     void OnDeviceRemoved() override;
-    static int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
-    static int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
-    static int32_t SetTouchpadPinchSwitch(bool switchFlag);
-    static void GetTouchpadPinchSwitch(bool &switchFlag);
-    static int32_t SetTouchpadSwipeSwitch(bool switchFlag);
-    static void GetTouchpadSwipeSwitch(bool &switchFlag);
-    static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
-    static void GetTouchpadRotateSwitch(bool &rotateSwitch);
-    static int32_t SetTouchpadDoubleTapAndDragState(bool switchFlag);
-    static void GetTouchpadDoubleTapAndDragState(bool &switchFlag);
-    static int32_t SetTouchpadScrollRows(int32_t rows);
-    static int32_t GetTouchpadScrollRows();
+    static int32_t SetTouchpadThreeFingersTapSwitch(int32_t userId, bool switchFlag);
+    static int32_t GetTouchpadThreeFingersTapSwitch(int32_t userId, bool &switchFlag);
+    static int32_t SetTouchpadPinchSwitch(int32_t userId, bool switchFlag);
+    static void GetTouchpadPinchSwitch(int32_t userId, bool &switchFlag);
+    static int32_t SetTouchpadSwipeSwitch(int32_t userId, bool switchFlag);
+    static void GetTouchpadSwipeSwitch(int32_t userId, bool &switchFlag);
+    static int32_t SetTouchpadRotateSwitch(int32_t userId, bool rotateSwitch);
+    static void GetTouchpadRotateSwitch(int32_t userId, bool &rotateSwitch);
+    static void NotifyLibinputDragState(bool switchFlag);
+    static int32_t SetTouchpadDoubleTapAndDragState(int32_t userId, bool switchFlag);
+    static void GetTouchpadDoubleTapAndDragState(int32_t userId, bool &switchFlag);
+    static int32_t SetTouchpadScrollRows(int32_t userId, int32_t rows);
+    static int32_t GetTouchpadScrollRows(int32_t userId);
+    void NotifyLibinputDoubleClickDragState(int32_t userId, bool switchFlag);
+    static void OnDataShareReady(int32_t userId);
+    static void OnSwitchUser(int32_t userId);
 
 private:
-    static int32_t PutConfigDataToDatabase(std::string &key, bool value);
-    static void GetConfigDataFromDatabase(std::string &key, bool &value);
+    static int32_t PutConfigDataToDatabase(int32_t userId, const std::string &settingKey,
+        const std::string &key, bool value);
+    static void GetConfigDataFromDatabase(int32_t userId, const std::string &settingKey,
+        const std::string &key, bool &value);
 
     int32_t OnEventTouchPadDown(struct libinput_event *event);
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
@@ -158,6 +165,7 @@ private:
     const int32_t deviceId_ { -1 };
     bool isRotateGesture_ { false };
     double rotateAngle_ { 0.0 };
+    static std::atomic<bool> dataShareReady_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::deque<Coords>> swipeHistory_;
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
