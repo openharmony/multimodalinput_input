@@ -25,7 +25,7 @@
 #include "i_mouse_event_normalizer.h"
 #include "touchpad_control_display_gain.h"
 #include "key_event.h"
-#include "libinput.h"
+
 #include "pointer_event.h"
 
 namespace OHOS {
