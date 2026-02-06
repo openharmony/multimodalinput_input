@@ -460,13 +460,8 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 
     InitExcludeParse("IsEnableCombineKey", key);
     if (IsExcludeKey(key)) {
-        if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("ExcludekeyCode:%{private}d,ExcludekeyAction:%{public}d",
-                key->GetKeyCode(), key->GetKeyAction());
-        } else {
-            MMI_HILOGD("ExcludekeyCode:%{private}d, ExcludekeyAction:%{public}d",
-                key->GetKeyCode(), key->GetKeyAction());
-        }
+        MMI_HILOGD("ExcludekeyCode:%{private}d, ExcludekeyAction:%{public}d",
+            key->GetKeyCode(), key->GetKeyAction());
         auto items = key->GetKeyItems();
         MMI_HILOGI("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
@@ -559,13 +554,8 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
 bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
-    if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
-            key->GetKeyCode(), key->GetKeyAction());
-    } else {
-        MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
-            key->GetKeyCode(), key->GetKeyAction());
-    }
+    MMI_HILOGD("KeyEvent occured. code:%{private}d, keyAction:%{public}d",
+        key->GetKeyCode(), key->GetKeyAction());
     if (key->GetKeyCode() == KeyEvent::KEYCODE_F1) {
         DfxHisysevent::ReportKeyEvent("screen on");
     }
