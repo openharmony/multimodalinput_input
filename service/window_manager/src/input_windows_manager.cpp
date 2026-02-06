@@ -1975,8 +1975,8 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
         }
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGD("Displays Info size:%{public}zu, focusWindowId:%{public}d",
-        displayGroupInfo.displaysInfo.size(), displayGroupInfo.focusWindowId);
+    MMI_HILOGD("Displays Info size:%{public}zu, focusWindowId:%{public}d, winNum:%{public}zu",
+        displayGroupInfo.displaysInfo.size(), displayGroupInfo.focusWindowId, displayGroupInfo.windowsInfo.size());
     auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
@@ -2889,11 +2889,11 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
         MMI_HILOGD("windowsInfos, id:%{public}d, pid:%{public}d, agentPid:%{public}d, uid:%{public}d, "
             "area.x:%d, area.y:%d, area.width:%{public}d, area.height:%{public}d, "
             "defaultHotAreas.size:%{public}zu, pointerHotAreas.size:%{public}zu, "
-            "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d, "
+            "agentWindowId:%{public}d, flags:%{public}d, action:%{public}d, displayId:%{public}d, groupId:%{public}d"
             "zOrder:%{public}f, privacyMode:%{public}d, privacyProtect:%{public}d, windowType:%{public}d",
             item.id, item.pid, item.agentPid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder, item.privacyMode,
+            item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder, item.privacyMode,
             item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%d, y:%d, width:%{public}d, height:%{public}d",
@@ -2946,10 +2946,10 @@ void InputWindowsManager::PrintDisplayGroupInfo(const OLD::DisplayGroupInfo disp
         return;
     }
     MMI_HILOGD("logicalInfo,focusWindowId:%{public}d,"
-               "windowsInfosNum:%{public}zu,displayInfosNum:%{public}zu",
+               "windowsInfosNum:%{public}zu,displayInfosNum:%{public}zu, groupId:%{public}d",
         displayGroupInfo.focusWindowId,
         displayGroupInfo.windowsInfo.size(),
-        displayGroupInfo.displaysInfo.size());
+        displayGroupInfo.displaysInfo.size(), displayGroupInfo.groupId);
     PrintWindowInfo(displayGroupInfo.windowsInfo);
     for (const auto &item : displayGroupInfo.displaysInfo) {
         PrintDisplayInfo(item);
@@ -7205,56 +7205,52 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     std::shared_ptr<DelegateInterface> delegateProxy =
         CursorDrawingComponent::GetInstance().GetDelegateProxy();
     CHKPV(delegateProxy);
-    std::vector<OLD::DisplayInfo> displaysInfo;
-    std::vector<WindowInfo> windowsInfo;
-    delegateProxy->OnPostSyncTask([this, &displaysInfo, &windowsInfo] {
-        const auto& iter = displayGroupInfoMap_.find(MAIN_GROUPID);
-        if (iter != displayGroupInfoMap_.end()) {
-            displaysInfo = iter->second.displaysInfo;
-            windowsInfo = iter->second.windowsInfo;
-            return RET_OK;
+    std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap;
+    delegateProxy->OnPostSyncTask([this, &displayGroupInfoMap] {
+        for (auto iter = displayGroupInfoMap_.begin(); iter != displayGroupInfoMap_.end(); ++iter) {
+            displayGroupInfoMap.insert(std::make_pair(iter->first, iter->second));
         }
-        displaysInfo = displayGroupInfo_.displaysInfo;
-        windowsInfo = displayGroupInfo_.windowsInfo;
         return RET_OK;
     });
-    mprintf(fd, "Windows information:\t");
-    mprintf(fd, "windowsInfos,num:%zu", windowsInfo.size());
-    for (const auto &item : windowsInfo) {
-        mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
-            "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-            "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
-            "| action:%d | displayId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
-            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
-            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder,
-            item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
-        for (const auto &win : item.defaultHotAreas) {
-            mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                win.x, win.y, win.width, win.height);
-        }
-        for (const auto &pointer : item.pointerHotAreas) {
-            mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                pointer.x, pointer.y, pointer.width, pointer.height);
-        }
+    for (auto iterm = displayGroupInfoMap.begin(); iterm != displayGroupInfoMap.end(); ++iterm) {
+        mprintf(fd, "Windows information:\t");
+        mprintf(fd, "windowsInfos,num:%zu", iterm->second.windowsInfo.size());
+        for (const auto &item : iterm->second.windowsInfo) {
+            mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+                "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
+                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
+                "| action:%d | displayId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
+                item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+                item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+                item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder,
+                item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
+            for (const auto &win : item.defaultHotAreas) {
+                mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+                    win.x, win.y, win.width, win.height);
+            }
+            for (const auto &pointer : item.pointerHotAreas) {
+                mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+                    pointer.x, pointer.y, pointer.width, pointer.height);
+            }
 
-        std::string dump;
-        dump += StringPrintf("\t pointerChangeAreas: ");
-        for (const auto &it : item.pointerChangeAreas) {
-            dump += StringPrintf("%d | ", it);
+            std::string dump;
+            dump += StringPrintf("\t pointerChangeAreas: ");
+            for (const auto &it : item.pointerChangeAreas) {
+                dump += StringPrintf("%d | ", it);
+            }
+            dump += StringPrintf("\n\t transform: ");
+            for (const auto &it : item.transform) {
+                dump += StringPrintf("%f | ", it);
+            }
+            std::istringstream stream(dump);
+            std::string line;
+            while (std::getline(stream, line, '\n')) {
+                mprintf(fd, "%s", line.c_str());
+            }
         }
-        dump += StringPrintf("\n\t transform: ");
-        for (const auto &it : item.transform) {
-            dump += StringPrintf("%f | ", it);
-        }
-        std::istringstream stream(dump);
-        std::string line;
-        while (std::getline(stream, line, '\n')) {
-            mprintf(fd, "%s", line.c_str());
-        }
+        DumpDisplayInfo(fd, iterm->second.displaysInfo);
+        mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
     }
-    DumpDisplayInfo(fd, displaysInfo);
-    mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     std::string ancoWindows;
     DumpAncoWindows(ancoWindows);
@@ -8035,8 +8031,8 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
     WindowInfoEX windowInfoEX;
     int32_t deviceId = lastTouchEvent_->GetDeviceId();
     if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
-        MMI_HILOGI("get deviceId failed:%{public}d", deviceId);
-        return RET_ERR;
+        MMI_HILOGI("touch event deviceId not found deviceId:%{public}d", deviceId);
+        touchItemDownInfos_[deviceId] = {};
     }
     windowInfoEX.window = shiftWindowInfo.targetWindowInfo;
     windowInfoEX.flag = true;
