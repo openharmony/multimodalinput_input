@@ -41,7 +41,9 @@ constexpr size_t FIRST_ITEM { 0 };
 constexpr size_t SECOND_ITEM { 1 };
 constexpr size_t THIRD_ITEM { 2 };
 constexpr size_t FORTH_ITEM { 3 };
+constexpr size_t DYNAMIC_MOUSE_N_SPEEDS { 20 };
 constexpr size_t DYNAMIC_MOUSE_N_GAIN_PARAMS { 4 };
+constexpr size_t DYNAMIC_TOUCHPAD_N_SPEEDS { 11 };
 constexpr size_t DYNAMIC_TOUCHPAD_N_CURVE_SLOPES { 4 };
 constexpr std::uintmax_t MAX_SIZE_OF_INPUT_PRODUCT_CONFIG { 524288 }; // 512KB
 } // namespace
@@ -62,16 +64,16 @@ bool PointerMotionAcceleration::Curve::IsValid() const
 
 bool PointerMotionAcceleration::DynamicMouseCurve::IsValid() const
 {
-    return (!speeds.empty() &&
-            (slowGains.size() >= DYNAMIC_MOUSE_N_GAIN_PARAMS) &&
-            (fastGains.size() >= DYNAMIC_MOUSE_N_GAIN_PARAMS));
+    return ((speeds.size() == DYNAMIC_MOUSE_N_SPEEDS) &&
+            (slowGains.size() == DYNAMIC_MOUSE_N_GAIN_PARAMS) &&
+            (fastGains.size() == DYNAMIC_MOUSE_N_GAIN_PARAMS));
 }
 
 bool PointerMotionAcceleration::DynamicTouchpadCurve::IsValid() const
 {
-    return (!speeds.empty() &&
-            (slopes.size() >= DYNAMIC_TOUCHPAD_N_CURVE_SLOPES) &&
-            (stdVins.size() >= DYNAMIC_TOUCHPAD_N_CURVE_SLOPES));
+    return ((speeds.size() == DYNAMIC_TOUCHPAD_N_SPEEDS) &&
+            (slopes.size() == DYNAMIC_TOUCHPAD_N_CURVE_SLOPES) &&
+            (stdVins.size() == DYNAMIC_TOUCHPAD_N_CURVE_SLOPES));
 }
 
 int32_t PointerMotionAcceleration::DynamicAccelerateMouse(const Offset &offset, bool mode, size_t speed,
