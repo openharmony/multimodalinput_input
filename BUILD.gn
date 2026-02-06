@@ -219,6 +219,7 @@ group("mmi_tests") {
     "service:ApplicationStateObserverTest",
     "service:ConnectManagerProxyEXTest",
     "service:CursorDrawingComponentTest",
+    "service:CursorDrawingComponentCoverageTest",
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",
     "service:DeviceEventMonitorTest",
