@@ -21,7 +21,8 @@ namespace MMI {
 namespace {
 }
 
-std::string SettingItem::ToJson() const {
+std::string SettingItem::ToJson() const
+{
     std::stringstream jsonStream;
     jsonStream << "{";
     bool isFirstField = true;
@@ -31,9 +32,9 @@ std::string SettingItem::ToJson() const {
         }
         jsonStream << "\"" << field << "\":";
         if (std::holds_alternative<int32_t>(value)) {
-            jsonStream << std::get<int32_t>(value);
+            jsonStream << (std::get<int32_t>(value));
         } else if (std::holds_alternative<bool>(value)) {
-            jsonStream << (std::get<bool>(value) ? "true" : "false");
+            jsonStream << ((std::get<bool>(value)) ? "true" : "false");
         } else if (std::holds_alternative<std::string>(value)) {
             jsonStream << "\"" << std::get<std::string>(value) << "\"";
         }
@@ -43,7 +44,8 @@ std::string SettingItem::ToJson() const {
     return jsonStream.str();
 }
 
-bool SettingItem::FromJson(const std::string& key, const std::string& jsonStr) {
+bool SettingItem::FromJson(const std::string& key, const std::string& jsonStr)
+{
     JsonParser parser(jsonStr.c_str());
     if (!cJSON_IsObject(parser.Get())) {
         return false;
@@ -94,7 +96,7 @@ void SettingItem::MergeFrom(const SettingItem& item)
         } else if (it->second != value) {
             it->second = value;
         }
-    }    
+    }
 }
 
 std::vector<SettingItem> SettingData::GetSettingItems() const

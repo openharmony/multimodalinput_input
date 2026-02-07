@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef SETTING_DATA_H
+#define SETTING_DATA_H
+
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -79,7 +81,7 @@ public:
                 return true;
             }
             return false;
-        }, variant);
+            }, variant);
     }
 
 private:
@@ -87,5 +89,7 @@ private:
     std::vector<SettingItem> settingItems_;
     bool isNewUser_ { false };
 };
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
+
+#endif // SETTING_DATA_H

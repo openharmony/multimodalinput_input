@@ -724,8 +724,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001,
     bool isUiExtension = true;
     PointerStyle pointerStyle;
     EXPECT_CALL(*winmgrmock, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
-    int32_t userId = 100; 
-    int32_t ret = CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    int32_t userId = 100;
+    int32_t ret = CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid, windowId, pointerStyle,
+        isUiExtension);
     EXPECT_EQ(ret, RET_OK);
     testing::Mock::AllowLeak(winmgrmock.get());
 }

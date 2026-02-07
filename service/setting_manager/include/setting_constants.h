@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef SETTING_CONSTANTS_H
+#define SETTING_CONSTANTS_H
+
 #include <string>
 #include <vector>
 
@@ -41,3 +43,5 @@ namespace SettingConstants {
 }  // namespace SettingConstants
 }  // namespace MMI
 }  // namespace OHOS
+
+#endif // SETTING_CONSTANTS_H

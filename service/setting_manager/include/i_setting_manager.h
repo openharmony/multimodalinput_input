@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef I_SETTING_MANAGER_H
+#define I_SETTING_MANAGER_H
+
 #include <memory>
 #include <mutex>
 #include <string>
@@ -52,3 +54,5 @@ private:
 #define INPUT_SETTING_MANAGER ::OHOS::MMI::ISettingManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
+
+#endif // I_SETTING_MANAGER_H

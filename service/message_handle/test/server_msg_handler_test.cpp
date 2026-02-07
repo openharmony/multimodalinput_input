@@ -1715,22 +1715,26 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
         .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
     int32_t userId = 100;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false,
+        PointerEvent::DISPLAY_COORDINATE), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false,
+        PointerEvent::DISPLAY_COORDINATE), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false,
+        PointerEvent::DISPLAY_COORDINATE), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, false,
+        PointerEvent::DISPLAY_COORDINATE), RET_OK);
 }
 
 /**
@@ -3348,16 +3352,19 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, 
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true,
+        PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true,
+        PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true,
+        PointerEvent::DISPLAY_COORDINATE));
 }
 
 /**

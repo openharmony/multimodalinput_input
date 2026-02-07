@@ -24,7 +24,8 @@ namespace MMI {
 
 class SettingDataMigrator {
 public:
-    static SettingDataMigrator& GetInstance() {
+    static SettingDataMigrator& GetInstance()
+    {
         static SettingDataMigrator instance;
         return instance;
     }
@@ -36,13 +37,13 @@ public:
 private:
     bool MigrateSettings(const std::string& filePath, const std::string& settingKey,
         const std::set<std::string>& settingFields);
-    bool MigrateUserSettings(int32_t userId, const std::string& filePath, 
+    bool MigrateUserSettings(int32_t userId, const std::string& filePath,
         const std::string& settingKey, const std::set<std::string>& settingFields);
-    bool CreateNewSettingFromFile(const std::string& filePath, 
+    bool CreateNewSettingFromFile(const std::string& filePath,
         const std::string& settingKey, const std::set<std::string>& settingFields, SettingItem& item);
-    bool UpdateExistingSetting(const std::string& settingKey, 
+    bool UpdateExistingSetting(const std::string& settingKey,
         const std::string& settingVal, SettingItem& item, bool& needWrite);
-    int32_t GetRightClickTypeVal(std::shared_ptr<NativePreferences::Preferences> &touchpadPref);
+    int32_t GetRightClickTypeVal(std::shared_ptr<NativePreferences::Preferences>& touchpadPref);
 
     SettingDataMigrator() = default;
     ~SettingDataMigrator() = default;

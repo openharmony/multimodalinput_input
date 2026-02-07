@@ -23,7 +23,8 @@ namespace OHOS {
 namespace MMI {
 class SettingStorage final {
 public:
-    static SettingStorage& GetInstance() {
+    static SettingStorage& GetInstance()
+    {
         static SettingStorage instance;
         return instance;
     }

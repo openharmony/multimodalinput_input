@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef SETTING_TYPES_H
+#define SETTING_TYPES_H
+
 #include <set>
+
 namespace OHOS {
 namespace MMI {
 const std::string MOUSE_KEY_SETTING = "settings.input.mouse";
@@ -86,3 +89,5 @@ const std::set<std::string> SETTING_KEYS = {
 };
 } // namespace MMI
 } // namespace OHOS
+
+#endif // SETTING_TYPES_H
