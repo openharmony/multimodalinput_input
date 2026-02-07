@@ -1709,7 +1709,7 @@ int32_t MMIService::GetCallingUser()
 {
     int32_t userId = ACCOUNT_MGR->GetAccountIdFromUid(GetCallingUid());
     if (userId < 0) {
-        int32_t userId = ACCOUNT_MGR->GetCurrentAccountId();
+        userId = ACCOUNT_MGR->GetCurrentAccountId();
     }
     return userId > 0 ? userId : DEFAULT_USER_ID;
 }
