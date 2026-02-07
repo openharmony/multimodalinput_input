@@ -428,6 +428,9 @@ private:
         for (auto it = lines.begin(); it != lines.end(); it++) {
             AddPropertyFromString(*it);
         }
+        DispProperty();
+        MMI_HILOGI("devnode:%{public}s", devnode_.c_str());
+        AddProperty("DEVNAME", devnode_);
         CheckInputProperties();
     }
 
@@ -653,6 +656,13 @@ private:
     void AddProperty(std::string key, std::string value)
     {
         property_[std::move(key)] = std::move(value);
+    }
+
+    void DispProperty()
+    {
+        for (const auto &elem: property_) {
+            MMI_HILOGI("%{public}s -> %{public}s", elem.first.c_str(), elem.second.c_str());
+        }
     }
 
     std::optional<std::string> GetSubsystem()

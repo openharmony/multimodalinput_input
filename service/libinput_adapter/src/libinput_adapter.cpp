@@ -145,11 +145,18 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             MMI_HILOGWK("Input device path is nullptr");
             return RET_ERR;
         }
+        MMI_HILOGI("path:%{public}s", path);
         char realPath[PATH_MAX] = {};
-        if (realpath(path, realPath) == nullptr) {
+        for (int32_t i = 0; i < MAX_RETRY_COUNT; i++) {
+            if (realpath(path, realPath) != nullptr) {
+                break;
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
-            MMI_HILOGWK("The error path is %{public}s, error:%{public}s", path, std::strerror(errno));
-            return RET_ERR;
+            MMI_HILOGW("The error path is %{public}s, error:%{public}s", path, std::strerror(errno));
+            if (i == (MAX_RETRY_COUNT -1)) {
+                MMI_HILOGE("Retry failed, path:%{public}s", path);
+                return RET_ERR;
+            }
         }
         int32_t fd = 0;
         for (int32_t i = 0; i < MAX_RETRY_COUNT; i++) {
@@ -1066,7 +1073,7 @@ void LibinputAdapter::OnDeviceAdded(std::string path)
     }
 
     DTaskCallback cb = [this, path] {
-        MMI_HILOGI("OnDeviceAdded, path:%{private}s", path.c_str());
+        MMI_HILOGI("OnDeviceAdded, path:%{public}s", path.c_str());
         udev_device_record_devnode(path.c_str());
         libinput_device* device = libinput_path_add_device(input_, path.c_str());
         if (device != nullptr) {
