@@ -254,8 +254,8 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
     return OnInjectPointerEventExt(userId, pointerEvent, isShell, useCoordinate);
 }
 
-int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-    const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell)
+int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t pid, const TouchpadCDG& touchpadCDG, bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -339,8 +339,8 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-int32_t ServerMsgHandler::OnInjectPointerEventExt(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
-    int32_t useCoordinate)
+int32_t ServerMsgHandler::OnInjectPointerEventExt(int32_t userId,
+    const std::shared_ptr<PointerEvent> pointerEvent, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);

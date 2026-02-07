@@ -194,12 +194,12 @@ bool SettingManager::CheckAddUser(int32_t userId)
         return false;
     }
     std::string settingVal = "";
-    for (auto &key : SETTING_KEYS) {
+    for (auto& key : SETTING_KEYS) {
         INPUT_SETTING_STORAGE.Read(userId, key, settingVal);
         std::string value = "";
         data.SerializeToJson(key, value);
         if (settingVal != value) {
-             INPUT_SETTING_STORAGE.Write(userId, key, value);
+            INPUT_SETTING_STORAGE.Write(userId, key, value);
         }
     }
     data.SetAddFlag(false);

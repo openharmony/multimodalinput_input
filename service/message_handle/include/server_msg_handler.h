@@ -172,7 +172,8 @@ private:
     void LaunchAbility();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AccelerateMotion(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t AccelerateMotionTouchpad(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
+    int32_t AccelerateMotionTouchpad(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG& touchpadCDG);
     float ScreenFactor(const int32_t diagonalInch);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

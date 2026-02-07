@@ -1339,7 +1339,7 @@ ErrCode MMIService::GetPointerSpeed(int32_t &speed)
     int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, userId, &speed] {
-            return this->ReadPointerSpeed(userId,speed);
+            return this->ReadPointerSpeed(userId, speed);
         }
         );
     if (ret != RET_OK) {
@@ -2379,7 +2379,8 @@ ErrCode MMIService::InjectTouchPadEvent(const PointerEvent& pointerEvent,
     int32_t userId = GetCallingUser();
     ret = delegateTasks_.PostSyncTask(
         [this, userId, pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell] {
-            return sMsgHandler_.OnInjectTouchPadEvent(userId, pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell);
+            return sMsgHandler_.OnInjectTouchPadEvent(userId, pointerEventPtr, pid, touchpadCDG,
+                isNativeInject, isShell);
         }
         );
     if (ret != RET_OK) {

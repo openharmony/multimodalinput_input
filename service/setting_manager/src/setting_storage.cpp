@@ -188,7 +188,7 @@ bool SettingStorage::ReadDataInternal(int32_t userId, const std::string& key, st
 }
 
 bool SettingStorage::ReadBatch(int32_t userId, const std::vector<std::string>& keys,
-                              std::unordered_map<std::string, std::string>& result)
+                               std::unordered_map<std::string, std::string>& result)
 {
     if (keys.empty()) {
         MMI_HILOGE("Keys is empty");
@@ -238,7 +238,8 @@ bool SettingStorage::ReadBatch(int32_t userId, const std::vector<std::string>& k
     }
 
     do {
-        std::string key, value;
+        std::string key;
+        std::string value;
         int keyIndex = 0;  // KEYWORD column index
         int valueIndex = 1;  // VALUE column index
 

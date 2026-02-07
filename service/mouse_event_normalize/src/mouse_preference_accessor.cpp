@@ -114,9 +114,11 @@ int32_t MousePreferenceAccessor::GetTouchpadSpeed(IInputServiceContext &env, int
     return speed;
 }
 
-int32_t MousePreferenceAccessor::SetTouchpadScrollSwitch(IInputServiceContext &env, int32_t userId, int32_t pid, bool switchFlag)
+int32_t MousePreferenceAccessor::SetTouchpadScrollSwitch(IInputServiceContext& env, int32_t userId, int32_t pid,
+    bool switchFlag)
 {
-    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_SWITCH, switchFlag) != RET_OK) {
+    if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_SWITCH,
+        switchFlag) != RET_OK) {
         MMI_HILOGE("Failed to set scroll switch flag, switchFlag:%{public}d", switchFlag);
         return RET_ERR;
     }
@@ -227,8 +229,8 @@ void MousePreferenceAccessor::GetConfigDataFromDatabase(IInputServiceContext &en
     value = defaultVal;
 }
 
-int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,
-    const std::string &field, int32_t value)
+int32_t MousePreferenceAccessor::PutConfigDataToDatabase(IInputServiceContext& env, int32_t userId,
+    const std::string& key, const std::string& field, int32_t value)
 {
     auto settingManager = env.GetSettingManager();
     if (settingManager == nullptr) {
