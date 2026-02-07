@@ -31,6 +31,7 @@ PropertyReader::~PropertyReader() {}
 void PropertyReader::ReadPropertys(std::string path, DTaskCallback callback)
 {
     ffrt::submit([this, path, callback] {
+        MMI_HILOGI("ReadPropertys path:%{public}s", path.c_str());
         if (!udev_device_property_add('c', path.c_str())) {
             return;
         }
