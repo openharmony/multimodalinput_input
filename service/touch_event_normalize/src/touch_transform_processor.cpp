@@ -36,7 +36,9 @@ namespace MMI {
 namespace {
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
+#ifdef OHOS_BUILD_KNUCKLE
 constexpr int32_t DRIVER_NUMBER { 8 };
+#endif // OHOS_BUILD_KNUCKLE
 constexpr int32_t MT_TOOL_THP_FEATURE {11};
 constexpr uint32_t TOUCH_CANCEL_MASK { 1U << 29U };
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };

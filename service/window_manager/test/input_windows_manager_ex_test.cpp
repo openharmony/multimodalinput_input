@@ -21,7 +21,6 @@
 #include "mmi_matrix3.h"
 #include "mock.h"
 #include "mouse_event_interface.h"
-#include "knuckle_handler_component.h"
 
 namespace OHOS {
 namespace MMI {
@@ -4282,7 +4281,6 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_005, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto &knuckleHandlerComponent = KnuckleHandlerComponent::GetInstance();
 
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -4313,7 +4311,6 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_006, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto &knuckleHandlerComponent = KnuckleHandlerComponent::GetInstance();
 
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -4348,7 +4345,6 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_007, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto &knuckleHandlerComponent = KnuckleHandlerComponent::GetInstance();
 
     int32_t displayId = 0;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
