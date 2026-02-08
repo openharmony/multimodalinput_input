@@ -135,6 +135,10 @@ config("libmmi_server_config") {
   if (input_feature_key_hook) {
     include_dirs += [ "${mmi_service_path}/event_hook/include" ]
   }
+
+  if (input_feature_knuckle) {
+    defines += [ "OHOS_BUILD_KNUCKLE" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {

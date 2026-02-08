@@ -290,6 +290,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchDown_002, TestSize.Level1)
     ASSERT_FALSE(ret);
 }
 
+#ifdef OHOS_BUILD_KNUCKLE
 /**
  * @tc.name: TouchTransformProcessorTest_NotifyFingersenseProcess_001
  * @tc.desc: Test the function NotifyFingersenseProcess
@@ -306,6 +307,7 @@ HWTEST_F(TouchTransformProcessorTest, NotifyFingersenseProcess_001, TestSize.Lev
     int32_t toolType = 0;
     EXPECT_NO_FATAL_FAILURE(processor.NotifyFingersenseProcess(displayId, item, toolType));
 }
+#endif // OHOS_BUILD_KNUCKLE
 
 /**
  * @tc.name: TouchTransformProcessorTest_OnEventTouchMotion_002
