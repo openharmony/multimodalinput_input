@@ -26,6 +26,7 @@ config("inputConsumer_config") {
     "include",
     "${mmi_path}/frameworks/ets/common/include",
     "${mmi_path}/frameworks/ets/key_code/include",
+    "${mmi_path}/service/permission_helper/include",
   ]
 }
 subsystem_name = "multimodalinput"
@@ -50,6 +51,7 @@ taihe_shared_library("InputConsumer") {
     ":inputConsumer_config",
   ]
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -67,6 +69,7 @@ taihe_shared_library("InputConsumer") {
     ":run_taihe",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/util:libmmi-util",
   ]
   branch_protector_ret = "pac_ret"
