@@ -152,7 +152,7 @@ public:
         bool isUiExtension = false) const;
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindowId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
-    void DispatchPointerDispatch(int32_t pointerAction, int32_t windowId = -1);
+    void DispatchPointerRedispatch(int32_t pointerAction, const WindowInfo& windowInfo);
     void SendPointerEvent(int32_t pointerAction);
     bool IsMouseSimulate();
     bool HasMouseHideFlag();
