@@ -3346,7 +3346,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt002, 
         .displayId_ = pointerEvent->GetTargetDisplayId(), .pointerId_ = pointerEvent->GetPointerId()};
     msgHandler.nativeTargetWindowIds_.insert(std::make_pair(touch, 10));
     int32_t userId = 100;
-    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true, PointerEvent::DISPLAY_COORDINATE));
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnInjectPointerEventExt(userId, pointerEvent, true,
+        PointerEvent::DISPLAY_COORDINATE));
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
