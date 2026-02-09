@@ -311,7 +311,8 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
             displayInfo->width, displayInfo->height);
         ret = PointerMotionAcceleration::AccelerateTouchpad(offset,
             winMgr->GetMouseIsCaptureMode(),
-            MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId),
+            static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
