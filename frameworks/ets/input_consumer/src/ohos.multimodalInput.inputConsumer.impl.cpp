@@ -16,6 +16,7 @@
 #include "inputConsumer_keyOptions_impl.h"
 #include "inputConsumer_hotkeyOptions_impl.h"
 #include "inputConsumer_keyPressed_impl.h"
+#include "permission_helper.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AniConsumerImpl"
@@ -575,6 +576,10 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
 
     std::ostringstream oss;
     for (const auto &item : preKeys) {
+        if (item < 0) {
+            taihe::set_business_error(COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
+            return RET_ERR;
+        }
         auto it = std::find(pressKeyCodes.begin(), pressKeyCodes.end(), item);
         if (it == pressKeyCodes.end()) {
             MMI_HILOGE("PreKeys is not expect");
@@ -816,6 +821,10 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     keyOption->SetPreKeys(preKeys);
     std::string subKeyNames = "";
     for (const auto &item : preKeys) {
+        if (item < 0) {
+            taihe::set_business_error(COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
+            return RET_ERR;
+        }
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
         MMI_HILOGD("preKeys:%{private}d", item);
@@ -867,6 +876,10 @@ void SubscribeKey(KeyOptions const& keyOptions, callback_view<void(KeyOptions co
     CHKPV(event);
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
+    if (!PER_HELPER->VerifySystemApp()) {
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        return;
+    }
     if (GetEventInfoAPI9(keyOptions, event, keyOption) != RET_OK) {
         MMI_HILOGE("GetEventInfoAPI9 failed");
         return;
@@ -906,6 +919,10 @@ void UnsubscribeKey(KeyOptions const& keyOptions, optional_view<uintptr_t> opq)
     auto keyOption = std::make_shared<KeyOption>();
     CHKPV(keyOption);
     int32_t subscribeId = -1;
+    if (!PER_HELPER->VerifySystemApp()) {
+        HandleCommonErrors(COMMON_USE_SYSAPI_ERROR);
+        return;
+    }
     if (GetEventInfoAPI9(keyOptions, event, keyOption) != RET_OK) {
         MMI_HILOGE("GetEventInfoAPI9 failed");
         return;
