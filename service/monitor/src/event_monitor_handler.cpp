@@ -35,6 +35,15 @@ constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t POWER_UID { 5528 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
+const std::set<int32_t> TOUCH_GESTURE_ACTIONS {
+    PointerEvent::TOUCH_ACTION_SWIPE_DOWN,
+    PointerEvent::TOUCH_ACTION_SWIPE_UP,
+    PointerEvent::TOUCH_ACTION_SWIPE_RIGHT,
+    PointerEvent::TOUCH_ACTION_SWIPE_LEFT,
+    PointerEvent::TOUCH_ACTION_PINCH_OPENED,
+    PointerEvent::TOUCH_ACTION_PINCH_CLOSEED,
+    PointerEvent::TOUCH_ACTION_GESTURE_END,
+};
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -54,6 +63,11 @@ void EventMonitorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent>
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
+        return;
+    }
+    // This filter touch-gesture events being dispatched to applications.
+    // This is a quick win sulotion, should be optimized later.
+    if (TOUCH_GESTURE_ACTIONS.find(pointerEvent->GetPointerAction()) != TOUCH_GESTURE_ACTIONS.cend()) {
         return;
     }
     CHKPV(nextHandler_);
@@ -77,6 +91,11 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
             MMI_HILOGD("Knuckle event, skip");
             return;
         }
+    }
+    // This filter touch-gesture events being dispatched to applications.
+    // This is a quick win sulotion, should be optimized later.
+    if (TOUCH_GESTURE_ACTIONS.find(pointerEvent->GetPointerAction()) != TOUCH_GESTURE_ACTIONS.cend()) {
+        return;
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
