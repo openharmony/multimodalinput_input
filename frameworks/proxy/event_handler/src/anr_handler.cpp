@@ -34,6 +34,7 @@ namespace {
 [[ maybe_unused ]] constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
 [[ maybe_unused ]] constexpr int32_t TIME_TRANSITION { 1000 };
 constexpr int32_t PRINT_INTERVAL_COUNT { 100 };
+constexpr int32_t WRAP_THRESHOLD { 100 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -159,10 +160,19 @@ void ANRHandler::SendEvent(int32_t eventType, int32_t eventId)
     {
         std::lock_guard<std::mutex> guard(mutex_);
         if (pendingEvents_.count(eventType) && pendingEvents_[eventType] != -1) {
-            if (eventId > pendingEvents_[eventType]) {
+            int32_t pendingId = pendingEvents_[eventType];
+            bool isWrapped = (eventId <= WRAP_THRESHOLD) &&
+                             (pendingId >= INT32_MAX - WRAP_THRESHOLD);
+
+            if (isWrapped) {
+                MMI_HILOGD("Detected eventId wrap-around, old:%{public}d, new:%{public}d",
+                           pendingId, eventId);
                 pendingEvents_[eventType] = eventId;
+                shouldSubmit = true;
+            } else if (eventId > pendingId) {
+                pendingEvents_[eventType] = eventId;
+                return;
             }
-            return;
         } else {
             pendingEvents_[eventType] = eventId;
             shouldSubmit = true;
