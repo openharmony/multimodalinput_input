@@ -51,13 +51,16 @@ ohos_unittest("KeyCommandTest") {
     "key_config_parser_test.cpp",
     "repeat_key_handler_test.cpp",
     "sequence_key_handler_test.cpp",
-    "two_finger_gesture_handler_test.cpp",
     "key_cmd_handleRepeatKey_test.cpp",
     "key_cmd_sendKeyEvent_test.cpp",
     "key_command_handler_util_test.cpp",
     "pull_throw_subscriber_handler_test.cpp",
     "${mmi_path}/service/common/setting_datashare/test/setting_datashare_test.cpp",
   ]
+
+  if (input_feature_knuckle) {
+    sources += [ "two_finger_gesture_handler_test.cpp" ]
+  }
 
   deps = [
     "${mmi_path}/service:libmmi-server",
