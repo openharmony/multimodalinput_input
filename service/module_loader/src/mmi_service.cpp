@@ -3342,6 +3342,10 @@ ErrCode MMIService::GetWindowPid(int32_t windowId, int32_t &windowPid)
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("GetWindowPid: Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     windowPid = INVALID_PID;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, windowId, &windowPid] {
@@ -3395,6 +3399,14 @@ ErrCode MMIService::AppendExtraData(const ExtraData &extraData)
 ErrCode MMIService::EnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("EnableInputDevice: Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         [enable] {
             return ::OHOS::MMI::InputDeviceManager::GetInstance()->OnEnableInputDevice(enable);
