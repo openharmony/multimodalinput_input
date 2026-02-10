@@ -23,7 +23,7 @@ namespace MMI {
 void TouchpadFuzzTest(FuzzedDataProvider &fdp)
 {
     bool flag = fdp.ConsumeBool();
-    MMIService::GetInstance()->ReadTouchpadDoubleTapAndDragState(flag);
+    MMIService::GetInstance()->ReadTouchpadDoubleTapAndDragState(0, flag);
     MMIService::GetInstance()->SetTouchpadDoubleTapAndDragState(flag);
     MMIService::GetInstance()->GetTouchpadDoubleTapAndDragState(flag);
 

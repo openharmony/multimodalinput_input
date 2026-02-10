@@ -271,7 +271,8 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
     KeyAutoRepeat keyAutoRepeat;
     std::string testKey = "testKey";
     int32_t testValue = 123;
-    int32_t result = keyAutoRepeat.PutConfigDataToDatabase(testKey, testValue);
+    int32_t userId = 0;
+    int32_t result = keyAutoRepeat.PutConfigDataToDatabase(userId, testKey, testValue);
     EXPECT_NE(result, -1);
     ASSERT_TRUE(PREFERENCES_MGR->GetIntValue(testKey, testValue));
 }
@@ -288,12 +289,13 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetConfigDataFromDatabase_001, Tes
     KeyAutoRepeat keyAutoRepeat;
     std::string key = "test_key";
     int32_t value = 0;
+    int32_t userId = 0;
     PREFERENCES_MGR->SetIntValue(key, KEYBOARD_FILE_NAME, 42);
-    int32_t ret = keyAutoRepeat.GetConfigDataFromDatabase(key, value);
+    int32_t ret = keyAutoRepeat.GetConfigDataFromDatabase(userId, key, value);
     EXPECT_EQ(ret, RET_OK);
     key = "nonexistent_key";
     value = 0;
-    ret = keyAutoRepeat.GetConfigDataFromDatabase(key, value);
+    ret = keyAutoRepeat.GetConfigDataFromDatabase(userId, key, value);
     EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI

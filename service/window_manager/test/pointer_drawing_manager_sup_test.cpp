@@ -839,7 +839,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetPointerSi
     pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::CURSOR_CIRCLE;
     pointerDrawingManager.hardwareCursorPointerManager_->SetHdiServiceState(true);
     pointerDrawingManager.hardwareCursorPointerManager_->isEnableState_ = true;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(size));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(0, size));
 }
 
 /**
@@ -854,7 +854,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SetPointerSi
     PointerDrawingManager pointerDrawingManager;
     int32_t size = 10;
     pointerDrawingManager.lastMouseStyle_.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(size));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerSize(0, size));
 }
 
 /**

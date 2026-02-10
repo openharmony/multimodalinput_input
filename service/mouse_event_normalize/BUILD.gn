@@ -126,6 +126,7 @@ external_deps = [
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "libinput:libinput-third-mmi",
 ]
 
 part_name = "${mmi_part_name}"

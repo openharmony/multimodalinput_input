@@ -31,11 +31,12 @@ namespace MMI {
 void StubHandlePinchSwitchFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
+    int32_t userId = 0;
 
     bool switchFlag = provider.ConsumeBool();
 
     MMIService::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
-    MMIService::GetInstance()->ReadTouchpadPinchSwitch(switchFlag);
+    MMIService::GetInstance()->ReadTouchpadPinchSwitch(userId, switchFlag);
     MMIService::GetInstance()->GetTouchpadPinchSwitch(switchFlag);
 }
 } // MMI

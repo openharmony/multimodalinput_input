@@ -223,7 +223,7 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerColor_
     int32_t userId = 100;
     EXPECT_NO_FATAL_FAILURE(instance_->SetPointerColor(userId, color));
 
-    auto ret = instance_->GetPointerColor(userId);
+    auto ret = instance_->GetPointerColor(0);
     EXPECT_EQ(ret, color);
 }
 
@@ -235,17 +235,18 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerColor_
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_001, TestSize.Level1)
 {
+    int32_t userId = 0;
     int32_t pid = 1;
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
     bool isUiExtension = false;
-    int32_t ret = instance_->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_ERR);
 
     EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
 
-    ret = instance_->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    ret = instance_->GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_OK);
 
     auto style = instance_->GetLastMouseStyle();
