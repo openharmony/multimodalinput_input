@@ -14012,23 +14012,25 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AbandonRedispatch_001,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DispatchPointerDispatch_001
+ * @tc.name: InputWindowsManagerTest_DispatchPointerRedispatch_001
  * @tc.desc: Test branch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerDispatch_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerRedispatch_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-    int32_t windowId = 1;
-    inputWindowsManager->DispatchPointerDispatch(pointerAction, windowId);
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.agentWindowId = 1;
+    inputWindowsManager->DispatchPointerRedispatch(pointerAction, windowInfo);
     EXPECT_EQ(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     inputWindowsManager->lastPointerEventRedispatch_ = pointerEvent;
-    inputWindowsManager->DispatchPointerDispatch(pointerAction, windowId);
+    inputWindowsManager->DispatchPointerRedispatch(pointerAction, windowInfo);
     EXPECT_NE(inputWindowsManager->lastPointerEventRedispatch_, nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
