@@ -2711,7 +2711,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-void InputWindowsManager::DispatchPointerDispatch(int32_t pointerAction, int32_t windowId)
+void InputWindowsManager::DispatchPointerRedispatch(int32_t pointerAction, const WindowInfo& windowInfo)
 {
     CALL_INFO_TRACE;
     if (lastPointerEventRedispatch_ == nullptr) {
@@ -2730,14 +2730,28 @@ void InputWindowsManager::DispatchPointerDispatch(int32_t pointerAction, int32_t
         MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
         return;
     }
-    pointerEvent->SetTargetWindowId(windowId);
+    pointerEvent->SetTargetWindowId(windowInfo.id);
+    pointerEvent->SetAgentWindowId(windowInfo.agentWindowId);
+    pointerEvent->SetTargetDisplayId(windowInfo.displayId);
+    pointerEvent->SetDeviceId(lastPointerEventRedispatch_->GetDeviceId());
     pointerEvent->SetPointerId(lastPointerId);
     pointerEvent->AddPointerItem(lastPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetButtonId(lastPointerEventRedispatch_->GetButtonId());
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
+    pointerEvent->ClearButtonPressed();
+    std::set<int32_t> pressedButtons = lastPointerEventRedispatch_->GetPressedButtons();
+    for (const auto &buttonId : pressedButtons) {
+        pointerEvent->SetButtonPressed(buttonId);
+    }
+    int32_t axisEventType = lastPointerEventRedispatch_->GetAxisEventType();
+    pointerEvent->SetAxisEventType(axisEventType);
+    std::vector<int32_t> pressedKeys = lastPointerEventRedispatch_->GetPressedKeys();
+    pointerEvent->SetPressedKeys(pressedKeys);
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
     auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
     if (eventDispatchHandler == nullptr) {
@@ -4081,10 +4095,13 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         winId2ZorderMap.clear();
     }
     if (dispatchEventFlag) {
-        if (axisBeginWindowInfoMap_[zOrder] &&
-            (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE || action == PointerEvent::POINTER_ACTION_AXIS_END)) {
-            firstBtnDownWindowInfo = {
-                axisBeginWindowInfoMap_[zOrder]->id, axisBeginWindowInfoMap_[zOrder]->displayId};
+        if (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE || action == PointerEvent::POINTER_ACTION_AXIS_END) {
+            auto iter = axisBeginWindowInfoMap_.find(zOrder);
+            if (iter != axisBeginWindowInfoMap_.end() && iter->second) {
+                firstBtnDownWindowInfo = {iter->second->id, iter->second->displayId};
+            } else {
+                firstBtnDownWindowInfo = {-1, -1};
+            }
         }
     } else {
         if (axisBeginWindowInfo_ &&
@@ -4571,13 +4588,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             axisBeginWindowInfoMap_[zOrder] = touchWindow;
         } else {
             axisBeginWindowInfo_ = touchWindow;
-            for (auto it = axisBeginWindowInfoMap_.begin(); it != axisBeginWindowInfoMap_.end();) {
-                if (it->second && it->second->id == axisBeginWindowInfo_->id) {
-                    DispatchPointerDispatch(PointerEvent::POINTER_ACTION_AXIS_END, axisBeginWindowInfo_->id);
-                    windowLastEventIdMap_[axisBeginWindowInfo_->id] = pointerEvent->GetId();
-                    it = axisBeginWindowInfoMap_.erase(it);
-                } else {
-                    ++it;
+            if (axisBeginWindowInfo_) {
+                for (auto it = axisBeginWindowInfoMap_.begin(); it != axisBeginWindowInfoMap_.end();) {
+                    if (it->second && it->second->id == axisBeginWindowInfo_->id) {
+                        DispatchPointerRedispatch(PointerEvent::POINTER_ACTION_AXIS_END, axisBeginWindowInfo_.value());
+                        windowLastEventIdMap_[axisBeginWindowInfo_->id] = pointerEvent->GetId();
+                        it = axisBeginWindowInfoMap_.erase(it);
+                    } else {
+                        ++it;
+                    }
                 }
             }
         }
@@ -4655,7 +4674,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         }
         pointerEvent->SetOriginPointerAction(pointerAction);
-        MMI_HILOGI("Mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
+        if (touchWindow) {
+            MMI_HILOGI("Mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
+        }
     }
 
     bool checkFlag = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
