@@ -51,7 +51,7 @@ private:
     static std::shared_mutex mutex_;
     static std::shared_ptr<PropertyNameMapper> instance_;
     static int32_t timerId_;
-    std::unique_ptr<IPropertyNameMapper, ComponentManager::Component<IPropertyNameMapper>> mapper_ {
+    ComponentManager::Handle<IPropertyNameMapper> mapper_ {
         nullptr, ComponentManager::Component<IPropertyNameMapper>() };
 };
 } // namespace MMI

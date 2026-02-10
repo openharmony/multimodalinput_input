@@ -66,15 +66,14 @@ public:
     };
 
     template<typename IComponent>
-    using Handle = std::unique_ptr<IComponent, Component<IComponent>>;
+    using Handle = std::shared_ptr<IComponent>;
 
     ComponentManager() = default;
     ~ComponentManager() = default;
     DISALLOW_COPY_AND_MOVE(ComponentManager);
 
     template<typename IComponent>
-    static std::unique_ptr<IComponent, Component<IComponent>> LoadLibrary(
-        IInputServiceContext *context, const char *libPath);
+    static Handle<IComponent> LoadLibrary(IInputServiceContext *context, const char *libPath);
 };
 
 template<typename IComponent>
@@ -174,8 +173,7 @@ void ComponentManager::Component<IComponent>::Unload()
 }
 
 template<typename IComponent>
-std::unique_ptr<IComponent, ComponentManager::Component<IComponent>> ComponentManager::LoadLibrary(
-    IInputServiceContext *context, const char *libPath)
+ComponentManager::Handle<IComponent> ComponentManager::LoadLibrary(IInputServiceContext *context, const char *libPath)
 {
     if (libPath == nullptr) {
         MMI_HILOGE("libPath is null");

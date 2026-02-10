@@ -17,7 +17,7 @@
 #define TOUCH_GESTURE_INTERFACE_H
 
 #include <memory>
-#include <shared_mutex>
+#include <mutex>
 
 #include "nocopyable.h"
 
@@ -44,12 +44,13 @@ public:
     void OnSessionLost(int32_t session) override;
 
 private:
+    ComponentManager::Handle<ITouchGestureManager> GetTouchGestureManager() const;
     void LoadTouchGestureManager(IInputServiceContext *env);
-    void OnTouchGestureManagerLoaded(TouchGestureInterface &touchGestureMgr);
+    void OnTouchGestureManagerLoaded();
 
-    mutable std::shared_mutex mutex_;
+    mutable std::mutex mutex_;
     std::set<Handler> pendingHandlers_;
-    std::unique_ptr<ITouchGestureManager, ComponentManager::Component<ITouchGestureManager>> touchGestureMgr_ {
+    ComponentManager::Handle<ITouchGestureManager> touchGestureMgr_ {
         nullptr, ComponentManager::Component<ITouchGestureManager>() };
 };
 } // namespace MMI

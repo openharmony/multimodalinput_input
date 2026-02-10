@@ -351,7 +351,7 @@ private:
     std::vector<std::string> FilterConsumers(const std::vector<std::string> &deviceNames);
     void UpdateConsumers(const cJSON* consumer);
     bool ParseDeviceConsumerConfig();
-#if OHOS_BUILD_ENABLE_TOUCH_GESTURE
+#ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     void AddSessionObserver();
     bool AddGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
     void RemoveGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);
