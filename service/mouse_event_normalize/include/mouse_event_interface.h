@@ -16,16 +16,16 @@
 #ifndef MOUSE_EVENT_INTERFACE_H
 #define MOUSE_EVENT_INTERFACE_H
 
+#include <atomic>
 #include <functional>
 #include <memory>
-#include <shared_mutex>
+#include <mutex>
 
 #include "component_manager.h"
 #include "device_observer.h"
 #include "i_mouse_event_normalizer.h"
 #include "touchpad_control_display_gain.h"
 #include "key_event.h"
-
 #include "pointer_event.h"
 
 namespace OHOS {
@@ -56,30 +56,30 @@ public:
     void AttachInputServiceContext(std::shared_ptr<IInputServiceContext> env);
     void LoadMouseExplicitly();
     // MouseEventNormalize Interface
-    bool HasMouse() ;
-    int32_t OnEvent(struct libinput_event *event) ;
+    bool HasMouse();
+    int32_t OnEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> GetPointerEvent();
-    std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId) ;
-    void Dump(int32_t fd, const std::vector<std::string> &args) ;
-    int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle) ;
-    bool CheckAndPackageAxisEvent(libinput_event* event) ;
+    std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
+    bool CheckAndPackageAxisEvent(libinput_event* event);
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
-    bool CheckFilterMouseEvent(struct libinput_event *event) ;
+    bool CheckFilterMouseEvent(struct libinput_event *event);
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY) ;
-    void OnDisplayLost(int32_t displayId) ;
-    int32_t GetDisplayId() const ;
+    bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
+    void OnDisplayLost(int32_t displayId);
+    int32_t GetDisplayId();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1) ;
-    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY) ;
-    int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable) ;
+    int32_t SetPointerLocation(int32_t x, int32_t y, int32_t displayId = -1);
+    int32_t GetPointerLocation(int32_t &displayId, double &displayX, double &displayY);
+    int32_t SetMouseAccelerateMotionSwitch(int32_t deviceId, bool enable);
 
-    int32_t SetMouseScrollRows(int32_t rows) ;
+    int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows() const ;
-    int32_t SetMousePrimaryButton(int32_t primaryButton) ;
+    int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton() const ;
-    int32_t SetPointerSpeed(int32_t speed) ;
+    int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed() const ;
     int32_t GetTouchpadSpeed() const ;
     int32_t SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const ;
@@ -95,8 +95,8 @@ public:
     void ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const;
 
     // MouseDeviceState Interface
-    int32_t GetMouseCoordsX() const;
-    int32_t GetMouseCoordsY() const;
+    int32_t GetMouseCoordsX();
+    int32_t GetMouseCoordsY();
     void SetMouseCoords(int32_t x, int32_t y);
     bool IsLeftBtnPressed();
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
@@ -104,6 +104,8 @@ public:
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
 private:
+    std::shared_ptr<IInputServiceContext> GetEnv() const;
+    ComponentManager::Handle<IMouseEventNormalize> GetMouse() const;
     void SetUpDeviceObserver(std::shared_ptr<MouseEventInterface> self);
     void TearDownDeviceObserver();
     void OnDeviceAdded(std::shared_ptr<MouseEventInterface> self, int32_t deviceId);
@@ -111,9 +113,13 @@ private:
     void LoadMouse();
     void OnMouseLoaded();
     void UnloadMouse();
+    void ScheduleUnloadingTimer();
+    void RemoveUnloadingTimer();
+    void ResetUnloadingTimer();
 
     mutable std::mutex mutex_;
     std::weak_ptr<IInputServiceContext> env_;
+    std::atomic_bool loading_ { false };
     std::shared_ptr<IDeviceObserver> inputDevObserver_;
     int32_t unloadTimerId_ { -1 };
     ComponentManager::Handle<IMouseEventNormalize> mouse_ {

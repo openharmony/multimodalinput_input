@@ -40,19 +40,20 @@ std::shared_ptr<TouchGestureInterface> TouchGestureInterface::Load(IInputService
 
 bool TouchGestureInterface::DoesSupportGesture(TouchGestureType gestureType, int32_t nFingers) const
 {
-    std::shared_lock guard { mutex_ };
-    if (touchGestureMgr_ == nullptr) {
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
         return false;
     }
-    return touchGestureMgr_->DoesSupportGesture(gestureType, nFingers);
+    return touchGestureMgr->DoesSupportGesture(gestureType, nFingers);
 }
 
 bool TouchGestureInterface::AddHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers)
 {
-    std::unique_lock guard { mutex_ };
-    if (touchGestureMgr_ == nullptr) {
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
+        std::lock_guard guard { mutex_ };
         pendingHandlers_.emplace(Handler {
             .session_ = session,
             .gesture_ = gestureType,
@@ -60,14 +61,15 @@ bool TouchGestureInterface::AddHandler(int32_t session, TouchGestureType gesture
         });
         return true;
     }
-    return touchGestureMgr_->AddHandler(session, gestureType, nFingers);
+    return touchGestureMgr->AddHandler(session, gestureType, nFingers);
 }
 
 void TouchGestureInterface::RemoveHandler(int32_t session, TouchGestureType gestureType, int32_t nFingers)
 {
-    std::unique_lock guard { mutex_ };
-    if (touchGestureMgr_ == nullptr) {
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
+        std::lock_guard guard { mutex_ };
         pendingHandlers_.erase(Handler {
             .session_ = session,
             .gesture_ = gestureType,
@@ -75,74 +77,94 @@ void TouchGestureInterface::RemoveHandler(int32_t session, TouchGestureType gest
         });
         return;
     }
-    touchGestureMgr_->RemoveHandler(session, gestureType, nFingers);
+    touchGestureMgr->RemoveHandler(session, gestureType, nFingers);
 }
 
 bool TouchGestureInterface::HasHandler() const
 {
-    std::shared_lock guard { mutex_ };
-    if (!pendingHandlers_.empty()) {
-        return true;
+    ComponentManager::Handle<ITouchGestureManager> touchGestureMgr {};
+    {
+        std::lock_guard guard { mutex_ };
+        if (!pendingHandlers_.empty()) {
+            return true;
+        }
+        touchGestureMgr = touchGestureMgr_;
     }
-    if (touchGestureMgr_ == nullptr) {
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
         return false;
     }
-    return touchGestureMgr_->HasHandler();
+    return touchGestureMgr->HasHandler();
 }
 
 void TouchGestureInterface::HandleGestureWindowEmerged(int32_t windowId, std::shared_ptr<PointerEvent> lastTouchEvent)
 {
-    std::shared_lock guard { mutex_ };
-    if (touchGestureMgr_ == nullptr) {
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
         return;
     }
-    touchGestureMgr_->HandleGestureWindowEmerged(windowId, lastTouchEvent);
+    touchGestureMgr->HandleGestureWindowEmerged(windowId, lastTouchEvent);
 }
 
 void TouchGestureInterface::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    std::shared_lock guard { mutex_ };
-    if (touchGestureMgr_ == nullptr) {
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
         return;
     }
-    touchGestureMgr_->Dump(fd, args);
+    touchGestureMgr->Dump(fd, args);
 }
 
 void TouchGestureInterface::OnSessionLost(int32_t session)
 {
-    std::shared_lock guard { mutex_ };
-    if (touchGestureMgr_ == nullptr) {
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGW("No touch-gesture manager");
         return;
     }
-    touchGestureMgr_->OnSessionLost(session);
+    touchGestureMgr->OnSessionLost(session);
+}
+
+ComponentManager::Handle<ITouchGestureManager> TouchGestureInterface::GetTouchGestureManager() const
+{
+    std::lock_guard guard { mutex_ };
+    return touchGestureMgr_;
 }
 
 void TouchGestureInterface::LoadTouchGestureManager(IInputServiceContext *env)
 {
     MMI_HILOGI("Start loading TouchGesture");
-    TouchGestureInterface touchGestureMgr {};
-    touchGestureMgr.touchGestureMgr_ = ComponentManager::LoadLibrary<ITouchGestureManager>(
+    auto touchGestureMgr = ComponentManager::LoadLibrary<ITouchGestureManager>(
         env, LIB_TOUCH_GESTURE_MANAGER_NAME);
-    if (touchGestureMgr.touchGestureMgr_ == nullptr) {
+    if (touchGestureMgr == nullptr) {
         MMI_HILOGE("Failed to load TouchGesture");
         return;
     }
+    {
+        std::lock_guard guard { mutex_ };
+        touchGestureMgr_ = std::move(touchGestureMgr);
+    }
     MMI_HILOGI("TouchGesture loaded");
-    OnTouchGestureManagerLoaded(touchGestureMgr);
+    OnTouchGestureManagerLoaded();
 }
 
-void TouchGestureInterface::OnTouchGestureManagerLoaded(TouchGestureInterface &touchGestureMgr)
+void TouchGestureInterface::OnTouchGestureManagerLoaded()
 {
-    std::unique_lock guard { mutex_ };
-    touchGestureMgr_ = std::move(touchGestureMgr.touchGestureMgr_);
-    for (const auto &handler : pendingHandlers_) {
-        touchGestureMgr_->AddHandler(handler.session_, handler.gesture_, handler.nFingers_);
+    auto touchGestureMgr = GetTouchGestureManager();
+    if (touchGestureMgr == nullptr) {
+        MMI_HILOGE("TouchGestureManager not loaded");
+        return;
     }
-    pendingHandlers_.clear();
+    std::set<Handler> pendingHandlers {};
+    {
+        std::lock_guard guard { mutex_ };
+        pendingHandlers.swap(pendingHandlers_);
+    }
+    for (const auto &handler : pendingHandlers) {
+        touchGestureMgr->AddHandler(handler.session_, handler.gesture_, handler.nFingers_);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

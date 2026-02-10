@@ -63,6 +63,7 @@ std::shared_ptr<JoystickEventInterface> JoystickEventInterface::GetInstance()
 
 JoystickEventInterface::~JoystickEventInterface()
 {
+    RemoveUnloadingTimer();
     TearDownDeviceObserver();
 }
 
@@ -74,33 +75,39 @@ void JoystickEventInterface::AttachInputServiceContext(std::shared_ptr<IInputSer
 
 std::shared_ptr<KeyEvent> JoystickEventInterface::OnButtonEvent(struct libinput_event *event)
 {
-    std::lock_guard guard { mutex_ };
-    if (joystick_ == nullptr) {
+    auto joystick = GetJoystick();
+    if (joystick == nullptr) {
         MMI_HILOGE("Joystick module not loaded");
         return nullptr;
     }
-    return joystick_->OnButtonEvent(event);
+    return joystick->OnButtonEvent(event);
 }
 
 std::shared_ptr<PointerEvent> JoystickEventInterface::OnAxisEvent(struct libinput_event *event)
 {
-    std::lock_guard guard { mutex_ };
-    if (joystick_ == nullptr) {
+    auto joystick = GetJoystick();
+    if (joystick == nullptr) {
         MMI_HILOGE("Joystick module not loaded");
         return nullptr;
     }
-    return joystick_->OnAxisEvent(event);
+    return joystick->OnAxisEvent(event);
 }
 
 void JoystickEventInterface::CheckIntention(std::shared_ptr<PointerEvent> pointerEvent,
     std::function<void(std::shared_ptr<KeyEvent>)> handler)
 {
-    std::lock_guard guard { mutex_ };
-    if (joystick_ == nullptr) {
+    auto joystick = GetJoystick();
+    if (joystick == nullptr) {
         MMI_HILOGE("Joystick module not loaded");
         return;
     }
-    joystick_->CheckIntention(pointerEvent, handler);
+    joystick->CheckIntention(pointerEvent, handler);
+}
+
+ComponentManager::Handle<IJoystickEventNormalize> JoystickEventInterface::GetJoystick()
+{
+    std::lock_guard guard { mutex_ };
+    return joystick_;
 }
 
 void JoystickEventInterface::SetUpDeviceObserver(std::shared_ptr<JoystickEventInterface> self)
@@ -132,13 +139,10 @@ void JoystickEventInterface::OnDeviceAdded(std::shared_ptr<JoystickEventInterfac
         MMI_HILOGI("Device[%{private}d] Not joystick", deviceId);
         return;
     }
-    std::lock_guard guard { mutex_ };
-    if (unloadTimerId_ >= 0) {
-        TimerMgr->RemoveTimer(unloadTimerId_);
-        unloadTimerId_ = -1;
-    }
-    if (joystick_ != nullptr) {
-        joystick_->OnDeviceAdded(deviceId);
+    RemoveUnloadingTimer();
+    auto joystick = GetJoystick();
+    if (joystick != nullptr) {
+        joystick->OnDeviceAdded(deviceId);
     } else if (!loading_.load()) {
         loading_.store(true);
         ffrt::submit([self]() {
@@ -150,17 +154,15 @@ void JoystickEventInterface::OnDeviceAdded(std::shared_ptr<JoystickEventInterfac
 
 void JoystickEventInterface::OnDeviceRemoved(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId)
 {
-    std::lock_guard guard { mutex_ };
-    if (joystick_ != nullptr) {
-        joystick_->OnDeviceRemoved(deviceId);
-        if (!joystick_->HasJoystick()) {
-            MMI_HILOGI("Schedule unloading Joystick");
-            unloadTimerId_ = TimerMgr->AddLongTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
-                [self]() {
-                    self->UnloadJoystick();
-                }, std::string("UnloadJoystick"));
-        }
+    auto joystick = GetJoystick();
+    if (joystick == nullptr) {
+        return;
     }
+    joystick->OnDeviceRemoved(deviceId);
+    if (joystick->HasJoystick()) {
+        return;
+    }
+    ScheduleUnloadingTimer(self);
 }
 
 void JoystickEventInterface::LoadJoystick()
@@ -191,15 +193,15 @@ void JoystickEventInterface::LoadJoystick()
 
 void JoystickEventInterface::OnJoystickLoaded()
 {
-    std::lock_guard guard { mutex_ };
-    if (joystick_ == nullptr) {
+    auto joystick = GetJoystick();
+    if (joystick == nullptr) {
         MMI_HILOGE("Joystick module not loaded");
         return;
     }
     INPUT_DEV_MGR->ForEachDevice(
-        [this](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
+        [joystick](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
             if (dev.IsJoystick()) {
-                joystick_->OnDeviceAdded(id);
+                joystick->OnDeviceAdded(id);
             }
         });
 }
@@ -210,6 +212,49 @@ void JoystickEventInterface::UnloadJoystick()
     std::lock_guard guard { mutex_ };
     unloadTimerId_ = -1;
     joystick_ = { nullptr, ComponentManager::Component<IJoystickEventNormalize>() };
+}
+
+void JoystickEventInterface::ScheduleUnloadingTimer(std::shared_ptr<JoystickEventInterface> self)
+{
+    {
+        std::lock_guard guard { mutex_ };
+        if (unloadTimerId_ >= 0) {
+            return;
+        }
+    }
+    MMI_HILOGI("Schedule unloading Joystick");
+    auto timerId = TimerMgr->AddLongTimer(DEFAULT_UNLOAD_DELAY_TIME, REPEAT_ONCE,
+        [self]() {
+            self->UnloadJoystick();
+        }, std::string("UnloadJoystick"));
+    if (timerId < 0) {
+        MMI_HILOGE("AddLongTimer fail");
+        return;
+    }
+    {
+        std::lock_guard guard { mutex_ };
+        if (unloadTimerId_ < 0) {
+            unloadTimerId_ = timerId;
+            timerId = -1;
+        }
+    }
+    if (timerId >= 0) {
+        TimerMgr->RemoveTimer(timerId);
+    }
+}
+
+void JoystickEventInterface::RemoveUnloadingTimer()
+{
+    int32_t timerId { -1 };
+
+    {
+        std::lock_guard guard { mutex_ };
+        timerId = unloadTimerId_;
+        unloadTimerId_ = -1;
+    }
+    if (timerId >= 0) {
+        TimerMgr->RemoveTimer(timerId);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

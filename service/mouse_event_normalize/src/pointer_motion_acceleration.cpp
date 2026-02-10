@@ -66,7 +66,8 @@ bool PointerMotionAcceleration::DynamicMouseCurve::IsValid() const
 {
     return ((speeds.size() == DYNAMIC_MOUSE_N_SPEEDS) &&
             (slowGains.size() == DYNAMIC_MOUSE_N_GAIN_PARAMS) &&
-            (fastGains.size() == DYNAMIC_MOUSE_N_GAIN_PARAMS));
+            (fastGains.size() == DYNAMIC_MOUSE_N_GAIN_PARAMS) &&
+            (standardPPI > DEFAULT_PRECISION));
 }
 
 bool PointerMotionAcceleration::DynamicTouchpadCurve::IsValid() const

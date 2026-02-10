@@ -59,6 +59,7 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> handler);
 
 private:
+    ComponentManager::Handle<IJoystickEventNormalize> GetJoystick();
     void SetUpDeviceObserver(std::shared_ptr<JoystickEventInterface> self);
     void TearDownDeviceObserver();
     void OnDeviceAdded(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId);
@@ -66,6 +67,8 @@ private:
     void LoadJoystick();
     void OnJoystickLoaded();
     void UnloadJoystick();
+    void ScheduleUnloadingTimer(std::shared_ptr<JoystickEventInterface> self);
+    void RemoveUnloadingTimer();
 
     std::mutex mutex_;
     std::atomic_bool loading_ { false };
