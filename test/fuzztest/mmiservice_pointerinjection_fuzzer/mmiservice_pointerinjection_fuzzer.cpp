@@ -30,12 +30,13 @@ void PointerInjectionFuzzTest(FuzzedDataProvider &fdp)
         pointerEvent->pullId_ = fdp.ConsumeIntegral<int32_t>();
 
         int32_t pid = fdp.ConsumeIntegral<int32_t>();
+        int32_t userId = 0;
         bool isNativeInject = fdp.ConsumeBool();
         bool isShell = fdp.ConsumeBool();
         int32_t useCoordinate = fdp.ConsumeIntegral<int32_t>();
 
         MMIService::GetInstance()->CheckInjectPointerEvent(
-            pointerEvent, pid, isNativeInject, isShell, useCoordinate);
+            userId, pointerEvent, pid, isNativeInject, isShell, useCoordinate);
     }
 }
 

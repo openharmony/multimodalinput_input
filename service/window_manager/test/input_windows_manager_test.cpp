@@ -4312,7 +4312,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget001, 
 
     inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    inputWindowsManager.SetHoverScrollState(false);
+    int32_t userId = 0;
+    inputWindowsManager.SetHoverScrollState(userId, false);
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
 }
 
@@ -4358,7 +4359,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
     inputWindowsManager.mouseDownInfo_.id = -1;
-    inputWindowsManager.SetHoverScrollState(true);
+    int32_t userId = 0;
+    inputWindowsManager.SetHoverScrollState(userId, true);
     std::map<int32_t, PointerStyle> styleMap;
     PointerStyle pointerStyle;
     CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
@@ -4417,7 +4419,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
     inputWindowsManager.mouseDownInfo_.id = -1;
-    inputWindowsManager.SetHoverScrollState(true);
+    int32_t userId = 0;
+    inputWindowsManager.SetHoverScrollState(userId, true);
     std::map<int32_t, PointerStyle> styleMap;
     PointerStyle pointerStyle;
     CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);

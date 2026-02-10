@@ -58,6 +58,7 @@ public:
     MOCK_METHOD(std::shared_ptr<IKeyMapManager>, GetKeyMapManager, (), (const, override));
     MOCK_METHOD(std::shared_ptr<IPreferenceManager>, GetPreferenceManager, (), (const, override));
     MOCK_METHOD(ICursorDrawingComponent&, GetCursorDrawingComponent, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<ISettingManager>, GetSettingManager, (), (const, override));
     MOCK_METHOD(std::shared_ptr<IInputEventHandler>, GetDispatchHandler, (), (const, override));
 };
 

@@ -22,8 +22,9 @@ namespace OHOS {
 namespace MMI {
 void SetPointerSizeFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t userId = 0;
     int32_t size = fdp.ConsumeIntegral<int32_t>();
-    CursorDrawingComponent::GetInstance().SetPointerSize(size);
+    CursorDrawingComponent::GetInstance().SetPointerSize(userId, size);
 }
 
 bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)

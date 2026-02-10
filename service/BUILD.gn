@@ -897,6 +897,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -1349,6 +1350,8 @@ ohos_unittest("CursorDrawingComponentTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/setting_manager/include",
+    "${mmi_path}/service/module_loader/include",
   ]
   sources = [
     "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp",
@@ -1656,6 +1659,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "${mmi_path}/service/event_hook/include/checker",
     "window_manager/test",
     "${mmi_path}/intention/scheduler/component_manager/include",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   sources = [ "window_manager/test/input_windows_manager_one_test.cpp" ]
@@ -2759,6 +2763,7 @@ ohos_unittest("InputEventHandlerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   sources = [ "event_handler/test/input_event_handler_test.cpp" ]

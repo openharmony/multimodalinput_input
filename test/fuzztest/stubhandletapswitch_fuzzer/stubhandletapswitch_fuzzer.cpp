@@ -32,10 +32,11 @@ void StubHandleTapSwitchFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
 
+    int32_t userId = 0;
     bool switchFlag = provider.ConsumeBool();
 
     MMIService::GetInstance()->SetTouchpadTapSwitch(switchFlag);
-    MMIService::GetInstance()->ReadTouchpadTapSwitch(switchFlag);
+    MMIService::GetInstance()->ReadTouchpadTapSwitch(userId, switchFlag);
     MMIService::GetInstance()->GetTouchpadTapSwitch(switchFlag);
 }
 } // MMI

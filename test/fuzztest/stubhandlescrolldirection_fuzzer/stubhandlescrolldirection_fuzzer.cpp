@@ -31,11 +31,12 @@ namespace MMI {
 void StubHandleScrollDirectionFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
+    int32_t userId = 0;
 
     bool switchFlag = provider.ConsumeBool();
 
     MMIService::GetInstance()->SetTouchpadScrollDirection(switchFlag);
-    MMIService::GetInstance()->ReadTouchpadScrollDirection(switchFlag);
+    MMIService::GetInstance()->ReadTouchpadScrollDirection(userId, switchFlag);
     MMIService::GetInstance()->GetTouchpadScrollDirection(switchFlag);
 }
 } // MMI

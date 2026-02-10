@@ -223,10 +223,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
     ServerMsgHandler servermsghandler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    int32_t userId = 0;
     int32_t pid = 1;
     bool isNativeInject = true;
     int32_t result = servermsghandler.OnInjectPointerEvent(
-        pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
+        userId, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
 }
 
@@ -906,19 +907,20 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt_001,
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
-    int32_t ret = handler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE);
+    int32_t userId = 0;
+    int32_t ret = handler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
     pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
-    ret = handler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE);
+    ret = handler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
     sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE));
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE));
     sourceType = PointerEvent::SOURCE_TYPE_JOYSTICK;
-    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE));
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE));
     sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
-    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(pointerEvent, false, PointerEvent::DISPLAY_COORDINATE));
+    EXPECT_NO_FATAL_FAILURE(handler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE));
 }
 
 /**
@@ -1912,7 +1914,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_002, Te
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNAUTHORIZED));
     EXPECT_EQ(
-        msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE),
+        msgHandler.OnInjectPointerEvent(0, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE),
         COMMON_PERMISSION_CHECK_ERROR);
 }
 
@@ -1937,7 +1939,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_003, Te
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     EXPECT_NE(
-        msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE),
+        msgHandler.OnInjectPointerEvent(0, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE),
         RET_OK);
 }
 
@@ -1960,7 +1962,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_004, Te
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     EXPECT_NE(
-        msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE),
+        msgHandler.OnInjectPointerEvent(0, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE),
         RET_OK);
 }
 
@@ -2954,7 +2956,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_005, Te
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     int32_t result =
-        msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
+        msgHandler.OnInjectPointerEvent(0, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
 }
 

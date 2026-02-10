@@ -16,7 +16,6 @@ import("../../multimodalinput_mini.gni")
 config("input_service_prototype_configs") {
   include_dirs = [
     "include",
-    "${root_out_dir}/diff_libinput_mmi/export_include",
     "${mmi_path}/libudev/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -54,7 +53,7 @@ ohos_source_set("input_service_prototype") {
 
   deps = []
 
-  external_deps = []
+  external_deps = [ "libinput:libinput-third-mmi" ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"
