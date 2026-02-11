@@ -554,29 +554,29 @@ void AccountManager::OnDataShareReady(const EventFwk::CommonEventData &data)
 }
 
 int32_t AccountManager::RegisterCommonEventCallback(
- 	const std::function<void(const EventFwk::CommonEventData &)> &callback)
+    const std::function<void(const EventFwk::CommonEventData &)> &callback)
 {
- 	std::lock_guard<std::mutex> guard { observerCallbacksMutex_ };
- 	int32_t callbackId = nextId_++;
- 	observerCallbacks_[callbackId] = callback;
- 	return callbackId;
+    std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
+    int32_t callbackId = nextId_++;
+    observerCallbacks_[callbackId] = callback;
+    return callbackId;
 }
- 	 
+
 bool AccountManager::UnRegisterCommonEventCallback(int32_t callbackId)
 {
- 	std::lock_guard<std::mutex> guard { observerCallbacksMutex_ };
- 	return observerCallbacks_.erase(callbackId) > 0;
+    std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
+    return observerCallbacks_.erase(callbackId) > 0;
 }
- 	 
+
 void AccountManager::TriggerObserverCallback(const EventFwk::CommonEventData &data)
 {
- 	{
-        std::lock_guard<std::mutex> guard { observerCallbacksMutex_ };
+    {
+        std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
         auto observers = observerCallbacks_;
     }
- 	for (const auto &[id, callback] : observers) {
- 	    callback(data);
- 	}
+    for (const auto &[id, callback] : observers) {
+        callback(data);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

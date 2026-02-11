@@ -80,7 +80,7 @@ public:
     std::vector<int32_t> QueryAllCreatedOsAccounts();
     int32_t QueryCurrentAccountId();
     int32_t RegisterCommonEventCallback(const std::function<void(const EventFwk::CommonEventData &)> &callback);
- 	bool UnRegisterCommonEventCallback(int32_t callbackId);
+    bool UnRegisterCommonEventCallback(int32_t callbackId);
 
     AccountManager();
     ~AccountManager();
@@ -107,8 +107,8 @@ private:
     std::map<int32_t, std::unique_ptr<AccountSetting>> accounts_;
     std::map<std::string, std::function<void(const EventFwk::CommonEventData &)>> handlers_;
     std::unordered_map<int32_t, std::function<void(const EventFwk::CommonEventData &)>> observerCallbacks_;
- 	int32_t nextId_ { 0 };
- 	std::mutex observerCallbacksMutex_;
+    int32_t nextId_{0};
+    std::mutex observerCallbacksMutex_;
 };
 
 inline int32_t AccountManager::AccountSetting::GetAccountId() const
