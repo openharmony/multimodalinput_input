@@ -839,9 +839,9 @@ bool GetMouseScrollDirectionAsync()
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-    } else if (errorCode == -COMMON_PERMISSION_CHECK_FAILED) {
+    } else if (errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Permission denied");
-        taihe::set_business_error(COMMON_PERMISSION_CHECK_FAILED, "Permission denied.");
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "Permission denied.");
     } else if (errorCode < RET_OK) {
         MMI_HILOGE("Input Service Exception");
         taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input Service Exception.");
@@ -859,9 +859,9 @@ void SetMouseScrollDirectionAsync(bool state)
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-    } else if (errorCode == -COMMON_PERMISSION_CHECK_FAILED) {
+    } else if (errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
         MMI_HILOGE("Permission denied");
-        taihe::set_business_error(COMMON_PERMISSION_CHECK_FAILED, "Permission denied.");
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "Permission denied.");
     } else if (errorCode < RET_OK) {
         MMI_HILOGE("Input Service Exception");
         taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input Service Exception.");
