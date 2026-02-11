@@ -1282,8 +1282,8 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (HandleTouchpadSyncEvent(event)) {
- 	    MMI_HILOGI("Sync touchpad settings");
- 	}
+        MMI_HILOGI("Sync touchpad settings");
+    }
     if (std::fabs(DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon()) {
         MMI_HILOGI("Register touchpad settings observer");
         TOUCHPAD_MGR->SyncTouchpadSettingsData();
