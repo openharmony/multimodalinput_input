@@ -585,33 +585,39 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEve
 }
 
 /**
- * @tc.name: MouseEventNormalizeTest_GetPointerEvent01
- * @tc.desc: Test the function GetPointerEvent
+ * @tc.name: MouseEventNormalizeTest_SetMouseScrollDirection_001
+ * @tc.desc: Test SetMouseScrollDirection
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent01, TestSize.Level1)
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollDirection_001, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
-    MouseEventNormalize mouseEventNormalize;
-    int32_t deviceId = 1;
-    mouseEventNormalize.processors_.insert(std::make_pair(1, std::make_shared<OHOS::MMI::MouseTransformProcessor>(1)));
-    EXPECT_NO_FATAL_FAILURE(mouseEventNormalize.GetPointerEvent(deviceId));
+    bool state = false;
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetMouseScrollDirection(userId, state) == RET_OK);
+    bool newState = true;
+    MouseEventHdr->GetMouseScrollDirection(userId, newState);
+    ASSERT_FALSE(newState);
 }
 
 /**
- * @tc.name: MouseEventNormalizeTest_GetPointerEvent02
- * @tc.desc: Test the function GetPointerEvent
+ * @tc.name: MouseEventNormalizeTest_GetMouseScrollDirection_001
+ * @tc.desc: Test GetMouseScrollDirection
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent02, TestSize.Level1)
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollDirection_001, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
-    MouseEventNormalize mouseEventNormalize;
-    int32_t deviceId = 1;
-    mouseEventNormalize.processors_.insert(std::make_pair(2, std::make_shared<OHOS::MMI::MouseTransformProcessor>(2)));
-    EXPECT_NO_FATAL_FAILURE(mouseEventNormalize.GetPointerEvent(deviceId));
+    bool state = false;
+    bool newState = true;
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetMouseScrollDirection(userId, state) == RET_OK);
+    MouseEventHdr->GetMouseScrollDirection(userId, newState);
+    ASSERT_FALSE(newState);
+    state = true;
+    MouseEventHdr->SetMouseScrollDirection(userId, state);
+    MouseEventHdr->GetMouseScrollDirection(userId, newState);
+    ASSERT_TRUE(newState);
 }
 }
 }
