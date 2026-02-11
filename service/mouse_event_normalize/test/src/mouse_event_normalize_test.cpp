@@ -49,6 +49,8 @@ private:
     bool preScrollSwitch_ { true };
     bool preScrollDirection_ { true };
     bool preTapSwitch_ { true };
+    bool preMousePointerSpeed_ { true };
+    bool preMouseScrollDirection_ { true };
 };
 
 GeneralMouse MouseEventNormalizeTest::vMouse_;
@@ -106,6 +108,7 @@ void MouseEventNormalizeTest::SetUp()
     MouseEventHdr->GetTouchpadScrollSwitch(userId, preScrollSwitch_);
     MouseEventHdr->GetTouchpadScrollDirection(userId, preScrollDirection_);
     MouseEventHdr->GetTouchpadTapSwitch(userId, preTapSwitch_);
+    MouseEventHdr->GetMouseScrollDirection(userId, preMouseScrollDirection_);
 }
 
 void MouseEventNormalizeTest::TearDown()
@@ -120,6 +123,7 @@ void MouseEventNormalizeTest::TearDown()
     MouseEventHdr->SetTouchpadScrollSwitch(userId, pid, preScrollSwitch_);
     MouseEventHdr->SetTouchpadScrollDirection(userId, preScrollDirection_);
     MouseEventHdr->SetTouchpadTapSwitch(userId, preTapSwitch_);
+    MouseEventHdr->SetMouseScrollDirection(userId, preMouseScrollDirection_);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -578,6 +582,36 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEve
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     MouseEventHdr->CheckAndPackageAxisEvent(event);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetPointerEvent01
+ * @tc.desc: Test the function GetPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseEventNormalize mouseEventNormalize;
+    int32_t deviceId = 1;
+    mouseEventNormalize.processors_.insert(std::make_pair(1, std::make_shared<OHOS::MMI::MouseTransformProcessor>(1)));
+    EXPECT_NO_FATAL_FAILURE(mouseEventNormalize.GetPointerEvent(deviceId));
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetPointerEvent02
+ * @tc.desc: Test the function GetPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseEventNormalize mouseEventNormalize;
+    int32_t deviceId = 1;
+    mouseEventNormalize.processors_.insert(std::make_pair(2, std::make_shared<OHOS::MMI::MouseTransformProcessor>(2)));
+    EXPECT_NO_FATAL_FAILURE(mouseEventNormalize.GetPointerEvent(deviceId));
 }
 }
 }

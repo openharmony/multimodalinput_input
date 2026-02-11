@@ -1833,6 +1833,65 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
     return jsPointerMgr->GetTouchpadScrollRows(env, argv[0]);
 }
 
+napi_value JsPointerContext::SetMouseScrollDirection(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(GET_CB_INFO).c_str());
+        return nullptr;
+    }
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseScrollDirection", "boolean");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
+        MMI_HILOGE("state parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "mouseScrollDirection", "boolean");
+        return nullptr;
+    }
+    bool state = true;
+    if (napi_get_value_bool(env, argv[0], &state) != napi_ok) {
+        MMI_HILOGE("Failed to get bool value");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    if (jsPointer == nullptr) {
+        MMI_HILOGE("jsPointer is null, return value is null");
+        return nullptr;
+    }
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (jsPointerMgr == nullptr) {
+        MMI_HILOGE("jsPointerMgr is null, return value is null");
+        return nullptr;
+    }
+    return jsPointerMgr->SetMouseScrollDirection(env, state);
+}
+
+napi_value JsPointerContext::GetMouseScrollDirection(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(GET_CB_INFO).c_str());
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    if (jsPointer == nullptr) {
+        MMI_HILOGE("jsPointer is null, return value is null");
+        return nullptr;
+    }
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (jsPointerMgr == nullptr) {
+        MMI_HILOGE("jsPointerMgr is null, return value is null");
+        return nullptr;
+    }
+    return jsPointerMgr->GetMouseScrollDirection(env);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1898,6 +1957,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollRows", SetTouchpadScrollRows),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollRows", GetTouchpadScrollRows),
+        DECLARE_NAPI_STATIC_FUNCTION("setMouseScrollDirection", SetMouseScrollDirection),
+        DECLARE_NAPI_STATIC_FUNCTION("getMouseScrollDirection", GetMouseScrollDirection),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

@@ -141,6 +141,7 @@ private:
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
     bool preDoubleTapAndDragState_ { true };
+    bool preMouseScrollDirection_ { true };
 };
 
 void InputManagerPointerTest::SetUpTestCase()
@@ -170,6 +171,7 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadDoubleTapAndDragState(preDoubleTapAndDragState_);
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
+    InputManager::GetInstance()->GetMouseScrollDirection(preMouseScrollDirection_);
     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
     InputManager::GetInstance()->GetTouchpadScrollRows(preScrollRows_);
 }
@@ -193,6 +195,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
+    InputManager::GetInstance()->SetMouseScrollDirection(preMouseScrollDirection_);
     InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
     InputManager::GetInstance()->SetTouchpadScrollRows(preScrollRows_);
 }
@@ -1897,6 +1900,34 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollRows_
         ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollRows(newRows) == RET_OK);
         ASSERT_EQ(rows, newRows);
     }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetMouseScrollDirection_001
+ * @tc.desc: Sets Mouse scroll direction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool state = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetMouseScrollDirection(state) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetMouseScrollDirection_001
+ * @tc.desc: Gets mouse scroll direction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetMouseScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool state = true;
+    InputManager::GetInstance()->GetMouseScrollDirection(state);
+    bool newState = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetMouseScrollDirection(newState) == RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

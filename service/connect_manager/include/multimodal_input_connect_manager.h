@@ -170,6 +170,8 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows(int32_t &rows);
+    int32_t SetMouseScrollDirection(bool state);
+    int32_t GetMouseScrollDirection(bool &state);
     int32_t SkipPointerLayer(bool isSkip);
     int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);

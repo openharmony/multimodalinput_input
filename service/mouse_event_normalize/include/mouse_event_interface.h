@@ -92,6 +92,8 @@ public:
     void GetTouchpadRightClickType(int32_t userId, int32_t &type) const ;
     int32_t SetTouchpadPointerSpeed(int32_t userId, int32_t speed) const ;
     void GetTouchpadPointerSpeed(int32_t userId, int32_t &speed) const ;
+    int32_t SetMouseScrollDirection(int32_t userId, bool state) const ;
+    int32_t GetMouseScrollDirection(int32_t userId, bool &state) const ;
     void ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const;
 
     // MouseDeviceState Interface

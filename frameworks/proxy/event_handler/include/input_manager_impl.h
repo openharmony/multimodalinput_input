@@ -200,6 +200,9 @@ public:
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows(int32_t &rows);
 
+    int32_t SetMouseScrollDirection(bool state);
+    int32_t GetMouseScrollDirection(bool &state);
+
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid, int32_t eventId);
 

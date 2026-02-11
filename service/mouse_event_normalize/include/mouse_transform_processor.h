@@ -127,6 +127,7 @@ private:
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
     void SetPointerEventRightButtonSource(const int32_t eventType, uint32_t button);
+    void SetMouseScrollAxisValue(libinput_pointer_axis_source source, double &axisValue);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static bool IsEventFromVirtualSource(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);

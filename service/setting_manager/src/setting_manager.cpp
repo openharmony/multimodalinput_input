@@ -85,6 +85,7 @@ void SettingManager::Initialize()
             {FIELD_MOUSE_POINTER_COLOR, POINTER_COLOR_DEFAULT},
             {FIELD_MOUSE_POINTER_SIZE, g_defaultPointerSize},
             {FIELD_MOUSE_POINTER_STYLE, POINTER_STYLE_DEFAULT},
+            {FIELD_MOUSE_SCROLL_DIRECTION, BOOL_DEFAULT},
         }};
 
     SettingItem touchpadItem = {.settingKey = TOUCHPAD_KEY_SETTING,

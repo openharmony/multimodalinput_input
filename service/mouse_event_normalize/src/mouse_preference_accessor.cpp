@@ -144,6 +144,20 @@ void MousePreferenceAccessor::GetTouchpadScrollDirection(IInputServiceContext &e
     GetConfigDataFromDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_DIRECTION, state);
 }
 
+int32_t MousePreferenceAccessor::SetMouseScrollDirection(IInputServiceContext &env, int32_t userId, bool state)
+{
+    if (PutConfigDataToDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_SCROLL_DIRECTION, state) != RET_OK) {
+        MMI_HILOGE("Failed to set scroll direction flag");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void MousePreferenceAccessor::GetMouseScrollDirection(IInputServiceContext &env, int32_t userId, bool &state)
+{
+    GetConfigDataFromDatabase(env, userId, MOUSE_KEY_SETTING, FIELD_MOUSE_SCROLL_DIRECTION, state);
+}
+
 int32_t MousePreferenceAccessor::SetTouchpadTapSwitch(IInputServiceContext &env, int32_t userId, bool switchFlag)
 {
     if (PutConfigDataToDatabase(env, userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_TAP_SWITCH, switchFlag) != RET_OK) {

@@ -39,7 +39,8 @@ namespace SettingConstants {
         FIELD_TOUCHPAD_SCROLL_DIRECTION,
         FIELD_TOUCHPAD_SCROLL_SWITCH,
         FIELD_TOUCHPAD_PINCH_SWITCH,
-        FIELD_TOUCHPAD_SWIPE_SWITCH
+        FIELD_TOUCHPAD_SWIPE_SWITCH,
+        FIELD_MOUSE_SCROLL_DIRECTION
     };
 
     const std::vector<std::string> SETTING_FIELDS_NUM = {
