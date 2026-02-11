@@ -681,6 +681,7 @@ void InputDeviceManager::SetIsDeviceReportEvent(int32_t deviceId, bool isDeviceR
     if (isDeviceReportEvent) {
         NotifyAddPointerDevice(item->second.isPointerDevice, existEnabledPointerDevice);
     }
+    NotifyDeviceFirstReportEvent(deviceId);
 }
 
 bool InputDeviceManager::GetIsDeviceReportEvent(int32_t deviceId)
@@ -1596,6 +1597,15 @@ void InputDeviceManager::NotifyDeviceRemoved(int32_t deviceId) const
     for (auto observer : observers_) {
         if (observer != nullptr) {
             observer->OnDeviceRemoved(deviceId);
+        }
+    }
+}
+
+void InputDeviceManager::NotifyDeviceFirstReportEvent(int32_t deviceId) const
+{
+    for (auto observer : observers_) {
+        if (observer != nullptr) {
+            observer->OnDeviceFirstReportEvent(deviceId);
         }
     }
 }

@@ -25,6 +25,8 @@
 #include "key_monitor_manager.h"
 #include "touch_event_normalize.h"
 #include "mmi_log.h"
+#include "input_device_manager.h"
+#include "account_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -679,6 +681,70 @@ int32_t InputPlugin::GetFocusedPid() const
         return -1;
     }
     return WIN_MGR->GetFocusPid();
+}
+
+bool InputPlugin::HasLocalMouseDevice() const
+{
+    if (INPUT_DEV_MGR == nullptr) {
+        return false;
+    }
+    return INPUT_DEV_MGR->HasLocalMouseDevice();
+}
+
+bool InputPlugin::AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer)
+{
+    if (INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("Input device manager is null");
+        return false;
+    }
+    if (observer == nullptr) {
+        MMI_HILOGE("observer is null");
+        return false;
+    }
+    INPUT_DEV_MGR->Attach(observer);
+    return true;
+}
+
+bool InputPlugin::DetachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer)
+{
+    if (INPUT_DEV_MGR == nullptr) {
+        MMI_HILOGE("Input device manager is null");
+        return false;
+    }
+    if (observer == nullptr) {
+        MMI_HILOGE("observer is null");
+        return false;
+    }
+    INPUT_DEV_MGR->Detach(observer);
+    return true;
+}
+
+int32_t InputPlugin::GetCurrentAccountId() const
+{
+    if (ACCOUNT_MGR == nullptr) {
+        MMI_HILOGE("Get account manager failed");
+        return RET_ERR;
+    }
+    return ACCOUNT_MGR->GetCurrentAccountId();
+}
+
+int32_t InputPlugin::RegisterCommonEventCallback(
+    const std::function<void(const EventFwk::CommonEventData &)> &callback)
+{
+    if (ACCOUNT_MGR == nullptr) {
+        MMI_HILOGE("Get account manager failed");
+        return RET_ERR;
+    }
+    return ACCOUNT_MGR->RegisterCommonEventCallback(callback);
+}
+
+bool InputPlugin::UnRegisterCommonEventCallback(int32_t callbackId)
+{
+    if (ACCOUNT_MGR == nullptr) {
+        MMI_HILOGE("Get account manager failed");
+        return false;
+    }
+    return ACCOUNT_MGR->UnRegisterCommonEventCallback(callbackId);
 }
 } // namespace MMI
 } // namespace OHOS

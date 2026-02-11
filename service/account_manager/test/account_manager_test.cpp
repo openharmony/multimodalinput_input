@@ -676,5 +676,61 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_GetCurrentAccountId_01, TestSize
     ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->OnRemoveUser(data));
 }
 
+/**
+ * @tc.name: AccountManagerTest_RegisterCommonEventCallback_001
+ * @tc.desc: Test the function RegisterCommonEventCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_RegisterCommonEventCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(ACCOUNT_MGR, nullptr);
+    ACCOUNT_MGR->observerCallbacks_.clear();
+    ACCOUNT_MGR->nextId_ = 0;
+    auto callback = [](const EventFwk::CommonEventData &) {};
+    auto ret = ACCOUNT_MGR->RegisterCommonEventCallback(callback);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ACCOUNT_MGR->observerCallbacks_.size(), 1);
+    EXPECT_EQ(ACCOUNT_MGR->nextId_, 1);
+    auto ret1 = ACCOUNT_MGR->UnRegisterCommonEventCallback(ret);
+    EXPECT_TRUE(ret1);
+}
+
+/**
+ * @tc.name: AccountManagerTest_UnRegisterCommonEventCallback_001
+ * @tc.desc: Test the function UnRegisterCommonEventCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_UnRegisterCommonEventCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(ACCOUNT_MGR, nullptr);
+    ACCOUNT_MGR->observerCallbacks_.clear();
+    auto callback = [](const EventFwk::CommonEventData &) {};
+    ACCOUNT_MGR->observerCallbacks_[0] = callback;
+    auto ret = ACCOUNT_MGR->UnRegisterCommonEventCallback(0);
+    EXPECT_TRUE(ret);
+    ret = ACCOUNT_MGR->UnRegisterCommonEventCallback(0);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccountManagerTest_TriggerObserverCallback_001
+ * @tc.desc: Test the function TriggerObserverCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_TriggerObserverCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(ACCOUNT_MGR, nullptr);
+    ACCOUNT_MGR->observerCallbacks_.clear();
+    auto callback = [](const EventFwk::CommonEventData &) {};
+    ACCOUNT_MGR->observerCallbacks_[0] = callback;
+    EventFwk::CommonEventData data;
+    ASSERT_NO_FATAL_FAILURE(ACCOUNT_MGR->TriggerObserverCallback(data));
+}
 } // namespace MMI
 } // namespace OHOS
