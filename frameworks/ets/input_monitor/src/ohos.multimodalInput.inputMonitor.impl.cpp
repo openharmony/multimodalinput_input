@@ -26,7 +26,7 @@
 
 namespace {
 constexpr int32_t KEY_LIST_SIZE { 5 };
-constexpr int32_t TWO_FINGERS { 2 };
+[[ maybe_unused ]] constexpr int32_t TWO_FINGERS { 2 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
 constexpr int32_t FIVE_FINGERS { 5 };
@@ -81,7 +81,7 @@ void onPinchByNumber(int32_t fingers,
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::Pinch const& info)> receiver,
     uintptr_t opq)
 {
-    if (fingers < TWO_FINGERS) {
+    if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
@@ -93,7 +93,7 @@ void onRotateByNumber(int32_t fingers,
     ::taihe::callback_view<void(::ohos::multimodalInput::gestureEvent::Rotate const& info)> receiver,
     uintptr_t opq)
 {
-    if (fingers > TWO_FINGERS) {
+    if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
@@ -202,7 +202,7 @@ void offPinchImpl(::taihe::optional_view<uintptr_t> receiver)
 
 void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
-    if (fingers < TWO_FINGERS) {
+    if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
@@ -211,7 +211,7 @@ void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receive
 
 void offRotateByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
-    if (fingers > TWO_FINGERS) {
+    if (fingers > 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
