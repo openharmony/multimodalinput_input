@@ -6530,10 +6530,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollDirection_001, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollDirection_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool switchFlag = true;
-    int32_t result = InputManager::GetInstance()->SetMouseScrollSwitch(switchFlag);
+    bool state = true;
+    int32_t result = InputManager::GetInstance()->SetMouseScrollDirection(state);
     ASSERT_EQ(result, RET_OK);
-    result = InputManager::GetInstance()->GetMouseScrollSwitch(switchFlag);
+    result = InputManager::GetInstance()->GetMouseScrollDirection(state);
     ASSERT_EQ(result, RET_OK);
 }
 } // namespace MMI
