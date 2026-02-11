@@ -69,6 +69,7 @@ private:
     void SwipeInwardSpeedJudge(std::shared_ptr<PointerEvent> pointerEvent);
     bool TouchPadKnuckleDoubleClickHandle(libinput_event* event);
     bool HandleTouchPadEdgeSwipe(libinput_event* event);
+    bool HandleTouchpadSyncEvent(libinput_event* event);
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);

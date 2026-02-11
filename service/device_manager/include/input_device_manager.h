@@ -170,6 +170,7 @@ private:
     void PointerDeviceInit();
     void NotifyDeviceAdded(int32_t deviceId) const;
     void NotifyDeviceRemoved(int32_t deviceId) const;
+    void NotifyDeviceFirstReportEvent(int32_t deviceId) const;
     void SetSpecialVirtualDevice(std::shared_ptr<InputDevice> inputDevice) const;
 
 private:

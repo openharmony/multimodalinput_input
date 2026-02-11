@@ -161,11 +161,6 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
         if (!INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId)) {
             INPUT_DEV_MGR->SetIsDeviceReportEvent(deviceId, true);
-#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-            if (INPUT_DEV_MGR->HasLocalMouseDevice()) {
-                TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
-            }
-#endif // OHOS_BUILD_ENABLE_TOUCHPAD
         }
     }
     auto manager = InputPluginManager::GetInstance();
@@ -334,9 +329,6 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     CHKPR(device, ERROR_NULL_POINTER);
     INPUT_DEV_MGR->OnInputDeviceAdded(device);
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    if (INPUT_DEV_MGR->HasLocalMouseDevice()) {
-        TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
-    }
     if (INPUT_DEV_MGR->IsTouchPadDevice(device)) {
         bool switchFlag = false;
         int32_t userId = ACCOUNT_MGR->GetCurrentAccountId();
@@ -363,11 +355,6 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     INPUT_DEV_MGR->OnInputDeviceRemoved(device);
-#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    if (!INPUT_DEV_MGR->HasLocalMouseDevice()) {
-        TOUCHPAD_MGR->OnUpdateTouchpadSwitch();
-    }
-#endif // OHOS_BUILD_ENABLE_TOUCHPAD
     return RET_OK;
 }
 
@@ -1294,6 +1281,9 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
         return true;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    if (HandleTouchpadSyncEvent(event)) {
+ 	    MMI_HILOGI("Sync touchpad settings");
+ 	}
     if (std::fabs(DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon()) {
         MMI_HILOGI("Register touchpad settings observer");
         TOUCHPAD_MGR->SyncTouchpadSettingsData();
@@ -1373,6 +1363,23 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     nextHandler_->HandleKeyEvent(keyDownEvent);
     nextHandler_->HandleKeyEvent(keyUpEvent);
     return true;
+}
+
+bool EventNormalizeHandler::HandleTouchpadSyncEvent(libinput_event *event)
+{
+    if (event == nullptr) {
+        MMI_HILOGI("Event is null");
+        return false;
+    }
+    auto manager = InputPluginManager::GetInstance();
+    if (manager == nullptr) {
+        MMI_HILOGI("InputPluginManager is null");
+        return false;
+    }
+    auto pData = std::make_shared<IPluginData>();
+    pData->stage = InputPluginStage::INPUT_BEFORE_NORMALIZED;
+    int32_t result = manager->HandleEvent(event, pData);
+    return result == RET_DO;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 
