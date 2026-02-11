@@ -31,11 +31,12 @@ namespace MMI {
 void StubHandleRotateSwitchFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
+    int32_t userId = 0;
 
     bool rotateSwitch = provider.ConsumeBool();
 
     MMIService::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
-    MMIService::GetInstance()->ReadTouchpadRotateSwitch(rotateSwitch);
+    MMIService::GetInstance()->ReadTouchpadRotateSwitch(userId, rotateSwitch);
     MMIService::GetInstance()->GetTouchpadRotateSwitch(rotateSwitch);
 }
 } // MMI

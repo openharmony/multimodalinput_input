@@ -22,8 +22,9 @@ namespace OHOS {
 namespace MMI {
 void SetPointerColorFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t userId = 0;
     int32_t color = fdp.ConsumeIntegral<int32_t>();
-    CursorDrawingComponent::GetInstance().SetPointerColor(color);
+    CursorDrawingComponent::GetInstance().SetPointerColor(userId, color);
 }
 
 bool MmiServiceFuzzTest(FuzzedDataProvider &fdp)

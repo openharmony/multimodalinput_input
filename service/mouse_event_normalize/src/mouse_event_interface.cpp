@@ -204,92 +204,85 @@ int32_t MouseEventInterface::SetMouseAccelerateMotionSwitch(int32_t deviceId, bo
     return mouse->SetMouseAccelerateMotionSwitch(deviceId, enable);
 }
 
-int32_t MouseEventInterface::SetMouseScrollRows(int32_t rows)
+int32_t MouseEventInterface::SetMouseScrollRows(int32_t userId, int32_t rows)
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::SetMouseScrollRows(*env, rows);
+    return MousePreferenceAccessor::SetMouseScrollRows(*env, userId, rows);
 }
 
-int32_t MouseEventInterface::GetMouseScrollRows() const
+int32_t MouseEventInterface::GetMouseScrollRows(int32_t userId) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::GetMouseScrollRows(*env);
+    return MousePreferenceAccessor::GetMouseScrollRows(*env, userId);
 }
 
-int32_t MouseEventInterface::SetMousePrimaryButton(int32_t primaryButton)
+int32_t MouseEventInterface::SetMousePrimaryButton(int32_t userId, int32_t primaryButton)
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::SetMousePrimaryButton(*env, primaryButton);
+    return MousePreferenceAccessor::SetMousePrimaryButton(*env, userId, primaryButton);
 }
 
-int32_t MouseEventInterface::GetMousePrimaryButton() const
+int32_t MouseEventInterface::GetMousePrimaryButton(int32_t userId) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::GetMousePrimaryButton(*env);
+    return MousePreferenceAccessor::GetMousePrimaryButton(*env, userId);
 }
 
-int32_t MouseEventInterface::SetPointerSpeed(int32_t speed)
+int32_t MouseEventInterface::SetPointerSpeed(int32_t userId, int32_t speed)
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    auto ret = MousePreferenceAccessor::SetPointerSpeed(*env, speed);
-    if (ret != RET_OK) {
-        return ret;
-    }
-    auto mouse = GetMouse();
-    if (mouse != nullptr) {
-        mouse->SetPointerSpeed(speed);
-    }
-    return RET_OK;
+    auto ret = MousePreferenceAccessor::SetPointerSpeed(*env, userId, speed);
+    return ret;
 }
 
-int32_t MouseEventInterface::GetPointerSpeed() const
+int32_t MouseEventInterface::GetPointerSpeed(int32_t userId) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::GetPointerSpeed(*env);
+    return MousePreferenceAccessor::GetPointerSpeed(*env, userId);
 }
 
-int32_t MouseEventInterface::GetTouchpadSpeed() const
+int32_t MouseEventInterface::GetTouchpadSpeed(int32_t userId) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::GetTouchpadSpeed(*env);
+    return MousePreferenceAccessor::GetTouchpadSpeed(*env, userId);
 }
 
-int32_t MouseEventInterface::SetTouchpadScrollSwitch(int32_t pid, bool switchFlag) const
+int32_t MouseEventInterface::SetTouchpadScrollSwitch(int32_t userId, int32_t pid, bool switchFlag) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    auto ret = MousePreferenceAccessor::SetTouchpadScrollSwitch(*env, pid, switchFlag);
+    auto ret = MousePreferenceAccessor::SetTouchpadScrollSwitch(*env, userId, pid, switchFlag);
     if (ret != RET_OK) {
         MMI_HILOGE("MousePref SetTouchpadScrollSwitch fail");
         return ret;
@@ -303,94 +296,94 @@ int32_t MouseEventInterface::SetTouchpadScrollSwitch(int32_t pid, bool switchFla
     return RET_OK;
 }
 
-void MouseEventInterface::GetTouchpadScrollSwitch(bool &switchFlag) const
+void MouseEventInterface::GetTouchpadScrollSwitch(int32_t userId, bool &switchFlag) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadScrollSwitch(*env, switchFlag);
+    MousePreferenceAccessor::GetTouchpadScrollSwitch(*env, userId, switchFlag);
 }
 
-int32_t MouseEventInterface::SetTouchpadScrollDirection(bool state) const
+int32_t MouseEventInterface::SetTouchpadScrollDirection(int32_t userId, bool state) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::SetTouchpadScrollDirection(*env, state);
+    return MousePreferenceAccessor::SetTouchpadScrollDirection(*env, userId, state);
 }
 
-void MouseEventInterface::GetTouchpadScrollDirection(bool &state) const
+void MouseEventInterface::GetTouchpadScrollDirection(int32_t userId, bool &state) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadScrollDirection(*env, state);
+    MousePreferenceAccessor::GetTouchpadScrollDirection(*env, userId, state);
 }
 
-int32_t MouseEventInterface::SetTouchpadTapSwitch(bool switchFlag) const
+int32_t MouseEventInterface::SetTouchpadTapSwitch(int32_t userId, bool switchFlag) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::SetTouchpadTapSwitch(*env, switchFlag);
+    return MousePreferenceAccessor::SetTouchpadTapSwitch(*env, userId, switchFlag);
 }
 
-void MouseEventInterface::GetTouchpadTapSwitch(bool &switchFlag) const
+void MouseEventInterface::GetTouchpadTapSwitch(int32_t userId, bool &switchFlag) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadTapSwitch(*env, switchFlag);
+    MousePreferenceAccessor::GetTouchpadTapSwitch(*env, userId, switchFlag);
 }
 
-int32_t MouseEventInterface::SetTouchpadRightClickType(int32_t type) const
+int32_t MouseEventInterface::SetTouchpadRightClickType(int32_t userId, int32_t type) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::SetTouchpadRightClickType(*env, type);
+    return MousePreferenceAccessor::SetTouchpadRightClickType(*env, userId, type);
 }
 
-void MouseEventInterface::GetTouchpadRightClickType(int32_t &type) const
+void MouseEventInterface::GetTouchpadRightClickType(int32_t userId, int32_t &type) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadRightClickType(*env, type);
+    MousePreferenceAccessor::GetTouchpadRightClickType(*env, userId, type);
 }
 
-int32_t MouseEventInterface::SetTouchpadPointerSpeed(int32_t speed) const
+int32_t MouseEventInterface::SetTouchpadPointerSpeed(int32_t userId, int32_t speed) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return RET_ERR;
     }
-    return MousePreferenceAccessor::SetTouchpadPointerSpeed(*env, speed);
+    return MousePreferenceAccessor::SetTouchpadPointerSpeed(*env, userId, speed);
 }
 
-void MouseEventInterface::GetTouchpadPointerSpeed(int32_t &speed) const
+void MouseEventInterface::GetTouchpadPointerSpeed(int32_t userId, int32_t &speed) const
 {
     auto env = GetEnv();
     if (env == nullptr) {
         MMI_HILOGE("No input service context");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadPointerSpeed(*env, speed);
+    MousePreferenceAccessor::GetTouchpadPointerSpeed(*env, userId, speed);
 }
 
 void  MouseEventInterface::ReadTouchpadCDG(TouchpadCDG &touchpadCDG) const

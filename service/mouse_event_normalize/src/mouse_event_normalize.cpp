@@ -322,12 +322,6 @@ int32_t MouseEventNormalize::LibinputChangeToPointer(const uint32_t keyValue)
     return MouseState->LibinputChangeToPointer(keyValue);
 }
 
-int32_t MouseEventNormalize::SetPointerSpeed(int32_t speed)
-{
-    MouseTransformProcessor::SetPointerSpeed(speed);
-    return RET_OK;
-}
-
 int32_t MouseEventNormalize::SetScrollSwitchSetterPid(int32_t pid)
 {
     MouseTransformProcessor::SetScrollSwitchSetterPid(pid);

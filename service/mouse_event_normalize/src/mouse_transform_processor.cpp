@@ -19,6 +19,7 @@
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
+#include "i_setting_manager.h"
 #include "mouse_device_state.h"
 #include "mouse_preference_accessor.h"
 #include "pointer_device_manager.h"
@@ -72,14 +73,12 @@ constexpr double CONST_HALF { 0.5 };
 constexpr int32_t CONST_TWO { 2 };
 constexpr double CONST_DOUBLE_ZERO { 0.0 };
 constexpr double CONST_DOUBLE_ONE { 1.0 };
-constexpr int32_t DEFAULT_SPEED { 10 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 std::atomic_bool MouseTransformProcessor::isVirtualDeviceEvent_ = false;
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
 
-std::atomic_int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
 std::atomic_int32_t MouseTransformProcessor::globalScrollSwitchPid_ = -1;
 
 MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int32_t deviceId)
@@ -90,7 +89,6 @@ MouseTransformProcessor::MouseTransformProcessor(IInputServiceContext *env, int3
         MMI_HILOGE("Env is nullptr");
         return;
     }
-    globalPointerSpeed_.store(MousePreferenceAccessor::GetPointerSpeed(*env_));
 }
 
 MouseTransformProcessor::~MouseTransformProcessor()
@@ -271,17 +269,19 @@ int32_t MouseTransformProcessor::UpdateMouseMoveLocation(const OLD::DisplayInfo*
             MMI_HILOGE("Env is nullptr");
             return RET_ERR;
         }
+        int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
         ret = PointerMotionAcceleration::DynamicAccelerateMouse(offset,
             winMgr->GetMouseIsCaptureMode(),
-            globalPointerSpeed_.load(), dalta_time, displayPpi, static_cast<double>(factor),
-                abs_x, abs_y);
+            MousePreferenceAccessor::GetPointerSpeed(*env_, userId), dalta_time, displayPpi,
+                static_cast<double>(factor), abs_x, abs_y);
         return ret;
     } else {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
+        int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
         ret = PointerMotionAcceleration::AccelerateMouse(offset,
             winMgr->GetMouseIsCaptureMode(),
-            globalPointerSpeed_.load(), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+            MousePreferenceAccessor::GetPointerSpeed(*env_, userId), static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     }
 }
@@ -304,19 +304,22 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         MMI_HILOGE("winMgr is nullptr");
         return RET_ERR;
     }
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
     if (displayInfo->width == static_cast<int32_t>(CONST_DOUBLE_ZERO) ||
         displayInfo->height == static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
             displayInfo->width, displayInfo->height);
         ret = PointerMotionAcceleration::AccelerateTouchpad(offset,
             winMgr->GetMouseIsCaptureMode(),
-            MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId),
+            static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
     } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = PointerMotionAcceleration::AccelerateTouchpad(offset, winMgr->GetMouseIsCaptureMode(),
-            MousePreferenceAccessor::GetTouchpadSpeed(*env_), static_cast<DeviceType>(deviceType), abs_x, abs_y);
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId), static_cast<DeviceType>(deviceType),
+            abs_x, abs_y);
         return ret;
     } else {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
@@ -342,7 +345,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         }
         ret = PointerMotionAcceleration::DynamicAccelerateTouchpad(offset,
             winMgr->GetMouseIsCaptureMode(),
-            MousePreferenceAccessor::GetTouchpadSpeed(*env_), displaySize, touchpadSize, touchpadPPi, frequency,
+            MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId), displaySize, touchpadSize, touchpadPPi, frequency,
                 abs_x, abs_y);
         return ret;
     }
@@ -500,12 +503,12 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     uint32_t originButton = button;
     const int32_t type = libinput_event_get_type(event);
     bool tpTapSwitch = true;
-    MousePreferenceAccessor::GetTouchpadTapSwitch(*env_, tpTapSwitch);
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    MousePreferenceAccessor::GetTouchpadTapSwitch(*env_, userId, tpTapSwitch);
 
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
         GetVirtualTouchpadTapSwitch(tpTapSwitch);
-
         unaccelerated_.dx = libinput_event_vtrackpad_get_dx_unaccelerated(data);
         unaccelerated_.dy = libinput_event_vtrackpad_get_dy_unaccelerated(data);
     }
@@ -660,12 +663,9 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
         MMI_HILOGE("Env is nullptr");
         return RET_ERR;
     }
-    auto prefMgr = GetPreferenceManager();
-    if (prefMgr == nullptr) {
-        MMI_HILOGE("prefMgr is nullptr");
-        return RET_ERR;
-    }
-    int32_t primaryButton = prefMgr->GetIntValue(name, 0);
+    int32_t primaryButton = 0;
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, FIELD_MOUSE_PRIMARY_BUTTON, primaryButton);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
         primaryButton = GetVirtualTouchpadPrimaryButton();
@@ -696,8 +696,9 @@ void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_sour
         MMI_HILOGD("Env is nullptr");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadScrollSwitch(*env_, tpScrollSwitch);
-    MousePreferenceAccessor::GetTouchpadScrollDirection(*env_, scrollDirectionState);
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    MousePreferenceAccessor::GetTouchpadScrollSwitch(*env_, userId, tpScrollSwitch);
+    MousePreferenceAccessor::GetTouchpadScrollDirection(*env_, userId, scrollDirectionState);
     if (scrollDirectionState == true && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         direction = -1;
     }
@@ -783,16 +784,17 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (env_ == nullptr) {
         return ERROR_NULL_POINTER;
     }
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
 #ifndef OHOS_BUILD_ENABLE_WATCH
     if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-        pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetTouchpadScrollRows(*env_));
+        pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetTouchpadScrollRows(*env_, userId));
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     } else {
-        pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetMouseScrollRows(*env_));
+        pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetMouseScrollRows(*env_, userId));
     }
 #else
-    pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetMouseScrollRows(*env_));
+    pointerEvent_->SetScrollRows(MousePreferenceAccessor::GetMouseScrollRows(*env_, userId));
 #endif // OHOS_BUILD_ENABLE_WATCH
     const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
@@ -800,14 +802,14 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 #ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-            axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_) * (axisValue / initRows);
-            axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+            axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_, userId) * (axisValue / initRows);
+            axisValue = HandleAxisAccelateTouchPad(userId, axisValue) * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
         } else {
-            axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
+            axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_, userId) * axisValue * tpScrollDirection;
         }
 #else
-        axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
+        axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_, userId) * axisValue * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_WATCH
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
@@ -816,14 +818,14 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 #ifndef OHOS_BUILD_ENABLE_WATCH
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-            axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_) * (axisValue / initRows);
-            axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+            axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_, userId) * (axisValue / initRows);
+            axisValue = HandleAxisAccelateTouchPad(userId, axisValue) * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
         } else {
-            axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
+            axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_, userId) * axisValue * tpScrollDirection;
         }
 #else
-        axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_) * axisValue * tpScrollDirection;
+        axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_, userId) * axisValue * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_WATCH
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
@@ -831,7 +833,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
+double MouseTransformProcessor::HandleAxisAccelateTouchPad(int32_t userId, double axisValue)
 {
     const int32_t initRows = 3;
     DeviceType deviceType = DeviceType::DEVICE_PC;
@@ -859,7 +861,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
             MMI_HILOGE("Env is nullptr");
             return axisValue;
         }
-        axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_) * (axisValue / initRows);
+        axisValue = MousePreferenceAccessor::GetTouchpadScrollRows(*env_, userId) * (axisValue / initRows);
     }
     return axisValue;
 }
@@ -1329,11 +1331,6 @@ int32_t MouseTransformProcessor::GetPointerLocation(IInputServiceContext &env, i
     return RET_OK;
 }
 
-void MouseTransformProcessor::SetPointerSpeed(int32_t speed)
-{
-    globalPointerSpeed_.store(speed);
-}
-
 void MouseTransformProcessor::SetScrollSwitchSetterPid(int32_t pid)
 {
     globalScrollSwitchPid_.store(pid);
@@ -1391,6 +1388,15 @@ std::shared_ptr<IPreferenceManager> MouseTransformProcessor::GetPreferenceManage
         return nullptr;
     }
     return env_->GetPreferenceManager();
+}
+
+std::shared_ptr<ISettingManager> MouseTransformProcessor::GetSettingManager() const
+{
+    if (env_ == nullptr) {
+        MMI_HILOGE("Env is nullptr");
+        return nullptr;
+    }
+    return env_->GetSettingManager();
 }
 
 #ifndef OHOS_BUILD_ENABLE_WATCH
@@ -1511,12 +1517,14 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButtonOrLeftButton(struct l
 void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
+    CHKPV(pointerEvent_);
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
     if (env_ == nullptr) {
         MMI_HILOGE("Env is nullptr");
         return;
     }
-    MousePreferenceAccessor::GetTouchpadRightClickType(*env_, switchTypeData);
+    MousePreferenceAccessor::GetTouchpadRightClickType(*env_, userId, switchTypeData);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (isVirtualDeviceEvent_) {
         GetVirtualTouchpadRightClickType(switchTypeData);

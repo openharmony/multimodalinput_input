@@ -19,6 +19,7 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_preference_manager.h"
+#include "i_setting_manager.h"
 #include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -37,7 +38,6 @@ constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
 constexpr int32_t DEFAULT_KEY_REPEAT_RATE { 50 };
 constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
 constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
-const char* KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 } // namespace
 
 KeyAutoRepeat::KeyAutoRepeat() {}
@@ -115,7 +115,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             timerId_ = -1;
             repeatKeyCode_ = -1;
         }
-        int32_t delayTime = GetDelayTime();
+        int32_t delayTime = GetDelayTime(WIN_MGR->FindDisplayUserId(keyEvent_->GetTargetDisplayId()));
         keyEvent_->SetRepeatKey(true);
         AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
@@ -145,7 +145,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-            int32_t delayTime = GetDelayTime();
+            int32_t delayTime = GetDelayTime(WIN_MGR->FindDisplayUserId(keyEvent_->GetTargetDisplayId()));
             keyEvent_->SetRepeatKey(true);
             AddHandleTimer(delayTime);
             if (!JudgeLimitPrint(keyEvent_)) {
@@ -171,7 +171,8 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
         inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         this->keyEvent_->UpdateId();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-        int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
+        int32_t userId = WIN_MGR->FindDisplayUserId(keyEvent_->GetTargetDisplayId());
+        int32_t triggertime = KeyRepeat->GetIntervalTime(userId, keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
     }, "KeyAutoRepeat");
 }
@@ -181,17 +182,17 @@ std::string KeyAutoRepeat::GetTomlFilePath(const std::string &fileName) const
     return "/vendor/etc/keymap/" + fileName + ".TOML";
 }
 
-int32_t KeyAutoRepeat::GetIntervalTime(int32_t deviceId)
+int32_t KeyAutoRepeat::GetIntervalTime(int32_t userId, int32_t deviceId)
 {
     int32_t triggertime = DEFAULT_KEY_REPEAT_RATE;
-    GetKeyboardRepeatRate(triggertime);
+    GetKeyboardRepeatRate(userId, triggertime);
     return triggertime;
 }
 
-int32_t KeyAutoRepeat::GetDelayTime()
+int32_t KeyAutoRepeat::GetDelayTime(int32_t userId)
 {
     int32_t delaytime = DEFAULT_KEY_REPEAT_DELAY;
-    GetKeyboardRepeatDelay(delaytime);
+    GetKeyboardRepeatDelay(userId, delaytime);
     return delaytime;
 }
 
@@ -236,7 +237,7 @@ void KeyAutoRepeat::RemoveTimer()
     timerId_ = -1;
 }
 
-int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
+int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t userId, int32_t delay)
 {
     CALL_DEBUG_ENTER;
     int32_t repeatDelayTime = delay;
@@ -247,7 +248,7 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
         repeatDelayTime = MAX_KEY_REPEAT_DELAY;
     }
     std::string name = "keyboardRepeatDelay";
-    if (PutConfigDataToDatabase(name, repeatDelayTime) != RET_OK) {
+    if (PutConfigDataToDatabase(userId, name, repeatDelayTime) != RET_OK) {
         MMI_HILOGE("Failed to set keyboard repeat delay");
         return RET_ERR;
     }
@@ -255,7 +256,7 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
     return RET_OK;
 }
 
-int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
+int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t userId, int32_t rate)
 {
     CALL_DEBUG_ENTER;
     int32_t repeatRateTime = rate;
@@ -266,7 +267,7 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
         repeatRateTime = MAX_KEY_REPEAT_RATE;
     }
     std::string name = "keyboardRepeatRate";
-    if (PutConfigDataToDatabase(name, repeatRateTime) != RET_OK) {
+    if (PutConfigDataToDatabase(userId, name, repeatRateTime) != RET_OK) {
         MMI_HILOGE("Failed to set keyboard repeat rate");
         return RET_ERR;
     }
@@ -274,11 +275,11 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
     return RET_OK;
 }
 
-int32_t KeyAutoRepeat::GetKeyboardRepeatDelay(int32_t &delay)
+int32_t KeyAutoRepeat::GetKeyboardRepeatDelay(int32_t userId, int32_t &delay)
 {
     CALL_DEBUG_ENTER;
     std::string name = "keyboardRepeatDelay";
-    if (GetConfigDataFromDatabase(name, delay) != RET_OK) {
+    if (GetConfigDataFromDatabase(userId, name, delay) != RET_OK) {
         MMI_HILOGE("Failed to get keyboard repeat delay");
         return RET_ERR;
     }
@@ -292,11 +293,11 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatDelay(int32_t &delay)
     return RET_OK;
 }
 
-int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
+int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t userId, int32_t &rate)
 {
     CALL_DEBUG_ENTER;
     std::string name = "keyboardRepeatRate";
-    if (GetConfigDataFromDatabase(name, rate) != RET_OK) {
+    if (GetConfigDataFromDatabase(userId, name, rate) != RET_OK) {
         MMI_HILOGE("Failed to get keyboard repeat rate");
         return RET_ERR;
     }
@@ -315,15 +316,16 @@ int32_t KeyAutoRepeat::GetRepeatKeyCode() const
     return repeatKeyCode_;
 }
 
-int32_t KeyAutoRepeat::PutConfigDataToDatabase(std::string &key, int32_t value)
+int32_t KeyAutoRepeat::PutConfigDataToDatabase(int32_t userId, std::string &key, int32_t value)
 {
-    return PREFERENCES_MGR->SetIntValue(key, KEYBOARD_FILE_NAME, value);
+    bool ret = INPUT_SETTING_MANAGER->SetIntValue(userId, KEYBOARD_KEY_SETTING, key, value);
+    return ret ? RET_OK : RET_ERR;
 }
 
-int32_t KeyAutoRepeat::GetConfigDataFromDatabase(std::string &key, int32_t &value)
+int32_t KeyAutoRepeat::GetConfigDataFromDatabase(int32_t userId, std::string &key, int32_t &value)
 {
-    value = PREFERENCES_MGR->GetIntValue(key, value);
-    return RET_OK;
+    bool ret = INPUT_SETTING_MANAGER->GetIntValue(userId, KEYBOARD_KEY_SETTING, key, value);
+    return ret ? RET_OK : RET_ERR;
 }
 
 void KeyAutoRepeat::SetRepeatKeyCode(int32_t code)

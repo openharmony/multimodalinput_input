@@ -59,7 +59,6 @@ public:
     void GetPressedButtons(std::vector<int32_t>& pressedButtons) override;
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState) override;
     int32_t LibinputChangeToPointer(const uint32_t keyValue) override;
-    int32_t SetPointerSpeed(int32_t speed) override;
     int32_t SetScrollSwitchSetterPid(int32_t pid) override;
 
 private:

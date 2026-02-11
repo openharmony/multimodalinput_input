@@ -210,14 +210,15 @@ HWTEST_F(CursorDrawingComponentCoverageTest, IsPointerVisible_NotLoaded_001, Tes
 HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerStyle_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
+    int32_t pid = 0;
     int32_t windowId = 100;
-    int32_t displayId = 1;
     int32_t defaultId = 0;
     CursorDrawingComponent component;
     auto *instance = &component;
     PointerStyle style;
     style.id = defaultId;
-    auto ret = instance->SetPointerStyle(windowId, displayId, style, false);
+    auto ret = instance->SetPointerStyle(userId, pid, windowId, style);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_EQ(ret, RET_OK);
 #else
@@ -234,12 +235,13 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerStyle_NotLoaded_001, Test
 HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerStyle_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
+    int32_t pid = 0;
     int32_t windowId = 100;
-    int32_t displayId = 1;
     CursorDrawingComponent component;
     auto *instance = &component;
     PointerStyle style;
-    auto ret = instance->GetPointerStyle(windowId, displayId, style, false);
+    auto ret = instance->GetPointerStyle(userId, pid, windowId, style);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_EQ(ret, RET_OK);
 #else
@@ -256,13 +258,14 @@ HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerStyle_NotLoaded_001, Test
 HWTEST_F(CursorDrawingComponentCoverageTest, SetMouseIcon_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
+    int32_t pid = 0;
     int32_t windowId = 100;
-    int32_t displayId = 1;
     CursorDrawingComponent component;
     auto *instance = &component;
     CursorPixelMap pixelMap;
     pixelMap.pixelMap = nullptr;
-    auto ret = instance->SetMouseIcon(windowId, displayId, pixelMap);
+    auto ret = instance->SetMouseIcon(userId, pid, windowId, pixelMap);
 #ifndef OHOS_BUILD_ENABLE_POINTER_DRAWING
     EXPECT_EQ(ret, RET_OK);
 #else
@@ -423,10 +426,11 @@ HWTEST_F(CursorDrawingComponentCoverageTest, Init_NotLoaded_001, TestSize.Level1
 HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerColor_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
     uint32_t colorWhite = 0xFFFFFFFF;
     CursorDrawingComponent component;
     auto *instance = &component;
-    auto ret = instance->SetPointerColor(colorWhite);
+    auto ret = instance->SetPointerColor(userId, colorWhite);
 
     EXPECT_GE(ret, RET_OK);
 }
@@ -440,9 +444,10 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerColor_NotLoaded_001, Test
 HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerColor_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
     CursorDrawingComponent component;
     auto *instance = &component;
-    auto ret = instance->GetPointerColor();
+    auto ret = instance->GetPointerColor(userId);
 
     EXPECT_GE(ret, RET_OK);
 }
@@ -507,9 +512,10 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetMouseHotSpot_NotLoaded_001, Test
 HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerSize_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
     CursorDrawingComponent component;
     auto *instance = &component;
-    auto ret = instance->SetPointerSize(1);
+    auto ret = instance->SetPointerSize(userId, 1);
 
     EXPECT_GE(ret, RET_OK);
 }
@@ -523,9 +529,10 @@ HWTEST_F(CursorDrawingComponentCoverageTest, SetPointerSize_NotLoaded_001, TestS
 HWTEST_F(CursorDrawingComponentCoverageTest, GetPointerSize_NotLoaded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    int32_t userId = 0;
     CursorDrawingComponent component;
     auto *instance = &component;
-    auto ret = instance->GetPointerSize();
+    auto ret = instance->GetPointerSize(userId);
 
     EXPECT_GE(ret, RET_OK);
 }

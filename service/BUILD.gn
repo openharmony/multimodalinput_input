@@ -72,6 +72,8 @@ config("libmmi_server_config") {
     "key_command/include",
     "subscriber/include",
     "common/timer_manager/include",
+    "setting_manager/include",
+    "timer_manager/include",
     "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/device_state_manager/include",
@@ -186,6 +188,7 @@ ohos_shared_library("libcursor_drawing_adapter") {
     "${mmi_path}/util/socket/include/",
     "window_manager/include",
     "${mmi_service_path}/product_property_config/include",
+    "${mmi_path}/service/account_manager/include",
     "${mmi_service_path}/custom_config_parser/include",
   ]
 
@@ -351,7 +354,12 @@ ohos_shared_library("libmmi-server") {
     "account_manager/src/account_manager.cpp",
     "display_state_manager/src/display_event_monitor.cpp",
     "window_manager/src/cursor_drawing_component.cpp",
-    "drag_security/src/drag_security_manager.cpp"
+    "drag_security/src/drag_security_manager.cpp",
+    "setting_manager/src/setting_data_migrator.cpp",
+    "setting_manager/src/setting_constants.cpp",
+    "setting_manager/src/setting_data.cpp",
+    "setting_manager/src/setting_manager.cpp",
+    "setting_manager/src/setting_storage.cpp",
   ]
   if (input_feature_pen) {
     sources +=
@@ -594,7 +602,8 @@ ohos_shared_library("libmmi-server") {
       "ipc:ipc_single",
       "safwk:system_ability_fwk",
       "openssl:libcrypto_shared",
-      "openssl:libssl_shared"
+      "openssl:libssl_shared",
+      "os_account:os_account_innerkits",
     ]
   }
 
@@ -888,6 +897,7 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -1340,6 +1350,8 @@ ohos_unittest("CursorDrawingComponentTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/setting_manager/include",
+    "${mmi_path}/service/module_loader/include",
   ]
   sources = [
     "${mmi_path}/service/window_manager/test/cursor_drawing_component_test.cpp",
@@ -1487,6 +1499,8 @@ ohos_unittest("PointerDrawingManagerHardCursorTest") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/intention/scheduler/component_manager/include",
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/setting_manager/include"
   ]
  
   if (input_ext_feature_anco) {
@@ -1645,6 +1659,7 @@ ohos_unittest("InputWindowsManagerOneTest") {
     "${mmi_path}/service/event_hook/include/checker",
     "window_manager/test",
     "${mmi_path}/intention/scheduler/component_manager/include",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   sources = [ "window_manager/test/input_windows_manager_one_test.cpp" ]
@@ -2748,6 +2763,7 @@ ohos_unittest("InputEventHandlerTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/setting_manager/include",
   ]
 
   sources = [ "event_handler/test/input_event_handler_test.cpp" ]
@@ -4324,7 +4340,7 @@ ohos_unittest("PointerEventHookTest") {
     "${mmi_path}/intention/scheduler/component_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/common/timer_manager/include",
-    "${mmi_path}/service/device_config/include"
+    "${mmi_path}/service/device_config/include",
   ]
 
   sources = [
