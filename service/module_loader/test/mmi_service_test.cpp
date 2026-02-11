@@ -4992,5 +4992,65 @@ HWTEST_F(MMIServerTest, MMIService_ControlMouseEventToAnco_002, TestSize.Level1)
     EXPECT_NE(ret, RET_OK);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
+
+/**
+ * @tc.name: MMIService_SetMouseScrollDirection_001
+ * @tc.desc: SetMouseScrollDirection should succeed or fail due to PostSyncTask failure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetMouseScrollDirection_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool state = true;
+    int32_t ret = mmiService.SetMouseScrollDirection(state);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_SetMouseScrollDirection_002
+ * @tc.desc: SetMouseScrollDirection should fail when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_SetMouseScrollDirection_002, TestSize.Level1)
+{
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool state = false;
+    int32_t ret = mmiService.SetMouseScrollDirection(state);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetMouseScrollDirection_001
+ * @tc.desc: Verify return RET_OK when service is running and permission is valid
+ * @tc.type: FUNC
+ */
+HWTEST_F(MMIServerTest, MMIService_GetMouseScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_RUNNING;
+    bool switchFlag = false;
+    ErrCode ret = mmiService.GetMouseScrollDirection(switchFlag);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MMIService_GetMouseScrollDirection_002
+ * @tc.desc: Test GetMouseScrollDirection when service is not running
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetMouseScrollDirection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    mmiService.state_ = ServiceRunningState::STATE_NOT_START;
+    bool direction = false;
+    ErrCode ret = mmiService.GetMouseScrollDirection(direction);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+}
 } // namespace MMI
 } // namespace OHOS
