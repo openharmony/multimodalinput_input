@@ -15,6 +15,7 @@
 
 #include "touchpad_transform_processor.h"
 
+#include <cstdint>
 #include <linux/input.h>
 
 #include "dfx_hisysevent.h"
@@ -22,7 +23,7 @@
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
 #include "mouse_event_interface.h"
-
+#include "i_setting_manager.h"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
@@ -42,10 +43,9 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t DEFAULT_ROWS { 3 };
 constexpr int32_t MAX_N_POINTER_ITEMS { 10 };
-
-const char* TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
-std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
+// std::string g_threeFingerTapKey = "touchpadThreeFingerTap";
 } // namespace
+std::atomic_bool TouchPadTransformProcessor::dataShareReady_ = false;
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
     : deviceId_(deviceId)
@@ -341,7 +341,8 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     CALL_DEBUG_ENTER;
 
     bool tpSwipeSwitch = true;
-    GetTouchpadSwipeSwitch(tpSwipeSwitch);
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    GetTouchpadSwipeSwitch(userId, tpSwipeSwitch);
 
     if (!tpSwipeSwitch) {
         MMI_HILOGD("Touchpad swipe switch is false");
@@ -364,7 +365,8 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         return RET_ERR;
     }
     if (fingerCount == FINGER_TAP_THREE) {
-        GetTouchpadThreeFingersTapSwitch(tpSwipeSwitch);
+        int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+        GetTouchpadThreeFingersTapSwitch(userId, tpSwipeSwitch);
         if (!tpSwipeSwitch) {
             return RET_OK;
         }
@@ -586,7 +588,8 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadPinchGesture(libinput_event *
         return RET_ERR;
     }
     bool tpPinchSwitch = false;
-    GetTouchpadPinchSwitch(tpPinchSwitch);
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    GetTouchpadPinchSwitch(userId, tpPinchSwitch);
     if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT &&
         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
         action == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
@@ -595,7 +598,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadPinchGesture(libinput_event *
         return RET_ERR;
     }
     bool tpRotateSwitch = false;
-    GetTouchpadPinchSwitch(tpRotateSwitch);
+    GetTouchpadPinchSwitch(userId, tpRotateSwitch);
     if (!tpRotateSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT &&
         (action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN ||
         action == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
@@ -647,10 +650,9 @@ void TouchPadTransformProcessor::InitToolType()
     vecToolType_.push_back(std::make_pair(BTN_TOOL_LENS, PointerEvent::TOOL_TYPE_LENS));
 }
 
-int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(bool switchFlag)
+int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(int32_t userId, bool switchFlag)
 {
-    std::string name = "touchpadSwipe";
-    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+    if (PutConfigDataToDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SWIPE_SWITCH, switchFlag) != RET_OK) {
         MMI_HILOGE("Failed to set touchpad swpie switch flag to mem");
         return RET_ERR;
     }
@@ -660,16 +662,14 @@ int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(bool switchFlag)
     return RET_OK;
 }
 
-void TouchPadTransformProcessor::GetTouchpadSwipeSwitch(bool &switchFlag)
+void TouchPadTransformProcessor::GetTouchpadSwipeSwitch(int32_t userId, bool &switchFlag)
 {
-    std::string name = "touchpadSwipe";
-    GetConfigDataFromDatabase(name, switchFlag);
+    GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SWIPE_SWITCH, switchFlag);
 }
 
-int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
+int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(int32_t userId, bool switchFlag)
 {
-    std::string name = "touchpadPinch";
-    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+    if (PutConfigDataToDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_PINCH_SWITCH, switchFlag) != RET_OK) {
         MMI_HILOGE("Failed to set touchpad pinch switch flag to mem");
         return RET_ERR;
     }
@@ -679,16 +679,14 @@ int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
     return RET_OK;
 }
 
-void TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
+void TouchPadTransformProcessor::GetTouchpadPinchSwitch(int32_t userId, bool &switchFlag)
 {
-    std::string name = "touchpadPinch";
-    GetConfigDataFromDatabase(name, switchFlag);
+    GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_PINCH_SWITCH, switchFlag);
 }
 
-int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
+int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(int32_t userId, bool rotateSwitch)
 {
-    std::string name = "touchpadRotate";
-    if (PutConfigDataToDatabase(name, rotateSwitch) != RET_OK) {
+    if (PutConfigDataToDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_ROTATE_SWITCH, rotateSwitch) != RET_OK) {
         MMI_HILOGE("PutConfigDataToDatabase failed");
         return RET_ERR;
     }
@@ -698,27 +696,48 @@ int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
     return RET_OK;
 }
 
-void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
+void TouchPadTransformProcessor::GetTouchpadRotateSwitch(int32_t userId, bool &rotateSwitch)
 {
-    std::string name = "touchpadRotate";
-    GetConfigDataFromDatabase(name, rotateSwitch);
+    GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_ROTATE_SWITCH, rotateSwitch);
 }
 
-int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switchFlag)
+int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(int32_t userId, bool switchFlag)
 {
-    std::string name = "touchpadDoubleTapAndDrag";
-    if (!PREFERENCES_MGR->IsInitPreference()) {
-        MMI_HILOGE("Preference is not init");
-        return RET_ERR;
+    if (dataShareReady_.load()) {
+        if (PutConfigDataToDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_DOUBLE_TAP_AND_DRAG,
+            switchFlag) != RET_OK) {
+            MMI_HILOGE("PutConfigDataToDatabase failed");
+            return RET_ERR;
+        }
+        NotifyLibinputDragState(switchFlag);
+        DfxHisysevent::ReportTouchpadSettingState(
+            DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_DOUBLE_TAP_DRAG_SETTING, switchFlag);
     }
-    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("PutConfigDataToDatabase failed");
-        return RET_ERR;
-    }
+    return RET_OK;
+}
 
+void TouchPadTransformProcessor::OnDataShareReady(int32_t userId)
+{
+    dataShareReady_.store(true);
+    bool switchFlag = true;
+    GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_DOUBLE_TAP_AND_DRAG, switchFlag);
+    NotifyLibinputDragState(switchFlag);
+}
+
+void TouchPadTransformProcessor::OnSwitchUser(int32_t userId)
+{
+    if (dataShareReady_.load()) {
+        bool switchFlag = true;
+        GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_DOUBLE_TAP_AND_DRAG, switchFlag);
+        NotifyLibinputDragState(switchFlag);
+    }
+}
+
+void TouchPadTransformProcessor::NotifyLibinputDragState(bool switchFlag)
+{
     auto originDevices = INPUT_DEV_MGR->GetTouchPadDeviceOrigins();
     if (originDevices.empty()) {
-        return RET_OK;
+        return;
     }
 
     auto state = LIBINPUT_CONFIG_DRAG_DISABLED;
@@ -733,45 +752,55 @@ int32_t TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(bool switch
         MMI_HILOGI("Touchpad set double tap and drag state successfully, "
             "state:%{public}d, ret:%{public}d", state, ret);
     }
-
-    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_DOUBLE_TAP_DRAG_SETTING,
-        switchFlag);
-    return RET_OK;
 }
 
-void TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
+void TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(int32_t userId, bool &switchFlag)
 {
-    std::string name = "touchpadDoubleTapAndDrag";
-    GetConfigDataFromDatabase(name, switchFlag);
+    if (dataShareReady_.load()) {
+        GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_DOUBLE_TAP_AND_DRAG, switchFlag);
+    }
 }
 
-int32_t TouchPadTransformProcessor::SetTouchpadScrollRows(int32_t rows)
+int32_t TouchPadTransformProcessor::SetTouchpadScrollRows(int32_t userId, int32_t rows)
 {
     CALL_DEBUG_ENTER;
     int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
-    std::string name = "touchpadScrollRows";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, TOUCHPAD_FILE_NAME, newRows);
+    bool isSuccess = INPUT_SETTING_MANAGER->SetIntValue(userId, TOUCHPAD_KEY_SETTING,
+        FIELD_TOUCHPAD_SCROLL_ROWS, newRows);
+    if (!isSuccess) {
+        MMI_HILOGE("Set touchpad scroll rows failed, rows:%{public}d", newRows);
+        return RET_ERR;
+    }
     MMI_HILOGD("Set touchpad scroll rows successfully, rows:%{public}d", newRows);
-    return ret;
+    return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::GetTouchpadScrollRows()
+int32_t TouchPadTransformProcessor::GetTouchpadScrollRows(int32_t userId)
 {
     CALL_DEBUG_ENTER;
-    std::string name = "touchpadScrollRows";
-    int32_t rows = PREFERENCES_MGR->GetIntValue(name, DEFAULT_ROWS);
+    int32_t rows = DEFAULT_ROWS;
+    INPUT_SETTING_MANAGER->GetIntValue(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_SCROLL_ROWS, rows);
     MMI_HILOGD("Get touchpad scroll rows successfully, rows:%{public}d", rows);
     return rows;
 }
 
-int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
+int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(int32_t userId, const std::string &settingKey,
+    const std::string &key, bool value)
 {
-    return PREFERENCES_MGR->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
+    bool isSuccess = INPUT_SETTING_MANAGER->SetBoolValue(userId, settingKey, key, value);
+    if (!isSuccess) {
+        MMI_HILOGE("SetBoolValue failed, key:%{public}s, value:%{public}d", key.c_str(), (int32_t)(value));
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
-void TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
+void TouchPadTransformProcessor::GetConfigDataFromDatabase(int32_t userId, const std::string &settingKey,
+    const std::string &key, bool &value)
 {
-    value = PREFERENCES_MGR->GetBoolValue(key, true);
+    INPUT_SETTING_MANAGER->GetBoolValue(userId, settingKey, key, value);
+    MMI_HILOGE("GetConfigDataFromDatabase, settingKey:%{public}s, key:%{public}s, value:%{public}d",
+        settingKey.c_str(), key.c_str(), (int32_t)(value));
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
@@ -893,10 +922,12 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
     }
 }
 
-int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(int32_t userId, bool switchFlag)
 {
-    if (PutConfigDataToDatabase(g_threeFingerTapKey, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem");
+    if (PutConfigDataToDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_THREE_FINGERTAP_SWITCH,
+        switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem, switchFlag:%{public}d",
+            static_cast<int32_t>(switchFlag));
         return RET_ERR;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_PINCH_SETTING,
@@ -904,9 +935,9 @@ int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switch
     return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(int32_t userId, bool &switchFlag)
 {
-    GetConfigDataFromDatabase(g_threeFingerTapKey, switchFlag);
+    GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_THREE_FINGERTAP_SWITCH, switchFlag);
     return RET_OK;
 }
 } // namespace MMI

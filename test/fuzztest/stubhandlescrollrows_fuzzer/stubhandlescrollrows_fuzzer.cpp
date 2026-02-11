@@ -31,10 +31,11 @@ namespace MMI {
 void StubHandleScrollRowsFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
+    int32_t userId = 0;
     int32_t rows = provider.ConsumeIntegral<int32_t>();
 
     MMIService::GetInstance()->SetMouseScrollRows(rows);
-    MMIService::GetInstance()->ReadMouseScrollRows(rows);
+    MMIService::GetInstance()->ReadMouseScrollRows(userId, rows);
     MMIService::GetInstance()->GetMouseScrollRows(rows);
 }
 } // MMI

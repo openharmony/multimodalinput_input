@@ -31,7 +31,7 @@ ohos_shared_library("mmi_property_name_mapper") {
 
   include_dirs = [
     "include",
-    "${mmi_path}/intention/prototype/include",
+    "${mmi_path}/intention/prototype/include"
   ]
 
   sources = [ "src/property_name_mapper_impl.cpp" ]

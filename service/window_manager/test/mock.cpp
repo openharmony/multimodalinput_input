@@ -200,11 +200,11 @@ bool PointerDrawingManager::Init()
 {
     return true;
 }
-int32_t PointerDrawingManager::SetPointerColor(int32_t color)
+int32_t PointerDrawingManager::SetPointerColor(int32_t userId, int32_t color)
 {
     return 0;
 }
-int32_t PointerDrawingManager::GetPointerColor()
+int32_t PointerDrawingManager::GetPointerColor(int32_t userId)
 {
     return 0;
 }
@@ -236,11 +236,11 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
 {
     return 0;
 }
-int32_t PointerDrawingManager::SetPointerSize(int32_t size)
+int32_t PointerDrawingManager::SetPointerSize(int32_t userId, int32_t size)
 {
     return 0;
 }
-int32_t PointerDrawingManager::GetPointerSize()
+int32_t PointerDrawingManager::GetPointerSize(int32_t userId)
 {
     return 0;
 }

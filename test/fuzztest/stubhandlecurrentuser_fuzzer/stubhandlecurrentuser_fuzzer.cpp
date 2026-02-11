@@ -31,7 +31,6 @@ namespace MMI {
 void StubHandleCurrentUserFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
-
     int32_t userId = provider.ConsumeIntegral<int32_t>();
 
     MMIService::GetInstance()->SetCurrentUser(userId);

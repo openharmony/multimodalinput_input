@@ -157,7 +157,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAcce
     auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
     inputWindowsManager->captureModeInfo_.isCaptureMode = true;
-    double ret = processor.HandleAxisAccelateTouchPad(axisValue);
+    int32_t userId = 100;
+    double ret = processor.HandleAxisAccelateTouchPad(userId, axisValue);
     ASSERT_EQ(ret, 2.0);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD

@@ -55,21 +55,23 @@ public:
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap);
     bool GetPointerVisible(int32_t pid);
-    int32_t SetPointerColor(int32_t color);
-    int32_t GetPointerColor();
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension);
+    int32_t SetPointerColor(int32_t userId, int32_t color);
+    int32_t GetPointerColor(int32_t userId);
+    int32_t SetPointerStyle(int32_t userId, int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension);
+    int32_t GetPointerStyle(int32_t userId, int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false);
     void DrawPointerStyle(const PointerStyle &pointerStyle);
     bool IsPointerVisible();
     void SetMouseDisplayState(bool state);
     bool GetMouseDisplayState();
     int32_t SetCustomCursor(CursorPixelMap curPixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY);
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, CustomCursor cursor, CursorOptions options);
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap);
+    int32_t SetMouseIcon(int32_t userId, int32_t pid, int32_t windowId, CursorPixelMap curPixelMap);
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
-    int32_t SetPointerSize(int32_t size);
-    int32_t GetPointerSize();
+    int32_t SetPointerSize(int32_t userId, int32_t size);
+    int32_t GetPointerSize(int32_t userId);
     void GetPointerImageSize(int32_t &width, int32_t &height);
     int32_t GetCursorSurfaceId(uint64_t &surfaceId);
     PointerStyle GetLastMouseStyle();
@@ -139,9 +141,9 @@ public:
     ~CursorDrawingInformation();
     static CursorDrawingInformation& GetInstance();
 
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+    int32_t GetPointerStyle(int32_t userId, int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
         bool isUiExtension = false);
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+    int32_t SetPointerStyle(int32_t userId, int32_t pid, int32_t windowId, PointerStyle pointerStyle,
         bool isUiExtension = false);
     int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap);
     bool GetPointerVisible(int32_t pid);
@@ -149,7 +151,7 @@ public:
     bool IsPointerVisible();
     void OnSessionLost(int32_t pid);
     ICON_TYPE MouseIcon2IconType(MOUSE_ICON m);
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, CursorPixelMap curPixelMap);
+    int32_t SetMouseIcon(int32_t userId, int32_t pid, int32_t windowId, CursorPixelMap curPixelMap);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     bool IsPointerStyleParamValid(int32_t windowId, PointerStyle pointerStyle);
     int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
@@ -175,6 +177,8 @@ public:
     PointerStyle GetLastMouseStyle();
 
 private:
+    int32_t GetCurrentUser();
+
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     std::list<PidInfo> hapPidInfos_;

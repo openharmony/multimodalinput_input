@@ -126,6 +126,7 @@ external_deps = [
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "libinput:libinput-third-mmi",
 ]
 
 part_name = "${mmi_part_name}"
@@ -148,7 +149,7 @@ include_dirs = [
 
 sources = [
     "src/mouse_preference_accessor.cpp"
- ]
+]
 
 configs = [ "${mmi_path}/common/anco/comm:mmi_anco_channel_config" ]
 

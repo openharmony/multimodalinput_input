@@ -16,6 +16,7 @@
 #include <charconv>
 #include "account_manager.h"
 
+#include "os_account_manager.h"
 #ifdef SCREENLOCK_MANAGER_ENABLED
 #include <screenlock_manager.h>
 #endif // SCREENLOCK_MANAGER_ENABLED
@@ -31,6 +32,8 @@
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
 #include "dfx_hisysevent.h"
 #endif // OHOS_BUILD_ENABLE_DFX_RADAR
+
+#include "i_setting_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 #include "touchpad_settings_handler.h"
@@ -55,6 +58,7 @@ const std::string ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN { "accessibility_shortcut_
 const std::string ACC_SHORTCUT_TIMEOUT { "accessibility_shortcut_timeout" };
 const std::string SECURE_SETTING_URI_PROXY {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_%d?Proxy=true" };
+constexpr int32_t INVALID_USER_ID { -1 };
 }
 
 std::shared_ptr<AccountManager> AccountManager::instance_;
@@ -315,6 +319,11 @@ AccountManager::AccountManager()
                 DISPLAY_MONITOR->SetScreenLocked(false);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
+        }, {
+            EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY,
+            [this](const EventFwk::CommonEventData &data) {
+                OnDataShareReady(data);
+            }
         }
     };
 }
@@ -322,6 +331,43 @@ AccountManager::AccountManager()
 AccountManager::~AccountManager()
 {
     AccountManagerUnregister();
+}
+
+int32_t AccountManager::GetAccountIdFromUid(int32_t uid)
+{
+    int32_t userId = INVALID_USER_ID;
+    auto errCode = AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    if (errCode != RET_OK) {
+        MMI_HILOGI("GetOsAccountLocalIdFromUid failed, errCode:%{public}d", errCode);
+    }
+    return userId;
+}
+
+std::vector<int32_t> AccountManager::QueryAllCreatedOsAccounts()
+{
+    std::vector<int32_t> userIds;
+    std::vector<AccountSA::OsAccountInfo> osAccountInfos;
+    auto ret = AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    if (ret != 0) {
+        MMI_HILOGE("Query all accounts failed");
+        return userIds;
+    }
+    for (AccountSA::OsAccountInfo osAccountInfo : osAccountInfos) {
+        userIds.push_back(osAccountInfo.GetLocalId());
+    }
+    return userIds;
+}
+
+int32_t AccountManager::QueryCurrentAccountId()
+{
+    int32_t localId = 0;
+    int32_t ret = AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(localId);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("GetForegroundOsAccountLocalId failed");
+        return DEFAULT_USER_ID;
+    }
+    MMI_HILOGI("GetForegroundOsAccountLocalId localId: %{private}d", localId);
+    return localId;
 }
 
 void AccountManager::AccountManagerUnregister()
@@ -453,6 +499,7 @@ void AccountManager::OnAddUser(const EventFwk::CommonEventData &data)
     if (!isNew) {
         MMI_HILOGW("Account(%d) has existed", accountId);
     }
+    INPUT_SETTING_MANAGER->OnAddUser(accountId);
 }
 
 void AccountManager::OnRemoveUser(const EventFwk::CommonEventData &data)
@@ -465,6 +512,7 @@ void AccountManager::OnRemoveUser(const EventFwk::CommonEventData &data)
     } else {
         MMI_HILOGW("No account(%d)", accountId);
     }
+    INPUT_SETTING_MANAGER->OnRemoveUser(accountId);
 }
 
 void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
@@ -489,12 +537,18 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
         currentAccountId_ = accountId;
         MMI_HILOGI("Switched to account(%d)", currentAccountId_);
     }
+    INPUT_SETTING_MANAGER->OnSwitchUser(currentAccountId_);
 }
 
 int32_t AccountManager::GetCurrentAccountId()
 {
     std::lock_guard<std::mutex> guard { lock_ };
     return currentAccountId_;
+}
+
+void AccountManager::OnDataShareReady(const EventFwk::CommonEventData &data)
+{
+    INPUT_SETTING_MANAGER->OnDataShareReady();
 }
 } // namespace MMI
 } // namespace OHOS

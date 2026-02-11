@@ -177,9 +177,6 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_NUM_LOCK
 #endif // OHOS_BUILD_ENABLE_WATCH
 };
-#ifdef OHOS_BUILD_ENABLE_ANCO
-constexpr int32_t DEFAULT_USER_ID { 100 };
-#endif // OHOS_BUILD_ENABLE_ANCO
 const std::string SYS_PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", SYS_GET_DEVICE_TYPE_PARAM);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
 // Define vkeyboard functions from vendor
@@ -472,6 +469,7 @@ int32_t MMIService::Init()
         return SASERVICE_INIT_FAIL;
     }
     MMI_HILOGI("Set para input.pointer.device false");
+    INPUT_SETTING_MANAGER->Initialize();
     return RET_OK;
     // LCOV_EXCL_STOP
 }
@@ -482,7 +480,6 @@ void MMIService::OnStart()
     CHK_PID_AND_TID();
     int32_t ret = Init();
     CHKNOKRV(ret, "Init mmi_service failed");
-    MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
     auto keyHandler = InputHandler->GetKeyCommandHandler();
     if (keyHandler != nullptr) {
@@ -530,11 +527,6 @@ void MMIService::OnStart()
         CursorDrawingComponent::GetInstance().InitDefaultMouseIconPath();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    bool switchFlag = false;
-    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
-    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(switchFlag);
-#endif
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -790,9 +782,10 @@ ErrCode MMIService::SetMouseScrollRows(int32_t rows)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [rows] {
-            return MouseEventHdr->SetMouseScrollRows(rows);
+        [userId, rows] {
+            return MouseEventHdr->SetMouseScrollRows(userId, rows);
         }
         );
     if (ret != RET_OK) {
@@ -887,9 +880,10 @@ int32_t MMIService::SetMouseIconInner(int32_t windowId, const CursorPixelMap& cu
         MMI_HILOGE("Check pid permission failed");
         return ret;
     }
+    int32_t userId = GetCallingUser();
     ret = delegateTasks_.PostSyncTask(std::bind(
-        [pid, windowId, curPixelMap] {
-            return CursorDrawingComponent::GetInstance().SetMouseIcon(pid, windowId, curPixelMap);
+        [userId, pid, windowId, curPixelMap] {
+            return CursorDrawingComponent::GetInstance().SetMouseIcon(userId, pid, windowId, curPixelMap);
         }
         ));
     if (ret != RET_OK) {
@@ -971,9 +965,9 @@ ErrCode MMIService::SetNapStatus(int32_t pid, int32_t uid, const std::string& bu
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t MMIService::ReadMouseScrollRows(int32_t &rows)
+int32_t MMIService::ReadMouseScrollRows(int32_t userId, int32_t &rows)
 {
-    rows = MouseEventHdr->GetMouseScrollRows();
+    rows = MouseEventHdr->GetMouseScrollRows(userId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -991,9 +985,10 @@ ErrCode MMIService::GetMouseScrollRows(int32_t &rows)
     }
     rows = TOUCHPAD_SCROLL_ROWS;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &rows] {
-            return this->ReadMouseScrollRows(rows);
+        [this, userId, &rows] {
+            return this->ReadMouseScrollRows(userId, rows);
         }
         );
     if (ret != RET_OK) {
@@ -1017,9 +1012,10 @@ ErrCode MMIService::SetPointerSize(int32_t size)
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CursorDrawingComponent::GetInstance();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [size] {
-            return CursorDrawingComponent::GetInstance().SetPointerSize(size);
+        [userId, size] {
+            return CursorDrawingComponent::GetInstance().SetPointerSize(userId, size);
         }
         );
     if (ret != RET_OK) {
@@ -1031,10 +1027,10 @@ ErrCode MMIService::SetPointerSize(int32_t size)
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t MMIService::ReadPointerSize(int32_t &size)
+int32_t MMIService::ReadPointerSize(int32_t userId, int32_t &size)
 {
     // LCOV_EXCL_START
-    size = CursorDrawingComponent::GetInstance().GetPointerSize();
+    size = CursorDrawingComponent::GetInstance().GetPointerSize(userId);
     return RET_OK;
     // LCOV_EXCL_STOP
 }
@@ -1054,9 +1050,10 @@ ErrCode MMIService::GetPointerSize(int32_t &size)
     size = 1;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CursorDrawingComponent::GetInstance();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &size] {
-            return this->ReadPointerSize(size);
+        [this, userId, &size] {
+            return this->ReadPointerSize(userId, size);
         }
         );
     if (ret != RET_OK) {
@@ -1101,9 +1098,10 @@ ErrCode MMIService::SetMousePrimaryButton(int32_t primaryButton)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [primaryButton] {
-            return MouseEventHdr->SetMousePrimaryButton(primaryButton);
+        [userId, primaryButton] {
+            return MouseEventHdr->SetMousePrimaryButton(userId, primaryButton);
         }
         );
     if (ret != RET_OK) {
@@ -1115,10 +1113,10 @@ ErrCode MMIService::SetMousePrimaryButton(int32_t primaryButton)
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t MMIService::ReadMousePrimaryButton(int32_t &primaryButton)
+int32_t MMIService::ReadMousePrimaryButton(int32_t userId, int32_t &primaryButton)
 {
     // LCOV_EXCL_START
-    primaryButton = MouseEventHdr->GetMousePrimaryButton();
+    primaryButton = MouseEventHdr->GetMousePrimaryButton(userId);
     return RET_OK;
     // LCOV_EXCL_STOP
 }
@@ -1133,9 +1131,10 @@ ErrCode MMIService::GetMousePrimaryButton(int32_t &primaryButton)
     }
     primaryButton = -1;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &primaryButton] {
-            return this->ReadMousePrimaryButton(primaryButton);
+        [this, userId, &primaryButton] {
+            return this->ReadMousePrimaryButton(userId, primaryButton);
         }
         );
     if (ret != RET_OK) {
@@ -1244,9 +1243,10 @@ ErrCode MMIService::SetPointerColor(int32_t color)
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CursorDrawingComponent::GetInstance();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [color] {
-            return CursorDrawingComponent::GetInstance().SetPointerColor(color);
+        [userId, color] {
+            return CursorDrawingComponent::GetInstance().SetPointerColor(userId, color);
         }
         );
     if (ret != RET_OK) {
@@ -1258,10 +1258,10 @@ ErrCode MMIService::SetPointerColor(int32_t color)
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t MMIService::ReadPointerColor(int32_t &color)
+int32_t MMIService::ReadPointerColor(int32_t userId, int32_t &color)
 {
     if (POINTER_DEV_MGR.isInit) {
-        color = CursorDrawingComponent::GetInstance().GetPointerColor();
+        color = CursorDrawingComponent::GetInstance().GetPointerColor(userId);
     }
     return RET_OK;
 }
@@ -1281,9 +1281,10 @@ ErrCode MMIService::GetPointerColor(int32_t &color)
     color = DEFAULT_POINTER_COLOR;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CursorDrawingComponent::GetInstance();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &color] {
-            return this->ReadPointerColor(color);
+        [this, userId, &color] {
+            return this->ReadPointerColor(userId, color);
         }
         );
     if (ret != RET_OK) {
@@ -1302,9 +1303,10 @@ ErrCode MMIService::SetPointerSpeed(int32_t speed)
         return ERROR_NOT_SYSAPI;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [speed] {
-            return MouseEventHdr->SetPointerSpeed(speed);
+        [userId, speed] {
+            return MouseEventHdr->SetPointerSpeed(userId, speed);
         }
         );
     if (ret != RET_OK) {
@@ -1316,10 +1318,10 @@ ErrCode MMIService::SetPointerSpeed(int32_t speed)
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t MMIService::ReadPointerSpeed(int32_t &speed)
+int32_t MMIService::ReadPointerSpeed(int32_t userId, int32_t &speed)
 {
     // LCOV_EXCL_START
-    speed = MouseEventHdr->GetPointerSpeed();
+    speed = MouseEventHdr->GetPointerSpeed(userId);
     return RET_OK;
     // LCOV_EXCL_STOP
 }
@@ -1334,9 +1336,10 @@ ErrCode MMIService::GetPointerSpeed(int32_t &speed)
     }
     speed = 0;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &speed] {
-            return this->ReadPointerSpeed(speed);
+        [this, userId, &speed] {
+            return this->ReadPointerSpeed(userId, speed);
         }
         );
     if (ret != RET_OK) {
@@ -1386,13 +1389,14 @@ ErrCode MMIService::SetPointerStyle(int32_t windowId, const PointerStyle& pointe
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [clientPid, windowId, pointerStyle, isUiExtension] {
+        [userId, clientPid, windowId, pointerStyle, isUiExtension] {
             if (!POINTER_DEV_MGR.isInit) {
                 return RET_ERR;
             }
             return CursorDrawingComponent::GetInstance().SetPointerStyle(
-                clientPid, windowId, pointerStyle, isUiExtension);
+                userId, clientPid, windowId, pointerStyle, isUiExtension);
         }
         );
     if (ret != RET_OK) {
@@ -1438,13 +1442,14 @@ ErrCode MMIService::GetPointerStyle(int32_t windowId, PointerStyle& pointerStyle
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [clientPid, windowId, &pointerStyle, isUiExtension] {
+        [userId, clientPid, windowId, &pointerStyle, isUiExtension] {
             if (!POINTER_DEV_MGR.isInit) {
                 return RET_ERR;
             }
             return CursorDrawingComponent::GetInstance().GetPointerStyle(
-                clientPid, windowId, pointerStyle, isUiExtension);
+                userId, clientPid, windowId, pointerStyle, isUiExtension);
         }
         );
     if (ret != RET_OK) {
@@ -1463,9 +1468,10 @@ ErrCode MMIService::SetHoverScrollState(bool state)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [state] {
-            return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetHoverScrollState(state);
+        [userId, state] {
+            return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetHoverScrollState(userId, state);
         }
         );
     if (ret != RET_OK) {
@@ -1477,10 +1483,10 @@ ErrCode MMIService::SetHoverScrollState(bool state)
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t MMIService::ReadHoverScrollState(bool &state)
+int32_t MMIService::ReadHoverScrollState(int32_t userId, bool &state)
 {
     // LCOV_EXCL_START
-    state = WIN_MGR->GetHoverScrollState();
+    state = WIN_MGR->GetHoverScrollState(userId);
     return RET_OK;
     // LCOV_EXCL_STOP
 }
@@ -1495,9 +1501,10 @@ ErrCode MMIService::GetHoverScrollState(bool &state)
     }
     state = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &state] {
-            return this->ReadHoverScrollState(state);
+        [this, userId, &state] {
+            return this->ReadHoverScrollState(userId, state);
         }
         );
     if (ret != RET_OK) {
@@ -1698,6 +1705,15 @@ ErrCode MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
     return ret;
 }
 
+int32_t MMIService::GetCallingUser()
+{
+    int32_t userId = ACCOUNT_MGR->GetAccountIdFromUid(GetCallingUid());
+    if (userId < 0) {
+        userId = ACCOUNT_MGR->GetCurrentAccountId();
+    }
+    return userId > 0 ? userId : DEFAULT_USER_ID;
+}
+
 ErrCode MMIService::SetKeyboardRepeatDelay(int32_t delay)
 {
     CALL_INFO_TRACE;
@@ -1710,9 +1726,10 @@ ErrCode MMIService::SetKeyboardRepeatDelay(int32_t delay)
         return ERROR_NOT_SYSAPI;
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [delay] {
-            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->SetKeyboardRepeatDelay(delay);
+        [userId, delay] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->SetKeyboardRepeatDelay(userId, delay);
         }
         );
     if (ret != RET_OK) {
@@ -1735,9 +1752,10 @@ ErrCode MMIService::SetKeyboardRepeatRate(int32_t rate)
         return ERROR_NOT_SYSAPI;
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [rate] {
-            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->SetKeyboardRepeatRate(rate);
+        [userId, rate] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->SetKeyboardRepeatRate(userId, rate);
         }
         );
     if (ret != RET_OK) {
@@ -1761,9 +1779,10 @@ ErrCode MMIService::GetKeyboardRepeatDelay(int32_t &delay)
     }
     delay = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [&delay] {
-            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->GetKeyboardRepeatDelay(delay);
+        [userId, &delay] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->GetKeyboardRepeatDelay(userId, delay);
         }
         );
     if (ret != RET_OK) {
@@ -1787,9 +1806,10 @@ ErrCode MMIService::GetKeyboardRepeatRate(int32_t &rate)
     }
     rate = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [&rate] {
-            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->GetKeyboardRepeatRate(rate);
+        [userId, &rate] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->GetKeyboardRepeatRate(userId, rate);
         }
         );
     if (ret != RET_OK) {
@@ -2277,25 +2297,25 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys,
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+int32_t MMIService::CheckInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell, useCoordinate);
+    return sMsgHandler_.OnInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, isShell, useCoordinate);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-int32_t MMIService::CheckTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+int32_t MMIService::CheckTouchPadEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     int32_t pid, const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    return sMsgHandler_.OnInjectTouchPadEvent(pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+    return sMsgHandler_.OnInjectTouchPadEvent(userId, pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -2320,12 +2340,13 @@ ErrCode MMIService::InjectPointerEvent(const PointerEvent& pointerEvent, bool is
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
+    int32_t userId = GetCallingUser();
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectPointerEventExt(pointerEventPtr, pid, isNativeInject, isShell);
+    ret = InjectPointerEventExt(userId, pointerEventPtr, pid, isNativeInject, isShell);
 #else
     ret = delegateTasks_.PostSyncTask(
-        [this, pointerEventPtr, pid, isNativeInject, isShell, useCoordinate] {
-            return this->CheckInjectPointerEvent(pointerEventPtr, pid, isNativeInject, isShell, useCoordinate);
+        [this, userId, pointerEventPtr, pid, isNativeInject, isShell, useCoordinate] {
+            return this->CheckInjectPointerEvent(userId, pointerEventPtr, pid, isNativeInject, isShell, useCoordinate);
         }
         );
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -2355,9 +2376,11 @@ ErrCode MMIService::InjectTouchPadEvent(const PointerEvent& pointerEvent,
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
+    int32_t userId = GetCallingUser();
     ret = delegateTasks_.PostSyncTask(
-        [this, pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell] {
-            return sMsgHandler_.OnInjectTouchPadEvent(pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell);
+        [this, userId, pointerEventPtr, pid, touchpadCDG, isNativeInject, isShell] {
+            return sMsgHandler_.OnInjectTouchPadEvent(userId, pointerEventPtr, pid, touchpadCDG,
+                isNativeInject, isShell);
         }
         );
     if (ret != RET_OK) {
@@ -3509,27 +3532,27 @@ ErrCode MMIService::SetKeyDownDuration(const std::string &businessId, int32_t de
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-int32_t MMIService::ReadTouchpadScrollSwich(bool &switchFlag)
+int32_t MMIService::ReadTouchpadScrollSwich(int32_t userId, bool &switchFlag)
 {
-    MouseEventHdr->GetTouchpadScrollSwitch(switchFlag);
+    MouseEventHdr->GetTouchpadScrollSwitch(userId, switchFlag);
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadScrollDirection(bool &switchFlag)
+int32_t MMIService::ReadTouchpadScrollDirection(int32_t userId, bool &switchFlag)
 {
-    MouseEventHdr->GetTouchpadScrollDirection(switchFlag);
+    MouseEventHdr->GetTouchpadScrollDirection(userId, switchFlag);
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadTapSwitch(bool &switchFlag)
+int32_t MMIService::ReadTouchpadTapSwitch(int32_t userId, bool &switchFlag)
 {
-    MouseEventHdr->GetTouchpadTapSwitch(switchFlag);
+    MouseEventHdr->GetTouchpadTapSwitch(userId, switchFlag);
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
+int32_t MMIService::ReadTouchpadPointerSpeed(int32_t userId, int32_t &speed)
 {
-    MouseEventHdr->GetTouchpadPointerSpeed(speed);
+    MouseEventHdr->GetTouchpadPointerSpeed(userId, speed);
     return RET_OK;
 }
 
@@ -3539,35 +3562,35 @@ int32_t MMIService::ReadTouchpadCDG(TouchpadCDG &touchpadCDG)
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
+int32_t MMIService::ReadTouchpadRightMenuType(int32_t userId, int32_t &type)
 {
-    MouseEventHdr->GetTouchpadRightClickType(type);
+    MouseEventHdr->GetTouchpadRightClickType(userId, type);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
+int32_t MMIService::ReadTouchpadPinchSwitch(int32_t userId, bool &switchFlag)
 {
-    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(userId, switchFlag);
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
+int32_t MMIService::ReadTouchpadSwipeSwitch(int32_t userId, bool &switchFlag)
 {
-    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(userId, switchFlag);
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
+int32_t MMIService::ReadTouchpadRotateSwitch(int32_t userId, bool &rotateSwitch)
 {
-    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(userId, rotateSwitch);
     return RET_OK;
 }
 
-int32_t MMIService::ReadTouchpadDoubleTapAndDragState(bool &switchFlag)
+int32_t MMIService::ReadTouchpadDoubleTapAndDragState(int32_t userId, bool &switchFlag)
 {
-    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(userId, switchFlag);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
@@ -3585,9 +3608,10 @@ ErrCode MMIService::SetTouchpadScrollSwitch(bool switchFlag)
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [clientPid, switchFlag] {
-            return MouseEventHdr->SetTouchpadScrollSwitch(clientPid,
+        [userId, clientPid, switchFlag] {
+            return MouseEventHdr->SetTouchpadScrollSwitch(userId, clientPid,
                 switchFlag);
         }
         );
@@ -3612,9 +3636,10 @@ ErrCode MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
     }
     switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &switchFlag] {
-            return this->ReadTouchpadScrollSwich(switchFlag);
+        [this, userId, &switchFlag] {
+            return this->ReadTouchpadScrollSwich(userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3637,9 +3662,10 @@ ErrCode MMIService::SetTouchpadScrollDirection(bool state)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [state] {
-            return MouseEventHdr->SetTouchpadScrollDirection(state);
+        [userId, state] {
+            return MouseEventHdr->SetTouchpadScrollDirection(userId, state);
         }
         );
     if (ret != RET_OK) {
@@ -3663,9 +3689,10 @@ ErrCode MMIService::GetTouchpadScrollDirection(bool &state)
     }
     state = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &state] {
-            return this->ReadTouchpadScrollDirection(state);
+        [this, userId, &state] {
+            return this->ReadTouchpadScrollDirection(userId, state);
         }
         );
     if (ret != RET_OK) {
@@ -3688,9 +3715,10 @@ ErrCode MMIService::SetTouchpadTapSwitch(bool switchFlag)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
-            return MouseEventHdr->SetTouchpadTapSwitch(switchFlag);
+        [userId, switchFlag] {
+            return MouseEventHdr->SetTouchpadTapSwitch(userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3714,9 +3742,10 @@ ErrCode MMIService::GetTouchpadTapSwitch(bool &switchFlag)
     }
     switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &switchFlag] {
-            return this->ReadTouchpadTapSwitch(switchFlag);
+        [this, userId, &switchFlag] {
+            return this->ReadTouchpadTapSwitch(userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3744,9 +3773,10 @@ ErrCode MMIService::SetTouchpadPointerSpeed(int32_t speed)
         speed = MAX_SPEED;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [speed] {
-            return MouseEventHdr->SetTouchpadPointerSpeed(speed);
+        [userId, speed] {
+            return MouseEventHdr->SetTouchpadPointerSpeed(userId, speed);
         }
         );
     if (ret != RET_OK) {
@@ -3770,9 +3800,10 @@ ErrCode MMIService::GetTouchpadPointerSpeed(int32_t &speed)
     }
     speed = 1;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &speed] {
-            return this->ReadTouchpadPointerSpeed(speed);
+        [this, userId, &speed] {
+            return this->ReadTouchpadPointerSpeed(userId, speed);
         }
         );
     if (ret != RET_OK) {
@@ -3824,9 +3855,11 @@ ErrCode MMIService::SetTouchpadPinchSwitch(bool switchFlag)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
+        [userId, switchFlag] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadPinchSwitch(
+                userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3850,9 +3883,10 @@ ErrCode MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
     }
     switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &switchFlag] {
-            return this->ReadTouchpadPinchSwitch(switchFlag);
+        [this, userId, &switchFlag] {
+            return this->ReadTouchpadPinchSwitch(userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3875,9 +3909,11 @@ ErrCode MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
+        [userId, switchFlag] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadSwipeSwitch(
+                userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3901,9 +3937,10 @@ ErrCode MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
     }
     switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &switchFlag] {
-            return this->ReadTouchpadSwipeSwitch(switchFlag);
+        [this, userId, &switchFlag] {
+            return this->ReadTouchpadSwipeSwitch(userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -3942,9 +3979,10 @@ ErrCode MMIService::SetTouchpadRightClickType(int32_t type)
         return RET_ERR;
     }
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [type] {
-            return MouseEventHdr->SetTouchpadRightClickType(type);
+        [userId, type] {
+            return MouseEventHdr->SetTouchpadRightClickType(userId, type);
         }
         );
     if (ret != RET_OK) {
@@ -3968,9 +4006,10 @@ ErrCode MMIService::GetTouchpadRightClickType(int32_t &type)
     }
     type = 1;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &type] {
-            return this->ReadTouchpadRightMenuType(type);
+        [this, userId, &type] {
+            return this->ReadTouchpadRightMenuType(userId, type);
         }
         );
     if (ret != RET_OK) {
@@ -3993,9 +4032,11 @@ ErrCode MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
         return ERROR_NOT_SYSAPI;
     }
 #if defined OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [rotateSwitch] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
+        [userId, rotateSwitch] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadRotateSwitch(
+                userId, rotateSwitch);
         }
         );
     if (ret != RET_OK) {
@@ -4019,9 +4060,10 @@ ErrCode MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
     }
     rotateSwitch = true;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &rotateSwitch] {
-            return this->ReadTouchpadRotateSwitch(rotateSwitch);
+        [this, userId, &rotateSwitch] {
+            return this->ReadTouchpadRotateSwitch(userId, rotateSwitch);
         }
         );
     if (ret != RET_OK) {
@@ -4044,10 +4086,11 @@ ErrCode MMIService::SetTouchpadDoubleTapAndDragState(bool switchFlag)
         return ERROR_NOT_SYSAPI;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
+        [userId, switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadDoubleTapAndDragState(
-                switchFlag);
+                userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -4062,18 +4105,17 @@ ErrCode MMIService::GetTouchpadDoubleTapAndDragState(bool &switchFlag)
 {
     CALL_INFO_TRACE;
     if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
     switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &switchFlag] {
-            return this->ReadTouchpadDoubleTapAndDragState(switchFlag);
+        [this, userId, &switchFlag] {
+            return this->ReadTouchpadDoubleTapAndDragState(userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -4541,10 +4583,11 @@ ErrCode MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         return ERROR_NOT_SYSAPI;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [switchFlag] {
+        [userId, switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
-                switchFlag);
+                userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -4564,10 +4607,11 @@ ErrCode MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
     }
     switchFlag = true;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [&switchFlag] {
+        [userId, &switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
-                switchFlag);
+                userId, switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -4711,9 +4755,10 @@ ErrCode MMIService::SetTouchpadScrollRows(int32_t rows)
     }
     int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [newRows] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(newRows);
+        [userId, newRows] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(userId, newRows);
         }
         );
     if (ret != RET_OK) {
@@ -4725,10 +4770,10 @@ ErrCode MMIService::SetTouchpadScrollRows(int32_t rows)
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
+int32_t MMIService::ReadTouchpadScrollRows(int32_t userId, int32_t &rows)
 {
     // LCOV_EXCL_START
-    rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows(userId);
     return RET_OK;
     // LCOV_EXCL_STOP
 }
@@ -4747,9 +4792,10 @@ ErrCode MMIService::GetTouchpadScrollRows(int32_t &rows)
     }
     rows = TOUCHPAD_SCROLL_ROWS;
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
+    int32_t userId = GetCallingUser();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &rows] {
-            return this->ReadTouchpadScrollRows(rows);
+        [this, userId, &rows] {
+            return this->ReadTouchpadScrollRows(userId, rows);
         }
         );
     if (ret != RET_OK) {

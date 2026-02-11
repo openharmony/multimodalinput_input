@@ -169,64 +169,64 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t devic
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
+int32_t TouchEventNormalize::SetTouchpadPinchSwitch(int32_t userId, bool switchFlag) const
 {
-    return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
+    return TouchPadTransformProcessor::SetTouchpadPinchSwitch(userId, switchFlag);
 }
 
-void TouchEventNormalize::GetTouchpadPinchSwitch(bool &switchFlag) const
+void TouchEventNormalize::GetTouchpadPinchSwitch(int32_t userId, bool &switchFlag) const
 {
-    TouchPadTransformProcessor::GetTouchpadPinchSwitch(switchFlag);
+    TouchPadTransformProcessor::GetTouchpadPinchSwitch(userId, switchFlag);
 }
 
-int32_t TouchEventNormalize::SetTouchpadSwipeSwitch(bool switchFlag) const
+int32_t TouchEventNormalize::SetTouchpadSwipeSwitch(int32_t userId, bool switchFlag) const
 {
-    return TouchPadTransformProcessor::SetTouchpadSwipeSwitch(switchFlag);
+    return TouchPadTransformProcessor::SetTouchpadSwipeSwitch(userId, switchFlag);
 }
 
-void TouchEventNormalize::GetTouchpadSwipeSwitch(bool &switchFlag) const
+void TouchEventNormalize::GetTouchpadSwipeSwitch(int32_t userId, bool &switchFlag) const
 {
-    TouchPadTransformProcessor::GetTouchpadSwipeSwitch(switchFlag);
+    TouchPadTransformProcessor::GetTouchpadSwipeSwitch(userId, switchFlag);
 }
 
-int32_t TouchEventNormalize::SetTouchpadRotateSwitch(bool rotateSwitch) const
+int32_t TouchEventNormalize::SetTouchpadRotateSwitch(int32_t userId, bool rotateSwitch) const
 {
-    return TouchPadTransformProcessor::SetTouchpadRotateSwitch(rotateSwitch);
+    return TouchPadTransformProcessor::SetTouchpadRotateSwitch(userId, rotateSwitch);
 }
 
-void TouchEventNormalize::GetTouchpadRotateSwitch(bool &rotateSwitch) const
+void TouchEventNormalize::GetTouchpadRotateSwitch(int32_t userId, bool &rotateSwitch) const
 {
-    TouchPadTransformProcessor::GetTouchpadRotateSwitch(rotateSwitch);
+    TouchPadTransformProcessor::GetTouchpadRotateSwitch(userId, rotateSwitch);
 }
 
-int32_t TouchEventNormalize::SetTouchpadDoubleTapAndDragState(bool switchFlag) const
+int32_t TouchEventNormalize::SetTouchpadDoubleTapAndDragState(int32_t userId, bool switchFlag) const
 {
-    return TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(switchFlag);
+    return TouchPadTransformProcessor::SetTouchpadDoubleTapAndDragState(userId, switchFlag);
 }
 
-void TouchEventNormalize::GetTouchpadDoubleTapAndDragState(bool &switchFlag) const
+void TouchEventNormalize::GetTouchpadDoubleTapAndDragState(int32_t userId, bool &switchFlag) const
 {
-    TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(switchFlag);
+    TouchPadTransformProcessor::GetTouchpadDoubleTapAndDragState(userId, switchFlag);
 }
 
-int32_t TouchEventNormalize::SetTouchpadScrollRows(int32_t rows)
+int32_t TouchEventNormalize::SetTouchpadScrollRows(int32_t userId, int32_t rows)
 {
-    return TouchPadTransformProcessor::SetTouchpadScrollRows(rows);
+    return TouchPadTransformProcessor::SetTouchpadScrollRows(userId, rows);
 }
 
-int32_t TouchEventNormalize::GetTouchpadScrollRows() const
+int32_t TouchEventNormalize::GetTouchpadScrollRows(int32_t userId) const
 {
-    return TouchPadTransformProcessor::GetTouchpadScrollRows();
+    return TouchPadTransformProcessor::GetTouchpadScrollRows(userId);
 }
 
-int32_t TouchEventNormalize::SetTouchpadThreeFingersTapSwitch(bool switchFlag) const
+int32_t TouchEventNormalize::SetTouchpadThreeFingersTapSwitch(int32_t userId, bool switchFlag) const
 {
-    return TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(switchFlag);
+    return TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(userId, switchFlag);
 }
 
-int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) const
+int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(int32_t userId, bool &switchFlag) const
 {
-    return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
+    return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(userId, switchFlag);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 

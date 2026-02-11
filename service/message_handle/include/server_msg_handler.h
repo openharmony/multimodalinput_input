@@ -118,13 +118,13 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void DealGesturePointers(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    int32_t OnInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell, int32_t useCoordinate);
-    int32_t OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    int32_t OnInjectTouchPadEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
-    int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
+    int32_t OnInjectPointerEventExt(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
         int32_t useCoordinate);
-    int32_t OnInjectTouchPadEventExt(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t OnInjectTouchPadEventExt(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
         const TouchpadCDG &touchpadCDG, bool isShell);
     int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -171,8 +171,9 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t AccelerateMotionTouchpad(std::shared_ptr<PointerEvent> pointerEvent, const TouchpadCDG &touchpadCDG);
+    int32_t AccelerateMotion(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t AccelerateMotionTouchpad(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent,
+        const TouchpadCDG& touchpadCDG);
     float ScreenFactor(const int32_t diagonalInch);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

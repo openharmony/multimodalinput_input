@@ -26,7 +26,7 @@
 #include "i_preference_manager.h"
 #include "i_cursor_drawing_component.h"
 #include "i_uds_server.h"
-
+#include "i_setting_manager.h"
 namespace OHOS {
 namespace MMI {
 class IInputServiceContext {
@@ -45,6 +45,7 @@ public:
     virtual std::shared_ptr<IKeyMapManager> GetKeyMapManager() const = 0;
     virtual std::shared_ptr<IPreferenceManager> GetPreferenceManager() const = 0;
     virtual ICursorDrawingComponent& GetCursorDrawingComponent() const = 0;
+    virtual std::shared_ptr<ISettingManager> GetSettingManager() const = 0;
 };
 } // namespace MMI
 } // namespace OHOS

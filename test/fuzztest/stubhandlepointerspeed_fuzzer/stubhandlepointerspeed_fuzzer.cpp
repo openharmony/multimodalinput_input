@@ -31,11 +31,12 @@ namespace MMI {
 void StubHandlePointerSpeedFuzzTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider provider(data, size);
+    int32_t userId = 0;
 
     int32_t speed = provider.ConsumeIntegral<int32_t>();
 
     MMIService::GetInstance()->SetTouchpadPointerSpeed(speed);
-    MMIService::GetInstance()->ReadTouchpadPointerSpeed(speed);
+    MMIService::GetInstance()->ReadTouchpadPointerSpeed(userId, speed);
     MMIService::GetInstance()->GetTouchpadPointerSpeed(speed);
 }
 } // MMI

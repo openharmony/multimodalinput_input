@@ -201,7 +201,7 @@ public:
     void InitAncoUds();
     void StopAncoUds();
     int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
-    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    int32_t InjectPointerEventExt(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
     ErrCode AncoAddChannel(const sptr<IAncoChannel>& channel) override;
     ErrCode AncoRemoveChannel(const sptr<IAncoChannel>& channel) override;
@@ -251,25 +251,25 @@ protected:
     int32_t CheckPointerVisible(bool &visible);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ReadMouseScrollRows(int32_t &rows);
-    int32_t ReadPointerSize(int32_t &size);
-    int32_t ReadMousePrimaryButton(int32_t &primaryButton);
-    int32_t ReadPointerSpeed(int32_t &speed);
-    int32_t ReadHoverScrollState(bool &state);
-    int32_t ReadPointerColor(int32_t &color);
-    int32_t ReadTouchpadScrollSwich(bool &switchFlag);
-    int32_t ReadTouchpadScrollDirection(bool &state);
-    int32_t ReadTouchpadTapSwitch(bool &switchFlag);
-    int32_t ReadTouchpadPointerSpeed(int32_t &speed);
+    int32_t ReadMouseScrollRows(int32_t userId, int32_t &rows);
+    int32_t ReadPointerSize(int32_t userId, int32_t &size);
+    int32_t ReadMousePrimaryButton(int32_t userId, int32_t &primaryButton);
+    int32_t ReadPointerSpeed(int32_t userId, int32_t &speed);
+    int32_t ReadHoverScrollState(int32_t userId, bool &state);
+    int32_t ReadPointerColor(int32_t userId, int32_t &color);
+    int32_t ReadTouchpadScrollSwich(int32_t userId, bool &switchFlag);
+    int32_t ReadTouchpadScrollDirection(int32_t userId, bool &state);
+    int32_t ReadTouchpadTapSwitch(int32_t userId, bool &switchFlag);
+    int32_t ReadTouchpadPointerSpeed(int32_t userId, int32_t &speed);
     int32_t ReadTouchpadCDG(TouchpadCDG &touchpadCDG);
-    int32_t ReadTouchpadRightMenuType(int32_t &type);
+    int32_t ReadTouchpadRightMenuType(int32_t userId, int32_t &type);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    int32_t ReadTouchpadPinchSwitch(bool &switchFlag);
-    int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
-    int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
-    int32_t ReadTouchpadDoubleTapAndDragState(bool &switchFlag);
-    int32_t ReadTouchpadScrollRows(int32_t &rows);
+    int32_t ReadTouchpadPinchSwitch(int32_t userId, bool &switchFlag);
+    int32_t ReadTouchpadSwipeSwitch(int32_t userId, bool &switchFlag);
+    int32_t ReadTouchpadRotateSwitch(int32_t userId, bool &rotateSwitch);
+    int32_t ReadTouchpadDoubleTapAndDragState(int32_t userId, bool &switchFlag);
+    int32_t ReadTouchpadScrollRows(int32_t userId, int32_t &rows);
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
@@ -290,9 +290,9 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::unordered_map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t CheckInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate);
-    int32_t CheckTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t CheckTouchPadEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell);
     bool InitLibinputService();
     bool InitService();
@@ -351,6 +351,7 @@ private:
     std::vector<std::string> FilterConsumers(const std::vector<std::string> &deviceNames);
     void UpdateConsumers(const cJSON* consumer);
     bool ParseDeviceConsumerConfig();
+    int32_t GetCallingUser();
 #ifdef OHOS_BUILD_ENABLE_TOUCH_GESTURE
     void AddSessionObserver();
     bool AddGestureHandlerSync(int32_t session, TouchGestureType gestureType, int32_t nFingers);

@@ -220,9 +220,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisibl
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerColor_001, TestSize.Level1)
 {
     int32_t color = 0;
-    EXPECT_NO_FATAL_FAILURE(instance_->SetPointerColor(color));
+    int32_t userId = 100;
+    EXPECT_NO_FATAL_FAILURE(instance_->SetPointerColor(userId, color));
 
-    auto ret = instance_->GetPointerColor();
+    auto ret = instance_->GetPointerColor(0);
     EXPECT_EQ(ret, color);
 }
 
@@ -234,17 +235,18 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerColor_
  */
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_001, TestSize.Level1)
 {
+    int32_t userId = 0;
     int32_t pid = 1;
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = 1;
     bool isUiExtension = false;
-    int32_t ret = instance_->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_ERR);
 
     EXPECT_NO_FATAL_FAILURE(instance_->DrawPointerStyle(pointerStyle));
 
-    ret = instance_->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    ret = instance_->GetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_OK);
 
     auto style = instance_->GetLastMouseStyle();
@@ -308,8 +310,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetMouseIcon_001
 {
     int32_t pid = 1;
     int32_t windowId = 1;
+    int32_t userId = 100;
     CursorPixelMap curPixelMap;
-    int32_t ret = instance_->SetMouseIcon(pid, windowId, curPixelMap);
+    int32_t ret = instance_->SetMouseIcon(userId, pid, windowId, curPixelMap);
     EXPECT_EQ(ret, RET_ERR);
 
     EXPECT_NO_FATAL_FAILURE(instance_->GetMouseIconPath());
@@ -357,9 +360,10 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetCustomCursor_
 HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerSize_001, TestSize.Level1)
 {
     int32_t size = 1;
-    int32_t ret = instance_->SetPointerSize(size);
+    int32_t userId = 100;
+    int32_t ret = instance_->SetPointerSize(userId, size);
     EXPECT_EQ(ret, RET_OK);
-    ret = instance_->GetPointerSize();
+    ret = instance_->GetPointerSize(userId);
     EXPECT_EQ(ret, size);
 }
 
@@ -632,8 +636,9 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetMouseIconPath
 {
     int32_t pid = 1;
     int32_t windowId = 1;
+    int32_t userId = 100;
     CursorPixelMap curPixelMap;
-    int32_t ret = instance_->SetMouseIcon(pid, windowId, curPixelMap);
+    int32_t ret = instance_->SetMouseIcon(userId, pid, windowId, curPixelMap);
     instance_->isLoaded_ = false;
     EXPECT_EQ(ret, RET_ERR);
     EXPECT_NO_FATAL_FAILURE(instance_->GetMouseIconPath());

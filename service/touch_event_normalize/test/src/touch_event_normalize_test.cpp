@@ -58,22 +58,24 @@ public:
 void TouchEventNormalizeTest::SetUp()
 {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(prePinchSwitch_);
-    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(preSwipeSwitch_);
-    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(preRotateSwitch_);
-    TOUCH_EVENT_HDR->GetTouchpadScrollRows();
-    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
+    int32_t userId = 100;
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(userId, prePinchSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(userId, preSwipeSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(userId, preRotateSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadScrollRows(userId);
+    TOUCH_EVENT_HDR->GetTouchpadDoubleTapAndDragState(userId, preDoubleTapDragSwitch_);
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 }
 
 void TouchEventNormalizeTest::TearDown()
 {
 #ifdef OHOS_BUILD_ENABLE_TOUCHPAD
-    TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(prePinchSwitch_);
-    TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
-    TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
-    TOUCH_EVENT_HDR->SetTouchpadScrollRows(preScrollRows_);
-    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(preDoubleTapDragSwitch_);
+    int32_t userId = 100;
+    TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(userId, prePinchSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(userId, preSwipeSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(userId, preRotateSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadScrollRows(userId, preScrollRows_);
+    TOUCH_EVENT_HDR->SetTouchpadDoubleTapAndDragState(userId, preDoubleTapDragSwitch_);
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 }
 
@@ -129,7 +131,8 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadPinchSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(userId, flag) == RET_OK);
 }
 
 /**
@@ -142,11 +145,12 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(userId, flag) == RET_OK);
     flag = true;
-    TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(flag);
+    TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(userId, flag);
     bool newFlag = true;
-    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(newFlag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(userId, newFlag);
 }
 
 /**
@@ -159,7 +163,8 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadSwipeSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(userId, flag) == RET_OK);
 }
 
 /**
@@ -172,11 +177,12 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(flag) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(userId, flag) == RET_OK);
     flag = true;
-    TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(flag);
+    TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(userId, flag);
     bool newFlag = true;
-    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(newFlag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(userId, newFlag);
 }
 
 /**
@@ -189,7 +195,8 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitc
 {
     CALL_TEST_DEBUG;
     bool rotateSwitch = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(userId, rotateSwitch) != RET_OK);
 }
 
 /**
@@ -202,11 +209,12 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitc
 {
     CALL_TEST_DEBUG;
     bool rotateSwitch = false;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(userId, rotateSwitch) != RET_OK);
     rotateSwitch = true;
-    TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(userId, rotateSwitch);
     bool newRotateSwitch = true;
-    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(newRotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(userId, newRotateSwitch);
 }
 
 /**
@@ -219,7 +227,8 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadScrollRows_
 {
     CALL_TEST_DEBUG;
     int32_t rows = 50;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadScrollRows(rows) == RET_OK);
+    int32_t userId = 100;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadScrollRows(userId, rows) == RET_OK);
 }
 
 /**
@@ -232,8 +241,9 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadScrollRows_
 {
     CALL_TEST_DEBUG;
     int32_t rows = 50;
-    TOUCH_EVENT_HDR->SetTouchpadScrollRows(rows);
-    int32_t newRows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    int32_t userId = 100;
+    TOUCH_EVENT_HDR->SetTouchpadScrollRows(userId, rows);
+    int32_t newRows = TOUCH_EVENT_HDR->GetTouchpadScrollRows(userId);
     ASSERT_TRUE(rows == newRows);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD

@@ -239,8 +239,8 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t pid, int32_t funcKey, bo
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-    bool isNativeInject, bool isShell, int32_t useCoordinate)
+int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -251,11 +251,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return checkReturn;
         }
     }
-    return OnInjectPointerEventExt(pointerEvent, isShell, useCoordinate);
+    return OnInjectPointerEventExt(userId, pointerEvent, isShell, useCoordinate);
 }
 
-int32_t ServerMsgHandler::OnInjectTouchPadEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-    const TouchpadCDG &touchpadCDG, bool isNativeInject, bool isShell)
+int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t pid, const TouchpadCDG& touchpadCDG, bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -266,7 +266,7 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(const std::shared_ptr<PointerEve
             return checkReturn;
         }
     }
-    return OnInjectTouchPadEventExt(pointerEvent, touchpadCDG, isShell);
+    return OnInjectTouchPadEventExt(userId, pointerEvent, touchpadCDG, isShell);
 }
 
 bool ServerMsgHandler::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -274,7 +274,7 @@ bool ServerMsgHandler::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEven
     return pointerEvent->GetZOrder() > 0;
 }
 
-int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<PointerEvent> pointerEvent,
+int32_t ServerMsgHandler::OnInjectTouchPadEventExt(int32_t userId, const std::shared_ptr<PointerEvent> pointerEvent,
     const TouchpadCDG &touchpadCDG, bool isShell)
 {
     CALL_DEBUG_ENTER;
@@ -286,7 +286,7 @@ int32_t ServerMsgHandler::OnInjectTouchPadEventExt(const std::shared_ptr<Pointer
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        int32_t ret = AccelerateMotionTouchpad(pointerEvent, touchpadCDG);
+        int32_t ret = AccelerateMotionTouchpad(userId, pointerEvent, touchpadCDG);
         if (ret != RET_OK) {
             MMI_HILOGE("Failed to accelerate motion, error:%{public}d", ret);
             return ret;
@@ -339,8 +339,8 @@ void ServerMsgHandler::DealGesturePointers(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
-    int32_t useCoordinate)
+int32_t ServerMsgHandler::OnInjectPointerEventExt(int32_t userId,
+    const std::shared_ptr<PointerEvent> pointerEvent, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -377,7 +377,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-            int32_t ret = AccelerateMotion(pointerEvent);
+            int32_t ret = AccelerateMotion(userId, pointerEvent);
             if (ret != RET_OK) {
                 MMI_HILOGE("Failed to accelerate motion, error:%{public}d", ret);
                 return ret;
@@ -425,7 +425,7 @@ float ServerMsgHandler::ScreenFactor(const int32_t diagonalInch)
     }
 }
 
-int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::AccelerateMotion(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
         (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) ||
@@ -463,11 +463,11 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         pointerEvent->HasFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER)) {
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
-            MouseEventHdr->GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT));
+            MouseEventHdr->GetTouchpadSpeed(userId), static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT));
     } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
-            MouseEventHdr->GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
+            MouseEventHdr->GetTouchpadSpeed(userId), static_cast<int32_t>(DeviceType::DEVICE_PC));
     } else {
         uint64_t deltaTime = 0;
 #ifdef OHOS_BUILD_MOUSE_REPORTING_RATE
@@ -483,12 +483,12 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
             int32_t diagonalInch = static_cast<int32_t>(diagonalMm / MM_TO_INCH);
             float factor = ScreenFactor(diagonalInch);
             ret = HandleMotionDynamicAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseEventHdr->GetPointerSpeed(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseEventHdr->GetPointerSpeed(userId),
             deltaTime, static_cast<double>(displayInfo->ppi), static_cast<double>(factor));
         } else {
             ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
-            MouseEventHdr->GetPointerSpeed(), static_cast<int32_t>(DeviceType::DEVICE_PC));
+            MouseEventHdr->GetPointerSpeed(userId), static_cast<int32_t>(DeviceType::DEVICE_PC));
         }
     }
     if (ret != RET_OK) {
@@ -506,7 +506,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::AccelerateMotionTouchpad(std::shared_ptr<PointerEvent> pointerEvent,
+int32_t ServerMsgHandler::AccelerateMotionTouchpad(int32_t userId, std::shared_ptr<PointerEvent> pointerEvent,
     const TouchpadCDG &touchpadCDG)
 {
     PointerEvent::PointerItem pointerItem {};
@@ -561,7 +561,7 @@ int32_t ServerMsgHandler::AccelerateMotionTouchpad(std::shared_ptr<PointerEvent>
     preTime = currentTime;
 #else
     ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseEventHdr->GetTouchpadSpeed(),
+        &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseEventHdr->GetTouchpadSpeed(userId),
             static_cast<int32_t>(DeviceType::DEVICE_PC));
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     if (ret != RET_OK) {
