@@ -6472,5 +6472,69 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetExternalObject, TestSize.Level1)
     InputManager::GetInstance()->GetExternalObject(pluginName, pluginRemoteStub);
     EXPECT_TRUE(!pluginRemoteStub);
 }
+
+/**
+ * @tc.name: InputManagerTest_SetMouseScrollDirection_001
+ * @tc.desc: Set mouse scroll direction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = InputManager::GetInstance()->SetMouseScrollDirection(false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->SetMouseScrollDirection(true);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetMouseScrollDirection_001
+ * @tc.desc: Get mouse scroll direction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetMouseScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool statefalse = false;
+    auto ret = InputManager::GetInstance()->GetMouseScrollDirection(statefalse);
+    ASSERT_EQ(ret, RET_OK);
+    bool statetrue = true;
+    ret = InputManager::GetInstance()->GetMouseScrollDirection(statetrue);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseScrollDirection_001
+ * @tc.desc: SetMouseScrollDirection and GetMouseScrollDirection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool state = true;
+    int32_t result = InputManager::GetInstance()->SetMouseScrollDirection(state);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetMouseScrollDirection(state);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseScrollDirection_001
+ * @tc.desc: SetMouseScrollDirection and GetMouseScrollDirection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollDirection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t result = InputManager::GetInstance()->SetMouseScrollSwitch(switchFlag);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetMouseScrollSwitch(switchFlag);
+    ASSERT_EQ(result, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

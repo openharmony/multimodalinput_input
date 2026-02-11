@@ -49,6 +49,8 @@ public:
     static int32_t SetTouchpadPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t speed);
     static void GetTouchpadPointerSpeed(IInputServiceContext &env, int32_t userId, int32_t &speed);
     static int32_t GetTouchpadScrollRows(IInputServiceContext &env, int32_t userId);
+    static int32_t SetMouseScrollDirection(IInputServiceContext &env, int32_t userId, bool state);
+    static void GetMouseScrollDirection(IInputServiceContext &env, int32_t userId, bool &state);
 
 private:
     static int32_t PutConfigDataToDatabase(IInputServiceContext &env, int32_t userId, const std::string &key,

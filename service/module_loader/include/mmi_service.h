@@ -193,6 +193,8 @@ public:
     ErrCode TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     ErrCode SetTouchpadScrollRows(int32_t rows) override;
     ErrCode GetTouchpadScrollRows(int32_t &rows) override;
+    ErrCode SetMouseScrollDirection(bool state) override;
+    ErrCode GetMouseScrollDirection(bool &state) override;
     ErrCode SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
     ErrCode SetClientInfo(int32_t pid, uint64_t readThreadId) override;

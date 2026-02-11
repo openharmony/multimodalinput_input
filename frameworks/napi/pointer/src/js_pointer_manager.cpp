@@ -1159,6 +1159,52 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     return promise;
 }
 
+napi_value JsPointerManager::SetMouseScrollDirection(napi_env env, bool state)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if (asyncContext == nullptr) {
+        MMI_HILOGE("asyncContext is null, return value is null");
+        return nullptr;
+    }
+    asyncContext->errorCode = InputManager::GetInstance()->SetMouseScrollDirection(state);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (napi_create_promise(env, &asyncContext->deferred, &promise) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(CREATE_PROMISE).c_str());
+        return nullptr;
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetMouseScrollDirection(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    bool state = true;
+    asyncContext->errorCode = InputManager::GetInstance()->GetMouseScrollDirection(state);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    asyncContext->reserve << ReturnType::BOOL << state;
+    napi_value promise = nullptr;
+    if (napi_create_promise(env, &asyncContext->deferred, &promise) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(CREATE_PROMISE).c_str());
+        return nullptr;
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
 napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, CustomCursor cursor,
     CursorOptions options)
 {

@@ -35,6 +35,7 @@ const std::string FIELD_MOUSE_HOVER_SCROLL_STATE = "isEnableHoverScroll";
 const std::string FIELD_MOUSE_POINTER_COLOR = "pointerColor";
 const std::string FIELD_MOUSE_POINTER_SIZE = "pointerSize";
 const std::string FIELD_MOUSE_POINTER_STYLE = "pointerStyle";
+const std::string FIELD_MOUSE_SCROLL_DIRECTION = "scrollDirection";
 const std::string FIELD_MAGIC_POINTER_COLOR = "magicPointerColor";
 const std::string FIELD_MAGIC_POINTER_SIZE = "magicPointerSize";
 // 触控板相关的设置项
@@ -59,7 +60,8 @@ const std::set<std::string> MOUSE_SETTING_FIELDS = {
     FIELD_MOUSE_HOVER_SCROLL_STATE,
     FIELD_MOUSE_POINTER_COLOR,
     FIELD_MOUSE_POINTER_SIZE,
-    FIELD_MOUSE_POINTER_STYLE
+    FIELD_MOUSE_POINTER_STYLE,
+    FIELD_MOUSE_SCROLL_DIRECTION
 };
 
 // 触摸板配置支持的键值白名单

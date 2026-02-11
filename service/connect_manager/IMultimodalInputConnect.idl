@@ -159,6 +159,8 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void SetPixelMapData([in] int infoId, [in] CursorPixelMap pixelMap);
     void SetTouchpadScrollRows([in] int rows);
     void GetTouchpadScrollRows([out] int rows);
+    void SetMouseScrollDirection([in] boolean state);
+    void GetMouseScrollDirection([out] boolean state);
     void SetClientInfo([in] int pid, [in] unsigned long readThreadId);
     void GetIntervalSinceLastInput([out] long timeInterval);
     [macrodef OHOS_BUILD_ENABLE_MAGICCURSOR] void GetPointerSnapshot([out] CursorPixelMap pixelMap);
