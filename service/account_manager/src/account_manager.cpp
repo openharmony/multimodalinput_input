@@ -570,9 +570,10 @@ bool AccountManager::UnRegisterCommonEventCallback(int32_t callbackId)
 
 void AccountManager::TriggerObserverCallback(const EventFwk::CommonEventData &data)
 {
+    decltype(observerCallbacks_) observers;
     {
         std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
-        auto observers = observerCallbacks_;
+        observers = observerCallbacks_;
     }
     for (const auto &[id, callback] : observers) {
         callback(data);
