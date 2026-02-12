@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <map>
-#include <mutex>
 
 #include "ani_common.h"
 #include "input_device.h"
