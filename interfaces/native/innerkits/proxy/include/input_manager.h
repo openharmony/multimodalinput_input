@@ -1365,6 +1365,22 @@ public:
      */
     int32_t RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
+    /**
+     * @brief Sets the state of the mouse scrolling direction.
+     * @param state Indicates the state of the mouse scrolling direction.
+     * @return return <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 24
+     */
+    int32_t SetMouseScrollDirection(bool state);
+
+    /**
+     * @brief Gets the state of the mouse scrolling direction.
+     * @param state Indicates the state of the mouse scrolling direction.
+     * @return return <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 24
+     */
+    int32_t GetMouseScrollDirection(bool &state);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

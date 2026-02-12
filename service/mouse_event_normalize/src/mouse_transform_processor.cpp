@@ -704,6 +704,16 @@ void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_sour
     }
 }
 
+void MouseTransformProcessor::SetMouseScrollAxisValue(libinput_pointer_axis_source source, double &axisValue)
+{
+    bool mouseScrollState = true;
+    int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    MousePreferenceAccessor::GetMouseScrollDirection(*env_, userId, mouseScrollState);
+    if (!mouseScrollState && source == LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
+        axisValue = -axisValue;
+    }
+}
+
 int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
@@ -811,6 +821,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 #else
         axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_, userId) * axisValue * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_WATCH
+        SetMouseScrollAxisValue(source, axisValue);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
@@ -827,6 +838,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 #else
         axisValue = MousePreferenceAccessor::GetMouseScrollRows(*env_, userId) * axisValue * tpScrollDirection;
 #endif // OHOS_BUILD_ENABLE_WATCH
+        SetMouseScrollAxisValue(source, axisValue);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;

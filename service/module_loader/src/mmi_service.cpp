@@ -4810,6 +4810,63 @@ ErrCode MMIService::GetTouchpadScrollRows(int32_t &rows)
     return RET_OK;
 }
 
+ErrCode MMIService::SetMouseScrollDirection(bool state)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Check inject permission failed");
+        return ERROR_NO_PERMISSION;
+    }
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
+    int32_t ret = delegateTasks_.PostSyncTask([this, userId, &state] {
+        return MouseEventHdr->SetMouseScrollDirection(userId, state);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set mouse scroll direction switch failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+ErrCode MMIService::GetMouseScrollDirection(bool &state)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputDeviceController()) {
+        MMI_HILOGE("Check inject permission failed");
+        return ERROR_NO_PERMISSION;
+    }
+    state = true;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t userId = GetCallingUser();
+    int32_t ret = delegateTasks_.PostSyncTask([this, userId, &state] {
+        return MouseEventHdr->GetMouseScrollDirection(userId, state);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get mouse scroll direction switch failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 ErrCode MMIService::AncoAddChannel(const sptr<IAncoChannel>& channel)
 {

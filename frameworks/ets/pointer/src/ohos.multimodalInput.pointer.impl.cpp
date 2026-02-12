@@ -830,6 +830,46 @@ int32_t GetPointerSizeSyncImpl()
     }
     return size;
 }
+
+bool GetMouseScrollDirectionAsync()
+{
+    CALL_DEBUG_ENTER;
+    bool state = true;
+    auto errorCode = InputManager::GetInstance()->GetMouseScrollDirection(state);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+    } else if (errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
+        MMI_HILOGE("Permission denied");
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "Permission denied.");
+    } else if (errorCode < RET_OK) {
+        MMI_HILOGE("Input Service Exception");
+        taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input Service Exception.");
+    } else if (errorCode != RET_OK) {
+        MMI_HILOGE("GetMouseScrollDirection failed");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+    }
+    return state;
+}
+
+void SetMouseScrollDirectionAsync(bool state)
+{
+    CALL_DEBUG_ENTER;
+    auto errorCode = InputManager::GetInstance()->SetMouseScrollDirection(state);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        taihe::set_business_error(COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+    } else if (errorCode == -COMMON_PERMISSION_CHECK_ERROR) {
+        MMI_HILOGE("Permission denied");
+        taihe::set_business_error(COMMON_PERMISSION_CHECK_ERROR, "Permission denied.");
+    } else if (errorCode < RET_OK) {
+        MMI_HILOGE("Input Service Exception");
+        taihe::set_business_error(INPUT_SERVICE_EXCEPTION, "Input Service Exception.");
+    } else if (errorCode != RET_OK) {
+        MMI_HILOGE("SetMouseScrollDirection failed");
+        taihe::set_business_error(COMMON_PARAMETER_ERROR, "Parameter error.");
+    }
+}
 } // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
@@ -879,4 +919,6 @@ TH_EXPORT_CPP_API_SetPointerSpeedSyncImpl(SetPointerSpeedSyncImpl);
 TH_EXPORT_CPP_API_IsPointerVisibleSyncImpl(IsPointerVisibleSyncImpl);
 TH_EXPORT_CPP_API_GetPointerColorSyncImpl(GetPointerColorSyncImpl);
 TH_EXPORT_CPP_API_GetPointerSizeSyncImpl(GetPointerSizeSyncImpl);
+TH_EXPORT_CPP_API_GetMouseScrollDirectionAsync(GetMouseScrollDirectionAsync);
+TH_EXPORT_CPP_API_SetMouseScrollDirectionAsync(SetMouseScrollDirectionAsync);
 // NOLINTEND
