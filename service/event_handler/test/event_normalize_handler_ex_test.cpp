@@ -95,7 +95,7 @@ using namespace testing::ext;
 
 InputPluginManager *mock_instance_plug{nullptr};
 int32_t mock_ret{RET_NOTDO};
-InputPluginManager *InputPluginManager::GetInstance()
+InputPluginManager *InputPluginManager::GetInstance(const std::string &directory)
 {
     return mock_instance_plug;
 }
