@@ -2434,6 +2434,7 @@ ohos_unittest("LongPressSubscribeHandlerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm_lite",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -2472,7 +2473,6 @@ ohos_unittest("StylusKeyTest") {
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "common_event_service:cesfwk_innerkits",
   ]
 }
 
