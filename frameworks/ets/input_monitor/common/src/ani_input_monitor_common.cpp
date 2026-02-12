@@ -175,7 +175,6 @@ int32_t TaiheMonitorConverter::TouchToTaihe(const PointerEvent::PointerItem &ite
     out.toolType.from_value(item.GetToolType());
     out.fixedDisplayX = taihe::optional<int32_t>(std::in_place_t{}, item.GetFixedDisplayX());
     out.fixedDisplayY = taihe::optional<int32_t>(std::in_place_t{}, item.GetFixedDisplayY());
-    out.blobId = taihe::optional<int32_t>(std::in_place_t{}, item.GeTBlobId());
     return RET_OK;
 }
 
