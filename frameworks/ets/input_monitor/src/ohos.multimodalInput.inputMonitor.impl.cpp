@@ -211,7 +211,7 @@ void offPinchByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receive
 
 void offRotateByNumber(int32_t fingers, ::taihe::optional_view<uintptr_t> receiver)
 {
-    if (fingers > 0) {
+    if (fingers < 0) {
         taihe::set_business_error(COMMON_PARAMETER_ERROR, "fingers is invalid");
         return;
     }
