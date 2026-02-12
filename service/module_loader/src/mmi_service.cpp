@@ -4818,10 +4818,10 @@ ErrCode MMIService::SetMouseScrollDirection(bool state)
         return MMISERVICE_NOT_RUNNING;
     }
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP");
+        MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PER_HELPER->CheckInjectPermission()) {
+    if (!PER_HELPER->CheckInputDeviceController()) {
         MMI_HILOGE("Check inject permission failed");
         return ERROR_NO_PERMISSION;
     }
@@ -4846,10 +4846,10 @@ ErrCode MMIService::GetMouseScrollDirection(bool &state)
         return MMISERVICE_NOT_RUNNING;
     }
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP or inject permission failed");
+        MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PER_HELPER->CheckInjectPermission()) {
+    if (!PER_HELPER->CheckInputDeviceController()) {
         MMI_HILOGE("Check inject permission failed");
         return ERROR_NO_PERMISSION;
     }
