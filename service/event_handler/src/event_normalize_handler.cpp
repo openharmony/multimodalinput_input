@@ -207,10 +207,20 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
+#ifndef OHOS_BUILD_ENABLE_TOUCHPAD
+            if (INPUT_DEV_MGR->IsTouchPadDevice(device)) {
+                break;
+            }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
             OnEventDeviceAdded(event);
             break;
         }
         case LIBINPUT_EVENT_DEVICE_REMOVED: {
+#ifndef OHOS_BUILD_ENABLE_TOUCHPAD
+            if (INPUT_DEV_MGR->IsTouchPadDevice(device)) {
+                break;
+            }
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
             OnEventDeviceRemoved(event);
             break;
         }
