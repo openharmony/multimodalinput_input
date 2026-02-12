@@ -25,9 +25,11 @@
 #include "iremote_broker.h"
 #include "i_input_device_consumer.h"
 #include "device_observer.h"
-#include <common_event_subscriber.h>
 
 namespace OHOS {
+namespace EventFwk {
+class CommonEventData;
+}
 namespace MMI {
 
 using PluginEventType = std::variant<libinput_event *, std::shared_ptr<PointerEvent>, std::shared_ptr<AxisEvent>,
