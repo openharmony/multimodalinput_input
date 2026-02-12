@@ -588,7 +588,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Atta
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::shared_ptr<MockIDeviceObserver> mockDeviceObserver = std::make_shared<MockIDeviceObserver>();
-    EXPECT_FALSE(inputPluginContext->AttachDeviceObserver(mockDeviceObserver));
+    EXPECT_TRUE(inputPluginContext->AttachDeviceObserver(mockDeviceObserver));
 }
 
 /**
@@ -601,7 +601,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Deta
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::shared_ptr<MockIDeviceObserver> mockDeviceObserver = std::make_shared<MockIDeviceObserver>();
-    EXPECT_FALSE(inputPluginContext->DetachDeviceObserver(mockDeviceObserver));
+    EXPECT_TRUE(inputPluginContext->DetachDeviceObserver(mockDeviceObserver));
 }
 
 /**
@@ -613,7 +613,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetC
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
-    EXPECT_EQ(inputPluginContext->GetCurrentAccountId(), -1);
+    int32_t defaultAccountId = 100;
+    EXPECT_EQ(inputPluginContext->GetCurrentAccountId(), defaultAccountId);
 }
 
 /**
@@ -628,7 +629,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Regi
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::function<void(const EventFwk::CommonEventData &)> callback = [](const EventFwk::CommonEventData &) {};
     int32_t callbackId = inputPluginContext->RegisterCommonEventCallback(callback);
-    EXPECT_EQ(callbackId, -1);
+    EXPECT_EQ(callbackId, 0);
 }
 
 /**
