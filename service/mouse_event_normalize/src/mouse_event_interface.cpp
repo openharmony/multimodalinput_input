@@ -326,6 +326,35 @@ void MouseEventInterface::GetTouchpadScrollDirection(int32_t userId, bool &state
     MousePreferenceAccessor::GetTouchpadScrollDirection(*env, userId, state);
 }
 
+int32_t MouseEventInterface::SetMouseScrollDirection(int32_t userId, bool state) const
+{
+    std::shared_ptr<IInputServiceContext> env;
+    {
+        std::lock_guard guard { mutex_ };
+        env = env_.lock();
+    }
+    if (env == nullptr) {
+        MMI_HILOGE("No input service context");
+        return RET_ERR;
+    }
+    return MousePreferenceAccessor::SetMouseScrollDirection(*env, userId, state);
+}
+
+int32_t MouseEventInterface::GetMouseScrollDirection(int32_t userId, bool &state) const
+{
+    std::shared_ptr<IInputServiceContext> env;
+    {
+        std::lock_guard guard { mutex_ };
+        env = env_.lock();
+    }
+    if (env == nullptr) {
+        MMI_HILOGE("No input service context");
+        return RET_ERR;
+    }
+    MousePreferenceAccessor::GetMouseScrollDirection(*env, userId, state);
+    return RET_OK;
+}
+
 int32_t MouseEventInterface::SetTouchpadTapSwitch(int32_t userId, bool switchFlag) const
 {
     auto env = GetEnv();

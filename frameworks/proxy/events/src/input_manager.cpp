@@ -786,6 +786,16 @@ int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
     return InputMgrImpl.GetTouchpadScrollRows(rows);
 }
 
+int32_t InputManager::SetMouseScrollDirection(bool state)
+{
+    return InputMgrImpl.SetMouseScrollDirection(state);
+}
+
+int32_t InputManager::GetMouseScrollDirection(bool &state)
+{
+    return InputMgrImpl.GetMouseScrollDirection(state);
+}
+
 void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     InputMgrImpl.ClearWindowPointerStyle(pid, windowId);

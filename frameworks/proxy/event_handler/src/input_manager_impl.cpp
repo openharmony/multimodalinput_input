@@ -2501,6 +2501,26 @@ int32_t InputManagerImpl::GetTouchpadScrollRows(int32_t &rows)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetMouseScrollDirection(bool state)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseScrollDirection(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the direction of mouse scroll failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::GetMouseScrollDirection(bool &state)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetMouseScrollDirection(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the direction of mouse scroll failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
 {
     CALL_INFO_TRACE;

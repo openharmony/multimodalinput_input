@@ -264,3 +264,11 @@ function GetPointerColorSyncImpl(): i32;
 
 @rename("getPointerSizeSync")
 function GetPointerSizeSyncImpl(): i32;
+
+@gen_async("getMouseScrollDirection")
+@gen_promise("getMouseScrollDirection")
+function GetMouseScrollDirectionAsync(): bool;
+
+@gen_async("setMouseScrollDirection")
+@gen_promise("setMouseScrollDirection")
+function SetMouseScrollDirectionAsync(state: bool): void;

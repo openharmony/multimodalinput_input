@@ -1352,5 +1352,27 @@ int32_t MultimodalInputConnectManager::RedispatchInputEvent(std::shared_ptr<Poin
     }
     return multimodalInputConnectService_->RedispatchInputEvent(*pointerEvent);
 }
+
+int32_t MultimodalInputConnectManager::SetMouseScrollDirection(bool state)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("MultimodalInputConnectService_ is nullptr");
+        return INVALID_HANDLER_ID;
+    }
+    return multimodalInputConnectService_->SetMouseScrollDirection(state);
+}
+
+int32_t MultimodalInputConnectManager::GetMouseScrollDirection(bool &state)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("MultimodalInputConnectService_ is nullptr");
+        return INVALID_HANDLER_ID;
+    }
+    return multimodalInputConnectService_->GetMouseScrollDirection(state);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -49,6 +49,8 @@ private:
     bool preScrollSwitch_ { true };
     bool preScrollDirection_ { true };
     bool preTapSwitch_ { true };
+    bool preMousePointerSpeed_ { true };
+    bool preMouseScrollDirection_ { true };
 };
 
 GeneralMouse MouseEventNormalizeTest::vMouse_;
@@ -106,6 +108,7 @@ void MouseEventNormalizeTest::SetUp()
     MouseEventHdr->GetTouchpadScrollSwitch(userId, preScrollSwitch_);
     MouseEventHdr->GetTouchpadScrollDirection(userId, preScrollDirection_);
     MouseEventHdr->GetTouchpadTapSwitch(userId, preTapSwitch_);
+    MouseEventHdr->GetMouseScrollDirection(userId, preMouseScrollDirection_);
 }
 
 void MouseEventNormalizeTest::TearDown()
@@ -120,6 +123,7 @@ void MouseEventNormalizeTest::TearDown()
     MouseEventHdr->SetTouchpadScrollSwitch(userId, pid, preScrollSwitch_);
     MouseEventHdr->SetTouchpadScrollDirection(userId, preScrollDirection_);
     MouseEventHdr->SetTouchpadTapSwitch(userId, preTapSwitch_);
+    MouseEventHdr->SetMouseScrollDirection(userId, preMouseScrollDirection_);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -578,6 +582,42 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEve
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     MouseEventHdr->CheckAndPackageAxisEvent(event);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetMouseScrollDirection_001
+ * @tc.desc: Test SetMouseScrollDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollDirection_001, TestSize.Level1)
+{
+    bool state = false;
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetMouseScrollDirection(userId, state) == RET_OK);
+    bool newState = true;
+    MouseEventHdr->GetMouseScrollDirection(userId, newState);
+    ASSERT_FALSE(newState);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetMouseScrollDirection_001
+ * @tc.desc: Test GetMouseScrollDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollDirection_001, TestSize.Level1)
+{
+    bool state = false;
+    bool newState = true;
+    int32_t userId = 100;
+    ASSERT_TRUE(MouseEventHdr->SetMouseScrollDirection(userId, state) == RET_OK);
+    MouseEventHdr->GetMouseScrollDirection(userId, newState);
+    ASSERT_FALSE(newState);
+    state = true;
+    MouseEventHdr->SetMouseScrollDirection(userId, state);
+    MouseEventHdr->GetMouseScrollDirection(userId, newState);
+    ASSERT_TRUE(newState);
 }
 }
 }
