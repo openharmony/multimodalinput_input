@@ -644,6 +644,7 @@ int32_t JsInputMonitor::GetJsPointerItem(napi_env env, const PointerEvent::Point
     CHKRR(SetNameProperty(env, value, "toolType", item.GetToolType()), "Set toolType", RET_ERR);
     CHKRR(SetNameProperty(env, value, "fixedDisplayX", item.GetFixedDisplayX()), "Set fixedDisplayX", RET_ERR);
     CHKRR(SetNameProperty(env, value, "fixedDisplayY", item.GetFixedDisplayY()), "Set fixedDisplayY", RET_ERR);
+    CHKRR(SetNameProperty(env, value, "blobId", item.GetBlobId()), "Set blobId", RET_ERR);
     return RET_OK;
 }
 
