@@ -815,6 +815,7 @@ ohos_unittest("EventFilterHandlerTest") {
     "preferences:native_preferences",
     "window_manager:libdm_lite",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -2130,6 +2131,7 @@ ohos_unittest("ModuleLoaderTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 
   if (security_component_enable) {
@@ -2470,6 +2472,7 @@ ohos_unittest("StylusKeyTest") {
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -2710,6 +2713,7 @@ ohos_unittest("EventHandlerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -2792,6 +2796,7 @@ ohos_unittest("InputEventHandlerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -2833,6 +2838,7 @@ ohos_unittest("EventNormalizeHandlerTest") {
     "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -2885,6 +2891,7 @@ ohos_unittest("EventHandlerEXTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
   if (resource_schedule_service_enabled) {
     external_deps += [ "resource_schedule_service:ressched_client" ]
@@ -3490,6 +3497,7 @@ ohos_unittest("EventDumpTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -3970,6 +3978,7 @@ ohos_unittest("KeyEventHookManagerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -4108,6 +4117,7 @@ ohos_unittest("InputEventHookManagerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -4196,6 +4206,7 @@ ohos_unittest("KeyLoopClosureCheckerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -4283,6 +4294,7 @@ ohos_unittest("PointerLoopClosureCheckerTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -4375,6 +4387,7 @@ ohos_unittest("PointerEventHookTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -4468,6 +4481,7 @@ ohos_unittest("KeyEventHookTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
@@ -4557,6 +4571,7 @@ ohos_unittest("InputEventHookTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "common_event_service:cesfwk_innerkits",
   ]
 }
 
