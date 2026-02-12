@@ -27,6 +27,7 @@
 #include "mmi_log.h"
 #include "input_device_manager.h"
 #include "account_manager.h"
+#include "common_event_data.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER

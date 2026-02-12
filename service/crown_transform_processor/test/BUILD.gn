@@ -68,7 +68,6 @@ ohos_unittest("CrownTransformProcessorTest") {
     "preferences:native_preferences",
     "samgr:samgr_proxy",
     "window_manager:libwm",
-    "common_event_service:cesfwk_innerkits",
   ]
 }
 
