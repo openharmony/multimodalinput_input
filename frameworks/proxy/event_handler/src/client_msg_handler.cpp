@@ -265,13 +265,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     std::list<PointerEvent::PointerItem> pointerItems{ pointerEvent->GetAllPointerItems() };
     for (const auto &item : pointerItems) {
         MMI_HILOGD("Report pointer event,PI:%{public}d,WI:%{public}d,DX:%{private}d,DY:%{private}d"
-            ",DXP:%{private}f,DYP:%{private}f,WXP:%{private}f,WYP:%{private}f,GX:%{private}f,GY:%{private}f,"
-            "ToolType:%{public}d",
+            ",DXP:%{private}f,DYP:%{private}f,WXP:%{private}f,WYP:%{private}f,GX:%{private}f,GY:%{private}f",
             item.GetPointerId(), item.GetTargetWindowId(),
             item.GetDisplayX(), item.GetDisplayY(),
             item.GetDisplayXPos(), item.GetDisplayYPos(),
             item.GetWindowXPos(), item.GetWindowYPos(),
-            item.GetGlobalX(), item.GetGlobalY(), item.GetToolType());
+            item.GetGlobalX(), item.GetGlobalY());
     }
     InputMgrImpl.OnPointerEvent(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
