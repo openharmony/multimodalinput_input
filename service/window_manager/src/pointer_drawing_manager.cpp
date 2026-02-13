@@ -2893,6 +2893,11 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
     MMI_HILOGI("Mouse traversal occurs, lastDisplayId_:%{public}" PRIu64 ", rsId:%{public}" PRIu64,
         lastDisplayId_, rsId);
 
+    auto surfaceNodePtr = GetSurfaceNode();
+    if (surfaceNodePtr != nullptr) {
+        surfaceNodePtr->RemoveFromTree();
+    }
+
     if (GetHardCursorEnabled()) {
         // 隐藏上一个屏幕的软、硬光标
         PostSoftCursorTask([this]() {
