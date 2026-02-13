@@ -133,7 +133,7 @@ void InputEvent::UpdateId()
     if (g_nextEventId >= INT32_MAX) {
         g_nextEventId = 1;
     }
-    id_ = static_cast<int32_t>(g_nextEventId++);
+    id_ = g_nextEventId++;
 }
 
 int64_t InputEvent::GetActionTime() const
