@@ -25,6 +25,7 @@
 #include "libinput_mock.h"
 #include "libinput_wrapper.h"
 #include "net_packet.h"
+#include "input_device_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputPluginManagerTest"
@@ -74,6 +75,13 @@ public:
     MOCK_METHOD(bool, IsFingerPressed, (), (override, const));
     MOCK_METHOD(const ISessionHandlerCollection *, GetMonitorCollection, (), (override, const));
     MOCK_METHOD(int32_t, GetFocusedPid, (), (override, const));
+    MOCK_METHOD(bool, HasLocalMouseDevice, (), (override, const));
+    MOCK_METHOD(bool, AttachDeviceObserver, (const std::shared_ptr<IDeviceObserver> &observer), (override));
+    MOCK_METHOD(bool, DetachDeviceObserver, (const std::shared_ptr<IDeviceObserver> &observer), (override));
+    MOCK_METHOD(int32_t, GetCurrentAccountId, (), (override, const));
+    MOCK_METHOD(int32_t, RegisterCommonEventCallback,
+                (const std::function<void(const EventFwk::CommonEventData &)> &callback), (override));
+    MOCK_METHOD(bool, UnRegisterCommonEventCallback, (int32_t callbackId), (override));
 };
 
 class MockInputPlugin : public IInputPlugin {
@@ -116,6 +124,14 @@ public:
     bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
     bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
     int Dump(int fd, const std::vector<std::u16string> &args) { return 0; }
+};
+
+class MockIDeviceObserver : public IDeviceObserver {
+public:
+    MOCK_METHOD1(OnDeviceAdded, void(int32_t deviceId));
+    MOCK_METHOD1(OnDeviceRemoved, void(int32_t deviceId));
+    MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
+    MOCK_METHOD1(OnDeviceFirstReportEvent, void(int32_t deviceId));
 };
 
 /**
@@ -548,6 +564,86 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetF
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     EXPECT_EQ(inputPluginContext->GetFocusedPid(), -1);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HasLocalMouseDevice_001
+ * @tc.desc: test INPUT_DEV_MGR == nullptr
+ * @tc.require: test HasLocalMouseDevice
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HasLocalMouseDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    EXPECT_EQ(inputPluginContext->HasLocalMouseDevice(), false);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_AttachDeviceObserver_001
+ * @tc.desc: test INPUT_DEV_MGR == nullptr
+ * @tc.require: test AttachDeviceObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_AttachDeviceObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockIDeviceObserver> mockDeviceObserver = std::make_shared<MockIDeviceObserver>();
+    EXPECT_TRUE(inputPluginContext->AttachDeviceObserver(mockDeviceObserver));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_DetachDeviceObserver_001
+ * @tc.desc: test INPUT_DEV_MGR == nullptr
+ * @tc.require: test DetachDeviceObserver
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_DetachDeviceObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockIDeviceObserver> mockDeviceObserver = std::make_shared<MockIDeviceObserver>();
+    EXPECT_TRUE(inputPluginContext->DetachDeviceObserver(mockDeviceObserver));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_GetCurrentAccountId_001
+ * @tc.desc: test ACCOUNT_MGR == nullptr
+ * @tc.require: test GetCurrentAccountId
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_GetCurrentAccountId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    int32_t defaultAccountId = 100;
+    EXPECT_EQ(inputPluginContext->GetCurrentAccountId(), defaultAccountId);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_RegisterCommonEventCallback_001
+ * @tc.desc: test ACCOUNT_MGR == nullptr
+ * @tc.require: test RegisterCommonEventCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_RegisterCommonEventCallback_001,
+         TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::function<void(const EventFwk::CommonEventData &)> callback = [](const EventFwk::CommonEventData &) {};
+    int32_t callbackId = inputPluginContext->RegisterCommonEventCallback(callback);
+    EXPECT_EQ(callbackId, 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_UnRegisterCommonEventCallback_001
+ * @tc.desc: test ACCOUNT_MGR == nullptr
+ * @tc.require: test UnRegisterCommonEventCallback
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRegisterCommonEventCallback_001,
+         TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    int32_t callbackId = 1;
+    EXPECT_FALSE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
 }
 } // namespace MMI
 } // namespace OHOS

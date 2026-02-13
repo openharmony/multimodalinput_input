@@ -40,6 +40,7 @@ public:
     MOCK_METHOD1(OnDeviceAdded, void(int32_t deviceId));
     MOCK_METHOD1(OnDeviceRemoved, void(int32_t deviceId));
     MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
+    MOCK_METHOD1(OnDeviceFirstReportEvent, void(int32_t deviceId));
 };
 
 /**
@@ -258,6 +259,27 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_
     InputDeviceManager inputDeviceManager;
     std::shared_ptr<InputDevice> device = nullptr;
     ASSERT_NO_FATAL_FAILURE(inputDeviceManager.SetSpecialVirtualDevice(device));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_NotifyDeviceFirstReportEvent_001
+ * @tc.desc: Test NotifyDeviceFirstReportEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyDeviceFirstReportEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto observer = std::make_shared<MockIDeviceObserver>();
+    INPUT_DEV_MGR->Attach(observer);
+    EXPECT_CALL(*observer, OnDeviceFirstReportEvent(0)).Times(1);
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceFirstReportEvent(0));
+    INPUT_DEV_MGR->Detach(observer);
+    auto observerNull = nullptr;
+    INPUT_DEV_MGR->Attach(observerNull);
+    EXPECT_CALL(*observer, OnDeviceFirstReportEvent(0)).Times(0);
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceFirstReportEvent(0));
+    INPUT_DEV_MGR->Detach(observerNull);
 }
 } // namespace MMI
 } // namespace OHOS

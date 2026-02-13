@@ -30,11 +30,7 @@ const std::string g_volumeSwitchesKey {"settings.trackpad.right_volume_switches"
 const std::string g_brightnessSwitchesKey {"settings.trackpad.left_brightness_switches"};
 const std::string g_pressureKey {"settings.trackpad.press_level"};
 const std::string g_vibrationKey {"settings.trackpad.shock_level"};
-const std::string g_touchpadSwitchesKey {"settings.trackpad.touchpad_switches"};
 const std::string g_knuckleSwitchesKey {"settings.trackpad.touchpad_switches"};
-const std::string g_touchpadMasterSwitchesKey {"settings.trackpad.touchpad_master_switches"};
-const std::string g_keepTouchpadEnableSwitchesKey {"settings.trackpad.keep_touchpad_enable_switches"};
-const int32_t RET_ERR { -1 };
 
 class TouchpadSettingsHandlerTest : public testing::Test {
 public:
@@ -109,23 +105,10 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_003, TestSize.Level1)
  */
 HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_004, TestSize.Level1)
 {
-    bool ret = true;
-    SettingObserver::UpdateFunc updateTouchpadSwitchFunc = [&ret](const std::string& key) {
-        std::cout <<"Test UpdateTouchpadSwitchFunc" << std::endl;
-    };
-    TOUCHPAD_MGR->updateTouchpadSwitchFunc_ = updateTouchpadSwitchFunc;
-    EXPECT_NE(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
-    int32_t serviceId = 3101;
-    TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadMasterSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->isCommonEventReady_.store(true);
     TOUCHPAD_MGR->hasRegistered_ = false;
     TOUCHPAD_MGR->currentAccountId_ = 0;
     ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->RegisterTpObserver(123));
-    TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
 }
 
 /**
@@ -181,9 +164,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_004, TestSize.Level1)
     TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->pressureObserver_ = nullptr;
     TOUCHPAD_MGR->vibrationObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_= nullptr;
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
     EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
 }
@@ -201,18 +181,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterUpdateFunc_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterTouchpadSwitchUpdateFunc_001
- * @tc.desc: Test if RegisterTouchpadSwitchUpdateFunc sets the updateTouchpadSwitchFunc_ to a non-null value
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, RegisterTouchpadSwitchUpdateFunc_001, TestSize.Level1)
-{
-    TOUCHPAD_MGR->RegisterUpdateFunc();
-    EXPECT_NE(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
-}
-
-/**
  * @tc.name: SyncTouchpadSettingsData_001
  * @tc.desc: Test when two updateFunc is null, SyncTouchpadSettingsData should return true
  * @tc.type: FUNC
@@ -220,19 +188,11 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTouchpadSwitchUpdateFunc_001, Test
  */
 HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_001, TestSize.Level1)
 {
-    TOUCHPAD_MGR->isCommonEventReady_.store(false);
-    EXPECT_FALSE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_FALSE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
-
     TOUCHPAD_MGR->hasRegistered_ = true;
     TOUCHPAD_MGR->isCommonEventReady_.store(true);
     TOUCHPAD_MGR->updateFunc_ = nullptr;
     EXPECT_EQ(TOUCHPAD_MGR->updateFunc_, nullptr);
-    TOUCHPAD_MGR->updateTouchpadSwitchFunc_ = nullptr;
-    EXPECT_EQ(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
     TOUCHPAD_MGR->SyncTouchpadSettingsData();
-    EXPECT_FALSE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_FALSE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
 }
 
 /**
@@ -251,22 +211,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_002, TestSize.Lev
     };
     TOUCHPAD_MGR->updateFunc_ = updateFunc;
     EXPECT_NE(TOUCHPAD_MGR->updateFunc_, nullptr);
-    TOUCHPAD_MGR->updateTouchpadSwitchFunc_ = nullptr;
-    EXPECT_EQ(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
     TOUCHPAD_MGR->SyncTouchpadSettingsData();
-    EXPECT_FALSE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_FALSE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
-
-    SettingObserver::UpdateFunc updateTouchpadSwitchFunc = [&ret](const std::string& key) {
-        std::cout <<"Test UpdateTouchpadSwitchFunc" << std::endl;
-    };
     TOUCHPAD_MGR->updateFunc_ = nullptr;
     EXPECT_EQ(TOUCHPAD_MGR->updateFunc_, nullptr);
-    TOUCHPAD_MGR->updateTouchpadSwitchFunc_ = updateTouchpadSwitchFunc;
-    EXPECT_NE(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
-    TOUCHPAD_MGR->SyncTouchpadSettingsData();
-    EXPECT_FALSE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_FALSE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
 }
 
 /**
@@ -282,16 +229,9 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsData_003, TestSize.Lev
     SettingObserver::UpdateFunc UpdateFunc = [&ret](const std::string& key) {
         std::cout <<"Test UpdateFunc" << std::endl;
     };
-    SettingObserver::UpdateFunc updateTouchpadSwitchFunc = [&ret](const std::string& key) {
-        std::cout <<"Test UpdateTouchpadSwitchFunc" << std::endl;
-    };
     TOUCHPAD_MGR->updateFunc_ = UpdateFunc;
     EXPECT_NE(TOUCHPAD_MGR->updateFunc_, nullptr);
-    TOUCHPAD_MGR->updateTouchpadSwitchFunc_ = updateTouchpadSwitchFunc;
-    EXPECT_NE(TOUCHPAD_MGR->updateTouchpadSwitchFunc_, nullptr);
     ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
-    EXPECT_TRUE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_TRUE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
 }
 
 /**
@@ -332,12 +272,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
             .CreateObserver(g_pressureKey, TOUCHPAD_MGR->updateFunc_);
     TOUCHPAD_MGR->vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadSwitchesKey, TOUCHPAD_MGR->updateFunc_);
-    TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadMasterSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
@@ -345,9 +279,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_005, TestSize.Level1)
     TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->pressureObserver_ = nullptr;
     TOUCHPAD_MGR->vibrationObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_= nullptr;
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
 }
 
@@ -361,25 +292,12 @@ HWTEST_F(TouchpadSettingsHandlerTest, UnregisterTpObserver_006, TestSize.Level1)
 {
     TOUCHPAD_MGR->hasRegistered_ = true;
     TOUCHPAD_MGR->currentAccountId_ = 1;
-    int32_t serviceId = 3101;
     TOUCHPAD_MGR->volumeSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->pressureObserver_ = nullptr;
     TOUCHPAD_MGR->vibrationObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadMasterSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
     EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
-
-    TOUCHPAD_MGR->hasRegistered_ = true;
-    TOUCHPAD_MGR->currentAccountId_ = 1;
-    TOUCHPAD_MGR->touchpadMasterSwitchesObserver_ = nullptr;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_keepTouchpadEnableSwitchesKey, TOUCHPAD_MGR->updateTouchpadSwitchFunc_);
-    EXPECT_TRUE(TOUCHPAD_MGR->UnregisterTpObserver(2));
-    TOUCHPAD_MGR->keepTouchpadEnableSwitchesObserver_= nullptr;
 }
 
 /**
@@ -396,8 +314,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_006, TestSize.Level1)
             .CreateObserver(g_pressureKey, TOUCHPAD_MGR->updateFunc_);
     TOUCHPAD_MGR->vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     bool ret = true;
@@ -430,8 +346,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
             .CreateObserver(g_pressureKey, TOUCHPAD_MGR->updateFunc_);
     TOUCHPAD_MGR->vibrationObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_vibrationKey, TOUCHPAD_MGR->updateFunc_);
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
-            .CreateObserver(g_touchpadSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = SettingDataShare::GetInstance(serviceId)
             .CreateObserver(g_knuckleSwitchesKey, TOUCHPAD_MGR->updateFunc_);
     ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->RegisterTpObserver(123));
@@ -439,7 +353,6 @@ HWTEST_F(TouchpadSettingsHandlerTest, RegisterTpObserver_008, TestSize.Level1)
     TOUCHPAD_MGR->brightnessSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->pressureObserver_ = nullptr;
     TOUCHPAD_MGR->vibrationObserver_ = nullptr;
-    TOUCHPAD_MGR->touchpadSwitchesObserver_ = nullptr;
     TOUCHPAD_MGR->knuckleSwitchesObserver_ = nullptr;
 }
 
@@ -608,111 +521,13 @@ HWTEST_F(TouchpadSettingsHandlerTest, SyncTouchpadSettingsDataTest_002, TestSize
 {
     TOUCHPAD_MGR->SetCommonEventReady();
     TOUCHPAD_MGR->hasRegistered_ = true;
+    TOUCHPAD_MGR->updateFunc_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
-}
-
-/**
- * @tc.name: SetSwitchDefaultState_001
- * @tc.desc: (master != ERR_OK && enable != ERR_OK) || (master == ERR_OK && enable != ERR_OK)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, SetSwitchDefaultState_001, TestSize.Level1)
-{
-    int32_t master = ERR_INVALID_VALUE;
-    int32_t enable = ERR_INVALID_VALUE;
-    std::string masterValue = "";
-    std::string enableValue = "";
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
-    EXPECT_TRUE(enableValue == "1");
-
-    master = ERR_OK;
-    enable = ERR_INVALID_VALUE;
-    masterValue = "1";
-    enableValue = "";
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
-    EXPECT_TRUE(enableValue == "1");
-    EXPECT_TRUE(masterValue == "1");
-}
-
-/**
- * @tc.name: SetSwitchDefaultState_002
- * @tc.desc: (master != ERR_OK && enable == ERR_OK) || (master == ERR_OK && enable == ERR_OK)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, SetSwitchDefaultState_002, TestSize.Level1)
-{
-    int32_t master = ERR_INVALID_VALUE;
-    int32_t enable = ERR_OK;
-    std::string masterValue = "";
-    std::string enableValue = "1";
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
-    EXPECT_TRUE(enableValue == "1");
-    EXPECT_TRUE(masterValue == "1");
-
-    master = ERR_OK;
-    enable = ERR_OK;
-    masterValue = "1";
-    enableValue = "1";
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SetSwitchDefaultState(master, enable, masterValue, enableValue));
-    EXPECT_TRUE(enableValue == "1");
-    EXPECT_TRUE(masterValue == "1");
-}
-
-/**
- * @tc.name: LoadSwitchState_001
- * @tc.desc: Test LoadSwitchState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, LoadSwitchState_001, TestSize.Level1)
-{
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->LoadSwitchState());
-    EXPECT_TRUE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_TRUE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
-}
-
-/**
- * @tc.name: SetTouchpadState_001
- * @tc.desc: Test SetTouchpadState
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, SetTouchpadState_001, TestSize.Level1)
-{
-    TOUCHPAD_MGR->touchpadMasterSwitches_ = false;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = false;
-    auto ret = TOUCHPAD_MGR->SetTouchpadState();
-    EXPECT_EQ(ret, RET_ERR);
-    
-    TOUCHPAD_MGR->touchpadMasterSwitches_ = true;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = false;
-    ret = TOUCHPAD_MGR->SetTouchpadState();
-    EXPECT_EQ(ret, RET_ERR);
-
-    TOUCHPAD_MGR->touchpadMasterSwitches_ = false;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = true;
-    ret = TOUCHPAD_MGR->SetTouchpadState();
-    EXPECT_EQ(ret, RET_ERR);
-
-    TOUCHPAD_MGR->touchpadMasterSwitches_ = true;
-    TOUCHPAD_MGR->keepTouchpadEnableSwitches_ = true;
-    ret = TOUCHPAD_MGR->SetTouchpadState();
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: OnUpdateTouchpadSwitch_001
- * @tc.desc: Test OnUpdateTouchpadSwitch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchpadSettingsHandlerTest, OnUpdateTouchpadSwitch_001, TestSize.Level1)
-{
-    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->OnUpdateTouchpadSwitch());
-    EXPECT_TRUE(TOUCHPAD_MGR->touchpadMasterSwitches_);
-    EXPECT_TRUE(TOUCHPAD_MGR->keepTouchpadEnableSwitches_);
+    auto updateFunc = [](const std::string &key) {
+        std::cout << "Test UpdateFunc" << std::endl;
+    };
+    TOUCHPAD_MGR->updateFunc_ = updateFunc;
+    ASSERT_NO_FATAL_FAILURE(TOUCHPAD_MGR->SyncTouchpadSettingsData());
 }
 
 /**

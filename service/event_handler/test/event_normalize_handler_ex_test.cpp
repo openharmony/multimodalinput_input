@@ -20,6 +20,8 @@
 #include "input_device_manager.h"
 #include "libinput.h"
 #include "touch_event_normalize.h"
+#include "plugin_stage.h"
+#include "multimodal_input_plugin_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventNormalizeHandlerEXTest"
@@ -91,6 +93,17 @@ using namespace testing;
 using namespace testing::ext;
 } // namespace
 
+InputPluginManager *mock_instance_plug{nullptr};
+int32_t mock_ret{RET_NOTDO};
+InputPluginManager *InputPluginManager::GetInstance(const std::string &directory)
+{
+    return mock_instance_plug;
+}
+
+int32_t InputPluginManager::HandleEvent(PluginEventType event, std::shared_ptr<IPluginData> data)
+{
+    return mock_ret;
+}
 class EventTestHandler final : public IInputEventHandler {
 public:
     EventTestHandler() = default;
@@ -373,6 +386,45 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetRightButt
     handler.ResetRightButtonSource(pointerEvent);
     PointerEvent::RightButtonSource rightButtonSource = pointerEvent->GetRightButtonSource();
     EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::INVALID);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandleTouchpadSyncEvent_001
+ * @tc.desc: Test the function HandleTouchpadSyncEvent with nullptr event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchpadSyncEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event *event = nullptr;
+    auto ret = handler.HandleTouchpadSyncEvent(event);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandleTouchpadSyncEvent_002
+ * @tc.desc: Test the function HandleTouchpadSyncEvent with nullptr manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchpadSyncEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event;
+    mock_instance_plug = new InputPluginManager("");
+    mock_ret = RET_NOTDO;
+    auto ret = handler.HandleTouchpadSyncEvent(&event);
+    EXPECT_FALSE(ret);
+    mock_ret = RET_DO;
+    ret = handler.HandleTouchpadSyncEvent(&event);
+    EXPECT_TRUE(ret);
+    delete mock_instance_plug;
+    mock_instance_plug = nullptr;
+    ret = handler.HandleTouchpadSyncEvent(&event);
+    EXPECT_FALSE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
