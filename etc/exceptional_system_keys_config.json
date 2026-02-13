@@ -110,6 +110,12 @@
         },
         {
             "preKeys": [],
+            "finalKey": 10,
+            "longPressTime": 0,
+            "triggerType": "up"
+        },
+        {
+            "preKeys": [],
             "finalKey": 11,
             "longPressTime": 0,
             "triggerType": "down"
