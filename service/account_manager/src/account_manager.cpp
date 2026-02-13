@@ -79,6 +79,7 @@ std::shared_ptr<AccountManager> AccountManager::GetInstance()
 void AccountManager::CommonEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     AccountManager::GetInstance()->OnCommonEvent(data);
+    AccountManager::GetInstance()->TriggerObserverCallback(data);
 }
 
 AccountManager::AccountSetting::AccountSetting(int32_t accountId)
@@ -380,6 +381,7 @@ void AccountManager::AccountManagerUnregister()
         timerId_ = -1;
     }
     accounts_.clear();
+    observerCallbacks_.clear();
     // LCOV_EXCL_STOP
 }
 
@@ -549,6 +551,33 @@ int32_t AccountManager::GetCurrentAccountId()
 void AccountManager::OnDataShareReady(const EventFwk::CommonEventData &data)
 {
     INPUT_SETTING_MANAGER->OnDataShareReady();
+}
+
+int32_t AccountManager::RegisterCommonEventCallback(
+    const std::function<void(const EventFwk::CommonEventData &)> &callback)
+{
+    std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
+    int32_t callbackId = nextId_++;
+    observerCallbacks_[callbackId] = callback;
+    return callbackId;
+}
+
+bool AccountManager::UnRegisterCommonEventCallback(int32_t callbackId)
+{
+    std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
+    return observerCallbacks_.erase(callbackId) > 0;
+}
+
+void AccountManager::TriggerObserverCallback(const EventFwk::CommonEventData &data)
+{
+    decltype(observerCallbacks_) observers;
+    {
+        std::lock_guard<std::mutex> guard{observerCallbacksMutex_};
+        observers = observerCallbacks_;
+    }
+    for (const auto &[id, callback] : observers) {
+        callback(data);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

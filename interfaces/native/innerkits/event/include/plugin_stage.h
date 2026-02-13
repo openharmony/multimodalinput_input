@@ -24,8 +24,12 @@
 #include "net_packet.h"
 #include "iremote_broker.h"
 #include "i_input_device_consumer.h"
+#include "device_observer.h"
 
 namespace OHOS {
+namespace EventFwk {
+class CommonEventData;
+}
 namespace MMI {
 
 using PluginEventType = std::variant<libinput_event *, std::shared_ptr<PointerEvent>, std::shared_ptr<AxisEvent>,
@@ -156,6 +160,13 @@ struct IPluginContext {
     virtual bool IsFingerPressed() const = 0;
     virtual const ISessionHandlerCollection *GetMonitorCollection() const = 0;
     virtual int32_t GetFocusedPid() const = 0;
+    virtual bool HasLocalMouseDevice() const = 0;
+    virtual bool AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) = 0;
+    virtual bool DetachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) = 0;
+    virtual int32_t GetCurrentAccountId() const = 0;
+    virtual int32_t RegisterCommonEventCallback(
+        const std::function<void(const EventFwk::CommonEventData &)> &callback) = 0;
+    virtual bool UnRegisterCommonEventCallback(int32_t callbackId) = 0;
 };
 
 inline bool checkPluginEventNull(PluginEventType &event)

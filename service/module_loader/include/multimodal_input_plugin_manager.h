@@ -73,6 +73,13 @@ public:
     bool IsFingerPressed() const override;
     const ISessionHandlerCollection *GetMonitorCollection() const override;
     int32_t GetFocusedPid() const override;
+    bool HasLocalMouseDevice() const override;
+    bool AttachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) override;
+    bool DetachDeviceObserver(const std::shared_ptr<IDeviceObserver> &observer) override;
+    int32_t GetCurrentAccountId() const override;
+    int32_t RegisterCommonEventCallback(
+        const std::function<void(const EventFwk::CommonEventData &)> &callback) override;
+    bool UnRegisterCommonEventCallback(int32_t callbackId) override;
 
     int32_t prio_ = 200;
     std::function<void(PluginEventType, int64_t)> callback_;

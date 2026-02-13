@@ -79,6 +79,8 @@ public:
     int32_t GetAccountIdFromUid(int32_t uid);
     std::vector<int32_t> QueryAllCreatedOsAccounts();
     int32_t QueryCurrentAccountId();
+    int32_t RegisterCommonEventCallback(const std::function<void(const EventFwk::CommonEventData &)> &callback);
+    bool UnRegisterCommonEventCallback(int32_t callbackId);
 
     AccountManager();
     ~AccountManager();
@@ -94,6 +96,7 @@ private:
     void OnRemoveUser(const EventFwk::CommonEventData &data);
     void OnSwitchUser(const EventFwk::CommonEventData &data);
     void OnDataShareReady(const EventFwk::CommonEventData &data);
+    void TriggerObserverCallback(const EventFwk::CommonEventData &data);
 
     static std::shared_ptr<AccountManager> instance_;
     static std::mutex mutex_;
@@ -103,6 +106,9 @@ private:
     std::shared_ptr<CommonEventSubscriber> subscriber_;
     std::map<int32_t, std::unique_ptr<AccountSetting>> accounts_;
     std::map<std::string, std::function<void(const EventFwk::CommonEventData &)>> handlers_;
+    std::unordered_map<int32_t, std::function<void(const EventFwk::CommonEventData &)>> observerCallbacks_;
+    int32_t nextId_{0};
+    std::mutex observerCallbacksMutex_;
 };
 
 inline int32_t AccountManager::AccountSetting::GetAccountId() const
