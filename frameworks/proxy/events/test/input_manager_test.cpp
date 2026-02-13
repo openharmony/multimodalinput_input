@@ -1064,6 +1064,84 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_15, TestSize.Level
 }
 
 /**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_18
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_18, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event %{private}d up trigger callback", keyEvent->GetKeyCode());
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_19
+ * @tc.desc: Verify subscribe key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_19, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(0);
+    int32_t subscribeId = INVAID_VALUE;
+    subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
+        MMI_HILOGD("Subscribe key event %{private}d up trigger callback", keyEvent->GetKeyCode());
+    });
+    EXPECT_TRUE(subscribeId >= 0);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+}
+
+/**
  * @tc.name: InputManagerTest_SubscribeKeyEvent_020
  * @tc.desc: Verify subscribe key event.
  * @tc.type: FUNC
@@ -3595,6 +3673,134 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_018, TestSize.Level1)
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_DAGGER_LONG_PRESS);
 
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_DAGGER_LONG_PRESS);
+    itemFirst.SetPressed(false);
+    itemFirst.SetDownTime(500);
+    keyEvent->AddKeyItem(itemFirst);
+
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_019
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_019, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+    itemFirst.SetPressed(true);
+    itemFirst.SetDownTime(500);
+    keyEvent->AddKeyItem(itemFirst);
+
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_020
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
+    itemFirst.SetPressed(true);
+    itemFirst.SetDownTime(500);
+    keyEvent->AddKeyItem(itemFirst);
+
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_021
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_021, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_MOUSE_ASSISTANT);
+    itemFirst.SetPressed(false);
+    itemFirst.SetDownTime(500);
+    keyEvent->AddKeyItem(itemFirst);
+
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectKeyEvent_022
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem itemFirst;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
+
+    itemFirst.SetKeyCode(KeyEvent::KEYCODE_MOUSE_INTELLIGENCE_SELECTION);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
