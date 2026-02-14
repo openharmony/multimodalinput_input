@@ -1882,16 +1882,19 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW };
     if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_CANCEL)) {
         MMI_HILOGE("Up event for service exception re-sending");
+        BytraceAdapter::MMIClientTraceStop();
         return;
     }
 
     if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
         MMI_HILOGE("Pull up event for service exception re-sending");
+        BytraceAdapter::MMIClientTraceStop();
         return;
     }
 
     if (RecoverPointerEvent(pointerActionAxisEvents, PointerEvent::POINTER_ACTION_AXIS_END)) {
         MMI_HILOGE("Axis event for service exception re-sending");
+        BytraceAdapter::MMIClientTraceStop();
         return;
     }
 
@@ -2320,12 +2323,6 @@ int32_t InputManagerImpl::SetTouchpadScrollSwitch(bool switchFlag)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
-    return ret;
-#else
-    MMI_HILOGW("Pointer device module does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
 
 int32_t InputManagerImpl::GetTouchpadScrollSwitch(bool &switchFlag)
 {
@@ -2342,12 +2339,6 @@ int32_t InputManagerImpl::GetTouchpadScrollSwitch(bool &switchFlag)
 #else
     MMI_HILOGW("Pointer device does not support");
     BytraceAdapter::MMIClientTraceStop();
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
-    return ret;
-#else
-    MMI_HILOGW("Pointer device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
@@ -2408,12 +2399,6 @@ int32_t InputManagerImpl::SetTouchpadTapSwitch(bool switchFlag)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
-    return ret;
-#else
-    MMI_HILOGW("Pointer device module does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
 
 int32_t InputManagerImpl::GetTouchpadTapSwitch(bool &switchFlag)
 {
@@ -2430,12 +2415,6 @@ int32_t InputManagerImpl::GetTouchpadTapSwitch(bool &switchFlag)
 #else
     MMI_HILOGW("Pointer device does not support");
     BytraceAdapter::MMIClientTraceStop();
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
-    return ret;
-#else
-    MMI_HILOGW("Pointer device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
