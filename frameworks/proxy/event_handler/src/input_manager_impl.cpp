@@ -286,7 +286,11 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
         return RET_ERR;
     }
     sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
-    CHKPR(service, RET_ERR);
+    if (service == nullptr) {
+        MMI_HILOGE("service is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return RET_ERR;
+    }
     const int32_t filterId = EventFilterService::GetNextId();
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->AddInputEventFilter(service, filterId, priority, deviceTags);
     if (ret != RET_OK) {
@@ -402,8 +406,16 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
     std::string msg = "SubscribeKeyEvent";
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPR(keyOption, RET_ERR);
-    CHKPR(callback, RET_ERR);
+    if (keyOption == nullptr) {
+        MMI_HILOGE("keyOption is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return RET_ERR;
+    }
+    if (callback == nullptr) {
+        MMI_HILOGE("callback is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return RET_ERR;
+    }
     if (keyOption->GetPriority() > 0
         && (keyOption->GetFinalKey() != KeyEvent::KEYCODE_HEADSETHOOK || keyOption->GetPreKeys().size() > 0)) {
         MMI_HILOGE("KeyOption validation failed");
@@ -500,7 +512,11 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     std::string msg = "SubscribeSwitchEvent, type:" + std::to_string(switchType);
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-    CHKPR(callback, RET_ERR);
+    if (callback == nullptr) {
+        MMI_HILOGE("callback is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return RET_ERR;
+    }
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
         MMI_HILOGE("Switch type error, switchType:%{public}d", switchType);
         BytraceAdapter::MMIClientTraceStop();
@@ -1059,7 +1075,11 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     std::string msg = "AddMonitorKeyEvent";
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    CHKPR(monitor, INVALID_HANDLER_ID);
+    if (monitor == nullptr) {
+        MMI_HILOGE("monitor is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return INVALID_HANDLER_ID;
+    }
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     MMI_HILOGI("Support key event monitor function");
     int32_t ret = AddMonitor(consumer, HANDLE_EVENT_TYPE_KEY);
@@ -1195,7 +1215,11 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     std::string msg = "AddInterceptor, priority:" + std::to_string(priority);
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    CHKPR(interceptor, INVALID_HANDLER_ID);
+    if (interceptor == nullptr) {
+        MMI_HILOGE("interceptor is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return INVALID_HANDLER_ID;
+    }
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         BytraceAdapter::MMIClientTraceStop();
@@ -1257,7 +1281,11 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     std::string msg = "SimulateKeyEvent";
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPV(keyEvent);
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("keyEvent is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return;
+    }
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("Key action:%{public}d", keyEvent->GetKeyAction());
     } else {
@@ -1913,7 +1941,11 @@ int32_t InputManagerImpl::SendDisplayInfo(const UserScreenInfo &userScreenInfo)
     std::string msg = "SendDisplayInfo, userId:" + std::to_string(userScreenInfo.userId);
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPR(client, RET_ERR);
+    if (client == nullptr) {
+        MMI_HILOGE("client is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return RET_ERR;
+    }
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     int32_t ret = PackDisplayData(pkt, userScreenInfo);
     if (ret != RET_OK) {
@@ -1936,7 +1968,11 @@ int32_t InputManagerImpl::SendWindowInfo()
     std::string msg = "SendWindowInfo, count:" + std::to_string(windowGroupInfo_.windowsInfo.size());
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPR(client, RET_ERR);
+    if (client == nullptr) {
+        MMI_HILOGE("client is nullptr");
+        BytraceAdapter::MMIClientTraceStop();
+        return RET_ERR;
+    }
     NetPacket pkt(MmiMessageId::WINDOW_INFO);
     int32_t ret = PackWindowGroupInfo(pkt);
     if (ret != RET_OK) {
