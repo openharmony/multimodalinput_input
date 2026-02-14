@@ -2936,7 +2936,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_002, Te
     uint32_t deviceTags = 0;
     int32_t result = impl->AddInterceptor(interceptor, priority, deviceTags);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    EXPECT_NE(result, INVALID_HANDLER_ID);
+    EXPECT_EQ(result, RET_ERR);
 #else
     EXPECT_EQ(result, ERROR_UNSUPPORT);
 #endif
@@ -3627,7 +3627,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_002, T
     UserScreenInfo userScreenInfo;
     userScreenInfo.userId = 100;
     int32_t result = impl->SendDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, MSG_SEND_FAIL);
 }
 
 /**
@@ -3643,7 +3643,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_002, Te
     impl->windowGroupInfo_.focusWindowId = 1;
     impl->windowGroupInfo_.displayId = 0;
     int32_t result = impl->SendWindowInfo();
-    EXPECT_EQ(result, RET_ERR);
+    EXPECT_EQ(result, MSG_SEND_FAIL);
 }
 } // namespace MMI
 } // namespace OHOS
