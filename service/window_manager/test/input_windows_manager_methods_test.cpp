@@ -34,6 +34,42 @@ using namespace testing::ext;
 namespace OHOS {
 namespace MMI {
 
+// ============================================================================
+// Test Constants - Descriptive names for magic numbers
+// ============================================================================
+namespace TestConstants {
+    // Coordinate values for testing
+    constexpr int32_t DEFAULT_DISPLAY_X = 500;
+    constexpr int32_t DEFAULT_DISPLAY_Y = 400;
+    constexpr int32_t OUT_OF_BOUNDS_X = 9999;
+    constexpr int32_t OUT_OF_BOUNDS_Y = 9999;
+    constexpr int32_t CLAMP_MIN_X = 100;
+    constexpr int32_t CLAMP_MIN_Y = 150;
+
+    // Window size values
+    constexpr int32_t DEFAULT_WINDOW_WIDTH = 1000;
+    constexpr int32_t DEFAULT_WINDOW_HEIGHT = 800;
+
+    // Display size values
+    constexpr int32_t DEFAULT_DISPLAY_WIDTH = 1920;
+    constexpr int32_t DEFAULT_DISPLAY_HEIGHT = 1080;
+
+    // ID values
+    constexpr int32_t TEST_PROCESS_ID = 100;
+    constexpr int32_t TEST_POINTER_ID = 1;
+    constexpr int32_t TEST_DEVICE_ID = 5;
+    constexpr int32_t TEST_KEY_DEVICE_ID = 1;
+    constexpr int32_t TEST_WINDOW_ID = 1;
+    constexpr int32_t INVALID_DEVICE_ID = 99999;
+    constexpr int32_t INVALID_POINTER_ID = 99999;
+    constexpr int32_t INVALID_GROUP_ID = 99999;
+
+    // ZOrder values
+    constexpr int32_t DEFAULT_ZORDER = 1;
+    constexpr int32_t MEDIUM_ZORDER = 3;
+    constexpr int32_t HIGH_ZORDER = 5;
+} // namespace TestConstants
+
 /**
  * @class InputWindowsManagerMethodsTest
  * @brief Test fixture for InputWindowsManager specific methods
@@ -71,7 +107,7 @@ protected:
      * @param sourceType The source type
      * @return Shared pointer to the created pointer event
      */
-    std::shared_ptr<PointerEvent> CreateTestPointerEvent(int32_t pointerId = 1,
+    std::shared_ptr<PointerEvent> CreateTestPointerEvent(int32_t pointerId = TestConstants::TEST_POINTER_ID,
         int32_t action = PointerEvent::POINTER_ACTION_MOVE,
         int32_t sourceType = PointerEvent::SOURCE_TYPE_MOUSE)
     {
@@ -82,15 +118,15 @@ protected:
 
         PointerEvent::PointerItem pointerItem;
         pointerItem.SetPointerId(pointerId);
-        pointerItem.SetDisplayX(500);
-        pointerItem.SetDisplayY(400);
-        pointerItem.SetWindowX(500);
-        pointerItem.SetWindowY(400);
+        pointerItem.SetDisplayX(TestConstants::DEFAULT_DISPLAY_X);
+        pointerItem.SetDisplayY(TestConstants::DEFAULT_DISPLAY_Y);
+        pointerItem.SetWindowX(TestConstants::DEFAULT_DISPLAY_X);
+        pointerItem.SetWindowY(TestConstants::DEFAULT_DISPLAY_Y);
         pointerEvent->AddPointerItem(pointerItem);
         pointerEvent->SetPointerId(pointerId);
         pointerEvent->SetPointerAction(action);
         pointerEvent->SetSourceType(sourceType);
-        pointerEvent->SetDeviceId(5);
+        pointerEvent->SetDeviceId(TestConstants::TEST_DEVICE_ID);
 
         return pointerEvent;
     }
@@ -111,7 +147,7 @@ protected:
 
         keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
         keyEvent->SetKeyAction(action);
-        keyEvent->SetDeviceId(1);
+        keyEvent->SetDeviceId(TestConstants::TEST_KEY_DEVICE_ID);
         keyEvent->AddFlag(flags);
 
         return keyEvent;
@@ -123,15 +159,15 @@ protected:
      * @param flags The window flags
      * @return WindowInfo structure
      */
-    WindowInfo CreateTestWindowInfo(int32_t windowId = 1, uint32_t flags = 0)
+    WindowInfo CreateTestWindowInfo(int32_t windowId = TestConstants::TEST_WINDOW_ID, uint32_t flags = 0)
     {
         WindowInfo windowInfo;
         windowInfo.id = windowId;
         windowInfo.flags = flags;
-        windowInfo.pid = 100;
-        windowInfo.area.width = 1000;
-        windowInfo.area.height = 800;
-        windowInfo.zOrder = 1;
+        windowInfo.pid = TestConstants::TEST_PROCESS_ID;
+        windowInfo.area.width = TestConstants::DEFAULT_WINDOW_WIDTH;
+        windowInfo.area.height = TestConstants::DEFAULT_WINDOW_HEIGHT;
+        windowInfo.zOrder = TestConstants::DEFAULT_ZORDER;
 
         return windowInfo;
     }
@@ -157,8 +193,8 @@ HWTEST_F(InputWindowsManagerOneTest, SendBackCenterPointerEvent_NullLastPointerE
     inputWindowsManager_->lastPointerEvent_ = nullptr;
     CursorPosition cursorPos;
     cursorPos.displayId = 0;
-    cursorPos.cursorPos.x = 500;
-    cursorPos.cursorPos.y = 400;
+    cursorPos.cursorPos.x = TestConstants::DEFAULT_DISPLAY_X;
+    cursorPos.cursorPos.y = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call SendBackCenterPointerEvent with null last pointer event
     // Then: Should handle gracefully (CHKPV will return) without modifying state
@@ -184,8 +220,8 @@ HWTEST_F(InputWindowsManagerOneTest, SendBackCenterPointerEvent_NoWindowFound_00
 
     CursorPosition cursorPos;
     cursorPos.displayId = 0;
-    cursorPos.cursorPos.x = 9999;
-    cursorPos.cursorPos.y = 9999;
+    cursorPos.cursorPos.x = TestConstants::OUT_OF_BOUNDS_X;
+    cursorPos.cursorPos.y = TestConstants::OUT_OF_BOUNDS_Y;
 
     // When: Call SendBackCenterPointerEvent
     // Then: Should return early when no window found without modifying last event
@@ -209,8 +245,8 @@ HWTEST_F(InputWindowsManagerOneTest, SendBackCenterPointerEvent_PointerActionMov
 
     CursorPosition cursorPos;
     cursorPos.displayId = 0;
-    cursorPos.cursorPos.x = 500;
-    cursorPos.cursorPos.y = 400;
+    cursorPos.cursorPos.x = TestConstants::DEFAULT_DISPLAY_X;
+    cursorPos.cursorPos.y = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call SendBackCenterPointerEvent with MOVE action
     // Then: Should set action to CANCEL
@@ -235,8 +271,8 @@ HWTEST_F(InputWindowsManagerOneTest, SendBackCenterPointerEvent_PointerActionPul
 
     CursorPosition cursorPos;
     cursorPos.displayId = 0;
-    cursorPos.cursorPos.x = 500;
-    cursorPos.cursorPos.y = 400;
+    cursorPos.cursorPos.x = TestConstants::DEFAULT_DISPLAY_X;
+    cursorPos.cursorPos.y = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call SendBackCenterPointerEvent with PULL_MOVE action
     // Then: Should set action to PULL_CANCEL
@@ -262,8 +298,8 @@ HWTEST_F(InputWindowsManagerOneTest, PrintHighZorder_NullTargetWindow_001, TestS
     // Given: Invalid target window ID
     int32_t targetWindowId = -1;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
 
     std::vector<WindowInfo> windowsInfo;
     size_t originalSize = windowsInfo.size();
@@ -286,16 +322,16 @@ HWTEST_F(InputWindowsManagerOneTest, PrintHighZorder_ValidTargetNoHigherZorder_0
     CALL_TEST_DEBUG;
 
     // Given: Valid target window with no higher zorder windows
-    WindowInfo targetWindow = CreateTestWindowInfo(1, 0);
-    targetWindow.zOrder = 5;
+    WindowInfo targetWindow = CreateTestWindowInfo(TestConstants::TEST_WINDOW_ID, 0);
+    targetWindow.zOrder = TestConstants::HIGH_ZORDER;
 
     std::vector<WindowInfo> windowsInfo;
     windowsInfo.push_back(targetWindow);
 
-    int32_t targetWindowId = 1;
+    int32_t targetWindowId = TestConstants::TEST_WINDOW_ID;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
     size_t originalSize = windowsInfo.size();
 
     // When: Call PrintHighZorder with no higher zorder windows
@@ -317,21 +353,21 @@ HWTEST_F(InputWindowsManagerOneTest, PrintHighZorder_HigherZorderWindowsExist_00
     CALL_TEST_DEBUG;
 
     // Given: Target window with higher zorder windows
-    WindowInfo targetWindow = CreateTestWindowInfo(1, 0);
-    targetWindow.zOrder = 3;
+    WindowInfo targetWindow = CreateTestWindowInfo(TestConstants::TEST_WINDOW_ID, 0);
+    targetWindow.zOrder = TestConstants::MEDIUM_ZORDER;
 
     WindowInfo higherWindow = CreateTestWindowInfo(2, 0);
-    higherWindow.zOrder = 5;
+    higherWindow.zOrder = TestConstants::HIGH_ZORDER;
     higherWindow.windowInputType = WindowInputType::NORMAL;
 
     std::vector<WindowInfo> windowsInfo;
     windowsInfo.push_back(higherWindow);
     windowsInfo.push_back(targetWindow);
 
-    int32_t targetWindowId = 1;
+    int32_t targetWindowId = TestConstants::TEST_WINDOW_ID;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
     size_t originalSize = windowsInfo.size();
 
     // When: Call PrintHighZorder with higher zorder windows
@@ -356,7 +392,7 @@ HWTEST_F(InputWindowsManagerOneTest, GetFocusPid_NoDisplayGroup_001, TestSize.Le
     CALL_TEST_DEBUG;
 
     // Given: Non-existent display group ID
-    int32_t groupId = 99999;
+    int32_t groupId = TestConstants::INVALID_GROUP_ID;
 
     // When: Call GetFocusPid with non-existent group
     int32_t result = inputWindowsManager_->GetFocusPid(groupId);
@@ -422,7 +458,7 @@ HWTEST_F(InputWindowsManagerOneTest, ClearMismatchTypeWinIds_NoDeviceEntry_001, 
     // Given: Non-existent device ID
     int32_t pointerId = 1;
     int32_t displayId = 0;
-    int32_t deviceId = 99999;
+    int32_t deviceId = TestConstants::INVALID_DEVICE_ID;
 
     // When: Call ClearMismatchTypeWinIds with non-existent device
     // Then: Should return early without error or crash
@@ -441,9 +477,9 @@ HWTEST_F(InputWindowsManagerOneTest, ClearMismatchTypeWinIds_NoPointerEntry_002,
     CALL_TEST_DEBUG;
 
     // Given: Existing device but non-existent pointer ID
-    int32_t pointerId = 99999;
+    int32_t pointerId = TestConstants::INVALID_POINTER_ID;
     int32_t displayId = 0;
-    int32_t deviceId = 5;
+    int32_t deviceId = TestConstants::TEST_DEVICE_ID;
 
     // When: Call ClearMismatchTypeWinIds with non-existent pointer
     // Then: Should return early without error or crash
@@ -677,12 +713,12 @@ HWTEST_F(InputWindowsManagerOneTest, PullEnterLeaveEvent_NullPointerEvent_001, T
 
     // Given: Window info but null pointer event
     WindowInfo touchWindow;
-    touchWindow.id = 1;
-    touchWindow.area.width = 1000;
-    touchWindow.area.height = 800;
+    touchWindow.id = TestConstants::TEST_WINDOW_ID;
+    touchWindow.area.width = TestConstants::DEFAULT_WINDOW_WIDTH;
+    touchWindow.area.height = TestConstants::DEFAULT_WINDOW_HEIGHT;
 
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
 
     // When: Call PullEnterLeaveEvent with null pointer event
@@ -705,8 +741,8 @@ HWTEST_F(InputWindowsManagerOneTest, PullEnterLeaveEvent_NullTouchWindow_002, Te
     auto pointerEvent = CreateTestPointerEvent();
     ASSERT_NE(pointerEvent, nullptr);
 
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
     WindowInfo* touchWindow = nullptr;
 
     // When: Call PullEnterLeaveEvent with null touch window
@@ -728,17 +764,17 @@ HWTEST_F(InputWindowsManagerOneTest, PullEnterLeaveEvent_GetPointerItemFailed_00
     // Given: Valid pointers but GetPointerItem will fail
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->SetDeviceId(5);
+    pointerEvent->SetPointerId(TestConstants::TEST_POINTER_ID);
+    pointerEvent->SetDeviceId(TestConstants::TEST_DEVICE_ID);
     // Don't add any pointer items - GetPointerItem will fail
 
     WindowInfo touchWindow;
-    touchWindow.id = 1;
-    touchWindow.area.width = 1000;
-    touchWindow.area.height = 800;
+    touchWindow.id = TestConstants::TEST_WINDOW_ID;
+    touchWindow.area.width = TestConstants::DEFAULT_WINDOW_WIDTH;
+    touchWindow.area.height = TestConstants::DEFAULT_WINDOW_HEIGHT;
 
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call PullEnterLeaveEvent with no pointer items
     // Then: Should return early when GetPointerItem fails without throwing
@@ -761,13 +797,13 @@ HWTEST_F(InputWindowsManagerOneTest, PullEnterLeaveEvent_MixLeftRightAntiAxisMov
     ASSERT_NE(pointerEvent, nullptr);
 
     WindowInfo touchWindow;
-    touchWindow.id = 1;
-    touchWindow.area.width = 1000;
-    touchWindow.area.height = 800;
+    touchWindow.id = TestConstants::TEST_WINDOW_ID;
+    touchWindow.area.width = TestConstants::DEFAULT_WINDOW_WIDTH;
+    touchWindow.area.height = TestConstants::DEFAULT_WINDOW_HEIGHT;
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
 
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call PullEnterLeaveEvent with MIX_LEFT_RIGHT_ANTI_AXIS_MOVE type
     // Then: Should update pointer item coordinates without throwing
@@ -795,8 +831,8 @@ HWTEST_F(InputWindowsManagerOneTest, PullEnterLeaveEvent_WindowSwitch_005, TestS
     touchWindow.area.height = 800;
     touchWindow.windowInputType = WindowInputType::NORMAL;
 
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call PullEnterLeaveEvent with different window
     // Then: Should handle window switch logic without throwing
@@ -819,17 +855,17 @@ HWTEST_F(InputWindowsManagerOneTest, PullEnterLeaveEvent_CoordinateClamping_006,
     ASSERT_NE(pointerEvent, nullptr);
 
     WindowInfo touchWindow;
-    touchWindow.id = 1;
-    touchWindow.area.width = 1000;
-    touchWindow.area.height = 800;
+    touchWindow.id = TestConstants::TEST_WINDOW_ID;
+    touchWindow.area.width = TestConstants::DEFAULT_WINDOW_WIDTH;
+    touchWindow.area.height = TestConstants::DEFAULT_WINDOW_HEIGHT;
     touchWindow.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
 
     // Set currentDisplayXY_ for lower boundary
-    inputWindowsManager_->currentDisplayXY_.first = 100;
-    inputWindowsManager_->currentDisplayXY_.second = 150;
+    inputWindowsManager_->currentDisplayXY_.first = TestConstants::CLAMP_MIN_X;
+    inputWindowsManager_->currentDisplayXY_.second = TestConstants::CLAMP_MIN_Y;
 
-    int32_t logicalX = 500;
-    int32_t logicalY = 400;
+    int32_t logicalX = TestConstants::DEFAULT_DISPLAY_X;
+    int32_t logicalY = TestConstants::DEFAULT_DISPLAY_Y;
 
     // When: Call PullEnterLeaveEvent with coordinates needing clamping
     // Then: Coordinates should be clamped to window bounds without throwing
@@ -854,23 +890,23 @@ HWTEST_F(InputWindowsManagerOneTest, CalcDrawCoordinate_EmptyTransform_001, Test
     // Given: Display info with empty transform
     OLD::DisplayInfo displayInfo;
     displayInfo.id = 0;
-    displayInfo.width = 1920;
-    displayInfo.height = 1080;
-    displayInfo.validWidth = 1920;
-    displayInfo.validHeight = 1080;
+    displayInfo.width = TestConstants::DEFAULT_DISPLAY_WIDTH;
+    displayInfo.height = TestConstants::DEFAULT_DISPLAY_HEIGHT;
+    displayInfo.validWidth = TestConstants::DEFAULT_DISPLAY_WIDTH;
+    displayInfo.validHeight = TestConstants::DEFAULT_DISPLAY_HEIGHT;
     displayInfo.x = 0;
     displayInfo.y = 0;
 
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetRawDisplayX(500);
-    pointerItem.SetRawDisplayY(400);
+    pointerItem.SetRawDisplayX(TestConstants::DEFAULT_DISPLAY_X);
+    pointerItem.SetRawDisplayY(TestConstants::DEFAULT_DISPLAY_Y);
 
     // When: Call CalcDrawCoordinate with empty transform
     auto result = inputWindowsManager_->CalcDrawCoordinate(displayInfo, pointerItem);
 
     // Then: Should return raw coordinates
-    EXPECT_EQ(result.first, 500);
-    EXPECT_EQ(result.second, 400);
+    EXPECT_EQ(result.first, TestConstants::DEFAULT_DISPLAY_X);
+    EXPECT_EQ(result.second, TestConstants::DEFAULT_DISPLAY_Y);
 }
 
 /**
@@ -890,8 +926,8 @@ HWTEST_F(InputWindowsManagerOneTest, CalcDrawCoordinate_WithTransform_002, TestS
     displayInfo.height = 1080;
 
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetRawDisplayX(500);
-    pointerItem.SetRawDisplayY(400);
+    pointerItem.SetRawDisplayX(TestConstants::DEFAULT_DISPLAY_X);
+    pointerItem.SetRawDisplayY(TestConstants::DEFAULT_DISPLAY_Y);
 
     // When: Call CalcDrawCoordinate
     auto result = inputWindowsManager_->CalcDrawCoordinate(displayInfo, pointerItem);
@@ -917,7 +953,7 @@ HWTEST_F(InputWindowsManagerOneTest, CancelTouch_NoDeviceEntry_001, TestSize.Lev
 
     // Given: Non-existent device ID
     int32_t touch = 1;
-    int32_t deviceId = 99999;
+    int32_t deviceId = TestConstants::INVALID_DEVICE_ID;
 
     // When: Call CancelTouch with non-existent device
     bool result = inputWindowsManager_->CancelTouch(touch, deviceId);
@@ -958,12 +994,12 @@ HWTEST_F(InputWindowsManagerOneTest, CancelTouch_ValidEntry_003, TestSize.Level1
     CALL_TEST_DEBUG;
 
     // Given: Valid touch and device IDs with internal state set up
-    int32_t touch = 1;
-    int32_t deviceId = 5;
+    int32_t touch = TestConstants::TEST_POINTER_ID;
+    int32_t deviceId = TestConstants::TEST_DEVICE_ID;
 
     // Set up internal state: create a touch entry with flag=true
     WindowInfoEX windowInfoEx;
-    windowInfoEx.window.id = 1;
+    windowInfoEx.window.id = TestConstants::TEST_WINDOW_ID;
     windowInfoEx.flag = true;
     inputWindowsManager_->touchItemDownInfos_[deviceId][touch] = windowInfoEx;
 
