@@ -2886,6 +2886,25 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddMonitorKeyEvent_Trace_001
 }
 
 /**
+ * @tc.name: InputManagerImplTest_AddMonitorKeyEvent_Trace_002
+ * @tc.desc: Test AddMonitor(KeyEvent) with valid monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddMonitorKeyEvent_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    auto monitor = [](std::shared_ptr<KeyEvent> event) {};
+    int32_t result = impl->AddMonitor(monitor);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    EXPECT_NE(result, INVALID_HANDLER_ID);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif
+}
+
+/**
  * @tc.name: InputManagerImplTest_AddInterceptor_Trace_001
  * @tc.desc: Test AddInterceptor with nullptr interceptor
  * @tc.type: FUNC
@@ -2900,6 +2919,27 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_001, Te
     uint32_t deviceTags = 0;
     int32_t result = impl->AddInterceptor(interceptor, priority, deviceTags);
     EXPECT_EQ(result, INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AddInterceptor_Trace_002
+ * @tc.desc: Test AddInterceptor with valid interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<IInputEventConsumer> interceptor = std::make_shared<TestInputEventConsumer>();
+    int32_t priority = 100;
+    uint32_t deviceTags = 0;
+    int32_t result = impl->AddInterceptor(interceptor, priority, deviceTags);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_NE(result, INVALID_HANDLER_ID);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif
 }
 
 /**
