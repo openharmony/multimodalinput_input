@@ -2659,11 +2659,12 @@ HWTEST_F(InputManagerImplTest, PackUiExtentionWindowInfo_WriteError_002, TestSiz
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.eventFilterServices_.clear();
-    size_t initialSize = InputMgrImpl.eventFilterServices_.size();
-    int32_t result = InputMgrImpl.RemoveInputEventFilter(1);
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
+    size_t initialSize = impl->eventFilterServices_.size();
+    int32_t result = impl->RemoveInputEventFilter(1);
     EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(InputMgrImpl.eventFilterServices_.size(), initialSize);
+    EXPECT_EQ(impl->eventFilterServices_.size(), initialSize);
 }
 
 /**
@@ -2675,17 +2676,18 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.eventFilterServices_.clear();
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
     auto filter = std::make_shared<InputEventFilterMock>();
     sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
     ASSERT_NE(service, nullptr);
-    InputMgrImpl.eventFilterServices_.emplace(1, std::make_tuple(service, 0, 0));
-    InputMgrImpl.eventFilterServices_.emplace(2, std::make_tuple(service, 1, 1));
-    EXPECT_EQ(InputMgrImpl.eventFilterServices_.size(), 2u);
+    impl->eventFilterServices_.emplace(1, std::make_tuple(service, 0, 0));
+    impl->eventFilterServices_.emplace(2, std::make_tuple(service, 1, 1));
+    EXPECT_EQ(impl->eventFilterServices_.size(), 2u);
 
-    int32_t result = InputMgrImpl.RemoveInputEventFilter(-1);
+    int32_t result = impl->RemoveInputEventFilter(-1);
     EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(InputMgrImpl.eventFilterServices_.size(), 0u);
+    EXPECT_EQ(impl->eventFilterServices_.size(), 0u);
 }
 
 /**
@@ -2697,16 +2699,17 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.eventFilterServices_.clear();
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
     auto filter = std::make_shared<InputEventFilterMock>();
     sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
     ASSERT_NE(service, nullptr);
-    InputMgrImpl.eventFilterServices_.emplace(1, std::make_tuple(service, 0, 0));
-    size_t initialSize = InputMgrImpl.eventFilterServices_.size();
+    impl->eventFilterServices_.emplace(1, std::make_tuple(service, 0, 0));
+    size_t initialSize = impl->eventFilterServices_.size();
 
-    int32_t result = InputMgrImpl.RemoveInputEventFilter(999);
+    int32_t result = impl->RemoveInputEventFilter(999);
     EXPECT_EQ(result, RET_OK);
-    EXPECT_EQ(InputMgrImpl.eventFilterServices_.size(), initialSize);
+    EXPECT_EQ(impl->eventFilterServices_.size(), initialSize);
 }
 
 /**
@@ -2718,9 +2721,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetWindowInputEventConsumer_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     auto eventHandler = std::make_shared<AppExecFwk::EventHandler>();
     std::shared_ptr<IInputEventConsumer> consumer = nullptr;
-    int32_t result = InputMgrImpl.SetWindowInputEventConsumer(consumer, eventHandler);
+    int32_t result = impl->SetWindowInputEventConsumer(consumer, eventHandler);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -2733,9 +2737,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetWindowInputEventConsumer_
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetWindowInputEventConsumer_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<IInputEventConsumer> consumer = std::make_shared<TestInputEventConsumer>();
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
-    int32_t result = InputMgrImpl.SetWindowInputEventConsumer(consumer, eventHandler);
+    int32_t result = impl->SetWindowInputEventConsumer(consumer, eventHandler);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -2748,9 +2753,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetWindowInputEventConsumer_
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<KeyOption> keyOption = nullptr;
     auto callback = [](std::shared_ptr<KeyEvent> event) {};
-    int32_t result = InputMgrImpl.SubscribeKeyEvent(keyOption, callback);
+    int32_t result = impl->SubscribeKeyEvent(keyOption, callback);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -2763,9 +2769,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_001,
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     std::function<void(std::shared_ptr<KeyEvent>)> callback = nullptr;
-    int32_t result = InputMgrImpl.SubscribeKeyEvent(keyOption, callback);
+    int32_t result = impl->SubscribeKeyEvent(keyOption, callback);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -2778,6 +2785,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_002,
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     keyOption->SetPriority(1);
     keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
@@ -2785,7 +2793,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_003,
     preKeys.insert(KeyEvent::KEYCODE_B);
     keyOption->SetPreKeys(preKeys);
     auto callback = [](std::shared_ptr<KeyEvent> event) {};
-    int32_t result = InputMgrImpl.SubscribeKeyEvent(keyOption, callback);
+    int32_t result = impl->SubscribeKeyEvent(keyOption, callback);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -2798,8 +2806,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_003,
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeKeyEvent_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t subscriberId = 12345;
-    InputMgrImpl.UnsubscribeKeyEvent(subscriberId);
+    impl->UnsubscribeKeyEvent(subscriberId);
     EXPECT_TRUE(true);
 }
 
@@ -2812,10 +2821,15 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeKeyEvent_Trace_00
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeSwitchEvent_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t switchType = SwitchEvent::SwitchType::SWITCH_DEFAULT;
     std::function<void(std::shared_ptr<SwitchEvent>)> callback = nullptr;
-    int32_t result = InputMgrImpl.SubscribeSwitchEvent(switchType, callback);
+    int32_t result = impl->SubscribeSwitchEvent(switchType, callback);
+#ifdef OHOS_BUILD_ENABLE_SWITCH
     EXPECT_EQ(result, RET_ERR);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
 /**
@@ -2827,10 +2841,15 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeSwitchEvent_Trace_0
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeSwitchEvent_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t switchType = -1;
     auto callback = [](std::shared_ptr<SwitchEvent> event) {};
-    int32_t result = InputMgrImpl.SubscribeSwitchEvent(switchType, callback);
+    int32_t result = impl->SubscribeSwitchEvent(switchType, callback);
+#ifdef OHOS_BUILD_ENABLE_SWITCH
     EXPECT_EQ(result, RET_ERR);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
 /**
@@ -2842,11 +2861,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeSwitchEvent_Trace_0
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeLongPressEvent_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     LongPressRequest longPressRequest;
     longPressRequest.fingerCount = 1;
     longPressRequest.duration = 500;
     std::function<void(LongPressEvent)> callback = nullptr;
-    int32_t result = InputMgrImpl.SubscribeLongPressEvent(longPressRequest, callback);
+    int32_t result = impl->SubscribeLongPressEvent(longPressRequest, callback);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -2859,8 +2879,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeLongPressEvent_Trac
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddMonitorKeyEvent_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::function<void(std::shared_ptr<KeyEvent>)> monitor = nullptr;
-    int32_t result = InputMgrImpl.AddMonitor(monitor);
+    int32_t result = impl->AddMonitor(monitor);
     EXPECT_EQ(result, INVALID_HANDLER_ID);
 }
 
@@ -2873,10 +2894,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddMonitorKeyEvent_Trace_001
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<IInputEventConsumer> interceptor = nullptr;
     int32_t priority = 100;
     uint32_t deviceTags = 0;
-    int32_t result = InputMgrImpl.AddInterceptor(interceptor, priority, deviceTags);
+    int32_t result = impl->AddInterceptor(interceptor, priority, deviceTags);
     EXPECT_EQ(result, INVALID_HANDLER_ID);
 }
 
@@ -2889,8 +2911,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_001, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInterceptor_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t interceptorId = 12345;
-    int32_t result = InputMgrImpl.RemoveInterceptor(interceptorId);
+    int32_t result = impl->RemoveInterceptor(interceptorId);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -2903,8 +2926,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInterceptor_Trace_001,
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SimulateKeyEvent_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<KeyEvent> keyEvent = nullptr;
-    InputMgrImpl.SimulateInputEvent(keyEvent);
+    impl->SimulateInputEvent(keyEvent);
     EXPECT_TRUE(true);
 }
 
@@ -2917,11 +2941,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SimulateKeyEvent_Trace_001, 
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SimulateKeyEvent_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    InputMgrImpl.SimulateInputEvent(keyEvent);
+    impl->SimulateInputEvent(keyEvent);
     EXPECT_TRUE(true);
 }
 
@@ -2934,8 +2959,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SimulateKeyEvent_Trace_002, 
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseScrollRows_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t rows = 5;
-    int32_t result = InputMgrImpl.SetMouseScrollRows(rows);
+    int32_t result = impl->SetMouseScrollRows(rows);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -2948,8 +2974,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseScrollRows_Trace_001
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMouseScrollRows_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t rows = 0;
-    int32_t result = InputMgrImpl.GetMouseScrollRows(rows);
+    int32_t result = impl->GetMouseScrollRows(rows);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -2962,10 +2989,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMouseScrollRows_Trace_001
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_RegisterDevListener_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::string type = "change";
     std::shared_ptr<IInputDeviceListener> listener = nullptr;
-    int32_t result = InputMgrImpl.RegisterDevListener(type, listener);
-    EXPECT_EQ(result, RET_OK);
+    int32_t result = impl->RegisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
@@ -2977,10 +3005,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RegisterDevListener_Trace_00
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_RegisterDevListener_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::string type = "";
     std::shared_ptr<IInputDeviceListener> listener = nullptr;
-    int32_t result = InputMgrImpl.RegisterDevListener(type, listener);
-    EXPECT_EQ(result, RET_OK);
+    int32_t result = impl->RegisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
@@ -2992,9 +3021,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RegisterDevListener_Trace_00
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnregisterDevListener_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::string type = "change";
     std::shared_ptr<IInputDeviceListener> listener = nullptr;
-    int32_t result = InputMgrImpl.UnregisterDevListener(type, listener);
+    int32_t result = impl->UnregisterDevListener(type, listener);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3007,10 +3037,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnregisterDevListener_Trace_
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnregisterDevListener_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::string type = "";
     std::shared_ptr<IInputDeviceListener> listener = nullptr;
-    int32_t result = InputMgrImpl.UnregisterDevListener(type, listener);
-    EXPECT_EQ(result, RET_OK);
+    int32_t result = impl->UnregisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_ERR);
 }
 
 /**
@@ -3022,6 +3053,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnregisterDevListener_Trace_
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     UserScreenInfo userScreenInfo;
     userScreenInfo.userId = 100;
     DisplayGroupInfo group;
@@ -3032,8 +3064,8 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_001, T
     display.height = 1080;
     group.displaysInfo.push_back(display);
     userScreenInfo.displayGroups.push_back(group);
-    int32_t result = InputMgrImpl.SendDisplayInfo(userScreenInfo);
-    EXPECT_EQ(result, RET_OK);
+    int32_t result = impl->SendDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, MSG_SEND_FAIL);
 }
 
 /**
@@ -3045,17 +3077,18 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.windowGroupInfo_.focusWindowId = 1;
-    InputMgrImpl.windowGroupInfo_.displayId = 0;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->windowGroupInfo_.focusWindowId = 1;
+    impl->windowGroupInfo_.displayId = 0;
     WindowInfo window;
     window.id = 1;
     window.pid = 1000;
     Rect hotArea = {0, 0, 100, 100};
     window.defaultHotAreas.push_back(hotArea);
     window.pointerHotAreas.push_back(hotArea);
-    InputMgrImpl.windowGroupInfo_.windowsInfo.push_back(window);
-    int32_t result = InputMgrImpl.SendWindowInfo();
-    EXPECT_EQ(result, RET_OK);
+    impl->windowGroupInfo_.windowsInfo.push_back(window);
+    int32_t result = impl->SendWindowInfo();
+    EXPECT_EQ(result, MSG_SEND_FAIL);
 }
 
 /**
@@ -3067,11 +3100,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_001, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = -1;
     bool isUiExtension = false;
-    int32_t result = InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t result = impl->SetPointerStyle(windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -3084,11 +3118,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     pointerStyle.id = 0;
     bool isUiExtension = false;
-    int32_t result = InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t result = impl->SetPointerStyle(windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3101,10 +3136,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_002, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerStyle_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t windowId = 1;
     PointerStyle pointerStyle;
     bool isUiExtension = false;
-    int32_t result = InputMgrImpl.GetPointerStyle(windowId, pointerStyle, isUiExtension);
+    int32_t result = impl->GetPointerStyle(windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3117,8 +3153,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerStyle_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSpeed_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t speed = 5;
-    int32_t result = InputMgrImpl.SetPointerSpeed(speed);
+    int32_t result = impl->SetPointerSpeed(speed);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3131,8 +3168,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSpeed_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSpeed_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t speed = 0;
-    int32_t result = InputMgrImpl.GetPointerSpeed(speed);
+    int32_t result = impl->GetPointerSpeed(speed);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3145,8 +3183,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSpeed_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t color = 0xFF0000;
-    int32_t result = InputMgrImpl.SetPointerColor(color);
+    int32_t result = impl->SetPointerColor(color);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3159,8 +3198,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerColor_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t color = 0;
-    int32_t result = InputMgrImpl.GetPointerColor(color);
+    int32_t result = impl->GetPointerColor(color);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3173,8 +3213,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerColor_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSize_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t size = 1;
-    int32_t result = InputMgrImpl.SetPointerSize(size);
+    int32_t result = impl->SetPointerSize(size);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3187,8 +3228,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSize_Trace_001, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSize_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t size = 0;
-    int32_t result = InputMgrImpl.GetPointerSize(size);
+    int32_t result = impl->GetPointerSize(size);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3201,8 +3243,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSize_Trace_001, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerVisible_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool visible = true;
-    int32_t result = InputMgrImpl.SetPointerVisible(visible);
+    int32_t priority = 0;
+    int32_t result = impl->SetPointerVisible(visible, priority);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3215,8 +3259,10 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerVisible_Trace_001,
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerVisible_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool visible = false;
-    int32_t result = InputMgrImpl.SetPointerVisible(visible);
+    int32_t priority = 0;
+    int32_t result = impl->SetPointerVisible(visible, priority);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3229,10 +3275,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerVisible_Trace_002,
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerLocation_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t x = 100;
     int32_t y = 200;
     int32_t displayId = 0;
-    int32_t result = InputMgrImpl.SetPointerLocation(x, y, displayId);
+    int32_t result = impl->SetPointerLocation(x, y, displayId);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3245,11 +3292,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerLocation_Trace_001
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t displayId = 0;
     double displayX = 0.0;
     double displayY = 0.0;
-    int32_t result = InputMgrImpl.GetPointerLocation(displayId, displayX, displayY);
-    EXPECT_EQ(result, RET_OK);
+    int32_t result = impl->GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(result, ERROR_APP_NOT_FOCUSED);
 }
 
 /**
@@ -3261,10 +3309,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation_Trace_001
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseIcon_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t windowId = -1;
     void* pixelMap = nullptr;
-    int32_t result = InputMgrImpl.SetMouseIcon(windowId, pixelMap);
-    EXPECT_EQ(result, RET_ERR);
+    int32_t result = impl->SetMouseIcon(windowId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
 }
 
 /**
@@ -3276,10 +3325,11 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseIcon_Trace_001, Test
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t windowId = -1;
     int32_t hotSpotX = 0;
     int32_t hotSpotY = 0;
-    int32_t result = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    int32_t result = impl->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -3292,8 +3342,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_Trace_001, T
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMousePrimaryButton_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t button = 0;
-    int32_t result = InputMgrImpl.SetMousePrimaryButton(button);
+    int32_t result = impl->SetMousePrimaryButton(button);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3306,8 +3357,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMousePrimaryButton_Trace_
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMousePrimaryButton_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t button = 0;
-    int32_t result = InputMgrImpl.GetMousePrimaryButton(button);
+    int32_t result = impl->GetMousePrimaryButton(button);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3320,8 +3372,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMousePrimaryButton_Trace_
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetHoverScrollState_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool state = true;
-    int32_t result = InputMgrImpl.SetHoverScrollState(state);
+    int32_t result = impl->SetHoverScrollState(state);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3334,8 +3387,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetHoverScrollState_Trace_00
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetHoverScrollState_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool state = false;
-    int32_t result = InputMgrImpl.GetHoverScrollState(state);
+    int32_t result = impl->GetHoverScrollState(state);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3348,8 +3402,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetHoverScrollState_Trace_00
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadScrollSwitch_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool switchFlag = true;
-    int32_t result = InputMgrImpl.SetTouchpadScrollSwitch(switchFlag);
+    int32_t result = impl->SetTouchpadScrollSwitch(switchFlag);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3362,8 +3417,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadScrollSwitch_Trac
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadScrollSwitch_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool switchFlag = false;
-    int32_t result = InputMgrImpl.GetTouchpadScrollSwitch(switchFlag);
+    int32_t result = impl->GetTouchpadScrollSwitch(switchFlag);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3376,8 +3432,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadScrollSwitch_Trac
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadTapSwitch_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool switchFlag = true;
-    int32_t result = InputMgrImpl.SetTouchpadTapSwitch(switchFlag);
+    int32_t result = impl->SetTouchpadTapSwitch(switchFlag);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3390,8 +3447,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadTapSwitch_Trace_0
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadTapSwitch_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     bool switchFlag = false;
-    int32_t result = InputMgrImpl.GetTouchpadTapSwitch(switchFlag);
+    int32_t result = impl->GetTouchpadTapSwitch(switchFlag);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3404,8 +3462,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadTapSwitch_Trace_0
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadPointerSpeed_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t speed = 5;
-    int32_t result = InputMgrImpl.SetTouchpadPointerSpeed(speed);
+    int32_t result = impl->SetTouchpadPointerSpeed(speed);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3418,8 +3477,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadPointerSpeed_Trac
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadPointerSpeed_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     int32_t speed = 0;
-    int32_t result = InputMgrImpl.GetTouchpadPointerSpeed(speed);
+    int32_t result = impl->GetTouchpadPointerSpeed(speed);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3432,8 +3492,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadPointerSpeed_Trac
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetCursorSurfaceId_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     uint64_t surfaceId = 0;
-    int32_t result = InputMgrImpl.GetCursorSurfaceId(surfaceId);
+    int32_t result = impl->GetCursorSurfaceId(surfaceId);
     EXPECT_EQ(result, RET_OK);
 }
 
@@ -3446,8 +3507,9 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetCursorSurfaceId_Trace_001
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.lastPointerEvent_ = nullptr;
-    InputMgrImpl.OnDisconnected();
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->lastPointerEvent_ = nullptr;
+    impl->OnDisconnected();
     EXPECT_TRUE(true);
 }
 
@@ -3460,11 +3522,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_001, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    InputMgrImpl.lastPointerEvent_ = pointerEvent;
-    InputMgrImpl.OnDisconnected();
+    impl->lastPointerEvent_ = pointerEvent;
+    impl->OnDisconnected();
     EXPECT_TRUE(true);
 }
 
@@ -3477,11 +3540,12 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_002, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    InputMgrImpl.lastPointerEvent_ = pointerEvent;
-    InputMgrImpl.OnDisconnected();
+    impl->lastPointerEvent_ = pointerEvent;
+    impl->OnDisconnected();
     EXPECT_TRUE(true);
 }
 
@@ -3494,18 +3558,19 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_003, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInputEventFilter_Trace_MaxFilter, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputMgrImpl.eventFilterServices_.clear();
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
     auto filter = std::make_shared<InputEventFilterMock>();
     sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
     ASSERT_NE(service, nullptr);
     
     for (size_t i = 0; i < MAX_FILTER_NUM + 1; ++i) {
-        InputMgrImpl.eventFilterServices_.emplace(static_cast<int32_t>(i), 
+        impl->eventFilterServices_.emplace(static_cast<int32_t>(i), 
             std::make_tuple(service, 0, 0));
     }
     
     auto newFilter = std::make_shared<InputEventFilterMock>();
-    int32_t result = InputMgrImpl.AddInputEventFilter(newFilter, 100, 0);
+    int32_t result = impl->AddInputEventFilter(newFilter, 100, 0);
     EXPECT_EQ(result, RET_ERR);
 }
 } // namespace MMI
