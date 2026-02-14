@@ -3573,5 +3573,37 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInputEventFilter_Trace_Ma
     int32_t result = impl->AddInputEventFilter(newFilter, 100, 0);
     EXPECT_EQ(result, RET_ERR);
 }
+
+/**
+ * @tc.name: InputManagerImplTest_SendDisplayInfo_Trace_002
+ * @tc.desc: Test SendDisplayInfo with client nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 100;
+    int32_t result = impl->SendDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendWindowInfo_Trace_002
+ * @tc.desc: Test SendWindowInfo with client nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->windowGroupInfo_.focusWindowId = 1;
+    impl->windowGroupInfo_.displayId = 0;
+    int32_t result = impl->SendWindowInfo();
+    EXPECT_EQ(result, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
