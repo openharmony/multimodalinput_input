@@ -2806,7 +2806,7 @@ int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
 
 int32_t InputManagerImpl::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string msg = "GetKeyState";
     BytraceAdapter::MMIClientTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetKeyState(pressedKeys, specialKeysState);
