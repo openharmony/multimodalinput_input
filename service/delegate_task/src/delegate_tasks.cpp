@@ -123,7 +123,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     auto task = PostTask(callback, promise);
     CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
-    static constexpr int32_t TIMEOUT = 3000;
+    static constexpr int32_t TIMEOUT = 5000;
     std::chrono::milliseconds span(TIMEOUT);
     auto res = future.wait_for(span);
     task->SetWaited();
