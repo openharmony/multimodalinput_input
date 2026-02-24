@@ -3605,7 +3605,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInputEventFilter_Trace_Ma
     ASSERT_NE(service, nullptr);
     
     for (size_t i = 0; i < MAX_FILTER_NUM + 1; ++i) {
-        impl->eventFilterServices_.emplace(static_cast<int32_t>(i), 
+        impl->eventFilterServices_.emplace(static_cast<int32_t>(i),
             std::make_tuple(service, 0, 0));
     }
     
