@@ -51,6 +51,13 @@ private:
     std::shared_ptr<Media::PixelMap> pixelMap_ { nullptr };
 };
 
+struct CachedPointerConfig {
+    int32_t color;
+    int32_t size;
+    bool isValid;
+    CachedPointerConfig() : color(DEFAULT_VALUE), size(DEFAULT_POINTER_SIZE), isValid(false) {}
+};
+
 class ScreenModeChangeListener final : public OHOS::Rosen::ScreenManagerLite::IScreenModeChangeListener {
 public:
     using callback_t = std::function<void(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &)>;
@@ -107,6 +114,7 @@ public:
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
     void DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY) override;
+    void OnSwitchUser(int32_t userId) override;
     std::vector<std::vector<std::string>> GetDisplayInfo(OLD::DisplayInfo &di);
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
@@ -336,6 +344,8 @@ private:
     std::shared_ptr<EventFwk::CommonEventSubscriber> commonEventSubscriber_ { nullptr };
     bool isCleared_ { false };
     std::mutex isClearedMtx_;
+    CachedPointerConfig cachedPointerConfig_;
+    std::mutex configCacheMutex_;
     std::atomic<uint64_t> workerThreadId_ { 0 };
 };
 } // namespace MMI

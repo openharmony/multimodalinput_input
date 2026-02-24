@@ -608,6 +608,12 @@ void CursorDrawingComponent::UpdatePointerItemCursorInfo(PointerEvent::PointerIt
     pointerInstance_->UpdatePointerItemCursorInfo(pointerItem);
 }
 
+void CursorDrawingComponent::OnSwitchUser(int32_t userId)
+{
+    CHK_IS_LOADV(isLoaded_, pointerInstance_)
+    pointerInstance_->OnSwitchUser(userId);
+}
+
 IPointerDrawingManager* CursorDrawingComponent::GetPointerInstance()
 {
     std::lock_guard<ffrt::mutex> lockGuard(g_loadSoMutex);
