@@ -57,10 +57,10 @@ HWTEST_F(WhitelistDataShareAccessorTest, WhitelistDataShareAccessorTest_GetInsta
 HWTEST_F(WhitelistDataShareAccessorTest, WhitelistDataShareAccessorTest_Init_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-   WhitelistDataShareAccessor accessor;
-   accessor.Init();
-   EXPECT_FALSE(accessor.initialized_.load());
-   std::this_thread::sleep_for(std::chrono::milliseconds(COOLING_TIME_MS));
+    WhitelistDataShareAccessor accessor;
+    accessor.Init();
+    EXPECT_FALSE(accessor.initialized_.load());
+    std::this_thread::sleep_for(std::chrono::milliseconds(COOLING_TIME_MS));
 }
 
 /**
