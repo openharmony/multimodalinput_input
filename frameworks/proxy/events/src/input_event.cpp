@@ -130,6 +130,9 @@ void InputEvent::SetId(int32_t id)
 
 void InputEvent::UpdateId()
 {
+    if (g_nextEventId >= INT32_MAX) {
+        g_nextEventId = 1;
+    }
     id_ = g_nextEventId++;
 }
 
