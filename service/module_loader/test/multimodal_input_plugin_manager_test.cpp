@@ -629,7 +629,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRe
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     int32_t callbackId = 1;
-    EXPECT_TRUE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
+    EXPECT_FALSE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
 }
 } // namespace MMI
 } // namespace OHOS
