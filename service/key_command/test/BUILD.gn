@@ -56,6 +56,7 @@ ohos_unittest("KeyCommandTest") {
     "key_command_handler_util_test.cpp",
     "pull_throw_subscriber_handler_test.cpp",
     "${mmi_path}/service/common/setting_datashare/test/setting_datashare_test.cpp",
+    "whitelist_data_share_accessor_test.cpp",
   ]
 
   if (input_feature_knuckle) {
