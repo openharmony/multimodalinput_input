@@ -3728,20 +3728,20 @@ void PointerDrawingManager::OnSwitchUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("OnSwitchUser called, userId:%{private}d", userId);
-    
+
     PointerStyle curPointerStyle;
     CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid_, GLOBAL_WINDOW_ID, curPointerStyle);
-    
+
     curPointerStyle.options = lastMouseStyle_.options;
-    
+
     if (WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle) != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return;
     }
-    
+
     DrawPointerStyle(curPointerStyle);
-    
-    MMI_HILOGI("OnSwitchUser completed, pointerStyle.id:%{public}d, color:%{public}d, size:%{public}d", 
+
+    MMI_HILOGI("OnSwitchUser completed, pointerStyle.id:%{public}d, color:%{public}d, size:%{public}d",
         curPointerStyle.id, curPointerStyle.color, curPointerStyle.size);
 } // namespace MMI
 } // namespace OHOS
