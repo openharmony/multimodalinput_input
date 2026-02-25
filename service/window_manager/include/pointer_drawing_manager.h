@@ -55,7 +55,7 @@ struct CachedPointerConfig {
     int32_t color;
     int32_t size;
     bool isValid;
-    CachedPointerConfig() : color(DEFAULT_VALUE), size(DEFAULT_POINTER_SIZE), isValid(false) {}
+    CachedPointerConfig() : color(-1), size(1), isValid(false) {}
 };
 
 class ScreenModeChangeListener final : public OHOS::Rosen::ScreenManagerLite::IScreenModeChangeListener {

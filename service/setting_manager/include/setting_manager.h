@@ -63,7 +63,7 @@ private:
     void ReadSettingData();
     void MarkUserConfigLoading(int32_t userId);
     void MarkUserConfigLoaded(int32_t userId);
-    bool IsUserConfigLoaded(int32_t userId) const;
+    bool IsUserConfigLoaded(int32_t userId) const override;
 
     // Helper methods for SetValueInner
     bool ShouldWriteToTemp() const;
@@ -79,7 +79,7 @@ private:
     std::mutex tempMapMutex_;
     std::shared_ptr<ffrt::queue> ffrtHandler_;
     std::unordered_map<int32_t, bool> userConfigLoadedMap_;
-    std::mutex userConfigLoadedMutex_;
+    mutable std::mutex userConfigLoadedMutex_;
 };
 } // namespace MMI
 } // namespace OHOS

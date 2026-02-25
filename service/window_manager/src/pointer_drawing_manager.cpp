@@ -3743,5 +3743,6 @@ void PointerDrawingManager::OnSwitchUser(int32_t userId)
 
     MMI_HILOGI("OnSwitchUser completed, pointerStyle.id:%{public}d, color:%{public}d, size:%{public}d",
         curPointerStyle.id, curPointerStyle.color, curPointerStyle.size);
+}
 } // namespace MMI
 } // namespace OHOS
