@@ -124,6 +124,8 @@ public:
 
     static void MMIServiceTraceStart(int32_t type, const std::string& msg);
     static void MMIServiceTraceStop();
+    static void MMIClientTraceStart(int32_t type, const std::string& msg);
+    static void MMIClientTraceStop();
 
     static void StartForegroundAppData(const std::string& type, size_t size);
     static void StopForegroundAppData();

@@ -2649,5 +2649,1001 @@ HWTEST_F(InputManagerImplTest, PackUiExtentionWindowInfo_WriteError_002, TestSiz
 
     EXPECT_EQ(result, RET_ERR);
 }
+
+/**
+ * @tc.name: InputManagerImplTest_RemoveInputEventFilter_Trace_001
+ * @tc.desc: Test RemoveInputEventFilter with empty filter list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
+    size_t initialSize = impl->eventFilterServices_.size();
+    int32_t result = impl->RemoveInputEventFilter(1);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(impl->eventFilterServices_.size(), initialSize);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_RemoveInputEventFilter_Trace_002
+ * @tc.desc: Test RemoveInputEventFilter with filterId -1 to remove all
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
+    auto filter = std::make_shared<InputEventFilterMock>();
+    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
+    ASSERT_NE(service, nullptr);
+    impl->eventFilterServices_.emplace(1, std::make_tuple(service, 0, 0));
+    impl->eventFilterServices_.emplace(2, std::make_tuple(service, 1, 1));
+    EXPECT_EQ(impl->eventFilterServices_.size(), 2u);
+
+    int32_t result = impl->RemoveInputEventFilter(-1);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(impl->eventFilterServices_.size(), 0u);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_RemoveInputEventFilter_Trace_003
+ * @tc.desc: Test RemoveInputEventFilter with non-existent filterId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInputEventFilter_Trace_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
+    auto filter = std::make_shared<InputEventFilterMock>();
+    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
+    ASSERT_NE(service, nullptr);
+    impl->eventFilterServices_.emplace(1, std::make_tuple(service, 0, 0));
+    size_t initialSize = impl->eventFilterServices_.size();
+
+    int32_t result = impl->RemoveInputEventFilter(999);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(impl->eventFilterServices_.size(), initialSize);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetWindowInputEventConsumer_Trace_001
+ * @tc.desc: Test SetWindowInputEventConsumer with nullptr consumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetWindowInputEventConsumer_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>();
+    std::shared_ptr<IInputEventConsumer> consumer = nullptr;
+    int32_t result = impl->SetWindowInputEventConsumer(consumer, eventHandler);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetWindowInputEventConsumer_Trace_002
+ * @tc.desc: Test SetWindowInputEventConsumer with nullptr eventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetWindowInputEventConsumer_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<IInputEventConsumer> consumer = std::make_shared<TestInputEventConsumer>();
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    int32_t result = impl->SetWindowInputEventConsumer(consumer, eventHandler);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeKeyEvent_Trace_001
+ * @tc.desc: Test SubscribeKeyEvent with nullptr keyOption
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<KeyOption> keyOption = nullptr;
+    auto callback = [](std::shared_ptr<KeyEvent> event) {};
+    int32_t result = impl->SubscribeKeyEvent(keyOption, callback);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeKeyEvent_Trace_002
+ * @tc.desc: Test SubscribeKeyEvent with nullptr callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::function<void(std::shared_ptr<KeyEvent>)> callback = nullptr;
+    int32_t result = impl->SubscribeKeyEvent(keyOption, callback);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeKeyEvent_Trace_003
+ * @tc.desc: Test SubscribeKeyEvent with invalid keyOption (priority > 0 with preKeys)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeKeyEvent_Trace_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPriority(1);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_A);
+    std::set<int32_t> preKeys;
+    preKeys.insert(KeyEvent::KEYCODE_B);
+    keyOption->SetPreKeys(preKeys);
+    auto callback = [](std::shared_ptr<KeyEvent> event) {};
+    int32_t result = impl->SubscribeKeyEvent(keyOption, callback);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UnsubscribeKeyEvent_Trace_001
+ * @tc.desc: Test UnsubscribeKeyEvent with valid subscriberId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnsubscribeKeyEvent_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t subscriberId = 12345;
+    impl->UnsubscribeKeyEvent(subscriberId);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeSwitchEvent_Trace_001
+ * @tc.desc: Test SubscribeSwitchEvent with nullptr callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeSwitchEvent_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t switchType = SwitchEvent::SwitchType::SWITCH_DEFAULT;
+    std::function<void(std::shared_ptr<SwitchEvent>)> callback = nullptr;
+    int32_t result = impl->SubscribeSwitchEvent(switchType, callback);
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    EXPECT_EQ(result, RET_ERR);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeSwitchEvent_Trace_002
+ * @tc.desc: Test SubscribeSwitchEvent with invalid switchType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeSwitchEvent_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t switchType = -1;
+    auto callback = [](std::shared_ptr<SwitchEvent> event) {};
+    int32_t result = impl->SubscribeSwitchEvent(switchType, callback);
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    EXPECT_EQ(result, RET_ERR);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SubscribeLongPressEvent_Trace_001
+ * @tc.desc: Test SubscribeLongPressEvent with nullptr callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SubscribeLongPressEvent_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    LongPressRequest longPressRequest;
+    longPressRequest.fingerCount = 1;
+    longPressRequest.duration = 500;
+    std::function<void(LongPressEvent)> callback = nullptr;
+    int32_t result = impl->SubscribeLongPressEvent(longPressRequest, callback);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AddMonitorKeyEvent_Trace_001
+ * @tc.desc: Test AddMonitor(KeyEvent) with nullptr monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddMonitorKeyEvent_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::function<void(std::shared_ptr<KeyEvent>)> monitor = nullptr;
+    int32_t result = impl->AddMonitor(monitor);
+    EXPECT_EQ(result, INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AddMonitorKeyEvent_Trace_002
+ * @tc.desc: Test AddMonitor(KeyEvent) with valid monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddMonitorKeyEvent_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    auto monitor = [](std::shared_ptr<KeyEvent> event) {};
+    int32_t result = impl->AddMonitor(monitor);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    EXPECT_NE(result, INVALID_HANDLER_ID);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AddInterceptor_Trace_001
+ * @tc.desc: Test AddInterceptor with nullptr interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<IInputEventConsumer> interceptor = nullptr;
+    int32_t priority = 100;
+    uint32_t deviceTags = 0;
+    int32_t result = impl->AddInterceptor(interceptor, priority, deviceTags);
+    EXPECT_EQ(result, INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AddInterceptor_Trace_002
+ * @tc.desc: Test AddInterceptor with valid interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInterceptor_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<IInputEventConsumer> interceptor = std::make_shared<TestInputEventConsumer>();
+    int32_t priority = 100;
+    uint32_t deviceTags = 0;
+    int32_t result = impl->AddInterceptor(interceptor, priority, deviceTags);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_EQ(result, RET_ERR);
+#else
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif
+}
+
+/**
+ * @tc.name: InputManagerImplTest_RemoveInterceptor_Trace_001
+ * @tc.desc: Test RemoveInterceptor with valid interceptorId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RemoveInterceptor_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t interceptorId = 12345;
+    int32_t result = impl->RemoveInterceptor(interceptorId);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SimulateKeyEvent_Trace_001
+ * @tc.desc: Test SimulateInputEvent(KeyEvent) with nullptr keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SimulateKeyEvent_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    impl->SimulateInputEvent(keyEvent);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SimulateKeyEvent_Trace_002
+ * @tc.desc: Test SimulateInputEvent(KeyEvent) with valid keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SimulateKeyEvent_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    impl->SimulateInputEvent(keyEvent);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetMouseScrollRows_Trace_001
+ * @tc.desc: Test SetMouseScrollRows with valid rows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseScrollRows_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t rows = 5;
+    int32_t result = impl->SetMouseScrollRows(rows);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetMouseScrollRows_Trace_001
+ * @tc.desc: Test GetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMouseScrollRows_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t rows = 0;
+    int32_t result = impl->GetMouseScrollRows(rows);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_RegisterDevListener_Trace_001
+ * @tc.desc: Test RegisterDevListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RegisterDevListener_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::string type = "change";
+    std::shared_ptr<IInputDeviceListener> listener = nullptr;
+    int32_t result = impl->RegisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_RegisterDevListener_Trace_002
+ * @tc.desc: Test RegisterDevListener with empty type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_RegisterDevListener_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::string type = "";
+    std::shared_ptr<IInputDeviceListener> listener = nullptr;
+    int32_t result = impl->RegisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UnregisterDevListener_Trace_001
+ * @tc.desc: Test UnregisterDevListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnregisterDevListener_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::string type = "change";
+    std::shared_ptr<IInputDeviceListener> listener = nullptr;
+    int32_t result = impl->UnregisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_UnregisterDevListener_Trace_002
+ * @tc.desc: Test UnregisterDevListener with empty type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_UnregisterDevListener_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::string type = "";
+    std::shared_ptr<IInputDeviceListener> listener = nullptr;
+    int32_t result = impl->UnregisterDevListener(type, listener);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendDisplayInfo_Trace_001
+ * @tc.desc: Test SendDisplayInfo with valid data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 100;
+    DisplayGroupInfo group;
+    group.id = 1;
+    DisplayInfo display;
+    display.id = 0;
+    display.width = 1920;
+    display.height = 1080;
+    group.displaysInfo.push_back(display);
+    userScreenInfo.displayGroups.push_back(group);
+    int32_t result = impl->SendDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, MSG_SEND_FAIL);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendWindowInfo_Trace_001
+ * @tc.desc: Test SendWindowInfo with valid data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->windowGroupInfo_.focusWindowId = 1;
+    impl->windowGroupInfo_.displayId = 0;
+    WindowInfo window;
+    window.id = 1;
+    window.pid = 1000;
+    Rect hotArea = {0, 0, 100, 100};
+    window.defaultHotAreas.push_back(hotArea);
+    window.pointerHotAreas.push_back(hotArea);
+    impl->windowGroupInfo_.windowsInfo.push_back(window);
+    int32_t result = impl->SendWindowInfo();
+    EXPECT_EQ(result, MSG_SEND_FAIL);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerStyle_Trace_001
+ * @tc.desc: Test SetPointerStyle with invalid pointerStyle id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t windowId = 1;
+    PointerStyle pointerStyle;
+    pointerStyle.id = -1;
+    bool isUiExtension = false;
+    int32_t result = impl->SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerStyle_Trace_002
+ * @tc.desc: Test SetPointerStyle with valid pointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerStyle_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t windowId = 1;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    bool isUiExtension = false;
+    int32_t result = impl->SetPointerStyle(windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerStyle_Trace_001
+ * @tc.desc: Test GetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerStyle_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t windowId = 1;
+    PointerStyle pointerStyle;
+    bool isUiExtension = false;
+    int32_t result = impl->GetPointerStyle(windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerSpeed_Trace_001
+ * @tc.desc: Test SetPointerSpeed with valid speed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSpeed_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t speed = 5;
+    int32_t result = impl->SetPointerSpeed(speed);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerSpeed_Trace_001
+ * @tc.desc: Test GetPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSpeed_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t speed = 0;
+    int32_t result = impl->GetPointerSpeed(speed);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerColor_Trace_001
+ * @tc.desc: Test SetPointerColor with valid color
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t color = 0xFF0000;
+    int32_t result = impl->SetPointerColor(color);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerColor_Trace_001
+ * @tc.desc: Test GetPointerColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerColor_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t color = 0;
+    int32_t result = impl->GetPointerColor(color);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerSize_Trace_001
+ * @tc.desc: Test SetPointerSize with valid size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSize_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t size = 1;
+    int32_t result = impl->SetPointerSize(size);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerSize_Trace_001
+ * @tc.desc: Test GetPointerSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerSize_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t size = 0;
+    int32_t result = impl->GetPointerSize(size);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerVisible_Trace_001
+ * @tc.desc: Test SetPointerVisible with visible true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerVisible_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool visible = true;
+    int32_t priority = 0;
+    int32_t result = impl->SetPointerVisible(visible, priority);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerVisible_Trace_002
+ * @tc.desc: Test SetPointerVisible with visible false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerVisible_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool visible = false;
+    int32_t priority = 0;
+    int32_t result = impl->SetPointerVisible(visible, priority);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerLocation_Trace_001
+ * @tc.desc: Test SetPointerLocation with valid params
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerLocation_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t x = 100;
+    int32_t y = 200;
+    int32_t displayId = 0;
+    int32_t result = impl->SetPointerLocation(x, y, displayId);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerLocation_Trace_001
+ * @tc.desc: Test GetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerLocation_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t displayId = 0;
+    double displayX = 0.0;
+    double displayY = 0.0;
+    int32_t result = impl->GetPointerLocation(displayId, displayX, displayY);
+    EXPECT_EQ(result, ERROR_APP_NOT_FOCUSED);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetMouseIcon_Trace_001
+ * @tc.desc: Test SetMouseIcon with invalid windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseIcon_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t windowId = -1;
+    void* pixelMap = nullptr;
+    int32_t result = impl->SetMouseIcon(windowId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetMouseHotSpot_Trace_001
+ * @tc.desc: Test SetMouseHotSpot with invalid windowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t windowId = -1;
+    int32_t hotSpotX = 0;
+    int32_t hotSpotY = 0;
+    int32_t result = impl->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetMousePrimaryButton_Trace_001
+ * @tc.desc: Test SetMousePrimaryButton with valid button
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMousePrimaryButton_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t button = 0;
+    int32_t result = impl->SetMousePrimaryButton(button);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetMousePrimaryButton_Trace_001
+ * @tc.desc: Test GetMousePrimaryButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMousePrimaryButton_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t button = 0;
+    int32_t result = impl->GetMousePrimaryButton(button);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetHoverScrollState_Trace_001
+ * @tc.desc: Test SetHoverScrollState with valid state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetHoverScrollState_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool state = true;
+    int32_t result = impl->SetHoverScrollState(state);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetHoverScrollState_Trace_001
+ * @tc.desc: Test GetHoverScrollState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetHoverScrollState_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool state = false;
+    int32_t result = impl->GetHoverScrollState(state);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetTouchpadScrollSwitch_Trace_001
+ * @tc.desc: Test SetTouchpadScrollSwitch with valid switchFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadScrollSwitch_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool switchFlag = true;
+    int32_t result = impl->SetTouchpadScrollSwitch(switchFlag);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetTouchpadScrollSwitch_Trace_001
+ * @tc.desc: Test GetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadScrollSwitch_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool switchFlag = false;
+    int32_t result = impl->GetTouchpadScrollSwitch(switchFlag);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetTouchpadTapSwitch_Trace_001
+ * @tc.desc: Test SetTouchpadTapSwitch with valid switchFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadTapSwitch_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool switchFlag = true;
+    int32_t result = impl->SetTouchpadTapSwitch(switchFlag);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetTouchpadTapSwitch_Trace_001
+ * @tc.desc: Test GetTouchpadTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadTapSwitch_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    bool switchFlag = false;
+    int32_t result = impl->GetTouchpadTapSwitch(switchFlag);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetTouchpadPointerSpeed_Trace_001
+ * @tc.desc: Test SetTouchpadPointerSpeed with valid speed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadPointerSpeed_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t speed = 5;
+    int32_t result = impl->SetTouchpadPointerSpeed(speed);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetTouchpadPointerSpeed_Trace_001
+ * @tc.desc: Test GetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadPointerSpeed_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    int32_t speed = 0;
+    int32_t result = impl->GetTouchpadPointerSpeed(speed);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetCursorSurfaceId_Trace_001
+ * @tc.desc: Test GetCursorSurfaceId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetCursorSurfaceId_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    uint64_t surfaceId = 0;
+    int32_t result = impl->GetCursorSurfaceId(surfaceId);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_OnDisconnected_Trace_001
+ * @tc.desc: Test OnDisconnected with no last pointer event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->lastPointerEvent_ = nullptr;
+    impl->OnDisconnected();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_OnDisconnected_Trace_002
+ * @tc.desc: Test OnDisconnected with pointer action up
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    impl->lastPointerEvent_ = pointerEvent;
+    impl->OnDisconnected();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_OnDisconnected_Trace_003
+ * @tc.desc: Test OnDisconnected with pointer action pull up
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_Trace_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    impl->lastPointerEvent_ = pointerEvent;
+    impl->OnDisconnected();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_AddInputEventFilter_Trace_MaxFilter
+ * @tc.desc: Test AddInputEventFilter when max filter number reached
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_AddInputEventFilter_Trace_MaxFilter, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->eventFilterServices_.clear();
+    auto filter = std::make_shared<InputEventFilterMock>();
+    sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
+    ASSERT_NE(service, nullptr);
+    
+    for (size_t i = 0; i < MAX_FILTER_NUM + 1; ++i) {
+        impl->eventFilterServices_.emplace(static_cast<int32_t>(i),
+            std::make_tuple(service, 0, 0));
+    }
+    
+    auto newFilter = std::make_shared<InputEventFilterMock>();
+    int32_t result = impl->AddInputEventFilter(newFilter, 100, 0);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendDisplayInfo_Trace_002
+ * @tc.desc: Test SendDisplayInfo with client nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendDisplayInfo_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 100;
+    int32_t result = impl->SendDisplayInfo(userScreenInfo);
+    EXPECT_EQ(result, MSG_SEND_FAIL);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendWindowInfo_Trace_002
+ * @tc.desc: Test SendWindowInfo with client nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendWindowInfo_Trace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto impl = std::make_shared<InputManagerImpl>();
+    impl->windowGroupInfo_.focusWindowId = 1;
+    impl->windowGroupInfo_.displayId = 0;
+    int32_t result = impl->SendWindowInfo();
+    EXPECT_EQ(result, MSG_SEND_FAIL);
+}
 } // namespace MMI
 } // namespace OHOS
