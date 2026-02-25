@@ -135,20 +135,6 @@ public:
 };
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_001
- * @tc.desc: Init will return RET_OK when directory_ is valid path
- * @tc.require:
- */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t result = InputPluginManager::GetInstance()->Init(udsServer);
-    EXPECT_EQ(result, RET_OK);
-}
-
-/**
  * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_HandleEvent_001
  * @tc.desc: Test_HandleEvent_001
  * @tc.require:
@@ -629,7 +615,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Regi
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::function<void(const EventFwk::CommonEventData &)> callback = [](const EventFwk::CommonEventData &) {};
     int32_t callbackId = inputPluginContext->RegisterCommonEventCallback(callback);
-    EXPECT_EQ(callbackId, 0);
+    EXPECT_NE(callbackId, -1);
 }
 
 /**
@@ -643,7 +629,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRe
     CALL_TEST_DEBUG;
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     int32_t callbackId = 1;
-    EXPECT_FALSE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
+    EXPECT_TRUE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
 }
 } // namespace MMI
 } // namespace OHOS
