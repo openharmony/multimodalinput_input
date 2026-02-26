@@ -1135,7 +1135,7 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
     eraseInvalidGroups(displayGroupInfoMapTmp_);
     for (auto iter = windowsPerDisplayMap_.begin(); iter != windowsPerDisplayMap_.end(); ) {
         if (!isDisplayGroupValid(iter->first)) {
-            MMI_HILOGE("erase groupid:%{public}d", iter->first);
+            MMI_HILOGI("erase groupid:%{public}d", iter->first);
             iter = windowsPerDisplayMap_.erase(iter);
         } else {
             ++iter;
@@ -7267,13 +7267,13 @@ void InputWindowsManager::DumpWindowInfo(int32_t fd, const std::vector<WindowInf
     mprintf(fd, "  windowsInfos: num:%zu\n", windowsInfo.size());
     for (const auto &item : windowsInfo) {
         mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
-        "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-        "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
-        "| action:%d | displayId:%d | groupId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
-        item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
-        item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-        item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder,
-        item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
+            "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
+            "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
+            "| action:%d | displayId:%d | groupId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
+            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+            item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder,
+            item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
         for (const auto &win : item.defaultHotAreas) {
             mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     win.x, win.y, win.width, win.height);
