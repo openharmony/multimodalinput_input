@@ -26,7 +26,6 @@
 #include "setting_storage.h"
 #include "touchpad_transform_processor.h"
 #include "i_input_service_context.h"
-#include "i_pointer_drawing_manager.h"
 #include "cursor_drawing_component.h"
 
 #undef MMI_LOG_TAG
@@ -522,6 +521,10 @@ bool SettingManager::IsParamsValid(int32_t userId, const std::string &settingKey
 
 void SettingManager::MarkUserConfigLoading(int32_t userId)
 {
+    if (userId < 0) {
+        MMI_HILOGE("Invalid userId:%{private}d", userId);
+        return;
+    }
     std::lock_guard<std::mutex> guard(userConfigLoadedMutex_);
     userConfigLoadedMap_[userId] = false;
     MMI_HILOGI("Mark user config loading, userId:%{private}d", userId);
@@ -529,6 +532,10 @@ void SettingManager::MarkUserConfigLoading(int32_t userId)
 
 void SettingManager::MarkUserConfigLoaded(int32_t userId)
 {
+    if (userId < 0) {
+        MMI_HILOGE("Invalid userId:%{private}d", userId);
+        return;
+    }
     std::lock_guard<std::mutex> guard(userConfigLoadedMutex_);
     userConfigLoadedMap_[userId] = true;
     MMI_HILOGI("Mark user config loaded, userId:%{private}d", userId);

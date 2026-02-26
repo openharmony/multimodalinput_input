@@ -3730,7 +3730,11 @@ void PointerDrawingManager::OnSwitchUser(int32_t userId)
     MMI_HILOGI("OnSwitchUser called, userId:%{private}d", userId);
 
     PointerStyle curPointerStyle;
-    CursorDrawingInformation::GetInstance().GetPointerStyle(userId, pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    if (CursorDrawingInformation::GetInstance().GetPointerStyle(
+        userId, pid_, GLOBAL_WINDOW_ID, curPointerStyle) != RET_OK) {
+        MMI_HILOGE("GetPointerStyle failed for userId:%{private}d", userId);
+        return;
+    }
 
     curPointerStyle.options = lastMouseStyle_.options;
 
