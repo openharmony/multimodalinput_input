@@ -1111,6 +1111,7 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(mutex_);
     auto isDisplayGroupValid = [userScreenInfo](int32_t groupId) {
         for (const auto &group : userScreenInfo.displayGroups) {
             if (group.id == groupId) {
@@ -5972,8 +5973,8 @@ bool InputWindowsManager::IsMoveAction(int32_t pointerAction)
 void InputWindowsManager::PrintSpecialWindow(int32_t pointerAction, const WindowInfo &touchWindow)
 {
     if (!IsMoveAction(pointerAction)) {
-        MMI_HILOG_DISPATCHI("special window %{public}d|%{public}d|%{public}d|%{public}u|%{public}d|%{public}d",
-            isFirstSpecialWindow, touchWindow.id, static_cast<int32_t>(touchWindow.windowInputType),
+        MMI_HILOG_DISPATCHI("special window %{public}d|%{public}d|%{public}u|%{public}d|%{public}d",
+            touchWindow.id, static_cast<int32_t>(touchWindow.windowInputType),
             touchWindow.flags, touchWindow.displayId, touchWindow.groupId);
     }
 }
