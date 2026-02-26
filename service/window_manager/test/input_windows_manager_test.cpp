@@ -2358,19 +2358,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     OLD::DisplayInfo displayInfo = {10, 20};
     double physicalX, physicalY;
     int32_t displayId;
-    WIN_MGR->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    WIN_MGR->TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(physicalX, RET_OK);
     EXPECT_EQ(physicalY, RET_OK);
     EXPECT_EQ(displayId, RET_OK);
     displayInfo.x = INT32_MAX;
     displayInfo.y = INT32_MAX;
-    WIN_MGR->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    WIN_MGR->TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(physicalX, RET_OK);
     EXPECT_EQ(physicalY, RET_OK);
     EXPECT_EQ(displayId, RET_OK);
     displayInfo.x = 50;
     displayInfo.y = 60;
-    WIN_MGR->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    WIN_MGR->TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(physicalX, RET_OK);
     EXPECT_EQ(physicalY, RET_OK);
     EXPECT_EQ(displayId, RET_OK);
@@ -3812,14 +3812,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     double physicalY = 200;
     int32_t displayId = -1;
     displayInfo.x = INT32_MAX;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId));
     displayInfo.x = 200;
-    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(logicalX, physicalX + displayInfo.x);
     displayInfo.y = INT32_MAX;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId));
     displayInfo.y = 200;
-    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(logicalY, physicalY + displayInfo.y);
     displaysInfo.x = 100;
     displaysInfo.width = INT32_MAX;
@@ -3827,7 +3827,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displaysInfo);
     }
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId));
 }
 
 /**
@@ -3850,10 +3850,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     int32_t displayMaxY = 400;
     int32_t displayId = -1;
     displayInfo.x = 200;
-    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(logicalX, physicalX + displayInfo.x);
     displayInfo.y = 200;
-    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(logicalY, physicalY + displayInfo.y);
     displaysInfo.x = 200;
     displaysInfo.width = 100;
@@ -3861,16 +3861,16 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
         it->second.displaysInfo.push_back(displaysInfo);
     }
-    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(displayMaxX, displaysInfo.x + displaysInfo.width);
     displaysInfo.y = 100;
     displaysInfo.height = INT32_MAX;
     it->second.displaysInfo.push_back(displaysInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId));
     displaysInfo.y = 200;
     displaysInfo.height = 200;
     it->second.displaysInfo.push_back(displaysInfo);
-    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    inputWindowsManager.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
     EXPECT_EQ(displayMaxY, displaysInfo.y + displaysInfo.height);
 }
 
