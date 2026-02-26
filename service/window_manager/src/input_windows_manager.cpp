@@ -5694,9 +5694,27 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    static bool isInAnco = false;
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+    bool isHoverEvent = IsAccessibilityFocusEvent(pointerEvent);
+    bool isInAnco = false;
+    
+    if (isHoverEvent) {
+        // Hover事件：每次实时判断是否在anco窗口
         isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+        MMI_HILOG_DISPATCHD("Hover event: isInAnco=%{public}d, windowId:%{public}d, "
+            "pointerAction:%{public}d", isInAnco, touchWindow->id, pointerEvent->GetPointerAction());
+    } else {
+        // 普通touch事件：使用静态变量
+        static bool staticIsInAnco = false;
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            bool newIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+            if (staticIsInAnco != newIsInAnco) {
+                MMI_HILOG_DISPATCHD("Touch event: isInAnco changed from %{public}d to %{public}d, "
+                    "windowId:%{public}d, pointerAction:%{public}d",
+                    staticIsInAnco, newIsInAnco, touchWindow->id, pointerEvent->GetPointerAction());
+            }
+            staticIsInAnco = newIsInAnco;
+        }
+        isInAnco = staticIsInAnco;
     }
 
     if (isInAnco) {
