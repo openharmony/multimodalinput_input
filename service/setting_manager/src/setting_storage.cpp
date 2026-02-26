@@ -88,6 +88,7 @@ void SettingStorage::ReleaseDataShareHelper()
     if (!helper_->Release()) {
         MMI_HILOGE("helper release false");
     }
+    helper_ = nullptr;
 }
 
 std::string SettingStorage::AssembleUriUser(int32_t userId, const std::string &key) const
