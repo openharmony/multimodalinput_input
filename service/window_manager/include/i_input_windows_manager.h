@@ -78,6 +78,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     virtual bool IsFocusedSession(int32_t session) const = 0;
     virtual void UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupInfo) = 0;
+    virtual void ClearDisplayMap(const UserScreenInfo &userScreenInfo) = 0;
     virtual void UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt) = 0;
     virtual void ProcessInjectEventGlobalXY(std::shared_ptr<PointerEvent> pointerEvent, int32_t useCoordinate) = 0;
     virtual void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo) = 0;
