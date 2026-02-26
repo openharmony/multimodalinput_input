@@ -1111,7 +1111,7 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
-    auto isDisplayGroupValid = [&userScreenInfo](int32_t groupId) {
+    auto isDisplayGroupValid = [userScreenInfo](int32_t groupId) {
         for (const auto &group : userScreenInfo.displayGroups) {
             if (group.id == groupId) {
                 return true;
@@ -1119,7 +1119,7 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
         }
         return false;
     };
-    auto eraseInvalidGroups = [isDisplayGroupValid](std::map<int32_t, OLD::DisplayGroupInfo> &map) {
+    auto eraseInvalidGroups = [&isDisplayGroupValid](std::map<int32_t, OLD::DisplayGroupInfo> &map) {
         for (auto iter = map.begin(); iter != map.end(); ) {
             if (!isDisplayGroupValid(iter->first)) {
                 MMI_HILOGI("erase groupId:%{public}d, maindisplayid:%{public}d",
@@ -5959,25 +5959,22 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
 bool InputWindowsManager::IsMoveAction(int32_t pointerAction)
 {
-    if ((pointerAction != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_PULL_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        pointerAction != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-        pointerAction != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-        pointerAction != PointerEvent::POINTER_ACTION_LEVITATE_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE)) {
-        return false;
-    }
-    return true;
+    return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+           pointerAction == PointerEvent::POINTER_ACTION_SWIPE_UPDATE ||
+           pointerAction == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
+           pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
 }
 
 void InputWindowsManager::PrintSpecialWindow(int32_t pointerAction, const WindowInfo &touchWindow)
 {
     if (!IsMoveAction(pointerAction)) {
         MMI_HILOG_DISPATCHI("special window %{public}d|%{public}d|%{public}d|%{public}u|%{public}d|%{public}d",
-            isFirstSpecialWindow, item.id, static_cast<int32_t>(item.windowInputType),
-            item.flags, item.displayId, item.groupId);
+            isFirstSpecialWindow, touchWindow.id, static_cast<int32_t>(touchWindow.windowInputType),
+            touchWindow.flags, touchWindow.displayId, touchWindow.groupId);
     }
 }
 
