@@ -69,24 +69,30 @@ ANCO下无障碍屏幕朗读时，从屏幕顶部按下滑动到屏幕中间，�
 **时序图**：
 ```
 时间轴：
-| T1: 手指1 DOWN (anco内)        → isInAnco = true
-|    ↓ 无障碍拦截
-| T2: 手指2 DOWN (anco外)        → isInAnco = false  ✅ 正确
+| T1: DOWN (anco内)              → isInAnco = true
+|    ↓ 无障碍拦截并延迟注入 HOVER_ENTER
+| T2: UP (anco内)                → isInAnco = true
 |    ↓
-| T3: 手指2 MOVE (anco外)        → isInAnco = false  ✅ 正确
-|    ↓ 无障碍延迟转换
-| T4: 手指1 HOVER_ENTER (anco内) → isInAnco = true  ❌ 错误！覆盖了手指2的状态
+| T3: DOWN (anco外)              → isInAnco = false  ✅ 正确
 |    ↓
-| T5: 手指2 MOVE (anco外)        → isInAnco = true  ❌ 错误！
+| T4: UP (anco外)                → isInAnco = false  ✅ 正确
 |    ↓
-| T6: 手指2 UP (anco外)          → isInAnco = true  ❌ 错误！
+| T5: HOVER_ENTER (anco内) 延迟注入 → isInAnco = true  ❌ 错误！覆盖了当前状态
+|    ↓
+| T6: MOVE (anco外) 真实事件     → isInAnco = true  ❌ 错误！
+|    ↓
+| T7: UP (anco外) 真实事件       → isInAnco = true  ❌ 错误！
 ```
+**无障碍事件转换示例**：
+- 真实事件：DOWN (anco内) → UP (anco内) → DOWN (anco外) → UP (anco外)
+- 注入事件：HOVER_ENTER (anco内) → HOVER_EXIT (anco内) → HOVER_ENTER (anco外) → HOVER_EXIT (anco外)
+- 问题：HOVER_ENTER (anco内) 可能在 T6/T7 之后到达，导致状态混乱
 
 **根本原因**：
-1. **状态管理不一致**：`touchItemDownInfos_[deviceId][pointerId]` 按触摸点管理状态，但 `isInAnco` 是全局静态变量，无法区分不同的 pointerId
-2. **无法区分触摸点**：静态变量无法知道是哪个 pointerId 的事件
-3. **时序敏感**：无障碍事件转换导致事件延迟到达
-4. **状态污染**：延迟的 `HOVERVER_ENTER` 错误地覆盖了当前手指的状态
+1. 状态时序不匹配：isInAnco 使用静态变量，按事件到达顺序更新状态
+2. 注入事件延迟：无障碍注入的 hover 事件可能延迟到达
+3. 时序无法保障：真实 touch 事件和注入 hover 事件之间的时序无法保障
+4. 状态污染：延迟的 HOVER_ENTER 事件会错误地覆盖当前手指的状态，影响后续所有 move、up 事件的分发
 
 ### 核心矛盾
 
@@ -95,9 +101,9 @@ ANCO下无障碍屏幕朗读时，从屏幕顶部按下滑动到屏幕中间，�
 - `static bool isInAnco` - 全局状态，无法区分触摸点 ❌
 
 **问题本质**：
-- 静态变量无法支持多指触摸场景
-- 延迟的hover事件会错误地覆盖当前手指的状态
-- 影响后续所有move、up事件的分发
+- 静态变量 `isInAnco` 无法区分真实事件和注入事件
+- 延迟的 hover 事件会错误地覆盖当前手指的状态
+- 影响后续所有 move、up 事件的分发
 
 ## 四、修改方案
 
@@ -141,21 +147,24 @@ if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
 
 #### 方案4：Hover事件单独处理（推荐）
 在5697行之前判断是否为hover事件，分别处理：
-
 ```cpp
 bool isHoverEvent = IsAccessibilityFocusEvent(pointerEvent);
 bool isInAnco = false;
 
 if (isHoverEvent) {
-    // Hover事件：每次实时判断是否在anco窗口
-    isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    static bool hoverIsInAnco = false;
+    // Hover事件：POINTER_HOVER_ENTER事件判断是否需要重新判断是否在湖内
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER || NeedTouchTracking()) {
+      hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    }
+    isInAnco = hoverIsInAnco;
 } else {
     // 普通touch事件：使用静态变量
-    static bool staticIsInAnco = false;
+    static bool touchIsInAnco = false;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        staticIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+      touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     }
-    isInAnco = staticIsInAnco;
+    isInAnco = touchIsInAnco;
 }
 ```
 
@@ -266,21 +275,28 @@ if (isHoverEvent) {
   → 事件注入到anco ✅
 ```
 
-### 场景2：时序混乱问题
+### 场景2：时序混乱问题（真实事件 vs 注入事件）
 ```
-手指1 (pointerId=0) DOWN in ANCO
-  → staticIsInAnco = true
-手指2 (pointerId=1) DOWN outside ANCO
-  → staticIsInAnco = false ✅
-手指2 (pointerId=1) MOVE outside ANCO
-  → 使用 staticIsInAnco = false ✅
-手指1 (pointerId=0) HOVER_ENTER in ANCO (延迟)
-  → Hover事件实时判断 isInAnco = true ✅ 不影响手指2
-手指2 (pointerId=1) MOVE outside ANCO
-  → 使用 staticIsInAnco = false ✅ 正确
-手指2 (pointerId=1) UP outside ANCO
-  → 使用 staticIsInAnco = false ✅ 正确
+真实事件序列：
+| T1: DOWN (anco内)              → staticIsInAnco = true
+|    ↓ 无障碍拦截并延迟注入 HOVER_ENTER
+| T2: UP (anco内)                → staticIsInAnco = true
+|    ↓
+| T3: DOWN (anco外)              → staticIsInAnco = false  ✅ 正确
+|    ↓
+| T4: UP (anco外)                → staticIsInAnco = false  ✅ 正确
+|    ↓
+| T5: HOVER_ENTER (anco内) [延迟注入] → Hover事件实时判断 isInAnco = true  ✅ 不影响touch事件
+|    ↓
+| T6: MOVE (anco外) [真实事件]     → 使用 staticIsInAnco = false  ✅ 正确
+|    ↓
+| T7: UP (anco外) [真实事件]       → 使用 staticIsInAnco = false  ✅ 正确
 ```
+
+**说明**：
+- 真实 touch 事件：使用 `staticIsInAnco`，按真实时序更新
+- 注入 hover 事件：实时判断 `IsInAncoWindow`，不依赖状态
+- 两者互不影响，避免了时序混乱问题
 
 ### 场景3：混合场景（touch + hover）
 ```
@@ -309,7 +325,8 @@ if (isHoverEvent) {
 - ⚠️ 需要验证hover事件在各种场景下的兼容性
 
 **未解决的问题**：
-- ⚠️ 普通touch事件的多指场景：如果手指1在anco内，手指2在anco外，`staticIsInAnco` 会被手指2覆盖
+- ⚠️ 普通touch事件的多指场景：如果手指1在anco内，手指2在anco外，`staticIsInAnco` 会被手指2覆盖（按最后一个手指为准的设计）
+- ⚠️ 该问题属于设计特性，不是本次修复的目标
 
 ### 性能影响
 
