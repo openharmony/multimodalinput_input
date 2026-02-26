@@ -1120,7 +1120,7 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
         return false;
     };
     auto eraseInvalidGroups = [isDisplayGroupValid](std::map<int32_t, OLD::DisplayGroupInfo> &map) {
-        for (auto iter = map.begin(); iter != map.end();) {
+        for (auto iter = map.begin(); iter != map.end(); ) {
             if (!isDisplayGroupValid(iter->first)) {
                 MMI_HILOGI("erase groupId:%{public}d, maindisplayid:%{public}d",
                     iter->second.mainDisplayId, iter->second.groupId);
