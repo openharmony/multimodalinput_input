@@ -379,7 +379,7 @@ private:
     bool IsInsideDisplay(const OLD::DisplayInfo& displayInfo, double physicalX, double physicalY);
     bool CalculateLayout(const OLD::DisplayInfo& displayInfo, const Vector2D<double> &physical,
         Vector2D<double>& layout);
-    void FindPhysicalDisplay(const OLD::DisplayInfo& displayInfo, double& physicalX,
+    void TransformCoordToAdjacentDisplay(const OLD::DisplayInfo& displayInfo, double& physicalX,
         double& physicalY, int32_t& displayId);
     bool AcrossDisplay(const OLD::DisplayInfo &displayInfoDes, const OLD::DisplayInfo &displayInfoOri,
         Vector2D<double> &logical, Vector2D<double> &layout, const AcrossDirection &acrossDirection);
@@ -543,6 +543,16 @@ private:
     void ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
         PointerEvent::PointerItem& pointerItem, const WindowInfo* touchWindow);
     bool IsFirstTouch(int32_t pointerId, int32_t itemSize);
+    bool IsInPointereLockMode();
+
+    // Helper functions for UpdateAndAdjustMouseLocation refactoring
+    void ConvertToPhysicalCoordinates(const OLD::DisplayInfo& displayInfo, double& x, double& y, bool& isRealData);
+    const OLD::DisplayInfo* AdjustDisplayIdForPointerLock(int32_t& displayId);
+    void HandleCrossDisplayBoundary(const OLD::DisplayInfo& displayInfo, double& x, double& y, int32_t& displayId);
+    void GetEffectiveDisplayBounds(const OLD::DisplayInfo* displayInfo, int32_t& width, int32_t& height);
+    void ApplyCoordinateCorrection(const OLD::DisplayInfo* displayInfo, int32_t width, int32_t height, double& x, double& y);
+    void UpdateMouseLocationMaps(int32_t groupId, int32_t displayId, double x, double y);
+
 private:
     UDSServer* udsServer_ { nullptr };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
