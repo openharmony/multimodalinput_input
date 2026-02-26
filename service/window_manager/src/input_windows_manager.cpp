@@ -7249,17 +7249,17 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<OLD::Dis
     mprintf(fd, "displayInfos,num:%zu", displaysInfo.size());
     for (const auto &item : displaysInfo) {
         mprintf(fd, "\t displayInfos: rsId:%" PRIu64 " | displaySourceMode:%d id:%d | x:%d"
-                    "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
-                    "| displayDirection:%d | displayMode:%u | offsetX:%d | offsetY:%d"
-                    "| validWidth:%d | validHeight:%d | pointerActiveWidth:%d | pointerActiveHeight:%d\t",
-                    item.rsId, item.displaySourceMode, item.id, item.x, item.y, item.width,
-                    item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
-                    item.displayDirection, item.displayMode, item.offsetX, item.offsetY,
-                    item.validWidth, item.validHeight, item.pointerActiveWidth, item.pointerActiveHeight);
+            "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
+            "| displayDirection:%d | displayMode:%u | offsetX:%d | offsetY:%d"
+            "| validWidth:%d | validHeight:%d | pointerActiveWidth:%d | pointerActiveHeight:%d\t",
+            item.rsId, item.displaySourceMode, item.id, item.x, item.y, item.width,
+            item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
+            item.displayDirection, item.displayMode, item.offsetX, item.offsetY,
+            item.validWidth, item.validHeight, item.pointerActiveWidth, item.pointerActiveHeight);
         if (item.transform.size() == MATRIX3_SIZE) {
             mprintf(fd, "\t transform: scaleX:%f | scaleY:%f | anchorPointX:%f | anchorPointY:%f \t",
-                    item.transform[SCALE_X], item.transform[SCALE_Y], item.transform[ANCHOR_POINT_X],
-                    item.transform[ANCHOR_POINT_Y]);
+                item.transform[SCALE_X], item.transform[SCALE_Y], item.transform[ANCHOR_POINT_X],
+                item.transform[ANCHOR_POINT_Y]);
         }
     }
 }
@@ -7305,10 +7305,14 @@ void InputWindowsManager::DumpWindowInfo(int32_t fd, const std::vector<WindowInf
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<DelegateInterface> delegateProxy = nullptr;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    delegateProxy = POINTER_DEV_MGR.GetDelegateProxy();
-#endif  // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    auto proxy = POINTER_DEV_MGR.GetDelegateProxy();
+    if (proxy != nullptr) {
+        CursorDrawingComponent::GetInstance().SetDelegateProxy(proxy);
+    }
+    #endif  // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    std::shared_ptr<DelegateInterface> delegateProxy =
+        CursorDrawingComponent::GetInstance().GetDelegateProxy();
     CHKPV(delegateProxy);
     std::map<int32_t, OLD::DisplayGroupInfo> displayGroupInfoMap;
     delegateProxy->OnPostSyncTask([this, &displayGroupInfoMap] {
