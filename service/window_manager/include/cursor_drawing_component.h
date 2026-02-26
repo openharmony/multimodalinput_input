@@ -114,6 +114,7 @@ public:
     {
         workerThreadId_.store(tid);
     }
+    void OnSwitchUser(int32_t userId);
     IPointerDrawingManager* GetPointerInstance();
 private:
     CursorDrawingComponent();

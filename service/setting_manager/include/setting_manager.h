@@ -61,6 +61,9 @@ private:
     void SaveToCache(int32_t userId, SettingData& settingData);
     bool CheckAddUser(int32_t userId);
     void ReadSettingData();
+    void MarkUserConfigLoading(int32_t userId);
+    void MarkUserConfigLoaded(int32_t userId);
+    bool IsUserConfigLoaded(int32_t userId) const override;
 
     // Helper methods for SetValueInner
     bool ShouldWriteToTemp() const;
@@ -75,6 +78,8 @@ private:
     std::mutex cacheMapMutex_;
     std::mutex tempMapMutex_;
     std::shared_ptr<ffrt::queue> ffrtHandler_;
+    std::unordered_map<int32_t, bool> userConfigLoadedMap_;
+    mutable std::mutex userConfigLoadedMutex_;
 };
 } // namespace MMI
 } // namespace OHOS

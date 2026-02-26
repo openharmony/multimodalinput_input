@@ -26,6 +26,7 @@
 #include "setting_storage.h"
 #include "touchpad_transform_processor.h"
 #include "i_input_service_context.h"
+#include "cursor_drawing_component.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "SettingManager"
@@ -127,6 +128,7 @@ void SettingManager::OnDataShareReady()
         flushFlag_.store(true);
         int32_t userId = ACCOUNT_MGR->QueryCurrentAccountId();
         MMI_HILOGI("Run task in data share ready, current id:%{private}d", userId);
+        MarkUserConfigLoading(userId);
         ReadSettingData(userId);
         if (GetVersion(userId) != VERSION_NUMBERS_LATEST) {
             MMI_HILOGI("Migrate settings for all user");
@@ -142,6 +144,7 @@ void SettingManager::OnDataShareReady()
 #endif  // OHOS_BUILD_ENABLE_TOUCHPAD
         flushFlag_.store(false);
         databaseReadyFlag_.store(true);
+        MarkUserConfigLoaded(userId);
     });
 }
 
@@ -157,10 +160,13 @@ void SettingManager::OnSwitchUser(int32_t userId)
     }
     ffrtHandler_->submit([this, userId] {
         MMI_HILOGI("Run task on switch, id:%{private}d", userId);
+        MarkUserConfigLoading(userId);
         flushFlag_.store(true);
         if (CheckAddUser(userId)) {
             MMI_HILOGI("Add id switch, id:%{private}d", userId);
             flushFlag_.store(false);
+            MarkUserConfigLoaded(userId);
+            CursorDrawingComponent::GetInstance().OnSwitchUser(userId);
             return;
         }
         ReadSettingData(userId);
@@ -176,6 +182,8 @@ void SettingManager::OnSwitchUser(int32_t userId)
         TouchPadTransformProcessor::OnSwitchUser(userId);
 #endif  // OHOS_BUILD_ENABLE_TOUCHPAD
         flushFlag_.store(false);
+        MarkUserConfigLoaded(userId);
+        CursorDrawingComponent::GetInstance().OnSwitchUser(userId);
     });
 }
 
@@ -238,6 +246,10 @@ void SettingManager::OnRemoveUser(int32_t userId)
     std::lock_guard<std::mutex> guard(cacheMapMutex_);
     if (auto it = cacheSettingMap_.find(userId); it != cacheSettingMap_.end()) {
         cacheSettingMap_.erase(it);
+    }
+    {
+        std::lock_guard<std::mutex> loadGuard(userConfigLoadedMutex_);
+        userConfigLoadedMap_.erase(userId);
     }
 }
 
@@ -505,6 +517,38 @@ bool SettingManager::IsParamsValid(int32_t userId, const std::string &settingKey
         return false;
     }
     return true;
+}
+
+void SettingManager::MarkUserConfigLoading(int32_t userId)
+{
+    if (userId < 0) {
+        MMI_HILOGE("Invalid userId:%{private}d", userId);
+        return;
+    }
+    std::lock_guard<std::mutex> guard(userConfigLoadedMutex_);
+    userConfigLoadedMap_[userId] = false;
+    MMI_HILOGI("Mark user config loading, userId:%{private}d", userId);
+}
+
+void SettingManager::MarkUserConfigLoaded(int32_t userId)
+{
+    if (userId < 0) {
+        MMI_HILOGE("Invalid userId:%{private}d", userId);
+        return;
+    }
+    std::lock_guard<std::mutex> guard(userConfigLoadedMutex_);
+    userConfigLoadedMap_[userId] = true;
+    MMI_HILOGI("Mark user config loaded, userId:%{private}d", userId);
+}
+
+bool SettingManager::IsUserConfigLoaded(int32_t userId) const
+{
+    std::lock_guard<std::mutex> guard(userConfigLoadedMutex_);
+    auto iter = userConfigLoadedMap_.find(userId);
+    if (iter != userConfigLoadedMap_.end()) {
+        return iter->second;
+    }
+    return false;
 }
 }  // namespace MMI
 }  // namespace OHOS

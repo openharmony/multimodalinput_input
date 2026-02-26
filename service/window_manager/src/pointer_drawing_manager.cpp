@@ -2188,8 +2188,31 @@ int32_t PointerDrawingManager::GetPointerColor(int32_t userId)
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
     int32_t pointerColor = DEFAULT_VALUE;
+    
+    bool configLoaded = INPUT_SETTING_MANAGER->IsUserConfigLoaded(userId);
+    
     INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, name, pointerColor);
-    tempPointerColor_ = pointerColor;
+    
+    if (configLoaded) {
+        {
+            std::lock_guard<std::mutex> guard(configCacheMutex_);
+            cachedPointerConfig_.color = pointerColor;
+            cachedPointerConfig_.isValid = true;
+        }
+        tempPointerColor_ = pointerColor;
+    } else {
+        MMI_HILOGW("User config not loaded, using last valid config, userId:%{private}d", userId);
+        std::lock_guard<std::mutex> guard(configCacheMutex_);
+        if (cachedPointerConfig_.isValid) {
+            pointerColor = cachedPointerConfig_.color;
+            MMI_HILOGI("Use cached pointer color:%{public}d", pointerColor);
+        } else {
+            pointerColor = MIN_POINTER_COLOR;
+            MMI_HILOGW("No valid cached config, use default color");
+        }
+        tempPointerColor_ = pointerColor;
+    }
+    
     if (pointerColor == DEFAULT_VALUE) {
         pointerColor = MIN_POINTER_COLOR;
     }
@@ -2302,8 +2325,31 @@ int32_t PointerDrawingManager::GetPointerSize(int32_t userId)
     std::string name = POINTER_SIZE;
     GetPreferenceKey(name);
     int32_t pointerSize = DEFAULT_POINTER_SIZE;
+    
+    bool configLoaded = INPUT_SETTING_MANAGER->IsUserConfigLoaded(userId);
+    
     INPUT_SETTING_MANAGER->GetIntValue(userId, MOUSE_KEY_SETTING, name, pointerSize);
-    MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
+    
+    if (configLoaded) {
+        {
+            std::lock_guard<std::mutex> guard(configCacheMutex_);
+            cachedPointerConfig_.size = pointerSize;
+            cachedPointerConfig_.isValid = true;
+        }
+        MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
+    } else {
+        MMI_HILOGW("User config not loaded, using last valid config, userId:%{private}d", userId);
+        std::lock_guard<std::mutex> guard(configCacheMutex_);
+        if (cachedPointerConfig_.isValid) {
+            pointerSize = cachedPointerConfig_.size;
+            MMI_HILOGI("Use cached pointer size:%{public}d", pointerSize);
+        } else {
+            pointerSize = DEFAULT_POINTER_SIZE;
+            MMI_HILOGW("No valid cached config, use default size");
+        }
+        MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
+    }
+    
     return pointerSize;
 }
 
@@ -3676,6 +3722,31 @@ void PointerDrawingManager::AllPointerDeviceRemoved()
 {
     UnsubscribeScreenModeChange();
     ClearScreenPointer();
+}
+
+void PointerDrawingManager::OnSwitchUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("OnSwitchUser called, userId:%{private}d", userId);
+
+    PointerStyle curPointerStyle;
+    if (CursorDrawingInformation::GetInstance().GetPointerStyle(
+        userId, pid_, GLOBAL_WINDOW_ID, curPointerStyle) != RET_OK) {
+        MMI_HILOGE("GetPointerStyle failed for userId:%{private}d", userId);
+        return;
+    }
+
+    curPointerStyle.options = lastMouseStyle_.options;
+
+    if (WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle) != RET_OK) {
+        MMI_HILOGE("Set pointer style failed");
+        return;
+    }
+
+    DrawPointerStyle(curPointerStyle);
+
+    MMI_HILOGI("OnSwitchUser completed, pointerStyle.id:%{public}d, color:%{public}d, size:%{public}d",
+        curPointerStyle.id, curPointerStyle.color, curPointerStyle.size);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -129,6 +129,7 @@ public:
     virtual void InitPointerObserver() {}
     virtual void DeleteSurfaceNode() {}
     virtual void UpdatePointerVisible() {}
+    virtual void OnSwitchUser(int32_t userId) {}
     virtual int32_t InitLayer(const MOUSE_ICON mouseStyle)
     {
         return 0;
