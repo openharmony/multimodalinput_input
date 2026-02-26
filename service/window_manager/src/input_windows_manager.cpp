@@ -1111,7 +1111,6 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(mutex_);
     auto isDisplayGroupValid = [&userScreenInfo](int32_t groupId) {
         for (const auto &group : userScreenInfo.displayGroups) {
             if (group.id == groupId) {
