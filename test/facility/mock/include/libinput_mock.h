@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,6 +101,13 @@ public:
     MOCK_METHOD(struct libinput_event_switch*, GetSwitchEvent, (struct libinput_event*));
     MOCK_METHOD(enum libinput_switch, SwitchGetSwitch, (struct libinput_event_switch*));
     MOCK_METHOD(enum libinput_switch_state, SwitchGetSwitchState, (struct libinput_event_switch*));
+    MOCK_METHOD(void*, Dlopen, (const char* filename, int flag), ());
+    MOCK_METHOD(void*, Dlsym, (void* handle, const char* symbol), ());
+    MOCK_METHOD(int, Dlclose, (void* handle), ());
+    MOCK_METHOD(const char*, Dlerror, (), ());
+    MOCK_METHOD(libinput_button_state, GetButtonState, (libinput_event_pointer* event), ());
+    MOCK_METHOD(libinput_event_joystick_button*, GetJoystickButtonEvent, (libinput_event* event), ());
+    MOCK_METHOD(libinput_button_state, GetJoystickButtonState, (libinput_event_joystick_button* event), ());
 };
 } // namespace MMI
 } // namespace OHOS
