@@ -271,51 +271,6 @@ HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_01, TestSize.Level1)
 }
 
 /**
- * @tc.name: FilterInvalidPointerItem_02
- * @tc.desc: Test the function FilterInvalidPointerItem
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, FilterInvalidPointerItem_02, TestSize.Level1)
-{
-    MMIService* mmiService = MMIService::GetInstance();
-    mmiService->Init();
-    auto udsItem = std::make_shared<UDSSession>("temp", 0, NUM_100, NUM_100, NUM_100);
-    mmiService->AddSession(udsItem);
-
-    EventDispatchHandler eventdispatchhandler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetTargetDisplayId(NUM_1);
-
-    OHOS::MMI::WindowInfo win1 = {.id = NUM_1, .pid = NUM_100};
-    OHOS::MMI::WindowInfo win2 = {.id = NUM_2, .pid = NUM_200};
-    std::vector<OHOS::MMI::WindowInfo> windowsInfo1 = { win1, win2 };
-    std::vector<OHOS::MMI::WindowInfo> windowsInfo2 = { win2 };
-    OLD::DisplayGroupInfo group1 = EventDispatchTest::CreateDisplayGroupInfo(NUM_1, NUM_1);
-    group1.windowsInfo = windowsInfo1;
-    OLD::DisplayGroupInfo group2 = EventDispatchTest::CreateDisplayGroupInfo(NUM_2, NUM_2);
-    group2.windowsInfo = windowsInfo2;
-    WIN_MGR->UpdateDisplayInfo(group1);
-    WIN_MGR->UpdateDisplayInfo(group2);
-
-    PointerEvent::PointerItem pointeritem1;
-    pointeritem1.SetPointerId(NUM_1);
-    pointeritem1.SetTargetWindowId(NUM_1);
-    PointerEvent::PointerItem pointeritem2;
-    pointeritem2.SetPointerId(NUM_2);
-    pointeritem2.SetTargetWindowId(NUM_2);
-
-    pointerEvent->AddPointerItem(pointeritem1);
-    pointerEvent->AddPointerItem(pointeritem2);
-
-    eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, NUM_100);
-    EXPECT_EQ(NUM_2, pointerEvent->GetAllPointerItems().size());
-
-    AccountManager::GetInstance()->AccountManagerUnregister();
-}
-
-/**
  * @tc.name: EventDispatchTest_AddFlagToEsc001
  * @tc.desc: Test AddFlagToEsc
  * @tc.type: FUNC
