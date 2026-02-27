@@ -5700,13 +5700,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     if (isHoverEvent) {
         static bool hoverIsInAnco = false;
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER || NeedTouchTracking()) {
-        hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+            hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
         }
         isInAnco = hoverIsInAnco;
     } else {
         static bool touchIsInAnco = false;
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+            touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
         }
         isInAnco = touchIsInAnco;
     }
