@@ -305,6 +305,8 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
         return RET_ERR;
     }
     int32_t userId = WIN_MGR->FindDisplayUserId(pointerEvent_->GetTargetDisplayId());
+    bool isFoldPC = std::find(DEVICE_TYPE_FOLD_PC_VECTOR.begin(), DEVICE_TYPE_FOLD_PC_VECTOR.end(), SYS_PRODUCT_TYPE) !=
+                    DEVICE_TYPE_FOLD_PC_VECTOR.end();
     if (displayInfo->width == static_cast<int32_t>(CONST_DOUBLE_ZERO) ||
         displayInfo->height == static_cast<int32_t>(CONST_DOUBLE_ZERO)) {
         MMI_HILOGW("displayinfo get failed, use default acclerate. width:%{public}d height:%{public}d",
@@ -314,7 +316,7 @@ int32_t MouseTransformProcessor::UpdateTouchpadMoveLocation(const OLD::DisplayIn
             MousePreferenceAccessor::GetTouchpadSpeed(*env_, userId),
             static_cast<DeviceType>(deviceType), abs_x, abs_y);
         return ret;
-    } else if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper") {
+    } else if (isFoldPC && devName == "input_mt_wrapper") {
         deviceType = static_cast<int32_t>(DeviceType::DEVICE_FOLD_PC_VIRT);
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
         ret = PointerMotionAcceleration::AccelerateTouchpad(offset, winMgr->GetMouseIsCaptureMode(),
@@ -1657,8 +1659,10 @@ bool MouseTransformProcessor::IsEventFromVirtualSource(struct libinput_event* ev
     struct libinput_device *device = libinput_event_get_device(event);
     CHKPF(device);
     const std::string devName = libinput_device_get_name(device);
+    bool isFoldPC = std::find(DEVICE_TYPE_FOLD_PC_VECTOR.begin(), DEVICE_TYPE_FOLD_PC_VECTOR.end(), SYS_PRODUCT_TYPE) !=
+                    DEVICE_TYPE_FOLD_PC_VECTOR.end();
     // virtual touchpad's event is generated from the touchscreen on a foldable PC.
-    return (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC && devName == "input_mt_wrapper");
+    return (isFoldPC && devName == "input_mt_wrapper");
 }
 
 void MouseTransformProcessor::GetVirtualTouchpadTapSwitch(bool &switchFlag)
