@@ -1116,7 +1116,7 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
             return !group.windowsInfo.empty() && group.windowsInfo.back().action == WINDOW_UPDATE_ACTION::ADD_END;
         });
     if (!isAddEnd) {
-        MMI_HILOGI("zhf not end");
+        MMI_HILOGD("add not end");
         return;
     }
 
