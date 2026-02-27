@@ -64,7 +64,8 @@ private:
     void TearDownDeviceObserver();
     void OnDeviceAdded(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId);
     void OnDeviceRemoved(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId);
-    void LoadJoystick();
+    void LoadJoystick(std::shared_ptr<JoystickEventInterface> self);
+    void OnJoystickLoaded(std::weak_ptr<JoystickEventInterface> self);
     void OnJoystickLoaded();
     void UnloadJoystick();
     void ScheduleUnloadingTimer(std::shared_ptr<JoystickEventInterface> self);

@@ -17,6 +17,7 @@
 #include "gtest/gtest.h"
 
 #include "define_multimodal.h"
+#include "delegate_interface.h"
 #include "ffrt.h"
 #include "input_device_manager.h"
 #include "input_service_context.h"
@@ -46,12 +47,23 @@ public:
     void TearDown();
 
 private:
+    int32_t callTimes_ { 0 };
     std::shared_ptr<InputServiceContext> env_ {};
+    std::shared_ptr<IDelegateInterface> delegate_ {};
 };
 
 JoystickEventInterfaceTest::JoystickEventInterfaceTest()
 {
+    auto postTask = [this](DTaskCallback callback) {
+        if (callback) {
+            ++callTimes_;
+            callback();
+        }
+        return RET_OK;
+    };
+    delegate_ = std::make_shared<DelegateInterface>(postTask, postTask);
     env_ = std::make_shared<InputServiceContext>();
+    env_->AttachDelegateInterface(delegate_);
 }
 
 void JoystickEventInterfaceTest::SetUpTestCase()
@@ -61,7 +73,9 @@ void JoystickEventInterfaceTest::TearDownTestCase()
 {}
 
 void JoystickEventInterfaceTest::SetUp()
-{}
+{
+    callTimes_ = 0;
+}
 
 void JoystickEventInterfaceTest::TearDown()
 {
@@ -260,6 +274,35 @@ HWTEST_F(JoystickEventInterfaceTest, UnloadJoystick_001, TestSize.Level1)
     joystick->UnloadJoystick();
     EXPECT_EQ(joystick->unloadTimerId_, -1);
     EXPECT_EQ(joystick->joystick_, nullptr);
+}
+
+/**
+ * @tc.name: OnJoystickLoaded_001
+ * @tc.desc: Test JoystickEventInterface::OnJoystickLoaded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventInterfaceTest, OnJoystickLoaded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto joystick = std::make_shared<JoystickEventInterface>();
+    joystick->OnJoystickLoaded(joystick);
+    EXPECT_EQ(callTimes_, 0);
+}
+
+/**
+ * @tc.name: OnJoystickLoaded_002
+ * @tc.desc: Test JoystickEventInterface::OnJoystickLoaded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickEventInterfaceTest, OnJoystickLoaded_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto joystick = std::make_shared<JoystickEventInterface>();
+    joystick->AttachInputServiceContext(env_);
+    joystick->OnJoystickLoaded(joystick);
+    EXPECT_EQ(callTimes_, 1);
 }
 } // namespace MMI
 } // namespace OHOS

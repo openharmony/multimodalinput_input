@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "ffrt.h"
+#include "delegate_interface.h"
 #include "input_service_context.h"
 #include "touch_gesture_interface.h"
 
@@ -32,6 +33,8 @@ using namespace testing::ext;
 
 class TouchGestureInterfaceTest : public testing::Test {
 public:
+    TouchGestureInterfaceTest();
+
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp() {}
@@ -39,7 +42,22 @@ public:
 
 private:
     InputServiceContext env_ {};
+    int32_t callTimes_ { 0 };
+    std::shared_ptr<IDelegateInterface> delegate_ {};
 };
+
+TouchGestureInterfaceTest::TouchGestureInterfaceTest()
+{
+    auto postTask = [this](DTaskCallback callback) {
+        if (callback) {
+            ++callTimes_;
+            callback();
+        }
+        return RET_OK;
+    };
+    delegate_ = std::make_shared<DelegateInterface>(postTask, postTask);
+    env_.AttachDelegateInterface(delegate_);
+}
 
 /**
  * @tc.name: DoesSupportGesture_001
@@ -99,6 +117,34 @@ HWTEST_F(TouchGestureInterfaceTest, HasHandler_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto touchGestureMgr = std::make_shared<TouchGestureInterface>();
     EXPECT_FALSE(touchGestureMgr->HasHandler());
+}
+
+/**
+ * @tc.name: OnTouchGestureManagerLoaded_001
+ * @tc.desc: Test JoystickEventInterface::OnTouchGestureManagerLoaded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureInterfaceTest, OnTouchGestureManagerLoaded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchGestureMgr = std::make_shared<TouchGestureInterface>();
+    touchGestureMgr->OnTouchGestureManagerLoaded(touchGestureMgr, nullptr);
+    EXPECT_EQ(callTimes_, 0);
+}
+
+/**
+ * @tc.name: OnTouchGestureManagerLoaded_002
+ * @tc.desc: Test JoystickEventInterface::OnTouchGestureManagerLoaded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureInterfaceTest, OnTouchGestureManagerLoaded_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto touchGestureMgr = std::make_shared<TouchGestureInterface>();
+    touchGestureMgr->OnTouchGestureManagerLoaded(touchGestureMgr, &env_);
+    EXPECT_EQ(callTimes_, 1);
 }
 } // namespace MMI
 } // namespace OHOS
