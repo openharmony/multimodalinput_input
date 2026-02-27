@@ -355,8 +355,6 @@ ohos_unittest("TabletToolTransformTest") {
 
   configs = [
     "${mmi_path}:coverage_flags",
-    "${mmi_path}/service:libmmi_server_config",
-    "${mmi_path}/service/filter:mmi_event_filter_config",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
@@ -380,13 +378,10 @@ ohos_unittest("TabletToolTransformTest") {
     "${mmi_path}/service/app_state_manager/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/device_config/include",
-    "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/dfx/include",
-    "${mmi_path}/service/filter/include",
     "${mmi_path}/service/hardware_cursor_pointer_manager/include",
     "${mmi_path}/service/joystick/include",
     "${mmi_path}/service/libinput_adapter/include",
-    "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/common/timer_manager/include",
@@ -399,7 +394,6 @@ ohos_unittest("TabletToolTransformTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/setting_datashare/include",
     "${mmi_path}/service/knuckle/include",
-    "${mmi_path}/service/device_manager/include",
   ]
 
   if (input_ext_feature_anco) {
@@ -409,17 +403,11 @@ ohos_unittest("TabletToolTransformTest") {
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
-    "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
-    "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
     "${mmi_path}/service/dfx/src/api_duration_statistics.cpp",
     "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
-    "${mmi_path}/service/filter/src/event_filter_handler.cpp",
     "${mmi_path}/service/common/setting_datashare/src/setting_datashare.cpp",
     "${mmi_path}/service/common/setting_datashare/src/setting_observer.cpp",
     "${mmi_path}/service/libinput_adapter/src/property_reader.cpp",
-    "${mmi_path}/service/module_loader/src/app_debug_listener.cpp",
-    "${mmi_path}/service/module_loader/src/input_screen_capture_agent.cpp",
-    "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
     "${mmi_path}/service/common/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
@@ -441,17 +429,13 @@ ohos_unittest("TabletToolTransformTest") {
     ]
   }
 
-  if (input_feature_touchpad) {
-    sources += [
-      "${mmi_path}/service/event_handler/src/touchpad_settings_handler.cpp",
-    ]
-  }
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines = [ "USE_ROSEN_DRAWING" ]
   }
 
   deps = [
     "${mmi_path}/intention/scheduler/component_manager:mmi_component_manager",
+    "${mmi_path}/test/facility/device_manager_mock:device_manager_mock",
     "${mmi_path}/test/facility/event_dispatch_mock:event_dispatch_mock",
     "${mmi_path}/test/facility/event_handler_mock:event_handler_mock",
     "${mmi_path}/test/facility/event_hook_mock:event_hook_mock",

@@ -5042,15 +5042,29 @@ bool InputWindowsManager::IsWriteTablet(PointerEvent::PointerItem &pointerItem) 
 {
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
         static int32_t lastDeviceId = -1;
+        static std::shared_ptr<InputDevice> inputDevice = nullptr;
         static bool isTablet = false;
 
         auto nowId = pointerItem.GetDeviceId();
         if (lastDeviceId != nowId) {
+            inputDevice = INPUT_DEV_MGR->GetInputDevice(nowId);
+            CHKPF(inputDevice);
+            lastDeviceId = nowId;
             isTablet = INPUT_DEV_MGR->CheckDevice(nowId,
                 [](const IInputDeviceManager::IInputDevice &dev) {
                     return dev.IsMouse();
                 });
-            lastDeviceId = nowId;
+        }
+        if (inputDevice != nullptr) {
+            MMI_HILOGD("name:%{public}s type:%{public}d bus:%{public}d, "
+                "version:%{public}d product:%{public}d vendor:%{public}d, "
+                "phys:%{public}s uniq:%{public}s",
+                inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
+                inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
+        }
+        if (inputDevice != nullptr && inputDevice->GetBus() == BUS_USB) {
+            return true;
         }
         return isTablet;
     }

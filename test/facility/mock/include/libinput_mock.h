@@ -46,6 +46,8 @@ public:
     MOCK_METHOD(uint64_t, TabletToolGetTimeUsec, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(double, TabletToolGetPressure, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(int32_t, TabletToolGetTwist, (struct libinput_event_tablet_tool *));
+    MOCK_METHOD(double, TabletToolGetXTransformed, (struct libinput_event_tablet_tool *, uint32_t));
+    MOCK_METHOD(double, TabletToolGetYTransformed, (struct libinput_event_tablet_tool *, uint32_t));
     MOCK_METHOD(int32_t, GetHandFeature, (struct libinput_event *));
     MOCK_METHOD(int32_t, TouchEventGetBlobId, (struct libinput_event_touch *));
     MOCK_METHOD(uint64_t, TouchEventGetTime, (struct libinput_event_touch *));
