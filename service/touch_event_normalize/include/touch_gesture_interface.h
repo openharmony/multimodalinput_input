@@ -45,7 +45,8 @@ public:
 
 private:
     ComponentManager::Handle<ITouchGestureManager> GetTouchGestureManager() const;
-    void LoadTouchGestureManager(IInputServiceContext *env);
+    void LoadTouchGestureManager(std::shared_ptr<TouchGestureInterface> self, IInputServiceContext *env);
+    void OnTouchGestureManagerLoaded(std::weak_ptr<TouchGestureInterface> self, IInputServiceContext *env);
     void OnTouchGestureManagerLoaded();
 
     mutable std::mutex mutex_;

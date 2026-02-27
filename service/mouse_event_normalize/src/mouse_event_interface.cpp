@@ -649,12 +649,25 @@ void MouseEventInterface::OnMouseLoaded()
         MMI_HILOGE("Mouse module not loaded");
         return;
     }
-    INPUT_DEV_MGR->ForEachDevice(
-        [mouse](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
-            if (dev.IsMouse()) {
-                mouse->OnDeviceAdded(id);
-            }
-        });
+    auto env = GetEnv();
+    if (env == nullptr) {
+        MMI_HILOGE("No input service context");
+        return;
+    }
+    auto delegate = env->GetDelegateInterface();
+    if (delegate == nullptr) {
+        MMI_HILOGE("No delegate");
+        return;
+    }
+    delegate->OnPostAsyncTask([mouse]() {
+        INPUT_DEV_MGR->ForEachDevice(
+            [mouse](int32_t id, const IInputDeviceManager::IInputDevice &dev) {
+                if (dev.IsMouse()) {
+                    mouse->OnDeviceAdded(id);
+                }
+            });
+        return RET_OK;
+    });
 }
 
 void MouseEventInterface::UnloadMouse()
