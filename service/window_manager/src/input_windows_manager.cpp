@@ -5694,9 +5694,21 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerItem.SetTargetWindowId(touchWindow->id);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    static bool isInAnco = false;
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    bool isHoverEvent = IsAccessibilityFocusEvent(pointerEvent);
+    bool isInAnco = false;
+    
+    if (isHoverEvent) {
+        static bool hoverIsInAnco = false;
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER || NeedTouchTracking()) {
+            hoverIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+        }
+        isInAnco = hoverIsInAnco;
+    } else {
+        static bool touchIsInAnco = false;
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            touchIsInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+        }
+        isInAnco = touchIsInAnco;
     }
 
     if (isInAnco) {
