@@ -91,12 +91,14 @@ public:
     void UpdateCaptureMode(const OLD::DisplayGroupInfo &displayGroupInfo);
     bool IsFocusedSession(int32_t session) const;
     void UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupInfo);
+    void ClearDisplayMap(const UserScreenInfo &userScreenInfo);
     void UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     void ProcessInjectEventGlobalXY(std::shared_ptr<PointerEvent> pointerEvent, int32_t useCoordinate);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDisplayInfo(int32_t fd, const std::vector<OLD::DisplayInfo>& displaysInfo);
+    void DumpWindowInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t GetWindowAgentPid(int32_t windowId) const;
@@ -310,6 +312,8 @@ private:
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
     bool IsWritePen(PointerEvent::PointerItem &pointerItem) const;
     bool IsWriteTablet(PointerEvent::PointerItem &pointerItem) const;
+    bool IsMoveAction(int32_t pointerAction);
+    void PrintSpecialWindow(int32_t pointerAction, const WindowInfo &touchWindow);
     void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, OLD::DisplayGroupInfo &displayGroupInfo);
     void UpdateWindowsInfoPerDisplay(const OLD::DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;

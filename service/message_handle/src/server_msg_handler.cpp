@@ -886,6 +886,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         return RET_ERR;
     }
     Printf(userScreenInfo);
+    WIN_MGR->ClearDisplayMap(userScreenInfo);
     for (auto &displayGroupInfo : oldDisplayGroupInfos_) {
         WIN_MGR->UpdateDisplayInfoExtIfNeed(displayGroupInfo, true);
     }

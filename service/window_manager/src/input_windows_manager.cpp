@@ -1031,11 +1031,11 @@ void InputWindowsManager::UpdateCaptureMode(const OLD::DisplayGroupInfo &display
     auto &WindowInfo = GetWindowInfoVector(displayGroupInfo.groupId);
     int32_t focusWindowId = GetFocusWindowId(displayGroupInfo.groupId);
     if (displayGroupInfo.windowsInfo.empty()) {
-        MMI_HILOGW("windowsInfo is empty");
+        MMI_HILOGW("The windowsinfo of synchronous groupId:%{public}d is empty", displayGroupInfo.groupId);
         return;
     }
     if (WindowInfo.empty()) {
-        MMI_HILOGW("windowsInfo is empty");
+        MMI_HILOGW("windowsInfo is empty, groupId:%{public}d", displayGroupInfo.groupId);
         return;
     }
     CaptureModeInfo captureModeInfo;
@@ -1106,6 +1106,34 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 #endif // OHOS_BUILD_ENABLE_ANCO
         UpdateDisplayInfoExtIfNeed(displayGroupInfo, false);
     }
+}
+
+void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
+{
+    CALL_DEBUG_ENTER;
+    if (userScreenInfo.userState != UserState::USER_ACTIVE) {
+        MMI_HILOGI("user:%{public}d not active", userScreenInfo.userId);
+        return;
+    }
+
+    std::set<int32_t> validGroupIds;
+    for (const auto &group : userScreenInfo.displayGroups) {
+        validGroupIds.insert(group.id);
+    }
+    auto eraseInvalidGroups = [&](auto &map) {
+        for (auto it = map.begin(); it != map.end();) {
+            if (validGroupIds.find(it->first) == validGroupIds.end()) {
+                MMI_HILOGI("erase groupid:%{public}d", it->first);
+                it = map.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    };
+
+    eraseInvalidGroups(displayGroupInfoMap_);
+    eraseInvalidGroups(displayGroupInfoMapTmp_);
+    eraseInvalidGroups(windowsPerDisplayMap_);
 }
 
 void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt)
@@ -5590,15 +5618,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
-                if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
-                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
-                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
-                    MMI_HILOG_DISPATCHD("the first special window status:%{public}d", isFirstSpecialWindow);
-                }
             }
             std::pair<int32_t, int32_t> logicalXY(std::make_pair(static_cast<int32_t>(logicalX),
                 static_cast<int32_t>(logicalY)));
@@ -5606,6 +5625,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             CheckUIExtentionWindowDefaultHotArea(logicalXY, isHotArea, pointerEvent, item.uiExtentionWindowInfo,
                 &touchWindow);
             if (isSpecialWindow) {
+                PrintSpecialWindow(pointerEvent->GetPointerAction(), item);
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id,
                     pointerEvent->GetDeviceId());
                 isHotArea = true;
@@ -5853,13 +5873,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
     // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
-    if ((pointerAction != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_PULL_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
-        pointerAction != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        pointerAction != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-        pointerAction != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-        pointerAction != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE)) {
+    if (!IsMoveAction(pointerAction)) {
         int32_t focusWindowId = GetFocusWindowId(groupId);
         if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
@@ -5947,6 +5961,27 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         ClearExtraData();
     }
     return ERR_OK;
+}
+
+bool InputWindowsManager::IsMoveAction(int32_t pointerAction)
+{
+    return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+           pointerAction == PointerEvent::POINTER_ACTION_SWIPE_UPDATE ||
+           pointerAction == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
+           pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_MOVE ||
+           pointerAction == PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);
+}
+
+void InputWindowsManager::PrintSpecialWindow(int32_t pointerAction, const WindowInfo &touchWindow)
+{
+    if (!IsMoveAction(pointerAction)) {
+        MMI_HILOG_DISPATCHI("special window %{public}d|%{public}d|%{public}u|%{public}d|%{public}d",
+            touchWindow.id, static_cast<int32_t>(touchWindow.windowInputType),
+            touchWindow.flags, touchWindow.displayId, touchWindow.groupId);
+    }
 }
 
 void InputWindowsManager::ProcessOtherTouchHit(std::shared_ptr<PointerEvent> pointerEvent,
@@ -7217,17 +7252,55 @@ void InputWindowsManager::DumpDisplayInfo(int32_t fd, const std::vector<OLD::Dis
     mprintf(fd, "displayInfos,num:%zu", displaysInfo.size());
     for (const auto &item : displaysInfo) {
         mprintf(fd, "\t displayInfos: rsId:%" PRIu64 " | displaySourceMode:%d id:%d | x:%d"
-                    "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
-                    "| displayDirection:%d | displayMode:%u | offsetX:%d | offsetY:%d"
-                    "| validWidth:%d | validHeight:%d | pointerActiveWidth:%d | pointerActiveHeight:%d\t",
-                    item.rsId, item.displaySourceMode, item.id, item.x, item.y, item.width,
-                    item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
-                    item.displayDirection, item.displayMode, item.offsetX, item.offsetY,
-                    item.validWidth, item.validHeight, item.pointerActiveWidth, item.pointerActiveHeight);
+            "| y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d"
+            "| displayDirection:%d | displayMode:%u | offsetX:%d | offsetY:%d"
+            "| validWidth:%d | validHeight:%d | pointerActiveWidth:%d | pointerActiveHeight:%d\t",
+            item.rsId, item.displaySourceMode, item.id, item.x, item.y, item.width,
+            item.height, item.name.c_str(), item.uniq.c_str(), item.direction,
+            item.displayDirection, item.displayMode, item.offsetX, item.offsetY,
+            item.validWidth, item.validHeight, item.pointerActiveWidth, item.pointerActiveHeight);
         if (item.transform.size() == MATRIX3_SIZE) {
             mprintf(fd, "\t transform: scaleX:%f | scaleY:%f | anchorPointX:%f | anchorPointY:%f \t",
                 item.transform[SCALE_X], item.transform[SCALE_Y], item.transform[ANCHOR_POINT_X],
                 item.transform[ANCHOR_POINT_Y]);
+        }
+    }
+}
+
+void InputWindowsManager::DumpWindowInfo(int32_t fd, const std::vector<WindowInfo> windowsInfo)
+{
+    mprintf(fd, "  windowsInfos: num:%zu\n", windowsInfo.size());
+    for (const auto &item : windowsInfo) {
+        mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+            "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
+            "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
+            "| action:%d | displayId:%d | groupId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
+            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+            item.agentWindowId, item.flags, item.action, item.displayId, item.groupId, item.zOrder,
+            item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
+        for (const auto &win : item.defaultHotAreas) {
+            mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+                    win.x, win.y, win.width, win.height);
+        }
+        for (const auto &pointer : item.pointerHotAreas) {
+            mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+                    pointer.x, pointer.y, pointer.width, pointer.height);
+        }
+
+        std::string dump;
+        dump += StringPrintf("\t pointerChangeAreas: ");
+        for (const auto &it : item.pointerChangeAreas) {
+            dump += StringPrintf("%d | ", it);
+        }
+        dump += StringPrintf("\n\t transform: ");
+        for (const auto &it : item.transform) {
+            dump += StringPrintf("%f | ", it);
+        }
+        std::istringstream stream(dump);
+        std::string line;
+        while (std::getline(stream, line, '\n')) {
+            mprintf(fd, "%s\n", line.c_str());
         }
     }
 }
@@ -7251,44 +7324,28 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         }
         return RET_OK;
     });
-    for (auto iterm = displayGroupInfoMap.begin(); iterm != displayGroupInfoMap.end(); ++iterm) {
-        mprintf(fd, "Windows information:\t");
-        mprintf(fd, "windowsInfos,num:%zu", iterm->second.windowsInfo.size());
-        for (const auto &item : iterm->second.windowsInfo) {
-            mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
-                "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
-                "| action:%d | displayId:%d | zOrder:%f | Privacy:%d | Type:%d \t",
-                item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
-                item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-                item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder,
-                item.isSkipSelfWhenShowOnVirtualScreen, static_cast<int32_t>(item.windowInputType));
-            for (const auto &win : item.defaultHotAreas) {
-                mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                    win.x, win.y, win.width, win.height);
-            }
-            for (const auto &pointer : item.pointerHotAreas) {
-                mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
-                    pointer.x, pointer.y, pointer.width, pointer.height);
-            }
-
-            std::string dump;
-            dump += StringPrintf("\t pointerChangeAreas: ");
-            for (const auto &it : item.pointerChangeAreas) {
-                dump += StringPrintf("%d | ", it);
-            }
-            dump += StringPrintf("\n\t transform: ");
-            for (const auto &it : item.transform) {
-                dump += StringPrintf("%f | ", it);
-            }
-            std::istringstream stream(dump);
-            std::string line;
-            while (std::getline(stream, line, '\n')) {
-                mprintf(fd, "%s", line.c_str());
-            }
-        }
-        DumpDisplayInfo(fd, iterm->second.displaysInfo);
+    for (const auto &iterm : displayGroupInfoMap) {
+        mprintf(fd, "Windows of displayGroupInfoMap information:\t");
+        mprintf(fd, "windowsInfos,,groupId:%d,mainDisplayId:%d,num:%zu",
+            iterm.first, iterm.second.mainDisplayId, iterm.second.windowsInfo.size());
+        DumpWindowInfo(fd, iterm.second.windowsInfo);
+        DumpDisplayInfo(fd, iterm.second.displaysInfo);
         mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
+    }
+    std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap;
+    delegateProxy->OnPostSyncTask([this, &windowsPerDisplayMap] {
+        for (auto iter = windowsPerDisplayMap_.begin(); iter != windowsPerDisplayMap_.end(); ++iter) {
+            windowsPerDisplayMap.insert(std::make_pair(iter->first, iter->second));
+        }
+        return RET_OK;
+    });
+    for (const auto &it : windowsPerDisplayMap) {
+        mprintf(fd, "windowsPerDisplayMap information:\t");
+        mprintf(fd, "windowsInfos,groupId:%d\t", it.first);
+        for (const auto &iter : it.second) {
+            mprintf(fd, "  windowsInfos,displayId:%d,num:%zu\t", iter.first, iter.second.windowsInfo.size());
+            DumpWindowInfo(fd, iter.second.windowsInfo);
+        }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     std::string ancoWindows;

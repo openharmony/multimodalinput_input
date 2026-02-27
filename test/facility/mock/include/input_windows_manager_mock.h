@@ -41,6 +41,7 @@ public:
     MOCK_METHOD(void, PrintEnterEventInfo, (std::shared_ptr<PointerEvent>));
     MOCK_METHOD(bool, IsFocusedSession, (int32_t), (const));
     void UpdateDisplayInfo(OLD::DisplayGroupInfo&) override {}
+    void ClearDisplayMap(const UserScreenInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo&, bool) override {}
     void ProcessInjectEventGlobalXY(std::shared_ptr<PointerEvent>, int32_t) override {};
     void UpdateWindowInfo(const WindowGroupInfo&) override {}

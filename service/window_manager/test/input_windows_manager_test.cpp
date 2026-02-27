@@ -6845,6 +6845,90 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget,
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_ClearDisplayMap
+ * @tc.desc: Test ClearDisplayMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    DisplayGroupInfo group;
+    group.id = 1;
+    group.displaysInfo.push_back(DisplayInfo());
+    DisplayInfo display;
+    display.width = 1920;
+    display.height = 1080;
+    group.displaysInfo.push_back(display);
+    WindowInfo window;
+    window.groupId = 0;
+    window.id = 123;
+    window.action = WINDOW_UPDATE_ACTION::ADD;
+    group.windowsInfo.push_back(window);
+    userScreenInfo.displayGroups.push_back(group);
+    userScreenInfo.screens.push_back(ScreenInfo());
+    userScreenInfo.userState = UserState::USER_INACTIVE;
+
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    OLD::DisplayInfo info;
+    info.id = 0;
+    displayGroupInfo.displaysInfo.push_back(info);
+    inputWindowsMgr.displayGroupInfoMap_[0] = displayGroupInfo;
+    inputWindowsMgr.displayGroupInfoMapTmp_[0] = displayGroupInfo;
+    inputWindowsMgr.ClearDisplayMap(userScreenInfo);
+    EXPECT_EQ(inputWindowsMgr.displayGroupInfoMap_.size(), 1);
+
+    OLD::DisplayGroupInfo groupInfo;
+    groupInfo.groupId = 1;
+    info.id = 1;
+    groupInfo.displaysInfo.push_back(info);
+    inputWindowsMgr.displayGroupInfoMap_[1] = groupInfo;
+    inputWindowsMgr.displayGroupInfoMapTmp_[1] = groupInfo;
+
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsMgr.windowsPerDisplayMap_[0][0] = winGroupInfo;
+    inputWindowsMgr.windowsPerDisplayMap_[1][0] = winGroupInfo;
+
+    userScreenInfo.userState = UserState::USER_ACTIVE;
+    
+    inputWindowsMgr.ClearDisplayMap(userScreenInfo);
+    EXPECT_EQ(inputWindowsMgr.displayGroupInfoMap_.size(), 1);
+    EXPECT_EQ(inputWindowsMgr.displayGroupInfoMapTmp_.size(), 1);
+    EXPECT_EQ(inputWindowsMgr.windowsPerDisplayMap_.size(), 1);
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_PrintSpecialWindow
+ * @tc.desc: Test PrintSpecialWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintSpecialWindow, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_DOWN;
+    WindowInfo winInfo;
+    winInfo.id = 0;
+    winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    winInfo.flags = 0;
+    winInfo.displayId = 0;
+    winInfo.groupId = 0;
+    inputWindowsMgr.PrintSpecialWindow(pointerAction, winInfo);
+    EXPECT_EQ(pointerAction, PointerEvent::POINTER_ACTION_DOWN);
+ 
+    pointerAction = PointerEvent::POINTER_ACTION_MOVE;
+    inputWindowsMgr.PrintSpecialWindow(pointerAction, winInfo);
+    EXPECT_EQ(pointerAction, PointerEvent::POINTER_ACTION_MOVE);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayInfoExtIfNeed
  * @tc.desc: Test UpdateDisplayInfoExtIfNeed
  * @tc.type: FUNC
