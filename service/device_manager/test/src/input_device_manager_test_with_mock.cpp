@@ -15,6 +15,8 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <linux/input.h>
+
 #include "input_device_manager.h"
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"
@@ -24,6 +26,11 @@ namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
+
+namespace {
+char g_sysname[] { "event0" };
+char g_sysname1[] { "event999" };
+} // namespace
 
 class InputDeviceManagerTestWithMock : public testing::Test {
 public:
@@ -822,6 +829,120 @@ HWTEST_F(InputDeviceManagerTestWithMock, UpdatePhysicalInputDevice_001, TestSize
 
     auto* physicalDevice = INPUT_DEV_MGR->GetPhysicalInputDevice(physicalId);
     EXPECT_NE(physicalDevice, nullptr);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetId_001
+ * @tc.desc: Test PhysicalInputDevice::GetId with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(InputDeviceManager::PhysicalInputDevice::GetId(nullptr).empty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetId_002
+ * @tc.desc: Test PhysicalInputDevice::GetId with vendor and product both 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct libinput_device device {};
+    device.vendor = 0;
+    device.product = 0;
+    EXPECT_TRUE(InputDeviceManager::PhysicalInputDevice::GetId(&device).empty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetId_003
+ * @tc.desc: Test PhysicalInputDevice::GetId with vendor and product both non-0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetId_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetSysname).WillOnce(Return(g_sysname1));
+
+    struct libinput_device device {
+        .busType = BUS_USB,
+        .vendor = 1,
+        .product = 1,
+    };
+    auto physicalId = InputDeviceManager::PhysicalInputDevice::GetId(&device);
+    EXPECT_TRUE(physicalId.empty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetId_004
+ * @tc.desc: Test PhysicalInputDevice::GetId with vendor and product both non-0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetId_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetSysname).WillOnce(Return(g_sysname));
+
+    struct libinput_device device {
+        .busType = BUS_USB,
+        .vendor = 1,
+        .product = 1,
+    };
+    auto physicalId = InputDeviceManager::PhysicalInputDevice::GetId(&device);
+    EXPECT_FALSE(physicalId.empty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetSyspath_001
+ * @tc.desc: Test PhysicalInputDevice::GetSyspath with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetSyspath_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(InputDeviceManager::PhysicalInputDevice::GetSyspath(nullptr).empty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetSyspath_002
+ * @tc.desc: Test PhysicalInputDevice::GetSyspath with null sysname
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetSyspath_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetSysname).WillOnce(Return(nullptr));
+
+    struct libinput_device device {};
+    EXPECT_TRUE(InputDeviceManager::PhysicalInputDevice::GetSyspath(&device).empty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetSyspath_003
+ * @tc.desc: Test PhysicalInputDevice::GetSyspath with valid sysname
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetSyspath_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceGetSysname).WillOnce(Return(g_sysname));
+
+    struct libinput_device device {};
+    auto syspath = InputDeviceManager::PhysicalInputDevice::GetSyspath(&device);
+    EXPECT_FALSE(syspath.empty());
 }
 } // namespace MMI
 } // namespace OHOS

@@ -242,12 +242,12 @@ double libinput_event_touch_get_tool_height_transformed(struct libinput_event_to
 
 double libinput_event_tablet_tool_get_x_transformed(struct libinput_event_tablet_tool *event, uint32_t width)
 {
-    return -1.0;
+    return g_instance->TabletToolGetXTransformed(event, width);
 }
 
 double libinput_event_tablet_tool_get_y_transformed(struct libinput_event_tablet_tool *event, uint32_t height)
 {
-    return -1.0;
+    return g_instance->TabletToolGetYTransformed(event, height);
 }
 
 uint64_t libinput_event_touchpad_get_time_usec(struct libinput_event_touch *event)

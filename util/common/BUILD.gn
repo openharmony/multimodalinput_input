@@ -43,13 +43,13 @@ ohos_unittest("UtilCommonTest") {
   ]
 
   deps = [
+    "${mmi_path}/test/facility/config_policy_utils_mock:config_policy_utils_mock",
     "${mmi_path}/util:libmmi-util",
     "${mmi_path}/util:mmi_rust_key_config",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "config_policy:configpolicy_util",
     "cJSON:cjson",
     "googletest:gmock_main",
     "googletest:gtest_main",

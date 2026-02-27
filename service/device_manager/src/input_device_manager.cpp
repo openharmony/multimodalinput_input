@@ -16,6 +16,7 @@
 #include "input_device_manager.h"
 
 #include <linux/input.h>
+#include <filesystem>
 #include <iomanip>
 #include <regex>
 #include <sstream>
@@ -199,15 +200,64 @@ std::string InputDeviceManager::PhysicalInputDevice::GetId(struct libinput_devic
     if ((vendor == 0) && (product == 0)) {
         return std::string();
     }
+
+    auto sysPath = PhysicalInputDevice::GetSyspath(device);
+    auto name = libinput_device_get_name(device);
+    MMI_HILOGI("Syspath of '%{public}s': %{private}s", (name ? name : "(null)"), sysPath.c_str());
+
     auto bus = libinput_device_get_id_bustype(device);
-    auto version = libinput_device_get_id_version(device);
     constexpr int32_t ID_WIDTH { 4 };
     std::ostringstream sid {};
-    sid << "InputId:" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << bus
-        << "-" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << vendor
-        << "-" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << product
-        << "-" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << version;
-    return std::move(sid).str();
+    sid << "/" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << std::uppercase << bus
+        << ":" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << std::uppercase << vendor
+        << ":" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << std::uppercase << product;
+    const std::string sInputId(std::move(sid).str());
+
+    auto sPos = sysPath.find(sInputId);
+    if ((sPos <= 0) || (sPos == std::string::npos)) {
+        MMI_HILOGW("No input id in syspath: %{private}s", sInputId.c_str());
+        return std::string();
+    }
+    auto tPos = sysPath.find_first_of('/', sPos + 1);
+    if (tPos == std::string::npos) {
+        MMI_HILOGW("No input following input id");
+        return std::string();
+    }
+
+    if (bus != BUS_USB) {
+        return sysPath.substr(0, tPos);
+    }
+
+    auto rPos = sysPath.find_last_of('/', sPos - 1);
+    if (rPos == std::string::npos) {
+        MMI_HILOGW("No usb-interface in syspath");
+        return std::string();
+    }
+    return (sysPath.substr(0, rPos) + sInputId);
+}
+
+std::string InputDeviceManager::PhysicalInputDevice::GetSyspath(struct libinput_device* device)
+{
+    if (device == nullptr) {
+        MMI_HILOGW("Input device is null");
+        return std::string();
+    }
+    auto sysname = libinput_device_get_sysname(device);
+    if (sysname == nullptr) {
+        MMI_HILOGW("No sysname");
+        return std::string();
+    }
+    std::ostringstream sPath {};
+    sPath << "/sys/class/input/" << sysname << "/device";
+    const std::string sysLink(std::move(sPath).str());
+
+    std::error_code ec {};
+    auto sysPath = std::filesystem::canonical(sysLink, ec);
+    if (ec) {
+        MMI_HILOGW("Syslink is not real: %{private}s", sysLink.c_str());
+        return std::string();
+    }
+    return sysPath.string();
 }
 
 void InputDeviceManager::PhysicalInputDevice::UpdateTags(struct libinput_device* device)
