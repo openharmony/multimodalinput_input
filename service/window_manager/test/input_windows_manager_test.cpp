@@ -6870,6 +6870,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
     group.windowsInfo.push_back(window);
     userScreenInfo.displayGroups.push_back(group);
     userScreenInfo.screens.push_back(ScreenInfo());
+    userScreenInfo.userState = UserState::USER_INACTIVE;
 
     OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.groupId = 1;
@@ -6894,14 +6895,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
     inputWindowsMgr.windowsPerDisplayMap_[0][0] = winGroupInfo;
     inputWindowsMgr.windowsPerDisplayMap_[1][0] = winGroupInfo;
 
-    UserScreenInfo screenInfo;
-    screenInfo.userId = 0;
-    window.action = WINDOW_UPDATE_ACTION::ADD_END;
-    group.windowsInfo.push_back(window);
-    screenInfo.displayGroups.push_back(group);
-    screenInfo.screens.push_back(ScreenInfo());
+    userScreenInfo.userState = UserState::USER_ACTIVE;
     
-    inputWindowsMgr.ClearDisplayMap(screenInfo);
+    inputWindowsMgr.ClearDisplayMap(userScreenInfo);
     EXPECT_EQ(inputWindowsMgr.displayGroupInfoMap_.size(), 1);
     EXPECT_EQ(inputWindowsMgr.displayGroupInfoMapTmp_.size(), 1);
     EXPECT_EQ(inputWindowsMgr.windowsPerDisplayMap_.size(), 1);

@@ -1111,12 +1111,8 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
-    bool isAddEnd = std::any_of(userScreenInfo.displayGroups.begin(), userScreenInfo.displayGroups.end(),
-        [](const auto &group) {
-            return !group.windowsInfo.empty() && group.windowsInfo.back().action == WINDOW_UPDATE_ACTION::ADD_END;
-        });
-    if (!isAddEnd) {
-        MMI_HILOGD("add not end");
+    if (userScreenInfo.userState != UserState::USER_ACTIVE) {
+        MMI_HILOGI("user:%{public}d not active", userScreenInfo.userId);
         return;
     }
 
