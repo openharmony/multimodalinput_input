@@ -228,7 +228,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     int32_t toolType = item.GetToolType();
     MMI_HILOGD("Pointer tool type:%{public}d", toolType);
     switch (toolType) {
-#ifdef OHOS_BUILD_KNUCKLE
         case PointerEvent::TOOL_TYPE_FINGER: {
             twoFingerGestureHandler_->HandleFingerGestureDownEvent(touchEvent);
             if (CheckBundleName(touchEvent)) {
@@ -239,7 +238,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             }
             break;
         }
-#endif // OHOS_BUILD_KNUCKLE
         default: {
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
@@ -256,7 +254,6 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     switch (toolType) {
-#ifdef OHOS_BUILD_KNUCKLE
         case PointerEvent::TOOL_TYPE_FINGER: {
             twoFingerGestureHandler_->HandleFingerGestureUpEvent(touchEvent);
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
@@ -265,7 +262,6 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             }
             break;
         }
-#endif // OHOS_BUILD_KNUCKLE
         default: {
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
