@@ -6863,9 +6863,14 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
     display.width = 1920;
     display.height = 1080;
     group.displaysInfo.push_back(display);
+    WindowInfo window;
+    window.groupId = 0;
+    window.id = 123;
+    window.action = WINDOW_UPDATE_ACTION::ADD;
+    group.windowsInfo.push_back(window);
     userScreenInfo.displayGroups.push_back(group);
     userScreenInfo.screens.push_back(ScreenInfo());
- 
+
     OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.groupId = 1;
     OLD::DisplayInfo info;
@@ -6873,21 +6878,30 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
     displayGroupInfo.displaysInfo.push_back(info);
     inputWindowsMgr.displayGroupInfoMap_[0] = displayGroupInfo;
     inputWindowsMgr.displayGroupInfoMapTmp_[0] = displayGroupInfo;
- 
+    inputWindowsMgr.ClearDisplayMap(userScreenInfo);
+    EXPECT_EQ(inputWindowsMgr.displayGroupInfoMap_.size(), 1);
+
     OLD::DisplayGroupInfo groupInfo;
     groupInfo.groupId = 1;
     info.id = 1;
     groupInfo.displaysInfo.push_back(info);
     inputWindowsMgr.displayGroupInfoMap_[1] = groupInfo;
     inputWindowsMgr.displayGroupInfoMapTmp_[1] = groupInfo;
- 
+
     WindowGroupInfo winGroupInfo;
     WindowInfo winInfo;
     winGroupInfo.windowsInfo.push_back(winInfo);
     inputWindowsMgr.windowsPerDisplayMap_[0][0] = winGroupInfo;
     inputWindowsMgr.windowsPerDisplayMap_[1][0] = winGroupInfo;
+
+    UserScreenInfo screenInfo;
+    screenInfo.userId = 0;
+    window.action = WINDOW_UPDATE_ACTION::ADD_END;
+    group.windowsInfo.push_back(window);
+    screenInfo.displayGroups.push_back(group);
+    screenInfo.screens.push_back(ScreenInfo());
     
-    inputWindowsMgr.ClearDisplayMap(userScreenInfo);
+    inputWindowsMgr.ClearDisplayMap(screenInfo);
     EXPECT_EQ(inputWindowsMgr.displayGroupInfoMap_.size(), 1);
     EXPECT_EQ(inputWindowsMgr.displayGroupInfoMapTmp_.size(), 1);
     EXPECT_EQ(inputWindowsMgr.windowsPerDisplayMap_.size(), 1);

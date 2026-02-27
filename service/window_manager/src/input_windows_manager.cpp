@@ -1111,35 +1111,33 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
-    auto isDisplayGroupValid = [&userScreenInfo](int32_t groupId) {
-        for (const auto &group : userScreenInfo.displayGroups) {
-            if (group.id == groupId) {
-                return true;
-            }
-        }
-        return false;
-    };
-    auto eraseInvalidGroups = [&isDisplayGroupValid](std::map<int32_t, OLD::DisplayGroupInfo> &map) {
-        for (auto iter = map.begin(); iter != map.end();) {
-            if (!isDisplayGroupValid(iter->first)) {
-                MMI_HILOGI("erase groupId:%{public}d, maindisplayid:%{public}d",
-                    iter->second.mainDisplayId, iter->second.groupId);
-                iter = map.erase(iter);
+    bool isAddEnd = std::any_of(userScreenInfo.displayGroups.begin(), userScreenInfo.displayGroups.end(),
+        [](const auto &group) {
+            return !group.windowsInfo.empty() && group.windowsInfo.back().action == WINDOW_UPDATE_ACTION::ADD_END;
+        });
+    if (!isAddEnd) {
+        MMI_HILOGI("zhf not end");
+        return;
+    }
+
+    std::set<int32_t> validGroupIds;
+    for (const auto &group : userScreenInfo.displayGroups) {
+        validGroupIds.insert(group.id);
+    }
+    auto eraseInvalidGroups = [&](auto &map) {
+        for (auto it = map.begin(); it != map.end();) {
+            if (validGroupIds.find(it->first) == validGroupIds.end()) {
+                MMI_HILOGI("erase groupid:%{public}d", it->first);
+                it = map.erase(it);
             } else {
-                ++iter;
+                ++it;
             }
         }
     };
+
     eraseInvalidGroups(displayGroupInfoMap_);
     eraseInvalidGroups(displayGroupInfoMapTmp_);
-    for (auto iter = windowsPerDisplayMap_.begin(); iter != windowsPerDisplayMap_.end();) {
-        if (!isDisplayGroupValid(iter->first)) {
-            MMI_HILOGI("erase groupid:%{public}d", iter->first);
-            iter = windowsPerDisplayMap_.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
+    eraseInvalidGroups(windowsPerDisplayMap_);
 }
 
 void InputWindowsManager::UpdateDisplayInfoExtIfNeed(OLD::DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt)
@@ -7326,7 +7324,14 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
         DumpDisplayInfo(fd, iterm.second.displaysInfo);
         mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
     }
-    for (const auto &it : windowsPerDisplayMap_) {
+    std::map<int32_t, std::map<int32_t, WindowGroupInfo>> windowsPerDisplayMap;
+    delegateProxy->OnPostSyncTask([this, &windowsPerDisplayMap] {
+        for (auto iter = windowsPerDisplayMap_.begin(); iter != windowsPerDisplayMap_.end(); ++iter) {
+            windowsPerDisplayMap.insert(std::make_pair(iter->first, iter->second));
+        }
+        return RET_OK;
+    });
+    for (const auto &it : windowsPerDisplayMap) {
         mprintf(fd, "windowsPerDisplayMap information:\t");
         mprintf(fd, "windowsInfos,groupId:%d\t", it.first);
         for (const auto &iter : it.second) {
