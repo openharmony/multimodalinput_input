@@ -191,7 +191,7 @@ PluginResult InputPluginManager::ProcessEvent(
     int64_t lostTime = endTime - beginTime;
     int32_t timeout = result == PluginResult::UseNoNeedReissue ? TIMEOUT_USE_EVENT_US : TIMEOUT_US;
     if (lostTime >= timeout) {
-        MMI_HILOGW("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
+        MMI_HILOGW("iplugin timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
             iplugin->GetName().c_str(), endTime, lostTime);
     }
     return result;
