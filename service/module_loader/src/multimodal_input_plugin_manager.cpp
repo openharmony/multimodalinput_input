@@ -28,6 +28,7 @@
 #include "input_device_manager.h"
 #include "account_manager.h"
 #include "common_event_data.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -40,6 +41,7 @@ namespace MMI {
 const char *FILE_EXTENSION = ".so";
 const char *FOLDER_PATH = "/system/lib64/multimodalinput/autorun";
 const int32_t TIMEOUT_US = 300;
+const int32_t TIMEOUT_USE_EVENT_US = 2500;
 const int32_t MAX_TIMER = 3;
 
 InputPluginManager::~InputPluginManager()
@@ -215,10 +217,14 @@ int32_t InputPluginManager::DoHandleEvent(
             continue;
         }
         beginTime = GetSysClockTime();
+        std::string msg = "PluginManager::ProcessEvent, plugin Name is: " + (*pluginIt)->GetName();
+        BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
         result = ProcessEvent(event, *pluginIt, data);
+        BytraceAdapter::MMIServiceTraceStop();
         endTime = GetSysClockTime();
         lostTime = endTime - beginTime;
-        if (lostTime >= TIMEOUT_US) {
+        int32_t timeout = result == PluginResult::UseNoNeedReissue ? TIMEOUT_USE_EVENT_US : TIMEOUT_US;
+        if (lostTime >= timeout) {
             MMI_HILOGW("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
                 (*pluginIt)->GetName().c_str(), endTime, lostTime);
         }
