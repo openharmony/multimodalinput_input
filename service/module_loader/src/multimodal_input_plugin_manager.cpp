@@ -226,7 +226,6 @@ int32_t InputPluginManager::DoHandleEvent(
             continue;
         }
         result = ProcessEvent(event, *pluginIt, data);
-        endTime = GetSysClockTime();
         if (result == PluginResult::UseNeedReissue) {
             if (IntermediateEndEvent(event)) {
                 MMI_HILOGE("pluginIt is intermediate or end event");
