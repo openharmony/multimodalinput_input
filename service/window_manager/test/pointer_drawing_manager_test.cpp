@@ -3958,6 +3958,41 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DeleteScreenPointe
     ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
 }
 
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearDisappearedScreenPointer_001
+ * @tc.desc: Test ClearDisappearedScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedScreenPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    std::set<uint64_t> screenIds = {0};
+    pointerDrawingManager.ClearDisappearedScreenPointer(screenIds);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearDisappearedScreenPointer_002
+ * @tc.desc: Test ClearDisappearedScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearDisappearedScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    std::set<uint64_t> screenIds = {1};
+    pointerDrawingManager.ClearDisappearedScreenPointer(screenIds);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+}
 
 /**
  * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
