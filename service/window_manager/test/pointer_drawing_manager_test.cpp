@@ -3812,6 +3812,21 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearResources_002
     EXPECT_EQ(pointerDrawingManager->initLoadingAndLoadingRightPixelTimerId_, DEFAULT_VALUE);
 }
 
+
+/**
+ * @tc.name: PointerDrawingManagerTest_AllPointerDeviceRemoved_001
+ * @tc.desc: Test AllPointerDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AllPointerDeviceRemoved_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.AllPointerDeviceRemoved();
+    ASSERT_EQ(pointerDrawingManager.screenModeChangeListener_, nullptr);
+}
+
 /**
  * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
  * @tc.desc: Test ClearScreenPointer
@@ -3829,17 +3844,117 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_AllPointerDeviceRemoved_001
- * @tc.desc: Test AllPointerDeviceRemoved
+ * @tc.name: PointerDrawingManagerTest_GetScreenPointer_001
+ * @tc.desc: Test GetScreenPointer
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AllPointerDeviceRemoved_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_GetScreenPointer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.AllPointerDeviceRemoved();
-    ASSERT_EQ(pointerDrawingManager.screenModeChangeListener_, nullptr);
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    auto otherScreenPointer = pointerDrawingManager.GetScreenPointer(0);
+    ASSERT_EQ(screenPointer, otherScreenPointer);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CopyScreenPointers_001
+ * @tc.desc: Test CopyScreenPointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CopyScreenPointers_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    auto screenPointers = pointerDrawingManager.CopyScreenPointers();
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.begin(), screenPointers.begin());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InsertScreenPointer_001
+ * @tc.desc: Test InsertScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InsertScreenPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateScreenPointer_001
+ * @tc.desc: Test UpdateScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateScreenPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.UpdateScreenPointer(0, screenPointer);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateScreenPointer_002
+ * @tc.desc: Test UpdateScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    auto otherScreenPointer =  std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.UpdateScreenPointer(0, otherScreenPointer);
+    ASSERT_NE(pointerDrawingManager.screenPointers_.[0], screenPointer);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateScreenPointer_002
+ * @tc.desc: Test UpdateScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateScreenPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    auto otherScreenPointer =  std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.UpdateScreenPointer(0, otherScreenPointer);
+    ASSERT_NE(pointerDrawingManager.screenPointers_.[0], screenPointer);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
+ * @tc.desc: Test ClearScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    pointerDrawingManager.ClearScreenPointer();
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
 }
 } // namespace MMI
 } // namespace OHOS
