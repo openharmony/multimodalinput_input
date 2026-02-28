@@ -3938,7 +3938,7 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateScreenPointe
     ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
     auto otherScreenPointer =  std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
     pointerDrawingManager.UpdateScreenPointer(0, otherScreenPointer);
-    ASSERT_NE(pointerDrawingManager.screenPointers_.[0], screenPointer);
+    ASSERT_NE(pointerDrawingManager.screenPointers_[0], screenPointer);
 }
 
 /**
