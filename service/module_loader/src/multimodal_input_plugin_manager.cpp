@@ -176,13 +176,23 @@ void InputPluginManager::PluginAssignmentCallBack(
 PluginResult InputPluginManager::ProcessEvent(
     PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data)
 {
-    return std::visit(
+    int64_t beginTime = GetSysClockTime();
+    std::string msg = "PluginManager::ProcessEvent, plugin Name is: " + iplugin->GetName();
+    BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
+    PluginResult result = std::visit(
         overloaded{
             [data, iplugin](libinput_event* evt) { return iplugin->HandleEvent(evt, data); },
             [data, iplugin](std::shared_ptr<PointerEvent> evt) { return iplugin->HandleEvent(evt, data); },
             [data, iplugin](std::shared_ptr<AxisEvent> evt) { return iplugin->HandleEvent(evt, data); },
             [data, iplugin](std::shared_ptr<KeyEvent> evt) { return iplugin->HandleEvent(evt, data); }
         }, event);
+    BytraceAdapter::MMIServiceTraceStop();
+    int32_t timeout = result == PluginResult::UseNoNeedReissue ? TIMEOUT_USE_EVENT_US : TIMEOUT_US;
+    if (GetSysClockTime() - beginTime >= timeout) {
+        MMI_HILOGW("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
+            iplugin->GetName().c_str(), endTime, lostTime);
+    }
+    return result;
 }
 
 int32_t InputPluginManager::DoHandleEvent(
@@ -208,26 +218,13 @@ int32_t InputPluginManager::DoHandleEvent(
         }
         start_plugin = std::next(cur_plugin);
     }
-    int64_t beginTime = 0;
     PluginResult result;
-    int64_t endTime = 0;
-    int64_t lostTime = 0;
     for (auto pluginIt = start_plugin; pluginIt != plugins.end(); ++pluginIt) {
         if ((*pluginIt) == nullptr) {
             continue;
         }
-        beginTime = GetSysClockTime();
-        std::string msg = "PluginManager::ProcessEvent, plugin Name is: " + (*pluginIt)->GetName();
-        BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
         result = ProcessEvent(event, *pluginIt, data);
-        BytraceAdapter::MMIServiceTraceStop();
         endTime = GetSysClockTime();
-        lostTime = endTime - beginTime;
-        int32_t timeout = result == PluginResult::UseNoNeedReissue ? TIMEOUT_USE_EVENT_US : TIMEOUT_US;
-        if (lostTime >= timeout) {
-            MMI_HILOGW("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
-                (*pluginIt)->GetName().c_str(), endTime, lostTime);
-        }
         if (result == PluginResult::UseNeedReissue) {
             if (IntermediateEndEvent(event)) {
                 MMI_HILOGE("pluginIt is intermediate or end event");
