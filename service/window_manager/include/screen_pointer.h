@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,9 +40,9 @@ public:
     ScreenPointer(hwcmgr_ptr_t hwcmgr, handler_ptr_t handler, screen_info_ptr_t si);
     ~ScreenPointer();
 
-    bool Init(PointerRenderer &render);
-    bool InitSurface();
-    void UpdateScreenInfo(screen_info_ptr_t si);
+    bool Init(PointerRenderer &render, bool needDrawPointer = true);
+    bool InitSurface(bool needDrawPointer);
+    void UpdateScreenInfo(screen_info_ptr_t si, bool needDrawPointer);
     bool UpdatePadding(uint32_t mainWidth, uint32_t mainHeight);
     void OnDisplayInfo(const OLD::DisplayInfo &di);
 

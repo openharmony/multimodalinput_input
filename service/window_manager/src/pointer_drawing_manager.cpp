@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1676,6 +1676,15 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
             rsId, displayInfo_.rsId);
         Rosen::RSTransaction::FlushImplicitTransaction();
+    } else {
+        auto screenPointers = CopyScreenPointers();
+        for (auto &[screenId, sp] : screenPointers) {
+            std::shared_ptr<Rosen::RSSurfaceNode> surfaceNodePtr = (sp == nullptr) ? nullptr : sp->GetSurfaceNode();
+            if (surfaceNodePtr != nullptr) {
+                surfaceNodePtr->AttachToDisplay(screenId);
+                MMI_HILOGI("Attach screenId:%{public}" PRIu64, screenId);
+            }
+        }
     }
     CHKPR(sp, RET_ERR);
     SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
@@ -3007,16 +3016,17 @@ sptr<OHOS::Rosen::ScreenInfo> PointerDrawingManager::UpdateScreenPointerAndFindM
         if (screen->GetSourceMode() == OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN) {
             mainScreen = screen;
         }
+        bool needDrawPointer = (GetSurfaceNode() != nullptr);
         auto [iter, insertOk] = InsertScreenPointer(sid, nullptr);
         if (!insertOk && iter->second != nullptr) {
             // Update ScreenPointer when it already exist
             auto sp = GetScreenPointer(sid);
-            sp->UpdateScreenInfo(screen);
+            sp->UpdateScreenInfo(screen, needDrawPointer);
             MMI_HILOGI("Update ScreenPointer, screenId=%{public}" PRIu64, sid);
         } else {
             // Create and init ScreenPointer when it does not exist
             auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager_, handler_, screen);
-            if (sp == nullptr || !sp->Init(pointerRenderer_)) {
+            if (sp == nullptr || !sp->Init(pointerRenderer_, needDrawPointer)) {
                 MMI_HILOGE("Failed to init ScreenPointer, screenId=%{public}" PRIu64, sid);
                 DeleteScreenPointer(sid);
                 continue;
