@@ -51,13 +51,73 @@ HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdateScreenInfo_001, TestSize.Lev
     sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
     ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, screenInfo);
     ASSERT_NE(screenpointer, nullptr);
-    auto ret = screenpointer->InitSurface();
+    auto ret = screenpointer->InitSurface(true);
     EXPECT_EQ(ret, true);
     uint32_t width = screenpointer->GetScreenWidth();
     EXPECT_EQ(width, 0);
     uint32_t height = screenpointer->GetScreenHeight();
     EXPECT_EQ(height, 0);
-    EXPECT_NO_FATAL_FAILURE(screenpointer->UpdateScreenInfo(screenInfo));
+    EXPECT_NO_FATAL_FAILURE(screenpointer->UpdateScreenInfo(screenInfo, true));
+}
+
+/**
+ * @tc.name: ScreenPointerTest_UpdateScreenInfo_002
+ * @tc.desc: Test UpdateScreenInfo with needDrawPointer=false
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_UpdateScreenInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, screenInfo);
+    ASSERT_NE(screenpointer, nullptr);
+    auto ret = screenpointer->InitSurface(true);
+    EXPECT_EQ(ret, true);
+    EXPECT_NO_FATAL_FAILURE(screenpointer->UpdateScreenInfo(screenInfo, false));
+}
+
+/**
+ * @tc.name: ScreenPointerTest_InitSurface_002
+ * @tc.desc: Test InitSurface with needDrawPointer=false then UpdateScreenInfo with needDrawPointer=true
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_InitSurface_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, screenInfo);
+    ASSERT_NE(screenpointer, nullptr);
+    auto ret = screenpointer->InitSurface(false);
+    EXPECT_EQ(ret, true);
+    EXPECT_NO_FATAL_FAILURE(screenpointer->UpdateScreenInfo(screenInfo, true));
+}
+
+/**
+ * @tc.name: ScreenPointerTest_InitSurface_003
+ * @tc.desc: Test InitSurface with needDrawPointer=false then UpdateScreenInfo with needDrawPointer=false
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(ScreenPointerTest, ScreenPointerTest_InitSurface_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    hwcmgr_ptr_t hwcmgr = std::make_shared<HardwareCursorPointerManager>();
+    ASSERT_NE(hwcmgr, nullptr);
+    handler_ptr_t handler = nullptr;
+    sptr<OHOS::Rosen::ScreenInfo> screenInfo = new OHOS::Rosen::ScreenInfo();
+    ScreenPointer* screenpointer = new ScreenPointer(hwcmgr, handler, screenInfo);
+    ASSERT_NE(screenpointer, nullptr);
+    auto ret = screenpointer->InitSurface(false);
+    EXPECT_EQ(ret, true);
+    EXPECT_NO_FATAL_FAILURE(screenpointer->UpdateScreenInfo(screenInfo, false));
 }
 
 /**
