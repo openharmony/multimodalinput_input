@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1720,6 +1720,110 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePoi
     shiftWindowInfo.x = -1;
     shiftWindowInfo.y = 1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown));
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_003
+ * @tc.desc: Test the function ShiftAppMousePointerEvent with left button not pressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePointerEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = false;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+    EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_004
+ * @tc.desc: Test the function ShiftAppMousePointerEvent with autoGenDown enabled and invalid coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePointerEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = true;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pressedButtons_.insert(PointerEvent::MOUSE_BUTTON_LEFT);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+
+    shiftWindowInfo.x = -100;
+    shiftWindowInfo.y = -100;
+    EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_005
+ * @tc.desc: Test the function ShiftAppMousePointerEvent with autoGenDown enabled and valid coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePointerEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = true;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pressedButtons_.insert(PointerEvent::MOUSE_BUTTON_LEFT);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+
+    shiftWindowInfo.x = 100;
+    shiftWindowInfo.y = 200;
+    EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_006
+ * @tc.desc: Test the function ShiftAppMousePointerEvent with autoGenDown disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePointerEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = false;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pressedButtons_.insert(PointerEvent::MOUSE_BUTTON_LEFT);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+
+    EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
+}
+
+/* *
+ * @tc.name: InputWindowsManagerOneTest_ShiftAppMousePointerEvent_007
+ * @tc.desc: Test the function ShiftAppMousePointerEvent with autoGenDown enabled and default coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppMousePointerEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    ShiftWindowInfo shiftWindowInfo;
+    bool autoGenDown = true;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pressedButtons_.insert(PointerEvent::MOUSE_BUTTON_LEFT);
+    inputWindowsManager->lastPointerEvent_ = pointerEvent;
+
+    shiftWindowInfo.x = -1;
+    shiftWindowInfo.y = -1;
+    EXPECT_EQ(inputWindowsManager->ShiftAppMousePointerEvent(shiftWindowInfo, autoGenDown), RET_ERR);
 }
 
 /* *

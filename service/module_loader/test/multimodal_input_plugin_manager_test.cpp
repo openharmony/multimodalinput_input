@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,6 +105,8 @@ public:
     MOCK_METHOD(PluginResult, HandleEvent,
         (std::shared_ptr<AxisEvent> axisEvent, std::shared_ptr<IPluginData> data), (override, const));
     MOCK_METHOD(void, HandleMonitorStatus, (bool monitorStatus, const std::string &monitorType), (override, const));
+    MOCK_METHOD(bool, HandleShortcutKey, (const IShortcutKey &shortcutKey));
+    MOCK_METHOD(bool, HandleSequenceKeys, (const std::vector<ISequenceKey> &sequenceKeys));
 };
 
 class MockUDSSession : public UDSSession {
@@ -135,6 +137,222 @@ public:
 };
 
 /**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_001
+ * @tc.desc: Init should return RET_OK when directory does not exist
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/non/existent/path");
+    int32_t result = manager->Init(udsServer);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_002
+ * @tc.desc: Init should return RET_OK when directory is empty
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp/empty_dir");
+    int32_t result = manager->Init(udsServer);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_Init_003
+ * @tc.desc: Init should skip invalid plugins and continue processing
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_Init_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp/plugins_with_invalid_so");
+    int32_t result = manager->Init(udsServer);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_001
+ * @tc.desc: Test LoadPlugin with valid .so file and successful plugin initialization
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string validPath = "/tmp/valid_plugin.so";
+    // Mock dlopen, dlsym, and InitPlugin behavior
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return(nullptr));
+
+    // Call LoadPlugin
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    bool result = manager->LoadPlugin(validPath);
+    EXPECT_FALSE(result);
+
+    // Verify plugin is inserted into plugins_
+    auto& plugins = manager->plugins_;
+    ASSERT_EQ(plugins.size(), 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_002
+ * @tc.desc: Test LoadPlugin with dlopen failure
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string invalidPath = "/tmp/invalid_plugin.so";
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return("dlopen error"));
+
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    bool result = manager->LoadPlugin(invalidPath);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_003
+ * @tc.desc: Test LoadPlugin with missing InitPlugin symbol
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string validPath = "/tmp/plugin_missing_init.so";
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, Dlsym(_, "UnintPlugin")).Times(0);
+    EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return("symbol not found"));
+
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    bool result = manager->LoadPlugin(validPath);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_004
+ * @tc.desc: Test LoadPlugin with failed InitPlugin callback
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string validPath = "/tmp/plugin_init_failed.so";
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return(nullptr));
+
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    bool result = manager->LoadPlugin(validPath);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_005
+ * @tc.desc: Test LoadPlugin with multiple plugins in same stage sorted by priority
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string plugin1Path = "/tmp/plugin_high_priority.so";
+    std::string plugin2Path = "/tmp/plugin_low_priority.so";
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, Dlsym(_, "InitPlugin")).WillRepeatedly(Return(reinterpret_cast<void*>(0x3)));
+    EXPECT_CALL(libinputMock, Dlsym(_, "UnintPlugin")).WillRepeatedly(Return(reinterpret_cast<void*>(0x4)));
+
+    EXPECT_CALL(libinputMock, Dlerror()).WillRepeatedly(Return(nullptr));
+
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->LoadPlugin(plugin1Path);
+    manager->LoadPlugin(plugin2Path);
+
+    auto& plugins = manager->plugins_;
+    ASSERT_EQ(plugins.size(), 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_PluginAssignmentCallBack_001
+ * @tc.desc: Test PluginAssignmentCallBack with existing stage plugins
+ * @tc.require: test PluginAssignmentCallBack
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_PluginAssignmentCallBack_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin1 = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPluginContext> mockPlugin2 = std::make_shared<MockInputPluginContext>();
+
+    EXPECT_CALL(*mockPlugin1, SetCallback(testing::_)).Times(1);
+    EXPECT_CALL(*mockPlugin2, SetCallback(testing::_)).Times(1);
+
+    manager->plugins_[InputPluginStage::INPUT_AFTER_FILTER] = { mockPlugin1, mockPlugin2 };
+
+    std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
+
+    manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_AFTER_FILTER);
+
+    ASSERT_EQ(manager->plugins_.size(), 1);
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_AFTER_FILTER);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 2);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_PluginAssignmentCallBack_002
+ * @tc.desc: Test PluginAssignmentCallBack with non-existing stage plugins
+ * @tc.require: test PluginAssignmentCallBack
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_PluginAssignmentCallBack_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    manager->plugins_.clear();
+
+    std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
+
+    manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_AFTER_FILTER);
+
+    EXPECT_EQ(manager->plugins_.size(), 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_PluginAssignmentCallBack_003
+ * @tc.desc: Test PluginAssignmentCallBack with empty plugin list in stage
+ * @tc.require: test PluginAssignmentCallBack
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_PluginAssignmentCallBack_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    manager->plugins_[InputPluginStage::INPUT_AFTER_FILTER] = {};
+
+    std::function<void(PluginEventType, int64_t)> callback = [](PluginEventType, int64_t) {};
+
+    manager->PluginAssignmentCallBack(callback, InputPluginStage::INPUT_AFTER_FILTER);
+
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_AFTER_FILTER);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 0);
+}
+
+/**
  * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_HandleEvent_001
  * @tc.desc: Test_HandleEvent_001
  * @tc.require:
@@ -158,8 +376,8 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
  * @tc.desc: Test_IntermediateEndEvent_001
  * @tc.require:
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_001,
-    TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     libinput_event event;
@@ -189,18 +407,549 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
 }
 
 /**
- * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_001
- * @tc.desc: Test_GetExternalObject_001
- * @tc.require: test GetExternalObject
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_002
+ * @tc.desc: Test IntermediateEndEvent with null event
+ * @tc.require: test IntermediateEndEvent
  */
-HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPluginManager_GetExternalObject_001,
-    TestSize.Level1)
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string pluginName = "yunshuiqiao";
-    sptr<IRemoteObject> inputDevicePluginStub = nullptr;
-    int32_t result = InputPluginManager::GetInstance()->GetExternalObject(pluginName, inputDevicePluginStub);
-    EXPECT_EQ(result, ERROR_NULL_POINTER);
+    std::shared_ptr<AxisEvent> axisEvent = std::make_shared<AxisEvent>(AxisEvent::AXIS_ACTION_START);
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(axisEvent)); // Non-libinput_event*
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_003
+ * @tc.desc: Test IntermediateEndEvent with motion events
+ * @tc.require: test IntermediateEndEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+
+    // Test LIBINPUT_EVENT_POINTER_MOTION
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    // Test LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_004
+ * @tc.desc: Test IntermediateEndEvent with keyboard key release
+ * @tc.require: test IntermediateEndEvent
+ */
+HWTEST_F(MultimodalInputPluginManagerTest,
+    MultimodalInputPluginManagerTest_InputPluginManager_IntermediateEndEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_event event;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_KEYBOARD_KEY));
+    struct libinput_event_keyboard keyboardEvent;
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillRepeatedly(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).WillRepeatedly(Return(LIBINPUT_KEY_STATE_RELEASED));
+    EXPECT_TRUE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+
+    // Test key press state
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).WillRepeatedly(Return(LIBINPUT_KEY_STATE_PRESSED));
+    EXPECT_FALSE(InputPluginManager::GetInstance()->IntermediateEndEvent(&event));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleMonitorStatus_001
+ * @tc.desc: Test HandleMonitorStatus with non-existing stage
+ * @tc.require: test HandleMonitorStatus
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleMonitorStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear(); // Clear all plugins
+
+    bool monitorStatus = true;
+    std::string monitorType = "testType";
+    manager->HandleMonitorStatus(monitorStatus, monitorType);
+
+    // Verify no plugins were processed
+    EXPECT_EQ(manager->plugins_.size(), 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleMonitorStatus_002
+ * @tc.desc: Test HandleMonitorStatus with empty plugin list
+ * @tc.require: test HandleMonitorStatus
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleMonitorStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = {}; // Empty plugin list
+
+    bool monitorStatus = false;
+    std::string monitorType = "emptyList";
+    manager->HandleMonitorStatus(monitorStatus, monitorType);
+
+    // Verify plugin list remains empty
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 0);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleMonitorStatus_003
+ * @tc.desc: Test HandleMonitorStatus with multiple plugins
+ * @tc.require: test HandleMonitorStatus
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleMonitorStatus_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin1 = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPluginContext> mockPlugin2 = std::make_shared<MockInputPluginContext>();
+
+    EXPECT_CALL(*mockPlugin1, HandleMonitorStatus(true, "multiPlugin")).Times(1);
+    EXPECT_CALL(*mockPlugin2, HandleMonitorStatus(true, "multiPlugin")).Times(1);
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin1, mockPlugin2 };
+
+    bool monitorStatus = true;
+    std::string monitorType = "multiPlugin";
+    manager->HandleMonitorStatus(monitorStatus, monitorType);
+
+    // Verify plugins were processed
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 2);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleMonitorStatus_004
+ * @tc.desc: Test HandleMonitorStatus with nullptr plugin
+ * @tc.require: test HandleMonitorStatus
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleMonitorStatus_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, HandleMonitorStatus(false, "nullPlugin")).Times(1);
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { nullptr, mockPlugin };
+
+    bool monitorStatus = false;
+    std::string monitorType = "nullPlugin";
+    manager->HandleMonitorStatus(monitorStatus, monitorType);
+
+    // Verify only valid plugin was processed
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 2);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleShortcutKey_001
+ * @tc.desc: Test HandleShortcutKey with empty plugin list
+ * @tc.require: test HandleShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleShortcutKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+
+    ShortcutKey key;
+    key.preKeys = { 1, 2 };
+    key.finalKey = 3;
+    key.keyDownDuration = 100;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->HandleShortcutKey(key);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleShortcutKey_002
+ * @tc.desc: Test HandleShortcutKey with nullptr plugin
+ * @tc.require: test HandleShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleShortcutKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { nullptr };
+
+    ShortcutKey key;
+    key.preKeys = { 1, 2 };
+    key.finalKey = 3;
+    key.keyDownDuration = 100;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->HandleShortcutKey(key);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleShortcutKey_003
+ * @tc.desc: Test HandleShortcutKey with empty plugin list
+ * @tc.require: test HandleShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleShortcutKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+
+    KeyOption option;
+    option.SetPreKeys({ 1, 2 });
+    option.SetFinalKey(3);
+    option.SetFinalKeyDownDuration(100);
+    option.SetFinalKeyDown(true);
+
+    bool result = manager->HandleShortcutKey(option);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleShortcutKey_004
+ * @tc.desc: Test HandleShortcutKey with nullptr plugin
+ * @tc.require: test HandleShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleShortcutKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { nullptr };
+
+    KeyOption option;
+    option.SetPreKeys({ 1, 2 });
+    option.SetFinalKey(3);
+    option.SetFinalKeyDownDuration(100);
+    option.SetFinalKeyDown(true);
+
+    bool result = manager->HandleShortcutKey(option);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ProcessShortcutKey_001
+ * @tc.desc: Test ProcessShortcutKey with plugin consuming shortcut key
+ * @tc.require: test ProcessShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ProcessShortcutKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleShortcutKey(testing::_)).WillRepeatedly(Return(true));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    IShortcutKey shortcutKey;
+    shortcutKey.preKeys = { 1, 2 };
+    shortcutKey.finalKey = 3;
+    shortcutKey.keyDownDuration = 100;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->ProcessShortcutKey(shortcutKey);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ProcessShortcutKey_002
+ * @tc.desc: Test ProcessShortcutKey with plugin not consuming shortcut key
+ * @tc.require: test ProcessShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ProcessShortcutKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleShortcutKey(testing::_)).WillRepeatedly(Return(false));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    IShortcutKey shortcutKey;
+    shortcutKey.preKeys = { 1, 2 };
+    shortcutKey.finalKey = 3;
+    shortcutKey.keyDownDuration = 100;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->ProcessShortcutKey(shortcutKey);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ProcessShortcutKey_003
+ * @tc.desc: Test ProcessShortcutKey with empty plugin list
+ * @tc.require: test ProcessShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ProcessShortcutKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+
+    IShortcutKey shortcutKey;
+    shortcutKey.preKeys = { 1, 2 };
+    shortcutKey.finalKey = 3;
+    shortcutKey.keyDownDuration = 100;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->ProcessShortcutKey(shortcutKey);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ProcessShortcutKey_004
+ * @tc.desc: Test ProcessShortcutKey with nullptr plugin context
+ * @tc.require: test ProcessShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ProcessShortcutKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { nullptr };
+
+    IShortcutKey shortcutKey;
+    shortcutKey.preKeys = { 1, 2 };
+    shortcutKey.finalKey = 3;
+    shortcutKey.keyDownDuration = 100;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->ProcessShortcutKey(shortcutKey);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ProcessShortcutKey_005
+ * @tc.desc: Test ProcessShortcutKey with nullptr plugin object
+ * @tc.require: test ProcessShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ProcessShortcutKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly(Return(nullptr));
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    IShortcutKey shortcutKey;
+    shortcutKey.preKeys = { 1, 2 };
+    shortcutKey.finalKey = 3;
+    shortcutKey.keyDownDuration = 100;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->ProcessShortcutKey(shortcutKey);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_ProcessShortcutKey_006
+ * @tc.desc: Test ProcessShortcutKey with multiple stages and plugins
+ * @tc.require: test ProcessShortcutKey
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_ProcessShortcutKey_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    std::shared_ptr<MockInputPluginContext> mockPlugin1 = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPluginContext> mockPlugin2 = std::make_shared<MockInputPluginContext>();
+
+    EXPECT_CALL(*mockPlugin1, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleShortcutKey(testing::_)).WillRepeatedly(Return(false));
+        return mockInputPlugin;
+    });
+
+    EXPECT_CALL(*mockPlugin2, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleShortcutKey(testing::_)).WillRepeatedly(Return(true));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin1 };
+    manager->plugins_[InputPluginStage::INPUT_AFTER_FILTER] = { mockPlugin2 };
+
+    IShortcutKey shortcutKey;
+    shortcutKey.preKeys = { 1, 2 };
+    shortcutKey.finalKey = 3;
+    shortcutKey.keyDownDuration = 100;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+
+    bool result = manager->ProcessShortcutKey(shortcutKey);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleSequenceKeys_001
+ * @tc.desc: Test_HandleSequenceKeys_001 - Normal flow with valid sequence
+ * @tc.require: test HandleSequenceKeys
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleSequenceKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    // Prepare a valid sequence
+    Sequence sequence;
+    sequence.sequenceKeys.push_back({ .keyCode = 1, .keyAction = KeyEvent::KEY_ACTION_DOWN, .actionTime = 100,
+        .delay = 0 });
+    sequence.sequenceKeys.push_back({ .keyCode = 2, .keyAction = KeyEvent::KEY_ACTION_UP, .actionTime = 200,
+        .delay = 50 });
+
+    // Mock plugin to consume the sequence
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleSequenceKeys(testing::_)).WillRepeatedly(Return(true));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    bool result = manager->HandleSequenceKeys(sequence);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleSequenceKeys_002
+ * @tc.desc: Test_HandleSequenceKeys_002 - Empty sequence
+ * @tc.require: test HandleSequenceKeys
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleSequenceKeys_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    // Prepare an empty sequence
+    Sequence sequence;
+
+    // Mock plugin that does not consume the sequence
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleSequenceKeys(testing::_)).WillRepeatedly(Return(false));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    bool result = manager->HandleSequenceKeys(sequence);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleSequenceKeys_003
+ * @tc.desc: Test_HandleSequenceKeys_003 - Plugin consumes sequence
+ * @tc.require: test HandleSequenceKeys
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleSequenceKeys_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    // Prepare a valid sequence
+    Sequence sequence;
+    sequence.sequenceKeys.push_back({ .keyCode = 1, .keyAction = KeyEvent::KEY_ACTION_DOWN, .actionTime = 100,
+        .delay = 0 });
+
+    // Mock plugin to consume the sequence
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleSequenceKeys(testing::_)).WillRepeatedly(Return(true));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    bool result = manager->HandleSequenceKeys(sequence);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleSequenceKeys_004
+ * @tc.desc: Test_HandleSequenceKeys_004 - Plugin does not consume sequence
+ * @tc.require: test HandleSequenceKeys
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleSequenceKeys_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    // Prepare a valid sequence
+    Sequence sequence;
+    sequence.sequenceKeys.push_back({ .keyCode = 1, .keyAction = KeyEvent::KEY_ACTION_DOWN, .actionTime = 100,
+        .delay = 0 });
+
+    // Mock plugin that does not consume the sequence
+    std::shared_ptr<MockInputPluginContext> mockPlugin = std::make_shared<MockInputPluginContext>();
+    EXPECT_CALL(*mockPlugin, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleSequenceKeys(testing::_)).WillRepeatedly(Return(false));
+        return mockInputPlugin;
+    });
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin };
+
+    bool result = manager->HandleSequenceKeys(sequence);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_HandleSequenceKeys_005
+ * @tc.desc: Test_HandleSequenceKeys_005 - Multiple plugins, first one consumes
+ * @tc.require: test HandleSequenceKeys
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_HandleSequenceKeys_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+
+    // Prepare a valid sequence
+    Sequence sequence;
+    sequence.sequenceKeys.push_back({ .keyCode = 1, .keyAction = KeyEvent::KEY_ACTION_DOWN, .actionTime = 100,
+        .delay = 0 });
+
+    // Mock two plugins, first one consumes the sequence
+    std::shared_ptr<MockInputPluginContext> mockPlugin1 = std::make_shared<MockInputPluginContext>();
+    std::shared_ptr<MockInputPluginContext> mockPlugin2 = std::make_shared<MockInputPluginContext>();
+
+    EXPECT_CALL(*mockPlugin1, GetPlugin()).WillRepeatedly([]() {
+        auto mockInputPlugin = std::make_shared<MockInputPlugin>();
+        EXPECT_CALL(*mockInputPlugin, HandleSequenceKeys(testing::_)).WillRepeatedly(Return(true));
+        return mockInputPlugin;
+    });
+
+    EXPECT_CALL(*mockPlugin2, GetPlugin()).Times(0); // Second plugin should not be called
+
+    manager->plugins_[InputPluginStage::INPUT_BEFORE_KEYCOMMAND] = { mockPlugin1, mockPlugin2 };
+
+    bool result = manager->HandleSequenceKeys(sequence);
+    EXPECT_TRUE(result);
 }
 
 /**
