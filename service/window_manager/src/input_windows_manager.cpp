@@ -4717,6 +4717,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END;
     if (checkFlag) {
         int32_t focusWindowId = GetFocusWindowId(groupId);
+        if (!touchWindow) {
+            MMI_HILOGE("touchWindow is nullopt");
+            return RET_ERR;
+        }
         if ((!GetHoverScrollState(FindDisplayUserId(pointerEvent->GetTargetDisplayId()))) &&
             (focusWindowId != touchWindow->id)) {
             MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
@@ -4747,6 +4751,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         if (timerId_ != DEFAULT_VALUE) {
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = DEFAULT_VALUE;
+        }
+        if (!touchWindow) {
+            MMI_HILOGE("touchWindow is nullopt");
+            return RET_ERR;
         }
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         if (!CursorDrawingComponent::GetInstance().GetMouseDisplayState() &&

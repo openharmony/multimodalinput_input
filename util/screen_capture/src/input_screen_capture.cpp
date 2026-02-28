@@ -33,7 +33,12 @@ sptr<InputScreenCaptureMonitorListener> g_screenCaptureMonitorListener { nullptr
 
 extern "C" int32_t IsScreenCaptureWorking(int32_t capturePid)
 {
-    std::list<int32_t> pidList = Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+    auto* monitor = Media::ScreenCaptureMonitor::GetInstance();
+    if (monitor == nullptr) {
+        MMI_HILOGE("ScreenCaptureMonitor instance is null, capture not active");
+        return false;
+    }
+    std::list<int32_t> pidList = monitor->IsScreenCaptureWorking();
     auto iter = std::find(pidList.begin(), pidList.end(), capturePid);
     if (iter != pidList.end()) {
         return true;

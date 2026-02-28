@@ -44,6 +44,12 @@ void MMIFdListener::OnReadable(int32_t fd)
             ssize_t size = recv(fd, szBuf + oneRecvSize, MAX_PACKET_BUF_SIZE - oneRecvSize,
                                 MSG_DONTWAIT | MSG_NOSIGNAL);
             if (size > 0) {
+                if (static_cast<size_t>(size) > MAX_PACKET_BUF_SIZE - oneRecvSize) {
+                    MMI_HILOGE("recv returned invalid size: %{public}zd, but only %{public}zu space available",
+                        size, MAX_PACKET_BUF_SIZE - oneRecvSize);
+                    shouldTry = false;
+                    break;
+                }
                 recvSize += size;
                 oneRecvSize += size;
                 continue;
