@@ -3942,6 +3942,24 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateScreenPointe
 }
 
 /**
+ * @tc.name: PointerDrawingManagerTest_DeleteScreenPointer_001
+ * @tc.desc: Test DeleteScreenPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DeleteScreenPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    auto screenPointer = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    pointerDrawingManager.screenPointers_.insert(std::make_pair(0, screenPointer));
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+    pointerDrawingManager.DeleteScreenPointer(0);
+    ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
+}
+
+
+/**
  * @tc.name: PointerDrawingManagerTest_ClearScreenPointer_001
  * @tc.desc: Test ClearScreenPointer
  * @tc.type: FUNC
