@@ -61,6 +61,7 @@ private:
     bool CheckSimulatedModifierKeyEventFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyAction(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyActionFromShell(const std::shared_ptr<KeyEvent> &keyEvent);
+    void UpdateSimulatedEventModifierState(const std::shared_ptr<KeyEvent> &keyEvent);
     void HandleSimulatedModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &keyItem);
     void HandleSimulatedModifierKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, KeyEvent::KeyItem &keyItem);
     void SyncSimulatedModifierKeyEventState(const std::shared_ptr<KeyEvent> &keyEvent);
