@@ -79,8 +79,8 @@ void DragSecurityManager::DragSecurityUpdatePointerEvent(std::shared_ptr<Pointer
     if (pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         DragSecurityData dragEventData = {
             .timestampMs = distributeEventTime,
-            .coordinateX = pointerItem.GetDisplayXPos(),
-            .coordinateY = pointerItem.GetDisplayYPos(),
+            .coordinateX = pointerItem.GetGlobalX(),
+            .coordinateY = pointerItem.GetGlobalY(),
         };
         signature = Base64Encode(GenerateSignature(nonceBin, dragEventData));
     }
