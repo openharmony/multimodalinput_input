@@ -4367,7 +4367,8 @@ ErrCode MMIService::CreateVKeyboardDevice(sptr<IRemoteObject> &vkeyboardDevice)
         return ERROR_NO_PERMISSION;
     }
     vkeyboardDevice = nullptr;
-    isFoldPC_ = SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC;
+    isFoldPC_ = std::find(DEVICE_TYPE_FOLD_PC_VECTOR.begin(), DEVICE_TYPE_FOLD_PC_VECTOR.end(), SYS_PRODUCT_TYPE) !=
+                DEVICE_TYPE_FOLD_PC_VECTOR.end();
     if (!isFoldPC_) {
         MMI_HILOGE("Failed to create vkeyboard device, feature not support");
         return RET_ERR;
