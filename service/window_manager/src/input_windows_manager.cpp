@@ -1111,22 +1111,32 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
 {
     CALL_DEBUG_ENTER;
+
     if (userScreenInfo.userState != UserState::USER_ACTIVE) {
-        MMI_HILOGI("user:%{public}d not active", userScreenInfo.userId);
+        MMI_HILOGI("user:%{private}d not active", userScreenInfo.userId);
         return;
     }
 
-    std::set<int32_t> validGroupIds;
+    std::unordered_set<int32_t> groupIds;
+    std::string groupIdStr;
     for (const auto &group : userScreenInfo.displayGroups) {
-        validGroupIds.insert(group.id);
+        groupIds.insert(group.id);
+        groupIdStr += StringPrintf("|%{public}d", group.id);
     }
+
+    std::unordered_set<int32_t> invalidGroupIds;
+    for (const auto &[groupId, groupInfo] : displayGroupInfoMap_) {
+        if (groupInfo.currentUserId == userScreenInfo.userId && groupIds.find(groupId) == groupIds.end()) {
+            invalidGroupIds.insert(groupId);
+        }
+    }
+
     auto eraseInvalidGroups = [&](auto &map) {
-        for (auto it = map.begin(); it != map.end();) {
-            if (validGroupIds.find(it->first) == validGroupIds.end()) {
-                MMI_HILOGI("erase groupid:%{public}d", it->first);
-                it = map.erase(it);
-            } else {
-                ++it;
+        for (const auto &id : invalidGroupIds) {
+            auto it = map.find(id);
+            if (it != map.end()) {
+                MMI_HILOGI("erase groupid:%{public}d %{public}s", id, groupIdStr.c_str());
+                map.erase(it);
             }
         }
     };

@@ -6858,6 +6858,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
     userScreenInfo.userId = 0;
     DisplayGroupInfo group;
     group.id = 1;
+    group.currentUserId = 0;
     group.displaysInfo.push_back(DisplayInfo());
     DisplayInfo display;
     display.width = 1920;
