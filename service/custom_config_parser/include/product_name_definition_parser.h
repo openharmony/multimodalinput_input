@@ -34,12 +34,14 @@ public:
     static ProductNameDefinitionParser& GetInstance();
     int32_t Init();
     std::string GetProductName(const std::string &key);
+    std::vector<std::string> GetProductNameVector(const std::string &key);
     int32_t ParseProductNameMap(const JsonParser &jsonParser);
 
 private:
     struct ProductNameDefinitionItem {
         std::string productAlias;
         std::string productName;
+        std::vector<std::string> productNamesVector;
     };
 
 private:
@@ -51,6 +53,7 @@ private:
 
     private:
     std::map<std::string, std::string> productNames_;
+    std::map<std::string, std::vector<std::string>> productNamesVector_;
     std::shared_mutex lock_;
     std::atomic_bool isInitialized_ { false };
 };
