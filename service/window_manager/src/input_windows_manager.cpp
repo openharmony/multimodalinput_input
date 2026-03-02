@@ -3327,8 +3327,9 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
     auto displayInfo = FindPhysicalDisplayInfo("default0");
     CHKPF(displayInfo);
     MMI_HILOGD("PhysicalDisplay.width:%{public}d, PhysicalDisplay.height:%{public}d, "
-               "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d",
-               displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y);
+               "PhysicalDisplay.topLeftX:%{private}d, PhysicalDisplay.topLeftY:%{private}d, "
+               "PhysicalDisplay.expandHeight:%{public}d",
+               displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y, displayInfo->expandHeight);
     displayId = displayInfo->id;
     auto width = displayInfo->width;
     auto height = displayInfo->height;
@@ -3338,7 +3339,7 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
     }
     PhysicalCoordinate phys {
         .x = libinput_event_tablet_tool_get_x_transformed(tip, width),
-        .y = libinput_event_tablet_tool_get_y_transformed(tip, height),
+        .y = libinput_event_tablet_tool_get_y_transformed(tip, height - displayInfo->expandHeight),
     };
     MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, phys.x, phys.y);
