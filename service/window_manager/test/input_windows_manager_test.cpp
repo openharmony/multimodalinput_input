@@ -6858,7 +6858,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
     userScreenInfo.userId = 0;
     DisplayGroupInfo group;
     group.id = 1;
-    group.currentUserId = 0;
     group.displaysInfo.push_back(DisplayInfo());
     DisplayInfo display;
     display.width = 1920;
@@ -6875,6 +6874,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
 
     OLD::DisplayGroupInfo displayGroupInfo;
     displayGroupInfo.groupId = 1;
+    displayGroupInfo.currentUserId = 0;
     OLD::DisplayInfo info;
     info.id = 0;
     displayGroupInfo.displaysInfo.push_back(info);
@@ -6885,6 +6885,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearDisplayMap, TestS
 
     OLD::DisplayGroupInfo groupInfo;
     groupInfo.groupId = 1;
+    groupInfo.currentUserId = 0;
     info.id = 1;
     groupInfo.displaysInfo.push_back(info);
     inputWindowsMgr.displayGroupInfoMap_[1] = groupInfo;
