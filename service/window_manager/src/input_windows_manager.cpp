@@ -1118,10 +1118,13 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
     }
 
     std::unordered_set<int32_t> groupIds;
-    std::string groupIdStr;
+    std::string groupIdsStr;
     for (const auto &group : userScreenInfo.displayGroups) {
         groupIds.insert(group.id);
-        groupIdStr += StringPrintf("|%{public}d", group.id);
+        groupIdsStr += std::to_string(group.id) + "|";
+    }
+    if (!groupIdsStr.empty()) {
+        groupIdsStr.pop_back();
     }
 
     std::unordered_set<int32_t> invalidGroupIds;
@@ -1135,7 +1138,7 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
         for (const auto &id : invalidGroupIds) {
             auto it = map.find(id);
             if (it != map.end()) {
-                MMI_HILOGI("erase groupid:%{public}d %{public}s", id, groupIdStr.c_str());
+                MMI_HILOGI("erase groupid:%{public}d|%{public}s", id, groupIdsStr.c_str());
                 map.erase(it);
             }
         }
