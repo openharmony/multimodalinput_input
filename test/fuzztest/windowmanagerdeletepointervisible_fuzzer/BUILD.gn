@@ -36,7 +36,10 @@ ohos_fuzztest("WindowManagerDeletePointerVisibleFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "windowmanagerdeletepointervisible_fuzzer.cpp" ]
+  sources = [
+    "windowmanagerdeletepointervisible_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/proxy:libmmi-common",
@@ -46,6 +49,7 @@ ohos_fuzztest("WindowManagerDeletePointerVisibleFuzzTest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "ffrt:libffrt",
     "graphic_2d:librender_service_base",
     "hilog:libhilog",
     "ipc:ipc_core",
