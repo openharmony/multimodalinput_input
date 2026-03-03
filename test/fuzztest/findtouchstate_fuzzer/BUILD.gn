@@ -25,6 +25,7 @@ ohos_fuzztest("FindTouchStateFuzzTest") {
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/event_resample/include",
     "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
    ]
   cflags = [
     "-g",
