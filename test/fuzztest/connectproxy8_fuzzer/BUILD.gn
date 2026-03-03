@@ -87,6 +87,7 @@ ohos_fuzztest("ConnectProxy8FuzzTest") {
     "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "data_share:datashare_consumer",
   ]
 
   if (security_component_enable) {
