@@ -45,6 +45,8 @@ ohos_fuzztest("InputKeyboardFuzzTest") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/account_manager/include",
+
   ]
   cflags = [
     "-g",

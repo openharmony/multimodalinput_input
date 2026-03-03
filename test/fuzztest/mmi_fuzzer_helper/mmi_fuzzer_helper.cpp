@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
+#include "account_manager.h"
 #include "ffrt_inner.h"
-#include "mmi_service.h"
 #include <cstdlib>
 
 namespace OHOS {
 namespace MMI {
-static void CleanupMMIService()
+static void CleanupAccountManager()
 {
-    auto service = MMIService::GetInstance();
-    if (service != nullptr) {
-        service->OnStop();
+    auto accountMgr = ACCOUNT_MGR;
+    if (accountMgr != nullptr) {
+        accountMgr->AccountManagerUnregister();
     }
 }
 
@@ -31,7 +31,6 @@ __attribute__((constructor))
 static void RegisterCleanup()
 {
     std::make_shared<ffrt::queue>("MMI_Fuzz")->submit([]{});
-    std::atexit(CleanupMMIService);
-}
+    std::atexit(CleanupAccountManager);
 } // namespace MMI
 } // namespace OHOS

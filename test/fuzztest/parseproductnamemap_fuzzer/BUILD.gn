@@ -47,7 +47,8 @@ ohos_fuzztest("ParseProductNameMapFuzzTest") {
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/util/json_parser/include",
     "${mmi_path}/service/custom_config_parser/include",
-    "${mmi_path}/service/product_property_config/include"
+    "${mmi_path}/service/product_property_config/include"    "${mmi_path}/service/account_manager/include",
+
   ]
   cflags = [
     "-g",

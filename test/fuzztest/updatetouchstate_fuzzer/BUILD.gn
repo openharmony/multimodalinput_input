@@ -21,9 +21,10 @@ module_output_path = "input/input"
 ohos_fuzztest("UpdateTouchStateFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "${mmi_path}/test/fuzztest/updatetouchstate_fuzzer"
-  include_dirs = [ 
+  include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
-    "${mmi_path}/service/event_resample/include"
+    "${mmi_path}/service/event_resample/include",
+    "${mmi_path}/service/account_manager/include",
    ]
   cflags = [
     "-g",

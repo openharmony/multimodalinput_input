@@ -48,6 +48,7 @@ ohos_fuzztest("GetPointerSizeFuzzTest") {
     "${mmi_path}/service/product_type_config/include",
     "${mmi_path}/service/custom_config_parser/include",
     "${mmi_path}/service/common/include",
+    "${mmi_path}/service/account_manager/include",
   ]
   cflags = [
     "-g",

@@ -24,6 +24,8 @@ ohos_fuzztest("NotifyAddDeviceListenersFuzzTest") {
   include_dirs = [
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/account_manager/include",
+
   ]
   cflags = [
     "-g",
