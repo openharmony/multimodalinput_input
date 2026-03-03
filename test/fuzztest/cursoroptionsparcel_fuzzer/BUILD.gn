@@ -70,6 +70,7 @@ ohos_fuzztest("CursorOptionsParcelFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

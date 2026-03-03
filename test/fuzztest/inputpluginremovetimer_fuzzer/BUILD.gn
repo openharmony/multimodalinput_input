@@ -43,7 +43,10 @@ ohos_fuzztest("InputPluginRemoveTimerFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "inputpluginremovetimer_fuzzer.cpp" ]
+  sources = [
+    "inputpluginremovetimer_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-common",
@@ -59,6 +62,7 @@ ohos_fuzztest("InputPluginRemoveTimerFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "googletest:gtest_main",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",

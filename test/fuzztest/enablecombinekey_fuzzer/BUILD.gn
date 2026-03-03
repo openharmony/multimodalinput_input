@@ -62,7 +62,10 @@ ohos_fuzztest("EnableCombineKeyFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "enablecombinekey_fuzzer.cpp" ]
+  sources = [
+    "enablecombinekey_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -75,6 +78,7 @@ ohos_fuzztest("EnableCombineKeyFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",

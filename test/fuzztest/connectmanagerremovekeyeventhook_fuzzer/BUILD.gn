@@ -55,7 +55,10 @@ ohos_fuzztest("ConnectManagerRemoveKeyEventHookFuzzTest") {
     "-fno-omit-frame-pointer",
     "-g",
   ]
-  sources = [ "connectmanagerremovekeyeventhook_fuzzer.cpp" ]
+  sources = [
+    "connectmanagerremovekeyeventhook_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -73,6 +76,7 @@ ohos_fuzztest("ConnectManagerRemoveKeyEventHookFuzzTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
