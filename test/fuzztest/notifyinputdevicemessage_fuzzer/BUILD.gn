@@ -33,7 +33,10 @@ ohos_fuzztest("NotifyInputdeviceMessageFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "notifyinputdevicemessage_fuzzer.cpp" ]
+  sources = [
+    "notifyinputdevicemessage_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -44,6 +47,7 @@ ohos_fuzztest("NotifyInputdeviceMessageFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
   ]
 }

@@ -63,7 +63,10 @@ ohos_fuzztest("ModuleLoaderOnUnregisterDevListenerFuzzTest") {
     "${mmi_path}/service/filter:mmi_event_filter_config",
   ]
 
-  sources = [ "moduleloaderonunregisterdevlistener_fuzzer.cpp" ]
+  sources = [
+    "moduleloaderonunregisterdevlistener_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -76,6 +79,7 @@ ohos_fuzztest("ModuleLoaderOnUnregisterDevListenerFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

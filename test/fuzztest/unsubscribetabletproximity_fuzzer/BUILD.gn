@@ -63,7 +63,10 @@ ohos_fuzztest("UnsubscribeTabletProximityFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "unsubscribetabletproximity_fuzzer.cpp" ]
+  sources = [
+    "unsubscribetabletproximity_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -76,6 +79,7 @@ ohos_fuzztest("UnsubscribeTabletProximityFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
