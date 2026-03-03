@@ -44,7 +44,6 @@ ohos_fuzztest("InputEventFuzzTest") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/account_manager/include",
-
   ]
   cflags = [
     "-g",
