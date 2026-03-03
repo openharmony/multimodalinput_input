@@ -58,7 +58,10 @@ ohos_fuzztest("ConnectProxy17FuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "connectproxy17_fuzzer.cpp" ]
+  sources = [
+    "connectproxy17_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -76,6 +79,7 @@ ohos_fuzztest("ConnectProxy17FuzzTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

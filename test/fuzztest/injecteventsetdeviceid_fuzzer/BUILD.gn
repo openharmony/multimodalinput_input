@@ -79,7 +79,10 @@ ohos_fuzztest("InjecteventSetDeviceIdFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "injecteventsetdeviceid_fuzzer.cpp" ]
+  sources = [
+    "injecteventsetdeviceid_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
@@ -105,6 +108,7 @@ ohos_fuzztest("InjecteventSetDeviceIdFuzzTest") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",

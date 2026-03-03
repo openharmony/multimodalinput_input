@@ -71,6 +71,7 @@ ohos_fuzztest("AncoOneHandDataFuzzTest") {
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
