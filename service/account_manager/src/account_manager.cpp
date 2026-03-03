@@ -374,8 +374,8 @@ int32_t AccountManager::QueryCurrentAccountId()
 void AccountManager::AccountManagerUnregister()
 {
     // LCOV_EXCL_START
-    std::lock_guard<std::mutex> guard { lock_ };
     UnsubscribeCommonEvent();
+    std::lock_guard<std::mutex> guard { lock_ };
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
