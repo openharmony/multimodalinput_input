@@ -57,7 +57,10 @@ ohos_fuzztest("ParseProductNameMapFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "parseproductnamemap_fuzzer.cpp" ]
+  sources = [
+    "parseproductnamemap_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -70,6 +73,7 @@ ohos_fuzztest("ParseProductNameMapFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",

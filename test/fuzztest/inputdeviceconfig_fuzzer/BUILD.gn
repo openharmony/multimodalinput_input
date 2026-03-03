@@ -54,7 +54,10 @@ ohos_fuzztest("InputDeviceConfigFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "inputdeviceconfig_fuzzer.cpp" ]
+  sources = [
+    "inputdeviceconfig_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -67,6 +70,7 @@ ohos_fuzztest("InputDeviceConfigFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
