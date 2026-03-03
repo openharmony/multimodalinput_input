@@ -32,5 +32,7 @@ static void RegisterCleanup()
 {
     std::make_shared<ffrt::queue>("MMI_Fuzz")->submit([]{});
     std::atexit(CleanupAccountManager);
+}
+
 } // namespace MMI
 } // namespace OHOS
