@@ -753,5 +753,456 @@ HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetWorkerThreadI
     instance_->SetWorkerThreadId(tid);
     ASSERT_EQ(instance_->workerThreadId_, tid);
 }
+
+/**
+ * @tc.name: CursorDrawingComponentTest_LoadLibrary_001
+ * @tc.desc: Test LoadLibrary
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_LoadLibrary_001, TestSize.Level1)
+{
+    instance_->soHandle_ = nullptr;
+    bool ret = instance_->LoadLibrary();
+    if (instance_->soHandle_ == nullptr)
+    {
+        EXPECT_EQ(ret, false);
+    }
+    else
+    {
+        EXPECT_EQ(ret, true);
+    }
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_ResetUnloadTimer_002
+ * @tc.desc: Test ResetUnloadTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_ResetUnloadTimer_002, TestSize.Level1)
+{
+    int32_t unloadTime = 5000;
+    int32_t checkInterval = 1000;
+    instance_->timerId_ = -1;
+    bool ret = instance_->ResetUnloadTimer(unloadTime, checkInterval);
+    EXPECT_EQ(ret, true);
+    EXPECT_NE(instance_->timerId_, -1);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_AllPointerDeviceRemoved_001
+ * @tc.desc: Test AllPointerDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_AllPointerDeviceRemoved_001, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->AllPointerDeviceRemoved());
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->AllPointerDeviceRemoved());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_UpdateMouseLayer_001
+ * @tc.desc: Test UpdateMouseLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateMouseLayer_001, TestSize.Level1)
+{
+    int32_t x = 200;
+    int32_t y = 200;
+    instance_->isLoaded_ = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->UpdateMouseLayer(x, y));
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->UpdateMouseLayer(x, y));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_DrawNewDpiPointer_001
+ * @tc.desc: Test DrawNewDpiPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_DrawNewDpiPointer_001, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->DrawNewDpiPointer());
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->DrawNewDpiPointer());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_OnSwitchUser_001
+ * @tc.desc: Test OnSwitchUser
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_OnSwitchUser_001, TestSize.Level1)
+{
+    int32_t userId = 200;
+    instance_->isLoaded_ = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->OnSwitchUser(userId));
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->OnSwitchUser(userId));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_GetCurrentCursorInfo_001
+ * @tc.desc: Test GetCurrentCursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetCurrentCursorInfo_001, TestSize.Level1)
+{
+    bool visible = false;
+    PointerStyle style;
+    instance_->isLoaded_ = false;
+    int32_t ret = instance_->GetCurrentCursorInfo(visible, style);
+    EXPECT_EQ(ret, RET_OK);
+    instance_->isLoaded_ = true;
+    ret = instance_->GetCurrentCursorInfo(visible, style);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_InitDefaultMouseIconPath_001
+ * @tc.desc: Test InitDefaultMouseIconPath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_InitDefaultMouseIconPath_001, TestSize.Level1)
+{
+    EXPECT_NO_FATAL_FAILURE(instance_->InitDefaultMouseIconPath());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SwitchPointerStyle_001
+ * @tc.desc: Test SwitchPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SwitchPointerStyle_001, TestSize.Level1)
+{
+    EXPECT_NO_FATAL_FAILURE(instance_->SwitchPointerStyle());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_GetIconStyle_001
+ * @tc.desc: Test GetIconStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetIconStyle_001, TestSize.Level1)
+{
+    MOUSE_ICON style = MOUSE_ICON::DEFAULT;
+    instance_->isLoaded_ = false;
+    IconStyle ret = instance_->GetIconStyle(style);
+    EXPECT_EQ(ret.alignmentWay, 0);
+    instance_->isLoaded_ = true;
+    ret = instance_->GetIconStyle(style);
+    EXPECT_NE(ret.iconPath.empty(), true);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_UnLoad_003
+ * @tc.desc: Test UnLoad Uninstall Logic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UnLoad_003, TestSize.Level1)
+{
+    instance_->isLoaded_ = false;
+    instance_->soHandle_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(instance_->UnLoad());
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetMouseIcon_002
+ * @tc.desc: Test SetMouseIcon Illegal argument
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetMouseIcon_002, TestSize.Level1)
+{
+    int32_t userId = 100;
+    CursorPixelMap curPixelMap;
+    int32_t ret = instance_->SetMouseIcon(userId, -1, 1, curPixelMap);
+    EXPECT_EQ(ret, RET_ERR);
+    ret = instance_->SetMouseIcon(userId, 1, -1, curPixelMap);
+    EXPECT_EQ(ret, RET_ERR);
+    curPixelMap.pixelMap = nullptr;
+    ret = instance_->SetMouseIcon(userId, 1, 1, curPixelMap);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_002
+ * @tc.desc: Test SetPointerVisible with invisible state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_002, TestSize.Level1)
+{
+    int32_t pid = 2;
+    bool visible = false;
+    int32_t priority = 0;
+    instance_->SetPointerVisible(pid, visible, priority, false);
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, visible);
+    ret = instance_->IsPointerVisible();
+    EXPECT_EQ(ret, visible);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_003
+ * @tc.desc: Test SetPointerVisible with different priority
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_003, TestSize.Level1)
+{
+    int32_t pid = 3;
+    bool visible = true;
+    int32_t priority = 1;
+    instance_->SetPointerVisible(pid, visible, priority, false);
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, visible);
+    ret = instance_->IsPointerVisible();
+    EXPECT_EQ(ret, visible);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_004
+ * @tc.desc: Test SetPointerVisible for HAP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_004, TestSize.Level1)
+{
+    int32_t pid = 4;
+    bool visible = true;
+    int32_t priority = 0;
+    instance_->SetPointerVisible(pid, visible, priority, true);
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, visible);
+    ret = instance_->IsPointerVisible();
+    EXPECT_EQ(ret, visible);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_005
+ * @tc.desc: Test SetPointerVisible multiple PIDs
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_005, TestSize.Level1)
+{
+    int32_t pid1 = 5;
+    int32_t pid2 = 6;
+    bool visible1 = true;
+    bool visible2 = false;
+    instance_->SetPointerVisible(pid1, visible1, 0, false);
+    instance_->SetPointerVisible(pid2, visible2, 0, false);
+    bool ret1 = instance_->GetPointerVisible(pid1);
+    bool ret2 = instance_->GetPointerVisible(pid2);
+    EXPECT_EQ(ret1, visible1);
+    EXPECT_EQ(ret2, visible2);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid1));
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid2));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_006
+ * @tc.desc: Test SetPointerVisible update existing PID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_006, TestSize.Level1)
+{
+    int32_t pid = 7;
+    instance_->SetPointerVisible(pid, true, 0, false);
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, true);
+
+    instance_->SetPointerVisible(pid, false, 0, false);
+    ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, false);
+
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_007
+ * @tc.desc: Test SetPointerVisible with non-existent PID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_007, TestSize.Level1)
+{
+    int32_t pid = 8;
+    bool visible = true;
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, true);
+
+    instance_->SetPointerVisible(pid, visible, 0, false);
+    ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, visible);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_010
+ * @tc.desc: Test updating existing HAP PID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_010, TestSize.Level1)
+{
+    int32_t pid = 100;
+    instance_->SetPointerVisible(pid, true, 0, true);
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, true);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_011
+ * @tc.desc: Test when pointerInstance is null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_011, TestSize.Level1)
+{
+    int32_t pid = 101;
+    int32_t result = instance_->SetPointerVisible(pid, true, 0, true);
+    EXPECT_EQ(result, RET_OK);
+
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, true);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_012
+ * @tc.desc: Test drag state with non-zero priority
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_012, TestSize.Level1)
+{
+    int32_t pid = 102;
+    bool visible = true;
+    int32_t priority = 1;
+
+    int32_t result = instance_->SetPointerVisible(pid, visible, priority, false);
+    EXPECT_EQ(result, RET_OK);
+
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, visible);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_013
+ * @tc.desc: Test drag state with visible=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_013, TestSize.Level1)
+{
+    int32_t pid = 103;
+    bool visible = false;
+    int32_t priority = 0;
+
+    int32_t result = instance_->SetPointerVisible(pid, visible, priority, false);
+    EXPECT_EQ(result, RET_OK);
+
+    bool ret = instance_->GetPointerVisible(pid);
+    EXPECT_EQ(ret, visible);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerVisible_014
+ * @tc.desc: Test conditional update for pointer visibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerVisible_014, TestSize.Level1)
+{
+    int32_t pid = 104;
+    int32_t result = instance_->SetPointerVisible(pid, true, 0, false);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_NO_FATAL_FAILURE(instance_->DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_UpdateBindDisplayId_001
+ * @tc.desc: Test UpdateBindDisplayId with valid rsId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_UpdateBindDisplayId_001, TestSize.Level1)
+{
+    uint64_t rsId = 1001;
+    instance_->isLoaded_ = false;
+    EXPECT_NO_FATAL_FAILURE(instance_->UpdateBindDisplayId(rsId));
+
+    instance_->isLoaded_ = true;
+    EXPECT_NO_FATAL_FAILURE(instance_->UpdateBindDisplayId(rsId));
+
+    uint64_t invalidRsId = 0;
+    EXPECT_NO_FATAL_FAILURE(instance_->UpdateBindDisplayId(invalidRsId));
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_SetPointerStyle_002
+ * @tc.desc: Test SetPointerStyle with GLOBAL_WINDOW_ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_SetPointerStyle_002, TestSize.Level1)
+{
+    constexpr int32_t CURSOR_CIRCLE_STYLE{41};
+    int32_t userId = 0;
+    int32_t pid = 1;
+    int32_t windowId = GLOBAL_WINDOW_ID;
+    PointerStyle pointerStyle;
+    pointerStyle.id = CURSOR_CIRCLE_STYLE;
+    bool isUiExtension = false;
+
+    int32_t ret = instance_->SetPointerStyle(userId, pid, windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(ret, RET_OK);
+
+    PointerStyle invalidStyle;
+    invalidStyle.id = -1;
+    ret = instance_->SetPointerStyle(userId, pid, windowId, invalidStyle, isUiExtension);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: CursorDrawingComponentTest_GetPointerInstance_001
+ * @tc.desc: Test GetPointerInstance with lock and time update
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CursorDrawingComponentTest, CursorDrawingComponentTest_GetPointerInstance_001, TestSize.Level1)
+{
+    instance_->isLoaded_ = true;
+    instance_->pointerInstance_ = nullptr;
+    IPointerDrawingManager *ret = instance_->GetPointerInstance();
+    EXPECT_EQ(ret, nullptr);
+
+    instance_->isLoaded_ = false;
+    ret = instance_->GetPointerInstance();
+    EXPECT_EQ(ret, nullptr);
+}
+
 } // namespace MMI
 } // namespace OHOS
