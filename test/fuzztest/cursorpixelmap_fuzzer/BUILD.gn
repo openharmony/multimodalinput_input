@@ -56,6 +56,7 @@ ohos_fuzztest("CursorPixelMapFuzzTest") {
   sources = [
     "cursorpixelmap_fuzzer.cpp",
     "${mmi_path}/frameworks/proxy/events/src/pointer_style.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
   ]
 
   deps = [
