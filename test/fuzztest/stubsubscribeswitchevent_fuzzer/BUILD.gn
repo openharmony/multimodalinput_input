@@ -47,6 +47,7 @@ ohos_fuzztest("StubSubscribeSwitchEventFuzzTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/account_manager/include",
   ]
   cflags = [
     "-g",

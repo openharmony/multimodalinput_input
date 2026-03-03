@@ -27,6 +27,7 @@ ohos_fuzztest("InputPluginRemoveTimerFuzzTest") {
     "${mmi_path}/util/common/include",
     "${mmi_service_path}/product_property_config/include",
     "${mmi_service_path}/custom_config_parser/include",
+    "${mmi_path}/service/account_manager/include",
   ]
   configs = [
     "${mmi_path}:coverage_flags",

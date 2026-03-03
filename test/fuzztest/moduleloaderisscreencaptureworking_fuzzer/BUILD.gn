@@ -45,6 +45,7 @@ ohos_fuzztest("ModuleLoaderIsScreenCaptureWorkingFuzzTest") {
     "${mmi_path}/service/event_hook/include",
     "${mmi_path}/service/event_hook/include/hook",
     "${mmi_path}/service/event_hook/include/checker",
+    "${mmi_path}/service/account_manager/include",
   ]
   cflags = [
     "-g",

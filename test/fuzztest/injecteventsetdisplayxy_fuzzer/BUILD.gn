@@ -65,6 +65,8 @@ ohos_fuzztest("InjecteventSetDisplayXYFuzzTest") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/account_manager/include",
+
   ]
   cflags = [
     "-g",
