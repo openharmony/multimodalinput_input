@@ -24,6 +24,7 @@ ohos_fuzztest("ConnectManagerDispatchToNextHandlerFuzzTest") {
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/event_dispatch/include",

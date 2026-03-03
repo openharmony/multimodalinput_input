@@ -49,6 +49,7 @@ ohos_fuzztest("ParseProductNameMapFuzzTest") {
     "${mmi_path}/service/custom_config_parser/include",
     "${mmi_path}/service/product_property_config/include",
     "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",

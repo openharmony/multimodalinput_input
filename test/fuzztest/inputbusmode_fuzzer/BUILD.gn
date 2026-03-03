@@ -46,6 +46,7 @@ ohos_fuzztest("InputBusModeFuzzTest") {
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",
