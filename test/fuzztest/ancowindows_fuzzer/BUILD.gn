@@ -56,6 +56,7 @@ ohos_fuzztest("AncoWindowsFuzzTest") {
   sources = [
     "ancowindows_fuzzer.cpp",
     "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp"
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
   ]
 
   deps = [
