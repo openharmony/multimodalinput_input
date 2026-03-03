@@ -54,6 +54,7 @@ ohos_fuzztest("WindowManagerSkipPointerLayerFuzzTest") {
     "graphic_2d:librender_service_base",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "data_share:datashare_consumer",
   ]
 }
 

@@ -51,6 +51,7 @@ ohos_fuzztest("NotifyAddDeviceListenersFuzzTest") {
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "data_share:datashare_consumer",
   ]
 }
 
