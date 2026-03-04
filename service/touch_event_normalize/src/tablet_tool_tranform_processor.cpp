@@ -15,7 +15,11 @@
 
 #include "tablet_tool_tranform_processor.h"
 
+#include <linux/input.h>
+
 #include "i_input_windows_manager.h"
+#include "input_device_manager.h"
+#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -26,6 +30,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
+constexpr char CONFIG_NAME[] { "etc/input/input_product_config.json" };
+constexpr double DEFAULT_PRECISION { 0.01 };
+constexpr double CONSTANT_TWO { 2.0 };
 } // namespace
 
 TabletToolTransformProcessor::TabletToolTransformProcessor(int32_t deviceId)
@@ -66,12 +73,18 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
             }
             break;
         }
+        case LIBINPUT_EVENT_TABLET_TOOL_BUTTON: {
+            if (!OnToolButton(event)) {
+                MMI_HILOGE("OnToolButton failed");
+                return nullptr;
+            }
+            break;
+        }
         default: {
             MMI_HILOGE("Unexpected event type");
             return nullptr;
         }
     }
-    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
@@ -164,8 +177,9 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetDeviceId(deviceId_);
     int32_t toolType = GetToolType(event);
     item.SetToolType(toolType);
-    if (!WIN_MGR->CalculateTipPoint(event, targetDisplayId, tCoord, item)) {
-        MMI_HILOGE("CalculateTipPoint failed");
+
+    if (!CalculateCalibratedTipPoint(event, targetDisplayId, tCoord, item)) {
+        MMI_HILOGE("CalculateCalibratedTipPoint failed");
         return false;
     }
     double tiltX = libinput_event_tablet_tool_get_tilt_x(event);
@@ -176,13 +190,12 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     uint64_t time = libinput_event_tablet_tool_get_time_usec(event);
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetTargetDisplayId(targetDisplayId);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
-    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetDisplayXPos(tCoord.x);
     item.SetDisplayYPos(tCoord.y);
     item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
@@ -206,6 +219,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
     CHKPF(tabletEvent);
     uint64_t time = libinput_event_tablet_tool_get_time_usec(tabletEvent);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->SetActionTime(time);
     if (IsTouching(tabletEvent)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -233,13 +247,13 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     int32_t twist = libinput_event_tablet_tool_get_twist(tabletEvent);
 
     item.SetToolType(toolType);
+
     PhysicalCoordinate tCoord;
-    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord, item)) {
-        MMI_HILOGE("CalculateTipPoint failed");
+    if (!CalculateCalibratedTipPoint(tabletEvent, targetDisplayId, tCoord, item)) {
+        MMI_HILOGE("CalculateCalibratedTipPoint failed");
         return false;
     }
-    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
-    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
+
     item.SetDisplayXPos(tCoord.x);
     item.SetDisplayYPos(tCoord.y);
     item.SetRawDisplayX(static_cast<int32_t>(tCoord.x));
@@ -258,6 +272,7 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
     CHKPF(event);
     uint64_t time = libinput_event_tablet_tool_get_time_usec(event);
     pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem item;
@@ -278,6 +293,7 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
     CHKPF(tabletEvent);
     uint64_t time = libinput_event_tablet_tool_get_time_usec(tabletEvent);
     pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
     bool tabletProximityState = libinput_event_tablet_tool_get_proximity_state(tabletEvent);
     if (tabletProximityState) {
@@ -309,13 +325,13 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
     item.SetDownTime(time);
     item.SetPressed(false);
     item.SetToolType(toolType);
-    PhysicalCoordinate coord;
-    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord, item)) {
-        MMI_HILOGE("CalculateTipPoint failed");
+
+    PhysicalCoordinate coord {};
+    if (!CalculateCalibratedTipPoint(tabletEvent, targetDisplayId, coord, item)) {
+        MMI_HILOGE("CalculateCalibratedTipPoint failed");
         return false;
     }
-    item.SetDisplayX(static_cast<int32_t>(coord.x));
-    item.SetDisplayY(static_cast<int32_t>(coord.y));
+
     item.SetDisplayXPos(coord.x);
     item.SetDisplayYPos(coord.y);
     item.SetRawDisplayX(static_cast<int32_t>(coord.x));
@@ -335,6 +351,10 @@ bool TabletToolTransformProcessor::IsTouching(struct libinput_event_tablet_tool*
 
 void TabletToolTransformProcessor::DrawTouchGraphic()
 {
+    if ((pointerEvent_ == nullptr) ||
+        (pointerEvent_->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
+        return;
+    }
     CHKPV(current_);
     current_();
 }
@@ -410,6 +430,328 @@ void TabletToolTransformProcessor::DrawTouchGraphicDrawing()
         pointerItem.SetPressed(originalPressedStatus);
         pointerEvent_->UpdatePointerItem(pointerId, pointerItem);
     }
+}
+
+bool TabletToolTransformProcessor::OnToolButton(struct libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
+    auto tabletEvent = libinput_event_get_tablet_tool_event(event);
+    CHKPF(tabletEvent);
+    auto button = libinput_event_tablet_tool_get_button(tabletEvent);
+    if (button != BTN_STYLUS) {
+        return false;
+    }
+    auto winMgr = WIN_MGR;
+    if (winMgr == nullptr) {
+        MMI_HILOGE("WinMgr is null");
+        return false;
+    }
+    auto mouseInfo = winMgr->GetMouseInfo();
+    auto time = GetSysClockTime();
+    auto toolType = GetToolType(tabletEvent);
+
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
+    pointerEvent_->SetDeviceId(deviceId_);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
+    pointerEvent_->SetTargetWindowId(-1);
+    pointerEvent_->SetAgentWindowId(-1);
+    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
+
+    auto btnState = libinput_event_tablet_tool_get_button_state(tabletEvent);
+    if (btnState == LIBINPUT_BUTTON_STATE_PRESSED) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+        pointerEvent_->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
+    } else {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+        pointerEvent_->DeleteReleaseButton(PointerEvent::MOUSE_BUTTON_RIGHT);
+    }
+
+    PointerEvent::PointerItem mouseItem {};
+    mouseItem.SetPointerId(DEFAULT_POINTER_ID);
+    mouseItem.SetDeviceId(deviceId_);
+    mouseItem.SetToolType(toolType);
+    mouseItem.SetPressed(btnState == LIBINPUT_BUTTON_STATE_PRESSED);
+    mouseItem.SetDownTime(time);
+    mouseItem.SetDisplayXPos(mouseInfo.physicalX);
+    mouseItem.SetDisplayYPos(mouseInfo.physicalY);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, mouseItem);
+
+    MMI_HILOGI("Tablet tool button(%{public}d) %{public}s", button, (mouseItem.IsPressed()? "pressed" : "released"));
+    return true;
+}
+
+bool TabletToolTransformProcessor::IsTabletPointer() const
+{
+    return INPUT_DEV_MGR->CheckDevice(deviceId_,
+        [](const IInputDeviceManager::IInputDevice &dev) {
+            return dev.IsMouse();
+        });
+}
+
+bool TabletToolTransformProcessor::InitializeCalibration(struct libinput_device* device, int32_t displayId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(device);
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(displayId);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("Failed to get display info for displayId:%{public}d", displayId);
+        return false;
+    }
+    TabletCalibration calib {};
+    InitializeDefaultCalibration(device, *displayInfo, calib);
+
+    if (TabletToolTransformProcessor::IsCalibrationEnabled()) {
+        CalculateCalibration(*displayInfo, calib);
+    }
+
+    MMI_HILOGI("Calibration saved for displayId:%{public}d, ScreenInfo:%{public}dx%{public}d, direction:%{public}d",
+        calib.displayId, calib.screenWidth, calib.screenHeight, static_cast<int32_t>(calib.screenDirection));
+    calibration_ = calib;
+    return true;
+}
+
+void TabletToolTransformProcessor::InitializeDefaultCalibration(
+    struct libinput_device* device, const OLD::DisplayInfo& displayInfo, TabletCalibration &calib)
+{
+    if (device == nullptr) {
+        return;
+    }
+    calib.tabletMinX = libinput_device_get_axis_min(device, ABS_X);
+    calib.tabletMaxX = libinput_device_get_axis_max(device, ABS_X);
+    calib.tabletMinY = libinput_device_get_axis_min(device, ABS_Y);
+    calib.tabletMaxY = libinput_device_get_axis_max(device, ABS_Y);
+    MMI_HILOGI("Tablet original area: X[%{public}.0f, %{public}.0f], Y[%{public}.0f, %{public}.0f]",
+        calib.tabletMinX, calib.tabletMaxX, calib.tabletMinY, calib.tabletMaxY);
+    calib.calibratedMinX = calib.tabletMinX;
+    calib.calibratedMaxX = calib.tabletMaxX;
+    calib.calibratedMinY = calib.tabletMinY;
+    calib.calibratedMaxY = calib.tabletMaxY;
+    calib.displayId = displayInfo.id;
+    calib.screenWidth = displayInfo.validWidth;
+    calib.screenHeight = displayInfo.validHeight;
+    calib.screenDirection = displayInfo.direction;
+}
+
+void TabletToolTransformProcessor::CalculateCalibration(const OLD::DisplayInfo& displayInfo, TabletCalibration &calib)
+{
+    double tabletWidth = calib.tabletMaxX - calib.tabletMinX;
+    double tabletHeight = calib.tabletMaxY - calib.tabletMinY;
+    double screenWidth = displayInfo.validWidth;
+    double screenHeight = displayInfo.validHeight;
+
+    if ((tabletWidth < DEFAULT_PRECISION) ||
+        (tabletHeight < DEFAULT_PRECISION) ||
+        (screenWidth < DEFAULT_PRECISION) ||
+        (screenHeight < DEFAULT_PRECISION)) {
+        MMI_HILOGE("Tablet or screen size is zero");
+        return;
+    }
+
+    if (((tabletWidth > tabletHeight) && (screenWidth < screenHeight)) ||
+        ((tabletWidth < tabletHeight) && (screenWidth > screenHeight))) {
+        std::swap(screenWidth, screenHeight);
+    }
+    double tabletRatio = tabletWidth / tabletHeight;
+    double screenRatio = screenWidth / screenHeight;
+
+    MMI_HILOGI("Tablet ratio: %{public}.3f (%{public}.0fx%{public}.0f)", tabletRatio, tabletWidth, tabletHeight);
+    MMI_HILOGI("Screen ratio: %{public}.3f (%{public}.0fx%{public}.0f, displayId:%{public}d)",
+        screenRatio, screenWidth, screenHeight, displayInfo.id);
+
+    if (tabletRatio > screenRatio) {
+        double newHeight = tabletHeight;
+        double newWidth = newHeight * screenRatio;
+
+        calib.calibratedMinX = (tabletWidth - newWidth) / CONSTANT_TWO + calib.tabletMinX;
+        calib.calibratedMaxX = calib.calibratedMinX + newWidth;
+        calib.calibratedMinY = calib.tabletMinY;
+        calib.calibratedMaxY = calib.tabletMaxY;
+    } else {
+        double newWidth = tabletWidth;
+        double newHeight = newWidth / screenRatio;
+
+        calib.calibratedMinX = calib.tabletMinX;
+        calib.calibratedMaxX = calib.tabletMaxX;
+        calib.calibratedMinY = (tabletHeight - newHeight) / CONSTANT_TWO + calib.tabletMinY;
+        calib.calibratedMaxY = calib.calibratedMinY + newHeight;
+    }
+
+    MMI_HILOGI("Calibrated area: X[%{public}.0f, %{public}.0f], Y[%{public}.0f, %{public}.0f]",
+        calib.calibratedMinX, calib.calibratedMaxX, calib.calibratedMinY, calib.calibratedMaxY);
+}
+
+bool TabletToolTransformProcessor::CalculateCalibratedTipPoint(struct libinput_event_tablet_tool* tabletEvent,
+    int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(tabletEvent);
+    if (IsTabletPointer()) {
+        MMI_HILOGD("Associated tablet (INPUT_PROP_POINTER), use calibration path");
+        return CalculateWithCalibration(tabletEvent, targetDisplayId, coord);
+    }
+    MMI_HILOGD("Independent tablet (INPUT_PROP_DIRECT), use original CalculateTipPoint");
+    return WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, coord, pointerItem);
+}
+
+bool TabletToolTransformProcessor::IsScreenChanged(int32_t currentDisplayId) const
+{
+    if (!calibration_.has_value()) {
+        return false;
+    }
+
+    if (calibration_->displayId != currentDisplayId) {
+        MMI_HILOGI("Target display changed: %{public}d -> %{public}d",
+            calibration_->displayId, currentDisplayId);
+        return true;
+    }
+
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(currentDisplayId);
+    if (displayInfo == nullptr) {
+        MMI_HILOGW("Failed to get display info for displayId:%{public}d", currentDisplayId);
+        return false;
+    }
+
+    if ((calibration_->screenWidth != displayInfo->validWidth) ||
+        (calibration_->screenHeight != displayInfo->validHeight) ||
+        (calibration_->screenDirection != displayInfo->direction)) {
+        MMI_HILOGI("Screen (displayId:%{public}d) properties changed:"
+            "[%{public}dx%{public}d, %{public}d] -> [%{public}dx%{public}d, %{public}d]",
+            currentDisplayId,
+            calibration_->screenWidth, calibration_->screenHeight,
+            static_cast<int32_t>(calibration_->screenDirection),
+            displayInfo->width, displayInfo->height,
+            static_cast<int32_t>(displayInfo->direction));
+        return true;
+    }
+
+    return false;
+}
+
+bool TabletToolTransformProcessor::CalculateScreenCoordinateWithCalibration(
+    struct libinput_event_tablet_tool* tabletEvent,
+    const OLD::DisplayInfo& displayInfo, PhysicalCoordinate& coord)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(tabletEvent);
+    if (!calibration_) {
+        return false;
+    }
+    double tabletWidth = calibration_->tabletMaxX - calibration_->tabletMinX;
+    double tabletHeight = calibration_->tabletMaxY - calibration_->tabletMinY;
+    if ((tabletWidth < DEFAULT_PRECISION) || (tabletHeight < DEFAULT_PRECISION)) {
+        return false;
+    }
+    double rawX = libinput_event_tablet_tool_get_x_transformed(tabletEvent, static_cast<uint32_t>(tabletWidth));
+    double rawY = libinput_event_tablet_tool_get_y_transformed(tabletEvent, static_cast<uint32_t>(tabletHeight));
+    MMI_HILOGD("Raw hardware coordinates: (%.1f, %.1f)", rawX, rawY);
+
+    if ((rawX < calibration_->calibratedMinX) || (rawX >= calibration_->calibratedMaxX) ||
+        (rawY < calibration_->calibratedMinY) || (rawY >= calibration_->calibratedMaxY)) {
+        return false;
+    }
+    double calibratedWidth = calibration_->calibratedMaxX - calibration_->calibratedMinX;
+    double calibratedHeight = calibration_->calibratedMaxY - calibration_->calibratedMinY;
+    if ((calibratedWidth < DEFAULT_PRECISION) || (calibratedHeight < DEFAULT_PRECISION)) {
+        return false;
+    }
+    double normalizedX = (rawX - calibration_->calibratedMinX) / calibratedWidth;
+    double normalizedY = (rawY - calibration_->calibratedMinY) / calibratedHeight;
+    double screenWidth = displayInfo.validWidth;
+    double screenHeight = displayInfo.validHeight;
+
+    if (((tabletWidth > tabletHeight) && (screenWidth < screenHeight)) ||
+        ((tabletWidth < tabletHeight) && (screenWidth > screenHeight))) {
+        coord.x = (1.0 - normalizedY) * screenWidth;
+        coord.y = normalizedX * screenHeight;
+    } else {
+        coord.x = normalizedX * screenWidth;
+        coord.y = normalizedY * screenHeight;
+    }
+    MMI_HILOGD("Calibrated screen coordinates: (%.1f, %.1f)", coord.x, coord.y);
+    return true;
+}
+
+bool TabletToolTransformProcessor::CalculateWithCalibration(
+    struct libinput_event_tablet_tool* tabletEvent, int32_t& targetDisplayId, PhysicalCoordinate& coord)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(tabletEvent);
+    int32_t displayIdForCalibration = targetDisplayId;
+
+    if (displayIdForCalibration < 0) {
+        displayIdForCalibration = WIN_MGR->GetMainDisplayId();
+    }
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(displayIdForCalibration);
+    if (displayInfo == nullptr) {
+        MMI_HILOGE("No display(%{public}d)", displayIdForCalibration);
+        return false;
+    }
+    targetDisplayId = displayIdForCalibration;
+
+    if (!calibration_ || IsScreenChanged(displayIdForCalibration)) {
+        INPUT_DEV_MGR->ForDevice(deviceId_,
+            [this, displayIdForCalibration](const IInputDeviceManager::IInputDevice &dev) {
+                InitializeCalibration(dev.GetRawDevice(), displayIdForCalibration);
+            });
+    }
+    if (!CalculateScreenCoordinateWithCalibration(tabletEvent, *displayInfo, coord)) {
+        MMI_HILOGE("CalculateScreenCoordinateWithCalibration failed");
+        return false;
+    }
+    return true;
+}
+
+bool TabletToolTransformProcessor::IsCalibrationEnabled()
+{
+    static bool calibrationEnabled { false };
+    static std::once_flag flag;
+
+    std::call_once(flag, []() {
+        TabletToolTransformProcessor::LoadProductConfig(calibrationEnabled);
+    });
+    return calibrationEnabled;
+}
+
+void TabletToolTransformProcessor::LoadProductConfig(bool &enabled)
+{
+    enabled = false;
+    LoadConfig(CONFIG_NAME,
+        [&enabled](const char* cfgPath, cJSON* jsonCfg) {
+            return ReadTabletCalibrationConfig(cfgPath, jsonCfg, enabled);
+        });
+}
+
+bool TabletToolTransformProcessor::ReadTabletCalibrationConfig(const char* cfgPath, cJSON* jsonCfg, bool& enabled)
+{
+    if (!cJSON_IsObject(jsonCfg)) {
+        MMI_HILOGE("Config is not json object");
+        return false;
+    }
+    cJSON *jsonTabletCalibration = cJSON_GetObjectItemCaseSensitive(jsonCfg, "TabletCalibration");
+    if (jsonTabletCalibration == nullptr) {
+        MMI_HILOGE("Invalid config(%{private}s): no 'TabletCalibration'", cfgPath);
+        return true;
+    }
+    if (!cJSON_IsObject(jsonTabletCalibration)) {
+        MMI_HILOGE("TabletCalibration is not object");
+        return false;
+    }
+    cJSON *jsonEnabled = cJSON_GetObjectItemCaseSensitive(jsonTabletCalibration, "enabled");
+    if (jsonEnabled == nullptr) {
+        MMI_HILOGE("Invalid config(%{private}s): no 'TabletCalibration.enabled'", cfgPath);
+        return true;
+    }
+    if (!cJSON_IsBool(jsonEnabled)) {
+        MMI_HILOGE("enabled is not boolean");
+        return false;
+    }
+    enabled = cJSON_IsTrue(jsonEnabled);
+    MMI_HILOGI("Tablet calibration config loaded from '%{private}s'", cfgPath);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -40,6 +40,16 @@ enum libinput_tablet_tool_tip_state libinput_event_tablet_tool_get_tip_state(str
     return g_instance->TabletToolGetTipState(event);
 }
 
+uint32_t libinput_event_tablet_tool_get_button(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetButton(event);
+}
+
+enum libinput_button_state libinput_event_tablet_tool_get_button_state(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetButtonState(event);
+}
+
 double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *event)
 {
     return g_instance->TabletToolGetTiltX(event);
@@ -372,12 +382,12 @@ unsigned int libinput_device_get_id_vendor(struct libinput_device *device)
 
 const char* libinput_device_get_phys(struct libinput_device* device)
 {
-    return "";
+    return g_instance->DeviceGetPhys(device);
 }
 
 const char* libinput_device_get_uniq(struct libinput_device* device)
 {
-    return "";
+    return g_instance->DeviceGetUniq(device);
 }
 
 const char* libinput_device_get_sysname(struct libinput_device *device)
@@ -408,6 +418,11 @@ enum evdev_device_udev_tags libinput_device_get_tags(struct libinput_device* dev
 int libinput_device_has_capability(struct libinput_device *device, enum libinput_device_capability capability)
 {
     return ((g_instance != nullptr) ? g_instance->DeviceHasCapability(device, capability) : false);
+}
+
+int libinput_device_has_property(struct libinput_device *device, unsigned int property)
+{
+    return ((g_instance != nullptr) ? g_instance->DeviceHasProperty(device, property) : false);
 }
 
 int32_t libinput_device_has_key(struct libinput_device* device, int32_t keyCode)

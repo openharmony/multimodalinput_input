@@ -80,9 +80,8 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
     "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
+    "${mmi_path}/test/facility/window_manager_mock:window_manager_mock",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/service:libmmi-server-common",
   ]
 
   external_deps = [

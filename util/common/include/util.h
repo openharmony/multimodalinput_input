@@ -16,12 +16,15 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <functional>
 #include <map>
 #include <set>
 
 #include "mmi_log.h"
 #include "define_multimodal.h"
 #include "struct_multimodal.h"
+
+struct cJSON;
 
 namespace OHOS {
 
@@ -232,6 +235,10 @@ std::enable_if_t<IsStreamable<T>::value, std::string> DumpVec(const std::vector<
 }
 
 bool IsInteger(const char *target);
+
+using ConfigReadCallback = std::function<bool(const char *cfgPath, cJSON *jsonCfg)>;
+bool LoadConfig(const char *cfgName, ConfigReadCallback callback);
+
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H

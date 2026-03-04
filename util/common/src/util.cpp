@@ -15,6 +15,7 @@
 
 #include "util.h"
 #include <fstream>
+#include <filesystem>
 #include <regex>
 
 #include <sys/prctl.h>
@@ -24,6 +25,8 @@
 
 #include "accesstoken_kit.h"
 #include "app_mgr_client.h"
+#include "cJSON.h"
+#include "config_policy_utils.h"
 #include "singleton.h"
 
 #include "aggregator.h"
@@ -62,6 +65,7 @@ const std::string COLOR_PREFIX = "#";
 const char COLOR_FILL = '0';
 constexpr int64_t TIME_ROUND_UP { 999 };
 std::atomic<bool> g_isAccessTokenReady { false };
+constexpr std::uintmax_t MAX_SIZE_OF_CONFIG_FILE { 524288 }; // 512KB
 } // namespace
 
 int64_t GetSysClockTime()
@@ -769,6 +773,72 @@ Aggregator::~Aggregator()
         removeTimer_(timerId_);
     }
     FlushRecords(MMI_LOG_HEADER);
+}
+
+static bool LoadConfig1(const char *cfgPath, std::function<bool(const char*, cJSON*)> load)
+{
+    if (load == nullptr) {
+        MMI_HILOGE("LoadConfig1 load is nullptr");
+        return false;
+    }
+    std::error_code ec {};
+    auto realPath = std::filesystem::canonical(cfgPath, ec);
+    if (ec || !std::filesystem::exists(realPath, ec)) {
+        MMI_HILOGE("'%{private}s' is not real", cfgPath);
+        return false;
+    }
+    auto fsize = std::filesystem::file_size(realPath, ec);
+    if (ec || (fsize > MAX_SIZE_OF_CONFIG_FILE)) {
+        MMI_HILOGE("Unexpected size of PointerMotionAccelerationConfig");
+        return false;
+    }
+    std::ifstream ifs(realPath);
+    if (!ifs.is_open()) {
+        MMI_HILOGE("Can not open config");
+        return false;
+    }
+    std::string sConfig { std::istream_iterator<char>(ifs), std::istream_iterator<char>() };
+    auto jsonCfg = std::unique_ptr<cJSON, std::function<void(cJSON *)>>(
+        cJSON_Parse(sConfig.c_str()),
+        [](cJSON *object) {
+            if (object != nullptr) {
+                cJSON_Delete(object);
+            }
+        });
+    if (jsonCfg == nullptr) {
+        MMI_HILOGE("'%{private}s' is not json", cfgPath);
+        return false;
+    }
+    return load(cfgPath, jsonCfg.get());
+}
+
+bool LoadConfig(const char *cfgName, ConfigReadCallback load)
+{
+    auto cfgNames = std::unique_ptr<CfgFiles, std::function<void(CfgFiles*)>>(
+        ::GetCfgFiles(cfgName),
+        [](CfgFiles *names) {
+            if (names != nullptr) {
+                ::FreeCfgFiles(names);
+            }
+        });
+    if (cfgNames == nullptr) {
+        MMI_HILOGW("Can not find config(%{private}s)", cfgName);
+        return false;
+    }
+
+    for (int32_t index = MAX_CFG_POLICY_DIRS_CNT - 1; index >= 0; --index) {
+        if (cfgNames->paths[index] == nullptr) {
+            continue;
+        }
+        MMI_HILOGD("Try loading config from '%{private}s'", cfgNames->paths[index]);
+        if (LoadConfig1(cfgNames->paths[index], load)) {
+            MMI_HILOGI("Load config from '%{private}s' succeeded", cfgNames->paths[index]);
+            return true;
+        }
+    }
+
+    MMI_HILOGW("Can not load config(%{private}s) from all paths", cfgName);
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS
