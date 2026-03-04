@@ -3975,5 +3975,98 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ClearScreenPointer
     pointerDrawingManager.ClearScreenPointer();
     ASSERT_EQ(pointerDrawingManager.screenPointers_.size(), 0);
 }
+
+/**
+ * @tc.name: CreatePointerWindowForScreenPointer_006
+ * @tc.desc: Test CreatePointerWindowForScreenPointer with g_isRsRestart=true and screenPointers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, CreatePointerWindowForScreenPointer_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto *pointerDrawingManager = static_cast<PointerDrawingManager *>(IPointerDrawingManager::GetInstance());
+    ASSERT_NE(pointerDrawingManager, nullptr);
+
+    int32_t rsId = 1;
+    int32_t physicalX = 0;
+    int32_t physicalY = 0;
+
+    OLD::DisplayInfo displayInfo_;
+    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, displayInfo_);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager->screenPointers_[rsId] = sp;
+
+    OLD::DisplayInfo displaysInfo_;
+    displaysInfo_.rsId = 2;
+    pointerDrawingManager->displayInfo_ = displaysInfo_;
+
+    g_isRsRestart.store(true);
+    int32_t result = pointerDrawingManager->CreatePointerWindowForScreenPointer(rsId, physicalX, physicalY);
+    EXPECT_NE(result, RET_OK);
+    g_isRsRestart.store(false);
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_007
+ * @tc.desc: Test UpdateScreenPointerAndFindMainScreenInfo with surfaceNode_ not null (needDrawPointer=true)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window test";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(0);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screens.push_back(screen);
+
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, screen);
+    EXPECT_FALSE(pointerDrawingManager.screenPointers_.empty());
+}
+
+/**
+ * @tc.name: UpdateScreenPointerAndFindMainScreenInfo_008
+ * @tc.desc: Test UpdateScreenPointerAndFindMainScreenInfo with existing screenPointers and surfaceNode_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, UpdateScreenPointerAndFindMainScreenInfo_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window test";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+
+    std::vector<sptr<OHOS::Rosen::ScreenInfo>> screens;
+    sptr<OHOS::Rosen::ScreenInfo> screen = new OHOS::Rosen::ScreenInfo();
+    ASSERT_NE(screen, nullptr);
+    screen->SetRsId(0);
+    screen->SetType(OHOS::Rosen::ScreenType::REAL);
+    screen->SetSourceMode(OHOS::Rosen::ScreenSourceMode::SCREEN_MAIN);
+    screens.push_back(screen);
+
+    auto sp = std::make_shared<ScreenPointer>(nullptr, nullptr, pointerDrawingManager.displayInfo_);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp});
+
+    auto mainScreen = pointerDrawingManager.UpdateScreenPointerAndFindMainScreenInfo(screens);
+    EXPECT_EQ(mainScreen, screen);
+    EXPECT_EQ(pointerDrawingManager.screenPointers_.size(), 1);
+}
 } // namespace MMI
 } // namespace OHOS

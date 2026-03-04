@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -112,9 +112,9 @@ ScreenPointer::~ScreenPointer()
     }
 }
 
-bool ScreenPointer::Init(PointerRenderer &render)
+bool ScreenPointer::Init(PointerRenderer &render, bool needDrawPointer)
 {
-    if (!InitSurface()) {
+    if (!InitSurface(needDrawPointer)) {
         MMI_HILOGE("ScreenPointer InitSurface failed");
         return false;
     }
@@ -266,7 +266,7 @@ buffer_ptr_t ScreenPointer::CreateSurfaceBuffer(const OHOS::BufferRequestConfig 
     return buffer;
 }
 
-bool ScreenPointer::InitSurface()
+bool ScreenPointer::InitSurface(bool needDrawPointer)
 {
     // create SurfaceNode
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -283,9 +283,11 @@ bool ScreenPointer::InitSurface()
     surfaceNode_->SetVisible(true);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::TOP_LEFT);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    surfaceNode_->AttachToDisplay(screenId_);
+    if (needDrawPointer) {
+        surfaceNode_->AttachToDisplay(screenId_);
+    }
     surfaceNode_->SetBounds(0, 0, DEFAULT_CURSOR_SIZE, DEFAULT_CURSOR_SIZE);
-    MMI_HILOGI("AttachToDisplay %{public}" PRIu64 " completed", screenId_);
+    MMI_HILOGI("AttachToDisplay %{public}" PRIu64 " completed, needDrawPointer=%{public}d", screenId_, needDrawPointer);
 
     // create canvas node
     canvasNode_ = Rosen::RSCanvasNode::Create();
@@ -307,16 +309,10 @@ bool ScreenPointer::InitSurface()
     return true;
 }
 
-void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
+void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si, bool needDrawPointer)
 {
     CHKPV(si);
     CHKPV(surfaceNode_);
-    auto id = si->GetRsId();
-    if (screenId_ != id) {
-        surfaceNode_->AttachToDisplay(id);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-    }
-
     screenId_ = si->GetRsId();
     width_ = GetScreenInfoWidth(si);
     height_ = GetScreenInfoHeight(si);
@@ -328,10 +324,13 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si)
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
     surfaceNode_->RemoveFromTree();
-    surfaceNode_->AttachToDisplay(screenId_);
+    if (needDrawPointer) {
+        surfaceNode_->AttachToDisplay(screenId_);
+    }
     Rosen::RSTransaction::FlushImplicitTransaction();
     MMI_HILOGI("Update with ScreenInfo, id=%{public}" PRIu64 ", shape=(%{public}u, %{public}u), mode=%{public}u, "
-        "rotation=%{public}u, dpi=%{public}f", screenId_, width_, height_, mode_, rotation_, dpi_);
+        "rotation=%{public}u, dpi=%{public}f, needDrawPointer=%{public}d", screenId_, width_, height_, mode_,
+        rotation_, dpi_, needDrawPointer);
 }
 
 void ScreenPointer::OnDisplayInfo(const OLD::DisplayInfo &di)
