@@ -146,7 +146,7 @@ void JoystickEventInterface::OnDeviceAdded(std::shared_ptr<JoystickEventInterfac
     } else if (!loading_.load()) {
         loading_.store(true);
         ffrt::submit([self]() {
-            self->LoadJoystick();
+            self->LoadJoystick(self);
             self->loading_.store(false);
         });
     }
@@ -165,7 +165,7 @@ void JoystickEventInterface::OnDeviceRemoved(std::shared_ptr<JoystickEventInterf
     ScheduleUnloadingTimer(self);
 }
 
-void JoystickEventInterface::LoadJoystick()
+void JoystickEventInterface::LoadJoystick(std::shared_ptr<JoystickEventInterface> self)
 {
     MMI_HILOGI("Start loading Joystick");
     std::shared_ptr<IInputServiceContext> env;
@@ -188,7 +188,32 @@ void JoystickEventInterface::LoadJoystick()
         joystick_ = std::move(joystick);
     }
     MMI_HILOGI("Joystick loaded");
-    OnJoystickLoaded();
+    OnJoystickLoaded(self);
+}
+
+void JoystickEventInterface::OnJoystickLoaded(std::weak_ptr<JoystickEventInterface> self)
+{
+    std::shared_ptr<IInputServiceContext> env;
+    {
+        std::lock_guard guard { mutex_ };
+        env = env_.lock();
+    }
+    if (env == nullptr) {
+        MMI_HILOGE("No input service context");
+        return;
+    }
+    auto delegate = env->GetDelegateInterface();
+    if (delegate == nullptr) {
+        MMI_HILOGE("No delegate");
+        return;
+    }
+    delegate->OnPostAsyncTask([self]() {
+        auto joystick = self.lock();
+        if (joystick != nullptr) {
+            joystick->OnJoystickLoaded();
+        }
+        return RET_OK;
+    });
 }
 
 void JoystickEventInterface::OnJoystickLoaded()
