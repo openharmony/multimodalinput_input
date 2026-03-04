@@ -28,6 +28,10 @@ namespace MMI {
     #define RET_ERR (-1)
 #endif
 
+#ifndef RET_UNSUPPORT
+    #define RET_UNSUPPORT (-2)
+#endif
+
 inline constexpr int32_t INVALID_FD { -1 };
 inline constexpr int32_t INVALID_PID { -1 };
 

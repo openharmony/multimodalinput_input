@@ -42,7 +42,8 @@ public:
     virtual int32_t RegisterKnuckleSwitchByUserId(int32_t userId) = 0;
     virtual int32_t SetKnucklePermissions(uint32_t permissions, bool enable) = 0;
     virtual bool SkipKnuckleDetect() = 0;
-    virtual int32_t SetKnuckleSwitch(bool knuckleSwitch) = 0;
+    virtual int32_t SetKnuckleSwitch(int32_t uid, bool knuckleSwitch) = 0;
+    virtual int32_t GetKnuckleSwitch(int32_t uid, bool &knuckleSwitch) = 0;
     virtual void Dump(int32_t fd) = 0;
 };
 

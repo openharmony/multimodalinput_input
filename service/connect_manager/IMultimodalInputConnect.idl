@@ -175,6 +175,7 @@ interface OHOS.MMI.IMultimodalInputConnect {
     void SetMultiWindowScreenId([in] unsigned long screenId, [in] unsigned long displayNodeScreenId);
     void QuerySwitchStatus([in] int switchType, [out] int status);
     void SetKnuckleSwitch([in] boolean isKnuckleSwitch);
+    void GetKnuckleSwitch([out] boolean isKnuckleSwitch);
     void LaunchAiScreenAbility();
     void GetMaxMultiTouchPointNum([out] int pointNum);
     void SubscribeInputActive([in] int subscribeId, [in] long interval);

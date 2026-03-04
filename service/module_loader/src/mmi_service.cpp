@@ -152,8 +152,10 @@ const std::string PRODUCT_DEVICE_TYPE = system::GetParameter("const.product.devi
 const std::string PRODUCT_TYPE_PC = "2in1";
 const int32_t ERROR_WINDOW_ID_PERMISSION_DENIED = 26500001;
 constexpr int32_t MAX_DEVICE_NUM { 10 };
-constexpr int32_t GAME_UID { 7011 };
 constexpr int32_t PENGLAI_UID { 7655 };
+constexpr int32_t GAME_UID { 7011 };
+constexpr int32_t USS_UID { 6699 };
+constexpr int32_t STYLUS_UID { 7555 };
 constexpr int32_t SYNERGY_UID { 5521 };
 constexpr int32_t MIN_TIMEOUT_DELAY { 1 };
 constexpr int32_t MSDP_UID { 6699 };
@@ -5330,18 +5332,17 @@ ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
 {
     CALL_INFO_TRACE;
     int32_t callingUid = GetCallingUid();
-    int32_t gameUid = 7011;
-    int32_t ussUid = 6699;
-    if ((callingUid != gameUid && callingUid != ussUid) || !PER_HELPER->VerifySystemApp()) {
+    if ((callingUid != GAME_UID && callingUid != USS_UID && callingUid != STYLUS_UID) ||
+        !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
     int32_t pid = GetCallingPid();
     auto sess = GetSessionByPid(pid);
 #ifdef OHOS_BUILD_KNUCKLE
-    int32_t ret = delegateTasks_.PostAsyncTask(
-        [knuckleSwitch] {
-            return KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(knuckleSwitch);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [callingUid, knuckleSwitch] {
+            return KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(callingUid, knuckleSwitch);
         }
         );
     if (ret != RET_OK) {
@@ -5350,6 +5351,30 @@ ErrCode MMIService::SetKnuckleSwitch(bool knuckleSwitch)
     }
 #endif // OHOS_BUILD_KNUCKLE
     return RET_OK;
+}
+
+ErrCode MMIService::GetKnuckleSwitch(bool &knuckleSwitch)
+{
+    CALL_INFO_TRACE;
+    int32_t callingUid = GetCallingUid();
+    if ((callingUid != GAME_UID && callingUid != USS_UID && callingUid != STYLUS_UID) ||
+        !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+#ifdef OHOS_BUILD_KNUCKLE
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [callingUid, &knuckleSwitch] {
+            return KnuckleHandlerComponent::GetInstance().GetKnuckleSwitch(callingUid, knuckleSwitch);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKnuckleSwitch failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK
+#endif // OHOS_BUILD_KNUCKLE
+    return RET_UNSUPPORT;
 }
 
 ErrCode MMIService::LaunchAiScreenAbility()

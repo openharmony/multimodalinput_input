@@ -187,6 +187,7 @@ public:
     int32_t ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown);
     int32_t SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    int32_t GetKnuckleSwitch(bool &knuckleSwitch);
     int32_t LaunchAiScreenAbility();
     int32_t GetMaxMultiTouchPointNum(int32_t &pointNum);
     int32_t SubscribeInputActive(int32_t subscribeId, int64_t interval);
