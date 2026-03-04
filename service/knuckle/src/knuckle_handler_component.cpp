@@ -175,14 +175,24 @@ bool KnuckleHandlerComponent::SkipKnuckleDetect()
     return impl->SkipKnuckleDetect();
 }
 
-int32_t KnuckleHandlerComponent::SetKnuckleSwitch(bool knuckleSwitch)
+int32_t KnuckleHandlerComponent::SetKnuckleSwitch(int32_t uid, bool knuckleSwitch)
 {
     IKnuckleHandler *impl = Load();
     if (impl == nullptr) {
         MMI_HILOGE("impl is null");
         return RET_ERR;
     }
-    return impl->SetKnuckleSwitch(knuckleSwitch);
+    return impl->SetKnuckleSwitch(uid, knuckleSwitch);
+}
+
+int32_t KnuckleHandlerComponent::GetKnuckleSwitch(int32_t uid, bool &knuckleSwitch)
+{
+    IKnuckleHandler *impl = Load();
+    if (impl == nullptr) {
+        MMI_HILOGE("impl is null");
+        return RET_ERR;
+    }
+    return impl->GetKnuckleSwitch(uid, knuckleSwitch);
 }
 
 void KnuckleHandlerComponent::Dump(int32_t fd)

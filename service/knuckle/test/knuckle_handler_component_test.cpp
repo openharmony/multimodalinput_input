@@ -55,7 +55,8 @@ public:
     MOCK_METHOD1(RegisterKnuckleSwitchByUserId, int32_t(int32_t));
     MOCK_METHOD2(SetKnucklePermissions, int32_t(uint32_t, bool));
     MOCK_METHOD0(SkipKnuckleDetect, bool());
-    MOCK_METHOD1(SetKnuckleSwitch, int32_t(bool));
+    MOCK_METHOD2(SetKnuckleSwitch, int32_t(int32_t, bool));
+    MOCK_METHOD2(GetKnuckleSwitch, int32_t(int32_t, bool&));
     MOCK_METHOD1(Dump, void(int32_t));
 };
 
@@ -471,19 +472,55 @@ HWTEST_F(KnuckleHandlerComponentTest, KnuckleHandlerComponentTest_SetKnuckleSwit
     ASSERT_NE(knuckleHandler, nullptr);
 
     bool isCalled = false;
-    EXPECT_CALL(*knuckleHandler, SetKnuckleSwitch(_)).WillOnce(
-        [&isCalled] (bool knuckleSwitch) -> int32_t {
+    EXPECT_CALL(*knuckleHandler, SetKnuckleSwitch(_, _)).WillOnce(
+        [&isCalled] (int32_t uid, bool knuckleSwitch) -> int32_t {
+            (void)uid;
             (void)knuckleSwitch;
             isCalled = true;
             return RET_OK;
         });
     KnuckleHandlerComponent::GetInstance().impl_ = knuckleHandler;
 
-    KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(true);
+    KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(7011, true);
     KnuckleHandlerComponent::GetInstance().impl_ = nullptr;
     delete knuckleHandler;
     knuckleHandler = nullptr;
 
+    EXPECT_TRUE(isCalled);
+}
+
+/**
+ * @tc.name: KnuckleHandlerComponentTest_GetKnuckleSwitch
+ * @tc.desc: Test Overrides GetKnuckleSwitch function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleHandlerComponentTest_GetKnuckleSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleHandlerComponent::GetInstance().Unload();
+
+    MockIKnuckleHandler *knuckleHandler = new (std::nothrow) MockIKnuckleHandler();
+    ASSERT_NE(knuckleHandler, nullptr);
+
+    bool isCalled = false;
+    EXPECT_CALL(*knuckleHandler, GetKnuckleSwitch(_, _)).WillOnce(
+        [&isCalled] (int32_t uid, bool &knuckleSwitch) -> int32_t {
+            (void)uid;
+            (void)knuckleSwitch;
+            isCalled = true;
+            return RET_OK;
+        });
+    KnuckleHandlerComponent::GetInstance().impl_ = knuckleHandler;
+    int32_t ret = 0;
+    ret = KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(7011, true);
+    bool switchStatus = false;
+    KnuckleHandlerComponent::GetInstance().GetKnuckleSwitch(7011, switchStatus);
+    EXPECT_EQ(ret, RET_OK);
+    KnuckleHandlerComponent::GetInstance().impl_ = nullptr;
+    delete knuckleHandler;
+    knuckleHandler = nullptr;
+    EXPECT_FALSE(switchStatus);
     EXPECT_TRUE(isCalled);
 }
 

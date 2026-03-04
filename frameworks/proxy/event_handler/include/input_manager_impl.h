@@ -88,6 +88,7 @@ public:
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     void SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId);
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    int32_t GetKnuckleSwitch(bool &knuckleSwitch);
     int32_t SetInputDeviceConsumer(const std::vector<std::string>& deviceName,
         std::shared_ptr<IInputEventConsumer> consumer);
     void OnDeviceConsumerEvent(std::shared_ptr<PointerEvent> pointerEvent);
