@@ -33,7 +33,7 @@ std::shared_ptr<TouchGestureInterface> TouchGestureInterface::Load(IInputService
 {
     auto instance = std::make_shared<TouchGestureInterface>();
     ffrt::submit([instance, env]() {
-        instance->LoadTouchGestureManager(env);
+        instance->LoadTouchGestureManager(instance, env);
     });
     return instance;
 }
@@ -133,7 +133,8 @@ ComponentManager::Handle<ITouchGestureManager> TouchGestureInterface::GetTouchGe
     return touchGestureMgr_;
 }
 
-void TouchGestureInterface::LoadTouchGestureManager(IInputServiceContext *env)
+void TouchGestureInterface::LoadTouchGestureManager(
+    std::shared_ptr<TouchGestureInterface> self, IInputServiceContext *env)
 {
     MMI_HILOGI("Start loading TouchGesture");
     auto touchGestureMgr = ComponentManager::LoadLibrary<ITouchGestureManager>(
@@ -147,7 +148,28 @@ void TouchGestureInterface::LoadTouchGestureManager(IInputServiceContext *env)
         touchGestureMgr_ = std::move(touchGestureMgr);
     }
     MMI_HILOGI("TouchGesture loaded");
-    OnTouchGestureManagerLoaded();
+    OnTouchGestureManagerLoaded(self, env);
+}
+
+void TouchGestureInterface::OnTouchGestureManagerLoaded(
+    std::weak_ptr<TouchGestureInterface> self, IInputServiceContext *env)
+{
+    if (env == nullptr) {
+        MMI_HILOGE("No service context");
+        return;
+    }
+    auto delegate = env->GetDelegateInterface();
+    if (delegate == nullptr) {
+        MMI_HILOGE("No delegate");
+        return;
+    }
+    delegate->OnPostAsyncTask([self]() {
+        auto touchGestureInterface = self.lock();
+        if (touchGestureInterface != nullptr) {
+            touchGestureInterface->OnTouchGestureManagerLoaded();
+        }
+        return RET_OK;
+    });
 }
 
 void TouchGestureInterface::OnTouchGestureManagerLoaded()
