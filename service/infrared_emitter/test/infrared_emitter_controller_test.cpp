@@ -189,19 +189,36 @@ HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_InitInfrar
 
 /**
  * @tc.name: InfraredEmitterControllerTest_Transmit_002
- * @tc.desc: irInterface_ is nullptr，Transmit return true
+ * @tc.desc: irInterface_->Transmit success but outRet return false
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InfraredEmitterControllerTest, InfraredEmitterControllerTest_Transmit_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    struct FakeAdapter : public IInfraredEmitterAdapter {
+        int32_t Transmit(int32_t, const std::vector<int32_t>&, bool& outRet) override
+        {
+            outRet = false;
+            return 0;
+        }
+        int32_t GetCarrierFreqs(bool&, std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange>&) override
+        {
+            return 0;
+        }
+        int32_t HasIrEmitter(bool &hasIrEmitter) override
+        {
+            return 0;
+        }
+    };
+
     InfraredEmitterController controller;
-    controller.irInterface_ = nullptr;
+    controller.irInterface_ = new FakeAdapter();
     int64_t carrierFreq = 38000;
     std::vector<int64_t> pattern = {100, 200, 300};
     bool ret = controller.Transmit(carrierFreq, pattern);
     ASSERT_FALSE(ret);
+    delete controller.irInterface_;
 }
 
 /**
