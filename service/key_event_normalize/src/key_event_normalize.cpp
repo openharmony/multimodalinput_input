@@ -488,6 +488,35 @@ void KeyEventNormalize::HandleSimulatedModifierKeyActionFromShell(const std::sha
     }
 }
 
+void KeyEventNormalize::UpdateSimulatedEventModifierState(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    if (keyEvent == nullptr) {
+        MMI_HILOGE("KeyEvent is null");
+        return;
+    }
+
+    int32_t capsState = static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    int32_t numState = static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    int32_t scrollState = static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+
+    std::vector<struct libinput_device*> input_devices;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(input_devices);
+    if (input_devices.empty()) {
+        MMI_HILOGW("No keyboard device is currently available");
+        return;
+    }
+
+    for (auto& device : input_devices) {
+        capsState = libinput_get_funckey_state(device, KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+        numState = libinput_get_funckey_state(device, KeyEvent::NUM_LOCK_FUNCTION_KEY);
+        scrollState = libinput_get_funckey_state(device, KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+    }
+
+    keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, capsState);
+    keyEvent->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, numState);
+    keyEvent->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, scrollState);
+}
+
 void KeyEventNormalize::HandleSimulatedModifierKeyDown(const std::shared_ptr<KeyEvent> &keyEvent,
     KeyEvent::KeyItem &keyItem)
 {
@@ -572,8 +601,8 @@ bool KeyEventNormalize::CheckSimulatedModifierKeyEventFromShell(const std::share
     }
 
     const int32_t funcKey = keyEvent->TransitionFunctionKey(keyEvent->GetKeyCode());
-    if (funcKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
-        MMI_HILOGW("The shell simulate a function key");
+    if (funcKey == KeyEvent::UNKNOWN_FUNCTION_KEY) {
+        MMI_HILOGW("The shell simulate not function key");
         return false;
     }
 
@@ -591,7 +620,7 @@ bool KeyEventNormalize::CheckSimulatedModifierKeyEvent(const std::shared_ptr<Key
         MMI_HILOGE("The key event is not simulated");
         return false;
     }
-
+    UpdateSimulatedEventModifierState(keyEvent);
     auto it = g_ModifierKeys.find(keyEvent->GetKeyCode());
     if (it == g_ModifierKeys.end()) {
         MMI_HILOGW("The key event is not modifier key");
