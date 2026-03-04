@@ -1336,6 +1336,7 @@ enum HosKeyEventEnum {
     HOS_KEY_DIV = 3220,
 	HOS_KEY_PEN_MODE_SWITCH = 3221,
     HOS_KEY_MMX_TOUCH = 3222,
+    HOS_KEY_XKEY = 3232,
 
     /**
      * Left Knob roll-up
