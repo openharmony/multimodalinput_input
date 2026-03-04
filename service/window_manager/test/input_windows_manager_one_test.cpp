@@ -1204,7 +1204,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_AcrossDisplay_00
 
 /* *
  * @tc.name: InputWindowsManagerOneTest_FindPhysicalDisplay_001
- * @tc.desc: Test the function FindPhysicalDisplay
+ * @tc.desc: Test the function TransformCoordToAdjacentDisplay
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1234,7 +1234,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_FindPhysicalDisp
     displayInfo.validHeight = 1;
     displayInfo.direction = DIRECTION0;
     displayInfo.displayDirection = DIRECTION0;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId));
 }
 
 /* *

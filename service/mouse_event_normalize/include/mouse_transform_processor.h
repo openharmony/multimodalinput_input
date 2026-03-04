@@ -40,6 +40,28 @@ class MouseTransformProcessor final : public std::enable_shared_from_this<MouseT
         double dy;
     };
 
+    struct MotionDataContext {
+        double dx { 0.0f };
+        double dy { 0.0f };
+        int32_t libinputEventType { LIBINPUT_EVENT_NONE };
+        int32_t displayId { -1 };
+        double cursorX { 0.0f };
+        double cursorY { 0.0f };
+        const OLD::DisplayInfo* displayInfo { nullptr };
+        Offset offset;
+        DeviceType deviceType { DeviceType::DEVICE_UNKNOWN };
+        bool isValid { false };
+
+        MotionDataContext()
+            : dx(0.0), dy(0.0), libinputEventType(0), displayId(-1), cursorX(0.0), cursorY(0.0),
+              displayInfo(nullptr), deviceType(DeviceType::DEVICE_PC), isValid(false) {}
+    };
+
+    struct AxisInfo {
+        libinput_pointer_axis libinputAxis;
+        PointerEvent::AxisType pointerAxisType;
+    };
+
 public:
     enum class RightClickType {
         TP_RIGHT_BUTTON = 1,
@@ -86,8 +108,19 @@ public:
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
+    MotionDataContext ExtractMotionData(struct libinput_event_pointer* data,
+                                        struct libinput_event* event);
+    int32_t ProcessMotionByEventType(MotionDataContext& ctx,
+                                     struct libinput_event* event);
+    int32_t UpdateMotionEventState(MotionDataContext& ctx);
     int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
+    int32_t HandleAxisEvent(struct libinput_event_pointer* data, int32_t userId,
+        int32_t tpScrollDirection, libinput_pointer_axis_source source, const AxisInfo& axisInfo);
+    // Timer-related helper functions for axis scrolling
+    void OnAxisScrollTimer();
+    int32_t BeginAxisScrollEvent();
+    int32_t UpdateCursorLocationIfNeeded();
     int32_t HandleAxisBeginEndInner(struct libinput_event *event);
     int32_t HandleScrollFingerInner(struct libinput_event *event);
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
@@ -128,6 +161,15 @@ private:
     void DumpInner();
     void SetPointerEventRightButtonSource(const int32_t eventType, uint32_t button);
     void SetMouseScrollAxisValue(libinput_pointer_axis_source source, double &axisValue);
+    // Helper functions for button handling refactoring
+    void ResetPointerItemCanceledState();
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+    void HandleVirtualDeviceEvent(struct libinput_event_pointer* data);
+#endif
+    bool IsTouchpadTapEnabled(int32_t type);
+    int32_t HandleButtonReleased(uint32_t button, uint32_t originButton, int32_t type);
+    int32_t HandleButtonPressed(uint32_t button, uint32_t originButton, int32_t type);
+    int32_t UpdateCursorPositionOnButtonPress();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     static bool IsEventFromVirtualSource(struct libinput_event* event);
     static void GetVirtualTouchpadTapSwitch(bool &switchFlag);

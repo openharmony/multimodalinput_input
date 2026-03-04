@@ -6138,6 +6138,14 @@ bool InputWindowsManager::IsFirstTouch(int32_t pointerId, int32_t itemSize)
     return false;
 }
 
+bool InputWindowsManager::IsInPointereLockMode()
+{
+    return (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
+                WindowInputPolicy::FLAG_POINTER_LOCKED ||
+            (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
+                WindowInputPolicy::FLAG_POINTER_CONFINED;
+}
+
 void InputWindowsManager::ClearFirstTouchWindowInfos(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
@@ -6806,7 +6814,7 @@ bool InputWindowsManager::AcrossDisplay(const OLD::DisplayInfo &displayInfoDes, 
     return re;
 }
 
-void InputWindowsManager::FindPhysicalDisplay(const OLD::DisplayInfo& displayInfo, double& physicalX,
+void InputWindowsManager::TransformCoordToAdjacentDisplay(const OLD::DisplayInfo& displayInfo, double& physicalX,
     double& physicalY, int32_t& displayId)
 {
     CALL_DEBUG_ENTER;
@@ -6996,46 +7004,45 @@ void InputWindowsManager::ReverseRotateDisplayScreen(const OLD::DisplayInfo& inf
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData)
+void InputWindowsManager::ConvertToPhysicalCoordinates(
+    const OLD::DisplayInfo& displayInfo, double& x, double& y, bool& isRealData)
 {
-    int32_t groupId = FindDisplayGroupId(displayId);
-    auto displayInfo = GetPhysicalDisplay(displayId);
-    CHKPV(displayInfo);
+    CALL_DEBUG_ENTER;
     if (!isRealData) {
         Coordinate2D cursorPos = { 0.0f, 0.0f };
-        ReverseRotateDisplayScreen(*displayInfo, x, y, cursorPos);
+        ReverseRotateDisplayScreen(displayInfo, x, y, cursorPos);
         isRealData = true;
         x = cursorPos.x;
         y = cursorPos.y;
     }
+}
+
+const OLD::DisplayInfo* InputWindowsManager::AdjustDisplayIdForPointerLock(int32_t& displayId)
+{
+    CALL_DEBUG_ENTER;
+    displayId = pointerLockedWindow_.displayId;
+    return GetPhysicalDisplay(displayId);
+}
+
+void InputWindowsManager::HandleCrossDisplayBoundary(
+    const OLD::DisplayInfo& displayInfo, double& x, double& y, int32_t& displayId)
+{
+    CALL_DEBUG_ENTER;
     double oldX = x;
     double oldY = y;
-    int32_t lastDisplayId = displayId;
-    if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
-            WindowInputPolicy::FLAG_POINTER_LOCKED ||
-        (pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_CONFINED) ==
-            WindowInputPolicy::FLAG_POINTER_CONFINED) {
-        displayInfo = GetPhysicalDisplay(pointerLockedWindow_.displayId);
-        displayId = pointerLockedWindow_.displayId;
-    } else {
-        if (!IsInsideDisplay(*displayInfo, x, y)) {
-            FindPhysicalDisplay(*displayInfo, x, y, displayId);
-            MMI_HILOGD("Not IsInsideDisplay, cursorXY:{%{private}f, %{private}f}->{%{private}f, %{private}f}",
-                oldX, oldY, x, y);
-        }
-        if (displayId != lastDisplayId) {
-            displayInfo = GetPhysicalDisplay(displayId);
-        }
+
+    if (!IsInsideDisplay(displayInfo, x, y)) {
+        TransformCoordToAdjacentDisplay(displayInfo, x, y, displayId);
+        MMI_HILOGD("Not IsInsideDisplay, cursorXY:{%{private}f, %{private}f}->{%{private}f, %{private}f}",
+            oldX, oldY, x, y);
     }
-    if (displayInfo == nullptr) {
-        MMI_HILOGE("displayInfo is null");
-        return;
-    }
-    int32_t width = 0;
-    int32_t height = 0;
+}
+
+void InputWindowsManager::GetEffectiveDisplayBounds(
+    const OLD::DisplayInfo* displayInfo, int32_t& width, int32_t& height)
+{
+    CALL_DEBUG_ENTER;
     GetWidthAndHeight(displayInfo, width, height);
-    int32_t integerX = static_cast<int32_t>(x);
-    int32_t integerY = static_cast<int32_t>(y);
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     if (IsPointerActiveRectValid(*displayInfo)) {
         width = displayInfo->pointerActiveWidth;
@@ -7043,16 +7050,36 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         MMI_HILOGD("vtp cursor active area w:%{private}d, h:%{private}d", width, height);
     }
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+}
+
+void InputWindowsManager::ApplyCoordinateCorrection(
+    const OLD::DisplayInfo* displayInfo, int32_t width, int32_t height, double& x, double& y)
+{
+    CALL_DEBUG_ENTER;
+    int32_t integerX = static_cast<int32_t>(x);
+    int32_t integerY = static_cast<int32_t>(y);
+
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
     LimitMouseLocaltionInEvent(displayInfo, integerX, integerY, x, y);
+}
+
+void InputWindowsManager::UpdateMouseLocationMaps(int32_t groupId, int32_t displayId, double x, double y)
+{
+    CALL_DEBUG_ENTER;
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(displayInfo);
+
+    int32_t integerX = static_cast<int32_t>(x);
+    int32_t integerY = static_cast<int32_t>(y);
 
     PhysicalCoordinate coord {
         .x = integerX,
         .y = integerY,
     };
     RotateDisplayScreen(*displayInfo, coord);
+
     const auto iter = mouseLocationMap_.find(groupId);
     if (iter != mouseLocationMap_.end()) {
         mouseLocationMap_[groupId].displayId = displayId;
@@ -7065,10 +7092,47 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         cursorPosMap_[groupId].cursorPos.x = x;
         cursorPosMap_[groupId].cursorPos.y = y;
     }
-    MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, mousePhysicalXY={%{private}d, %{private}d}, "
-        "cursorPosXY: {%{private}.2f, %{private}.2f} -> {%{private}.2f %{private}.2f}",
-        static_cast<int32_t>(isRealData), displayId, static_cast<int32_t>(coord.x),
-        static_cast<int32_t>(coord.y), oldX, oldY, x, y);
+    MMI_HILOGD("Mouse Data: displayId:%{public}d, mousePhysicalXY={%{private}d, %{private}d}, "
+        "cursorPosXY: {%{private}.2f, %{private}.2f}",
+        displayId, static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y), x, y);
+}
+
+void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y, bool isRealData)
+{
+    int32_t groupId = FindDisplayGroupId(displayId);
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(displayInfo);
+
+    // 1. Coordinate conversion preprocessing
+    ConvertToPhysicalCoordinates(*displayInfo, x, y, isRealData);
+
+    double oldX = x;
+    double oldY = y;
+    int32_t lastDisplayId = displayId;
+
+    // 2. Handle pointer lock mode
+    if (IsInPointereLockMode()) {
+        displayInfo = AdjustDisplayIdForPointerLock(displayId);
+    } else {
+        // 3. Handle cross-display boundary
+        HandleCrossDisplayBoundary(*displayInfo, x, y, displayId);
+        if (displayId != lastDisplayId) {
+            displayInfo = GetPhysicalDisplay(displayId);
+        }
+    }
+    CHKPV(displayInfo);
+
+    // 4. Apply coordinate correction
+    int32_t width, height;
+    GetEffectiveDisplayBounds(displayInfo, width, height);
+    ApplyCoordinateCorrection(displayInfo, width, height, x, y);
+
+    // 5. Update mouse location maps
+    UpdateMouseLocationMaps(groupId, displayId, x, y);
+
+    MMI_HILOGD("Mouse Data: isRealData=%{public}d, displayId:%{public}d, "
+        "cursorPos: {%{private}.2f, %{private}.2f} -> {%{private}.2f, %{private}.2f}",
+        static_cast<int32_t>(isRealData), displayId, oldX, oldY, x, y);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
