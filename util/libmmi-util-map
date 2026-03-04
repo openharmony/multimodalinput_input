@@ -61,6 +61,7 @@
             OHOS::MMI::IntToHexRGB*;
             OHOS::MMI::StringReplace*;
             OHOS::MMI::IsInteger*;
+            OHOS::MMI::LoadConfig*;
             OHOS::MMI::CursorPixelMap;
             OHOS::MMI::IsNumeric*;
             OHOS::MMI::JsonParser*;

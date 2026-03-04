@@ -16,11 +16,35 @@
 #ifndef TABLET_TOOL_TRANSFORM_PROCESSOR_H
 #define TABLET_TOOL_TRANSFORM_PROCESSOR_H
 
+#include <optional>
+
+#include "cJSON.h"
+#include "old_display_info.h"
+#include "struct_multimodal.h"
 #include "transform_processor.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
 class TabletToolTransformProcessor final : public TransformProcessor {
+private:
+    struct TabletCalibration {
+        double tabletMinX { 0.0 };
+        double tabletMaxX { 0.0 };
+        double tabletMinY { 0.0 };
+        double tabletMaxY { 0.0 };
+
+        double calibratedMinX { 0.0 };
+        double calibratedMaxX { 0.0 };
+        double calibratedMinY { 0.0 };
+        double calibratedMaxY { 0.0 };
+
+        int32_t displayId { -1 };
+        int32_t screenWidth { 0 };
+        int32_t screenHeight { 0 };
+        Direction screenDirection { Direction::DIRECTION0 };
+    };
+
 public:
     explicit TabletToolTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TabletToolTransformProcessor);
@@ -40,11 +64,30 @@ private:
     void DrawTouchGraphic();
     void DrawTouchGraphicIdle();
     void DrawTouchGraphicDrawing();
+    bool OnToolButton(struct libinput_event* event);
+
+    bool IsTabletPointer() const;
+    bool InitializeCalibration(struct libinput_device* device, int32_t displayId);
+    void InitializeDefaultCalibration(struct libinput_device* device,
+        const OLD::DisplayInfo& displayInfo, TabletCalibration &calib);
+    void CalculateCalibration(const OLD::DisplayInfo& displayInfo, TabletCalibration &calib);
+    bool IsScreenChanged(int32_t currentDisplayId) const;
+    bool CalculateWithCalibration(struct libinput_event_tablet_tool* tabletEvent,
+        int32_t& targetDisplayId, PhysicalCoordinate& coord);
+    bool CalculateScreenCoordinateWithCalibration(struct libinput_event_tablet_tool* tabletEvent,
+        const OLD::DisplayInfo& displayInfo, PhysicalCoordinate& coord);
+    bool CalculateCalibratedTipPoint(struct libinput_event_tablet_tool* tabletEvent,
+        int32_t& targetDisplayId, PhysicalCoordinate& coord, PointerEvent::PointerItem& pointerItem);
+
+    static bool IsCalibrationEnabled();
+    static void LoadProductConfig(bool& enabled);
+    static bool ReadTabletCalibrationConfig(const char* cfgPath, cJSON* jsonCfg, bool& enabled);
 
 private:
     const int32_t deviceId_ { -1 };
     std::function<void()> current_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::optional<TabletCalibration> calibration_ {};
 };
 } // namespace MMI
 } // namespace OHOS

@@ -93,6 +93,7 @@ ohos_shared_library("libmmi-util") {
 
   external_deps = [
     "c_utils:utils",
+    "config_policy:configpolicy_util",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "access_token:libaccesstoken_sdk",

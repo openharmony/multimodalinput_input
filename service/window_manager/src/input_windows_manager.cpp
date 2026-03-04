@@ -3378,9 +3378,7 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
     CHKPF(tip);
     return TransformTipPoint(tip, coord, targetDisplayId, pointerItem);
 }
-#endif // OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
 const OLD::DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo(int32_t groupId)
 {
     auto iter = displayGroupInfoMap_.find(groupId);
@@ -5042,24 +5040,17 @@ bool InputWindowsManager::IsWriteTablet(PointerEvent::PointerItem &pointerItem) 
 {
     if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
         static int32_t lastDeviceId = -1;
-        static std::shared_ptr<InputDevice> inputDevice = nullptr;
+        static bool isTablet = false;
+
         auto nowId = pointerItem.GetDeviceId();
         if (lastDeviceId != nowId) {
-            inputDevice = INPUT_DEV_MGR->GetInputDevice(nowId);
-            CHKPF(inputDevice);
+            isTablet = INPUT_DEV_MGR->CheckDevice(nowId,
+                [](const IInputDeviceManager::IInputDevice &dev) {
+                    return dev.IsMouse();
+                });
             lastDeviceId = nowId;
         }
-        if (inputDevice != nullptr) {
-            MMI_HILOGD("name:%{public}s type:%{public}d bus:%{public}d, "
-                "version:%{public}d product:%{public}d vendor:%{public}d, "
-                "phys:%{public}s uniq:%{public}s",
-                inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
-                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
-                inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
-        }
-        if (inputDevice != nullptr && inputDevice->GetBus() == BUS_USB) {
-            return true;
-        }
+        return isTablet;
     }
     return false;
 }
@@ -5937,11 +5928,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         CursorDrawingComponent::GetInstance().OnWindowInfo(info);
         auto displayInfo = GetPhysicalDisplay(displayId);
         CHKPR(displayInfo, RET_ERR);
+        Direction displayDir = GetDisplayDirection(displayInfo);
         Coordinate2D cursorPos = {};
         ReverseRotateDisplayScreen(*displayInfo,  pointerItem.GetDisplayXPos(), pointerItem.GetDisplayYPos(),
             cursorPos);
+        UpdateAndAdjustMouseLocation(displayId, cursorPos.x, cursorPos.y);
         CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId, static_cast<int32_t>(cursorPos.x),
-            static_cast<int32_t>(cursorPos.y), pointerStyle, physicDisplayInfo->direction);
+            static_cast<int32_t>(cursorPos.y), pointerStyle, displayDir);
     } else if (POINTER_DEV_MGR.mouseDisplayState) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {

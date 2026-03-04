@@ -319,6 +319,7 @@ HWTEST_F(InputDeviceManagerTestWithMock, NotifyDeviceAdded_001, TestSize.Level1)
     INPUT_DEV_MGR->Attach(observer);
     int32_t deviceId { 1 };
     EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceAdded(deviceId));
+    INPUT_DEV_MGR->Detach(observer);
 }
 
 /**
@@ -335,6 +336,492 @@ HWTEST_F(InputDeviceManagerTestWithMock, NotifyDeviceRemoved_001, TestSize.Level
     INPUT_DEV_MGR->Attach(observer);
     int32_t deviceId { 1 };
     EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceRemoved(deviceId));
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_AddInputDevice_001
+ * @tc.desc: Test PhysicalInputDevice::AddInputDevice with normal case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_AddInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 61 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    EXPECT_NO_FATAL_FAILURE(physicalDevice.AddInputDevice(deviceId));
+    EXPECT_EQ(physicalDevice.GetInputDeviceCount(), 1u);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_RemoveInputDevice_001
+ * @tc.desc: Test PhysicalInputDevice::RemoveInputDevice with existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_RemoveInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 71 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId);
+    EXPECT_EQ(physicalDevice.GetInputDeviceCount(), 1u);
+
+    EXPECT_NO_FATAL_FAILURE(physicalDevice.RemoveInputDevice(deviceId));
+    EXPECT_EQ(physicalDevice.GetInputDeviceCount(), 0u);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_RemoveInputDevice_002
+ * @tc.desc: Test PhysicalInputDevice::RemoveInputDevice with non-existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_RemoveInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId1 { 71 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId1);
+    int32_t deviceId2 { 72 };
+    EXPECT_NO_FATAL_FAILURE(physicalDevice.RemoveInputDevice(deviceId2));
+    EXPECT_EQ(physicalDevice.GetInputDeviceCount(), 1u);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_IsEmpty_001
+ * @tc.desc: Test PhysicalInputDevice::IsEmpty returns true when empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_IsEmpty_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::PhysicalInputDevice physicalDevice;
+    EXPECT_TRUE(physicalDevice.IsEmpty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_IsEmpty_002
+ * @tc.desc: Test PhysicalInputDevice::IsEmpty returns false when not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_IsEmpty_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { 81 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId);
+    EXPECT_FALSE(physicalDevice.IsEmpty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_GetTags_001
+ * @tc.desc: Test PhysicalInputDevice::GetTags returns default tags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetTags_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::PhysicalInputDevice physicalDevice;
+    EXPECT_EQ(physicalDevice.GetTags(), 0u);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_ForeachInputDevice_001
+ * @tc.desc: Test PhysicalInputDevice::ForeachInputDevice callback mechanism
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_ForeachInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId1 { 101 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo);
+    int32_t deviceId2 { 102 };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId2, devInfo);
+    int32_t deviceId3 { 103 };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId3, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId1);
+    physicalDevice.AddInputDevice(deviceId2);
+    physicalDevice.AddInputDevice(deviceId3);
+
+    int32_t sum = 0;
+    physicalDevice.ForeachInputDevice([&sum](int32_t deviceId) {
+        sum += deviceId;
+    });
+    constexpr int32_t total { 306 };
+    EXPECT_EQ(sum, total);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_ForeachInputDevice_002
+ * @tc.desc: Test PhysicalInputDevice::ForeachInputDevice with empty device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_ForeachInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::PhysicalInputDevice physicalDevice;
+
+    int32_t count = 0;
+    physicalDevice.ForeachInputDevice([&count](int32_t deviceId) {
+        count++;
+    });
+
+    EXPECT_EQ(count, 0);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_MoveConstructor_001
+ * @tc.desc: Test PhysicalInputDevice move constructor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_MoveConstructor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId1 { 201 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo);
+    int32_t deviceId2 { 202 };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId2, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId1);
+    physicalDevice.AddInputDevice(deviceId2);
+
+    InputDeviceManager::PhysicalInputDevice movedDevice = std::move(physicalDevice);
+
+    EXPECT_EQ(movedDevice.GetInputDeviceCount(), 2u);
+    EXPECT_TRUE(physicalDevice.IsEmpty());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_MoveAssignment_001
+ * @tc.desc: Test PhysicalInputDevice move assignment operator
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_MoveAssignment_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId1 { 201 };
+    InputDeviceManager::InputDeviceInfo devInfo {};
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId1);
+
+    InputDeviceManager::PhysicalInputDevice movedDevice;
+    movedDevice = std::move(physicalDevice);
+
+    EXPECT_EQ(movedDevice.GetInputDeviceCount(), 1u);
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_IsPointerDevice_001
+ * @tc.desc: Test PhysicalInputDevice::IsPointerDevice returns true for pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_IsPointerDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    struct libinput_device rawDev {};
+    rawDev.udevDev.tags = EVDEV_UDEV_TAG_POINTINGSTICK;
+
+    int32_t deviceId { 201 };
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice {};
+    physicalDevice.AddInputDevice(deviceId);
+
+    EXPECT_TRUE(physicalDevice.IsPointerDevice());
+}
+
+/**
+ * @tc.name: PhysicalInputDevice_IsPointerDevice_002
+ * @tc.desc: Test PhysicalInputDevice::IsPointerDevice returns false for non-pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_IsPointerDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability)
+        .WillRepeatedly(Return(true));
+
+    struct libinput_device rawDev {};
+    rawDev.udevDev.tags = EVDEV_UDEV_TAG_INPUT;
+
+    InputDeviceManager::PhysicalInputDevice physicalDevice;
+    physicalDevice.AddInputDevice(100);
+
+    EXPECT_FALSE(physicalDevice.IsPointerDevice());
+}
+
+/**
+ * @tc.name: UpdateInputDeviceCaps_001
+ * @tc.desc: Test InputDeviceManager::UpdateInputDeviceCaps with normal device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, UpdateInputDeviceCaps_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability)
+        .WillRepeatedly(Return(true));
+
+    int32_t deviceId = 100;
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .physicalId = "test_physical_001",
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->UpdateInputDeviceCaps(deviceId));
+}
+
+/**
+ * @tc.name: UpdateInputDeviceCaps_002
+ * @tc.desc: Test InputDeviceManager::UpdateInputDeviceCaps with non-existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, UpdateInputDeviceCaps_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 999;
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->UpdateInputDeviceCaps(deviceId));
+}
+
+/**
+ * @tc.name: AddPhysicalInputDeviceInner_001
+ * @tc.desc: Test AddPhysicalInputDeviceInner calls UpdateInputDeviceCapabilities
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, AddPhysicalInputDeviceInner_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    int32_t deviceId { 101 };
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .physicalId = "test_physical_002",
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto device = INPUT_DEV_MGR->GetInputDevice(deviceId, false);
+    EXPECT_NE(device, nullptr);
+    const auto &physicalInputDevices = INPUT_DEV_MGR->physicalInputDevices_;
+    auto physIter = physicalInputDevices.find(devInfo.physicalId);
+    EXPECT_TRUE(physIter != physicalInputDevices.cend());
+    if (physIter != physicalInputDevices.cend()) {
+        const auto &deviceIds = physIter->second.inputDeviceIds_;
+        EXPECT_TRUE(deviceIds.find(deviceId) != deviceIds.cend());
+    }
+}
+
+/**
+ * @tc.name: AddPhysicalInputDeviceInner_002
+ * @tc.desc: Test AddPhysicalInputDeviceInner with multiple devices in same physical group
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, AddPhysicalInputDeviceInner_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability)
+        .WillRepeatedly(Return(true));
+
+    std::string physicalId { "test_physical_003" };
+    int32_t deviceId1 { 651 };
+    int32_t deviceId2 { 652 };
+    struct libinput_device rawDev1 {};
+    struct libinput_device rawDev2 {};
+
+    InputDeviceManager::InputDeviceInfo devInfo1 {
+        .inputDeviceOrigin = &rawDev1,
+        .physicalId = physicalId,
+    };
+
+    InputDeviceManager::InputDeviceInfo devInfo2 {
+        .inputDeviceOrigin = &rawDev2,
+        .physicalId = physicalId,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo1);
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId2, devInfo2);
+
+    auto device1 = INPUT_DEV_MGR->GetInputDevice(deviceId1, false);
+    auto device2 = INPUT_DEV_MGR->GetInputDevice(deviceId2, false);
+    EXPECT_NE(device1, nullptr);
+    EXPECT_NE(device2, nullptr);
+}
+
+/**
+ * @tc.name: CheckInputDeviceCaps_001
+ * @tc.desc: Test InputDeviceManager::CheckInputDeviceCaps with keyboard device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, CheckInputDeviceCaps_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability)
+        .WillRepeatedly([](struct libinput_device*, enum libinput_device_capability cap) {
+            return cap == LIBINPUT_DEVICE_CAP_KEYBOARD;
+        });
+
+    int32_t deviceId { 103 };
+    struct libinput_device rawDev {};
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .physicalId = "test_physical_004",
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->CheckInputDeviceCaps(deviceId));
+}
+
+/**
+ * @tc.name: RemoveInputDeviceFromPhysicalDevice_001
+ * @tc.desc: Test RemoveInputDeviceFromPhysicalDevice with valid physicalId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, RemoveInputDeviceFromPhysicalDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    std::string physicalId { "test_physical_005" };
+    int32_t deviceId { 104 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .physicalId = physicalId,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    const auto &physicalInputDevices = INPUT_DEV_MGR->physicalInputDevices_;
+    auto physIter = physicalInputDevices.find(devInfo.physicalId);
+    EXPECT_TRUE(physIter != physicalInputDevices.cend());
+    if (physIter != physicalInputDevices.cend()) {
+        const auto &deviceIds = physIter->second.inputDeviceIds_;
+        EXPECT_TRUE(deviceIds.find(deviceId) != deviceIds.cend());
+    }
+
+    INPUT_DEV_MGR->RemoveInputDeviceFromPhysicalDevice(deviceId, physicalId);
+    EXPECT_TRUE(physicalInputDevices.find(devInfo.physicalId) == physicalInputDevices.cend());
+}
+
+/**
+ * @tc.name: GetPhysicalInputDevice_001
+ * @tc.desc: Test GetPhysicalInputDevice returns existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, GetPhysicalInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    std::string physicalId { "test_physical_006" };
+    int32_t deviceId { 105 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .physicalId = physicalId,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto* physicalDevice = INPUT_DEV_MGR->GetPhysicalInputDevice(physicalId);
+    EXPECT_NE(physicalDevice, nullptr);
+    EXPECT_EQ(physicalDevice->GetInputDeviceCount(), 1u);
+}
+
+/**
+ * @tc.name: GetPhysicalInputDevice_002
+ * @tc.desc: Test GetPhysicalInputDevice returns nullptr for non-existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, GetPhysicalInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto* physicalDevice = INPUT_DEV_MGR->GetPhysicalInputDevice("non_existing_physical_id");
+    EXPECT_EQ(physicalDevice, nullptr);
+}
+
+/**
+ * @tc.name: UpdatePhysicalInputDevice_001
+ * @tc.desc: Test UpdatePhysicalInputDevice with new device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, UpdatePhysicalInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
+
+    std::string physicalId { "test_physical_007" };
+    int32_t deviceId { 106 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .physicalId = physicalId,
+    };
+
+    INPUT_DEV_MGR->UpdatePhysicalInputDevice(deviceId, devInfo);
+
+    auto* physicalDevice = INPUT_DEV_MGR->GetPhysicalInputDevice(physicalId);
+    EXPECT_NE(physicalDevice, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
