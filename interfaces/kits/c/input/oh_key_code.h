@@ -1082,6 +1082,16 @@ typedef enum {
      */
     KEYCODE_KBDINPUTASSIST_CANCEL = 2731,
     /**
+     * Mouse Assistant key
+     * @since 24
+     */
+    KEYCODE_MOUSE_ASSISTANT = 2732,
+    /**
+     * Mouse Intelligence Selection key
+     * @since 24
+     */
+    KEYCODE_MOUSE_INTELLIGENCE_SELECTION = 2733,
+    /**
      * Front key, which is used to launch the windshield defogger
      * @since 22
      */
