@@ -16,7 +16,9 @@
 #include "input_device_manager.h"
 
 #include <linux/input.h>
+#include <iomanip>
 #include <regex>
+#include <sstream>
 
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
@@ -128,6 +130,93 @@ bool InputDeviceManager::HiddenInputDevice::IsJoystick() const
 bool InputDeviceManager::HiddenInputDevice::IsMouse() const
 {
     return devInfo_.isPointerDevice;
+}
+
+InputDeviceManager::PhysicalInputDevice::PhysicalInputDevice(PhysicalInputDevice&& other)
+    : tags_(std::move(other.tags_)), inputDeviceIds_(std::move(other.inputDeviceIds_))
+{}
+
+InputDeviceManager::PhysicalInputDevice& InputDeviceManager::PhysicalInputDevice::operator=(
+    PhysicalInputDevice&& other)
+{
+    tags_ = std::move(other.tags_);
+    inputDeviceIds_ = std::move(other.inputDeviceIds_);
+    return *this;
+}
+
+void InputDeviceManager::PhysicalInputDevice::AddInputDevice(int32_t deviceId)
+{
+    INPUT_DEV_MGR->ForDevice(deviceId,
+        [this, deviceId](const IInputDevice& dev) {
+            inputDeviceIds_.insert(deviceId);
+            UpdateTags(dev.GetRawDevice());
+        });
+}
+
+void InputDeviceManager::PhysicalInputDevice::RemoveInputDevice(int32_t deviceId)
+{
+    inputDeviceIds_.erase(deviceId);
+}
+
+bool InputDeviceManager::PhysicalInputDevice::IsEmpty() const
+{
+    return inputDeviceIds_.empty();
+}
+
+uint32_t InputDeviceManager::PhysicalInputDevice::GetTags() const
+{
+    return tags_;
+}
+
+size_t InputDeviceManager::PhysicalInputDevice::GetInputDeviceCount() const
+{
+    return inputDeviceIds_.size();
+}
+
+void InputDeviceManager::PhysicalInputDevice::ForeachInputDevice(std::function<void(int32_t)> callback) const
+{
+    if (!callback) {
+        return;
+    }
+    for (int32_t deviceId : inputDeviceIds_) {
+        callback(deviceId);
+    }
+}
+
+bool InputDeviceManager::PhysicalInputDevice::IsPointerDevice() const
+{
+    return (tags_ & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL |
+            EVDEV_UDEV_TAG_POINTINGSTICK | EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+}
+
+std::string InputDeviceManager::PhysicalInputDevice::GetId(struct libinput_device* device)
+{
+    if (device == nullptr) {
+        return std::string();
+    }
+    auto vendor = libinput_device_get_id_vendor(device);
+    auto product = libinput_device_get_id_product(device);
+    if ((vendor == 0) && (product == 0)) {
+        return std::string();
+    }
+    auto bus = libinput_device_get_id_bustype(device);
+    auto version = libinput_device_get_id_version(device);
+    constexpr int32_t ID_WIDTH { 4 };
+    std::ostringstream sid {};
+    sid << "InputId:" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << bus
+        << "-" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << vendor
+        << "-" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << product
+        << "-" << std::setfill('0') << std::setw(ID_WIDTH) << std::hex << version;
+    return std::move(sid).str();
+}
+
+void InputDeviceManager::PhysicalInputDevice::UpdateTags(struct libinput_device* device)
+{
+    if (!device) {
+        return;
+    }
+    enum evdev_device_udev_tags deviceTags = libinput_device_get_tags(device);
+    tags_ |= static_cast<uint32_t>(deviceTags);
 }
 
 bool InputDeviceManager::CheckDevice(int32_t deviceId, std::function<bool(const IInputDevice&)> pred) const
@@ -562,6 +651,103 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device *i
     // LCOV_EXCL_STOP
 }
 
+InputDeviceManager::PhysicalInputDevice* InputDeviceManager::GetPhysicalInputDevice(const std::string& physicalId)
+{
+    auto it = physicalInputDevices_.find(physicalId);
+    if (it != physicalInputDevices_.end()) {
+        return &it->second;
+    }
+    return nullptr;
+}
+
+void InputDeviceManager::UpdatePhysicalInputDevice(int32_t deviceId, const struct InputDeviceInfo& info)
+{
+    if (info.physicalId.empty()) {
+        MMI_HILOGW("Cannot identify physical device (%{public}d)", deviceId);
+        return;
+    }
+    auto iter = physicalInputDevices_.find(info.physicalId);
+    if (iter == physicalInputDevices_.end()) {
+        auto [physIter, _] = physicalInputDevices_.emplace(info.physicalId, PhysicalInputDevice());
+        physIter->second.AddInputDevice(deviceId);
+        MMI_HILOGI("Added new physical input device, key:%{private}s, deviceId:%{public}d, tags:0x%{private}x",
+            info.physicalId.c_str(), deviceId, physIter->second.GetTags());
+    } else {
+        iter->second.AddInputDevice(deviceId);
+        MMI_HILOGI("Updated physical input device, key:%{private}s, deviceId:%{public}d, tags:0x%{private}x",
+            info.physicalId.c_str(), deviceId, iter->second.GetTags());
+    }
+}
+
+void InputDeviceManager::RemoveInputDeviceFromPhysicalDevice(int32_t deviceId, const std::string& physicalId)
+{
+    if (physicalId.empty()) {
+        MMI_HILOGW("Device key is empty for device(%{public}d)", deviceId);
+        return;
+    }
+
+    auto itPhys = physicalInputDevices_.find(physicalId);
+    if (itPhys == physicalInputDevices_.end()) {
+        MMI_HILOGW("Physical input device not found: %{private}s", physicalId.c_str());
+        return;
+    }
+
+    itPhys->second.RemoveInputDevice(deviceId);
+
+    if (itPhys->second.IsEmpty()) {
+        MMI_HILOGI("Removed physical input device: %{private}s", physicalId.c_str());
+        physicalInputDevices_.erase(itPhys);
+    } else {
+        MMI_HILOGI("Updated physical input device after removal, key:%{private}s, count:%{public}zu",
+            physicalId.c_str(), itPhys->second.GetInputDeviceCount());
+    }
+}
+
+void InputDeviceManager::UpdateInputDeviceCaps(int32_t deviceId)
+{
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
+        MMI_HILOGE("Input device not found: %{public}d", deviceId);
+        return;
+    }
+    CheckInputDeviceCaps(deviceId);
+    auto physIter = physicalInputDevices_.find(iter->second.physicalId);
+    if (physIter != physicalInputDevices_.cend()) {
+        physIter->second.ForeachInputDevice(
+            [this, deviceId](int32_t id) {
+                if (id != deviceId) {
+                    CheckInputDeviceCaps(id);
+                }
+            });
+    }
+}
+
+void InputDeviceManager::CheckInputDeviceCaps(int32_t deviceId)
+{
+    if (auto iter = inputDevice_.find(deviceId); iter != inputDevice_.end()) {
+        auto &devInfo = iter->second;
+        if (devInfo.isPointerDevice) {
+            return;
+        }
+        auto rawDev = devInfo.inputDeviceOrigin;
+        if (rawDev == nullptr) {
+            return;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(rawDev);
+        if ((udevTags & EVDEV_UDEV_TAG_TABLET) != EVDEV_UDEV_TAG_TABLET) {
+            return;
+        }
+        if (libinput_device_has_property(rawDev, INPUT_PROP_POINTER)) {
+            devInfo.isPointerDevice = true;
+            return;
+        }
+        if (auto physIter = physicalInputDevices_.find(devInfo.physicalId);
+            ((physIter != physicalInputDevices_.end()) && (physIter->second.IsPointerDevice()))) {
+            devInfo.isPointerDevice = true;
+        }
+    }
+}
+
 void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice)
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
@@ -704,6 +890,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
+    info.physicalId = PhysicalInputDevice::GetId(inputDevice);
     if (info.inputDeviceOrigin != nullptr) {
         info.isLocal = true;
     }
@@ -1103,6 +1290,8 @@ bool InputDeviceManager::CheckDuplicateInputDevice(std::shared_ptr<InputDevice> 
 void InputDeviceManager::AddPhysicalInputDeviceInner(int32_t deviceId, const struct InputDeviceInfo& info)
 {
     inputDevice_[deviceId] = info;
+    UpdatePhysicalInputDevice(deviceId, info);
+    UpdateInputDeviceCaps(deviceId);
 }
 
 void InputDeviceManager::AddVirtualInputDeviceInner(int32_t deviceId, std::shared_ptr<InputDevice> inputDevice)
@@ -1127,6 +1316,9 @@ void InputDeviceManager::RemovePhysicalInputDeviceInner(
             deviceId = it->first;
             enable = it->second.enable;
             isDeviceReportEvent = it->second.isDeviceReportEvent;
+
+            RemoveInputDeviceFromPhysicalDevice(deviceId, it->second.physicalId);
+
 #ifdef OHOS_BUILD_ENABLE_DFX_RADAR
             DfxHisyseventDevice::ReportDeviceBehavior(deviceId, "Device removed successfully");
 #endif

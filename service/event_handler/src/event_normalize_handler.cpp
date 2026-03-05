@@ -276,7 +276,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 #ifndef OHOS_BUILD_ENABLE_WATCH
         case LIBINPUT_EVENT_TABLET_TOOL_AXIS:
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY:
-        case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
+        case LIBINPUT_EVENT_TABLET_TOOL_TIP:
+        case LIBINPUT_EVENT_TABLET_TOOL_BUTTON: {
             HandleTableToolEvent(event);
             break;
         }
@@ -894,7 +895,17 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     EventStatistic::PushPointerEvent(pointerEvent);
-    nextHandler_->HandleTouchEvent(pointerEvent);
+
+    switch (pointerEvent->GetSourceType()) {
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            nextHandler_->HandleTouchEvent(pointerEvent);
+            break;
+        }
+        default: {
+            nextHandler_->HandlePointerEvent(pointerEvent);
+            break;
+        }
+    }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
     }
