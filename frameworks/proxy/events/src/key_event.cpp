@@ -841,6 +841,7 @@ const int32_t KeyEvent::KEYCODE_AOD_SLIDE_UNLOCK = 3219;
 const int32_t KeyEvent::KEYCODE_DIV = 3220;
 const int32_t KeyEvent::KEYCODE_KEY_PEN_MODE_SWITCH = 3221;
 const int32_t KeyEvent::KEYCODE_MMX_TOUCH = 3222;
+const int32_t KeyEvent::KEYCODE_XKEY = 3232;
 const int32_t KeyEvent::KEYCODE_REMOTE_POWER = 4000;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_DOWN = 10002;
