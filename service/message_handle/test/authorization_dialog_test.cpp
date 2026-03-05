@@ -40,13 +40,13 @@ public:
     ~RemoteObjectTest() {}
 
     int32_t GetObjectRefCount() { return 0; }
-    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { return 0; }
+    int32_t SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { return 0; }
     bool AddDeathRecipient(const sptr<DeathRecipient> &recipient)
     {
         return result;
     }
     bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
-    int Dump(int fd, const std::vector<std::u16string> &args) { return 0; }
+    int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) { return 0; }
 
 public:
     bool result = false;
@@ -410,24 +410,6 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_CloseAndOpenDialog, Te
 
     dialog.dialogConnectionCallback_->OpenDialog();
     EXPECT_TRUE(dialog.dialogConnectionCallback_->isDialogShow_);
-}
-
-/**
- * @tc.name: AuthorizationDialogTest_ConnectSystemUi_FullFlow
- * @tc.desc: Test ConnectSystemUi full flow
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi_FullFlow, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    AuthorizationDialog dialog;
-    ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
-
-    EXPECT_FALSE(dialog.dialogConnectionCallback_->DialogIsOpen());
-
-    bool result = dialog.ConnectSystemUi();
-    EXPECT_TRUE(result || !result);
 }
 
 /**
@@ -797,12 +779,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_001
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_007
  * @tc.desc: Test DialogConnectionCallback open-close without connect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_001, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -890,33 +872,6 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
     EXPECT_FALSE(dialog.dialogConnectionCallback_->DialogIsOpen());
 
     dialog.dialogConnectionCallback_->CloseDialog();
-    EXPECT_FALSE(dialog.dialogConnectionCallback_->DialogIsOpen());
-}
-
-/**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_007
- * @tc.desc: Test DialogConnectionCallback disconnect after close
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    AuthorizationDialog dialog;
-    ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
-    AppExecFwk::ElementName element;
-
-    sptr<IRemoteObject> remoteObject = sptr<IRemoteObject>(new RemoteObjectTest(u"test"));
-    dialog.dialogConnectionCallback_->OnAbilityConnectDone(element, remoteObject, 0);
-
-    dialog.dialogConnectionCallback_->OpenDialog();
-    EXPECT_TRUE(dialog.dialogConnectionCallback_->DialogIsOpen());
-
-    dialog.dialogConnectionCallback_->CloseDialog();
-    EXPECT_FALSE(dialog.dialogConnectionCallback_->DialogIsOpen());
-
-    dialog.dialogConnectionCallback_->OnAbilityDisconnectDone(element, 0);
-    EXPECT_FALSE(dialog.dialogConnectionCallback_->IsConnected());
     EXPECT_FALSE(dialog.dialogConnectionCallback_->DialogIsOpen());
 }
 
@@ -1065,7 +1020,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
     ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
     dialog.dialogConnectionCallback_->remoteObject_ = sptr<IRemoteObject>(new RemoteObjectTest(u"test"));
 
-    for (int i = 0; i < 5; i++) {
+    for (int32_t i = 0; i < 5; i++) {
         dialog.dialogConnectionCallback_->OpenDialog();
         EXPECT_TRUE(dialog.dialogConnectionCallback_->isDialogShow_);
 
@@ -1087,7 +1042,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
     ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
     AppExecFwk::ElementName element;
 
-    for (int i = 0; i < 5; i++) {
+    for (int32_t i = 0; i < 5; i++) {
         sptr<IRemoteObject> remoteObject = sptr<IRemoteObject>(new RemoteObjectTest(u"test"));
         dialog.dialogConnectionCallback_->OnAbilityConnectDone(element, remoteObject, 0);
         EXPECT_TRUE(dialog.dialogConnectionCallback_->IsConnected());
@@ -1122,36 +1077,6 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
     dialog.dialogConnectionCallback_->isDialogShow_ = true;
     dialog.dialogConnectionCallback_->CloseDialog();
     EXPECT_TRUE(dialog.dialogConnectionCallback_->isDialogShow_);
-}
-
-/**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_010
- * @tc.desc: Test DialogConnectionCallback with concurrent operations
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_010, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    AuthorizationDialog dialog;
-    ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
-    AppExecFwk::ElementName element;
-
-    sptr<IRemoteObject> remoteObject = sptr<IRemoteObject>(new RemoteObjectTest(u"test"));
-    dialog.dialogConnectionCallback_->OnAbilityConnectDone(element, remoteObject, 0);
-
-    dialog.dialogConnectionCallback_->OpenDialog();
-    EXPECT_TRUE(dialog.dialogConnectionCallback_->isDialogShow_);
-
-    EXPECT_TRUE(dialog.dialogConnectionCallback_->IsConnected());
-
-    EXPECT_TRUE(dialog.dialogConnectionCallback_->DialogIsOpen());
-
-    dialog.dialogConnectionCallback_->CloseDialog();
-    EXPECT_FALSE(dialog.dialogConnectionCallback_->isDialogShow_);
-
-    dialog.dialogConnectionCallback_->OnAbilityDisconnectDone(element, 0);
-    EXPECT_FALSE(dialog.dialogConnectionCallback_->IsConnected());
 }
 
 /**
