@@ -28,6 +28,7 @@
 #include "input_device_manager.h"
 #include "account_manager.h"
 #include "common_event_data.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -40,6 +41,7 @@ namespace MMI {
 const char *FILE_EXTENSION = ".so";
 const char *FOLDER_PATH = "/system/lib64/multimodalinput/autorun";
 const int32_t TIMEOUT_US = 300;
+const int32_t TIMEOUT_USE_EVENT_US = 2500;
 const int32_t MAX_TIMER = 3;
 
 InputPluginManager::~InputPluginManager()
@@ -174,13 +176,25 @@ void InputPluginManager::PluginAssignmentCallBack(
 PluginResult InputPluginManager::ProcessEvent(
     PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data)
 {
-    return std::visit(
+    int64_t beginTime = GetSysClockTime();
+    std::string msg = "PluginManager::ProcessEvent, plugin Name is: " + iplugin->GetName();
+    BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
+    PluginResult result = std::visit(
         overloaded{
             [data, iplugin](libinput_event* evt) { return iplugin->HandleEvent(evt, data); },
             [data, iplugin](std::shared_ptr<PointerEvent> evt) { return iplugin->HandleEvent(evt, data); },
             [data, iplugin](std::shared_ptr<AxisEvent> evt) { return iplugin->HandleEvent(evt, data); },
             [data, iplugin](std::shared_ptr<KeyEvent> evt) { return iplugin->HandleEvent(evt, data); }
         }, event);
+    BytraceAdapter::MMIServiceTraceStop();
+    int64_t endTime = GetSysClockTime();
+    int64_t lostTime = endTime - beginTime;
+    int32_t timeout = result == PluginResult::UseNoNeedReissue ? TIMEOUT_USE_EVENT_US : TIMEOUT_US;
+    if (lostTime >= timeout) {
+        MMI_HILOGW("iplugin timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
+            iplugin->GetName().c_str(), endTime, lostTime);
+    }
+    return result;
 }
 
 int32_t InputPluginManager::DoHandleEvent(
@@ -206,22 +220,12 @@ int32_t InputPluginManager::DoHandleEvent(
         }
         start_plugin = std::next(cur_plugin);
     }
-    int64_t beginTime = 0;
     PluginResult result;
-    int64_t endTime = 0;
-    int64_t lostTime = 0;
     for (auto pluginIt = start_plugin; pluginIt != plugins.end(); ++pluginIt) {
         if ((*pluginIt) == nullptr) {
             continue;
         }
-        beginTime = GetSysClockTime();
         result = ProcessEvent(event, *pluginIt, data);
-        endTime = GetSysClockTime();
-        lostTime = endTime - beginTime;
-        if (lostTime >= TIMEOUT_US) {
-            MMI_HILOGW("pluginIt timeout name:%{public}s ,endTime:%{public}" PRId64 ",lostTime:%{public}" PRId64,
-                (*pluginIt)->GetName().c_str(), endTime, lostTime);
-        }
         if (result == PluginResult::UseNeedReissue) {
             if (IntermediateEndEvent(event)) {
                 MMI_HILOGE("pluginIt is intermediate or end event");
