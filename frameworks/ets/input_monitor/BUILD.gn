@@ -43,7 +43,10 @@ part_name = "input"
 taihe_generated_file_path_inputMonitor = "$taihe_file_path/out/$subsystem_name/$part_name/inputMonitor"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_inputMonitor}"
-  deps = [ ":input_monitor_taihe" ]
+  deps = [
+    ":input_monitor_taihe",
+    "${mmi_path}/frameworks/ets/key_code:key_code_taihe",
+  ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputMonitor.ani.cpp",
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputMonitor.abi.c",
