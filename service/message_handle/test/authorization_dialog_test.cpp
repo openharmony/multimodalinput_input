@@ -603,12 +603,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_StateAfterDisconnect
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_001
  * @tc.desc: Test DialogConnectionCallback state after disconnect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_StateAfterDisconnect, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -662,12 +662,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_OpenWhenAlreadyOpen
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_002
  * @tc.desc: Test DialogConnectionCallback OpenDialog when already open
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_OpenWhenAlreadyOpen, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -710,12 +710,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_RemoteObjectConsistency
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_003
  * @tc.desc: Test DialogConnectionCallback remote object consistency
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_RemoteObjectConsistency, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -797,12 +797,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_OpenCloseWithoutConnect
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_001
  * @tc.desc: Test DialogConnectionCallback open-close without connect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_OpenCloseWithoutConnect, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -819,12 +819,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_ConnectDisconnectWithoutOpenClose
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_004
  * @tc.desc: Test DialogConnectionCallback connect-disconnect without open-close
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_ConnectDisconnectWithoutOpenClose, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -842,12 +842,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_OpenAfterDisconnect
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_005
  * @tc.desc: Test DialogConnectionCallback open after disconnect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_OpenAfterDisconnect, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -868,12 +868,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_CloseAfterDisconnect
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_006
  * @tc.desc: Test DialogConnectionCallback close after disconnect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_CloseAfterDisconnect, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -894,12 +894,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_DisconnectAfterClose
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_007
  * @tc.desc: Test DialogConnectionCallback disconnect after close
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_DisconnectAfterClose, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -1021,12 +1021,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_DialogShowFlagLifecycle
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_008
  * @tc.desc: Test DialogConnectionCallback dialog show flag lifecycle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_DialogShowFlagLifecycle, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -1075,12 +1075,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_MultipleConnectDisconnect
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_009
  * @tc.desc: Test DialogConnectionCallback multiple connect/disconnect operations
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_MultipleConnectDisconnect, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
@@ -1125,12 +1125,12 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallba
 }
 
 /**
- * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_ConcurrentOperations
+ * @tc.name: AuthorizationDialogTest_DialogConnectionCallback_010
  * @tc.desc: Test DialogConnectionCallback with concurrent operations
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_ConcurrentOperations, TestSize.Level1)
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_DialogConnectionCallback_010, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
