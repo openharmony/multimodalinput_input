@@ -66,7 +66,7 @@ void EventMonitorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent>
         return;
     }
     // This filter touch-gesture events being dispatched to applications.
-    // This is a quick win sulotion, should be optimized later.
+    // This is a quick win solution, should be optimized later.
     if (TOUCH_GESTURE_ACTIONS.find(pointerEvent->GetPointerAction()) != TOUCH_GESTURE_ACTIONS.cend()) {
         return;
     }
@@ -93,7 +93,7 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
         }
     }
     // This filter touch-gesture events being dispatched to applications.
-    // This is a quick win sulotion, should be optimized later.
+    // This is a quick win solution, should be optimized later.
     if (TOUCH_GESTURE_ACTIONS.find(pointerEvent->GetPointerAction()) != TOUCH_GESTURE_ACTIONS.cend()) {
         return;
     }

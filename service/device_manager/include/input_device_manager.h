@@ -38,6 +38,7 @@ private:
         bool isLocal { false };
         std::string dhid;
         std::string sysUid;
+        std::string physicalId;
         VendorConfig vendorConfig;
     };
 
@@ -58,6 +59,30 @@ private:
 
     private:
         InputDeviceInfo devInfo_ {};
+    };
+
+    class PhysicalInputDevice {
+    public:
+        PhysicalInputDevice() = default;
+        ~PhysicalInputDevice() = default;
+        DISALLOW_COPY(PhysicalInputDevice);
+        PhysicalInputDevice(PhysicalInputDevice&& other);
+        PhysicalInputDevice& operator=(PhysicalInputDevice&& other);
+
+        void AddInputDevice(int32_t deviceId);
+        void RemoveInputDevice(int32_t deviceId);
+        bool IsEmpty() const;
+        uint32_t GetTags() const;
+        size_t GetInputDeviceCount() const;
+        void ForeachInputDevice(std::function<void(int32_t)> callback) const;
+        bool IsPointerDevice() const;
+        static std::string GetId(struct libinput_device* device);
+
+    private:
+        void UpdateTags(struct libinput_device* device);
+
+        uint32_t tags_ { 0 };
+        std::set<int32_t> inputDeviceIds_;
     };
 
 public:
@@ -173,6 +198,12 @@ private:
     void NotifyDeviceFirstReportEvent(int32_t deviceId) const;
     void SetSpecialVirtualDevice(std::shared_ptr<InputDevice> inputDevice) const;
 
+    void UpdatePhysicalInputDevice(int32_t deviceId, const struct InputDeviceInfo& info);
+    PhysicalInputDevice* GetPhysicalInputDevice(const std::string& physicalId);
+    void RemoveInputDeviceFromPhysicalDevice(int32_t deviceId, const std::string& physicalId);
+    void UpdateInputDeviceCaps(int32_t deviceId);
+    void CheckInputDeviceCaps(int32_t deviceId);
+
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<int32_t, int32_t> recoverList_;
@@ -187,6 +218,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_WATCH
     bool sessionLostCallbackInitialized_ { false };
     bool virtualKeyboardEverConnected_ { false };
+    std::map<std::string, PhysicalInputDevice> physicalInputDevices_;
 
     static std::shared_ptr<InputDeviceManager> instance_;
     static std::mutex mutex_;

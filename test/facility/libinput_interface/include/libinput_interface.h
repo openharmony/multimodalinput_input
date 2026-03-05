@@ -118,6 +118,8 @@ public:
     virtual struct libinput_event_gesture* GetGestureEvent(struct libinput_event *event) = 0;
     virtual struct libinput_tablet_tool* TabletToolGetTool(struct libinput_event_tablet_tool *event) = 0;
     virtual enum libinput_tablet_tool_tip_state TabletToolGetTipState(struct libinput_event_tablet_tool *event) = 0;
+    virtual uint32_t TabletToolGetButton(struct libinput_event_tablet_tool *event) = 0;
+    virtual enum libinput_button_state TabletToolGetButtonState(struct libinput_event_tablet_tool *event) = 0;
     virtual enum libinput_tablet_tool_type TabletToolGetType(struct libinput_tablet_tool *tool) = 0;
     virtual enum libinput_pointer_axis_source GetAxisSource(struct libinput_event_pointer *event) = 0;
     virtual struct libinput_event_pointer* LibinputGetPointerEvent(struct libinput_event *event) = 0;
@@ -153,6 +155,8 @@ public:
     virtual enum libinput_config_status DeviceConfigSetDragEnabled(
         struct libinput_device *device, enum libinput_config_drag_state enable) = 0;
     virtual char* DeviceGetName(struct libinput_device *device) = 0;
+    virtual char* DeviceGetPhys(struct libinput_device *device) = 0;
+    virtual char* DeviceGetUniq(struct libinput_device *device) = 0;
     virtual struct libinput_event_keyboard* LibinputEventGetKeyboardEvent (struct libinput_event *event) = 0;
     virtual uint32_t LibinputEventKeyboardGetKey (struct libinput_event_keyboard *event) = 0;
     virtual enum libinput_key_state LibinputEventKeyboardGetKeyState (struct libinput_event_keyboard *event) = 0;
@@ -167,6 +171,7 @@ public:
     virtual char* DeviceGetSysname(struct libinput_device *device) = 0;
     virtual udev_device* DeviceGetUdevDevice(struct libinput_device *device) = 0;
     virtual int DeviceHasCapability(struct libinput_device *device, enum libinput_device_capability capability) = 0;
+    virtual int DeviceHasProperty(struct libinput_device *device, unsigned int property) = 0;
     virtual int32_t DeviceHasKey(struct libinput_device* device, int32_t keyCode) = 0;
     virtual int32_t DeviceGetAxisMin(struct libinput_device* device, int32_t code) = 0;
     virtual int32_t DeviceGetAxisMax(struct libinput_device* device, int32_t code) = 0;

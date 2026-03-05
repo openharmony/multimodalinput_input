@@ -35,6 +35,8 @@ public:
     MOCK_METHOD(struct libinput_event_gesture *, GetGestureEvent, (struct libinput_event *));
     MOCK_METHOD(struct libinput_tablet_tool *, TabletToolGetTool, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(enum libinput_tablet_tool_tip_state, TabletToolGetTipState, (struct libinput_event_tablet_tool *));
+    MOCK_METHOD(uint32_t, TabletToolGetButton, (struct libinput_event_tablet_tool *));
+    MOCK_METHOD(enum libinput_button_state, TabletToolGetButtonState, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(enum libinput_tablet_tool_type, TabletToolGetType, (struct libinput_tablet_tool *));
     MOCK_METHOD(enum libinput_pointer_axis_source, GetAxisSource, (struct libinput_event_pointer *));
     MOCK_METHOD(struct libinput_event_pointer*, LibinputGetPointerEvent, (struct libinput_event *));
@@ -70,6 +72,8 @@ public:
     MOCK_METHOD(enum libinput_config_status, DeviceConfigSetDragEnabled,
         (struct libinput_device *, enum libinput_config_drag_state));
     MOCK_METHOD(char*, DeviceGetName, (struct libinput_device *));
+    MOCK_METHOD(char*, DeviceGetPhys, (struct libinput_device *));
+    MOCK_METHOD(char*, DeviceGetUniq, (struct libinput_device *));
     MOCK_METHOD(struct libinput_event_keyboard*, LibinputEventGetKeyboardEvent, (struct libinput_event *));
     MOCK_METHOD(uint32_t, LibinputEventKeyboardGetKey, (struct libinput_event_keyboard *));
     MOCK_METHOD(enum libinput_key_state, LibinputEventKeyboardGetKeyState, (struct libinput_event_keyboard *));
@@ -84,6 +88,7 @@ public:
     MOCK_METHOD(char*, DeviceGetSysname, (struct libinput_device *));
     MOCK_METHOD(udev_device*, DeviceGetUdevDevice, (struct libinput_device *));
     MOCK_METHOD(int, DeviceHasCapability, (struct libinput_device *, enum libinput_device_capability));
+    MOCK_METHOD(int, DeviceHasProperty, (struct libinput_device *, unsigned int));
     MOCK_METHOD(int32_t, DeviceHasKey, (struct libinput_device*, int32_t));
     MOCK_METHOD(int32_t, DeviceGetAxisMin, (struct libinput_device*, int32_t));
     MOCK_METHOD(int32_t, DeviceGetAxisMax, (struct libinput_device*, int32_t));
