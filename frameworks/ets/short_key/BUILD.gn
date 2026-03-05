@@ -35,7 +35,10 @@ taihe_generated_file_path_shortKey =
     "$taihe_file_path/out/$subsystem_name/$part_name/shortKey"
 ohos_taihe("run_taihe") {
   taihe_generated_file_path = "${taihe_generated_file_path_shortKey}"
-  deps = [ ":short_key_taihe" ]
+  deps = [
+    ":short_key_taihe",
+    "${mmi_path}/frameworks/ets/key_code:key_code_taihe",
+  ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.shortKey.ani.cpp",
     "$taihe_generated_file_path/src/ohos.multimodalInput.shortKey.abi.c",
