@@ -3204,6 +3204,13 @@ public:
      * @since 24
      */
     static const int32_t KEYCODE_AOD_SINGLE_CLICK;
+
+    /**
+     * XKey
+     *
+     * @since 24
+     */
+    static const int32_t KEYCODE_XKEY;
 public:
     class KeyItem {
     public:
