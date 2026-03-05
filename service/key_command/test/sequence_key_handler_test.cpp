@@ -399,5 +399,437 @@ HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleScreenLocked_001, 
     ret = handler_->HandleScreenLocked(sequence, isLaunchAbility);
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequences_004
+ * @tc.desc: Test HandleSequences when screen is off and power key is pressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequences_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    bool ret = handler_->HandleSequences(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequences_005
+ * @tc.desc: Test HandleSequences when active sequence is repeating
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequences_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler_->sequenceOccurred_ = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 2017;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler_->keys_.push_back(sequenceKey);
+    bool ret = handler_->HandleSequences(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequences_006
+ * @tc.desc: Test HandleSequences when sequences configuration is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequences_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    context_.sequences_->clear();
+    bool ret = handler_->HandleSequences(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequences_007
+ * @tc.desc: Test HandleSequences when isLaunchAbility is true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequences_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(10000);
+    Sequence sequence;
+    sequence.statusConfigValue = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 2017;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    sequenceKey.actionTime = 10000;
+    sequence.sequenceKeys.push_back(sequenceKey);
+    context_.sequences_->push_back(sequence);
+    bool ret = handler_->HandleSequences(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_AddSequenceKey_004
+ * @tc.desc: Test AddSequenceKey when actionTime is less than last event time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_AddSequenceKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    sequenceKey.keyAction = 2;
+    sequenceKey.actionTime = 100;
+    handler_->keys_.push_back(sequenceKey);
+    keyEvent->SetKeyCode(2);
+    keyEvent->SetKeyAction(2);
+    keyEvent->SetActionTime(50);
+    bool ret = handler_->AddSequenceKey(keyEvent);
+    ASSERT_FALSE(ret);
+    ASSERT_TRUE(handler_->keys_.empty());
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_AddSequenceKey_005
+ * @tc.desc: Test AddSequenceKey when delay exceeds MAX_DELAY_TIME
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_AddSequenceKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    sequenceKey.keyAction = 2;
+    sequenceKey.actionTime = 100;
+    handler_->keys_.push_back(sequenceKey);
+    keyEvent->SetKeyCode(2);
+    keyEvent->SetKeyAction(2);
+    keyEvent->SetActionTime(10000000);
+    bool ret = handler_->AddSequenceKey(keyEvent);
+    ASSERT_TRUE(ret);
+    ASSERT_FALSE(handler_->keys_.empty());
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_AddSequenceKey_006
+ * @tc.desc: Test AddSequenceKey when keys size exceeds MAX_SEQUENCEKEYS_NUM
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_AddSequenceKey_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    for (int i = 0; i < 100; i++) {
+        SequenceKey sequenceKey;
+        sequenceKey.keyCode = i;
+        sequenceKey.keyAction = 2;
+        sequenceKey.actionTime = i * 10;
+        handler_->keys_.push_back(sequenceKey);
+    }
+    keyEvent->SetKeyCode(200);
+    keyEvent->SetKeyAction(2);
+    keyEvent->SetActionTime(1000);
+    bool ret = handler_->AddSequenceKey(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequence_002
+ * @tc.desc: Test HandleSequence when keysSize > sequenceKeysSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.statusConfigValue = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 10;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler_->keys_.push_back(sequenceKey);
+    handler_->keys_.push_back(sequenceKey);
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleSequence(sequence, isLaunchAbility);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequence_003
+ * @tc.desc: Test HandleSequence when keyAction not matching
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequence_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.statusConfigValue = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 10;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler_->keys_.push_back(sequenceKey);
+    SequenceKey seqKey;
+    seqKey.keyCode = 10;
+    seqKey.keyAction = KeyEvent::KEY_ACTION_UP;
+    sequence.sequenceKeys.push_back(seqKey);
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleSequence(sequence, isLaunchAbility);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleSequence_004
+ * @tc.desc: Test HandleSequence when delay not matching
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleSequence_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.statusConfigValue = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 10;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    sequenceKey.actionTime = 100;
+    sequenceKey.delay = 100;
+    handler_->keys_.push_back(sequenceKey);
+    SequenceKey seqKey;
+    seqKey.keyCode = 10;
+    seqKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    seqKey.actionTime = 100;
+    seqKey.delay = 10;
+    sequence.sequenceKeys.push_back(seqKey);
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleMatchedSequence_001
+ * @tc.desc: Test HandleMatchedSequence when screen is off and screenshot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleMatchedSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.ability.bundleName = "com.test.screenshot";
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleMatchedSequence_002
+ * @tc.desc: Test HandleMatchedSequence when screen is on and locked with screenshot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleMatchedSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.ability.bundleName = "com.test.screenshot";
+    sequence.timerId = -1;
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleNormalSequence_002
+ * @tc.desc: Test HandleNormalSequence without screenshot permission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleNormalSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.ability.bundleName = "com.test.screenshot";
+    sequence.abilityStartDelay = 0;
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleNormalSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    ASSERT_TRUE(isLaunchAbility);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleNormalSequence_003
+ * @tc.desc: Test HandleNormalSequence without screen record permission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleNormalSequence_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.ability.bundleName = "com.test.screenrecorder";
+    sequence.abilityStartDelay = 0;
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleNormalSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    ASSERT_TRUE(isLaunchAbility);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_HandleScreenLocked_002
+ * @tc.desc: Test HandleScreenLocked without screen capture permission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_HandleScreenLocked_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Sequence sequence;
+    sequence.ability.bundleName = "com.test.screenshot";
+    sequence.timerId = -1;
+    bool isLaunchAbility = false;
+    bool ret = handler_->HandleScreenLocked(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    ASSERT_TRUE(isLaunchAbility);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_IsActiveSequenceRepeating_001
+ * @tc.desc: Test IsActiveSequenceRepeating when sequenceOccurred_ is false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_IsActiveSequenceRepeating_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler_->sequenceOccurred_ = false;
+    bool ret = handler_->IsActiveSequenceRepeating(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_IsActiveSequenceRepeating_002
+ * @tc.desc: Test IsActiveSequenceRepeating when keys_ is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_IsActiveSequenceRepeating_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler_->sequenceOccurred_ = true;
+    handler_->keys_.clear();
+    bool ret = handler_->IsActiveSequenceRepeating(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_IsActiveSequenceRepeating_003
+ * @tc.desc: Test IsActiveSequenceRepeating when keyCode not match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_IsActiveSequenceRepeating_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2018);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler_->sequenceOccurred_ = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 2017;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler_->keys_.push_back(sequenceKey);
+    bool ret = handler_->IsActiveSequenceRepeating(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_IsActiveSequenceRepeating_004
+ * @tc.desc: Test IsActiveSequenceRepeating when all conditions match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_IsActiveSequenceRepeating_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler_->sequenceOccurred_ = true;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 2017;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler_->keys_.push_back(sequenceKey);
+    bool ret = handler_->IsActiveSequenceRepeating(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_MarkActiveSequence_001
+ * @tc.desc: Test MarkActiveSequence function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_MarkActiveSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    handler_->sequenceOccurred_ = false;
+    handler_->MarkActiveSequence(true);
+    ASSERT_TRUE(handler_->sequenceOccurred_);
+    handler_->MarkActiveSequence(false);
+    ASSERT_FALSE(handler_->sequenceOccurred_);
+}
+
+/**
+ * @tc.name: SequenceKeyHandlerTest_ResetSequenceKeys_001
+ * @tc.desc: Test ResetSequenceKeys function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SequenceKeyHandlerTest, SequenceKeyHandlerTest_ResetSequenceKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    handler_->keys_.push_back(sequenceKey);
+    Sequence sequence;
+    handler_->filterSequences_.push_back(sequence);
+    handler_->ResetSequenceKeys();
+    ASSERT_TRUE(handler_->keys_.empty());
+    ASSERT_TRUE(handler_->filterSequences_.empty());
+}
 } // namespace MMI
 } // namespace OHOS
