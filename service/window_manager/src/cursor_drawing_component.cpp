@@ -80,6 +80,7 @@ const char *POINTER_SIZE = "pointerSize";
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
+constexpr int32_t INVALID_USER { -1 };
 ffrt::mutex g_loadSoMutex;
 }
 
@@ -865,12 +866,13 @@ bool CursorDrawingInformation::IsPointerVisible()
 
 int32_t CursorDrawingInformation::GetCurrentUser()
 {
-    int32_t userId = DEFAULT_USER_ID;
+    int32_t userId = INVALID_USER;
     auto pointer = WIN_MGR->GetLastPointerEvent();
     if (pointer != nullptr) {
         userId = WIN_MGR->FindDisplayUserId(pointer->GetTargetDisplayId());
-    } else {
-        userId = ACCOUNT_MGR->GetCurrentAccountId();
+    }
+    if (userId < 0) {
+        userId = ACCOUNT_MGR->QueryCurrentAccountId();
     }
     return userId > 0 ? userId : DEFAULT_USER_ID;
 }
