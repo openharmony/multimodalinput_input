@@ -323,8 +323,8 @@ void ScreenPointer::UpdateScreenInfo(const sptr<OHOS::Rosen::ScreenInfo> si, boo
     mirrorWidth_ = si->GetMirrorWidth();
     mirrorHeight_ = si->GetMirrorHeight();
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
-    surfaceNode_->RemoveFromTree();
     if (needDrawPointer) {
+        surfaceNode_->RemoveFromTree();
         surfaceNode_->AttachToDisplay(screenId_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
