@@ -4203,6 +4203,11 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
             MMI_HILOGD("Skip the untouchable window to continue searching, "
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
+        } else if ((item.flags & WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK) ==
+                   WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK) {
+            MMI_HILOGD("Skip the mouse left button lock window to continue searching, "
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
         } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
             return std::make_optional(item);
         } else {
