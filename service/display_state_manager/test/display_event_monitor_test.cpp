@@ -136,5 +136,92 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_SendCancelEventWhenLoc
     CALL_TEST_DEBUG;
     EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SendCancelEventWhenLock());
 }
+
+/**
+ * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn_002
+ * @tc.desc: Test UpdateShieldStatusOnScreenOn when keyboard not supported
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = SHIELD_MODE::UNSET_MODE;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn());
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_002
+ * @tc.desc: Test UpdateShieldStatusOnScreenOff when keyboard not supported
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = SHIELD_MODE::UNSET_MODE;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff());
+}
+/**
+ * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_003
+ * @tc.desc: Test InitCommonEventSubscriber when subscribe failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    DISPLAY_MONITOR->hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->InitCommonEventSubscriber());
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_SendCancelEventWhenLock_002
+ * @tc.desc: Test SendCancelEventWhenLock when delegateProxy is null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_SendCancelEventWhenLock_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto originProxy = DISPLAY_MONITOR->delegateProxy_;
+    DISPLAY_MONITOR->delegateProxy_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SendCancelEventWhenLock());
+    DISPLAY_MONITOR->delegateProxy_ = originProxy;
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_SetScreenStatus_001
+ * @tc.desc: Test SetScreenStatus with all event types
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_SetScreenStatus_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    #define COMMON_EVENT_SCREEN_ON_STR "usual.event.SCREEN_ON"
+    #define COMMON_EVENT_SCREEN_OFF_STR "usual.event.SCREEN_OFF"
+    
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SetScreenStatus(COMMON_EVENT_SCREEN_ON_STR));
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SetScreenStatus(COMMON_EVENT_SCREEN_OFF_STR));
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SetScreenStatus("UNKNOWN_EVENT"));
+    
+    #undef COMMON_EVENT_SCREEN_ON_STR
+    #undef COMMON_EVENT_SCREEN_OFF_STR
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_SetScreenLocked_001
+ * @tc.desc: Test SetScreenLocked with true/false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_SetScreenLocked_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SetScreenLocked(true));
+    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->SetScreenLocked(false));
+}
 } // namespace MMI
 } // namespace OHOS
