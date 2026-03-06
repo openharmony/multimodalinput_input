@@ -38,7 +38,8 @@ public:
     int32_t RegisterKnuckleSwitchByUserId(int32_t userId);
     int32_t SetKnucklePermissions(uint32_t permissions, bool enable);
     bool SkipKnuckleDetect();
-    int32_t SetKnuckleSwitch(bool knuckleSwitch);
+    int32_t SetKnuckleSwitch(int32_t uid, bool knuckleSwitch);
+    int32_t GetKnuckleSwitch(int32_t uid, bool &knuckleSwitch);
     void Dump(int32_t fd);
 private:
     DISALLOW_COPY_AND_MOVE(KnuckleHandlerComponent);

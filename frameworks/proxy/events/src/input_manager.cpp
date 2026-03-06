@@ -987,6 +987,11 @@ int32_t InputManager::SetKnuckleSwitch(bool knuckleSwitch)
     return InputMgrImpl.SetKnuckleSwitch(knuckleSwitch);
 }
 
+int32_t InputManager::GetKnuckleSwitch(bool &knuckleSwitch)
+{
+    return InputMgrImpl.GetKnuckleSwitch(knuckleSwitch);
+}
+
 int32_t InputManager::LaunchAiScreenAbility()
 {
     // LCOV_EXCL_START

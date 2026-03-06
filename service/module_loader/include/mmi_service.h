@@ -222,6 +222,7 @@ public:
     ErrCode SetMultiWindowScreenId(uint64_t screenId, uint64_t displayNodeScreenId) override;
     int32_t SetMultiWindowScreenIdInner(uint64_t screenId, uint64_t displayNodeScreenId);
     ErrCode SetKnuckleSwitch(bool knuckleSwitch) override;
+    ErrCode GetKnuckleSwitch(bool &knuckleSwitch) override;
     ErrCode LaunchAiScreenAbility() override;
     ErrCode GetMaxMultiTouchPointNum(int32_t &pointNum) override;
     ErrCode SubscribeInputActive(int32_t subscribeId, int64_t interval) override;
