@@ -4448,6 +4448,21 @@ HWTEST_F(MMIServerTest, MMIService_SetKnuckleSwitch_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MMIService_GetKnuckleSwitch_001
+ * @tc.desc: Test GetKnuckleSwitch returns ERROR_NOT_SYSAPI when uid is not 7011 or not system app
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIService_GetKnuckleSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIService mmiService;
+    bool knuckleSwitch = true;
+    ErrCode ret = mmiService.GetKnuckleSwitch(knuckleSwitch);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
  * @tc.name: MMIService_LaunchAiScreenAbility_001
  * @tc.desc: Test LaunchAiScreenAbility when keyHandler is nullptr
  * @tc.type: FUNC

@@ -1178,6 +1178,14 @@ public:
     int32_t SetKnuckleSwitch(bool knuckleSwitch);
 
     /**
+     * @brief Get enable or disable the knuckle switch.
+     * @param knuckleSwitch If knuckleSwitch is true knuckle enable else disable.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 24
+    */
+    int32_t GetKnuckleSwitch(bool &knuckleSwitch);
+
+    /**
      * @brief 拉起小艺识屏
      * @return 如果成功，则返回0；否则返回非0值。
      * @since 14

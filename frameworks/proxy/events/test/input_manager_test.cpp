@@ -6195,6 +6195,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKnuckleSwitch_001, TestSize.Level
     ASSERT_NO_FATAL_FAILURE(inputManager->SetKnuckleSwitch(knuckleSwitch));
 }
 
+/*
+ * @tc.name: InputManagerTest_SetKnuckleSwitch_001
+ * @tc.desc: GetKnuckleSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetKnuckleSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool knuckleSwitch = false;
+    std::shared_ptr<InputManager> inputManager = std::make_shared<InputManager>();
+    ASSERT_NO_FATAL_FAILURE(inputManager->GetKnuckleSwitch(knuckleSwitch));
+}
+
 void InputManagerTest::ReadMaxMultiTouchPointNum(int32_t &maxMultiTouchPointNum)
 {
     maxMultiTouchPointNum = -1;

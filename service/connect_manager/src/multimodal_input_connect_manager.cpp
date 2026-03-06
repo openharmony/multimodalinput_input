@@ -1165,6 +1165,13 @@ int32_t MultimodalInputConnectManager::SetKnuckleSwitch(bool knuckleSwitch)
     return multimodalInputConnectService_->SetKnuckleSwitch(knuckleSwitch);
 }
 
+int32_t MultimodalInputConnectManager::GetKnuckleSwitch(bool &knuckleSwitch)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetKnuckleSwitch(knuckleSwitch);
+}
+
 int32_t MultimodalInputConnectManager::LaunchAiScreenAbility()
 {
     // LCOV_EXCL_START
