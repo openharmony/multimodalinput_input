@@ -34,6 +34,7 @@
 #ifdef OHOS_BUILD_KNUCKLE
 #include "knuckle_handler_component.h"
 #endif // OHOS_BUILD_KNUCKLE
+#include "input_screen_capture_agent.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -109,6 +110,11 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
             MMI_HILOGD("Display screen unlocked");
             DISPLAY_MONITOR->SetScreenLocked(false);
+            // Unload libmmi-screen_capture.z.so when screen is on and unlocked
+            if (DISPLAY_MONITOR->GetScreenStatus() ==
+                EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+                InputScreenCaptureAgent::GetInstance().UnloadLibrary();
+            }
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             MMI_HILOGI("Received data share ready event");
             if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
