@@ -2334,7 +2334,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
                     WindowInputPolicy::FLAG_POINTER_CONFINED) {
                 windowInfo = std::make_optional(pointerLockedWindow_);
             } else {
-                windowInfo = SelectWindowInfo(coord.x, coord.y, lastPointerEventCopy);
+                windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
             }
         } else {
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
