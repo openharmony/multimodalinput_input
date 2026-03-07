@@ -2238,12 +2238,10 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 {
-    if (DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-        if (!isDisplayRemoved) {
-            CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
-        } else {
-            CursorDrawingComponent::GetInstance().DrawScreenCenterPointer(dragPointerStyle_);
-        }
+    if (!isDisplayRemoved) {
+        CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
+    } else {
+        CursorDrawingComponent::GetInstance().DrawScreenCenterPointer(dragPointerStyle_);
     }
 }
 
