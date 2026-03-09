@@ -210,5 +210,36 @@ HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_001, TestSize.Level1)
     hookHandler.OnConnected();
     EXPECT_EQ(hookHandler.hookCallback_, nullptr);
 }
+
+/**
+ * @tc.name: OnConnected_Test_002
+ * @tc.desc: Test OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventHookHandlerTest, OnConnected_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyEventHookHandler hookHandler;
+    auto callback = [](std::shared_ptr<KeyEvent>) {};
+    hookHandler.SetHookCallback(callback);
+    hookHandler.OnConnected();
+    EXPECT_EQ(hookHandler.hookCallback_, nullptr);
+}
+
+/**
+ * @tc.name: RemoveKeyEventHook_Test_001
+ * @tc.desc: Test RemoveKeyEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventHookHandlerTest, RemoveKeyEventHook_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyEventHookHandler hookHandler;
+    int32_t hookId = -1;
+    int32_t ret = hookHandler.RemoveKeyEventHook(hookId);
+    EXPECT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
