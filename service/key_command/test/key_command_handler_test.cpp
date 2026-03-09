@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1657,6 +1657,21 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_
     handler.hasRegisteredSensor_ = false;
     handler.UnregisterProximitySensor();
     EXPECT_NE(handler.hasRegisteredSensor_, true);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_UnregisterProximitySensor_003
+ * @tc.desc: Test UnregisterProximitySensor functionality
+ * @tc.type: FUNC
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterProximitySensor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.hasRegisteredSensor_ = true;
+    
+    ASSERT_NO_FATAL_FAILURE(handler.UnregisterProximitySensor());
+    EXPECT_EQ(handler.hasRegisteredSensor_, false);
 }
 
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION

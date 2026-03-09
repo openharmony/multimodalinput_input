@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -135,6 +135,91 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_IsLaunchAbility_003, TestSiz
     STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
     STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
     ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_CreateStatusConfigObserver_001
+ * @tc.desc: Test CreateStatusConfigObserver with valid config key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    STYLUS_HANDLER->isShortHandConfig_ = false;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(STYLUS_HANDLER->isShortHandConfig_);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_CreateStatusConfigObserver_002
+ * @tc.desc: Test CreateStatusConfigObserver config value update
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    STYLUS_HANDLER->isShortHandConfig_ = false;
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = false;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(STYLUS_HANDLER->stylusKey_.statusConfigValue == true);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_CreateStatusConfigObserver_003
+ * @tc.desc: Test CreateStatusConfigObserver with shorthand target config
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    STYLUS_HANDLER->isShortHandConfig_ = false;
+    STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(STYLUS_HANDLER->shortHandTarget_.statusConfigValue == true);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_CreateStatusConfigObserver_004
+ * @tc.desc: Test CreateStatusConfigObserver config already initialized
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(STYLUS_HANDLER->isShortHandConfig_);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_CreateStatusConfigObserver_005
+ * @tc.desc: Test CreateStatusConfigObserver with null keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    STYLUS_HANDLER->isShortHandConfig_ = false;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS
