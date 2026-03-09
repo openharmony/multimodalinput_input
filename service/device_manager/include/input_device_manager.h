@@ -98,6 +98,7 @@ public:
     std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const override;
     int32_t FindInputDeviceId(struct libinput_device* inputDevice) override;
     bool HasPointerDevice() override;
+    bool HasPointerDeviceIncludingVirtual();
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
@@ -124,9 +125,6 @@ public:
     bool IsTouchPadDevice(struct libinput_device *device) const;
     struct libinput_device* GetKeyboardDevice() const;
     void GetMultiKeyboardDevice(std::vector<struct libinput_device*> &inputDevice);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    bool HasVirtualPointerDevice();
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
     bool HasVirtualKeyboardDevice();
     bool IsVirtualKeyboardDeviceEverConnected();
@@ -184,6 +182,9 @@ private:
     bool IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    bool HasVirtualPointerDevice();
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     void RecoverInputDeviceEnabled(SessionPtr session);
     int32_t NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG

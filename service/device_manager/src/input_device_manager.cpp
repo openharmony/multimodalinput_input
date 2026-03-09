@@ -544,6 +544,13 @@ bool InputDeviceManager::HasPointerDevice()
     // LCOV_EXCL_STOP
 }
 
+bool InputDeviceManager::HasPointerDeviceIncludingVirtual()
+{
+    // LCOV_EXCL_START
+    return HasPointerDevice() || HasVirtualPointerDevice();
+    // LCOV_EXCL_STOP
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 bool InputDeviceManager::HasVirtualPointerDevice()

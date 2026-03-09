@@ -847,8 +847,7 @@ bool CursorDrawingInformation::IsPointerVisible()
                 return item.visible;
             }
         }
-        if (!(INPUT_DEV_MGR->HasPointerDevice() || WIN_MGR->IsMouseSimulate() ||
-        INPUT_DEV_MGR->HasVirtualPointerDevice()) || pid_ == 0) {
+        if (!(INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual() || WIN_MGR->IsMouseSimulate()) || pid_ == 0) {
             auto info = hapPidInfos_.back();
             MMI_HILOGI("Only hap visible pid:%{public}d-visible:%{public}s", info.pid, info.visible ? "true" : "false");
             return info.visible;
@@ -963,8 +962,7 @@ int32_t CursorDrawingInformation::SetPointerVisible(int32_t pid, bool visible, i
         pidInfos_.pop_front();
     }
     if (!WIN_MGR->HasMouseHideFlag() ||
-        INPUT_DEV_MGR->HasPointerDevice() ||
-        INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+        INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
         auto pointerInstance = CursorDrawingComponent::GetInstance().GetPointerInstance();
         if (pointerInstance != nullptr) {
             pointerInstance->UpdatePointerVisible();
@@ -1020,7 +1018,7 @@ int32_t CursorDrawingInformation::SetPointerStyle(int32_t userId, int32_t pid, i
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
-    if (!INPUT_DEV_MGR->HasPointerDevice() && !INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+    if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
     }
