@@ -79,6 +79,7 @@ ohos_fuzztest("EnableHardwareCursorStatsFuzzTest") {
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
