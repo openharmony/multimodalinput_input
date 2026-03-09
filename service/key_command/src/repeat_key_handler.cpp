@@ -122,7 +122,8 @@ bool RepeatKeyHandler::HandleRepeatKey(const RepeatKey& item, const std::shared_
                 return false;
             }
             if (!statusValue) {
-                MMI_HILOGE("Get value from setting data, statusConfig:%{public}s, result is false", item.statusConfig.c_str());
+                MMI_HILOGE("Get value from setting data, statusConfig:%{public}s",
+                    item.statusConfig.c_str());
                 return false;
             }
         }
@@ -301,7 +302,8 @@ bool RepeatKeyHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared_
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         context_.repeatKey_.keyCode = item.keyCode;
         context_.repeatKey_.keyAction = keyEvent->GetKeyAction();
-        MMI_HILOGI("Update repeatkey status, keyCode:%{private}d, keyAction:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGI("Update repeatkey status, keyCode:%{private}d, keyAction:%{public}d",
+            keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
@@ -312,14 +314,16 @@ bool RepeatKeyHandler::CheckSpecialRepeatKey(RepeatKey& item, const std::shared_
     if (IsCallScene()) {
         return true;
     }
-    MMI_HILOGI("Check special repeat key, screenStatus:%{public}s, isScreenLocked:%{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("Check special repeat key, screenStatus:%{public}s, isScreenLocked:%{public}d",
+        screenStatus.c_str(), isScreenLocked);
     if ((screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) &&
         !IsMusicActivate()) {
         if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
 #ifdef OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
             service_.CallMistouchPrevention();
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
-            MMI_HILOGI("CheckSpecialRepeatKey match, skip repeat key handling, keyCode:%{private}d", keyEvent->GetKeyCode());
+            MMI_HILOGI("CheckSpecialRepeatKey match, skip repeat key handling, keyCode:%{private}d",
+                keyEvent->GetKeyCode());
         }
         return false;
     }

@@ -229,7 +229,8 @@ int32_t TwoFingerGestureHandler::LaunchAiScreenAbility(int32_t pid)
         return RET_ERR;
     }
 
-    MMI_HILOGI("Launch two finger gesture ability, bundleName:%{public}s", context_.twoFingerGesture_.ability.bundleName.c_str());
+    MMI_HILOGI("Launch two finger gesture ability, bundleName:%{public}s",
+        context_.twoFingerGesture_.ability.bundleName.c_str());
     LaunchTwoFingerAbility(context_.twoFingerGesture_);
 
     context_.twoFingerGesture_.startTime = 0;

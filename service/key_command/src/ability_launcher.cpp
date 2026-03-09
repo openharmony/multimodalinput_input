@@ -55,7 +55,8 @@ void AbilityLauncher::LaunchAbility(const Ability &ability)
 
     MMI_HILOGW("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     if (keyCommandService_ == nullptr) {
-        MMI_HILOGE("keyCommandService_ is null, cannot launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+        MMI_HILOGE("keyCommandService_ is null, cannot launch ability, bundleName:%{public}s",
+            ability.bundleName.c_str());
         return;
     }
     if (ability.abilityType == EXTENSION_ABILITY) {

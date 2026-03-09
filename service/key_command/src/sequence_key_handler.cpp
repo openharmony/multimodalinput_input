@@ -238,7 +238,8 @@ bool SequenceKeyHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunch
         return true;
     }
     if (sequence.abilityStartDelay == 0) {
-        MMI_HILOGI("Start launch sequence ability immediately, bundleName:%{public}s", sequence.ability.bundleName.c_str());
+        MMI_HILOGI("Start launch sequence ability immediately, bundleName:%{public}s",
+            sequence.ability.bundleName.c_str());
         LaunchSequenceAbility(sequence);
         isLaunchAbility = true;
         return true;
