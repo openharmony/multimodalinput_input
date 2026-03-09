@@ -72,6 +72,7 @@ ohos_fuzztest("ConnectProxy10FuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",

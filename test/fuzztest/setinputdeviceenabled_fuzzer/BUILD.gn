@@ -47,6 +47,7 @@ ohos_fuzztest("SetInputDeviceEnabledFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
