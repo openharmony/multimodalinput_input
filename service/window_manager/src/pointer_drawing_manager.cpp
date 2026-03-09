@@ -290,6 +290,7 @@ PointerDrawingManager::PointerDrawingManager()
         hardwareCursorPointerManager_->SetHdiServiceState(false);
     }
     if (hardwareCursorPointerManager_->IsSupported()) {
+        pointerRenderer_.LoadPointerToCache(CursorDrawingInformation::GetInstance().GetMouseIconPath());
         g_hardwareCanvasSize = GetCanvasSize();
         g_focalPoint = GetFocusCoordinates();
     }
@@ -381,6 +382,14 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPF(surfaceNodePtr);
     if (GetHardCursorEnabled()) {
+        if (GetCursorBlurEnabled) {
+            if (!vsyncStart_.load()) {
+                MMI_HILOGI("vsync stop, try render and move");
+                std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
+                RenderAndMoveOnVsync(physicalX, physicalY, false, MOUSE_ICON(lastMouseStyle_.id));
+            }
+            return vsyncStart_.load();
+        }
         if (!magicCursorSetBounds) {
             if (lastMouseStyle_.id != MOUSE_ICON::LOADING && lastMouseStyle_.id != MOUSE_ICON::RUNNING) {
                 // Change the coordinates issued by RS to asynchronous,
@@ -394,6 +403,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
                 MoveRetryAsync(physicalX, physicalY);
             }
         }
+        moveFinshed_.store(true);
     } else {
         if (!magicCursorSetBounds) {
             surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
@@ -458,21 +468,29 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
         lastDirection_ = direction;
     }
     lastMouseStyle_ = pointerStyle;
-    if (GetHardCursorEnabled()) {
-        UpdatePointerVisible();
-    } else {
-        int32_t UpdateLayerRes = UpdateMouseLayer(physicalX, physicalY);
-        if (UpdateLayerRes != RET_OK) {
-            MMI_HILOGE("Update Mouse Layer failed.");
-        }
-        UpdatePointerVisible();
-    }
+    UpdatePointerVisibleOnStyleChange(physicalX, physicalY);
     CursorDrawingInformation::GetInstance().SetMouseIconUpdate(false);
     offRenderScaleUpdate_ = false;
     mouseDirectionUpdate_ = false;
     MMI_HILOGD("Leave, rsId:%{public}" PRIu64 ", physicalX:%{private}d, physicalY:%{private}d",
         rsId, physicalX, physicalY);
     return RET_OK;
+}
+
+void PointerDrawingManager::UpdatePointervisibleOnStyleChange(int32_t physicalX, int32_t physicalY)
+{
+    if (GetCursorBlurEnabled()) {
+        MMI_HILOGI("Cursor style change, pending style ++");
+        mouseStylePending_.fetch_add(1);
+    }
+    if (GetHardCursorEnabled()) {
+        UpdatePointerVisible();
+    } else {
+        if (UpdateMouseLayer(physicalX, physicalY) != RET_OK) {
+            MMI_HILOGE("Update Mouse Layer failed.");
+        }
+        UpdatePointerVisible();
+    }
 }
 
 int32_t PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY)
@@ -520,8 +538,13 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
+    resample_.AddPoint(physicalX, physicalY, rsId);
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
+    if (moveFinished_.load()) {
+        UpdateCursorBlurEnabled();
+        moveFinshed_.store(false);
+    }
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
@@ -738,6 +761,8 @@ int32_t PointerDrawingManager::InitVsync(MOUSE_ICON mouseStyle)
         }
         g_isReStartVsync = false;
     }
+    vsyncStart_.store(true);
+    MMI_HILOGI("Start vsync");
     return RequestNextVSync();
 }
 
@@ -782,6 +807,9 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (GetHardCursorEnabled()) {
         MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
+        if (GetCursorBlurEnabled) {
+            return RET_OK;
+        }
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
             return InitVsync(mouseStyle);
         }
@@ -790,9 +818,9 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         // Change the drawing to asynchronous, and when obtaining the surfaceBuffer fails,
         // repeatedly obtain the surfaceBuffer.
         PostSoftCursorTask([this, mouseStyle]() {
-            SoftwareCursorRender(mouseStyle);
+            SoftwareCursorRender(mouseStyle, lastPhysicalX_, lastPhysicalY_);
         });
-        HardwareCursorRender(mouseStyle);
+        HardwareCursorRender(mouseStyle, lastPhysicalX_, lastPhysicalY_);
         return RET_OK;
     }
     return DrawCursor(mouseStyle);
@@ -1141,37 +1169,72 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
     }
 }
 
-void PointerDrawingManager::OnVsync(uint64_t timestamp)
+void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDynamic, MOUSE_ICON mouseStyle)
 {
-    if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
-        MMI_HILOGE("Current mouse style is not equal to last mouse style");
-        return;
-    }
-    if (!CursorDrawingInformation::GetInstance().IsPointerVisible() || !mouseDisplayState_) {
-        MMI_HILOGE("Mouse is hide, stop request vsync");
-        return;
-    }
-    PostTask([this]() -> void {
-        std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
-        if (currentMouseStyle_.id != MOUSE_ICON::RUNNING && currentMouseStyle_.id != MOUSE_ICON::LOADING) {
-            MMI_HILOGE("Current post task mouse style is not equal to last mouse style");
-            return;
-        }
-
-        HardwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
-        ResetMoveRetryTimer();
-        if (HardwareCursorMove(lastPhysicalX_, lastPhysicalY_) != RET_OK) {
-            MoveRetryAsync(lastPhysicalX_, lastPhysicalY_);
-        }
+    if (isDynamic) {
         PostSoftCursorTask([this]() {
-            SoftwareCursorDynamicRender(MOUSE_ICON(currentMouseStyle_.id));
-            SoftwareCursorMove(displayId_, lastPhysicalX_, lastPhysicalY_);
+            SoftwareCursorDynamicRender(mouseStyle);
         });
+        HardwareCursorDynamicRender(mouseStyle);
         currentFrame_++;
         if (currentFrame_ == frameCount_) {
             currentFrame_ = 0;
         }
         CursorDrawingInformation::GetInstance().SetMouseIconUpdate(false);
+    } else {
+        if (mouseStylePending_.load() > 0) {
+            MMI_HILOGD("cursor style update, mouseStylePending_:%{public}d", mouseStylePending_.load());
+            PostSoftCursorTask([this]() {
+                SoftwareCursorRender(mouseStyle, x, y);
+            });
+            HardwareCursorRender(mouseStyle, x, y);
+            mouseStylePending_.fetch_sub(1);
+        } else if (mouseStyle == MOUSE_ICON::DEFAULT) {
+            HardwareCursorRender(mouseStyle, x, y);
+        }
+    }
+    SoftwareCursorMoveAsync(displayId_, x, y);
+    ResetMoveRetryTimer();
+    if (HardwareCursorMove(x, y) != RET_OK) {
+        MoveRetryAsync(x, y);
+    }
+    moveFinshed_.store(true);
+}
+
+
+
+
+void PointerDrawingManager::OnVsync(uint64_t timestamp)
+{
+    MOUSE_ICON mouseStyle = MOUSE_ICON(currentMouseStyle_.id);
+    bool isDynamic = (mouseStyle == MOUSE_ICON::LOADING || mouseStyle == MOUSE_ICON::RUNNING);
+    if (!CursorDrawingInformation::GetInstance().IsPointerVisible() || !mouseDisplayState_) {
+        MMI_HILOGE("Mouse is hide, stop request vsync");
+        if (!isDynamic) {
+            PostSoftCursorTask([this]() {
+                SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_);
+            });
+            HideHardwareCursors();
+        }
+        vsyncStart_.store(false);
+        return;
+    }
+
+    if ((!resample_.HasCoords() || !GetCursorBlurEnabled()) && !isDynamic) {
+        MMI_HILOGE("No coords, stop request vsync");
+        vsyncStart_.store(false);
+        return;
+    }
+    PostTask([this, timestamp, mouseStyle, isDynamic]() -> void {
+        std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
+        MMI_HILOGD("mouseStyle:%{public}d, isDynamic:%{public}d", static_cast<uint32_t>(mouseStyle), isDynamic);
+        uint64_t resampleTimestamp = GetResampleTimestamp(timestamp);
+        int32_t x = lastPhysicalX_;
+        int32_t y = lastPhysicalY_;
+        if (!resample.GetResampledCoords(x, y, resampleTimestamp)) {
+            MMI_HILOGD("Failed to get resampled coords");
+        }
+        RenderAndMoveOnVsync(x, y, isDynamic, mouseStyle);
     });
     RequestNextVSync();
 }
@@ -1195,6 +1258,7 @@ int32_t PointerDrawingManager::RequestNextVSync()
 
 void PointerDrawingManager::RenderThreadLoop()
 {
+    SetThreadName(std::string("Render"));
     isRenderRunning_.store(true);
     runner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(runner_);
@@ -1238,6 +1302,7 @@ void PointerDrawingManager::SoftCursorRenderThreadLoop()
 
 void PointerDrawingManager::MoveRetryThreadLoop()
 {
+    SetThreadName(std::string("MoveRetry"));
     moveRetryRunner_ = AppExecFwk::EventRunner::Create(false);
     CHKPV(moveRetryRunner_);
     moveRetryHandler_ = std::make_shared<AppExecFwk::EventHandler>(moveRetryRunner_);
@@ -1732,6 +1797,10 @@ void PointerDrawingManager::CreatePointerWindow(uint64_t rsId, int32_t physicalX
         }
     }
     screenId_ = rsId;
+    if (GetCursorBlurEnabled()) {
+        mouseStylePending_.store(1);
+        MMI_HILOGI("createPointerWindow, set mouseStylePending_ to 1");
+    }
     AttachToDisplay();
     lastDisplayId_ = rsId;
     MMI_HILOGI("CreatePointerWindow The screenId_:%{public}" PRIu64, screenId_);
@@ -2609,22 +2678,13 @@ void PointerDrawingManager::UpdatePointerVisible()
         surfaceNodePtr->SetVisible(true);
         POINTER_DEV_MGR.isPointerVisible = true;
         if (GetHardCursorEnabled()) {
-            if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
-                MMI_HILOGE("Init Layer failed");
-                return;
-            }
-            if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_)) {
-                MMI_HILOGE("SetCursorLocation fail");
-            }
+            ShowCursorWhenHardwareCursorEnabled();
         }
         MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s, displayId_:%{public}" PRIu64,
             mouseDisplayState_ ? "true" : "false", displayId_);
     } else {
         if (GetHardCursorEnabled()) {
-            PostSoftCursorTask([this]() {
-                SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
-            });
-            HideHardwareCursors();
+            HideCursorWhenHardwareCursorEnabled();
         }
         surfaceNodePtr->SetVisible(false);
         RecordCursorVisibleStatus(false);
@@ -2632,6 +2692,34 @@ void PointerDrawingManager::UpdatePointerVisible()
             mouseDisplayState_ ? "true" : "false", displayId_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
+void PointerDrawingManager::ShowCursorWhenHardwareCursorEnabled()
+{
+    if (GetCursorBlurEnabled()) {
+        MMI_HILOGI("showCursor, init vsync");
+        InitVsync(MOUSE_ICON(lastMouseStyle_.id));
+    } else {
+        if (InitLayer(MOUSE_ICON(lastMouseStyle_.id)) != RET_OK) {
+            MMI_HILOGE("Init Layer failed");
+            return;
+        }
+        if (!SetCursorLocation(lastPhysicalX_, lastPhysicalY_)) {
+            MMI_HILOGE("SetCursorLocation fail");
+        }
+    }
+}
+void PointerDrawingManager::HideCursorWhenHardwareCursorEnabled()
+{
+    if (GetCursorBlurEnabled()) {
+        MMI_HILOGI("hideCursor, init vsync");
+        InitVsync(MOUSE_ICON(lastMouseStyle_.id));
+    } else {
+        PostSoftCursorTask([this]() {
+                SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_);
+            });
+        HideHardwareCursors();
+    }
 }
 
 void PointerDrawingManager::DeleteSurfaceNode()
@@ -2654,6 +2742,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y, uint64_t rs
     FixCursorPosition(x, y);
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
+    resample_.AddPoint(lastPhysicalX_, lastPhysicalY_, rsId);
     MMI_HILOGD("Pointer window move, x:%{private}d, y:%{private}d", lastPhysicalX_, lastPhysicalY_);
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
@@ -2952,7 +3041,7 @@ void PointerDrawingManager::UpdateBindDisplayId(uint64_t rsId)
     if (GetHardCursorEnabled()) {
         // 隐藏上一个屏幕的软、硬光标
         PostSoftCursorTask([this]() {
-            SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON);
+            SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_);
         });
         HideHardwareCursors();
         Rosen::RSTransaction::FlushImplicitTransaction();
@@ -3115,7 +3204,7 @@ Direction PointerDrawingManager::CalculateRenderDirection(bool isHard)
 }
 
 void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp,
-    MOUSE_ICON mouseStyle, bool isHard)
+    MOUSE_ICON mouseStyle, bool isHard, int32_t x, int32_t y, uint64_t screenId)
 {
     CHKPV(sp);
     auto mouseIcons = CursorDrawingInformation::GetInstance().GetMouseIconsMap();
@@ -3125,6 +3214,10 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.color = static_cast<uint32_t>(GetPointerColor(GetCurrentUser()));
     cfg.size = static_cast<uint32_t>(GetPointerSize(GetCurrentUser()));
     cfg.isHard = isHard;
+    cfg.x = x;
+    cfg.y = y;
+    cfg.screenId = screenId;
+    cfg.isBlur = mouseStyle == MOUSE_ICON::DEFAULT && GetCursorBlurEnabled();
     float scale = isHard ? sp->GetScale() : 1.0f;
     cfg.dpi = sp->GetDPI() * scale;
     Direction direction = CalculateRenderDirection(isHard);
@@ -3140,13 +3233,13 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     }
 }
 
-void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
+void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y)
 {
     auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         CHKPV(it.second);
         RenderConfig cfg;
-        CreateRenderConfig(cfg, it.second, mouseStyle, true);
+        CreateRenderConfig(cfg, it.second, mouseStyle, true, x, y, it.first);
         MMI_HILOGI("screen:%{public}" PRIu64 ", mode:%{public}u, dpi:%{public}f, screenId_:%{public}" PRIu64,
             it.first, it.second->GetMode(), cfg.dpi, screenId_);
         if (it.second->IsMirror() || it.first == screenId_) {
@@ -3162,13 +3255,13 @@ void PointerDrawingManager::HardwareCursorRender(MOUSE_ICON mouseStyle)
     MMI_HILOGD("HardwareCursorRender completed");
 }
 
-void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle)
+void PointerDrawingManager::SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y)
 {
     auto screenPointers = CopyScreenPointers();
     for (auto it : screenPointers) {
         CHKPV(it.second);
         RenderConfig cfg;
-        CreateRenderConfig(cfg, it.second, mouseStyle, false);
+        CreateRenderConfig(cfg, it.second, mouseStyle, false, x, y, it.first);
         MMI_HILOGI("SoftwareCursorRender, screen:%{public}" PRIu64 ", mode:%{public}u,"
                    " dpi:%{public}f, direction:%{public}d, screenId_:%{public}" PRIu64,
                    it.first, it.second->GetMode(), cfg.dpi, cfg.direction, screenId_);
@@ -3758,6 +3851,182 @@ void PointerDrawingManager::OnSwitchUser(int32_t userId)
 
     MMI_HILOGI("OnSwitchUser completed, pointerStyle.id:%{public}d, color:%{public}d, size:%{public}d",
         curPointerStyle.id, curPointerStyle.color, curPointerStyle.size);
+}
+
+ bool PointerDrawingManager::GetCursorBlurEnabled()
+ {
+    std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
+    return lastCursorBlurEnabled_;
+ }
+
+void PointerDrawingManager::UpdateCursorBlurEnabled()
+{
+    std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
+    currentCursorBlurEnabled_ = system.GetBoolParameter("rosen.multimodalinput.pc.support_blur_cursor", true);
+    MMI_HILOGD("UpdateCursorBlurEnabled, current%{public}d, last:%{public}d",
+        currentCursorBlurEnabled_, lastCursorBlurEnabled_);
+    if (currentCursorBlurEnabled_ != lastCursorBlurEnabled_) {
+        MMI_HILOGI("Cursor blur enabled status changed, currentCursorBlurEnabled_:%{public}d",
+            currentCursorBlurEnabled_);
+        lastCursorBlurEnabled_ = currentCursorBlurEnabled_;
+    }
+}
+
+uint64_t PointerDrawingManager::GetResampleTimestamp(uint64_t timestamp)
+{
+    sruct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    constexpr uint64_t NS_IN_S = 1000000000;
+    constexpr uint64_t NS_IN_MS = 1000000;
+    constexpr int64_t VSYNC_PEROID_NS = 16666667; // 60Hz
+    uint64_t recvTime = ts.tv_sec * NS_IN_S + ts.tv_nsec;
+    auto compensation = timestamp > recvTime ? timestamp - recvTime : 0;
+    int64_t period = 0;
+    if (!receiver_ || receiver_->GetVsyncPeriod() != RET_OK) {
+        period = VSYNC_PEROID_NS;
+    }
+    auto time = timestamp > period ? timestamp - period + NS_IN_MS : NS_IN_MS;
+    auto resampleTime = time > compensation ? time - compensation : 0;
+    return resampleTime;
+}
+
+void ResampleAlgorithm::AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId)
+{
+    constexpr size_t MAX_BUFFER_SIZE = 10;
+    constexpr int32_t TWICE = 2;
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (currentBuffer_.size() >= MAX_BUFFER_SIZE) {
+        currentBuffer_.pop_front();
+    }
+    currentBuffer_.push_back(Point{physicalX, physicalY, displayId});
+}
+
+bool ResampleAlgorithm::GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t timestamp)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (currentBuffer_.empty()) {
+        return false;
+    }
+    Point lastestPoint = currentBuffer_.back();
+    if (!CheckDifferentDisplayId()) {
+        MMI_HILOGD("Points in buffer have different displayId, skip resampling");
+        historyBuffer_ = currentBuffer_;
+        currentBuffer_.clear();
+        return false;
+    }
+    auto newXy = GetResampledCoords(timestamp);
+    MMI_HILOGD("GetResampledPoint, resampled coords: (%{private}d, %{private}d)",
+        newXy.x, newXy.y);
+    if (newXy.x != 0 && newXy.y != 0) {
+        outX = newXy.x;
+        outY = newXy.y;
+        return true;
+    }
+    historyBuffer_ = currentBuffer_;
+    currentBuffer_.clear();
+    return true;
+}
+
+bool ResampleAlgorithm::CheckDifferentDisplayId()
+{
+    if (currentBuffer_.empty()) {
+        return false;
+    }
+    bool checkCurrent = false;
+    auto displayId = currentBuffer_.front().displayId;
+    checkCurrent = std::all_of(currentBuffer_.begin(), currentBuffer_.end(),
+        [displayId](const Point& point) { return point.displayId == displayId; });
+    bool checkHistory = false;
+    if (!historyBuffer_.empty()) {
+        checkHistory = std::all_of(historyBuffer_.begin(), historyBuffer_.end(),
+            [displayId](const Point& point) { return point.displayId == displayId; });
+    }
+    return checkCurrent && checkHistory;
+}
+
+bool ResampleAlgorithm::HasCoords()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!currentBuffer_.empty()) {
+        return true;
+    }
+    if (keepResample_ <= 0) {
+        return false;
+    }
+    historyBuffer_.clear();
+    keepResample_--;
+    return true;
+}
+
+ResampleAlgorithm::Point ResampleAlgorithm::GetResampledCoords(uint64_t timestamp)
+{
+    if (currentBuffer_.empty() || historyBuffer_.empty()) {
+        return Point{0, 0, 0, 0};
+    }
+    constexpr uint64_t RESAMPLE_TIME_THRESHOLD_NS = 20000000; // 20ms
+    Point lastCurrent = currentBuffer_.back();
+    if (timestamp > lastCurrent.timestamp + RESAMPLE_TIME_THRESHOLD_NS) {
+        MMI_HILOGD("The time difference is too large, skip resampling");
+        return lastCurrent;
+    }
+    auto historyAvg = GetAvgPoint(historyBuffer_);
+    auto currentAvg = GetAvgPoint(currentBuffer_);
+    return LinearInterpolation(historyAvg, currentAvg, timestamp);
+}
+
+ResampleAlgorithm::Point ResampleAlgorithm::GetAvgPoint(const std::deque<Point>& events)
+{
+    if (events.empty()) {
+        return Point{0, 0, 0, 0};
+    }
+    int32_t avgX = 0;
+    int32_t avgY = 0;
+    uint64_t avgTimestamp = 0;
+    uint64_t count = 0;
+    uint64_t lastTime = 0;
+    uint64_t displayId = 0;
+    for (const auto& event : events) {
+        if (lastTime == 0 || event.timestamp != lastTime) {
+            avgX += event.x;
+            avgY += event.y;
+            avgTimestamp += event.timestamp;
+            displayId = event.displayId;
+            count++;
+            lastTime = event.timestamp;
+        }
+    }
+    if (count > 0) {
+        avgX /= count;
+        avgY /= count;
+        avgTimestamp /= count;
+    }
+    return Point{avgX, avgY, displayId, avgTimestamp};
+}
+
+ResampleAlgorithm::Point ResampleAlgorithm::LinearInterpolation(const Point& history,
+    const Point& current, uint64_t timestamp)
+{
+    constexpr uint64_t TIME_THRESHOLD = 100 * 1000000; // 100ms
+    constexpr int32_t NS_IN_S = 1000000000;
+    if (timestamp == history.timestamp || timestamp == current.timestamp || current.timestamp <= history.timestamp
+        || current.timestamp - history.timestamp > TIME_THRESHOLD || timestamp < history.timestamp) {
+        MMI_HILOGD("Timestamps are not suitable for interpolation, skip resampling");
+        return {0, 0, 0, 0};
+    }
+    if (timestamp < current.timestamp) {
+        float alpha = static_cast<float>(timestamp - history.timestamp) / (current.timestamp - history.timestamp);
+        float x = history.x + alpha * (current.x - history.x);
+        float y = history.y + alpha * (current.y - history.y);
+        MMI_HILOGD("Extrapolation alpha: %{public}f", alpha);
+        return Point{static_cast<int32_t>(x), static_cast<int32_t>(y), current.displayId, timestamp};
+    } else {
+        float alpha = static_cast<float>(timestamp - current.timestamp) / (history.timestamp - current.timestamp);
+        float x = current.x + alpha * (current.x - history.x);
+        float y = current.y + alpha * (current.y - history.y);
+        MMI_HILOGD("Extrapolation alpha: %{public}f", alpha);
+        return Point{static_cast<int32_t>(x), static_cast<int32_t>(y), current.displayId, timestamp};
+    }
+    return Point{0, 0, 0, 0};
 }
 } // namespace MMI
 } // namespace OHOS

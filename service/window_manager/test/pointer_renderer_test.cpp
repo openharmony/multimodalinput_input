@@ -209,6 +209,69 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: PointerRendererTest_Render_003
+ * @tc.desc: Test Render
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_Render_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    uuint32_t width = 10;
+    uint32_t height = 20;
+    uint8_t addr[800] = {10};
+    config.style_ = MOUSE_ICON::DEFAULT;
+    config.isHard = true;
+    config.isBlur = true;
+    int32_t ret = renderer.Render(addr, width, height, config);
+    EXPECT_EQ(ret, RET_OK);
+    config.isBlur = false;
+    ret = renderer.Render(addr, width, height, config);
+    EXPECT_EQ(ret, RET_OK);
+    config.isHard = false;
+    ret = renderer.Render(addr, width, height, config);
+    EXPECT_EQ(ret, RET_OK);
+    config.isBlur = true;
+    ret = renderer.Render(addr, width, height, config);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: PointerRendererTest_DefaultRender_001
+ * @tc.desc: Test Render
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    uint32_t width = 10;
+    uint32_t height = 20;
+    uint8_t addr[800] = {10};
+    config.style_ = MOUSE_ICON::TRANSPARENT_ICON;
+    int32_t ret = renderer.DefaultRender(addr, width, height, config);
+    EXPECT_EQ(ret, RET_OK);
+    config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
+    ret = renderer.DefaultRender(addr, width, height, config);
+    config.direction = 5;
+    EXPECT_EQ(ret, RET_ERR);
+    config.direction = 0;
+    config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ret = renderer.DefaultRender(addr, width, height, config);
+    EXPECT_EQ(ret, RET_ERR);
+    width = 0;
+    height = 0;
+    config.direction = 0;
+    config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ret = renderer.DefaultRender(addr, width, height, config);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
  * @tc.name: PointerRendererTest_DynamicRender_001
  * @tc.desc: Test DynamicRender
  * @tc.type: Function
