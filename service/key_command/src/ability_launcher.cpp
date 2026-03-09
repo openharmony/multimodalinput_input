@@ -55,7 +55,7 @@ void AbilityLauncher::LaunchAbility(const Ability &ability)
 
     MMI_HILOGW("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     if (keyCommandService_ == nullptr) {
-        MMI_HILOGE("[LaunchAbility] keyCommandService_ is null");
+        MMI_HILOGE("keyCommandService_ is null, cannot launch ability, bundleName:%{public}s", ability.bundleName.c_str());
         return;
     }
     if (ability.abilityType == EXTENSION_ABILITY) {
@@ -93,7 +93,7 @@ void AbilityLauncher::LaunchAbility(const Ability &ability, int64_t delay)
 {
     CALL_DEBUG_ENTER;
     if (ability.bundleName.empty()) {
-        MMI_HILOGW("BundleName is empty");
+        MMI_HILOGE("BundleName is empty, cannot launch ability");
         return;
     }
     AAFwk::Want want;
