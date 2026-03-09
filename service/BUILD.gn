@@ -3139,6 +3139,59 @@ ohos_unittest("ServerMsgHandlerTest") {
   }
 }
 
+ohos_unittest("AuthorizationDialogTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/common/include",
+    "${mmi_path}/service/message_handle/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "./ipc_blocklist.txt"
+  }
+
+  sources = [
+    "message_handle/test/authorization_dialog_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:app_manager",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "ffrt:libffrt",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+}
+
 ohos_unittest("PermissionHelperTest") {
   module_out_path = module_output_path
 
