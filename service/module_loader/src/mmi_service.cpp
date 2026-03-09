@@ -3104,7 +3104,7 @@ ErrCode MMIService::GetPointerLocation(int32_t &displayId, double &displayX, dou
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &displayId, &displayX, &displayY, clientPid] {
-            if (!INPUT_DEV_MGR->HasPointerDevice() && !INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+            if (!INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
                 MMI_HILOGE("There hasn't any pointer device");
                 return ERROR_DEVICE_NO_POINTER;
             }

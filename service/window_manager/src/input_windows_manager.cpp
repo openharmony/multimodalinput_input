@@ -2057,12 +2057,8 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     }
     UpdateDisplayMode(displayGroupInfo.groupId);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
-       (INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice())) {
-#else
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+       INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
         UpdatePointerChangeAreas(displayGroupInfo);
     }
     InitPointerStyle(displayGroupInfo.groupId);
@@ -2287,7 +2283,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
     }
     auto lastPointerEventCopy = GetLastPointerEvent();
     CHKPV(lastPointerEventCopy);
-    if (INPUT_DEV_MGR->HasPointerDevice() || INPUT_DEV_MGR->HasVirtualPointerDevice()) {
+    if (INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
         MouseLocation mouseLocation = GetMouseInfo();
         int32_t displayId = MouseEventHdr->GetDisplayId();
         displayId = displayId < 0 ? newId : displayId;
