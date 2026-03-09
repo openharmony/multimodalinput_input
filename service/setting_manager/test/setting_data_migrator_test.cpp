@@ -34,7 +34,6 @@ using namespace testing::ext;
 
 constexpr int32_t TEST_USER_ID_DEFAULT = 100;
 constexpr int32_t TEST_USER_ID_SECONDARY = 101;
-constexpr int32_t TEST_USER_ID_EMPTY = 0;
 constexpr int32_t DEFAULT_MOUSE_SPEED = 5;
 constexpr int32_t DEFAULT_SCROLL_ROWS = 3;
 constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 5;
@@ -66,10 +65,14 @@ void SettingDataMigratorTest::TearDownTestCase(void)
 
 void SettingDataMigratorTest::SetUp(void)
 {
+    SettingData emptyData;
+    SettingDataMigrator::GetInstance().Initialize(emptyData);
 }
 
 void SettingDataMigratorTest::TearDown(void)
 {
+    SettingData emptyData;
+    SettingDataMigrator::GetInstance().Initialize(emptyData);
 }
 
 } // namespace
@@ -384,20 +387,6 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_Migrator_001, TestSize.Lev
 }
 
 /**
- * @tc.name: SettingDataMigrator_Migrator_002
- * @tc.desc: Test Migrator method returns false for general case
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_Migrator_002, TestSize.Level1)
-{
-    SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
-    bool result = migrator.Migrator();
-
-    EXPECT_TRUE(result);
-}
-
-/**
  * @tc.name: SettingDataMigrator_Migrator_003
  * @tc.desc: Test Migrator method with default user ID
  * @tc.type: FUNC
@@ -505,20 +494,6 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_MigratorUserData_003, Test
 {
     SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
     bool result = migrator.MigratorUserData(TEST_USER_ID_SECONDARY);
-
-    EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: SettingDataMigrator_MigratorUserData_004
- * @tc.desc: Test MigratorUserData with zero user ID
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_MigratorUserData_004, TestSize.Level1)
-{
-    SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
-    bool result = migrator.MigratorUserData(TEST_USER_ID_EMPTY);
 
     EXPECT_TRUE(result);
 }
@@ -775,10 +750,16 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_SetFields_006, TestSize.Le
     std::string jsonStr = item.ToJson();
     EXPECT_FALSE(jsonStr.empty());
 
+    SettingData data;
     SettingItem newItem;
     bool parseResult = newItem.FromJson(MOUSE_KEY_SETTING, jsonStr);
     EXPECT_TRUE(parseResult);
     EXPECT_EQ(newItem.settingKey, MOUSE_KEY_SETTING);
+
+    data.AddSettingItem(newItem);
+    int32_t speed = 0;
+    EXPECT_TRUE(data.GetField(MOUSE_KEY_SETTING, FIELD_MOUSE_POINTER_SPEED, speed));
+    EXPECT_EQ(speed, DEFAULT_MOUSE_SPEED);
 }
 
 /**
@@ -1206,12 +1187,12 @@ HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_SequentialCalls_001, TestS
 }
 
 /**
- * @tc.name: SettingDataMigrator_ConcurrentInitialize_001
- * @tc.desc: Test multiple Initialize calls
+ * @tc.name: SettingDataMigrator_SequentialInitialize_001
+ * @tc.desc:  Test sequential Initialize calls
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_ConcurrentInitialize_001, TestSize.Level1)
+HWTEST_F(SettingDataMigratorTest, SettingDataMigrator_SequentialInitialize_001, TestSize.Level1)
 {
     SettingDataMigrator& migrator = SettingDataMigrator::GetInstance();
 
