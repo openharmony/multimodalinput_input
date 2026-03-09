@@ -40,8 +40,48 @@ constexpr float MAX_DPI {1.93f};   //1.93 is the max dpi for hardware cursor poi
 constexpr float EPSILON = 1e-6;
 constexpr uint32_t MAX_POINTER_SIZE {7};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+constexpr int32_t BLUR_NUM { 3 };
+constexpr int32_t BGRA_ALPHA_INDEX { 3 };
+constexpr float g_offset[] = {0.4f, 0.6f, 0.8f};
+constexpr float g_blur[] = {0.4f, 0.3f, 0.1f};
 
 namespace OHOS::MMI {
+static void ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul, const float pecent)
+{
+    if (!pixel || !isPixelPremul) {
+        MMI_HILOGE("Invalid pixel or not premultiplied");
+        return;
+    }
+    for (int32_t pixelIndex = 0; pixelIndex < len; pixelIndex++) {
+        if (pixelIndex != BGRA_ALPHA_INDEX) {
+            pixel[pixelIndex] = static_cast<uint8_t>(pixel[pixelIndex] * pecent);
+        }
+    }
+}
+
+static void SetAlpha(pixelmap_ptr_t pixelMap, const float pecent)
+{
+    if (!pixelMap) {
+        MMI_HILOGE("Invalid pixelMap");
+        return;
+    }
+    bool isPixelPremul = (pixelMap->GetAphaType() == Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL);
+    int32_t rowStride = pixelMap->GetRowStride();
+    int32_t height = pixelMap->GetHeight();
+    int32_t width = pixelMap->GetWidth();
+    uint8_t *pixels = static_cast<uint8_t *>(pixelMap->GetwritablePixels());
+    if (!pixels) {
+        MMI_HILOGE("Invalid pixels");
+        return;
+    }
+    for (int32_t i = 0; i < height; i++) {
+        for (int32_t j = 0; j < width; j++) {
+            uint8_t *pixel = pixels + i * rowStride + j * RENDER_STRIDE;
+            ApplyAlpha(pixel, RENDER_STRIDE, isPixelPremul, pecent);
+            pixel[BGRA_ALPHA_INDEX] = static_cast<uint8_t>(pixel[BGRA_ALPHA_INDEX] * pecent);
+        }
+    }
+}
 
 int32_t RenderConfig::GetImageSize() const
 {
@@ -67,7 +107,7 @@ std::string RenderConfig::ToString() const
     std::ostringstream oss;
     oss << "{style=" << style_ << ", align=" << align_ << ", color=" << color
         << ", size=" << size << ", direction=" << direction
-        <<", dpi=" << dpi
+        <<", dpi=" << dpi << ", screenId=" << screenId << ", isBlur=" << isBlur
         << ", isHard=" << isHard << ", ImageSize=" << GetImageSize() << "}";
     return oss.str();
 }
@@ -145,7 +185,11 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         (void)memset_s(addr, addrSize, 0, addrSize);
         return RET_OK;
     }
-
+    if (cfg.isHard && cfg.isBlur) {
+        MMI_HILOGD("default render");
+        return DefaultRender(addr, addrSize, width, height, cfg);
+    }
+    SetPointerCfg(cfg);
     // construct bitmap
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format {
@@ -174,13 +218,178 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     CHKPR(image, RET_ERR);
     // Draw image on canvas
     canvas.DrawImage(*image, cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
-
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), bitmap.ComputeByteSize());
     if (ret != EOK) {
         MMI_HILOGE("Memcpy_s failed");
         return RET_ERR;
     }
     return RET_OK;
+}
+
+int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
+    const RenderConfig &cfg)
+{
+    if (!cfg.isBlur) {
+        MMI_HILOGD("default render without blur");
+        return RET_ERR;
+    }
+    if (!defaultInit_) {
+        if (!defaultBitmap_.Build(width, height, defaultFormat_)) {
+            MMI_HILOGE("Default Bitmap build failed");
+        }
+        defaultCanvas_.Bind(defaultBitmap_);
+        LoadDefaultPointerImage(cfg);
+        SetPointercfg(cfg);
+        defaultInit_ = true;
+        MMI_HILOGI("default render init success");
+    }
+    if (!HasPointerCfg(cfg)) {
+        MMI_HILOGI("cfg change, render cfg:%{private}s", cfg.ToString().c_str());
+        LoadDefaultPointerImage(cfg);
+        SetPointercfg(cfg);
+    }
+    const auto& lastCfg = GetPointerCfg(cfg);
+    if (lastCfg.direction != cfg.direction) {
+        MMI_HILOGI("cfg change, rotate diretion");
+        int32_t directionFlag = -1;
+        int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
+        defaultCanvas_.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
+    }
+    defaultCanvas_.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    DrawBlurPointer(width, height, lastCfg, cfg);
+    DrawDefaultPointer(width, height, cfg);
+    SetPointerCfg(cfg);
+    errno_t ret = memcpy_s(addr, addrSize, defaultBitmap_.GetPixels(), addrSize);
+    if (ret != EOK) {
+        MMI_HILOGE("Memcpy_s failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void PointerRenderer::DrawDefaultPointer(uint32_t width, uint32_t height, const RenderConfig &cfg)
+{
+    const auto& images = screenImages_[cfg.screenId];
+    if (images.size() < BLUR_NUM + 1) {
+        MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
+        return;
+    }
+    if (!images[0]) {
+        MMI_HILOGE("Default pointer image is null");
+        return;
+    }
+    defaultCanvas_.DrawImage(*images[0], cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
+}
+
+void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg, const RenderConfig &cfg)
+{
+    const auto& images = screenImages_[cfg.screenId];
+    if (images.size() < BLUR_NUM + 1) {
+        MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
+        return;
+    }
+    for (int32_t i = 1; i <= BLUR_NUM; i++) {
+        if (!images[i]) {
+            MMI_HILOGE("Blur pointer image %{public}d is null", i);
+            continue;
+        }
+        int32_t localX = cfg.GetOffsetX() + (lastCfg.x - cfg.x) * g_offset[i - 1];
+        int32_t localY = cfg.GetOffsetY() + (lastCfg.y - cfg.y) * g_offset[i - 1];
+        int32_t imageSize = cfg.GetImageSize();
+        int32_t left = localX - imageSize / 2;
+        int32_t right = localX + imageSize / 2;
+        int32_t top = localY + imageSize / 2;
+        int32_t bottom = localY - imageSize / 2;
+        int32_t scale = imageSize / 4;
+        if (left < -scale || right > static_cast<int32_t>(width) + scale ||
+            bottom < -scale || top > static_cast<int32_t>(height) + scale) {
+            MMI_HILOGD("The blur image is out of bounds, no need to draw");
+            continue;
+        }
+        defaultCanvas_.DrawImage(*images[i], localX, localY, Rosen::Drawing::SamplingOptions());
+    }
+}
+
+bool PointerRenderer::hasPointerCfg(const RenderConfig &cfg)
+{
+    auto it = screenConfigs_.find(cfg.screenId);
+    if (it == screenConfigs_.end()) {
+        return false;
+    }
+    if (it->second != cfg) {
+        return false;
+    }
+    return true;
+}
+
+void PointerRenderer::SetPointerCfg(const RenderConfig &cfg)
+{
+    screenConfigs_[cfg.screenId] = cfg;
+}
+
+void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
+{
+    std::vector<image_ptr_t> images;
+    images.resize(BLUR_NUM + 1);
+    auto pixelmap = LoadCursorSvgWithColor(cfg);
+    if (!pixelmap) {
+        MMI_HILOGE("Load default cursor svg failed");
+        return;
+    }
+    auto defaultImage = ExtractDrawingImage(pixelmap);
+    if (!defaultImage) {
+        MMI_HILOGE("Extract default drawing image failed");
+        return;
+    }
+    images[0] = defaultImage;
+    for (int32_t i = 1; i <= BLUR_NUM; i++) {
+        pixelmap_ptr_t blurPixelMap = LoadCursorSvgWithColor(cfg);
+        if (!blurPixelMap) {
+            MMI_HILOGE("Load blur cursor svg failed");
+            continue;
+        }
+        SetAlpha(blurPixelMap, g_blur[i - 1]);
+        auto blurImage = ExtractDrawingImage(blurPixelMap);
+        if (!blurImage) {
+            MMI_HILOGE("Extract blur drawing image failed");
+            continue;
+        }
+        images[i] = blurImage;
+    }
+    screenImages_[cfg.screenId] = images;
+}
+
+void PointerRenderer::LoadPointerToCache(const std::map<MOUSE_ICON, IconStyle> &mouseIcons)
+{
+    std::string svgContent;
+    bool allLoaded = true;
+    for (const auto& [icon, style] : mouseIcons) {
+        if (!ReadFile(style.iconPath, svgContent)) {
+            MMI_HILOGE("read file failed for icon:%{public}d", icon);
+            allLoaded = false;
+            continue;
+        }
+        mouseIcons_[icon] = svgContent;
+    }
+    MMI_HILOGI("LoadPointerToCache, allLoaded:%{public}d", allLoaded);
+}
+
+bool PointerRenderer::GetPointerFromCache(const RenderConfig &cfg, std::string& svgContent)
+{
+    auto it = mouseIcons_.find(static_cast<MOUSE_ICON>(cfg.style_));
+    if (it != mouseIcons_.end()) {
+        svgContent = it->second;
+        MMI_HILOGI("Get pointer from cache for style:%{public}d", cfg.style_);
+        return true;
+    }
+    MMI_HILOGI("Pointer style:%{public}d not found in cache", cfg.style_);
+    if (ReadFile(style.iconPath, svgContent)) {
+        mouseIcons_[icon] = svgContent;
+        MMI_HILOGI("Read pointer file success for style:%{public}d", cfg.style_);
+        return true;
+    }
+    MMI_HILOGE("Read pointer file failed for style:%{public}d", cfg.style_);
+    return false;
 }
 
 image_ptr_t PointerRenderer::LoadPointerImage(const RenderConfig &cfg)
@@ -225,8 +434,8 @@ void SetCursorColorBaseOnStyle(const RenderConfig &cfg, OHOS::Media::DecodeOptio
 pixelmap_ptr_t PointerRenderer::LoadCursorSvgWithColor(const RenderConfig &cfg)
 {
     std::string svgContent;
-    if (!ReadFile(cfg.path_, svgContent)) {
-        MMI_HILOGE("read file failed");
+    if (!GetPointerFromCache(cfg, svgContent)) {
+        MMI_HILOGE("get pointer svg from cache failed");
         return nullptr;
     }
 
