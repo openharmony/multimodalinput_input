@@ -74,6 +74,7 @@ struct Touch {
   fixedDisplayY: Optional<i32>;
   globalX: Optional<i32>;
   globalY: Optional<i32>;
+  blobId: Optional<i32>;
 }
 
 struct TouchEvent {
