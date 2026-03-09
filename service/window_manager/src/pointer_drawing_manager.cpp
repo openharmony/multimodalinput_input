@@ -1612,6 +1612,18 @@ void PointerDrawingManager::AttachToDisplay()
                 ptr->SetAlpha(1 - alphaRatio);
             }
         }
+
+        auto screenPointers = CopyScreenPointers();
+        for (auto &[screenId, sp] : screenPointers) {
+            if (sp == nullptr) {
+                continue;
+            }
+            std::shared_ptr<Rosen::RSSurfaceNode> surfaceNodePtr = sp->GetSurfaceNode();
+            if (sp->IsMirror() && surfaceNodePtr != nullptr) {
+                surfaceNodePtr->AttachToDisplay(screenId);
+                MMI_HILOGI("AttachToDisplay mirror screenId:%{public}" PRIu64, screenId);
+            }
+        }
     }
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPV(surfaceNodePtr);
@@ -1677,15 +1689,6 @@ int32_t PointerDrawingManager::CreatePointerWindowForScreenPointer(uint64_t rsId
         MMI_HILOGI("ScreenPointer rsId %{public}" PRIu64 " displayInfo_.rsId %{public}" PRIu64,
             rsId, displayInfo_.rsId);
         Rosen::RSTransaction::FlushImplicitTransaction();
-    } else {
-        auto screenPointers = CopyScreenPointers();
-        for (auto &[screenId, sp] : screenPointers) {
-            std::shared_ptr<Rosen::RSSurfaceNode> surfaceNodePtr = (sp == nullptr) ? nullptr : sp->GetSurfaceNode();
-            if (surfaceNodePtr != nullptr) {
-                surfaceNodePtr->AttachToDisplay(screenId);
-                MMI_HILOGI("Attach screenId:%{public}" PRIu64, screenId);
-            }
-        }
     }
     CHKPR(sp, RET_ERR);
     SetSurfaceNode(sp->GetSurfaceNode()); // use SurfaceNode from current display
