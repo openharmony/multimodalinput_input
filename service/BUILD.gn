@@ -1913,6 +1913,43 @@ ohos_unittest("AccountManagerTest") {
   }
 }
 
+ohos_unittest("SettingDataMigratorTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/setting_manager/include",
+    "${mmi_path}/service/setting_manager/test",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "setting_manager/test/setting_data_migrator_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "preferences:native_preferences",
+  ]
+}
+
 ohos_unittest("SubscriberTest") {
   module_out_path = module_output_path
 
