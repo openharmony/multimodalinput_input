@@ -95,6 +95,7 @@ ohos_shared_library("libmmi-util") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "hisysevent:libhisysevent",
     "access_token:libaccesstoken_sdk",
     "ability_base:configuration",
