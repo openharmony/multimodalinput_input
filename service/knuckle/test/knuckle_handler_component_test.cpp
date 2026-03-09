@@ -507,20 +507,18 @@ HWTEST_F(KnuckleHandlerComponentTest, KnuckleHandlerComponentTest_GetKnuckleSwit
     EXPECT_CALL(*knuckleHandler, GetKnuckleSwitch(_, _)).WillOnce(
         [&isCalled] (int32_t uid, bool &knuckleSwitch) -> int32_t {
             (void)uid;
-            (void)knuckleSwitch;
+            knuckleSwitch = true;
             isCalled = true;
             return RET_OK;
         });
-    KnuckleHandlerComponent::GetInstance().impl_ = knuckleHandler;
-    int32_t ret = 0;
-    ret = KnuckleHandlerComponent::GetInstance().SetKnuckleSwitch(7011, true);
     bool switchStatus = false;
+    KnuckleHandlerComponent::GetInstance().impl_ = knuckleHandler;
     KnuckleHandlerComponent::GetInstance().GetKnuckleSwitch(7011, switchStatus);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(switchStatus);
+    
     KnuckleHandlerComponent::GetInstance().impl_ = nullptr;
     delete knuckleHandler;
     knuckleHandler = nullptr;
-    EXPECT_FALSE(switchStatus);
     EXPECT_TRUE(isCalled);
 }
 
