@@ -72,7 +72,7 @@ void TwoFingerGestureHandler::HandlePointerActionMoveEvent(const std::shared_ptr
         std::end(context_.twoFingerGesture_.touches),
         [id](const auto& item) { return item.id == id; });
     if (pos == std::end(context_.twoFingerGesture_.touches)) {
-        MMI_HILOGE("Cant't find the pointer id");
+        MMI_HILOGE("Cannot find the pointer id:%{public}d", id);
         return;
     }
     auto dx = std::abs(pos->x - item.GetDisplayX());
@@ -143,7 +143,7 @@ void TwoFingerGestureHandler::StopTwoFingerGesture()
 bool TwoFingerGestureHandler::CheckTwoFingerGestureAction() const
 {
     if (!context_.twoFingerGesture_.active) {
-        MMI_HILOGI("Two fingers active:%{public}d is fasle", context_.twoFingerGesture_.active);
+        MMI_HILOGI("Two fingers active:%{public}d is false", context_.twoFingerGesture_.active);
         return false;
     }
 
@@ -191,7 +191,7 @@ int32_t TwoFingerGestureHandler::CheckTwoFingerGesture(int32_t pid)
     int64_t milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     int64_t timeOut = milliseconds - context_.twoFingerGesture_.startTime;
     if (context_.twoFingerGesture_.touchEvent == nullptr) {
-        MMI_HILOGE("context_.twoFingerGesture_.touchEvent == nullptr");
+        MMI_HILOGE("TwoFingerGesture touchEvent is null, cannot check gesture");
         return RET_ERR;
     }
     if (timeOut > SCREEN_TIME_OUT) {
@@ -200,7 +200,7 @@ int32_t TwoFingerGestureHandler::CheckTwoFingerGesture(int32_t pid)
 
     if ((context_.twoFingerGesture_.windowId < 0) ||
         (context_.twoFingerGesture_.touchEvent->GetTargetWindowId() != context_.twoFingerGesture_.windowId)) {
-        MMI_HILOGE("Window changefocusWindowId:%{public}d, twoFingerGesture_.focusWindowId:%{public}d",
+        MMI_HILOGE("Window changed, currentWindowId:%{public}d, expectedWindowId:%{public}d",
             context_.twoFingerGesture_.touchEvent->GetTargetWindowId(),
             context_.twoFingerGesture_.windowId);
         return RET_ERR;
@@ -213,7 +213,7 @@ int32_t TwoFingerGestureHandler::CheckTwoFingerGesture(int32_t pid)
     }
 
     if (!context_.twoFingerGesture_.longPressFlag) {
-        MMI_HILOGE("The long press state is not set");
+        MMI_HILOGE("TwoFingerGesture long press state is not set, cannot launch ability");
         return RET_ERR;
     }
     return RET_OK;
@@ -229,7 +229,7 @@ int32_t TwoFingerGestureHandler::LaunchAiScreenAbility(int32_t pid)
         return RET_ERR;
     }
 
-    MMI_HILOGI("Start launch ai screen ability immediately");
+    MMI_HILOGI("Launch two finger gesture ability, bundleName:%{public}s", context_.twoFingerGesture_.ability.bundleName.c_str());
     LaunchTwoFingerAbility(context_.twoFingerGesture_);
 
     context_.twoFingerGesture_.startTime = 0;
