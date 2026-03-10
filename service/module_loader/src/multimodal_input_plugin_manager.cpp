@@ -133,15 +133,18 @@ bool InputPluginManager::LoadPlugin(const std::string &path)
         return false;
     }
     cPin->handle_ = handle;
-    InputPluginStage stage = iPin->GetStage();
 
-    auto result = plugins_.insert({stage, {cPin}});
-    if (!result.second) {
-        auto it = std::lower_bound(result.first->second.begin(), result.first->second.end(), cPin,
-            [](const std::shared_ptr<IPluginContext> &a, const std::shared_ptr<IPluginContext> &b) {
-                return a->GetPriority() < b->GetPriority();
-            });
-        result.first->second.insert(it, cPin);
+    for (const auto& stage : iPin->GetStages()) {
+        auto result = plugins_.insert({stage, {cPin}});
+        if (!result.second) {
+            auto it = std::lower_bound(result.first->second.begin(), result.first->second.end(), cPin,
+                [](const std::shared_ptr<IPluginContext> &a, const std::shared_ptr<IPluginContext> &b) {
+                    return a->GetPriority() < b->GetPriority();
+                });
+            result.first->second.insert(it, cPin);
+        }
+        MMI_HILOGI("Plugin %{public}s added to stage %{public}d", 
+                   iPin->GetName().c_str(), static_cast<int32_t>(stage));
     }
     return true;
 }
@@ -469,7 +472,12 @@ int32_t InputPlugin::Init(std::shared_ptr<IInputPlugin> pin)
 {
     name_ = pin->GetName();
     prio_ = pin->GetPriority();
-    stage_ = pin->GetStage();
+    stages_ = pin->GetStages();
+    if (stages_.empty()) {
+        MMI_HILOGE("Plugin returns empty stages.");
+        return RET_ERR;
+    }
+    stage_ = stages_[0];
     plugin_ = pin;
     return RET_OK;
 }
