@@ -568,6 +568,7 @@ void MMIService::OnStop()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+    ACCOUNT_MGR->AccountManagerUnregister();
 }
 
 void MMIService::AddAppDebugListener()

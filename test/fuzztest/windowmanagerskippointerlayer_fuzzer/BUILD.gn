@@ -29,6 +29,7 @@ ohos_fuzztest("WindowManagerSkipPointerLayerFuzzTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/account_manager/include",
   ]
   cflags = [
     "-g",
@@ -36,7 +37,10 @@ ohos_fuzztest("WindowManagerSkipPointerLayerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "windowmanagerskippointerlayer_fuzzer.cpp" ]
+  sources = [
+    "windowmanagerskippointerlayer_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/proxy:libmmi-common",
@@ -45,10 +49,13 @@ ohos_fuzztest("WindowManagerSkipPointerLayerFuzzTest") {
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
+    "ffrt:libffrt",
     "graphic_2d:librender_service_base",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "data_share:datashare_consumer",
   ]
 }
 

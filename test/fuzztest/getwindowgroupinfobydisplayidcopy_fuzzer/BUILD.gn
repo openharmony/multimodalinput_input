@@ -44,6 +44,7 @@ ohos_fuzztest("GetWindowGroupInfoByDisplayIdCopyFuzzTest") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
     "${mmi_path}/service/common/include",
   ]
   cflags = [
@@ -54,7 +55,10 @@ ohos_fuzztest("GetWindowGroupInfoByDisplayIdCopyFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "getwindowgroupinfobydisplayidcopy_fuzzer.cpp" ]
+  sources = [
+    "getwindowgroupinfobydisplayidcopy_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   configs = [
     "${mmi_path}/service:libmmi_server_config",
@@ -67,11 +71,13 @@ ohos_fuzztest("GetWindowGroupInfoByDisplayIdCopyFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

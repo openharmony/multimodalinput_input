@@ -55,7 +55,10 @@ ohos_fuzztest("IsWindowVisibleFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "iswindowvisible_fuzzer.cpp" ]
+  sources = [
+    "iswindowvisible_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   configs = [
     "${mmi_path}/service:libmmi_server_config",
@@ -68,11 +71,13 @@ ohos_fuzztest("IsWindowVisibleFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

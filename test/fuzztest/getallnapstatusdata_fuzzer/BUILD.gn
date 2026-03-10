@@ -46,6 +46,8 @@ ohos_fuzztest("GetAllNapstatusDataFuzzTest") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/common/include",
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",
@@ -62,7 +64,10 @@ ohos_fuzztest("GetAllNapstatusDataFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "getallnapstatusdata_fuzzer.cpp" ]
+  sources = [
+    "getallnapstatusdata_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -71,10 +76,12 @@ ohos_fuzztest("GetAllNapstatusDataFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
