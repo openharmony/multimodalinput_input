@@ -1150,7 +1150,7 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_CreateRender
     int32_t y = 0;
     int32_t screenId = 0;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(
-        cfg, screenpointer, mouseStyle,isHard, x, y, screenId));
+        cfg, screenpointer, mouseStyle, isHard, x, y, screenId));
 }
 
 /**
