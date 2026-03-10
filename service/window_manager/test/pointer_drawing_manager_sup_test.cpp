@@ -1146,7 +1146,10 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_CreateRender
     std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(nullptr, nullptr, displayInfo);
     MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     bool isHard = true;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(cfg, screenpointer, mouseStyle, isHard));
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t screenId = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(cfg, screenpointer, mouseStyle, isHard, x, y, screenId));
 }
 
 /**
@@ -1164,7 +1167,10 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_CreateRender
     std::shared_ptr<ScreenPointer> screenpointer = std::make_shared<ScreenPointer>(nullptr, nullptr, displayInfo);
     MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT;
     bool isHard = false;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(cfg, screenpointer, mouseStyle, isHard));
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t screenId = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(cfg, screenpointer, mouseStyle, isHard, x, y, screenId));
 }
 
 /**
