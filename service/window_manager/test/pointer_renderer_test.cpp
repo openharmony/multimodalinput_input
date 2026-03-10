@@ -219,7 +219,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_003, TestSize.Level1)
     CALL_TEST_DEBUG;
     RenderConfig config;
     PointerRenderer renderer;
-    uuint32_t width = 10;
+    uint32_t width = 10;
     uint32_t height = 20;
     uint8_t addr[800] = {10};
     config.style_ = MOUSE_ICON::DEFAULT;
@@ -252,22 +252,25 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     uint32_t width = 10;
     uint32_t height = 20;
     uint8_t addr[800] = {10};
+    constexpr uint32_t RENDER_STRIDE{4};
+    uint32_t addrSize = width * height * RENDER_STRIDE;
     config.style_ = MOUSE_ICON::TRANSPARENT_ICON;
-    int32_t ret = renderer.DefaultRender(addr, width, height, config);
+    int32_t ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_OK);
     config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
-    ret = renderer.DefaultRender(addr, width, height, config);
+    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     config.direction = 5;
     EXPECT_EQ(ret, RET_ERR);
     config.direction = 0;
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ret = renderer.DefaultRender(addr, width, height, config);
+    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_ERR);
     width = 0;
     height = 0;
     config.direction = 0;
+    addrSize = width * height * RENDER_STRIDE;
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ret = renderer.DefaultRender(addr, width, height, config);
+    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_ERR);
 }
 
