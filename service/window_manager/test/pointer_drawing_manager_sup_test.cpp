@@ -1201,9 +1201,11 @@ HWTEST_F(PointerDrawingManagerSupTest, PointerDrawingManagerSupTest_SoftwareCurs
     pointerDrawingManager.screenPointers_[displaysInfo.rsId] = spMirror;
     pointerDrawingManager.screenId_ = 100;
     MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle));
+    int32_t x = 0;
+    int32_t y = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle, x, y));
     pointerDrawingManager.screenId_ = 102;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SoftwareCursorRender(mouseStyle, x, y));
 }
 
 /**
