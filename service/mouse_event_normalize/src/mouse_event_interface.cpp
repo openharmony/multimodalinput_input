@@ -622,7 +622,7 @@ void MouseEventInterface::LoadMouse()
 
 void MouseEventInterface::LoadMouseExplicitly()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto mouse = GetMouse();
     if (mouse != nullptr) {
         ResetUnloadingTimer();
