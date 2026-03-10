@@ -42,8 +42,8 @@ constexpr uint32_t MAX_POINTER_SIZE {7};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 constexpr int32_t BLUR_NUM { 3 };
 constexpr int32_t BGRA_ALPHA_INDEX { 3 };
-constexpr float g_offset[] = {0.4f, 0.6f, 0.8f};
-constexpr float g_blur[] = {0.4f, 0.3f, 0.1f};
+constexpr float DEFAULT_OFFSET[] = {0.4f, 0.6f, 0.8f};
+constexpr float DEFAULT_BLUR[] = {0.4f, 0.3f, 0.1f};
 
 namespace OHOS::MMI {
 static void ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul, const float pecent)
@@ -281,7 +281,8 @@ void PointerRenderer::DrawDefaultPointer(uint32_t width, uint32_t height, const 
     defaultCanvas_.DrawImage(*images[0], cfg.GetOffsetX(), cfg.GetOffsetY(), Rosen::Drawing::SamplingOptions());
 }
 
-void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg, const RenderConfig &cfg)
+void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg,
+    const RenderConfig &cfg)
 {
     const auto& images = screenImages_[cfg.screenId];
     if (images.size() < BLUR_NUM + 1) {
@@ -293,8 +294,8 @@ void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const Ren
             MMI_HILOGE("Blur pointer image %{public}d is null", i);
             continue;
         }
-        int32_t localX = cfg.GetOffsetX() + (lastCfg.x - cfg.x) * g_offset[i - 1];
-        int32_t localY = cfg.GetOffsetY() + (lastCfg.y - cfg.y) * g_offset[i - 1];
+        int32_t localX = cfg.GetOffsetX() + (lastCfg.x - cfg.x) * DEFAULT_OFFSET[i - 1];
+        int32_t localY = cfg.GetOffsetY() + (lastCfg.y - cfg.y) * DEFAULT_OFFSET[i - 1];
         int32_t imageSize = cfg.GetImageSize();
         int32_t left = localX - imageSize / 2;
         int32_t right = localX + imageSize / 2;
@@ -357,7 +358,7 @@ void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
             MMI_HILOGE("Load blur cursor svg failed");
             continue;
         }
-        SetAlpha(blurPixelMap, g_blur[i - 1]);
+        SetAlpha(blurPixelMap, DEFAULT_BLUR[i - 1]);
         auto blurImage = ExtractDrawingImage(blurPixelMap);
         if (!blurImage) {
             MMI_HILOGE("Extract blur drawing image failed");

@@ -83,11 +83,11 @@ public:
         int32_t y { 0 };
         uint64_t displayId { 0 };
         uint64_t timestamp { 0 };
-        Point(int32_t x, int32_t y, uint64_t displayId, uint64_t timestamp) : 
-            x(x), y(y), displayId(displayId), timestamp(timestamp) {}
-        Point(int32_t x, int32_t y, uint64_t displayId) : 
-            x(x), y(y), displayId(displayId), timestamp(std::chrono::duration_cast<std::chrono::nanoseconds>(
-                std::chrono::high_resolution_clock::now().time_since_epoch()).count()) {}
+        Point(int32_t x, int32_t y, uint64_t displayId, uint64_t timestamp) : x(x), y(y),
+            displayId(displayId), timestamp(timestamp) {}
+        Point(int32_t x, int32_t y, uint64_t displayId) : x(x), y(y), displayId(displayId),
+            timestamp(std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()).count()) {}
     };
 public:
     ResampleAlgorithm() = default;
