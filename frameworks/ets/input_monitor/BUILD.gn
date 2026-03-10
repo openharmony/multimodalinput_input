@@ -46,6 +46,7 @@ ohos_taihe("run_taihe") {
   deps = [
     ":input_monitor_taihe",
     "${mmi_path}/frameworks/ets/key_code:key_code_taihe",
+    "${mmi_path}/frameworks/ets/touch_event:touch_event_taihe",
   ]
   outputs = [
     "$taihe_generated_file_path/src/ohos.multimodalInput.inputMonitor.ani.cpp",

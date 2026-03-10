@@ -91,6 +91,7 @@ public:
     MOCK_METHOD(const std::string, GetVersion, (), (override, const));
     MOCK_METHOD(const std::string, GetName, (), (override, const));
     MOCK_METHOD(InputPluginStage, GetStage, (), (override, const));
+    MOCK_METHOD(std::vector<InputPluginStage>, GetStages, (), (override, const));
     MOCK_METHOD(void, DeviceWillAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
     MOCK_METHOD(void, DeviceDidAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
     MOCK_METHOD(void, DeviceWillRemoved, (std::shared_ptr<InputDevice> inputDevice), (override));
