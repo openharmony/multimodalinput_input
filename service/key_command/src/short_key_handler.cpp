@@ -240,7 +240,7 @@ bool ShortKeyHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     if (shortcutKey.timerId < 0) {
         DfxHisysevent::ReportFailHandleKey("HandleKeyCancel", shortcutKey.finalKey,
             DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
-        MMI_HILOGD("HandleKeyCancel skipped, timerId:%{public}d < 0", shortcutKey.timerId);
+        MMI_HILOGE("HandleKeyCancel skipped, timerId:%{public}d < 0", shortcutKey.timerId);
     }
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
