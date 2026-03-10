@@ -3317,8 +3317,9 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     EventTouch& touchInfo, int32_t& physicalDisplayId, bool isNeedClear, bool hasValidAreaDowned)
 {
     CHKPF(touch);
+    int32_t toolType = libinput_event_touch_get_tool_type(touch);
     std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
-    if (screenId.empty() || (PRODUCT_TYPE == PRODUCT_TYPE_PC)) {
+    if (screenId.empty() || toolType == PointerEvent::TOOL_TYPE_THP_FEATURE || (PRODUCT_TYPE == PRODUCT_TYPE_PC)) {
         screenId = "default0";
     }
     auto info = FindPhysicalDisplayInfo(screenId);
