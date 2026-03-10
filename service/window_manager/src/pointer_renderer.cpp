@@ -65,11 +65,11 @@ static void SetAlpha(pixelmap_ptr_t pixelMap, const float pecent)
         MMI_HILOGE("Invalid pixelMap");
         return;
     }
-    bool isPixelPremul = (pixelMap->GetAphaType() == Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL);
+    bool isPixelPremul = (pixelMap->GetAlphaType() == Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL);
     int32_t rowStride = pixelMap->GetRowStride();
     int32_t height = pixelMap->GetHeight();
     int32_t width = pixelMap->GetWidth();
-    uint8_t *pixels = static_cast<uint8_t *>(pixelMap->GetwritablePixels());
+    uint8_t *pixels = static_cast<uint8_t *>(pixelMap->GetWritablePixels());
     if (!pixels) {
         MMI_HILOGE("Invalid pixels");
         return;
@@ -239,14 +239,14 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
         }
         defaultCanvas_.Bind(defaultBitmap_);
         LoadDefaultPointerImage(cfg);
-        SetPointercfg(cfg);
+        SetPointerCfg(cfg);
         defaultInit_ = true;
         MMI_HILOGI("default render init success");
     }
     if (!HasPointerCfg(cfg)) {
         MMI_HILOGI("cfg change, render cfg:%{private}s", cfg.ToString().c_str());
         LoadDefaultPointerImage(cfg);
-        SetPointercfg(cfg);
+        SetPointerCfg(cfg);
     }
     const auto& lastCfg = GetPointerCfg(cfg);
     if (lastCfg.direction != cfg.direction) {
@@ -310,7 +310,7 @@ void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const Ren
     }
 }
 
-bool PointerRenderer::hasPointerCfg(const RenderConfig &cfg)
+bool PointerRenderer::HasPointerCfg(const RenderConfig &cfg)
 {
     auto it = screenConfigs_.find(cfg.screenId);
     if (it == screenConfigs_.end()) {
@@ -383,8 +383,8 @@ bool PointerRenderer::GetPointerFromCache(const RenderConfig &cfg, std::string& 
         return true;
     }
     MMI_HILOGI("Pointer style:%{public}d not found in cache", cfg.style_);
-    if (ReadFile(style.iconPath, svgContent)) {
-        mouseIcons_[icon] = svgContent;
+    if (ReadFile(cfg.path_, svgContent)) {
+        mouseIcons_[static_cast<MOUSE_ICON>(cfg.style_)] = svgContent;
         MMI_HILOGI("Read pointer file success for style:%{public}d", cfg.style_);
         return true;
     }
