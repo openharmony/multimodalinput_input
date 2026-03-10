@@ -2057,8 +2057,12 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
     }
     UpdateDisplayMode(displayGroupInfo.groupId);
 #ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() &&
        INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual()) {
+#else // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         UpdatePointerChangeAreas(displayGroupInfo);
     }
     InitPointerStyle(displayGroupInfo.groupId);
@@ -2077,7 +2081,7 @@ void InputWindowsManager::UpdateDisplayInfo(OLD::DisplayGroupInfo &displayGroupI
 
     lastDpiMap_[groupId] = displayGroupInfoTemp.displaysInfo.empty() ? DEFAULT_DPI :
     displayGroupInfoTemp.displaysInfo[0].dpi;
-    if (INPUT_DEV_MGR->HasPointerDevice() && bFlag) {
+    if (INPUT_DEV_MGR->HasPointerDeviceIncludingVirtual() && bFlag) {
         NotifyPointerToWindow(groupId);
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
