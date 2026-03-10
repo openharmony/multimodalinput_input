@@ -203,7 +203,7 @@ bool SequenceKeyHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAb
         return true;
     }
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, &sequence] () {
-        MMI_HILOGI("Timer callback, screenshot delay %{public}d milisecond", LONG_ABILITY_START_DELAY);
+        MMI_HILOGI("Screenshot timer callback, delay:%{public}d ms", LONG_ABILITY_START_DELAY);
         LaunchSequenceAbility(sequence);
         sequence.timerId = -1;
     }, "SequenceKeyHandler-HandleScreenLocked");
@@ -238,7 +238,8 @@ bool SequenceKeyHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunch
         return true;
     }
     if (sequence.abilityStartDelay == 0) {
-        MMI_HILOGI("Start launch ability immediately");
+        MMI_HILOGI("Start launch sequence ability immediately, bundleName:%{public}s",
+            sequence.ability.bundleName.c_str());
         LaunchSequenceAbility(sequence);
         isLaunchAbility = true;
         return true;

@@ -155,7 +155,8 @@ bool KeyConfigParser::ParseShortcutKeys(const JsonParser &parser,
         shortcutKey.key = key;
         if (shortcutKeyMap.find(key) == shortcutKeyMap.end()) {
             if (!shortcutKeyMap.emplace(key, shortcutKey).second) {
-                MMI_HILOGW("Duplicate shortcutKey:%s", key.c_str());
+                MMI_HILOGW("Duplicate shortcutKey, key:%{private}s, bundleName:%{public}s",
+                    key.c_str(), shortcutKey.ability.bundleName.c_str());
             }
         }
     }
@@ -553,7 +554,7 @@ bool KeyConfigParser::GetSequenceKeys(const cJSON* jsonData, Sequence &sequence)
         }
         SequenceKey sequenceKey;
         if (!PackageSequenceKey(sequenceKeysJson, sequenceKey)) {
-            MMI_HILOGE("Packege sequence key failed");
+            MMI_HILOGE("Package sequence key failed, index:%{public}d", i);
             return false;
         }
         sequence.sequenceKeys.push_back(sequenceKey);
@@ -762,7 +763,7 @@ bool KeyConfigParser::GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt)
         return false;
     }
     if ((keyAction->valueint != KeyEvent::KEY_ACTION_DOWN) && (keyAction->valueint != KeyEvent::KEY_ACTION_UP)) {
-        MMI_HILOGE("THe key action must be down or up");
+        MMI_HILOGE("The key action must be down or up, current action:%{public}d", keyAction->valueint);
         return false;
     }
     keyActionInt = keyAction->valueint;
