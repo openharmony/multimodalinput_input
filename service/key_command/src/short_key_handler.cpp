@@ -219,7 +219,7 @@ bool ShortKeyHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, con
     }
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
     if (!keyItem) {
-        MMI_HILOGE("The keyItem is nullopt");
+        MMI_HILOGE("Get keyItem failed, keyItem is nullopt, keyCode:%{private}d", keyEvent->GetKeyCode());
         return false;
     }
     auto upTime = keyEvent->GetActionTime();
@@ -240,7 +240,7 @@ bool ShortKeyHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     if (shortcutKey.timerId < 0) {
         DfxHisysevent::ReportFailHandleKey("HandleKeyCancel", shortcutKey.finalKey,
             DfxHisysevent::KEY_ERROR_CODE::INVALID_PARAMETER);
-        MMI_HILOGE("Skip, timerid less than 0");
+        MMI_HILOGE("HandleKeyCancel skipped, timerId:%{public}d < 0", shortcutKey.timerId);
     }
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
@@ -255,7 +255,7 @@ bool ShortKeyHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> key
     CHKPF(keyEvent);
     if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode() &&
         keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGI("Handle consumed key event, cancel opration");
+        MMI_HILOGI("Handle consumed key event, cancel operation, keyCode:%{private}d", keyEvent->GetKeyCode());
         ResetCurrentLaunchAbilityKey();
         context_.repeatKey_.keyCode = -1;
         context_.repeatKey_.keyAction = -1;
