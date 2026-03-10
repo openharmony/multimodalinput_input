@@ -24,6 +24,8 @@ ohos_fuzztest("SetInputDeviceEnabledFuzzTest") {
   include_dirs = [
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",
@@ -33,7 +35,10 @@ ohos_fuzztest("SetInputDeviceEnabledFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "setinputdeviceenabled_fuzzer.cpp" ]
+  sources = [
+    "setinputdeviceenabled_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -42,9 +47,12 @@ ohos_fuzztest("SetInputDeviceEnabledFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
+    "data_share:datashare_consumer",
   ]
 }
 

@@ -44,6 +44,7 @@ ohos_fuzztest("ConnectProxy17FuzzTest") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   configs = [
     "${mmi_path}/service/filter:mmi_event_filter_config",
@@ -58,7 +59,10 @@ ohos_fuzztest("ConnectProxy17FuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "connectproxy17_fuzzer.cpp" ]
+  sources = [
+    "connectproxy17_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -68,6 +72,7 @@ ohos_fuzztest("ConnectProxy17FuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
@@ -76,12 +81,14 @@ ohos_fuzztest("ConnectProxy17FuzzTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "data_share:datashare_consumer",
   ]
 
   if (security_component_enable) {

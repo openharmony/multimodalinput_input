@@ -65,6 +65,7 @@ ohos_fuzztest("InjecteventSetDownTimeFuzzTest") {
     "${mmi_path}/service/common/include",
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/common/setting_datashare/include",
+    "${mmi_path}/service/account_manager/include",
   ]
   cflags = [
     "-g",
@@ -79,7 +80,10 @@ ohos_fuzztest("InjecteventSetDownTimeFuzzTest") {
     "${mmi_path}/common/anco/comm:mmi_anco_channel_config",
   ]
 
-  sources = [ "injecteventsetdowntime_fuzzer.cpp" ]
+  sources = [
+    "injecteventsetdowntime_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
@@ -102,6 +106,7 @@ ohos_fuzztest("InjecteventSetDownTimeFuzzTest") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",

@@ -44,6 +44,8 @@ ohos_fuzztest("CursorPixelMapFuzzTest") {
     "${mmi_path}/service/common/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
   ]
   cflags = [
     "-g",
@@ -56,6 +58,7 @@ ohos_fuzztest("CursorPixelMapFuzzTest") {
   sources = [
     "cursorpixelmap_fuzzer.cpp",
     "${mmi_path}/frameworks/proxy/events/src/pointer_style.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
   ]
 
   deps = [
@@ -65,11 +68,13 @@ ohos_fuzztest("CursorPixelMapFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

@@ -23,7 +23,9 @@ ohos_fuzztest("FindTouchStateFuzzTest") {
   fuzz_config_file = "${mmi_path}/test/fuzztest/findtouchstate_fuzzer"
   include_dirs = [ 
     "${mmi_path}/interfaces/util/common/include",
-    "${mmi_path}/service/event_resample/include"
+    "${mmi_path}/service/event_resample/include",
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_path}/service/common/setting_datashare/include",
    ]
   cflags = [
     "-g",
@@ -33,7 +35,10 @@ ohos_fuzztest("FindTouchStateFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "findtouchstate_fuzzer.cpp" ]
+  sources = [
+    "findtouchstate_fuzzer.cpp",
+    "${mmi_path}/test/fuzztest/mmi_fuzzer_helper/mmi_fuzzer_helper.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -42,11 +47,13 @@ ohos_fuzztest("FindTouchStateFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "ability_runtime:app_manager",
     "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
