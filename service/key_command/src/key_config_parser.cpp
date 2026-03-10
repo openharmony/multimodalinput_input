@@ -155,7 +155,7 @@ bool KeyConfigParser::ParseShortcutKeys(const JsonParser &parser,
         shortcutKey.key = key;
         if (shortcutKeyMap.find(key) == shortcutKeyMap.end()) {
             if (!shortcutKeyMap.emplace(key, shortcutKey).second) {
-                MMI_HILOGW("Duplicate shortcutKey, key:%{public}s, bundleName:%{public}s",
+                MMI_HILOGW("Duplicate shortcutKey, key:%{private}s, bundleName:%{public}s",
                     key.c_str(), shortcutKey.ability.bundleName.c_str());
             }
         }
