@@ -3433,44 +3433,41 @@ void PointerDrawingManager::SoftwareCursorMoveAsync(uint64_t displayId, int32_t 
 
 void PointerDrawingManager::MoveRetryAsync(int32_t x, int32_t y)
 {
+    moveRetryActive_ = true;
+    moveRetryCount_ = 0;
     moveRetryTimerId_ = TimerMgr->AddTimer(MOVE_RETRY_TIME, MAX_MOVE_RETRY_COUNT, [this, x, y]() {
         PostMoveRetryTask([this, x, y]() {
-            moveRetryCount_++;
-            MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, Timer Id:%{public}d,"
-                "move retry count:%{public}d", x, y, moveRetryTimerId_, moveRetryCount_);
-            if (moveRetryTimerId_ == DEFAULT_VALUE) {
-                moveRetryCount_ = 0;
-                MMI_HILOGI("MoveRetryAsync timer id is invalid, stop retry");
+            if (!moveRetryActive_.load()) {
+                MMI_HILOGI("MoveRetryAsync already stopped, skip execution");
                 return;
             }
+            moveRetryCount_++;
+            MMI_HILOGI("MoveRetryAsync start, x:%{private}d, y:%{private}d, Timer Id:%{public}d,"
+                "move retry count:%{public}d", x, y, moveRetryTimerId_.load(), moveRetryCount_.load());
             if (HardwareCursorMove(x, y) == RET_OK) {
-                int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
-                MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d, ret:%{public}d",
-                    moveRetryTimerId_, ret);
+                MMI_HILOGI("Move retry success, cancel timer, TimerId:%{public}d", moveRetryTimerId_.load());
+                moveRetryActive_ = false;
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;
                 return;
             }
-            MMI_HILOGE("Move retry failed, TimerId:%{public}d", moveRetryTimerId_);
-            if (moveRetryCount_ == MAX_MOVE_RETRY_COUNT) {
+            MMI_HILOGE("Move retry failed, TimerId:%{public}d", moveRetryTimerId_.load());
+            if (moveRetryCount_.load() == MAX_MOVE_RETRY_COUNT) {
                 MMI_HILOGI("Move retry execeed max count, stop retry");
+                moveRetryActive_ = false;
                 moveRetryTimerId_ = DEFAULT_VALUE;
                 moveRetryCount_ = 0;
             }
         });
     }, "PointerDrawingManager-MoveRetryAsync");
-    MMI_HILOGI("Create MoveRetry Timer, timerId: %{public}d", moveRetryTimerId_);
+    MMI_HILOGI("Create MoveRetry Timer, timerId: %{public}d", moveRetryTimerId_.load());
 }
 
 void PointerDrawingManager::ResetMoveRetryTimer()
 {
-    if (moveRetryTimerId_ != DEFAULT_VALUE) {
-        int32_t ret = TimerMgr->RemoveTimer(moveRetryTimerId_);
-        MMI_HILOGI("Cancel moveRetry Timer, TimerId:%{public}d, ret:%{public}d", moveRetryTimerId_, ret);
-        moveRetryTimerId_ = DEFAULT_VALUE;
-    }
-    if (moveRetryCount_ > 0) {
-        moveRetryCount_ = 0;
+    if (moveRetryActive_.load()) {
+        MMI_HILOGI("Cancel moveRetry Timer, TimerId:%{public}d", moveRetryTimerId_.load());
+        moveRetryActive_ = false;
     }
 }
 
