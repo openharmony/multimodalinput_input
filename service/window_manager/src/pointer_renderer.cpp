@@ -327,6 +327,15 @@ void PointerRenderer::SetPointerCfg(const RenderConfig &cfg)
     screenConfigs_[cfg.screenId] = cfg;
 }
 
+const RenderConfig& PointerRenderer::GetPointerCfg(const RenderConfig &defaultCfg)
+{
+    auto it = screenConfigs_.find(defaultCfg.screenId);
+    if (it == screenConfigs_.end()) {
+        return defaultCfg;
+    }
+    return it->second;
+}
+
 void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
 {
     std::vector<image_ptr_t> images;
