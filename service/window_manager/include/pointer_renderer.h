@@ -80,7 +80,7 @@ private:
         const RenderConfig &cfg);
     void DrawDefaultPointer(uint32_t width, uint32_t height, const RenderConfig &cfg);
     void DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg, const RenderConfig &cfg);
-    bool hasPointerCfg(const RenderConfig &cfg);
+    bool HasPointerCfg(const RenderConfig &cfg);
     void SetPointerCfg(const RenderConfig &cfg);
     const RenderConfig& GetPointerCfg(const RenderConfig &defaultCfg);
     void LoadDefaultPointerImage(const RenderConfig &cfg);
@@ -106,7 +106,7 @@ private:
         }
         imgMaps_.push_back({cfg, img});
     }
-    std::map<MOUSE_ICON, IconStyle> mouseIcons_;
+    std::map<MOUSE_ICON, std::string> mouseIcons_;
     std::map<uint64_t, RenderConfig> screenConfigs_;
     bool defaultInit_ { false };
     std::map<uint64_t, std::vector<image_ptr_t>> screenImages_;
