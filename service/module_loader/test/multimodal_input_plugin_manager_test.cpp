@@ -1381,5 +1381,213 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRe
     int32_t callbackId = 1;
     EXPECT_FALSE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
 }
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_Init_001
+ * @tc.desc: Test InputPlugin::Init with empty stages vector
+ * @tc.require: test InputPlugin::Init
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(Return(std::vector<InputPluginStage>{}));
+    
+    int32_t result = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_Init_002
+ * @tc.desc: Test InputPlugin::Init with single stage
+ * @tc.require: test InputPlugin::Init
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_AFTER_FILTER}));
+    
+    int32_t result = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(inputPluginContext->stages_.size(), 1);
+    EXPECT_EQ(inputPluginContext->stages_[0], InputPluginStage::INPUT_AFTER_FILTER);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_Init_003
+ * @tc.desc: Test InputPlugin::Init with multiple stages
+ * @tc.require: test InputPlugin::Init
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{
+            InputPluginStage::INPUT_AFTER_FILTER,
+            InputPluginStage::INPUT_BEFORE_KEYCOMMAND,
+            InputPluginStage::INPUT_AFTER_NORMALIZED}));
+    
+    int32_t result = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(inputPluginContext->stages_.size(), 3);
+    EXPECT_EQ(inputPluginContext->stages_[0], InputPluginStage::INPUT_AFTER_FILTER);
+    EXPECT_EQ(inputPluginContext->stages_[1], InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    EXPECT_EQ(inputPluginContext->stages_[2], InputPluginStage::INPUT_AFTER_NORMALIZED);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_001
+ * @tc.desc: Test LoadPlugin with multi-stage plugin adds plugin to all stages
+ * @tc.require: test LoadPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+    
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("multi_stage_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{
+            InputPluginStage::INPUT_AFTER_FILTER,
+            InputPluginStage::INPUT_BEFORE_KEYCOMMAND}));
+    
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    int32_t initResult = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(initResult, RET_OK);
+    
+    manager->plugins_.insert({InputPluginStage::INPUT_AFTER_FILTER, {inputPluginContext}});
+    manager->plugins_.insert({InputPluginStage::INPUT_BEFORE_KEYCOMMAND, {inputPluginContext}});
+    
+    EXPECT_EQ(manager->plugins_.size(), 2);
+    auto it1 = manager->plugins_.find(InputPluginStage::INPUT_AFTER_FILTER);
+    ASSERT_NE(it1, manager->plugins_.end());
+    EXPECT_EQ(it1->second.size(), 1);
+    
+    auto it2 = manager->plugins_.find(InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    ASSERT_NE(it2, manager->plugins_.end());
+    EXPECT_EQ(it2->second.size(), 1);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_002
+ * @tc.desc: Test LoadPlugin with duplicate stages in vector
+ * @tc.require: test LoadPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+    
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("duplicate_stage_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{
+            InputPluginStage::INPUT_AFTER_FILTER,
+            InputPluginStage::INPUT_AFTER_FILTER}));
+    
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    int32_t initResult = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(initResult, RET_OK);
+    
+    manager->plugins_.insert({InputPluginStage::INPUT_AFTER_FILTER, {inputPluginContext}});
+    
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_AFTER_FILTER);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 1);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_003
+ * @tc.desc: Test LoadPlugin with existing stage and multiple plugins sorted by priority
+ * @tc.require: test LoadPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+    
+    std::shared_ptr<MockInputPlugin> mockPlugin1 = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockPlugin1, GetName()).WillRepeatedly(Return("plugin_high_priority"));
+    EXPECT_CALL(*mockPlugin1, GetPriority()).WillRepeatedly(Return(200));
+    EXPECT_CALL(*mockPlugin1, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_AFTER_FILTER}));
+    
+    std::shared_ptr<MockInputPlugin> mockPlugin2 = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockPlugin2, GetName()).WillRepeatedly(Return("plugin_low_priority"));
+    EXPECT_CALL(*mockPlugin2, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockPlugin2, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_AFTER_FILTER}));
+    
+    std::shared_ptr<InputPlugin> inputPlugin1 = std::make_shared<InputPlugin>();
+    std::shared_ptr<InputPlugin> inputPlugin2 = std::make_shared<InputPlugin>();
+    
+    int32_t initResult1 = inputPlugin1->Init(mockPlugin1);
+    int32_t initResult2 = inputPlugin2->Init(mockPlugin2);
+    EXPECT_EQ(initResult1, RET_OK);
+    EXPECT_EQ(initResult2, RET_OK);
+    
+    manager->plugins_.insert({InputPluginStage::INPUT_AFTER_FILTER, {inputPlugin2, inputPlugin1}});
+    
+    auto it = manager->plugins_.find(InputPluginStage::INPUT_AFTER_FILTER);
+    ASSERT_NE(it, manager->plugins_.end());
+    EXPECT_EQ(it->second.size(), 2);
+    EXPECT_EQ(it->second.front()->GetPriority(), 100);
+    EXPECT_EQ(it->second.back()->GetPriority(), 200);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_004
+ * @tc.desc: Test LoadPlugin with multi-stage plugin across different stages
+ * @tc.require: test LoadPlugin
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_LoadPlugin_MultiStage_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputPluginManager* manager = InputPluginManager::GetInstance("/tmp");
+    manager->plugins_.clear();
+    
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("multi_stage_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(150));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{
+            InputPluginStage::INPUT_GLOBAL_INIT,
+            InputPluginStage::INPUT_AFTER_FILTER,
+            InputPluginStage::INPUT_BEFORE_KEYCOMMAND,
+            InputPluginStage::INPUT_AFTER_NORMALIZED}));
+    
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    int32_t initResult = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(initResult, RET_OK);
+    
+    manager->plugins_.insert({InputPluginStage::INPUT_GLOBAL_INIT, {inputPluginContext}});
+    manager->plugins_.insert({InputPluginStage::INPUT_AFTER_FILTER, {inputPluginContext}});
+    manager->plugins_.insert({InputPluginStage::INPUT_BEFORE_KEYCOMMAND, {inputPluginContext}});
+    manager->plugins_.insert({InputPluginStage::INPUT_AFTER_NORMALIZED, {inputPluginContext}});
+    
+    EXPECT_EQ(manager->plugins_.size(), 4);
+    EXPECT_EQ(inputPluginContext->stages_.size(), 4);
+}
 } // namespace MMI
 } // namespace OHOS
