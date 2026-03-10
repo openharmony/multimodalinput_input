@@ -382,7 +382,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPF(surfaceNodePtr);
     if (GetHardCursorEnabled()) {
-        if (GetCursorBlurEnabled) {
+        if (GetCursorBlurEnabled()) {
             if (!vsyncStart_.load()) {
                 MMI_HILOGI("vsync stop, try render and move");
                 std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
@@ -403,7 +403,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
                 MoveRetryAsync(physicalX, physicalY);
             }
         }
-        moveFinshed_.store(true);
+        moveFinished_.store(true);
     } else {
         if (!magicCursorSetBounds) {
             surfaceNodePtr->SetBounds(physicalX, physicalY, surfaceNodePtr->GetStagingProperties().GetBounds().z_,
@@ -477,7 +477,7 @@ int32_t PointerDrawingManager::DrawMovePointer(uint64_t rsId, int32_t physicalX,
     return RET_OK;
 }
 
-void PointerDrawingManager::UpdatePointervisibleOnStyleChange(int32_t physicalX, int32_t physicalY)
+void PointerDrawingManager::UpdatePointerVisibleOnStyleChange(int32_t physicalX, int32_t physicalY)
 {
     if (GetCursorBlurEnabled()) {
         MMI_HILOGI("Cursor style change, pending style ++");
@@ -543,7 +543,7 @@ void PointerDrawingManager::DrawPointer(uint64_t rsId, int32_t physicalX, int32_
     currentDirection_ = direction;
     if (moveFinished_.load()) {
         UpdateCursorBlurEnabled();
-        moveFinshed_.store(false);
+        moveFinished_.store(false);
     }
     AdjustMouseFocusToSoftRenderOrigin(direction, MOUSE_ICON(pointerStyle.id), physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
@@ -807,7 +807,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (GetHardCursorEnabled()) {
         MMI_HILOGI("mouseStyle:%{public}u", static_cast<uint32_t>(mouseStyle));
-        if (GetCursorBlurEnabled) {
+        if (GetCursorBlurEnabled()) {
             return RET_OK;
         }
         if ((mouseStyle == MOUSE_ICON::LOADING) || (mouseStyle == MOUSE_ICON::RUNNING)) {
@@ -1172,7 +1172,7 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
 void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDynamic, MOUSE_ICON mouseStyle)
 {
     if (isDynamic) {
-        PostSoftCursorTask([this]() {
+        PostSoftCursorTask([this, mouseStyle]() {
             SoftwareCursorDynamicRender(mouseStyle);
         });
         HardwareCursorDynamicRender(mouseStyle);
@@ -1184,7 +1184,7 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDy
     } else {
         if (mouseStylePending_.load() > 0) {
             MMI_HILOGD("cursor style update, mouseStylePending_:%{public}d", mouseStylePending_.load());
-            PostSoftCursorTask([this]() {
+            PostSoftCursorTask([this, mouseStyle, x, y]() {
                 SoftwareCursorRender(mouseStyle, x, y);
             });
             HardwareCursorRender(mouseStyle, x, y);
@@ -1198,7 +1198,7 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDy
     if (HardwareCursorMove(x, y) != RET_OK) {
         MoveRetryAsync(x, y);
     }
-    moveFinshed_.store(true);
+    moveFinished_.store(true);
 }
 
 
@@ -1231,7 +1231,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         uint64_t resampleTimestamp = GetResampleTimestamp(timestamp);
         int32_t x = lastPhysicalX_;
         int32_t y = lastPhysicalY_;
-        if (!resample.GetResampledCoords(x, y, resampleTimestamp)) {
+        if (!resample_.GetResampledCoords(x, y, resampleTimestamp)) {
             MMI_HILOGD("Failed to get resampled coords");
         }
         RenderAndMoveOnVsync(x, y, isDynamic, mouseStyle);
@@ -3862,7 +3862,8 @@ void PointerDrawingManager::OnSwitchUser(int32_t userId)
 void PointerDrawingManager::UpdateCursorBlurEnabled()
 {
     std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
-    currentCursorBlurEnabled_ = system.GetBoolParameter("rosen.multimodalinput.pc.support_blur_cursor", true);
+    currentCursorBlurEnabled_ = OHOS::system::GetBoolParameter(
+        "rosen.multimodalinput.pc.support_blur_cursor", true);
     MMI_HILOGD("UpdateCursorBlurEnabled, current%{public}d, last:%{public}d",
         currentCursorBlurEnabled_, lastCursorBlurEnabled_);
     if (currentCursorBlurEnabled_ != lastCursorBlurEnabled_) {
@@ -3874,7 +3875,7 @@ void PointerDrawingManager::UpdateCursorBlurEnabled()
 
 uint64_t PointerDrawingManager::GetResampleTimestamp(uint64_t timestamp)
 {
-    sruct timespec ts;
+    struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     constexpr uint64_t NS_IN_S = 1000000000;
     constexpr uint64_t NS_IN_MS = 1000000;
@@ -3882,10 +3883,11 @@ uint64_t PointerDrawingManager::GetResampleTimestamp(uint64_t timestamp)
     uint64_t recvTime = ts.tv_sec * NS_IN_S + ts.tv_nsec;
     auto compensation = timestamp > recvTime ? timestamp - recvTime : 0;
     int64_t period = 0;
-    if (!receiver_ || receiver_->GetVsyncPeriod() != RET_OK) {
+    if (!receiver_ || receiver_->GetVsyncPeriod(period) != RET_OK) {
         period = VSYNC_PEROID_NS;
     }
-    auto time = timestamp > period ? timestamp - period + NS_IN_MS : NS_IN_MS;
+    auto time = timestamp > static_cast<uint64_t>(period) ?
+        timestamp - static_cast<uint64_t>(period) + NS_IN_MS : NS_IN_MS;
     auto resampleTime = time > compensation ? time - compensation : 0;
     return resampleTime;
 }
