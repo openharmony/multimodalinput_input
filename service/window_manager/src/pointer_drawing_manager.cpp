@@ -1201,9 +1201,6 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDy
     moveFinished_.store(true);
 }
 
-
-
-
 void PointerDrawingManager::OnVsync(uint64_t timestamp)
 {
     MOUSE_ICON mouseStyle = MOUSE_ICON(currentMouseStyle_.id);
@@ -3853,11 +3850,11 @@ void PointerDrawingManager::OnSwitchUser(int32_t userId)
         curPointerStyle.id, curPointerStyle.color, curPointerStyle.size);
 }
 
- bool PointerDrawingManager::GetCursorBlurEnabled()
- {
+bool PointerDrawingManager::GetCursorBlurEnabled()
+{
     std::lock_guard<std::mutex> lock(cursorBlurEnableMutex_);
     return lastCursorBlurEnabled_;
- }
+}
 
 void PointerDrawingManager::UpdateCursorBlurEnabled()
 {
