@@ -1669,6 +1669,652 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_001, Tes
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_002
+ * @tc.desc: Test GetWindowInfo with empty window list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+    WIN_MGR->UpdateDisplayInfo(displayGroupInfo);
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_003
+ * @tc.desc: Test GetWindowInfo with untouchable window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = WindowInputPolicy::FLAG_UNTOUCHABLE;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_004
+ * @tc.desc: Test GetWindowInfo with mouse left button lock window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_005
+ * @tc.desc: Test GetWindowInfo with normal window and point in hot area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = 0;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, 1);
+    EXPECT_EQ(result->pid, 100);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_006
+ * @tc.desc: Test GetWindowInfo with point not in hot area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = 0;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 300;
+    int32_t logicalY = 300;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_007
+ * @tc.desc: Test GetWindowInfo with multiple windows, first is untouchable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 1000;
+    windowInfo1.area = {0, 0, 200, 200};
+    windowInfo1.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.flags = WindowInputPolicy::FLAG_UNTOUCHABLE;
+    windowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 200;
+    windowInfo2.uid = 2000;
+    windowInfo2.area = {0, 0, 300, 300};
+    windowInfo2.defaultHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.pointerHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.flags = 0;
+    windowInfo2.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo1);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, 2);
+    EXPECT_EQ(result->pid, 200);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_008
+ * @tc.desc: Test GetWindowInfo with multiple windows, first is mouse left button lock
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 1000;
+    windowInfo1.area = {0, 0, 200, 200};
+    windowInfo1.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK;
+    windowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 200;
+    windowInfo2.uid = 2000;
+    windowInfo2.area = {0, 0, 300, 300};
+    windowInfo2.defaultHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.pointerHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.flags = 0;
+    windowInfo2.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo1);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, 2);
+    EXPECT_EQ(result->pid, 200);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_009
+ * @tc.desc: Test GetWindowInfo with multiple windows, all untouchable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 1000;
+    windowInfo1.area = {0, 0, 200, 200};
+    windowInfo1.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.flags = WindowInputPolicy::FLAG_UNTOUCHABLE;
+    windowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 200;
+    windowInfo2.uid = 2000;
+    windowInfo2.area = {0, 0, 300, 300};
+    windowInfo2.defaultHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.pointerHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.flags = WindowInputPolicy::FLAG_UNTOUCHABLE;
+    windowInfo2.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo1);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_010
+ * @tc.desc: Test GetWindowInfo with multiple windows, all mouse left button lock
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 1000;
+    windowInfo1.area = {0, 0, 200, 200};
+    windowInfo1.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK;
+    windowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 200;
+    windowInfo2.uid = 2000;
+    windowInfo2.area = {0, 0, 300, 300};
+    windowInfo2.defaultHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.pointerHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK;
+    windowInfo2.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo1);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_011
+ * @tc.desc: Test GetWindowInfo with multiple windows, first window matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 1000;
+    windowInfo1.area = {0, 0, 200, 200};
+    windowInfo1.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.flags = 0;
+    windowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 200;
+    windowInfo2.uid = 2000;
+    windowInfo2.area = {0, 0, 300, 300};
+    windowInfo2.defaultHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.pointerHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.flags = 0;
+    windowInfo2.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo1);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, 1);
+    EXPECT_EQ(result->pid, 100);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_012
+ * @tc.desc: Test GetWindowInfo with mixed flags windows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo1;
+    windowInfo1.id = 1;
+    windowInfo1.pid = 100;
+    windowInfo1.uid = 1000;
+    windowInfo1.area = {0, 0, 200, 200};
+    windowInfo1.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo1.flags = WindowInputPolicy::FLAG_UNTOUCHABLE;
+    windowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo2;
+    windowInfo2.id = 2;
+    windowInfo2.pid = 200;
+    windowInfo2.uid = 2000;
+    windowInfo2.area = {0, 0, 300, 300};
+    windowInfo2.defaultHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.pointerHotAreas = {{0, 0, 300, 300}};
+    windowInfo2.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK;
+    windowInfo2.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    WindowInfo windowInfo3;
+    windowInfo3.id = 3;
+    windowInfo3.pid = 300;
+    windowInfo3.uid = 3000;
+    windowInfo3.area = {0, 0, 400, 400};
+    windowInfo3.defaultHotAreas = {{0, 0, 400, 400}};
+    windowInfo3.pointerHotAreas = {{0, 0, 400, 400}};
+    windowInfo3.flags = 0;
+    windowInfo3.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo1);
+    displayGroupInfo.windowsInfo.push_back(windowInfo2);
+    displayGroupInfo.windowsInfo.push_back(windowInfo3);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, 3);
+    EXPECT_EQ(result->pid, 300);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_013
+ * @tc.desc: Test GetWindowInfo with invalid groupId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = 0;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 999;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_014
+ * @tc.desc: Test GetWindowInfo with multiple hot areas
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 400, 400};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}, {200, 200, 400, 400}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}, {200, 200, 400, 400}};
+    windowInfo.flags = 0;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t groupId = 1;
+
+    auto result1 = WIN_MGR->GetWindowInfo(100, 100, groupId);
+    EXPECT_TRUE(result1.has_value());
+    EXPECT_EQ(result1->id, 1);
+
+    auto result2 = WIN_MGR->GetWindowInfo(300, 300, groupId);
+    EXPECT_TRUE(result2.has_value());
+    EXPECT_EQ(result2->id, 1);
+
+    auto result3 = WIN_MGR->GetWindowInfo(50, 250, groupId);
+    EXPECT_FALSE(result3.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_015
+ * @tc.desc: Test GetWindowInfo with negative coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = 0;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t groupId = 1;
+
+    auto result1 = WIN_MGR->GetWindowInfo(-10, 100, groupId);
+    EXPECT_FALSE(result1.has_value());
+
+    auto result2 = WIN_MGR->GetWindowInfo(100, -10, groupId);
+    EXPECT_FALSE(result2.has_value());
+
+    auto result3 = WIN_MGR->GetWindowInfo(-10, -10, groupId);
+    EXPECT_FALSE(result3.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_016
+ * @tc.desc: Test GetWindowInfo with window having both untouchable and mouse left button lock flags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_016, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = WindowInputPolicy::FLAG_UNTOUCHABLE | WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_FALSE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo_017
+ * @tc.desc: Test GetWindowInfo with window having other flags (not untouchable or mouse left button lock)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo_017, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OLD::DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.groupId = 1;
+    displayGroupInfo.type = GroupType::GROUP_SPECIAL;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 100;
+    windowInfo.uid = 1000;
+    windowInfo.area = {0, 0, 200, 200};
+    windowInfo.defaultHotAreas = {{0, 0, 200, 200}};
+    windowInfo.pointerHotAreas = {{0, 0, 200, 200}};
+    windowInfo.flags = WindowInputPolicy::FLAG_HANDWRITING | WindowInputPolicy::FLAG_DRAG_DISABLED;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    WIN_MGR->displayGroupInfoMap_.clear();
+    WIN_MGR->displayGroupInfoMap_[displayGroupInfo.groupId] = displayGroupInfo;
+
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+    int32_t groupId = 1;
+
+    auto result = WIN_MGR->GetWindowInfo(logicalX, logicalY, groupId);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, 1);
+    EXPECT_EQ(result->flags, WindowInputPolicy::FLAG_HANDWRITING | WindowInputPolicy::FLAG_DRAG_DISABLED);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SelectPointerChangeArea_001
  * @tc.desc: Test selecting pointer change area
  * @tc.type: FUNC
