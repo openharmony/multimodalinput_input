@@ -94,7 +94,7 @@ public:
     ~ResampleAlgorithm() = default;
     void AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId);
     bool HasCoords();
-    bool GetResampledCoords(int32_t &outX, int32_t &outY, uint64_t timestamp);
+    bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t timestamp);
 private:
     bool CheckDifferentDisplayId();
     Point GetResampledCoords(uint64_t timestamp);
@@ -216,7 +216,7 @@ private:
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle, Direction direction);
-    void UpdatePointervisibleOnStyleChange(int32_t physicalX, int32_t physicalY);
+    void UpdatePointerVisibleOnStyleChange(int32_t physicalX, int32_t physicalY);
     void AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -391,7 +391,7 @@ private:
     ResampleAlgorithm resample_;
     bool currentCursorBlurEnabled_ { true };
     bool lastCursorBlurEnabled_ { true };
-    std::atomic<bool> moveFinshed_ { false };
+    std::atomic<bool> moveFinished_ { false };
     std::mutex cursorBlurEnableMutex_;
 };
 } // namespace MMI
