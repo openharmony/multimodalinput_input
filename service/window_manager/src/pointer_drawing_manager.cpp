@@ -1231,7 +1231,7 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         uint64_t resampleTimestamp = GetResampleTimestamp(timestamp);
         int32_t x = lastPhysicalX_;
         int32_t y = lastPhysicalY_;
-        if (!resample_.GetResampledCoords(x, y, resampleTimestamp)) {
+        if (!resample_.GetResampledPoint(x, y, resampleTimestamp)) {
             MMI_HILOGD("Failed to get resampled coords");
         }
         RenderAndMoveOnVsync(x, y, isDynamic, mouseStyle);
@@ -3883,7 +3883,7 @@ uint64_t PointerDrawingManager::GetResampleTimestamp(uint64_t timestamp)
     uint64_t recvTime = ts.tv_sec * NS_IN_S + ts.tv_nsec;
     auto compensation = timestamp > recvTime ? timestamp - recvTime : 0;
     int64_t period = 0;
-    if (!receiver_ || receiver_->GetVsyncPeriod(period) != RET_OK) {
+    if (!receiver_ || receiver_->GetVSyncPeriod(period) != RET_OK) {
         period = VSYNC_PEROID_NS;
     }
     auto time = timestamp > static_cast<uint64_t>(period) ?
