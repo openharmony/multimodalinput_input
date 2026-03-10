@@ -2238,12 +2238,10 @@ void InputWindowsManager::UpdateDisplayMode(int32_t groupId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::DrawPointer(bool isDisplayRemoved)
 {
-    if (DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-        if (!isDisplayRemoved) {
-            CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
-        } else {
-            CursorDrawingComponent::GetInstance().DrawScreenCenterPointer(dragPointerStyle_);
-        }
+    if (!isDisplayRemoved) {
+        CursorDrawingComponent::GetInstance().DrawPointerStyle(dragPointerStyle_);
+    } else {
+        CursorDrawingComponent::GetInstance().DrawScreenCenterPointer(dragPointerStyle_);
     }
 }
 
@@ -2336,7 +2334,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const OLD::DisplayG
                     WindowInputPolicy::FLAG_POINTER_CONFINED) {
                 windowInfo = std::make_optional(pointerLockedWindow_);
             } else {
-                windowInfo = SelectWindowInfo(coord.x, coord.y, lastPointerEventCopy);
+                windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
             }
         } else {
             windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
