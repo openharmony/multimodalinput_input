@@ -269,7 +269,10 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
 
 void PointerRenderer::DrawDefaultPointer(const RenderConfig &cfg)
 {
-    const auto& images = screenImages_[cfg.screenId];
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex_);
+        const auto& images = screenImages_[cfg.screenId];
+    }
     if (images.size() < BLUR_NUM + 1) {
         MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
         return;
@@ -284,7 +287,10 @@ void PointerRenderer::DrawDefaultPointer(const RenderConfig &cfg)
 void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg,
     const RenderConfig &cfg)
 {
-    const auto& images = screenImages_[cfg.screenId];
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex_);
+        const auto& images = screenImages_[cfg.screenId];
+    }
     if (images.size() < BLUR_NUM + 1) {
         MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
         return;
@@ -313,6 +319,7 @@ void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const Ren
 
 bool PointerRenderer::HasPointerCfg(const RenderConfig &cfg)
 {
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     auto it = screenConfigs_.find(cfg.screenId);
     if (it == screenConfigs_.end()) {
         return false;
@@ -325,11 +332,13 @@ bool PointerRenderer::HasPointerCfg(const RenderConfig &cfg)
 
 void PointerRenderer::SetPointerCfg(const RenderConfig &cfg)
 {
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     screenConfigs_[cfg.screenId] = cfg;
 }
 
 const RenderConfig& PointerRenderer::GetPointerCfg(const RenderConfig &defaultCfg)
 {
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     auto it = screenConfigs_.find(defaultCfg.screenId);
     if (it == screenConfigs_.end()) {
         return defaultCfg;
@@ -366,13 +375,17 @@ void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
         }
         images[i] = blurImage;
     }
-    screenImages_[cfg.screenId] = images;
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex_);
+        screenImages_[cfg.screenId] = images;
+    }
 }
 
 void PointerRenderer::LoadPointerToCache(const std::map<MOUSE_ICON, IconStyle> &mouseIcons)
 {
     std::string svgContent;
     bool allLoaded = true;
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     for (const auto& [icon, style] : mouseIcons) {
         if (!ReadFile(style.iconPath, svgContent)) {
             MMI_HILOGE("read file failed for icon:%{public}d", icon);
@@ -386,6 +399,7 @@ void PointerRenderer::LoadPointerToCache(const std::map<MOUSE_ICON, IconStyle> &
 
 bool PointerRenderer::GetPointerFromCache(const RenderConfig &cfg, std::string& svgContent)
 {
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     auto it = mouseIcons_.find(static_cast<MOUSE_ICON>(cfg.style_));
     if (it != mouseIcons_.end()) {
         svgContent = it->second;
