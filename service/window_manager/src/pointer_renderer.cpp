@@ -46,42 +46,6 @@ constexpr float DEFAULT_OFFSET[] = {0.4f, 0.6f, 0.8f};
 constexpr float DEFAULT_BLUR[] = {0.4f, 0.3f, 0.1f};
 
 namespace OHOS::MMI {
-static void ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul, const float pecent)
-{
-    if (!pixel || !isPixelPremul) {
-        MMI_HILOGE("Invalid pixel or not premultiplied");
-        return;
-    }
-    for (int32_t pixelIndex = 0; pixelIndex < len; pixelIndex++) {
-        if (pixelIndex != BGRA_ALPHA_INDEX) {
-            pixel[pixelIndex] = static_cast<uint8_t>(pixel[pixelIndex] * pecent);
-        }
-    }
-}
-
-static void SetAlpha(pixelmap_ptr_t pixelMap, const float pecent)
-{
-    if (!pixelMap) {
-        MMI_HILOGE("Invalid pixelMap");
-        return;
-    }
-    bool isPixelPremul = (pixelMap->GetAlphaType() == Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL);
-    int32_t rowStride = pixelMap->GetRowStride();
-    int32_t height = pixelMap->GetHeight();
-    int32_t width = pixelMap->GetWidth();
-    uint8_t *pixels = static_cast<uint8_t *>(pixelMap->GetWritablePixels());
-    if (!pixels) {
-        MMI_HILOGE("Invalid pixels");
-        return;
-    }
-    for (int32_t i = 0; i < height; i++) {
-        for (int32_t j = 0; j < width; j++) {
-            uint8_t *pixel = pixels + i * rowStride + j * RENDER_STRIDE;
-            ApplyAlpha(pixel, RENDER_STRIDE, isPixelPremul, pecent);
-            pixel[BGRA_ALPHA_INDEX] = static_cast<uint8_t>(pixel[BGRA_ALPHA_INDEX] * pecent);
-        }
-    }
-}
 
 int32_t RenderConfig::GetImageSize() const
 {
@@ -382,6 +346,44 @@ void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
     {
         std::lock_guard<std::mutex> lock(cacheMutex_);
         screenImages_[cfg.screenId] = images;
+    }
+}
+
+void PointerRenderer::ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul,
+    const float pecent)
+{
+    if (!pixel || !isPixelPremul) {
+        MMI_HILOGE("Invalid pixel or not premultiplied");
+        return;
+    }
+    for (int32_t pixelIndex = 0; pixelIndex < len; pixelIndex++) {
+        if (pixelIndex != BGRA_ALPHA_INDEX) {
+            pixel[pixelIndex] = static_cast<uint8_t>(pixel[pixelIndex] * pecent);
+        }
+    }
+}
+
+void PointerRenderer::SetAlpha(pixelmap_ptr_t pixelMap, const float pecent)
+{
+    if (!pixelMap) {
+        MMI_HILOGE("Invalid pixelMap");
+        return;
+    }
+    bool isPixelPremul = (pixelMap->GetAlphaType() == Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL);
+    int32_t rowStride = pixelMap->GetRowStride();
+    int32_t height = pixelMap->GetHeight();
+    int32_t width = pixelMap->GetWidth();
+    uint8_t *pixels = static_cast<uint8_t *>(pixelMap->GetWritablePixels());
+    if (!pixels) {
+        MMI_HILOGE("Invalid pixels");
+        return;
+    }
+    for (int32_t i = 0; i < height; i++) {
+        for (int32_t j = 0; j < width; j++) {
+            uint8_t *pixel = pixels + i * rowStride + j * RENDER_STRIDE;
+            ApplyAlpha(pixel, RENDER_STRIDE, isPixelPremul, pecent);
+            pixel[BGRA_ALPHA_INDEX] = static_cast<uint8_t>(pixel[BGRA_ALPHA_INDEX] * pecent);
+        }
     }
 }
 

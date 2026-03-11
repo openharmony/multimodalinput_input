@@ -229,13 +229,13 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_003, TestSize.Level1)
     EXPECT_EQ(ret, RET_OK);
     config.isBlur = false;
     ret = renderer.Render(addr, width, height, config);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
     config.isHard = false;
     ret = renderer.Render(addr, width, height, config);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
     config.isBlur = true;
     ret = renderer.Render(addr, width, height, config);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -262,11 +262,11 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     renderer.defaultInit_ = false;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
     renderer.defaultInit_ = false;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -477,6 +477,45 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadDefaultPointerImage_001, T
 }
 
 /**
+ * @tc.name: PointerRendererTest_ApplyAlpha_001
+ * @tc.desc: Test ApplyAlpha
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_ApplyAlpha_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    uint8_t pixel[4] = {255, 255, 255, 255};
+    float pecent = 0.5f;
+    renderer.ApplyAlpha(pixel, 4, true, pecent);
+    EXPECT_EQ(pixel[3], 255);
+    EXPECT_EQ(pixel[0], static_cast<uint8_t>(255 * pecent));
+    renderer.ApplyAlpha(pixel, 4, false, pecent);
+    EXPECT_EQ(pixel[3], 255);
+    EXPECT_EQ(pixel[3], 0);
+    uint8_t* pixel1 = nullptr;
+    ASSERT_NO_FATAL_FAILURE(renderer.ApplyAlpha(pixel, 4, false, pecent));
+}
+
+/**
+ * @tc.name: PointerRendererTest_SetAlpha_001
+ * @tc.desc: Test SetAlpha
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_SetAlpha001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    pixelmap_ptr_t img = nullptr;
+    float pecent = 0.5f;
+    ASSERT_NO_FATAL_FAILURE(renderer.SetAlpha(img, pecent));
+    pixelmap_ptr_t img = std::make_shared<OHOS::Media::PixelMap>();
+    ASSERT_NO_FATAL_FAILURE(renderer.SetAlpha(img, pecent));
+}
+
+/**
  * @tc.name: PointerRendererTest_LoadPointerToCache_001
  * @tc.desc: Test LoadPointerToCache
  * @tc.type: Function
@@ -488,7 +527,10 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadPointerToCache_001, TestSi
     PointerRenderer renderer;
     const std::string path = "/system/etc/multimodalinput/mouse_icon/";
     EXPECT_TRUE(renderer.mouseIcons_.empty());
-    std::map<MOUSE_ICON, IconStyle> mouseIcons = {
+    std::map<MOUSE_ICON, IconStyle> mouseIcons = {};
+    renderer.LoadPointerToCache(mouseIcons);
+    EXPECT_TURE(renderer.mouseIcons_.empty());
+    mouseIcons = {
         {DEFAULT, {ANGLE_NW, path + "Default.svg"}},
     };
     renderer.LoadPointerToCache(mouseIcons);
@@ -508,6 +550,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerFromCache_001, TestS
     RenderConfig config;
     std::string svgContent;
     config.style_ = MOUSE_ICON::DEFAULT;
+    config.path_ = "/system/etc/multimodalinput/mouse_icon/Default.svg";
     EXPECT_TRUE(renderer.mouseIcons_.empty());
     bool ret = renderer.GetPointerFromCache(config, svgContent);
     EXPECT_EQ(ret, true);

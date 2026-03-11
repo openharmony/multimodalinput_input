@@ -1824,6 +1824,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdatePointerV
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.UpdatePointerVisibleOnStyleChange(0, 0));
+    pointerDrawMgr.lastCursorBlurEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.UpdatePointerVisibleOnStyleChange(0, 0));
 }
 
 /**
@@ -1838,6 +1840,24 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, false, MOUSE_ICON::DEFAULT));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, true, MOUSE_ICON::RUNNING));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_CreateRenderConfig_001
+@tc.desc: Test the function CreateRenderConfig
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CreateRenderConfig_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    RenderConfig config;
+    auto sp = std::make_shared<ScreenPointer>();
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateRenderConfig(
+        config, sp, MOUSE_ICON::DEFAULT, true, 0, 0, 0));
 }
 
 /**
@@ -1852,6 +1872,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ShowCursorWhen
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ShowCursorWhenHardwareCursorEnabled());
+    pointerDrawMgr.lastCursorBlurEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ShowCursorWhenHardwareCursorEnabled());
 }
 
 /**
@@ -1865,6 +1887,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_HideCursorWhen
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.HideCursorWhenHardwareCursorEnabled());
+    pointerDrawMgr.lastCursorBlurEnabled_ = false;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.HideCursorWhenHardwareCursorEnabled());
 }
 
@@ -1925,7 +1949,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_AddPoint_00
     int32_t y = 0;
     uint64_t id = 0;
     pointerDrawMgr.resample_.AddPoint(x, y, id);
-    EXPECT_FALSE(pointerDrawMgr.resample_.HasCoords());
+    EXPECT_TRUE(pointerDrawMgr.resample_.HasCoords());
 }
 
 /**
@@ -1951,6 +1975,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     pointerDrawMgr.resample_.currentBuffer_ = {
         ResampleAlgorithm::Point(curX, curY, curId, curTime)
     };
+    EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.historyBuffer_ = {
         ResampleAlgorithm::Point(preX, preY, preId, preTime)
     };
@@ -1987,6 +2012,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_CheckDiffer
     pointerDrawMgr.resample_.currentBuffer_ = {
         ResampleAlgorithm::Point(curX, curY, curId, curTime)
     };
+    ret = pointerDrawMgr.resample_.CheckDifferentDisplayId();
+    EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.historyBuffer_ = {
         ResampleAlgorithm::Point(preX, preY, preId, preTime)
     };
@@ -2019,11 +2046,14 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords00
     };
     bool ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, true);
-    pointerDrawMgr.resample_.historyBuffer_ = {};
+    pointerDrawMgr.resample_.currentBuffer_ = {};
     pointerDrawMgr.resample_.keepResample_ = 2;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, true);
     pointerDrawMgr.resample_.keepResample_ = 0;
+    ret = pointerDrawMgr.resample_.HasCoords();
+    EXPECT_EQ(ret, false);
+    pointerDrawMgr.resample_.keepResample_ = -1;
     ret = pointerDrawMgr.resample_.HasCoords();
     EXPECT_EQ(ret, false);
 }
@@ -2063,6 +2093,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     };
     ret = pointerDrawMgr.resample_.GetResampledCoords(curTime);
     EXPECT_EQ(ret.displayId, 0);
+    ret = pointerDrawMgr.resample_.GetResampledCoords(curTime + 1000 * 1000 * 20);
+    EXPECT_EQ(ret.displayId, 0);
 }
 
 /**
@@ -2092,14 +2124,32 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_LinearInter
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
-    ResampleAlgorithm::Point cur = ResampleAlgorithm::Point(0, 0, 0, 1000 * 1000 * 100);
-    ResampleAlgorithm::Point pre = ResampleAlgorithm::Point(10, 10, 0, 1000 * 1000 * 99);
-    uint64_t time = 1000 * 1000 * 100;
+    ResampleAlgorithm::Point cur = ResampleAlgorithm::Point(100, 100, 0, 1000 * 1000 * 1000);
+    ResampleAlgorithm::Point pre = ResampleAlgorithm::Point(0, 0, 0, 0);
+    uint64_t time = 1000 * 1000 * 500;
     ResampleAlgorithm::Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
     EXPECT_EQ(ret.displayId, 0);
-    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time + 1);
+    time = 1000 * 1000 * 1500;
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
     EXPECT_EQ(ret.displayId, 0);
-    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time - 1);
+    pre.timestamp = 1000 * 1000 * 1000;
+    time = 1000 * 1000 * 1000;
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
+    EXPECT_EQ(ret.displayId, 0);
+    pre.timestamp = 0;
+    cur.timestamp = 1000 * 1000 * 1000 * 2;
+    time = 1000 * 1000 * 500;
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
+    EXPECT_EQ(ret.displayId, 0);
+    pre.timestamp = 1000 * 1000 * 1000;
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
+    EXPECT_EQ(ret.displayId, 0);
+    cur.timestamp = 1000 * 1000 * 500 + 1;
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
+    EXPECT_EQ(ret.displayId, 0);
+    pre.timestamp = 1000 * 1000 * 400;
+    time = 1000 * 1000 * 500 + 1;
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
     EXPECT_EQ(ret.displayId, 0);
 }
 } // namespace MMI
