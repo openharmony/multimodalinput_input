@@ -4348,7 +4348,7 @@ ErrCode MMIService::TransmitInfrared(int64_t number, const std::vector<int64_t>&
     }
 #ifndef OHOS_BUILD_ENABLE_WATCH
     int32_t size = static_cast<int32_t>(pattern.size());
-    std::string context;
+    std::string context;;
     context.reserve(size * INFRARED_PATTERN_LOG_SIZE);
     context.append("infraredFrequency:").append(std::to_string(number)).append(";");
     for (int32_t i = 0; i < size; i++) {
