@@ -252,17 +252,19 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     uint32_t width = 10;
     uint32_t height = 20;
     uint8_t addr[800] = {10};
+    constexpr uint32_t renderStride = 4;
+    uint32_t addrSize = width * height * renderStride;
     config.style_ = MOUSE_ICON::DEFAULT;
     config.isBlur = false;
-    int32_t ret = renderer.DefaultRender(addr, width, height, config);
+    int32_t ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_ERR);
     config.isBlur = true;
     renderer.defaultInit_ = false;
-    ret = renderer.DefaultRender(addr, width, height, config);
+    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
     EXPECT_EQ(ret, RET_OK);
     renderer.defaultInit_ = false;
-    ret = renderer.DefaultRender(addr, width, height, config);
+    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
     EXPECT_EQ(ret, RET_OK);
 }
@@ -347,12 +349,12 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DrawBlurPointer_001, TestSize.
     PointerRenderer renderer;
     uint32_t width = 10;
     uint32_t height = 20;
-    RenderConfig lastCofig;
+    RenderConfig lastConfig;
     config.screenId = 0;
     renderer.screenImages_ = {
         {0, {nullptr, nullptr, nullptr, nullptr}}
     };
-    renderer.DrawBlurPointer(witdth, height, lastConfig, config);
+    renderer.DrawBlurPointer(width, height, lastConfig, config);
     EXPECT_EQ(renderer.screenImages_[0][0], nullptr);
     renderer.screenImages_ = {
         {0, {nullptr, nullptr, nullptr}}
@@ -383,12 +385,12 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_HasPointerCfg_001, TestSize.Le
     config1.screenId = 1;
     bool ret = renderer.HasPointerCfg(config);
     EXPECT_EQ(ret, false);
-    renderer.screenConfig_ = {
+    renderer.screenConfigs_ = {
         {0, config}
     };
     ret = renderer.HasPointerCfg(config);
     EXPECT_EQ(ret, true);
-    renderer.screenConfig_ = {
+    renderer.screenConfigs_ = {
         {1, config1}
     };
     ret = renderer.HasPointerCfg(config);
@@ -408,7 +410,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_SetPointerCfg_001, TestSize.Le
     PointerRenderer renderer;
     config.screenId = 0;
     renderer.SetPointerCfg(config);
-    EXPECT_EQ(renderer.screenConfig_[0], config);
+    EXPECT_EQ(renderer.screenConfigs_[0], config);
 }
 
 /**
@@ -427,7 +429,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerCfg_001, TestSize.Le
     defaultConfig.screenId = 0;
     auto cfg = renderer.GetPointerCfg(defaultConfig);
     EXPECT_EQ(cfg.screenId, defaultConfig.screenId);
-    renderer.screenConfig_ = {
+    renderer.screenConfigs_ = {
         {0, config}
     };
     auto cfg1 = renderer.GetPointerCfg(defaultConfig);
@@ -484,9 +486,10 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadPointerToCache_001, TestSi
 {
     CALL_TEST_DEBUG;
     PointerRenderer renderer;
+    const std::string path = "/system/etc/multimodalinput/mouse_icon/";
     EXPECT_TRUE(renderer.mouseIcons_.empty());
     std::map<MOUSE_ICON, IconStyle> mouseIcons = {
-        {DEFAULT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
+        {DEFAULT, {ANGLE_NW, path + "Default.svg"}},
     };
     renderer.LoadPointerToCache(mouseIcons);
     EXPECT_FALSE(renderer.mouseIcons_.empty());
