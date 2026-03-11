@@ -259,11 +259,11 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     config.isBlur = true;
     renderer.defaultInit_ = false;
     ret = renderer.DefaultRender(addr, width, height, config);
-    EXPECT_EQ(renderer.defaultInit_ , true);
+    EXPECT_EQ(renderer.defaultInit_, true);
     EXPECT_EQ(ret, RET_OK);
     renderer.defaultInit_ = false;
     ret = renderer.DefaultRender(addr, width, height, config);
-    EXPECT_EQ(renderer.defaultInit_ , true);
+    EXPECT_EQ(renderer.defaultInit_, true);
     EXPECT_EQ(ret, RET_OK);
 }
 
