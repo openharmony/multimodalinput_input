@@ -2012,12 +2012,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords00
     PointerDrawingManager pointerDrawMgr;
     int32_t curX = 10;
     int32_t curY = 10;
-    int32_t preX = 0;
-    int32_t preY = 0;
     uint64_t curTime = 1000 * 1000 * 100;
-    uint64_t preTime = 1000 * 1000 * 99;
     uint64_t curId = 0;
-    uint64_t preId = 1;
     pointerDrawMgr.resample_.currentBuffer_ = {
         ResampleAlgorithm::Point(curX, curY, curId, curTime)
     };
@@ -2049,7 +2045,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     uint64_t curTime = 1000 * 1000 * 100;
     uint64_t preTime = 1000 * 1000 * 99;
     uint64_t curId = 0;
-    uint64_t preId = 1;
     ResampleAlgorithm::Point ret = pointerDrawMgr.resample_.GetResampledCoords(curTime);
     EXPECT_EQ(ret.displayId, 0);
     pointerDrawMgr.resample_.currentBuffer_ = {
