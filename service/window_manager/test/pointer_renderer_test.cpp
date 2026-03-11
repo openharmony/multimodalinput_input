@@ -495,7 +495,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_ApplyAlpha_001, TestSize.Level
     EXPECT_EQ(pixel[3], 255);
     EXPECT_EQ(pixel[3], 0);
     uint8_t* pixel1 = nullptr;
-    ASSERT_NO_FATAL_FAILURE(renderer.ApplyAlpha(pixel, 4, false, pecent));
+    ASSERT_NO_FATAL_FAILURE(renderer.ApplyAlpha(pixel1, 0, false, pecent));
 }
 
 /**
@@ -511,7 +511,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_SetAlpha001, TestSize.Level1)
     pixelmap_ptr_t img = nullptr;
     float pecent = 0.5f;
     ASSERT_NO_FATAL_FAILURE(renderer.SetAlpha(img, pecent));
-    pixelmap_ptr_t img = std::make_shared<OHOS::Media::PixelMap>();
+    img = std::make_shared<OHOS::Media::PixelMap>();
     ASSERT_NO_FATAL_FAILURE(renderer.SetAlpha(img, pecent));
 }
 
@@ -529,7 +529,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_LoadPointerToCache_001, TestSi
     EXPECT_TRUE(renderer.mouseIcons_.empty());
     std::map<MOUSE_ICON, IconStyle> mouseIcons = {};
     renderer.LoadPointerToCache(mouseIcons);
-    EXPECT_TURE(renderer.mouseIcons_.empty());
+    EXPECT_TRUE(renderer.mouseIcons_.empty());
     mouseIcons = {
         {DEFAULT, {ANGLE_NW, path + "Default.svg"}},
     };
