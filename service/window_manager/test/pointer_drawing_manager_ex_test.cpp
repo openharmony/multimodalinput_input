@@ -1811,5 +1811,281 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ClearWindowPoi
     int32_t windowId = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ClearWindowPointerStyle(pid, windowId));
 }
+
+/**
+@tc.name: PointerDrawingManagerExTest_UpdatePointerVisibleOnStyleChange_001
+@tc.desc: Test the function UpdatePointerVisibleOnStyleChange
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdatePointerVisibleOnStyleChange_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.UpdatePointerVisibleOnStyleChange(0, 0));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RenderAndMoveOnVsync_001
+@tc.desc: Test the function RenderAndMoveOnVsync
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveOnVsync_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, false, MOUSE_ICON::DEFAULT));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_ShowCursorWhenHardwareCursorEnabled_001
+@tc.desc: Test the function ShowCursorWhenHardwareCursorEnabled
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_ShowCursorWhenHardwareCursorEnabled_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.ShowCursorWhenHardwareCursorEnabled());
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_HideCursorWhenHardwareCursorEnabled_001
+@tc.desc: Test the function HideCursorWhenHardwareCursorEnabled
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_HideCursorWhenHardwareCursorEnabled_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.HideCursorWhenHardwareCursorEnabled());
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_GetCursorBlurEnabled_001
+@tc.desc: Test the function GetCursorBlurEnabled
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_GetCursorBlurEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    bool ret = pointerDrawMgr.GetCursorBlurEnabled();
+    EXPEXCT_TRUE(ret);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_UpdateCursorBlurEnabled_001
+@tc.desc: Test the function UpdateCursorBlurEnabled
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdateCursorBlurEnable_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    pointerDrawMgr.lastCursorBlurEnabled_ = true;
+    pointerDrawMgr.UpdateCursorBlurEnable();
+    EXPEXCT_EQ(lastCursorBlurEnabled_, true);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_GetResampleTimestamp_001
+@tc.desc: Test the function GetResampleTimestamp
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_GetResampleTimestamp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    auto timestamp = pointerDrawMgr.GetResampleTimestamp();
+    EXPEXCT_EQ(timestamp >= 0, true);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_AddPoint_001
+@tc.desc: Test the function AddPoint
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_AddPoint_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t x = 0;
+    int32_t y = 0;
+    uint64_t id = 0;
+    auto timestamp = pointerDrawMgr.resample_.AddPoint(x, y, id);
+    EXPEXCT_FALSE(pointerDrawMgr.resample_.HasCoords());
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_GetResamplePoint_001
+@tc.desc: Test the function GetResamplePoint
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResamplePoint_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t curX = 10;
+    int32_t curY = 10;
+    int32_t preX = 0;
+    int32_t preY = 0;
+    uint64_t curTime = 1000 * 1000 * 100;
+    uint64_t preTime = 1000 * 1000 * 99;
+    uint64_t curId = 0;
+    uint64_t preId = 1;
+    bool ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    EXPEXCT_EQ(ret, false);
+    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, preId, preTime)};
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    EXPEXCT_EQ(ret, false);
+    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, curId, preTime)};
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    EXPEXCT_EQ(ret, true);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_CheckDifferetDisplayId_001
+@tc.desc: Test the function CheckDifferetDisplayId
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_CheckDifferetDisplayId_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t curX = 10;
+    int32_t curY = 10;
+    int32_t preX = 0;
+    int32_t preY = 0;
+    uint64_t curTime = 1000 * 1000 * 100;
+    uint64_t preTime = 1000 * 1000 * 99;
+    uint64_t curId = 0;
+    uint64_t preId = 1;
+    bool ret = pointerDrawMgr.resample_.CheckDifferetDisplayId();
+    EXPEXCT_EQ(ret, false);
+    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, preId, preTime)};
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    EXPEXCT_EQ(ret, false);
+    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, curId, preTime)};
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    EXPEXCT_EQ(ret, true);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_HasCoords_001
+@tc.desc: Test the function HasCoords
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t curX = 10;
+    int32_t curY = 10;
+    int32_t preX = 0;
+    int32_t preY = 0;
+    uint64_t curTime = 1000 * 1000 * 100;
+    uint64_t preTime = 1000 * 1000 * 99;
+    uint64_t curId = 0;
+    uint64_t preId = 1;
+    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    bool ret = pointerDrawMgr.resample_.HasCoords()
+    EXPECT_EQ(ret, true);
+    pointerDrawMgr.resample_.historyBuffer_ = {};
+    pointerDrawMgr.resample_.keepResample_ = 2;
+    ret = pointerDrawMgr.resample_.HasCoords()
+    EXPECT_EQ(ret, true);
+    pointerDrawMgr.resample_.keepResample_ = 0;
+    ret = pointerDrawMgr.resample_.HasCoords()
+    EXPECT_EQ(ret, false);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_GetResampleCoords_001
+@tc.desc: Test the function GetResampleCoords
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResampleCoords_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t curX = 10;
+    int32_t curY = 10;
+    int32_t preX = 0;
+    int32_t preY = 0;
+    uint64_t curTime = 1000 * 1000 * 100;
+    uint64_t preTime = 1000 * 1000 * 99;
+    uint64_t curId = 0;
+    uint64_t preId = 1;
+    Point ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
+    EXPEXCT_EQ(ret.dispalyId, 0);
+    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
+    EXPEXCT_EQ(ret.dispalyId, 0);
+    pointerDrawMgr.resample_.currentBuffer_ = {};
+    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, curId, preTime)};
+    ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
+    EXPEXCT_EQ(ret.dispalyId, 0);
+    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
+    EXPEXCT_EQ(ret.dispalyId, 0);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_GetAvgPoint_001
+@tc.desc: Test the function GetAvgPoint
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetAvgPoint_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    std::deque<Point> event = {};
+    Point ret = pointerDrawMgr.resample_.GetAvgPoint(event);
+    std::deque<Point> event = {Point(1, 1, 0, 1)};
+    Point ret = pointerDrawMgr.resample_.GetAvgPoint(event);
+    EXPEXCT_EQ(ret.displayId, 0);
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_RA_LinearInterpolation_001
+@tc.desc: Test the function LinearInterpolation
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_LinearInterpolation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    Point cur = Point(0, 0, 0, 1000 * 1000 * 100);
+    Point pre = Point(10, 10, 0, 1000 * 1000 * 99);
+    uint64_t time = 1000 * 1000 * 100;
+    Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
+    EXPEXCT_EQ(ret.displayId, 0);
+    Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time + 1);
+    EXPEXCT_EQ(ret.displayId, 0);
+    Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time - 1);
+    EXPEXCT_EQ(ret.displayId, 0);
+}
 } // namespace MMI
 } // namespace OHOS
