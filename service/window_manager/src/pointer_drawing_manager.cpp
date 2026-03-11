@@ -385,7 +385,6 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
         if (GetCursorBlurEnabled()) {
             if (!vsyncStart_.load()) {
                 MMI_HILOGI("vsync stop, try render and move");
-                std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
                 RenderAndMoveOnVsync(physicalX, physicalY, false, MOUSE_ICON(lastMouseStyle_.id));
             }
             return vsyncStart_.load();
@@ -1222,15 +1221,15 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         vsyncStart_.store(false);
         return;
     }
-    PostTask([this, timestamp, mouseStyle, isDynamic]() -> void {
+    uint64_t resampleTimestamp = GetResampleTimestamp(timestamp);
+    int32_t x = lastPhysicalX_;
+    int32_t y = lastPhysicalY_;
+    if (!resample_.GetResampledPoint(x, y, resampleTimestamp)) {
+        MMI_HILOGD("Failed to get resampled coords");
+    }
+    PostTask([this, x, y, mouseStyle, isDynamic]() -> void {
         std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
         MMI_HILOGD("mouseStyle:%{public}d, isDynamic:%{public}d", static_cast<uint32_t>(mouseStyle), isDynamic);
-        uint64_t resampleTimestamp = GetResampleTimestamp(timestamp);
-        int32_t x = lastPhysicalX_;
-        int32_t y = lastPhysicalY_;
-        if (!resample_.GetResampledPoint(x, y, resampleTimestamp)) {
-            MMI_HILOGD("Failed to get resampled coords");
-        }
         RenderAndMoveOnVsync(x, y, isDynamic, mouseStyle);
     });
     RequestNextVSync();
@@ -3893,7 +3892,6 @@ void ResampleAlgorithm::AddPoint(int32_t physicalX, int32_t physicalY, uint64_t 
 {
     constexpr size_t MAX_BUFFER_SIZE = 10;
     constexpr int32_t TWICE = 2;
-    std::lock_guard<std::mutex> lock(mutex_);
     if (currentBuffer_.size() >= MAX_BUFFER_SIZE) {
         currentBuffer_.pop_front();
     }
@@ -3904,7 +3902,6 @@ void ResampleAlgorithm::AddPoint(int32_t physicalX, int32_t physicalY, uint64_t 
 
 bool ResampleAlgorithm::GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t timestamp)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (currentBuffer_.empty()) {
         return false;
     }
@@ -3918,7 +3915,8 @@ bool ResampleAlgorithm::GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t
     auto newXy = GetResampledCoords(timestamp);
     MMI_HILOGD("GetResampledPoint, resampled coords: (%{private}d, %{private}d)",
         newXy.x, newXy.y);
-    if (newXy.x != 0 && newXy.y != 0) {
+    bool invalidPoint = (newXy.x == 0 && newXy.y == 0 && newXy.displayId == 0 && newXy.timestamp == 0);
+    if (!invalidPoint) {
         outX = newXy.x;
         outY = newXy.y;
     }
@@ -3946,7 +3944,6 @@ bool ResampleAlgorithm::CheckDifferentDisplayId()
 
 bool ResampleAlgorithm::HasCoords()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (!currentBuffer_.empty()) {
         return true;
     }
@@ -3967,7 +3964,7 @@ ResampleAlgorithm::Point ResampleAlgorithm::GetResampledCoords(uint64_t timestam
     Point lastCurrent = currentBuffer_.back();
     if (timestamp > lastCurrent.timestamp + RESAMPLE_TIME_THRESHOLD_NS) {
         MMI_HILOGD("The time difference is too large, skip resampling");
-        return lastCurrent;
+        return Point{0, 0, 0, 0};
     }
     auto historyAvg = GetAvgPoint(historyBuffer_);
     auto currentAvg = GetAvgPoint(currentBuffer_);

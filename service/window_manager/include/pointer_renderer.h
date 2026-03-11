@@ -107,6 +107,7 @@ private:
         imgMaps_.push_back({cfg, img});
     }
     std::map<MOUSE_ICON, std::string> mouseIcons_;
+    mutable std::mutex cacheMutex_;
     std::map<uint64_t, RenderConfig> screenConfigs_;
     bool defaultInit_ { false };
     std::map<uint64_t, std::vector<image_ptr_t>> screenImages_;
