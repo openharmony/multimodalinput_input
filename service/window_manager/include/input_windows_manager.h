@@ -240,6 +240,7 @@ public:
     void ClearTargetDeviceWindowId(int32_t deviceId);
     void ClearFirstTouchWindowInfos(int32_t deviceId);
     void ClearTargetWindowId(int32_t pointerId, int32_t deviceId);
+    void ClearMouseTargetWindowId();
     bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
