@@ -380,6 +380,8 @@ private:
     void CheckUIExtentionWindowPointerHotArea(int32_t logicalX, int32_t logicalY,
         const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
     std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY, int32_t groupId = DEFAULT_GROUP_ID);
+    std::optional<WindowInfo> GetCursorWindowInfo(int32_t logicalX, int32_t logicalY,
+        int32_t groupId = DEFAULT_GROUP_ID);
     bool IsInsideDisplay(const OLD::DisplayInfo& displayInfo, double physicalX, double physicalY);
     bool CalculateLayout(const OLD::DisplayInfo& displayInfo, const Vector2D<double> &physical,
         Vector2D<double>& layout);

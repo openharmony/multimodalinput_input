@@ -2476,7 +2476,7 @@ void InputWindowsManager::UpdatePointerDrawingManagerWindowInfo()
             coord.y = cursorPosy;
             RotateDisplayScreen(*displayInfo, coord);
         }
-        windowInfo = GetWindowInfo(coord.x, coord.y, groupId);
+        windowInfo = GetCursorWindowInfo(coord.x, coord.y, groupId);
     } else {
         windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEventCopy);
     }
@@ -4203,6 +4203,29 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
     for (const auto& item : WindowsInfo) {
         if ((item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
+            return std::make_optional(item);
+        } else {
+            MMI_HILOGD("Continue searching for the dispatch window");
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<WindowInfo> InputWindowsManager::GetCursorWindowInfo(int32_t logicalX, int32_t logicalY, int32_t groupId)
+{
+    CALL_DEBUG_ENTER;
+    auto &WindowsInfo = GetWindowInfoVector(groupId);
+    for (const auto& item : WindowsInfo) {
+        if ((item.flags & WindowInputPolicy::FLAG_UNTOUCHABLE) == WindowInputPolicy::FLAG_UNTOUCHABLE) {
+            MMI_HILOGD("Skip the untouchable window to continue searching, "
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        } else if ((item.flags & WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK) ==
+                   WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK) {
+            MMI_HILOGD("Skip the mouse left button lock window to continue searching, "
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
