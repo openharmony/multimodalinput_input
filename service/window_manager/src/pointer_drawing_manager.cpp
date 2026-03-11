@@ -3897,7 +3897,9 @@ void ResampleAlgorithm::AddPoint(int32_t physicalX, int32_t physicalY, uint64_t 
     if (currentBuffer_.size() >= MAX_BUFFER_SIZE) {
         currentBuffer_.pop_front();
     }
+    keepResample_ = TWICE;
     currentBuffer_.push_back(Point{physicalX, physicalY, displayId});
+    MMI_HILOGD("AddPoint, currentBuffer size:%{public}zu", currentBuffer_.size());
 }
 
 bool ResampleAlgorithm::GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t timestamp)
@@ -3919,7 +3921,6 @@ bool ResampleAlgorithm::GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t
     if (newXy.x != 0 && newXy.y != 0) {
         outX = newXy.x;
         outY = newXy.y;
-        return true;
     }
     historyBuffer_ = currentBuffer_;
     currentBuffer_.clear();

@@ -240,7 +240,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_003, TestSize.Level1)
 
 /**
  * @tc.name: PointerRendererTest_DefaultRender_001
- * @tc.desc: Test Render
+ * @tc.desc: Test DefaultRender
  * @tc.type: Function
  * @tc.require:
  */
@@ -252,6 +252,36 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     uint32_t width = 10;
     uint32_t height = 20;
     uint8_t addr[800] = {10};
+    config.style_ = MOUSE_ICON::DEFAULT;
+    config.isBlur = false;
+    int32_t ret = renderer.DefaultRender(addr, width, height, config);
+    EXPECT_EQ(ret, RET_ERR);
+    config.isBlur = true;
+    renderer.defaultInit_ = false;
+    ret = renderer.DefaultRender(addr, width, height, config);
+    EXPECT_EQ(renderer.defaultInit_ , true);
+    EXPECT_EQ(ret, RET_OK);
+    renderer.defaultInit_ = false;
+    ret = renderer.DefaultRender(addr, width, height, config);
+    EXPECT_EQ(renderer.defaultInit_ , true);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: PointerRendererTest_DefaultRender_002
+ * @tc.desc: Test DefaultRender
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    uint32_t width = 10;
+    uint32_t height = 20;
+    uint8_t addr[800] = {10};
+    config.isBlur = true;
     constexpr uint32_t renderStride = 4;
     uint32_t addrSize = width * height * renderStride;
     config.style_ = MOUSE_ICON::TRANSPARENT_ICON;
@@ -272,6 +302,198 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: PointerRendererTest_DrawDefaultPointer_001
+ * @tc.desc: Test DrawDefaultPointer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_DrawDefaultPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    config.screenId = 0;
+    renderer.screenImages_ = {
+        {0, {nullptr, nullptr, nullptr, nullptr}}
+    };
+    renderer.DrawDefaultPointer(config);
+    EXPECT_EQ(renderer.screenImages_[0][0], nullptr);
+    renderer.screenImages_ = {
+        {0, {nullptr, nullptr, nullptr}}
+    };
+    renderer.DrawDefaultPointer(config);
+    EXPECT_EQ(renderer.screenImages_[0][0], nullptr);
+    image_ptr_t img = std::make_shared<OHOS::Rosen::Drawing::Image>();
+    renderer.screenImages_ = {
+        {0, {img, nullptr, nullptr, nullptr}}
+    };
+    renderer.DrawDefaultPointer(config);
+    EXPECT_EQ(renderer.screenImages_[0][0], img);
+}
+
+/**
+ * @tc.name: PointerRendererTest_DrawBlurPointer_001
+ * @tc.desc: Test DrawBlurPointer
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_DrawBlurPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    uint32_t width = 10;
+    uint32_t height = 20;
+    RenderConfig lastCofig;
+    config.screenId = 0;
+    renderer.screenImages_ = {
+        {0, {nullptr, nullptr, nullptr, nullptr}}
+    };
+    renderer.DrawBlurPointer(witdth, height, lastConfig, config);
+    EXPECT_EQ(renderer.screenImages_[0][0], nullptr);
+    renderer.screenImages_ = {
+        {0, {nullptr, nullptr, nullptr}}
+    };
+    renderer.DrawBlurPointer(width, height, lastConfig, config);
+    EXPECT_EQ(renderer.screenImages_[0][0], nullptr);
+    image_ptr_t img = std::make_shared<OHOS::Rosen::Drawing::Image>();
+    renderer.screenImages_ = {
+        {0, {img, img, img, img}}
+    };
+    renderer.DrawBlurPointer(width, height, lastConfig, config);
+    EXPECT_EQ(renderer.screenImages_[0][0], img);
+}
+
+/**
+ * @tc.name: PointerRendererTest_HasPointerCfg_001
+ * @tc.desc: Test HasPointerCfg
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_HasPointerCfg_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    RenderConfig config1;
+    PointerRenderer renderer;
+    config.screenId = 0;
+    config1.screenId = 1;
+    bool ret = renderer.HasPointerCfg(config);
+    EXPECT_EQ(ret, false);
+    renderer.screenConfig_ = {
+        {0, config}
+    };
+    ret = renderer.HasPointerCfg(config);
+    EXPECT_EQ(ret, true);
+    renderer.screenConfig_ = {
+        {1, config1}
+    };
+    ret = renderer.HasPointerCfg(config);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: PointerRendererTest_SetPointerCfg_001
+ * @tc.desc: Test SetPointerCfg
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_SetPointerCfg_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    config.screenId = 0;
+    renderer.SetPointerCfg(config);
+    EXPECT_EQ(renderer.screenConfig_[0], config);
+}
+
+/**
+ * @tc.name: PointerRendererTest_GetPointerCfg_001
+ * @tc.desc: Test GetPointerCfg
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerCfg_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    RenderConfig defaultConfig;
+    PointerRenderer renderer;
+    config.screenId = 1;
+    defaultConfig.screenId = 0;
+    auto cfg = renderer.GetPointerCfg(defaultConfig);
+    EXPECT_EQ(cfg.screenId, defaultConfig.screenId);
+    renderer.screenConfig_ = {
+        {0, config}
+    };
+    auto cfg1 = renderer.GetPointerCfg(defaultConfig);
+    EXPECT_EQ(cfg1.screenId, config.screenId);
+}
+
+/**
+ * @tc.name: PointerRendererTest_LoadDefaultPointerImage_001
+ * @tc.desc: Test LoadDefaultPointerImage
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_LoadDefaultPointerImage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    config.screenId = 1;
+    renderer.screenImages_ = {
+        {0, {nullptr, nullptr, nullptr, nullptr}}
+    };
+    renderer.LoadDefaultPointerImage(config);
+    EXPECT_EQ(renderer.screenImages_[0][0], nullptr);
+}
+
+/**
+ * @tc.name: PointerRendererTest_LoadPointerToCache_001
+ * @tc.desc: Test LoadPointerToCache
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_LoadPointerToCache_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    EXPECT_TRUE(renderer.mouseIcons_.empty());
+    std::map<MOUSE_ICON, IconStyle> mouseIcons = {
+        {DEFAULT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
+    };
+    renderer.LoadPointerToCache(mouseIcons);
+    EXPECT_FALSE(renderer.mouseIcons_.empty());
+}
+
+/**
+ * @tc.name: PointerRendererTest_GetPointerFromCache_001
+ * @tc.desc: Test GetPointerFromCache
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerFromCache_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    RenderConfig config;
+    std::string svgContent;
+    config.style_ = MOUSE_ICON::DEFAULT;
+    EXPECT_TRUE(renderer.mouseIcons_.empty());
+    bool ret = renderer.GetPointerFromCache(config, svgContent);
+    EXPECT_EQ(ret, true);
+    EXPECT_FALSE(renderer.mouseIcons_.empty());
+    ret = renderer.GetPointerFromCache(config, svgContent);
+    EXPECT_EQ(ret, true);
+    config.path_ = "test";
+    config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
+    ret = renderer.GetPointerFromCache(config, svgContent);
+    EXPECT_EQ(ret, false);
 }
 
 /**
