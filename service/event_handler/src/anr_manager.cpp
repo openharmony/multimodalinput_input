@@ -114,6 +114,10 @@ void ANRManager::RemoveTimersByType(SessionPtr sess, int32_t type)
 void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, SessionPtr sess)
 {
     CHKPV(sess);
+    if (id < 0) {
+        MMI_HILOGD("Invalid eventId:%{public}d for ANR", id);
+        return;
+    }
     if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
