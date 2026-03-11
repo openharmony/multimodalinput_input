@@ -254,5 +254,31 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     int32_t ret = pointerDrawingManager.CheckHwcReady();
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_HardwareCursorRender_001
+ * @tc.desc: Test HardwareCursorRender
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorRender_001,
+    TestSize.Level1)
+{
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
+    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, SetPosition).
+        WillOnce(Return(RET_ERR)).
+        WillOnce(Return(RET_OK));
+    sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp});
+    pointerDrawingManager.lastPhysicalX_ = 10;
+    pointerDrawingManager.lastPhysicalY_ = 20;
+    pointerDrawingManager.displayId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwarecursorRender(MOUSE_ICON::DEFAULT, 10, 20));
+}
 } // namespace MMI
 } // namespace OHOS

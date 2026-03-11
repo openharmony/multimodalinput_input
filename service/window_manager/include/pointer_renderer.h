@@ -85,6 +85,8 @@ private:
     const RenderConfig& GetPointerCfg(const RenderConfig &defaultCfg);
     std::vector<image_ptr_t> GetPointerImage(const RenderConfig &cfg);
     void LoadDefaultPointerImage(const RenderConfig &cfg);
+    void ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul, const float pecent);
+    void SetAlpha(pixelmap_ptr_t pixelMap, const float pecent);
     image_ptr_t LoadPointerImage(const RenderConfig &cfg);
     bool GetPointerFromCache(const RenderConfig &cfg, std::string& svgContent);
     pixelmap_ptr_t LoadCursorSvgWithColor(const RenderConfig &cfg);
