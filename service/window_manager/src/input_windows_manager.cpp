@@ -2838,7 +2838,10 @@ void InputWindowsManager::NotifyPointerToWindow(int32_t groupId)
             MMI_HILOGE("Get pointer item failed, pointerId:%{public}d", pointerId);
             return;
         }
-        windowInfo = GetWindowInfo(pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), groupId);
+        int32_t displayId = lastPointerEventCopy->GetTargetDisplayId();
+        int32_t logicalX = GetLogicalPositionX(displayId) + pointerItem.GetDisplayX();
+        int32_t logicalY = GetLogicalPositionY(displayId) + pointerItem.GetDisplayY();
+        windowInfo = GetWindowInfo(logicalX, logicalY, groupId);
     } else {
         if ((pointerLockedWindow_.flags & WindowInputPolicy::FLAG_POINTER_LOCKED) ==
                 WindowInputPolicy::FLAG_POINTER_LOCKED ||
