@@ -78,7 +78,7 @@ public:
 private:
     int32_t DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
         const RenderConfig &cfg);
-    void DrawDefaultPointer(uint32_t width, uint32_t height, const RenderConfig &cfg);
+    void DrawDefaultPointer(const RenderConfig &cfg);
     void DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg, const RenderConfig &cfg);
     bool HasPointerCfg(const RenderConfig &cfg);
     void SetPointerCfg(const RenderConfig &cfg);

@@ -267,7 +267,7 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
     return RET_OK;
 }
 
-void PointerRenderer::DrawDefaultPointer(uint32_t width, uint32_t height, const RenderConfig &cfg)
+void PointerRenderer::DrawDefaultPointer(const RenderConfig &cfg)
 {
     const auto& images = screenImages_[cfg.screenId];
     if (images.size() < BLUR_NUM + 1) {
