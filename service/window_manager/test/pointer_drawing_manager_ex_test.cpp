@@ -1879,7 +1879,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_GetCursorBlurE
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     bool ret = pointerDrawMgr.GetCursorBlurEnabled();
-    EXPEXCT_TRUE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -1888,13 +1888,13 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_GetCursorBlurE
 @tc.type: FUNC
 @tc.require:
 */
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdateCursorBlurEnable_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_UpdateCursorBlurEnabled_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     pointerDrawMgr.lastCursorBlurEnabled_ = true;
-    pointerDrawMgr.UpdateCursorBlurEnable();
-    EXPEXCT_EQ(lastCursorBlurEnabled_, true);
+    pointerDrawMgr.UpdateCursorBlurEnabled();
+    EXPECT_EQ(pointerDrawMgr.lastCursorBlurEnabled_, true);
 }
 
 /**
@@ -1907,8 +1907,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_GetResampleTim
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
-    auto timestamp = pointerDrawMgr.GetResampleTimestamp();
-    EXPEXCT_EQ(timestamp >= 0, true);
+    auto timestamp = pointerDrawMgr.GetResampleTimestamp(1000 * 1000 * 10);
+    EXPECT_EQ(timestamp >= 0, true);
 }
 
 /**
@@ -1924,8 +1924,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_AddPoint_00
     int32_t x = 0;
     int32_t y = 0;
     uint64_t id = 0;
-    auto timestamp = pointerDrawMgr.resample_.AddPoint(x, y, id);
-    EXPEXCT_FALSE(pointerDrawMgr.resample_.HasCoords());
+    pointerDrawMgr.resample_.AddPoint(x, y, id);
+    EXPECT_FALSE(pointerDrawMgr.resample_.HasCoords());
 }
 
 /**
@@ -1947,14 +1947,20 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     uint64_t curId = 0;
     uint64_t preId = 1;
     bool ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
-    EXPEXCT_EQ(ret, false);
-    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
-    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, preId, preTime)};
+    EXPECT_EQ(ret, false);
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(curX, curY, curId, curTime)
+    };
+    pointerDrawMgr.resample_.historyBuffer_ = {
+        ResampleAlgorithm::Point(preX, preY, preId, preTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
-    EXPEXCT_EQ(ret, false);
-    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, curId, preTime)};
+    EXPECT_EQ(ret, false);
+    pointerDrawMgr.resample_.historyBuffer_ = {
+        ResampleAlgorithm::Point(preX, preY, curId, preTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
-    EXPEXCT_EQ(ret, true);
+    EXPECT_EQ(ret, true);
 }
 
 /**
@@ -1977,14 +1983,20 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_CheckDiffer
     uint64_t curId = 0;
     uint64_t preId = 1;
     bool ret = pointerDrawMgr.resample_.CheckDifferetDisplayId();
-    EXPEXCT_EQ(ret, false);
-    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
-    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, preId, preTime)};
+    EXPECT_EQ(ret, false);
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(curX, curY, curId, curTime)
+    };
+    pointerDrawMgr.resample_.historyBuffer_ = {
+        ResampleAlgorithm::Point(preX, preY, preId, preTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
-    EXPEXCT_EQ(ret, false);
-    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, curId, preTime)};
+    EXPECT_EQ(ret, false);
+    pointerDrawMgr.resample_.historyBuffer_ = {
+        ResampleAlgorithm::Point(preX, preY, curId, preTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
-    EXPEXCT_EQ(ret, true);
+    EXPECT_EQ(ret, true);
 }
 
 /**
@@ -2006,7 +2018,9 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_HasCoords00
     uint64_t preTime = 1000 * 1000 * 99;
     uint64_t curId = 0;
     uint64_t preId = 1;
-    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(curX, curY, curId, curTime)
+    };
     bool ret = pointerDrawMgr.resample_.HasCoords()
     EXPECT_EQ(ret, true);
     pointerDrawMgr.resample_.historyBuffer_ = {};
@@ -2036,18 +2050,24 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     uint64_t preTime = 1000 * 1000 * 99;
     uint64_t curId = 0;
     uint64_t preId = 1;
-    Point ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
-    EXPEXCT_EQ(ret.dispalyId, 0);
-    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    ResampleAlgorithm::Point ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
+    EXPECT_EQ(ret.dispalyId, 0);
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(curX, curY, curId, curTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
-    EXPEXCT_EQ(ret.dispalyId, 0);
+    EXPECT_EQ(ret.dispalyId, 0);
     pointerDrawMgr.resample_.currentBuffer_ = {};
-    pointerDrawMgr.resample_.historyBuffer_ = {Point(preX, preY, curId, preTime)};
+    pointerDrawMgr.resample_.historyBuffer_ = {
+        ResampleAlgorithm::Point(preX, preY, curId, preTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
-    EXPEXCT_EQ(ret.dispalyId, 0);
-    pointerDrawMgr.resample_.currentBuffer_ = {Point(curX, curY, curId, curTime)};
+    EXPECT_EQ(ret.dispalyId, 0);
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(curX, curY, curId, curTime)
+    };
     ret = pointerDrawMgr.resample_.GetResampleCoords(curTime);
-    EXPEXCT_EQ(ret.dispalyId, 0);
+    EXPECT_EQ(ret.dispalyId, 0);
 }
 
 /**
@@ -2060,11 +2080,11 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetAvgPoint
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
-    std::deque<Point> event = {};
-    Point ret = pointerDrawMgr.resample_.GetAvgPoint(event);
-    std::deque<Point> event = {Point(1, 1, 0, 1)};
-    Point ret = pointerDrawMgr.resample_.GetAvgPoint(event);
-    EXPEXCT_EQ(ret.displayId, 0);
+    std::deque<ResampleAlgorithm::Point> event = {};
+    ResampleAlgorithm::Point ret = pointerDrawMgr.resample_.GetAvgPoint(event);
+    std::deque<ResampleAlgorithm::Point> event = {Point(1, 1, 0, 1)};
+    ret = pointerDrawMgr.resample_.GetAvgPoint(event);
+    EXPECT_EQ(ret.displayId, 0);
 }
 
 /**
@@ -2077,15 +2097,15 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_LinearInter
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
-    Point cur = Point(0, 0, 0, 1000 * 1000 * 100);
-    Point pre = Point(10, 10, 0, 1000 * 1000 * 99);
+    ResampleAlgorithm::Point cur = Point(0, 0, 0, 1000 * 1000 * 100);
+    ResampleAlgorithm::Point pre = Point(10, 10, 0, 1000 * 1000 * 99);
     uint64_t time = 1000 * 1000 * 100;
-    Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
-    EXPEXCT_EQ(ret.displayId, 0);
-    Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time + 1);
-    EXPEXCT_EQ(ret.displayId, 0);
-    Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time - 1);
-    EXPEXCT_EQ(ret.displayId, 0);
+    ResampleAlgorithm::Point ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time);
+    EXPECT_EQ(ret.displayId, 0);
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time + 1);
+    EXPECT_EQ(ret.displayId, 0);
+    ret = pointerDrawMgr.resample_.LinearInterpolation(cur, pre, time - 1);
+    EXPECT_EQ(ret.displayId, 0);
 }
 } // namespace MMI
 } // namespace OHOS
