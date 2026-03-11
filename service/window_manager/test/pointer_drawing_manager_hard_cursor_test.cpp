@@ -56,7 +56,7 @@ public:
         return screenInfo;
     }
  
-    static std::shared_ptr<ScreenPointer> CreateScreenPointer(PointerRenderer pointerRenderer,
+    static std::shared_ptr<ScreenPointer> CreateScreenPointer(PointerRenderer& pointerRenderer,
         std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager,
         std::shared_ptr<AppExecFwk::EventHandler> handler,
         sptr<Rosen::ScreenInfo> screenInfo)
