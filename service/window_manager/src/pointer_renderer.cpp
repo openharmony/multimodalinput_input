@@ -257,7 +257,7 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
     }
     defaultCanvas_.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
     DrawBlurPointer(width, height, lastCfg, cfg);
-    DrawDefaultPointer(width, height, cfg);
+    DrawDefaultPointer(cfg);
     SetPointerCfg(cfg);
     errno_t ret = memcpy_s(addr, addrSize, defaultBitmap_.GetPixels(), addrSize);
     if (ret != EOK) {
@@ -269,10 +269,7 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
 
 void PointerRenderer::DrawDefaultPointer(const RenderConfig &cfg)
 {
-    {
-        std::lock_guard<std::mutex> lock(cacheMutex_);
-        const auto& images = screenImages_[cfg.screenId];
-    }
+    const auto& images = GetPointerImage(cfg);
     if (images.size() < BLUR_NUM + 1) {
         MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
         return;
@@ -287,10 +284,7 @@ void PointerRenderer::DrawDefaultPointer(const RenderConfig &cfg)
 void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg,
     const RenderConfig &cfg)
 {
-    {
-        std::lock_guard<std::mutex> lock(cacheMutex_);
-        const auto& images = screenImages_[cfg.screenId];
-    }
+    const auto& images = GetPointerImage(cfg);
     if (images.size() < BLUR_NUM + 1) {
         MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
         return;
@@ -342,6 +336,16 @@ const RenderConfig& PointerRenderer::GetPointerCfg(const RenderConfig &defaultCf
     auto it = screenConfigs_.find(defaultCfg.screenId);
     if (it == screenConfigs_.end()) {
         return defaultCfg;
+    }
+    return it->second;
+}
+
+std::vector<image_ptr_t> PointerRenderer::GetPointerImage(const RenderConfig &cfg)
+{
+    std::lock_guard<std::mutex> lock(cacheMutex_);
+    auto it = screenImages_.find(cfg.screenId);
+    if (it == screenImages_.end()) {
+        return {};
     }
     return it->second;
 }

@@ -435,6 +435,27 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerCfg_001, TestSize.Le
 }
 
 /**
+ * @tc.name: PointerRendererTest_GetPointerImage_001
+ * @tc.desc: Test GetPointerImage
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerImage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerRenderer renderer;
+    config.screenId = 0;
+    auto img = renderer.GetPointerImage(config);
+    EXPECT_EQ(img.size(), 0);
+    renderer.screenImages_ = {
+        {0, {nullptr}}
+    };
+    img = renderer.GetPointerImage(config);
+    EXPECT_EQ(img.size(), 1);
+}
+
+/**
  * @tc.name: PointerRendererTest_LoadDefaultPointerImage_001
  * @tc.desc: Test LoadDefaultPointerImage
  * @tc.type: Function
