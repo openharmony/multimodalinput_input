@@ -83,6 +83,7 @@ private:
     bool HasPointerCfg(const RenderConfig &cfg);
     void SetPointerCfg(const RenderConfig &cfg);
     const RenderConfig& GetPointerCfg(const RenderConfig &defaultCfg);
+    std::vector<image_ptr_t> GetPointerImage(const RenderConfig &cfg);
     void LoadDefaultPointerImage(const RenderConfig &cfg);
     image_ptr_t LoadPointerImage(const RenderConfig &cfg);
     bool GetPointerFromCache(const RenderConfig &cfg, std::string& svgContent);
