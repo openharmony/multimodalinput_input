@@ -1855,7 +1855,10 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CreateRenderCo
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
     RenderConfig config;
-    auto sp = std::make_shared<ScreenPointer>();
+    std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
+    sptr<Rosen::ScreenInfo> screenInfo = nullptr;
+    auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager, handler, screenInfo);
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateRenderConfig(
         config, sp, MOUSE_ICON::DEFAULT, true, 0, 0, 0));
 }

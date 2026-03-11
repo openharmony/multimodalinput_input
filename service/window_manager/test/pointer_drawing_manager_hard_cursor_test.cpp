@@ -278,7 +278,7 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.lastPhysicalX_ = 10;
     pointerDrawingManager.lastPhysicalY_ = 20;
     pointerDrawingManager.displayId_ = 0;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwarecursorRender(MOUSE_ICON::DEFAULT, 10, 20));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20));
 }
 } // namespace MMI
 } // namespace OHOS
