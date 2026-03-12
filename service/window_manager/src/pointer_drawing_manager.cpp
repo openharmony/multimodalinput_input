@@ -385,7 +385,7 @@ bool PointerDrawingManager::SetCursorLocation(int32_t physicalX, int32_t physica
         if (GetCursorBlurEnabled()) {
             if (!vsyncStart_.load()) {
                 MMI_HILOGI("vsync stop, try render and move");
-                RenderAndMoveOnVsync(physicalX, physicalY, false, MOUSE_ICON(lastMouseStyle_.id));
+                RenderAndMoveOnVsync(physicalX, physicalY);
             }
             return vsyncStart_.load();
         }
@@ -1168,8 +1168,15 @@ void PointerDrawingManager::SoftwareCursorDynamicRender(MOUSE_ICON mouseStyle)
     }
 }
 
-void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDynamic, MOUSE_ICON mouseStyle)
+void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y)
 {
+    if (!CursorDrawingInformation::GetInstance().IsPointerVisible() || !mouseDisplayState_) {
+        MMI_HILOGD("Mouse is hide, stop render");
+        return;
+    }
+    MOUSE_ICON mouseStyle = MOUSE_ICON(currentMouseStyle_.id);
+    bool isDynamic = (mouseStyle == MOUSE_ICON::LOADING || mouseStyle == MOUSE_ICON::RUNNING);
+    MMI_HILOGD("mouseStyle:%{public}d, isDynamic:%{public}d", static_cast<uint32_t>(mouseStyle), isDynamic);
     if (isDynamic) {
         PostSoftCursorTask([this, mouseStyle]() {
             SoftwareCursorDynamicRender(mouseStyle);
@@ -1202,11 +1209,9 @@ void PointerDrawingManager::RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDy
 
 void PointerDrawingManager::OnVsync(uint64_t timestamp)
 {
-    MOUSE_ICON mouseStyle = MOUSE_ICON(currentMouseStyle_.id);
-    bool isDynamic = (mouseStyle == MOUSE_ICON::LOADING || mouseStyle == MOUSE_ICON::RUNNING);
     if (!CursorDrawingInformation::GetInstance().IsPointerVisible() || !mouseDisplayState_) {
         MMI_HILOGE("Mouse is hide, stop request vsync");
-        if (!isDynamic) {
+        if (currentMouseStyle_.id != MOUSE_ICON::LOADING && currentMouseStyle_.id != MOUSE_ICON::RUNNING) {
             PostSoftCursorTask([this]() {
                 SoftwareCursorRender(MOUSE_ICON::TRANSPARENT_ICON, lastPhysicalX_, lastPhysicalY_);
             });
@@ -1216,7 +1221,8 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
         return;
     }
 
-    if ((!resample_.HasCoords() || !GetCursorBlurEnabled()) && !isDynamic) {
+    if (currentMouseStyle_.id != MOUSE_ICON::LOADING && currentMouseStyle_.id != MOUSE_ICON::RUNNING &&
+        (!resample_.HasCoords() || !GetCursorBlurEnabled())) {
         MMI_HILOGE("No coords, stop request vsync");
         vsyncStart_.store(false);
         return;
@@ -1227,10 +1233,9 @@ void PointerDrawingManager::OnVsync(uint64_t timestamp)
     if (!resample_.GetResampledPoint(x, y, resampleTimestamp)) {
         MMI_HILOGD("Failed to get resampled coords");
     }
-    PostTask([this, x, y, mouseStyle, isDynamic]() -> void {
+    PostTask([this, x, y]() -> void {
         std::lock_guard<std::recursive_mutex> lg(recursiveMtx_);
-        MMI_HILOGD("mouseStyle:%{public}d, isDynamic:%{public}d", static_cast<uint32_t>(mouseStyle), isDynamic);
-        RenderAndMoveOnVsync(x, y, isDynamic, mouseStyle);
+        RenderAndMoveOnVsync(x, y);
     });
     RequestNextVSync();
 }

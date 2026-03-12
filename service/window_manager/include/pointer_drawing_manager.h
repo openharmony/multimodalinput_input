@@ -247,7 +247,7 @@ private:
     void SoftCursorRenderThreadLoop();
     void MoveRetryThreadLoop();
     int32_t RequestNextVSync();
-    void RenderAndMoveOnVsync(int32_t x, int32_t y, bool isDynamic, MOUSE_ICON mouseStyle);
+    void RenderAndMoveOnVsync(int32_t x, int32_t y);
     void OnVsync(uint64_t timestamp);
     void PostTask(std::function<void()> task);
     void PostSoftCursorTask(std::function<void()> task);
