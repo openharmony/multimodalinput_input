@@ -103,7 +103,6 @@ private:
 private:
     std::deque<Point> currentBuffer_;
     std::deque<Point> historyBuffer_;
-    mutable std::mutex mutex_;
     int32_t keepResample_ { 2 };
 };
 
