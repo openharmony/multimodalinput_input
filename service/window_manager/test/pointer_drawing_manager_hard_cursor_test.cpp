@@ -266,10 +266,6 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
 {
     PointerDrawingManager pointerDrawingManager;
     ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
-    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, IsSupported).WillRepeatedly(Return(true));
-    EXPECT_CALL(*pointerDrawingManager.hardwareCursorPointerManager_, SetPosition).
-        WillOnce(Return(RET_ERR)).
-        WillOnce(Return(RET_OK));
     sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
     auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
         pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
