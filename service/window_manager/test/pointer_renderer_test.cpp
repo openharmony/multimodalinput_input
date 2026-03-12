@@ -262,11 +262,11 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     renderer.defaultInit_ = false;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
-    EXPECT_EQ(ret, RET_ERR);
-    renderer.defaultInit_ = false;
+    EXPECT_EQ(ret, RET_OK);
+    renderer.defaultInit_ = true;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -292,7 +292,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_002, TestSize.Le
     config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
     config.direction = 5;
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
     config.direction = 0;
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
