@@ -1839,8 +1839,28 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RenderAndMoveO
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawMgr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, false, MOUSE_ICON::DEFAULT));
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0, true, MOUSE_ICON::RUNNING));
+    pointerDrawMgr.mouseDisplayState_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0));
+    pointerDrawMgr.mouseDisplayState_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.RenderAndMoveOnVsync(0, 0));
+}
+
+/**
+@tc.name: PointerDrawingManagerExTest_OnVsync_001
+@tc.desc: Test the function OnVsync
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_OnVsync_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    pointerDrawMgr.mouseDisplayState_ = false;
+    uint64_t time = 1000 * 1000 * 100;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.OnVsync(time));
+    pointerDrawMgr.mouseDisplayState_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.OnVsync(time));
 }
 
 /**
