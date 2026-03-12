@@ -204,6 +204,7 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
         defaultCanvas_.Bind(defaultBitmap_);
         LoadDefaultPointerImage(cfg);
         SetPointerCfg(cfg);
+        defaultCanvas_.Save();
         defaultInit_ = true;
         MMI_HILOGI("default render init success");
     }
@@ -212,15 +213,16 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
         LoadDefaultPointerImage(cfg);
         SetPointerCfg(cfg);
     }
-    const auto& lastCfg = GetPointerCfg(cfg);
-    if (lastCfg.direction != cfg.direction) {
-        MMI_HILOGI("cfg change, rotate diretion");
+    if (cfg.direction >= 0) {
+        MMI_HILOGD("rotate diretion: %{public}u", cfg.direction);
         defaultCanvas_.Restore();
+        defaultCanvas_.Save();
         int32_t directionFlag = -1;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         defaultCanvas_.Rotate(degree, FOCUS_POINT, FOCUS_POINT);
     }
     defaultCanvas_.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    const auto& lastCfg = GetPointerCfg(cfg);
     DrawBlurPointer(width, height, lastCfg, cfg);
     DrawDefaultPointer(cfg);
     SetPointerCfg(cfg);
@@ -302,7 +304,7 @@ const RenderConfig& PointerRenderer::GetPointerCfg(const RenderConfig &defaultCf
     if (it == screenConfigs_.end()) {
         return defaultCfg;
     }
-    return it->second;
+    return it->second.isHard ? it->second : defaultCfg;
 }
 
 std::vector<image_ptr_t> PointerRenderer::GetPointerImage(const RenderConfig &cfg)
@@ -344,10 +346,8 @@ void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
         }
         images[i] = blurImage;
     }
-    {
-        std::lock_guard<std::mutex> lock(cacheMutex_);
-        screenImages_[cfg.screenId] = images;
-    }
+    std::lock_guard<std::mutex> lock(cacheMutex_);
+    screenImages_[cfg.screenId] = images;
 }
 
 void PointerRenderer::ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul,
@@ -392,7 +392,6 @@ void PointerRenderer::LoadPointerToCache(const std::map<MOUSE_ICON, IconStyle> &
 {
     std::string svgContent;
     bool allLoaded = true;
-    std::lock_guard<std::mutex> lock(cacheMutex_);
     for (const auto& [icon, style] : mouseIcons) {
         if (!ReadFile(style.iconPath, svgContent)) {
             MMI_HILOGE("read file failed for icon:%{public}d", icon);
