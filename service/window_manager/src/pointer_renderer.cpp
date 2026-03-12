@@ -215,6 +215,7 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
     const auto& lastCfg = GetPointerCfg(cfg);
     if (lastCfg.direction != cfg.direction) {
         MMI_HILOGI("cfg change, rotate diretion");
+        defaultCanvas_.Restore();
         int32_t directionFlag = -1;
         int32_t degree = static_cast<int32_t>(directionFlag * static_cast<int32_t>(cfg.direction) * ROTATION_ANGLE90);
         defaultCanvas_.Rotate(degree, FOCUS_POINT, FOCUS_POINT);

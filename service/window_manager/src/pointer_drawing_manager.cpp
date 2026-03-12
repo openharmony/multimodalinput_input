@@ -4017,7 +4017,7 @@ ResampleAlgorithm::Point ResampleAlgorithm::LinearInterpolation(const Point& his
         MMI_HILOGD("Extrapolation alpha: %{public}f", alpha);
         return Point{static_cast<int32_t>(x), static_cast<int32_t>(y), current.displayId, timestamp};
     } else {
-        float alpha = static_cast<float>(timestamp - current.timestamp) / (history.timestamp - current.timestamp);
+        float alpha = static_cast<float>(timestamp - current.timestamp) / (current.timestamp - history.timestamp);
         float x = current.x + alpha * (current.x - history.x);
         float y = current.y + alpha * (current.y - history.y);
         MMI_HILOGD("Extrapolation alpha: %{public}f", alpha);
