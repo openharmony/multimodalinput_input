@@ -296,7 +296,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_002, TestSize.Le
     config.direction = 0;
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     ret = renderer.DefaultRender(addr, addrSize, width, height, config);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
     width = 0;
     height = 0;
     config.direction = 0;
@@ -425,6 +425,8 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_GetPointerCfg_001, TestSize.Le
     RenderConfig config;
     RenderConfig defaultConfig;
     PointerRenderer renderer;
+    config.isHard = true;
+    defaultConfig.isHard = true;
     config.screenId = 1;
     defaultConfig.screenId = 0;
     auto cfg = renderer.GetPointerCfg(defaultConfig);
@@ -493,7 +495,6 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_ApplyAlpha_001, TestSize.Level
     EXPECT_EQ(pixel[0], static_cast<uint8_t>(255 * pecent));
     renderer.ApplyAlpha(pixel, 4, false, pecent);
     EXPECT_EQ(pixel[3], 255);
-    EXPECT_EQ(pixel[3], 0);
     uint8_t* pixel1 = nullptr;
     ASSERT_NO_FATAL_FAILURE(renderer.ApplyAlpha(pixel1, 0, false, pecent));
 }

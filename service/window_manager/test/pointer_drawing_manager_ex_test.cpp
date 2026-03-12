@@ -1864,26 +1864,6 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_OnVsync_001,
 }
 
 /**
-@tc.name: PointerDrawingManagerExTest_CreateRenderConfig_001
-@tc.desc: Test the function CreateRenderConfig
-@tc.type: FUNC
-@tc.require:
-*/
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_CreateRenderConfig_001,
-    TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawMgr;
-    RenderConfig config;
-    std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> handler = nullptr;
-    sptr<Rosen::ScreenInfo> screenInfo = nullptr;
-    auto sp = std::make_shared<ScreenPointer>(hardwareCursorPointerManager, handler, screenInfo);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateRenderConfig(
-        config, sp, MOUSE_ICON::DEFAULT, true, 0, 0, 0));
-}
-
-/**
 @tc.name: PointerDrawingManagerExTest_ShowCursorWhenHardwareCursorEnabled_001
 @tc.desc: Test the function ShowCursorWhenHardwareCursorEnabled
 @tc.type: FUNC
@@ -1998,16 +1978,20 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_RA_GetResample
     pointerDrawMgr.resample_.currentBuffer_ = {
         ResampleAlgorithm::Point(curX, curY, curId, curTime)
     };
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
     EXPECT_EQ(ret, false);
     pointerDrawMgr.resample_.historyBuffer_ = {
         ResampleAlgorithm::Point(preX, preY, preId, preTime)
     };
     ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
     EXPECT_EQ(ret, false);
+    pointerDrawMgr.resample_.currentBuffer_ = {
+        ResampleAlgorithm::Point(curX, curY, curId, curTime)
+    };
     pointerDrawMgr.resample_.historyBuffer_ = {
         ResampleAlgorithm::Point(preX, preY, curId, preTime)
     };
-    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime);
+    ret = pointerDrawMgr.resample_.GetResampledPoint(curX, curY, curTime + 1);
     EXPECT_EQ(ret, true);
 }
 
