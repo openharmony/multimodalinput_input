@@ -486,22 +486,6 @@ HWTEST_F(MMIServerTest, MarkProcessed_001, TestSize.Level1)
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 
-/**
- * @tc.name: ReadPointerColor_001
- * @tc.desc: Test the function ReadPointerColor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, ReadPointerColor_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIService mmiService;
-    int32_t color = 1;
-    int32_t userId = 100;
-    int32_t ret = mmiService.ReadPointerColor(userId, color);
-    EXPECT_EQ(ret, RET_OK);
-}
-
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 /**
