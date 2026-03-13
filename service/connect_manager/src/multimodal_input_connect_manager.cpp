@@ -951,10 +951,6 @@ int32_t MultimodalInputConnectManager::GetInfraredFrequencies(std::vector<Infrar
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     std::vector<InfraredFrequency> infos = {};
     auto ret = multimodalInputConnectService_->GetInfraredFrequencies(infos);
-    if (infos.size() < 0) {
-        MMI_HILOGE("GetInfraredFrequencies failed");
-        return RET_ERR;
-    }
     for (auto& info : infos) {
         requencys.push_back(info);
     }
