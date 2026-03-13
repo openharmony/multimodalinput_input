@@ -137,6 +137,8 @@ constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr int32_t COMMON_USE_SYSAPI_ERROR { -202 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
+constexpr size_t INFRARED_FREQ_LOG_SIZE { 80 };
+constexpr size_t INFRARED_PATTERN_LOG_SIZE { 60 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 constexpr int32_t RETRY_CHECK_TIMES { 5 };
 constexpr int32_t CHECK_EEVENT_INTERVAL_TIME { 4000 };
@@ -4324,11 +4326,13 @@ ErrCode MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequ
         info.max_ = item.max_;
         frequencies.push_back(info);
     }
-    std::string context = "";
     int32_t size = static_cast<int32_t>(frequencies.size());
+    std::string context;
+    context.reserve(size * INFRARED_FREQ_LOG_SIZE);
     for (int32_t i = 0; i < size; i++) {
-        context = context + "frequencies[" + std::to_string(i) + "]. max=" + std::to_string(frequencies[i].max_) +
-        ",min=" + std::to_string(frequencies[i].min_) + ";";
+        context.append("frequencies[").append(std::to_string(i)).append("]. max=")
+            .append(std::to_string(frequencies[i].max_)).append(",min=")
+            .append(std::to_string(frequencies[i].min_)).append(";");
     }
     MMI_HILOGD("Data from hdf context:%{public}s", context.c_str());
 #endif // OHOS_BUILD_ENABLE_WATCH
@@ -4343,10 +4347,13 @@ ErrCode MMIService::TransmitInfrared(int64_t number, const std::vector<int64_t>&
         return ERROR_NO_PERMISSION;
     }
 #ifndef OHOS_BUILD_ENABLE_WATCH
-    std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
+    std::string context;
+    context.reserve(size * INFRARED_PATTERN_LOG_SIZE);
+    context.append("infraredFrequency:").append(std::to_string(number)).append(";");
     for (int32_t i = 0; i < size; i++) {
-        context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
+        context.append("index:").append(std::to_string(i)).append(": pattern:")
+            .append(std::to_string(pattern[i])).append(";");
     }
     MMI_HILOGI("TransmitInfrared para context:%{public}s", context.c_str());
     if (!InfraredEmitterController::GetInstance()->Transmit(number, pattern)) {
