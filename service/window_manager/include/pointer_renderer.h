@@ -42,6 +42,10 @@ public:
     int32_t userIconHotSpotX { 0 };
     int32_t userIconHotSpotY { 0 };
     bool userIconFollowSystem { false };
+    int32_t x { 0 };
+    int32_t y { 0 };
+    uint64_t screenId { 0 };
+    bool isBlur { false };
     int32_t GetImageSize() const;
     float AdjustIncreaseRatio(float dpi) const;
     std::string ToString() const;
@@ -70,8 +74,21 @@ public:
     int32_t Render(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
     int32_t DynamicRender(uint8_t *addr, uint32_t width, uint32_t height, const RenderConfig &cfg);
     image_ptr_t UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg);
+    void LoadPointerToCache(const std::map<MOUSE_ICON, IconStyle> &mouseIcons);
 private:
+    int32_t DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
+        const RenderConfig &cfg);
+    void DrawDefaultPointer(const RenderConfig &cfg);
+    void DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg, const RenderConfig &cfg);
+    bool HasPointerCfg(const RenderConfig &cfg);
+    void SetPointerCfg(const RenderConfig &cfg);
+    const RenderConfig& GetPointerCfg(const RenderConfig &defaultCfg);
+    std::vector<image_ptr_t> GetPointerImage(const RenderConfig &cfg);
+    void LoadDefaultPointerImage(const RenderConfig &cfg);
+    void ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul, const float pecent);
+    void SetAlpha(pixelmap_ptr_t pixelMap, const float pecent);
     image_ptr_t LoadPointerImage(const RenderConfig &cfg);
+    bool GetPointerFromCache(const RenderConfig &cfg, std::string& svgContent);
     pixelmap_ptr_t LoadCursorSvgWithColor(const RenderConfig &cfg);
     image_ptr_t ExtractDrawingImage(pixelmap_ptr_t pixelMap);
     int32_t DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, const RenderConfig &cfg);
@@ -92,6 +109,18 @@ private:
         }
         imgMaps_.push_back({cfg, img});
     }
+    std::map<MOUSE_ICON, std::string> mouseIcons_;
+    mutable std::mutex cacheMutex_;
+    std::map<uint64_t, RenderConfig> screenConfigs_;
+    bool defaultInit_ { false };
+    std::map<uint64_t, std::vector<image_ptr_t>> screenImages_;
+
+    OHOS::Rosen::Drawing::Bitmap defaultBitmap_;
+    OHOS::Rosen::Drawing::BitmapFormat defaultFormat_ {
+        OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE,
+    };
+    OHOS::Rosen::Drawing::Canvas defaultCanvas_;
 };
 } // namespace OHOS::MMI
 

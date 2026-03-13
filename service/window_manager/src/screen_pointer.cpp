@@ -36,7 +36,7 @@ constexpr int32_t BASELINE_DENSITY{160};
 constexpr int32_t POINTER_WINDOW_INIT_SIZE{64};
 constexpr int32_t BUFFER_RELEASE_WAIT_MS{1000};
 constexpr int32_t NUM_TWO{2};
-constexpr int32_t DEFAULT_BUFFER_SIZE{10};
+constexpr int32_t DEFAULT_BUFFER_SIZE{8};
 constexpr int32_t DEFAULT_CURSOR_SIZE{512};
 constexpr uint32_t FOCUS_POINT = DEFAULT_CURSOR_SIZE / NUM_TWO;
 constexpr int32_t BUFFER_TIMEOUT{150};
@@ -243,7 +243,8 @@ buffer_ptr_t ScreenPointer::RequestBuffer(const RenderConfig &cfg, bool &isCommo
 bool ScreenPointer::IsDefaultCfg(const RenderConfig &cfg)
 {
     return (cfg == defaultCursorCfg_) && (cfg.direction == defaultCursorCfg_.direction)
-        && (cfg.align_ == defaultCursorCfg_.align_) && (cfg.isHard == defaultCursorCfg_.isHard);
+        && (cfg.align_ == defaultCursorCfg_.align_) && (cfg.isHard == defaultCursorCfg_.isHard)
+        && (cfg.isBlur == defaultCursorCfg_.isBlur);
 }
 
 buffer_ptr_t ScreenPointer::GetCurrentBuffer()
