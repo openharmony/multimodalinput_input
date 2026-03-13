@@ -143,8 +143,6 @@ bool InputPluginManager::LoadPlugin(const std::string &path)
                 });
             result.first->second.insert(it, cPin);
         }
-        MMI_HILOGI("Plugin %{public}s added to stage %{public}d", 
-                   iPin->GetName().c_str(), static_cast<int32_t>(stage));
     }
     return true;
 }
