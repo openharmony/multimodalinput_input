@@ -56,7 +56,7 @@ public:
         return screenInfo;
     }
  
-    static std::shared_ptr<ScreenPointer> CreateScreenPointer(PointerRenderer pointerRenderer,
+    static std::shared_ptr<ScreenPointer> CreateScreenPointer(PointerRenderer &pointerRenderer,
         std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager,
         std::shared_ptr<AppExecFwk::EventHandler> handler,
         sptr<Rosen::ScreenInfo> screenInfo)
@@ -253,6 +253,49 @@ HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTes
     pointerDrawingManager.displayId_ = 0;
     int32_t ret = pointerDrawingManager.CheckHwcReady();
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerHardCursorTest_HardwareCursorRender_001
+ * @tc.desc: Test HardwareCursorRender
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_HardwareCursorRender_001,
+    TestSize.Level1)
+{
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp});
+    pointerDrawingManager.lastPhysicalX_ = 10;
+    pointerDrawingManager.lastPhysicalY_ = 20;
+    pointerDrawingManager.displayId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.HardwareCursorRender(MOUSE_ICON::DEFAULT, 10, 20));
+}
+
+/**
+@tc.name: PointerDrawingManagerHardCursorTest_CreateRenderConfig_001
+@tc.desc: Test the function CreateRenderConfig
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(PointerDrawingManagerHardCursorTest, PointerDrawingManagerHardCursorTest_CreateRenderConfig_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RenderConfig config;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NE(pointerDrawingManager.hardwareCursorPointerManager_, nullptr);
+    sptr<Rosen::ScreenInfo> ScreenInfo = CreateScreenInfo(0, 0, Rosen::ScreenSourceMode::SCREEN_MAIN);
+    auto sp = CreateScreenPointer(pointerDrawingManager.pointerRenderer_,
+        pointerDrawingManager.hardwareCursorPointerManager_, pointerDrawingManager.handler_, ScreenInfo);
+    ASSERT_NE(sp, nullptr);
+    pointerDrawingManager.screenPointers_.insert({0, sp});
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreateRenderConfig(config, sp, MOUSE_ICON::DEFAULT, true, 0, 0, 0));
 }
 } // namespace MMI
 } // namespace OHOS

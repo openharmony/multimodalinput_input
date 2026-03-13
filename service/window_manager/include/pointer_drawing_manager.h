@@ -76,6 +76,36 @@ private:
     callback_t callback_;
 };
 
+class ResampleAlgorithm {
+public:
+    struct Point {
+        int32_t x { 0 };
+        int32_t y { 0 };
+        uint64_t displayId { 0 };
+        uint64_t timestamp { 0 };
+        Point(int32_t x, int32_t y, uint64_t displayId, uint64_t timestamp) : x(x), y(y),
+            displayId(displayId), timestamp(timestamp) {}
+        Point(int32_t x, int32_t y, uint64_t displayId) : x(x), y(y), displayId(displayId),
+            timestamp(std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch()).count()) {}
+    };
+public:
+    ResampleAlgorithm() = default;
+    ~ResampleAlgorithm() = default;
+    void AddPoint(int32_t physicalX, int32_t physicalY, uint64_t displayId);
+    bool HasCoords();
+    bool GetResampledPoint(int32_t &outX, int32_t &outY, uint64_t timestamp);
+private:
+    bool CheckDifferentDisplayId();
+    Point GetResampledCoords(uint64_t timestamp);
+    Point GetAvgPoint(const std::deque<Point>& events);
+    Point LinearInterpolation(const Point& history, const Point& current, uint64_t timestamp);
+private:
+    std::deque<Point> currentBuffer_;
+    std::deque<Point> historyBuffer_;
+    int32_t keepResample_ { 2 };
+};
+
 class DelegateInterface;
 class PointerDrawingManager final : public IPointerDrawingManager, public IDeviceObserver {
 public:
@@ -138,6 +168,8 @@ public:
         return delegateProxy_;
     }
     void UpdatePointerVisible() override;
+    void ShowCursorWhenHardwareCursorEnabled();
+    void HideCursorWhenHardwareCursorEnabled();
     void DestroyPointerWindow() override;
     void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
     void OnScreenModeChange(const std::vector<sptr<OHOS::Rosen::ScreenInfo>> &screens);
@@ -183,6 +215,7 @@ private:
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(uint64_t rsId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle, Direction direction);
+    void UpdatePointerVisibleOnStyleChange(int32_t physicalX, int32_t physicalY);
     void AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -214,6 +247,7 @@ private:
     void SoftCursorRenderThreadLoop();
     void MoveRetryThreadLoop();
     int32_t RequestNextVSync();
+    void RenderAndMoveOnVsync(int32_t x, int32_t y);
     void OnVsync(uint64_t timestamp);
     void PostTask(std::function<void()> task);
     void PostSoftCursorTask(std::function<void()> task);
@@ -240,10 +274,11 @@ private:
     bool DeleteScreenPointer(uint64_t screenId);
     void ClearScreenPointer();
     void ClearDisappearedScreenPointer(const std::set<uint64_t> &screenIds);
-    void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard);
+    void CreateRenderConfig(RenderConfig& cfg, std::shared_ptr<ScreenPointer> sp, MOUSE_ICON mouseStyle, bool isHard,
+        int32_t x, int32_t y, uint64_t screenId);
     Direction CalculateRenderDirection(bool isHard);
-    void SoftwareCursorRender(MOUSE_ICON mouseStyle);
-    void HardwareCursorRender(MOUSE_ICON mouseStyle);
+    void SoftwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y);
+    void HardwareCursorRender(MOUSE_ICON mouseStyle, int32_t x, int32_t y);
     void SoftwareCursorMove(uint64_t displayId, int32_t x, int32_t y);
     void SoftwareCursorMoveAsync(uint64_t displayId, int32_t x, int32_t y);
     void MoveRetryAsync(int32_t x, int32_t y);
@@ -269,6 +304,9 @@ private:
     void UnsubscribeScreenModeChange();
     void ClearResources() override;
     void ClearRunnerAndHandler();
+    bool GetCursorBlurEnabled();
+    void UpdateCursorBlurEnabled();
+    uint64_t GetResampleTimestamp(uint64_t timestamp);
 private:
     bool hasDisplay_ { false };
     bool hasPointerDevice_ { false };
@@ -348,6 +386,13 @@ private:
     CachedPointerConfig cachedPointerConfig_;
     std::mutex configCacheMutex_;
     std::atomic<uint64_t> workerThreadId_ { 0 };
+    std::atomic<bool> vsyncStart_ { false };
+    std::atomic<int32_t> mouseStylePending_ { 0 };
+    ResampleAlgorithm resample_;
+    bool currentCursorBlurEnabled_ { true };
+    bool lastCursorBlurEnabled_ { true };
+    std::atomic<bool> moveFinished_ { false };
+    std::mutex cursorBlurEnableMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
