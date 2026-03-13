@@ -327,5 +327,358 @@ HWTEST_F(MMIClientTest, MMIClientTest_StartEventRunner_001, TestSize.Level1)
     bool result = client->StartEventRunner();
     EXPECT_TRUE(result);
 }
+
+/**
+ * @tc.name: GetErrorStr_KnownCodes
+ * @tc.desc: Get error string for known error codes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetErrorStr_KnownCodes, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    const std::string& errOk = mmiClient.GetErrorStr(ERR_OK);
+    EXPECT_EQ(errOk, "ERR_OK.");
+    
+    const std::string& errInvalidParam = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_INVALID_PARAM);
+    EXPECT_EQ(errInvalidParam, "Invalid parameters");
+    
+    const std::string& errNoRunner = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_NO_EVENT_RUNNER);
+    EXPECT_EQ(errNoRunner, "Have not set event runner yet");
+}
+
+/**
+ * @tc.name: GetErrorStr_UnknownCode
+ * @tc.desc: Get error string for unknown error code
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetErrorStr_UnknownCode, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    ErrCode unknownCode = static_cast<ErrCode>(99999);
+    const std::string& errStr = mmiClient.GetErrorStr(unknownCode);
+    EXPECT_EQ(errStr, "Unknown event handler error!");
+}
+
+/**
+ * @tc.name: OnDisconnected_WithCallback
+ * @tc.desc: OnDisconnected with disconnected callback registered
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, OnDisconnected_WithCallback, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    bool callbackCalled = false;
+    ConnectCallback callback = [&callbackCalled](const IfMMIClient& client) {
+        callbackCalled = true;
+    };
+    client->RegisterDisconnectedFunction(callback);
+    client->Start();
+    client->OnDisconnect();
+    client->Stop();
+    EXPECT_TRUE(callbackCalled);
+}
+
+/**
+ * @tc.name: RegisterConnectedFunction_ValidCallback
+ * @tc.desc: Register connected function with valid callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, RegisterConnectedFunction_ValidCallback, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    bool callbackCalled = false;
+    ConnectCallback callback = [&callbackCalled](const IfMMIClient& client) {
+        callbackCalled = true;
+    };
+    ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterConnectedFunction(callback));
+}
+
+/**
+ * @tc.name: Stop_NoEventHandler
+ * @tc.desc: Stop client without event handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, Stop_NoEventHandler, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->eventHandler_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(client->Stop());
+}
+
+/**
+ * @tc.name: GetEventHandler_Valid
+ * @tc.desc: Get event handler when valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetEventHandler_Valid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    std::string threadName = "mmi_client_test";
+    auto eventRunner = AppExecFwk::EventRunner::Create(threadName);
+    EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>(eventRunner);
+    client->SetEventHandler(eventHandler);
+    EventHandlerPtr result = client->GetEventHandler();
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: GetEventHandler_Null
+ * @tc.desc: Get event handler when null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetEventHandler_Null, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->eventHandler_ = nullptr;
+    EventHandlerPtr result = client->GetEventHandler();
+    EXPECT_EQ(result, nullptr);
+}
+
+
+/**
+ * @tc.name: GetSharedPtr_Basic
+ * @tc.desc: Get shared pointer basic test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetSharedPtr_Basic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    MMIClientPtr ptr = client->GetSharedPtr();
+    EXPECT_NE(ptr, nullptr);
+}
+
+/**
+ * @tc.name: MarkIsEventHandlerChanged_SameThreadName
+ * @tc.desc: Mark eventHandler changed with same thread name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MarkIsEventHandlerChanged_SameThreadName, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    std::string threadName = "mmi_client_test_same";
+    auto eventRunner1 = AppExecFwk::EventRunner::Create(threadName);
+    EventHandlerPtr eventHandler1 = std::make_shared<AppExecFwk::EventHandler>(eventRunner1);
+    mmiClient.SetEventHandler(eventHandler1);
+    
+    auto eventRunner2 = AppExecFwk::EventRunner::Create(threadName);
+    EventHandlerPtr eventHandler2 = std::make_shared<AppExecFwk::EventHandler>(eventRunner2);
+    ASSERT_NO_FATAL_FAILURE(mmiClient.MarkIsEventHandlerChanged(eventHandler2));
+}
+
+/**
+ * @tc.name: MarkIsEventHandlerChanged_DifferentThreadName
+ * @tc.desc: Mark eventHandler changed with different thread name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MarkIsEventHandlerChanged_DifferentThreadName, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    std::string threadName1 = "mmi_client_test_diff1";
+    auto eventRunner1 = AppExecFwk::EventRunner::Create(threadName1);
+    EventHandlerPtr eventHandler1 = std::make_shared<AppExecFwk::EventHandler>(eventRunner1);
+    mmiClient.SetEventHandler(eventHandler1);
+    
+    std::string threadName2 = "mmi_client_test_diff2";
+    auto eventRunner2 = AppExecFwk::EventRunner::Create(threadName2);
+    EventHandlerPtr eventHandler2 = std::make_shared<AppExecFwk::EventHandler>(eventRunner2);
+    ASSERT_NO_FATAL_FAILURE(mmiClient.MarkIsEventHandlerChanged(eventHandler2));
+}
+
+/**
+ * @tc.name: AddFdListener_NullEventHandler
+ * @tc.desc: Add fd listener with null event handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, AddFdListener_NullEventHandler, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->eventHandler_ = nullptr;
+    int32_t validFd = 1;
+    bool result = client->AddFdListener(validFd, false);
+    EXPECT_FALSE(result);
+}
+
+
+/**
+ * @tc.name: DelFdListener_NullEventHandler
+ * @tc.desc: Delete fd listener with null event handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, DelFdListener_NullEventHandler, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->eventHandler_ = nullptr;
+    int32_t validFd = 1;
+    bool result = client->DelFdListener(validFd);
+    EXPECT_FALSE(result);
+}
+
+
+/**
+ * @tc.name: OnReconnect_Basic
+ * @tc.desc: Test OnReconnect function basic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, OnReconnect_Basic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    std::string threadName = "mmi_client_test";
+    auto eventRunner = AppExecFwk::EventRunner::Create(threadName);
+    EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>(eventRunner);
+    client->SetEventHandler(eventHandler);
+    ASSERT_NO_FATAL_FAILURE(client->OnReconnect());
+}
+
+/**
+ * @tc.name: SetScheduler_Basic
+ * @tc.desc: Test SetScheduler function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, SetScheduler_Basic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    ASSERT_NO_FATAL_FAILURE(client->SetScheduler());
+}
+
+/**
+ * @tc.name: GetErrorStr_AllKnownCodes
+ * @tc.desc: Get error string for all known error codes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetErrorStr_AllKnownCodes, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    
+    const std::string& errOk = mmiClient.GetErrorStr(ERR_OK);
+    EXPECT_EQ(errOk, "ERR_OK.");
+    
+    const std::string& errInvalidParam = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_INVALID_PARAM);
+    EXPECT_EQ(errInvalidParam, "Invalid parameters");
+    
+    const std::string& errNoRunner = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_NO_EVENT_RUNNER);
+    EXPECT_EQ(errNoRunner, "Have not set event runner yet");
+    
+    const std::string& errFdNotSupport = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_FD_NOT_SUPPORT);
+    EXPECT_EQ(errFdNotSupport, "Not support to listen file descriptors");
+    
+    const std::string& errFdAlready = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_FD_ALREADY);
+    EXPECT_EQ(errFdAlready, "File descriptor is already in listening");
+    
+    const std::string& errFdFailed = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_FD_FAILED);
+    EXPECT_EQ(errFdFailed, "Failed to listen file descriptor");
+    
+    const std::string& errRunnerNoPermit = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_RUNNER_NO_PERMIT);
+    EXPECT_EQ(errRunnerNoPermit, "No permit to start or stop deposited event runner");
+    
+    const std::string& errRunnerAlready = mmiClient.GetErrorStr(AppExecFwk::EVENT_HANDLER_ERR_RUNNER_ALREADY);
+    EXPECT_EQ(errRunnerAlready, "Event runner is already running");
+}
+
+/**
+ * @tc.name: GetSharedPtr_MultipleCalls
+ * @tc.desc: Get shared pointer multiple calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetSharedPtr_MultipleCalls, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    MMIClientPtr ptr1 = client->GetSharedPtr();
+    MMIClientPtr ptr2 = client->GetSharedPtr();
+    EXPECT_NE(ptr1, nullptr);
+    EXPECT_NE(ptr2, nullptr);
+    EXPECT_EQ(ptr1, ptr2);
+}
+
+/**
+ * @tc.name: GetCurrentConnectedStatus_BeforeStart
+ * @tc.desc: Get connection status before start
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetCurrentConnectedStatus_BeforeStart, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    bool status = client->GetCurrentConnectedStatus();
+    EXPECT_FALSE(status);
+}
+
+/**
+ * @tc.name: GetCurrentConnectedStatus_AfterStop
+ * @tc.desc: Get connection status after stop
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, GetCurrentConnectedStatus_AfterStop, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->Start();
+    client->Stop();
+    bool status = client->GetCurrentConnectedStatus();
+    EXPECT_TRUE(status);
+}
+
+/**
+ * @tc.name: OnRecvMsg_MaxSize
+ * @tc.desc: Receive msg with max size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, OnRecvMsg_MaxSize, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    const char* buf = "test_data";
+    int32_t size = MAX_PACKET_BUF_SIZE;
+    ASSERT_NO_FATAL_FAILURE(mmiClient.OnRecvMsg(buf, size));
+}
+
+/**
+ * @tc.name: OnRecvMsg_NegativeSize
+ * @tc.desc: Receive msg with negative size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, OnRecvMsg_NegativeSize, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MMIClient mmiClient;
+    const char* buf = "test_data";
+    int32_t size = -1;
+    ASSERT_NO_FATAL_FAILURE(mmiClient.OnRecvMsg(buf, size));
+}
 }
 } // namespace MMI

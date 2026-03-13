@@ -13345,6 +13345,22 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateWindowArea_007, 
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_001
+ * @tc.desc: Test with invalid pointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_001, TestSize.Level1)
+{
+    std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
+    auto pointerEvent = std::make_shared<PointerEvent>(PointerEvent::POINTER_ACTION_MOVE); // Invalid action
+ 
+    size_t initialSize = inputWindowsManager->activeTouchWinTypes_.size();
+    inputWindowsManager->RemoveActiveWindow(pointerEvent);
+    EXPECT_EQ(inputWindowsManager->activeTouchWinTypes_.size(), initialSize);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsEnterWindowTriggered_001
  * @tc.desc: Test IsEnterWindowTriggered with null pointerEvent
  * @tc.type: FUNC
