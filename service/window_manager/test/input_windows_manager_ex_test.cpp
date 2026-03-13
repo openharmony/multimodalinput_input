@@ -4713,6 +4713,78 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_002
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
 }
 
+/**
+ * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_003
+ * @tc.desc: Test the funcation RemoveActiveWindow_003
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+ 
+    inputWindowsManager->activeTouchWinTypes_.clear();
+ 
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(0);
+ 
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_004
+ * @tc.desc: Test the funcation RemoveActiveWindow_004
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+ 
+    inputWindowsManager->activeTouchWinTypes_.clear();
+ 
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(0);
+ 
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+}
+ 
+/**
+ * @tc.name: InputWindowsManagerTest_RemoveActiveWindow_005
+ * @tc.desc: Test the funcation RemoveActiveWindow_005
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RemoveActiveWindow_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+ 
+    int32_t windowId = 1;
+    int32_t pointerIdA = 0;
+    int32_t pointerIdB = 1;
+    inputWindowsManager->activeTouchWinTypes_.emplace(
+        windowId, InputWindowsManager::ActiveTouchWin{WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE, {pointerIdA}});
+ 
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(pointerIdB);
+ 
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->RemoveActiveWindow(pointerEvent));
+}
 #ifdef OHOS_BUILD_ENABLE_POINTER
 
 /**
