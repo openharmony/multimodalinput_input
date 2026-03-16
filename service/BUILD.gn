@@ -911,7 +911,6 @@ ohos_unittest("KeyShortcutManagerTest") {
     "${mmi_path}/service/device_manager/src/pointer_device_manager.cpp",
     "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
     "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
-    "${mmi_path}/service/module_loader/src/input_screen_capture_agent.cpp",
     "${mmi_path}/service/subscriber/src/key_shortcut_manager.cpp",
     "subscriber/test/src/key_shortcut_manager_test.cpp",
     "subscriber/test/src/timer_manager.cpp",
