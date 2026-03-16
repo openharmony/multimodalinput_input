@@ -90,6 +90,7 @@ public:
 
 private:
     InputPluginStage stage_;
+    std::vector<InputPluginStage> stages_;
     int32_t timerCnt_ = 0;
 };
 

@@ -123,6 +123,7 @@ struct IInputPlugin {
     virtual const std::string GetVersion() const = 0;
     virtual const std::string GetName() const = 0;
     virtual InputPluginStage GetStage() const = 0;
+    virtual std::vector<InputPluginStage> GetStages() const { return { GetStage() }; }
     virtual void DeviceWillAdded(std::shared_ptr<InputDevice> inputDevice){};
     virtual void DeviceDidAdded(std::shared_ptr<InputDevice> inputDevice){};
     virtual void DeviceWillRemoved(std::shared_ptr<InputDevice> inputDevice){};
