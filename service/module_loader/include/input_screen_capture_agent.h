@@ -51,7 +51,6 @@ public:
     bool IsScreenCaptureWorking(int32_t capturePid);
     void RegisterListener(ScreenCaptureCallback callback);
     bool IsMusicActivate();
-    void UnloadLibrary();
 private:
     int32_t LoadLibrary();
     int32_t LoadAudioLibrary();
