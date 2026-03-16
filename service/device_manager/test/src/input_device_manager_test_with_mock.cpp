@@ -17,10 +17,14 @@
 #include <gtest/gtest.h>
 #include <linux/input.h>
 
+#include "device_state_manager.h"
 #include "input_device_manager.h"
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"
 #include "libinput_mock.h"
+#include "input_event_handler.h"
+#include "uds_session.h"
+#include "device_observer.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,12 +34,23 @@ using namespace testing::ext;
 namespace {
 char g_sysname[] { "event0" };
 char g_sysname1[] { "event999" };
+constexpr char TEST_PROGRAM_NAME[] { "InputDeviceManagerTestWithMock" };
+constexpr int32_t TEST_MODULE_TYPE { 1 };
+constexpr int32_t TEST_UID { 100 };
+constexpr int32_t TEST_SESSION_PID_1 { 1001 };
+constexpr int32_t TEST_DEVICE_ID_1 { 101 };
+constexpr int32_t TEST_DEVICE_ID_2 { 102 };
+constexpr int32_t TEST_DEVICE_ID_INVALID { 999 };
+constexpr int32_t EXPECTED_DISABLED_DEVICES_COUNT { 2 };
+constexpr int32_t EXPECTED_NOTIFY_COUNT { 1 };
 } // namespace
 
 class InputDeviceManagerTestWithMock : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
 
 void InputDeviceManagerTestWithMock::SetUpTestCase()
@@ -47,11 +62,27 @@ void InputDeviceManagerTestWithMock::TearDownTestCase()
     KeyAutoRepeat::ReleaseInstance();
 }
 
+void InputDeviceManagerTestWithMock::SetUp()
+{}
+
+void InputDeviceManagerTestWithMock::TearDown()
+{
+    DEVICE_STATE_MGR->deviceStates_.clear();
+
+    auto devMgr = INPUT_DEV_MGR;
+    devMgr->inputDevice_.clear();
+    devMgr->recoverList_.clear();
+    devMgr->eduInputDisabled_ = false;
+    devMgr->eduInputDisabledPid_ = -1;
+}
+
 class InputDeviceObserver : public IDeviceObserver {
 public:
     MOCK_METHOD(void, OnDeviceAdded, (int32_t));
     MOCK_METHOD(void, OnDeviceRemoved, (int32_t));
     MOCK_METHOD(void, UpdatePointerDevice, (bool, bool, bool));
+    MOCK_METHOD(void, OnDeviceEnabled, (int32_t));
+    MOCK_METHOD(void, OnDeviceDisabled, (int32_t));
 };
 
 /**
@@ -457,10 +488,10 @@ HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetTags_001, TestSi
 HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_ForeachInputDevice_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t deviceId1 { 101 };
+    int32_t deviceId1 { TEST_DEVICE_ID_1 };
     InputDeviceManager::InputDeviceInfo devInfo {};
     INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo);
-    int32_t deviceId2 { 102 };
+    int32_t deviceId2 { TEST_DEVICE_ID_2 };
     INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId2, devInfo);
     int32_t deviceId3 { 103 };
     INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId3, devInfo);
@@ -643,7 +674,7 @@ HWTEST_F(InputDeviceManagerTestWithMock, AddPhysicalInputDeviceInner_001, TestSi
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, DeviceHasCapability).WillRepeatedly(Return(true));
 
-    int32_t deviceId { 101 };
+    int32_t deviceId { TEST_DEVICE_ID_1 };
     struct libinput_device rawDev {};
     InputDeviceManager::InputDeviceInfo devInfo {
         .inputDeviceOrigin = &rawDev,
@@ -943,6 +974,457 @@ HWTEST_F(InputDeviceManagerTestWithMock, PhysicalInputDevice_GetSyspath_003, Tes
     struct libinput_device device {};
     auto syspath = InputDeviceManager::PhysicalInputDevice::GetSyspath(&device);
     EXPECT_FALSE(syspath.empty());
+}
+
+/**
+ * @tc.name: DisableInputEventDispatch_001
+ * @tc.desc: Test DisableInputEventDispatch to disable all input
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputEventDispatch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t deviceId1 { TEST_DEVICE_ID_1 };
+    int32_t deviceId2 { TEST_DEVICE_ID_2 };
+    struct libinput_device rawDev1 {};
+    struct libinput_device rawDev2 {};
+
+    InputDeviceManager::InputDeviceInfo devInfo1 {
+        .inputDeviceOrigin = &rawDev1,
+        .enable = true,
+        .inputEnable = true,
+    };
+    InputDeviceManager::InputDeviceInfo devInfo2 {
+        .inputDeviceOrigin = &rawDev2,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo1);
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId2, devInfo2);
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceDisabled)
+        .Times(testing::Exactly(EXPECTED_DISABLED_DEVICES_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    int32_t ret = INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+    EXPECT_EQ(ret, RET_OK);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: DisableInputEventDispatch_002
+ * @tc.desc: Test DisableInputEventDispatch to enable all input
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputEventDispatch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t deviceId1 { TEST_DEVICE_ID_1 };
+    int32_t deviceId2 { TEST_DEVICE_ID_2 };
+    struct libinput_device rawDev1 {};
+    struct libinput_device rawDev2 {};
+
+    InputDeviceManager::InputDeviceInfo devInfo1 {
+        .inputDeviceOrigin = &rawDev1,
+        .enable = true,
+        .inputEnable = true,
+    };
+    InputDeviceManager::InputDeviceInfo devInfo2 {
+        .inputDeviceOrigin = &rawDev2,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId1, devInfo1);
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId2, devInfo2);
+
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceEnabled)
+        .Times(testing::Exactly(EXPECTED_DISABLED_DEVICES_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    int32_t ret = INPUT_DEV_MGR->DisableInputEventDispatch(false, pid);
+    EXPECT_EQ(ret, RET_OK);
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: DisableInputEventDispatch_003
+ * @tc.desc: Test DisableInputEventDispatch with already disabled state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputEventDispatch_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+
+    int32_t ret1 = INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+    EXPECT_EQ(ret1, RET_OK);
+
+    int32_t ret2 = INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+    EXPECT_EQ(ret2, RET_OK);
+}
+
+/**
+ * @tc.name: DisableInputEventDispatch_004
+ * @tc.desc: Test DisableInputEventDispatch with different pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, DisableInputEventDispatch_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid1 { 1001 };
+    int32_t pid2 { 1002 };
+
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid1);
+
+    int32_t ret = INPUT_DEV_MGR->DisableInputEventDispatch(true, pid2);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: IsEduInputDisabled_001
+ * @tc.desc: Test IsEduInputDisabled returns false initially
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, IsEduInputDisabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_FALSE(INPUT_DEV_MGR->IsEduInputDisabled());
+}
+
+/**
+ * @tc.name: IsEduInputDisabled_002
+ * @tc.desc: Test IsEduInputDisabled returns true after disable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, IsEduInputDisabled_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+    EXPECT_TRUE(INPUT_DEV_MGR->IsEduInputDisabled());
+}
+
+/**
+ * @tc.name: RecoverInputEnabled_001
+ * @tc.desc: Test RecoverInputEnabled with matching pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, RecoverInputEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceEnabled)
+        .Times(testing::Exactly(EXPECTED_NOTIFY_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    auto session = std::make_shared<UDSSession>(TEST_PROGRAM_NAME, TEST_MODULE_TYPE, -1, TEST_UID, pid);
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RecoverInputEnabled(session));
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: RecoverInputEnabled_002
+ * @tc.desc: Test RecoverInputEnabled with non-matching pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, RecoverInputEnabled_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid1 { 1001 };
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid1);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RecoverInputEnabled(nullptr));
+    EXPECT_TRUE(INPUT_DEV_MGR->IsEduInputDisabled());
+}
+
+/**
+ * @tc.name: NotifyDeviceEnabled_001
+ * @tc.desc: Test NotifyDeviceEnabled notifies observers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, NotifyDeviceEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceEnabled)
+        .Times(testing::Exactly(EXPECTED_NOTIFY_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceEnabled(deviceId));
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: NotifyDeviceDisabled_001
+ * @tc.desc: Test NotifyDeviceDisabled notifies observers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, NotifyDeviceDisabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceDisabled)
+        .Times(testing::Exactly(EXPECTED_NOTIFY_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    EXPECT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyDeviceDisabled(deviceId));
+
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: SetInputDeviceEnabled_001
+ * @tc.desc: Test SetInputDeviceEnabled with invalid device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, SetInputDeviceEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_INVALID };
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t index { 1 };
+
+    int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, true, index, pid, nullptr);
+    EXPECT_EQ(ret, ERROR_DEVICE_NOT_EXIST);
+}
+
+/**
+ * @tc.name: SetInputDeviceEnabled_002
+ * @tc.desc: Test SetInputDeviceEnable with no state change
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, SetInputDeviceEnabled_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t index { 1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, true, index, pid, nullptr);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: SetInputDeviceEnabled_003
+ * @tc.desc: Test SetInputDeviceEnable when edu disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, SetInputDeviceEnabled_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    int32_t index { 1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+
+    int32_t ret = INPUT_DEV_MGR->SetInputDeviceEnabled(deviceId, false, index, pid, nullptr);
+    EXPECT_EQ(ret, ERROR_EDU_INPUT_DISABLED);
+}
+
+/**
+ * @tc.name: EnableInputDevice_001
+ * @tc.desc: Test EnableInputDevice with invalid device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_INVALID };
+
+    int32_t ret = INPUT_DEV_MGR->EnableInputDevice(deviceId);
+    EXPECT_EQ(ret, ERROR_DEVICE_NOT_EXIST);
+}
+
+/**
+ * @tc.name: EnableInputDevice_002
+ * @tc.desc: Test EnableInputDevice with already enabled device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = true,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    int32_t ret = INPUT_DEV_MGR->EnableInputDevice(deviceId);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EnableInputDevice_003
+ * @tc.desc: Test EnableInputDevice when edu disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid { TEST_SESSION_PID_1 };
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = false,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+    INPUT_DEV_MGR->DisableInputEventDispatch(true, pid);
+
+    int32_t ret = INPUT_DEV_MGR->EnableInputDevice(deviceId);
+    EXPECT_EQ(ret, ERROR_EDU_INPUT_DISABLED);
+}
+
+/**
+ * @tc.name: EnableInputDevice_004
+ * @tc.desc: Test EnableInputDevice when input disabled by user
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDevice_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = false,
+        .inputEnable = false,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    int32_t ret = INPUT_DEV_MGR->EnableInputDevice(deviceId);
+    EXPECT_EQ(ret, ERROR_INPUT_DEVICE_DISABLED);
+}
+
+/**
+ * @tc.name: EnableInputDevice_005
+ * @tc.desc: Test EnableInputDevice successful case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTestWithMock, EnableInputDevice_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId { TEST_DEVICE_ID_1 };
+    struct libinput_device rawDev {};
+
+    InputDeviceManager::InputDeviceInfo devInfo {
+        .inputDeviceOrigin = &rawDev,
+        .enable = false,
+        .inputEnable = true,
+    };
+
+    INPUT_DEV_MGR->AddPhysicalInputDeviceInner(deviceId, devInfo);
+
+    auto observer = std::make_shared<InputDeviceObserver>();
+    EXPECT_CALL(*observer, OnDeviceEnabled)
+        .Times(testing::Exactly(EXPECTED_NOTIFY_COUNT));
+    INPUT_DEV_MGR->Attach(observer);
+
+    int32_t ret = INPUT_DEV_MGR->EnableInputDevice(deviceId);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(INPUT_DEV_MGR->IsInputDeviceEnable(deviceId));
+
+    INPUT_DEV_MGR->Detach(observer);
 }
 } // namespace MMI
 } // namespace OHOS
