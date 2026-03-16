@@ -36,7 +36,6 @@ config("mmi_connect_manager_config") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/filter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",

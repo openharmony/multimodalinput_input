@@ -53,6 +53,8 @@ public:
 
     virtual void OnDeviceAdded(int32_t deviceId) = 0;
     virtual void OnDeviceRemoved(int32_t deviceId) = 0;
+    virtual void OnDeviceEnabled(int32_t deviceId) = 0;
+    virtual void OnDeviceDisabled(int32_t deviceId) = 0;
     virtual bool HasMouse() = 0;
     virtual int32_t OnEvent(struct libinput_event *event) = 0;
     virtual std::shared_ptr<PointerEvent> GetPointerEvent() = 0;

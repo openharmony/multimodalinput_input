@@ -20,6 +20,7 @@
 #include <regex>
 #include <sstream>
 
+#include "device_state_manager.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
@@ -918,6 +919,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     bool enable = false;
     bool isDeviceReportEvent = false;
     RemovePhysicalInputDeviceInner(inputDevice, deviceId, enable, isDeviceReportEvent);
+    DEVICE_STATE_MGR->OnDeviceRemoved(deviceId);
     WIN_MGR->ClearTargetDeviceWindowId(deviceId);
     WIN_MGR->ClearFirstTouchWindowInfos(deviceId);
     std::string sysUid = GetInputIdentification(inputDevice);
@@ -1360,12 +1362,16 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
 {
     // LCOV_EXCL_START
     for (const auto &item : inputDevice_) {
-        if ((!item.second.isRemote && item.second.isPointerDevice && item.second.isDeviceReportEvent) ||
-            (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
-            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
-                item.second.isRemote, item.second.sysUid.c_str());
-            return true;
+        if (!item.second.isPointerDevice || !item.second.enable) {
+            continue;
         }
+        // 本地设备：需要额外检查 isDeviceReportEvent
+        if (!item.second.isRemote && !item.second.isDeviceReportEvent) {
+            continue;
+        }
+        MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+            item.second.isRemote, item.second.sysUid.c_str());
+        return true;
     }
     return false;
     // LOCV_EXCL_STOP
@@ -1373,14 +1379,14 @@ bool InputDeviceManager::HasEnabledPhysicalPointerDevice()
 
 bool InputDeviceManager::HasEnabledNoEventReportedPhysicalPointerDevice()
 {
-    // LOCV_EXCL_START
+    // LCOV_EXCL_START
     for (const auto &item : inputDevice_) {
-        if ((!item.second.isRemote && item.second.isPointerDevice) ||
-            (item.second.isRemote && item.second.isPointerDevice && item.second.enable)) {
-            MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
-                item.second.isRemote, item.second.sysUid.c_str());
-            return true;
+        if (!item.second.isPointerDevice || !item.second.enable) {
+            continue;
         }
+        MMI_HILOGI("DeviceId:%{public}d, isRemote:%{public}d, sys uid:%{public}s", item.first,
+            item.second.isRemote, item.second.sysUid.c_str());
+        return true;
     }
     return false;
     // LCOV_EXCL_STOP
@@ -1432,7 +1438,6 @@ void InputDeviceManager::PointerDeviceInit()
     POINTER_DEV_MGR.isFirstAdddistributedKVDataService = false;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     POINTER_DEV_MGR.isInit = true;
-    
     // LCOV_EXCL_STOP
 }
 
@@ -1577,6 +1582,7 @@ void InputDeviceManager::InitSessionLostCallback()
 void InputDeviceManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
+    RecoverInputEnabled(session);
     RecoverInputDeviceEnabled(session);
     devListeners_.remove(session);
 }
@@ -1666,52 +1672,173 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("The deviceId:%{public}d, enable:%{public}d, pid:%{public}d", deviceId, enable, pid);
+
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
         MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId");
-        return RET_ERR;
+        return ERROR_DEVICE_NOT_EXIST;
     }
-    item->second.enable = enable;
-    if (!enable) {
+
+    if (item->second.inputEnable == enable) {
+        NotifyInputdeviceMessage(session, index, RET_OK);
+        MMI_HILOGI("Device input already in state: %{public}d", enable);
+        return RET_OK;
+    }
+
+    if (eduInputDisabled_ && !enable) {
+        NotifyInputdeviceMessage(session, index, ERROR_EDU_INPUT_DISABLED);
+        MMI_HILOGE("EduInput disabled by session[%{private}d]", eduInputDisabledPid_);
+        return ERROR_EDU_INPUT_DISABLED;
+    }
+
+    item->second.inputEnable = enable;
+
+    if (enable) {
+        if (!eduInputDisabled_) {
+            DEVICE_STATE_MGR->EnableDevice(deviceId,
+                [](int32_t id) {
+                    INPUT_DEV_MGR->EnableInputDevice(id);
+                    return RET_OK;
+                });
+        }
+    } else if (item->second.enable) {
+        item->second.enable = false;
+        NotifyDeviceDisabled(deviceId);
         MMI_HILOGD("Disable inputdevice, save calling pid:%{public}d to recoverlist", pid);
         recoverList_.insert(std::pair<int32_t, int32_t>(deviceId, pid));
         InitSessionLostCallback();
     }
+
     NotifyInputdeviceMessage(session, index, RET_OK);
     return RET_OK;
+}
+
+int32_t InputDeviceManager::DisableInputEventDispatch(bool disabled, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGI("DisableInputEventDispatch: disabled=%{public}d, pid=%{public}d", disabled, pid);
+
+    if (eduInputDisabled_ == disabled) {
+        MMI_HILOGI("EduInput already in state: %{public}d", disabled);
+        return RET_OK;
+    }
+
+    if (eduInputDisabled_ && (eduInputDisabledPid_ != -1) && (eduInputDisabledPid_ != pid)) {
+        MMI_HILOGE("EduInput already disabled by pid=%{public}d", eduInputDisabledPid_);
+        return ERROR_EDU_INPUT_DISABLED;
+    }
+
+    if (disabled) {
+        MMI_HILOGI("Disable overall input by session[%{private}d]", pid);
+        InitSessionLostCallback();
+        eduInputDisabled_ = true;
+        eduInputDisabledPid_ = pid;
+
+        for (auto& [deviceId, deviceInfo] : inputDevice_) {
+            if (deviceInfo.enable) {
+                deviceInfo.enable = false;
+                NotifyDeviceDisabled(deviceId);
+            }
+        }
+        return RET_OK;
+    }
+
+    MMI_HILOGI("Enable overall input by session[%{private}d]", pid);
+    eduInputDisabled_ = false;
+    eduInputDisabledPid_ = -1;
+
+    for (auto& [deviceId, deviceInfo] : inputDevice_) {
+        if (!deviceInfo.inputEnable) {
+            continue;
+        }
+
+        DEVICE_STATE_MGR->EnableDevice(deviceId,
+            [](int32_t id) {
+                INPUT_DEV_MGR->EnableInputDevice(id);
+                return RET_OK;
+            });
+    }
+    return RET_OK;
+}
+
+void InputDeviceManager::RecoverInputEnabled(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(session);
+
+    if (session->GetPid() != eduInputDisabledPid_) {
+        return;
+    }
+
+    MMI_HILOGI("Recover input enabled for session[%{private}d]", session->GetPid());
+    eduInputDisabled_ = false;
+    eduInputDisabledPid_ = -1;
+
+    for (auto& [deviceId, deviceInfo] : inputDevice_) {
+        if (!deviceInfo.inputEnable) {
+            continue;
+        }
+
+        DEVICE_STATE_MGR->EnableDevice(deviceId,
+            [](int32_t id) {
+                INPUT_DEV_MGR->EnableInputDevice(id);
+                return RET_OK;
+            });
+    }
 }
 
 void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (auto item = recoverList_.begin(); item != recoverList_.end();) {
-        if (session->GetPid() == item->second) {
-            auto device = inputDevice_.find(item->first);
-            if (device != inputDevice_.end()) {
-                MMI_HILOGI("Recover input device:%{public}d", item->first);
-                device->second.enable = true;
-            }
-            item = recoverList_.erase(item);
-        } else {
-            item++;
+    std::set<int32_t> recovered;
+
+    for (const auto &[deviceId, pid] : recoverList_) {
+        if (session->GetPid() != pid) {
+            continue;
         }
+
+        auto devIter = inputDevice_.find(deviceId);
+        if (devIter == inputDevice_.end()) {
+            continue;
+        }
+
+        MMI_HILOGI("Recover input device[%{private}d] enabled", deviceId);
+        devIter->second.inputEnable = true;
+        recovered.emplace(deviceId);
+
+        if (eduInputDisabled_) {
+            continue;
+        }
+
+        DEVICE_STATE_MGR->EnableDevice(deviceId,
+            [](int32_t id) {
+                INPUT_DEV_MGR->EnableInputDevice(id);
+                return RET_OK;
+            });
     }
+
+    std::for_each(recovered.cbegin(), recovered.cend(),
+        [this](int32_t deviceId) {
+            recoverList_.erase(deviceId);
+        });
 }
 
-bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId)
+bool InputDeviceManager::IsEduInputDisabled() const
 {
-    bool enable = false;
+    return eduInputDisabled_;
+}
+
+bool InputDeviceManager::IsInputDeviceEnable(int32_t deviceId) const
+{
     CALL_DEBUG_ENTER;
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         MMI_HILOGD("Get inputDevice enabled failed, Invalid deviceId.");
-        return enable;
+        return false;
     }
-    enable = item->second.enable;
-    return enable;
+    return item->second.enable;
 }
 
 bool InputDeviceManager::IsLocalDevice(int32_t deviceId)
@@ -1809,6 +1936,92 @@ void InputDeviceManager::NotifyDeviceFirstReportEvent(int32_t deviceId) const
             observer->OnDeviceFirstReportEvent(deviceId);
         }
     }
+}
+
+void InputDeviceManager::NotifyDeviceEnabled(int32_t deviceId)
+{
+    MMI_HILOGI("NotifyDeviceEnabled: deviceId=%{public}d", deviceId);
+    for (auto observer : observers_) {
+        if (observer != nullptr) {
+            observer->OnDeviceEnabled(deviceId);
+        }
+    }
+
+    auto it = inputDevice_.find(deviceId);
+    if (it == inputDevice_.end() || !it->second.isPointerDevice) {
+        return;
+    }
+
+    bool hasEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (HasVirtualPointerDevice()) {
+        hasEnabledPointerDevice = true;
+    }
+
+    if (hasEnabledPointerDevice && !CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
+        if (HasTouchDevice()) {
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
+        } else {
+            CursorDrawingComponent::GetInstance().SetMouseDisplayState(true);
+            WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+        }
+    }
+#endif
+}
+
+void InputDeviceManager::NotifyDeviceDisabled(int32_t deviceId)
+{
+    MMI_HILOGI("NotifyDeviceDisabled: deviceId=%{public}d", deviceId);
+    for (auto observer : observers_) {
+        if (observer != nullptr) {
+            observer->OnDeviceDisabled(deviceId);
+        }
+    }
+
+    auto it = inputDevice_.find(deviceId);
+    if (it == inputDevice_.end() || !it->second.isPointerDevice) {
+        return;
+    }
+
+    bool hasEnabledPointerDevice = HasEnabledPhysicalPointerDevice();
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (HasVirtualPointerDevice()) {
+        hasEnabledPointerDevice = true;
+    }
+
+    if (!hasEnabledPointerDevice && CursorDrawingComponent::GetInstance().GetMouseDisplayState()) {
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        CursorDrawingComponent::GetInstance().SetMouseDisplayState(false);
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
+int32_t InputDeviceManager::EnableInputDevice(int32_t deviceId)
+{
+    auto item = inputDevice_.find(deviceId);
+    if (item == inputDevice_.end()) {
+        MMI_HILOGE("EnableInputDevice failed, deviceId:%{private}d not found", deviceId);
+        return ERROR_DEVICE_NOT_EXIST;
+    }
+
+    if (item->second.enable) {
+        return RET_OK;
+    }
+
+    if (eduInputDisabled_) {
+        MMI_HILOGW("Overall input disabled by session[%{private}d]", eduInputDisabledPid_);
+        return ERROR_EDU_INPUT_DISABLED;
+    }
+
+    if (!item->second.inputEnable) {
+        MMI_HILOGW("Input device[%{private}d] disabled by user", deviceId);
+        return ERROR_INPUT_DEVICE_DISABLED;
+    }
+
+    MMI_HILOGI("Enable input device[%{private}d]", deviceId);
+    item->second.enable = true;
+    NotifyDeviceEnabled(deviceId);
+    return RET_OK;
 }
 
 void InputDeviceManager::SetSpecialVirtualDevice(std::shared_ptr<InputDevice> inputDevice) const

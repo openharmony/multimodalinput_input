@@ -17,6 +17,7 @@
 
 #include <linux/input.h>
 #include <parameters.h>
+#include "device_state_manager.h"
 #include "display_manager_lite.h"
 #include "key_map_manager.h"
 #include "key_command_handler_util.h"
@@ -27,6 +28,8 @@
 #include "key_auto_repeat.h"
 #include "libinput_adapter.h"
 #include "key_auto_repeat.h"
+#include "input_device_manager.h"
+#include "event_dispatch_handler.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -74,12 +77,26 @@ private:
 sptr<FoldStatusCallback> g_foldStatusCallback { nullptr };
 } // namespace
 
+void KeyEventNormalize::InputDeviceObserver::OnDeviceEnabled(int32_t deviceId)
+{
+    KeyEventHdr->OnDeviceEnabled(deviceId);
+}
+
+void KeyEventNormalize::InputDeviceObserver::OnDeviceDisabled(int32_t deviceId)
+{
+    KeyEventHdr->OnDeviceDisabled(deviceId);
+}
+
 KeyEventNormalize::KeyEventNormalize() {}
 
-KeyEventNormalize::~KeyEventNormalize() {}
+KeyEventNormalize::~KeyEventNormalize()
+{
+    TearDownDeviceObserver();
+}
 
 void KeyEventNormalize::Init()
 {
+    SetUpDeviceObserver();
     g_foldStatusCallback = new (std::nothrow) FoldStatusCallback();
     CHKPV(g_foldStatusCallback);
     Rosen::DisplayManagerLite::GetInstance().RegisterFoldStatusListener(g_foldStatusCallback);
@@ -106,9 +123,9 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
-    int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
-    MMI_HILOGD("The linux input:%{private}d", keyCode);
-    keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
+    int32_t rawCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
+    MMI_HILOGD("The linux input:%{private}d", rawCode);
+    int32_t keyCode = KeyMapMgr->TransferDeviceKeyValue(device, rawCode);
     if (keyCode == KeyEvent::KEYCODE_UNKNOWN) {
         MMI_HILOGE("The key value is unknown");
         return RET_ERR;
@@ -149,6 +166,8 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
 
     int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
+
+    UpdateKeyState(rawCode, *keyEvent);
     return RET_OK;
 }
 
@@ -713,6 +732,131 @@ void KeyEventNormalize::SetKeyStatusRecord(bool enable, int32_t timeout)
 {
     keyStatusRecordSwitch_ = enable;
     keyStatusRecordTimeout_ = timeout;
+}
+
+void KeyEventNormalize::SetUpDeviceObserver()
+{
+    CALL_DEBUG_ENTER;
+    if (inputDevObserver_ != nullptr) {
+        MMI_HILOGI("InputDeviceObserver already set up");
+        return;
+    }
+    inputDevObserver_ = std::make_shared<InputDeviceObserver>();
+    INPUT_DEV_MGR->Attach(inputDevObserver_);
+}
+
+void KeyEventNormalize::TearDownDeviceObserver()
+{
+    CALL_DEBUG_ENTER;
+    if (inputDevObserver_ != nullptr) {
+        INPUT_DEV_MGR->Detach(inputDevObserver_);
+        inputDevObserver_.reset();
+    }
+}
+
+void KeyEventNormalize::OnDeviceEnabled(int32_t deviceId)
+{
+    MMI_HILOGI("Keyboard[%{public}d] received enable notification", deviceId);
+}
+
+void KeyEventNormalize::OnDeviceDisabled(int32_t deviceId)
+{
+    MMI_HILOGI("Keyboard[%{public}d] received disable notification", deviceId);
+    if (auto it = pressedKeys_.find(deviceId); it != pressedKeys_.end()) {
+        if (!it->second.empty()) {
+            DEVICE_STATE_MGR->AddPressedKeys(deviceId, it->second);
+
+            MMI_HILOGI("Keyboard[%{public}d] has pressed keys, sending KEY_UP events", deviceId);
+            SendKeyUpEvents(deviceId, it->second);
+        }
+
+        pressedKeys_.erase(it);
+    }
+}
+
+void KeyEventNormalize::SendKeyUpEvents(int32_t deviceId, const std::set<int32_t> &pressedKeys)
+{
+    CALL_DEBUG_ENTER;
+    auto inputChannel = InputHandler->GetEventNormalizeHandler();
+    if (inputChannel == nullptr) {
+        MMI_HILOGE("inputEventNormalizeHandler is null");
+        return;
+    }
+
+    for (int32_t rawCode : pressedKeys) {
+        auto keyEvent = PackageKeyUpEvent(deviceId, rawCode);
+        if (keyEvent == nullptr) {
+            continue;
+        }
+
+        LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
+        inputChannel->HandleKeyEvent(keyEvent);
+    }
+}
+
+std::shared_ptr<KeyEvent> KeyEventNormalize::PackageKeyUpEvent(int32_t deviceId, int32_t rawCode)
+{
+    auto keyEvent = GetKeyEvent();
+    if (keyEvent == nullptr) {
+        return nullptr;
+    }
+
+    int32_t keyCode = KeyEvent::KEYCODE_UNKNOWN;
+    INPUT_DEV_MGR->ForDevice(deviceId,
+        [this, rawCode, &keyCode](const IInputDeviceManager::IInputDevice &dev) {
+            keyCode = KeyMapMgr->TransferDeviceKeyValue(dev.GetRawDevice(), rawCode);
+            if (dev.GetRawDevice() != nullptr) {
+                keyCode = TransformVolumeKey(dev.GetRawDevice(), keyCode, KeyEvent::KEY_ACTION_UP);
+            }
+        });
+    if (keyCode == KeyEvent::KEYCODE_UNKNOWN) {
+        return nullptr;
+    }
+
+    auto time = GetSysClockTime();
+    keyEvent->RemoveReleasedKeyItems();
+    keyEvent->SetDeviceId(deviceId);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(time);
+
+    KeyEvent::KeyItem item {};
+    item.SetDownTime(time);
+    item.SetKeyCode(keyCode);
+    item.SetDeviceId(deviceId);
+    item.SetPressed(false);
+    item.SetUnicode(KeyCodeToUnicode(keyCode, keyEvent));
+
+    auto result = INPUT_DEV_MGR->CheckDevice(deviceId,
+        [this, &item, keyEvent](const IInputDeviceManager::IInputDevice &dev) {
+            auto rawDev = dev.GetRawDevice();
+            if (rawDev == nullptr) {
+                return false;
+            }
+            HandleKeyAction(rawDev, item, keyEvent);
+            return true;
+        });
+    if (!result) {
+        return nullptr;
+    }
+
+    auto keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    keyEvent->SetKeyIntention(keyIntention);
+    keyEvent->UpdateId();
+    keyEvent->SetRepeat(true);
+    return keyEvent;
+}
+
+void KeyEventNormalize::UpdateKeyState(int32_t rawCode, const KeyEvent &event)
+{
+    if (event.GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        pressedKeys_[event.GetDeviceId()].insert(rawCode);
+    } else {
+        auto it = pressedKeys_.find(event.GetDeviceId());
+        if (it != pressedKeys_.end()) {
+            it->second.erase(rawCode);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

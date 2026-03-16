@@ -17,8 +17,10 @@
 
 #include <linux/input.h>
 
+#include "device_state_manager.h"
 #include "i_input_windows_manager.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
 #include "util.h"
 
 #undef MMI_LOG_DOMAIN
@@ -86,6 +88,7 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
         }
     }
     pointerEvent_->UpdateId();
+    UpdateDeviceStateFromPointerEvent();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
     DrawTouchGraphic();
@@ -94,6 +97,183 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
 
 void TabletToolTransformProcessor::OnDeviceRemoved()
 {}
+
+void TabletToolTransformProcessor::OnDeviceEnabled()
+{
+    MMI_HILOGI("Tablet tool[%{public}d] received enable notification", deviceId_);
+}
+
+void TabletToolTransformProcessor::OnDeviceDisabled()
+{
+    MMI_HILOGI("TabletTool[%{public}d] received disable notification", deviceId_);
+    RecordActiveOperations();
+    SendTipUpEvent();
+    SendProximityOutEvent();
+    SendButtonUpEvents();
+
+    MMI_HILOGI("TabletTool[%{public}d] disabled, reset state data", deviceId_);
+    pointerEvent_ = nullptr;
+    isPressed_ = false;
+    isProximity_ = false;
+    calibration_ = std::nullopt;
+    current_ = [this]() {
+        DrawTouchGraphicIdle();
+    };
+}
+
+void TabletToolTransformProcessor::RecordActiveOperations()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    auto pressedButtons = pointerEvent_->GetPressedButtons();
+    if (pressedButtons.find(PointerEvent::MOUSE_BUTTON_RIGHT) != pressedButtons.cend()) {
+        DEVICE_STATE_MGR->AddPressedButtons(deviceId_, std::set({ BTN_STYLUS }));
+    }
+
+    if (isProximity_) {
+        DEVICE_STATE_MGR->SetProximity(deviceId_, true);
+    }
+}
+
+void TabletToolTransformProcessor::SendTipUpEvent()
+{
+    if (!isPressed_ || (pointerEvent_ == nullptr)) {
+        return;
+    }
+
+    auto time = GetSysClockTime();
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+
+    PointerEvent::PointerItem item {};
+    if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
+        MMI_HILOGE("GetPointerItem failed");
+        return;
+    }
+
+    item.SetPressed(false);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
+    pointerEvent_->UpdateId();
+
+    auto inputChannel = InputHandler->GetEventNormalizeHandler();
+    if (inputChannel != nullptr) {
+        LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+        inputChannel->HandlePointerEvent(pointerEvent_);
+    }
+
+    isPressed_ = false;
+    MMI_HILOGI("Sent tip up event for tablet tool[%{public}d]", deviceId_);
+}
+
+void TabletToolTransformProcessor::SendProximityOutEvent()
+{
+    if (!isProximity_ || (pointerEvent_ == nullptr)) {
+        return;
+    }
+
+    auto time = GetSysClockTime();
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+
+    PointerEvent::PointerItem item {};
+    if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
+        MMI_HILOGE("GetPointerItem failed");
+        return;
+    }
+
+    item.SetPressed(false);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
+    pointerEvent_->UpdateId();
+
+    auto inputChannel = InputHandler->GetEventNormalizeHandler();
+    if (inputChannel != nullptr) {
+        LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+        inputChannel->HandlePointerEvent(pointerEvent_);
+    }
+
+    isProximity_ = false;
+    MMI_HILOGI("Sent proximity out event for tablet tool[%{public}d]", deviceId_);
+}
+
+void TabletToolTransformProcessor::SendButtonUpEvents()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    auto pressedButtons = pointerEvent_->GetPressedButtons();
+    if (pressedButtons.empty()) {
+        return;
+    }
+
+    auto time = GetSysClockTime();
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetDeviceId(deviceId_);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+
+    for (auto buttonId : pressedButtons) {
+        pointerEvent_->SetButtonId(buttonId);
+        pointerEvent_->DeleteReleaseButton(buttonId);
+        pointerEvent_->UpdateId();
+
+        auto inputChannel = InputHandler->GetEventNormalizeHandler();
+        if (inputChannel != nullptr) {
+            LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+            inputChannel->HandlePointerEvent(pointerEvent_);
+        }
+
+        MMI_HILOGI("Sent button up event for button[%{public}d]", buttonId);
+    }
+}
+
+void TabletToolTransformProcessor::UpdateDeviceStateFromPointerEvent()
+{
+    if (pointerEvent_ == nullptr) {
+        MMI_HILOGW("pointerEvent_ is null, cannot update device state");
+        return;
+    }
+
+    switch (pointerEvent_->GetPointerAction()) {
+        case PointerEvent::POINTER_ACTION_DOWN: {
+            isPressed_ = true;
+            isProximity_ = true;
+            MMI_HILOGD("Tablet tool[%{public}d] pointer DOWN: isPressed=true, isProximity=true", deviceId_);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
+            isPressed_ = false;
+            MMI_HILOGD("Tablet tool[%{public}d] pointer UP: isPressed=false, isProximity=false", deviceId_);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_LEVITATE_MOVE: {
+            if (!isProximity_) {
+                isProximity_ = true;
+                MMI_HILOGD("Tablet tool[%{public}d] pointer MOVE: isProximity=true", deviceId_);
+            }
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_PROXIMITY_IN: {
+            isProximity_ = true;
+            MMI_HILOGD("Tablet tool[%{public}d] pointer PROXIMITY_IN: isProximity=true", deviceId_);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_PROXIMITY_OUT: {
+            isProximity_ = false;
+            MMI_HILOGD("Tablet tool[%{public}d] pointer PROXIMITY_OUT: isProximity=false", deviceId_);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    MMI_HILOGD("Device state updated: isPressed=%{public}s, isProximity=%{public}s, pressedButtonsCount=%{public}zu",
+        isPressed_ ? "true" : "false", isProximity_ ? "true" : "false", pointerEvent_->GetPressedButtons().size());
+}
 
 int32_t TabletToolTransformProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
 {

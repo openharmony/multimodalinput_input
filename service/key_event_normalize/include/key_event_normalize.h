@@ -18,6 +18,7 @@
 
 #include "singleton.h"
 
+#include "device_observer.h"
 #include "i_input_windows_manager.h"
 #include "key_event.h"
 #include "util.h"
@@ -34,6 +35,21 @@ class KeyEventNormalize final {
     struct InputProductConfig {
         VolumeSwapConfig volumeSwap_ { VolumeSwapConfig::NO_CONFIG };
     };
+
+    class InputDeviceObserver final : public IDeviceObserver {
+    public:
+        InputDeviceObserver() = default;
+        ~InputDeviceObserver() override = default;
+        DISALLOW_COPY_AND_MOVE(InputDeviceObserver);
+
+        void OnDeviceAdded(int32_t deviceId) override {}
+        void OnDeviceRemoved(int32_t deviceId) override {}
+        void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
+        void OnDeviceFirstReportEvent(int32_t deviceId) override {}
+        void OnDeviceEnabled(int32_t deviceId) override;
+        void OnDeviceDisabled(int32_t deviceId) override;
+    };
+
     DECLARE_DELAYED_SINGLETON(KeyEventNormalize);
 
 public:
@@ -69,6 +85,13 @@ private:
     void InterruptAutoRepeatKeyEvent(const std::shared_ptr<KeyEvent> &keyEvent);
     bool CheckKeyEventAutoUpTimer(int32_t keyCode);
     void KeyEventAutoUp(const std::shared_ptr<KeyEvent> &keyEvent, int32_t timeout);
+    void OnDeviceEnabled(int32_t deviceId);
+    void OnDeviceDisabled(int32_t deviceId);
+    void SendKeyUpEvents(int32_t deviceId, const std::set<int32_t> &pressedKeys);
+    std::shared_ptr<KeyEvent> PackageKeyUpEvent(int32_t deviceId, int32_t rawCode);
+    void UpdateKeyState(int32_t rawCode, const KeyEvent &keyEvent);
+    void SetUpDeviceObserver();
+    void TearDownDeviceObserver();
 
 private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
@@ -90,7 +113,10 @@ private:
         {KeyEvent::KEYCODE_META_LEFT, -1},
         {KeyEvent::KEYCODE_META_RIGHT, -1},
     };
+    std::shared_ptr<InputDeviceObserver> inputDevObserver_;
+    std::map<int32_t, std::set<int32_t>> pressedKeys_;
 };
+
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS

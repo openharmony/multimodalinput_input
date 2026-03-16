@@ -1139,6 +1139,15 @@ public:
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
 
     /**
+     * @brief Enables or disables input event dispatch.
+     * @param disabled true to disable input event dispatch, false to enable.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @permission ohos.permission.MANAGE_EDM_POLICY (system_core)
+     * @since 15
+     */
+    int32_t DisableInputEventDispatch(bool disabled);
+
+    /**
      * @brief shift AppPointerEvent from source window to target window
      * @param param - param for shift pointer event.
      * @param autoGenDown - send down event if true.
