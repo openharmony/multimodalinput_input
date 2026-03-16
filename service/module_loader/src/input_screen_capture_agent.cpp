@@ -55,7 +55,6 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
         return RET_ERR;
     }
     handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    MMI_HILOGI("load screen_capture");
     if (handle_.handle == nullptr) {
         MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return RET_ERR;
@@ -135,7 +134,6 @@ int32_t InputScreenCaptureAgent::LoadAudioLibrary()
         return RET_ERR;
     }
     handle_.handle = dlopen(libRealPath, RTLD_LAZY);
-    MMI_HILOGI("LoadAudioLibrary");
     if (handle_.handle == nullptr) {
         MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return RET_ERR;
@@ -148,17 +146,6 @@ int32_t InputScreenCaptureAgent::LoadAudioLibrary()
     }
     return RET_OK;
     // LCOV_EXCL_STOP
-}
-
-void InputScreenCaptureAgent::UnloadLibrary()
-{
-    std::lock_guard<std::mutex> guard(agentMutex_);
-    if (handle_.handle == nullptr) {
-        MMI_HILOGD("The library has not been loaded");
-        return;
-    }
-    MMI_HILOGI("Unload screen_capture");
-    handle_.Free();
 }
 }
 }
