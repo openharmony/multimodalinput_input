@@ -18,7 +18,6 @@
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "inputConsumer_ani_constructor"
-111
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     if (!vm) {
