@@ -15,7 +15,6 @@
 
 #include "input_windows_manager.h"
 #include <algorithm>
-#include <cstdlib>
 #include <linux/input.h>
 
 #include "account_manager.h"
@@ -81,32 +80,6 @@ constexpr int32_t RS_PROCESS_TIMEOUT { 500 * 1000 };
 constexpr int32_t HICAR_MIN_DISPLAY_ID { 1000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT { 1 };
-constexpr double INPUT_BASE_VERSION { 1.0 };
-constexpr const char* INPUT_OH_VERSION_PARAM { "const.system.input_oh_version" };
-constexpr const char* INPUT_ANCO_VERSION_PARAM { "const.system.input_anco_version" };
-
-bool ParseParameterVersion(const std::string &version, double &value)
-{
-    if (version.empty()) {
-        return false;
-    }
-    char *end = nullptr;
-    value = std::strtod(version.c_str(), &end);
-    return (end != version.c_str()) && (end != nullptr) && (*end == '\0');
-}
-
-bool ShouldUseNonDirectKeyEventPolicy()
-{
-    double inputOhVersion = 0.0;
-    double inputAncoVersion = 0.0;
-    std::string ohVersion = system::GetParameter(INPUT_OH_VERSION_PARAM, "");
-    std::string ancoVersion = system::GetParameter(INPUT_ANCO_VERSION_PARAM, "");
-    if (!ParseParameterVersion(ohVersion, inputOhVersion) ||
-        !ParseParameterVersion(ancoVersion, inputAncoVersion)) {
-        return false;
-    }
-    return inputOhVersion >= INPUT_BASE_VERSION && inputAncoVersion >= INPUT_BASE_VERSION;
-}
 #endif // OHOS_BUILD_ENABLE_ANCO
 constexpr double HALF_RATIO { 0.5 };
 constexpr int32_t TWOFOLD { 2 };
@@ -7981,9 +7954,9 @@ void InputWindowsManager::CleanInvalidPixelMap(int32_t groupId)
 
 void InputWindowsManager::SimulateKeyEventIfNeeded(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (ShouldUseNonDirectKeyEventPolicy()) {
-        if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-            MMI_HILOG_DISPATCHW("The accessibility keyevent is not injected into the anco repeatedly");
+    if (ShouldUseNonDirectPath()) {
+        if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+            keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
             return;
         }
         SimulateKeyExt(keyEvent);
