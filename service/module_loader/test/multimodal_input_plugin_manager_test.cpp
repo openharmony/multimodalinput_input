@@ -1393,7 +1393,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
     EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
     EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(Return(std::vector<InputPluginStage>{}));
     
@@ -1412,7 +1412,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
     EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
     EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
         Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_AFTER_FILTER}));
@@ -1434,7 +1434,7 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_Inpu
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
     
-    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test_plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
     EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
     EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
         Return(std::vector<InputPluginStage>{
