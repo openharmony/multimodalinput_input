@@ -91,6 +91,7 @@ public:
     MOCK_METHOD(const std::string, GetVersion, (), (override, const));
     MOCK_METHOD(const std::string, GetName, (), (override, const));
     MOCK_METHOD(InputPluginStage, GetStage, (), (override, const));
+    MOCK_METHOD(std::vector<InputPluginStage>, GetStages, (), (override, const));
     MOCK_METHOD(void, DeviceWillAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
     MOCK_METHOD(void, DeviceDidAdded, (std::shared_ptr<InputDevice> inputDevice), (override));
     MOCK_METHOD(void, DeviceWillRemoved, (std::shared_ptr<InputDevice> inputDevice), (override));
@@ -1379,6 +1380,74 @@ HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_UnRe
     std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
     int32_t callbackId = 1;
     EXPECT_FALSE(inputPluginContext->UnRegisterCommonEventCallback(callbackId));
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_Init_001
+ * @tc.desc: Test InputPlugin::Init with empty stages vector
+ * @tc.require: test InputPlugin::Init
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(Return(std::vector<InputPluginStage>{}));
+    
+    int32_t result = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_Init_002
+ * @tc.desc: Test InputPlugin::Init with single stage
+ * @tc.require: test InputPlugin::Init
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{InputPluginStage::INPUT_AFTER_FILTER}));
+    
+    int32_t result = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(inputPluginContext->stages_.size(), 1);
+    EXPECT_EQ(inputPluginContext->stages_[0], InputPluginStage::INPUT_AFTER_FILTER);
+}
+
+/**
+ * @tc.name: MultimodalInputPluginManagerTest_InputPlugin_Init_003
+ * @tc.desc: Test InputPlugin::Init with multiple stages
+ * @tc.require: test InputPlugin::Init
+ */
+HWTEST_F(MultimodalInputPluginManagerTest, MultimodalInputPluginManagerTest_InputPlugin_Init_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputPlugin> inputPluginContext = std::make_shared<InputPlugin>();
+    std::shared_ptr<MockInputPlugin> mockInputPlugin = std::make_shared<MockInputPlugin>();
+    
+    EXPECT_CALL(*mockInputPlugin, GetName()).WillRepeatedly(Return("test plugin"));
+    EXPECT_CALL(*mockInputPlugin, GetPriority()).WillRepeatedly(Return(100));
+    EXPECT_CALL(*mockInputPlugin, GetStages()).WillRepeatedly(
+        Return(std::vector<InputPluginStage>{
+            InputPluginStage::INPUT_AFTER_FILTER,
+            InputPluginStage::INPUT_BEFORE_KEYCOMMAND,
+            InputPluginStage::INPUT_AFTER_NORMALIZED}));
+    
+    int32_t result = inputPluginContext->Init(mockInputPlugin);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(inputPluginContext->stages_.size(), 3);
+    EXPECT_EQ(inputPluginContext->stages_[0], InputPluginStage::INPUT_AFTER_FILTER);
+    EXPECT_EQ(inputPluginContext->stages_[1], InputPluginStage::INPUT_BEFORE_KEYCOMMAND);
+    EXPECT_EQ(inputPluginContext->stages_[2], InputPluginStage::INPUT_AFTER_NORMALIZED);
 }
 } // namespace MMI
 } // namespace OHOS
