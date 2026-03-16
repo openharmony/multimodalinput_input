@@ -39,6 +39,8 @@ private:
 
         void OnDeviceAdded(int32_t deviceId) override;
         void OnDeviceRemoved(int32_t deviceId) override;
+        void OnDeviceEnabled(int32_t deviceId) override;
+        void OnDeviceDisabled(int32_t deviceId) override;
         void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
 
     private:
@@ -70,6 +72,8 @@ private:
     void UnloadJoystick();
     void ScheduleUnloadingTimer(std::shared_ptr<JoystickEventInterface> self);
     void RemoveUnloadingTimer();
+    void OnDeviceEnabled(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId);
+    void OnDeviceDisabled(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId);
 
     std::mutex mutex_;
     std::atomic_bool loading_ { false };

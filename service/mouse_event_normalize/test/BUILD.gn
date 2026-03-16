@@ -57,7 +57,6 @@ ohos_unittest("MouseEventNormalizeTestWithMock") {
     "${mmi_path}/service/module_loader/src/input_service_context.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
     "src/mouse_event_normalize_test_with_mock.cpp",
-    "src/mouse_transform_processor_test_with_mock.cpp",
   ]
 
   deps = [

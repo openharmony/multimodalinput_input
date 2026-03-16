@@ -49,6 +49,20 @@ void JoystickEventInterface::InputDeviceObserver::OnDeviceRemoved(int32_t device
     }
 }
 
+void JoystickEventInterface::InputDeviceObserver::OnDeviceEnabled(int32_t deviceId)
+{
+    if (auto parent = parent_.lock(); parent != nullptr) {
+        parent->OnDeviceEnabled(parent, deviceId);
+    }
+}
+
+void JoystickEventInterface::InputDeviceObserver::OnDeviceDisabled(int32_t deviceId)
+{
+    if (auto parent = parent_.lock(); parent != nullptr) {
+        parent->OnDeviceDisabled(parent, deviceId);
+    }
+}
+
 std::shared_ptr<JoystickEventInterface> JoystickEventInterface::GetInstance()
 {
     static std::once_flag flag;
@@ -280,6 +294,18 @@ void JoystickEventInterface::RemoveUnloadingTimer()
     if (timerId >= 0) {
         TimerMgr->RemoveTimer(timerId);
     }
+}
+
+void JoystickEventInterface::OnDeviceEnabled(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId)
+{}
+
+void JoystickEventInterface::OnDeviceDisabled(std::shared_ptr<JoystickEventInterface> self, int32_t deviceId)
+{
+    auto joystick = GetJoystick();
+    if (joystick == nullptr) {
+        return;
+    }
+    joystick->OnDeviceDisabled(deviceId);
 }
 } // namespace MMI
 } // namespace OHOS
