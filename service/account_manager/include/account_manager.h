@@ -17,7 +17,6 @@
 #define ACCOUNT_MANAGER_H
 
 #include <common_event_subscriber.h>
-111
 #include "setting_observer.h"
 
 namespace OHOS {
