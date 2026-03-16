@@ -63,6 +63,12 @@ private:
         PointerEvent::AxisType pointerAxisType;
     };
 
+    struct ButtonMappingData {
+        int32_t eventType_ { LIBINPUT_EVENT_NONE };
+        int32_t buttonCode_ {};
+        int32_t buttonId_ { PointerEvent::BUTTON_NONE };
+    };
+
 public:
     enum class RightClickType {
         TP_RIGHT_BUTTON = 1,
@@ -106,6 +112,8 @@ public:
 #endif // OHOS_BUILD_MOUSE_REPORTING_RATE
     int32_t SetMouseAccelerateMotionSwitch(bool enable);
     void OnDeviceRemoved();
+    void OnDeviceEnabled();
+    void OnDeviceDisabled();
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
@@ -162,6 +170,9 @@ private:
     void DumpInner();
     void SetPointerEventRightButtonSource(const int32_t eventType, uint32_t button);
     void SetMouseScrollAxisValue(libinput_pointer_axis_source source, double &axisValue);
+    void RecordActiveOperations();
+    void SendButtonUpEvents();
+    void SendAxisEndEvent();
     // Helper functions for button handling refactoring
     void ResetPointerItemCanceledState();
 #ifdef OHOS_BUILD_ENABLE_VKEYBOARD
@@ -204,11 +215,12 @@ private:
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
     uint32_t pressedButton_ { 0 };
+    bool isTouchpad_ { false };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
-    std::map<int32_t, int32_t> buttonMapping_;
+    std::map<int32_t, ButtonMappingData> buttonMapping_;
     Aggregator aggregator_ {
             [this](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return env_->GetTimerManager()->AddTimer(intervalMs, repeatCount, std::move(callback));

@@ -34,7 +34,8 @@ private:
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
         bool isDeviceReportEvent { false };
-        bool enable { false };
+        bool enable { false }; // actual enable status
+        bool inputEnable { true }; // enable status set by user
         bool isLocal { false };
         std::string dhid;
         std::string sysUid;
@@ -154,8 +155,10 @@ public:
     std::vector<int32_t> GetTouchPadIds();
     std::vector<libinput_device*> GetTouchPadDeviceOrigins();
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t index, int32_t pid, SessionPtr session);
+    int32_t DisableInputEventDispatch(bool disabled, int32_t pid);
     static std::shared_ptr<InputDeviceManager> GetInstance();
-    bool IsInputDeviceEnable(int32_t deviceId);
+    bool IsEduInputDisabled() const;
+    bool IsInputDeviceEnable(int32_t deviceId) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
     bool IsAddKeyboardExtFlag(int32_t deviceId, uint32_t &flag);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
@@ -185,6 +188,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasVirtualPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    void RecoverInputEnabled(SessionPtr session);
     void RecoverInputDeviceEnabled(SessionPtr session);
     int32_t NotifyInputdeviceMessage(SessionPtr session, int32_t index, int32_t result);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD_EXT_FLAG
@@ -197,7 +201,10 @@ private:
     void NotifyDeviceAdded(int32_t deviceId) const;
     void NotifyDeviceRemoved(int32_t deviceId) const;
     void NotifyDeviceFirstReportEvent(int32_t deviceId) const;
+    void NotifyDeviceEnabled(int32_t deviceId);
+    void NotifyDeviceDisabled(int32_t deviceId);
     void SetSpecialVirtualDevice(std::shared_ptr<InputDevice> inputDevice) const;
+    int32_t EnableInputDevice(int32_t deviceId);
 
     void UpdatePhysicalInputDevice(int32_t deviceId, const struct InputDeviceInfo& info);
     PhysicalInputDevice* GetPhysicalInputDevice(const std::string& physicalId);
@@ -220,6 +227,8 @@ private:
     bool sessionLostCallbackInitialized_ { false };
     bool virtualKeyboardEverConnected_ { false };
     std::map<std::string, PhysicalInputDevice> physicalInputDevices_;
+    bool eduInputDisabled_ { false };
+    int32_t eduInputDisabledPid_ { -1 };
 
     static std::shared_ptr<InputDeviceManager> instance_;
     static std::mutex mutex_;

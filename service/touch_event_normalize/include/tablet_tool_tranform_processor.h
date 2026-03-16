@@ -52,6 +52,8 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
     void OnDeviceRemoved() override;
+    void OnDeviceEnabled() override;
+    void OnDeviceDisabled() override;
 
 private:
     int32_t GetToolType(struct libinput_event_tablet_tool* tabletEvent);
@@ -83,8 +85,16 @@ private:
     static void LoadProductConfig(bool& enabled);
     static bool ReadTabletCalibrationConfig(const char* cfgPath, cJSON* jsonCfg, bool& enabled);
 
+    void RecordActiveOperations();
+    void SendProximityOutEvent();
+    void SendTipUpEvent();
+    void SendButtonUpEvents();
+    void UpdateDeviceStateFromPointerEvent();
+
 private:
     const int32_t deviceId_ { -1 };
+    bool isProximity_ { false };
+    bool isPressed_ { false };
     std::function<void()> current_;
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::optional<TabletCalibration> calibration_ {};

@@ -53,6 +53,22 @@ void MouseEventInterface::InputDeviceObserver::OnDeviceRemoved(int32_t deviceId)
     }
 }
 
+void MouseEventInterface::InputDeviceObserver::OnDeviceEnabled(int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    if (auto parent = parent_.lock(); parent != nullptr) {
+        parent->OnDeviceEnabled(parent, deviceId);
+    }
+}
+
+void MouseEventInterface::InputDeviceObserver::OnDeviceDisabled(int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    if (auto parent = parent_.lock(); parent != nullptr) {
+        parent->OnDeviceDisabled(parent, deviceId);
+    }
+}
+
 bool MouseEventInterface::HasMouse()
 {
     auto mouse = GetMouse();
@@ -589,6 +605,28 @@ void MouseEventInterface::OnDeviceRemoved(std::shared_ptr<MouseEventInterface> s
         return;
     }
     ScheduleUnloadingTimer();
+}
+
+void MouseEventInterface::OnDeviceEnabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGI("Mouse is nullptr");
+        return;
+    }
+    mouse->OnDeviceEnabled(deviceId);
+}
+
+void MouseEventInterface::OnDeviceDisabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    auto mouse = GetMouse();
+    if (mouse == nullptr) {
+        MMI_HILOGI("Mouse is nullptr");
+        return;
+    }
+    mouse->OnDeviceDisabled(deviceId);
 }
 
 void MouseEventInterface::LoadMouse()

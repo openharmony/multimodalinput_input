@@ -5168,6 +5168,33 @@ ErrCode MMIService::SetInputDeviceEnabled(int32_t deviceId, bool enable, int32_t
     return RET_OK;
 }
 
+ErrCode MMIService::DisableInputEventDispatch(bool disabled)
+{
+    CALL_INFO_TRACE;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckManageEdmPolicy()) {
+        MMI_HILOGE("MANAGE_EDM_POLICY permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, disabled, pid] {
+            return INPUT_DEV_MGR->DisableInputEventDispatch(disabled, pid);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("DisableInputEventDispatch failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 ErrCode MMIService::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_DEBUG_ENTER;

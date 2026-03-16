@@ -68,6 +68,24 @@ void MouseEventNormalize::OnDeviceRemoved(int32_t deviceId)
     }
 }
 
+void MouseEventNormalize::OnDeviceEnabled(int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    auto processor = GetProcessor(deviceId);
+    if (processor != nullptr) {
+        processor->OnDeviceEnabled();
+    }
+}
+
+void MouseEventNormalize::OnDeviceDisabled(int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    auto processor = GetProcessor(deviceId);
+    if (processor != nullptr) {
+        processor->OnDeviceDisabled();
+    }
+}
+
 bool MouseEventNormalize::HasMouse()
 {
     return !processors_.empty();

@@ -136,6 +136,7 @@ declare_args() {
     "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_interface.cpp",
     "delegate_task/src/delegate_tasks.cpp",
+    "device_manager/src/device_state_manager.cpp",
     "device_manager/src/input_device_manager.cpp",
     "device_manager/src/pointer_device_manager.cpp",
     "device_state_manager/src/device_event_monitor.cpp",
