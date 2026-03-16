@@ -25,13 +25,29 @@
 #include "input_windows_manager_mock.h"
 #include "libinput_mock.h"
 #include "touch_transform_processor.h"
+#include "input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t FIRST_POINTER_ID { 0 };
 constexpr int32_t TIME_WAIT_FOR_OP { 50 };
-}
+constexpr int32_t TEST_DEVICE_ID { 5 };
+constexpr int32_t TEST_DISPLAY_ID { 0 };
+constexpr int32_t TEST_WINDOW_ID { 1 };
+constexpr int32_t TEST_AGENT_WINDOW_ID { 2 };
+constexpr int32_t TEST_POINTER_ID_1 { 0 };
+constexpr int32_t TEST_POINTER_ID_2 { 1 };
+constexpr int32_t TEST_POINTER_ID_3 { 2 };
+constexpr int32_t TEST_DISPLAY_X_1 { 100 };
+constexpr int32_t TEST_DISPLAY_Y_1 { 100 };
+constexpr int32_t TEST_DISPLAY_X_2 { 200 };
+constexpr int32_t TEST_DISPLAY_Y_2 { 200 };
+constexpr int32_t TEST_DISPLAY_X_3 { 300 };
+constexpr int32_t TEST_DISPLAY_Y_3 { 300 };
+constexpr int32_t EXPECTED_TOUCH_EVENT_COUNT { 2 };
+} // namespace
+
 using namespace testing;
 using namespace testing::ext;
 
@@ -60,14 +76,16 @@ void TouchTransformProcessorTestWithMock::SetUpTestCase()
 void TouchTransformProcessorTestWithMock::TearDownTestCase()
 {
     CloseTouchscreen();
-    InputWindowsManagerMock::ReleaseInstance();
 }
 
 void TouchTransformProcessorTestWithMock::SetUp()
 {}
 
 void TouchTransformProcessorTestWithMock::TearDown()
-{}
+{
+    InputEventHandlerManager::ReleaseInstance();
+    InputWindowsManagerMock::ReleaseInstance();
+}
 
 void TouchTransformProcessorTestWithMock::SetupTouchscreen()
 {
@@ -331,5 +349,237 @@ HWTEST_F(TouchTransformProcessorTestWithMock, RemoveInvalidAreaDownedEventTest_0
     ASSERT_EQ(*(processor.InvalidAreaDownedEvents_.begin()), seatSlot);
 }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
+
+/**
+ * @tc.name: TouchTransformProcessorTest_OnDeviceEnabled_001
+ * @tc.desc: Test OnDeviceEnabled function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, OnDeviceEnabled_001, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    TouchTransformProcessor processor(deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.OnDeviceEnabled());
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_OnDeviceDisabled_001
+ * @tc.desc: Test OnDeviceDisabled function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, OnDeviceDisabled_001, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    TouchTransformProcessor processor(deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.OnDeviceDisabled());
+    EXPECT_EQ(processor.GetPointerEvent(), nullptr);
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_RecordActiveOperations_001
+ * @tc.desc: Test RecordActiveOperations when pointerEvent_ is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, RecordActiveOperations_001, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    TouchTransformProcessor processor(deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.RecordActiveOperations());
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_RecordActiveOperations_002
+ * @tc.desc: Test RecordActiveOperations with active touches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, RecordActiveOperations_002, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    int32_t displayId { TEST_DISPLAY_ID };
+    TouchTransformProcessor processor(deviceId);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(TEST_POINTER_ID_1);
+    item1.SetPressed(true);
+    item1.SetDisplayX(TEST_DISPLAY_X_1);
+    item1.SetDisplayY(TEST_DISPLAY_Y_1);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_1, item1);
+
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(TEST_POINTER_ID_2);
+    item2.SetPressed(false);
+    item2.SetDisplayX(TEST_DISPLAY_X_2);
+    item2.SetDisplayY(TEST_DISPLAY_Y_2);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_2, item2);
+
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(TEST_POINTER_ID_3);
+    item3.SetPressed(true);
+    item3.SetDisplayX(TEST_DISPLAY_X_3);
+    item3.SetDisplayY(TEST_DISPLAY_Y_3);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_3, item3);
+
+    processor.pointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(processor.RecordActiveOperations());
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_CancelAllTouches_001
+ * @tc.desc: Test CancelAllTouches when pointerEvent_ is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, CancelAllTouches_001, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    TouchTransformProcessor processor(deviceId);
+    EXPECT_NO_FATAL_FAILURE(processor.CancelAllTouches());
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_CancelAllTouches_002
+ * @tc.desc: Test CancelAllTouches when inputChannel is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, CancelAllTouches_002, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    int32_t displayId { TEST_DISPLAY_ID };
+    TouchTransformProcessor processor(deviceId);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(displayId);
+
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(TEST_POINTER_ID_1);
+    item1.SetPressed(true);
+    item1.SetDisplayX(TEST_DISPLAY_X_1);
+    item1.SetDisplayY(TEST_DISPLAY_Y_1);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_1, item1);
+
+    processor.pointerEvent_ = pointerEvent;
+
+    EXPECT_NO_FATAL_FAILURE(processor.CancelAllTouches());
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_CancelAllTouches_003
+ * @tc.desc: Test CancelAllTouches with active and inactive touches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, CancelAllTouches_003, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    int32_t displayId { TEST_DISPLAY_ID };
+    int32_t windowId { TEST_WINDOW_ID };
+    int32_t agentWindowId { TEST_AGENT_WINDOW_ID };
+    TouchTransformProcessor processor(deviceId);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetTargetWindowId(windowId);
+    pointerEvent->SetAgentWindowId(agentWindowId);
+    pointerEvent->SetDeviceId(deviceId);
+
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(TEST_POINTER_ID_1);
+    item1.SetPressed(true);
+    item1.SetDisplayX(TEST_DISPLAY_X_1);
+    item1.SetDisplayY(TEST_DISPLAY_Y_1);
+    item1.SetTargetWindowId(windowId);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_1, item1);
+
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(TEST_POINTER_ID_2);
+    item2.SetPressed(false);
+    item2.SetDisplayX(TEST_DISPLAY_X_2);
+    item2.SetDisplayY(TEST_DISPLAY_Y_2);
+    item2.SetTargetWindowId(windowId);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_2, item2);
+
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(TEST_POINTER_ID_3);
+    item3.SetPressed(true);
+    item3.SetDisplayX(TEST_DISPLAY_X_3);
+    item3.SetDisplayY(TEST_DISPLAY_Y_3);
+    item3.SetTargetWindowId(windowId);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_3, item3);
+
+    processor.pointerEvent_ = pointerEvent;
+
+    auto eventNormalizeHandler = std::make_shared<EventNormalizeHandler>();
+    EXPECT_CALL(*InputHandler, GetEventNormalizeHandler).WillOnce(Return(eventNormalizeHandler));
+    EXPECT_CALL(*eventNormalizeHandler, HandleTouchEvent).Times(EXPECTED_TOUCH_EVENT_COUNT);
+    EXPECT_CALL(*WIN_MGR_MOCK, UpdateTargetPointer).Times(EXPECTED_TOUCH_EVENT_COUNT);
+
+    EXPECT_NO_FATAL_FAILURE(processor.CancelAllTouches());
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_OnDeviceDisabled_002
+ * @tc.desc: Test OnDeviceDisabled with active touches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTestWithMock, OnDeviceDisabled_002, TestSize.Level1)
+{
+    int32_t deviceId { TEST_DEVICE_ID };
+    int32_t displayId { TEST_DISPLAY_ID };
+    int32_t windowId { TEST_WINDOW_ID };
+    int32_t agentWindowId { TEST_AGENT_WINDOW_ID };
+    TouchTransformProcessor processor(deviceId);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetTargetDisplayId(displayId);
+    pointerEvent->SetTargetWindowId(windowId);
+    pointerEvent->SetAgentWindowId(agentWindowId);
+    pointerEvent->SetDeviceId(deviceId);
+
+    PointerEvent::PointerItem item1;
+    item1.SetPointerId(TEST_POINTER_ID_1);
+    item1.SetPressed(true);
+    item1.SetDisplayX(TEST_DISPLAY_X_1);
+    item1.SetDisplayY(TEST_DISPLAY_Y_1);
+    item1.SetTargetWindowId(windowId);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_1, item1);
+
+    PointerEvent::PointerItem item2;
+    item2.SetPointerId(TEST_POINTER_ID_2);
+    item2.SetPressed(true);
+    item2.SetDisplayX(TEST_DISPLAY_X_2);
+    item2.SetDisplayY(TEST_DISPLAY_Y_2);
+    item2.SetTargetWindowId(windowId);
+    pointerEvent->UpdatePointerItem(TEST_POINTER_ID_2, item2);
+
+    processor.pointerEvent_ = pointerEvent;
+
+    auto eventNormalizeHandler = std::make_shared<EventNormalizeHandler>();
+    EXPECT_CALL(*InputHandler, GetEventNormalizeHandler).WillOnce(Return(eventNormalizeHandler));
+    EXPECT_CALL(*eventNormalizeHandler, HandleTouchEvent).Times(EXPECTED_TOUCH_EVENT_COUNT);
+    EXPECT_CALL(*WIN_MGR_MOCK, UpdateTargetPointer).Times(EXPECTED_TOUCH_EVENT_COUNT);
+    EXPECT_NO_FATAL_FAILURE(processor.OnDeviceDisabled());
+    EXPECT_EQ(processor.GetPointerEvent(), nullptr);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -907,6 +907,10 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
 #ifndef OHOS_BUILD_ENABLE_WATCH
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
 #endif // OHOS_BUILD_ENABLE_WATCH
+
+    if (eduInputDisabled_) {
+        info.enable = false;
+    }
     // LCOV_EXCL_STOP
 }
 
@@ -1672,36 +1676,21 @@ int32_t InputDeviceManager::SetInputDeviceEnabled(
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("The deviceId:%{public}d, enable:%{public}d, pid:%{public}d", deviceId, enable, pid);
-
     auto item = inputDevice_.find(deviceId);
     if (item == inputDevice_.end()) {
         NotifyInputdeviceMessage(session, index, ERROR_DEVICE_NOT_EXIST);
         MMI_HILOGD("Set inputDevice enabled failed, Invalid deviceId");
-        return ERROR_DEVICE_NOT_EXIST;
-    }
-
-    if (item->second.inputEnable == enable) {
-        NotifyInputdeviceMessage(session, index, RET_OK);
-        MMI_HILOGI("Device input already in state: %{public}d", enable);
-        return RET_OK;
-    }
-
-    if (eduInputDisabled_ && !enable) {
-        NotifyInputdeviceMessage(session, index, ERROR_EDU_INPUT_DISABLED);
-        MMI_HILOGE("EduInput disabled by session[%{private}d]", eduInputDisabledPid_);
-        return ERROR_EDU_INPUT_DISABLED;
+        return RET_ERR;
     }
 
     item->second.inputEnable = enable;
 
     if (enable) {
-        if (!eduInputDisabled_) {
-            DEVICE_STATE_MGR->EnableDevice(deviceId,
-                [](int32_t id) {
-                    INPUT_DEV_MGR->EnableInputDevice(id);
-                    return RET_OK;
-                });
-        }
+        DEVICE_STATE_MGR->EnableDevice(deviceId,
+            [](int32_t id) {
+                INPUT_DEV_MGR->EnableInputDevice(id);
+                return RET_OK;
+            });
     } else if (item->second.enable) {
         item->second.enable = false;
         NotifyDeviceDisabled(deviceId);
@@ -1749,10 +1738,6 @@ int32_t InputDeviceManager::DisableInputEventDispatch(bool disabled, int32_t pid
     eduInputDisabledPid_ = -1;
 
     for (auto& [deviceId, deviceInfo] : inputDevice_) {
-        if (!deviceInfo.inputEnable) {
-            continue;
-        }
-
         DEVICE_STATE_MGR->EnableDevice(deviceId,
             [](int32_t id) {
                 INPUT_DEV_MGR->EnableInputDevice(id);
@@ -1776,10 +1761,6 @@ void InputDeviceManager::RecoverInputEnabled(SessionPtr session)
     eduInputDisabledPid_ = -1;
 
     for (auto& [deviceId, deviceInfo] : inputDevice_) {
-        if (!deviceInfo.inputEnable) {
-            continue;
-        }
-
         DEVICE_STATE_MGR->EnableDevice(deviceId,
             [](int32_t id) {
                 INPUT_DEV_MGR->EnableInputDevice(id);
@@ -1807,10 +1788,6 @@ void InputDeviceManager::RecoverInputDeviceEnabled(SessionPtr session)
         MMI_HILOGI("Recover input device[%{private}d] enabled", deviceId);
         devIter->second.inputEnable = true;
         recovered.emplace(deviceId);
-
-        if (eduInputDisabled_) {
-            continue;
-        }
 
         DEVICE_STATE_MGR->EnableDevice(deviceId,
             [](int32_t id) {
