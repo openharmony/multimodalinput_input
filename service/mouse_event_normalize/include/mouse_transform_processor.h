@@ -54,7 +54,7 @@ class MouseTransformProcessor final : public std::enable_shared_from_this<MouseT
 
         MotionDataContext()
             : dx(0.0), dy(0.0), libinputEventType(0), displayId(-1), cursorX(0.0), cursorY(0.0),
-              displayInfo(nullptr), deviceType(DeviceType::DEVICE_PC), isValid(false) {}
+              displayInfo(nullptr), offset({0.0, 0.0}), deviceType(DeviceType::DEVICE_PC), isValid(false) {}
     };
 
     struct AxisInfo {
