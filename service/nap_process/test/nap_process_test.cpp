@@ -595,12 +595,12 @@ HWTEST_F(NapProcessTest, NapProcessTest_GetAllMmiSubscribedEvents_004, TestSize.
 }
 
 /**
- * @tc.name: NapProcessTest_Concurrent_001
+ * @tc.name: NapProcessTest_SequentialOperations_001
  * @tc.desc: Test concurrent access to napMap
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(NapProcessTest, NapProcessTest_Concurrent_001, TestSize.Level1)
+HWTEST_F(NapProcessTest, NapProcessTest_SequentialOperations_001, TestSize.Level1)
 {
     NapProcess napProcess;
     
