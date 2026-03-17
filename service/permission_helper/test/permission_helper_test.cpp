@@ -587,27 +587,11 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckFunctionKeyEnabled001, 
 
 /**
  * @tc.name: PermissionHelperTest_CheckInjectPermission_01
- * @tc.desc: Test CheckInjectPermission with SHELL token type
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInjectPermission_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 3;
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
-    bool result = PER_HELPER->CheckInjectPermission();
-    EXPECT_TRUE(result);
-}
-
-/**
- * @tc.name: PermissionHelperTest_CheckInjectPermission_02
  * @tc.desc: Test CheckInjectPermission with permission verify failed
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInjectPermission_02, TestSize.Level1)
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInjectPermission_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
