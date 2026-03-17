@@ -7955,6 +7955,10 @@ void InputWindowsManager::CleanInvalidPixelMap(int32_t groupId)
 
 void InputWindowsManager::SimulateKeyEventIfNeeded(std::shared_ptr<KeyEvent> keyEvent)
 {
+    if (ShouldUseNonDirectPath()) {
+        SimulateKeyExt(keyEvent);
+        return;
+    }
     if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
         (!INPUT_DEV_MGR->IsLocalDevice(keyEvent->GetDeviceId()) ||
             !keyEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY))) {
