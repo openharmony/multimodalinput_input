@@ -216,6 +216,7 @@ public:
     void SendOneHandData(const OLD::DisplayInfo &displayInfo, std::shared_ptr<PointerEvent> &pointerEvent);
     bool IsAncoGameActive();
     bool IsShouldSendToAnco(std::shared_ptr<PointerEvent> pointerEvent, bool isFirstSpecialWindow);
+    bool ShouldUseNonDirectPath();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #ifdef OHOS_BUILD_ENABLE_ANCO_GAME_EVENT_MAPPING
