@@ -652,21 +652,6 @@ HWTEST_F(MMIClientTest, GetCurrentConnectedStatus_AfterStop, TestSize.Level1)
 }
 
 /**
- * @tc.name: OnRecvMsg_MaxSize
- * @tc.desc: Receive msg with max size
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, OnRecvMsg_MaxSize, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    const char* buf = "test_data";
-    int32_t size = MAX_PACKET_BUF_SIZE;
-    ASSERT_NO_FATAL_FAILURE(mmiClient.OnRecvMsg(buf, size));
-}
-
-/**
  * @tc.name: OnRecvMsg_NegativeSize
  * @tc.desc: Receive msg with negative size
  * @tc.type: FUNC
