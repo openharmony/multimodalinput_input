@@ -8046,7 +8046,7 @@ bool InputWindowsManager::OnDisplayRemovedOrCombinationChanged(const OLD::Displa
     (void)GetMainScreenDisplayInfo(displaysInfoVector, oldMainDisplayInfo);
     MMI_HILOGI("newMainDisplayInfo:%{public}" PRIu64 ", oldMainDisplayInfo:%{public}" PRIu64,
         newMainDisplayInfo.rsId, oldMainDisplayInfo.rsId);
-    if (displayGroupInfo.displaysInfo.size() == displaysInfoVector.size() &&
+    if (displayGroupInfo.displaysInfo.size() >= displaysInfoVector.size() &&
         newMainDisplayInfo.rsId != oldMainDisplayInfo.rsId) {
         MMI_HILOGD("current mainScreenDisplayId changed");
         return true;
