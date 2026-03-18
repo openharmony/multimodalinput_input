@@ -55,7 +55,7 @@ private:
     sptr<SettingObserver> vibrationObserver_ {nullptr};
     sptr<SettingObserver> knuckleSwitchesObserver_ {nullptr};
     sptr<SettingObserver> swipeInwardSwitchesObserver_ {nullptr};
-    std::shared_mutex datashareUriMtx_
+    std::shared_mutex datashareUriMtx_;
     std::string datashareUri_ = "";
 };
 #define TOUCHPAD_MGR ::OHOS::MMI::TouchpadSettingsObserver::GetInstance()
