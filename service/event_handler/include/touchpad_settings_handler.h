@@ -35,7 +35,7 @@ static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
     bool GetCommonEventStatus();
     bool SupportSwipeInward();
     void SetSupportSwipeInward(int32_t value);
-    void SetDatashareUri(std::string& datashareUri);
+    void SetDatashareUri(const std::string& datashareUri);
     std::string GetDatashareUri();
 private:
     bool UnregisterSingleObserver(sptr<SettingObserver>& observer, const std::string& observerName);
