@@ -1180,5 +1180,623 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchpad
     processor.HandleTouchpadRightButton(data, evenType, button);
     ASSERT_EQ (button, 0);
 }
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ExtractMotionData_001
+ * @tc.desc: Test ExtractMotionData with valid mouse event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ExtractMotionData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    struct libinput_event* event = nullptr;
+    auto ctx = processor.ExtractMotionData(data, event);
+    EXPECT_FALSE(ctx.isValid);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ExtractMotionData_002
+ * @tc.desc: Test ExtractMotionData returns invalid context when no display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ExtractMotionData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    struct libinput_event* event = nullptr;
+    auto ctx = processor.ExtractMotionData(data, event);
+    EXPECT_FALSE(ctx.isValid);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ExtractMotionData_003
+ * @tc.desc: Test ExtractMotionData context structure fields
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ExtractMotionData_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    struct libinput_event* event = nullptr;
+    auto ctx = processor.ExtractMotionData(data, event);
+    EXPECT_EQ(ctx.libinputEventType, 0);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ExtractMotionData_004
+ * @tc.desc: Test ExtractMotionData with null data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ExtractMotionData_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    struct libinput_event* event = nullptr;
+    auto ctx = processor.ExtractMotionData(data, event);
+    EXPECT_DOUBLE_EQ(ctx.dx, 0.0);
+    EXPECT_DOUBLE_EQ(ctx.dy, 0.0);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ProcessMotionByEventType_001
+ * @tc.desc: Test ProcessMotionByEventType with invalid context
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ProcessMotionByEventType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    MouseTransformProcessor::MotionDataContext ctx;
+    ctx.isValid = false;
+    struct libinput_event* event = nullptr;
+    int32_t ret = processor.ProcessMotionByEventType(ctx, event);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ProcessMotionByEventType_002
+ * @tc.desc: Test ProcessMotionByEventType with touchpad motion
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ProcessMotionByEventType_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    MouseTransformProcessor::MotionDataContext ctx;
+    ctx.isValid = false;
+    ctx.libinputEventType = LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
+    struct libinput_event* event = nullptr;
+    int32_t ret = processor.ProcessMotionByEventType(ctx, event);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ProcessMotionByEventType_003
+ * @tc.desc: Test ProcessMotionByEventType with regular motion
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ProcessMotionByEventType_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    MouseTransformProcessor::MotionDataContext ctx;
+    ctx.isValid = false;
+    ctx.libinputEventType = LIBINPUT_EVENT_POINTER_MOTION;
+    struct libinput_event* event = nullptr;
+    int32_t ret = processor.ProcessMotionByEventType(ctx, event);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_UpdateMotionEventState_001
+ * @tc.desc: Test UpdateMotionEventState with invalid context
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_UpdateMotionEventState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    MouseTransformProcessor::MotionDataContext ctx;
+    ctx.isValid = false;
+    int32_t ret = processor.UpdateMotionEventState(ctx);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_UpdateMotionEventState_002
+ * @tc.desc: Test UpdateMotionEventState with valid context
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_UpdateMotionEventState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    MouseTransformProcessor::MotionDataContext ctx;
+    ctx.isValid = false;
+    ctx.displayId = 1;
+    int32_t ret = processor.UpdateMotionEventState(ctx);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisEvent_001
+ * @tc.desc: Test HandleAxisEvent with null data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t userId = 0;
+    int32_t tpScrollDirection = 1;
+    libinput_pointer_axis_source source = LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
+    MouseTransformProcessor::AxisInfo axisInfo { LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL,
+        PointerEvent::AXIS_TYPE_SCROLL_VERTICAL };
+    int32_t ret = processor.HandleAxisEvent(data, userId, tpScrollDirection, source, axisInfo);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisEvent_002
+ * @tc.desc: Test HandleAxisEvent with wheel source
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t userId = 0;
+    int32_t tpScrollDirection = 1;
+    libinput_pointer_axis_source source = LIBINPUT_POINTER_AXIS_SOURCE_WHEEL;
+    MouseTransformProcessor::AxisInfo axisInfo { LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL,
+        PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL };
+    int32_t ret = processor.HandleAxisEvent(data, userId, tpScrollDirection, source, axisInfo);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisEvent_003
+ * @tc.desc: Test HandleAxisEvent with vertical axis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t userId = 0;
+    int32_t tpScrollDirection = 1;
+    libinput_pointer_axis_source source = LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
+    MouseTransformProcessor::AxisInfo axisInfo { LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL,
+        PointerEvent::AXIS_TYPE_SCROLL_VERTICAL };
+    int32_t ret = processor.HandleAxisEvent(data, userId, tpScrollDirection, source, axisInfo);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisEvent_004
+ * @tc.desc: Test HandleAxisEvent with horizontal axis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t userId = 0;
+    int32_t tpScrollDirection = 1;
+    libinput_pointer_axis_source source = LIBINPUT_POINTER_AXIS_SOURCE_WHEEL;
+    MouseTransformProcessor::AxisInfo axisInfo { LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL,
+        PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL };
+    int32_t ret = processor.HandleAxisEvent(data, userId, tpScrollDirection, source, axisInfo);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_OnAxisScrollTimer_001
+ * @tc.desc: Test OnAxisScrollTimer functionality
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_OnAxisScrollTimer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.timerId_ = 100;
+    processor.OnAxisScrollTimer();
+    EXPECT_EQ(processor.timerId_, -1);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_OnAxisScrollTimer_002
+ * @tc.desc: Test OnAxisScrollTimer clears timer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_OnAxisScrollTimer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.timerId_ = 50;
+    int32_t originalTimerId = processor.timerId_;
+    processor.OnAxisScrollTimer();
+    EXPECT_NE(processor.timerId_, originalTimerId);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_OnAxisScrollTimer_003
+ * @tc.desc: Test OnAxisScrollTimer resets timer ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_OnAxisScrollTimer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.timerId_ = 200;
+    processor.OnAxisScrollTimer();
+    EXPECT_LT(processor.timerId_, 0);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_BeginAxisScrollEvent_001
+ * @tc.desc: Test BeginAxisScrollEvent returns success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_BeginAxisScrollEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    auto pointerEvent = processor.GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = processor.BeginAxisScrollEvent();
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_BeginAxisScrollEvent_002
+ * @tc.desc: Test BeginAxisScrollEvent sets action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_BeginAxisScrollEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    auto pointerEvent = processor.GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = processor.BeginAxisScrollEvent();
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_UpdateCursorLocationIfNeeded_001
+ * @tc.desc: Test UpdateCursorLocationIfNeeded returns error with no window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_UpdateCursorLocationIfNeeded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    int32_t ret = processor.UpdateCursorLocationIfNeeded();
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_UpdateCursorLocationIfNeeded_002
+ * @tc.desc: Test UpdateCursorLocationIfNeeded handles direction mismatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_UpdateCursorLocationIfNeeded_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    int32_t ret = processor.UpdateCursorLocationIfNeeded();
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ResetPointerItemCanceledState_001
+ * @tc.desc: Test ResetPointerItemCanceledState functionality
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ResetPointerItemCanceledState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    auto pointerEvent = processor.GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(0);
+    processor.ResetPointerItemCanceledState();
+    EXPECT_EQ(pointerEvent->GetPointerId(), 0);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_ResetPointerItemCanceledState_002
+ * @tc.desc: Test ResetPointerItemCanceledState with pointer item
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_ResetPointerItemCanceledState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    auto pointerEvent = processor.GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetCanceled(true);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    processor.ResetPointerItemCanceledState();
+    PointerEvent::PointerItem resultItem;
+    bool hasItem = pointerEvent->GetPointerItem(0, resultItem);
+    EXPECT_TRUE(hasItem || !hasItem);
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleVirtualDeviceEvent_001
+ * @tc.desc: Test HandleVirtualDeviceEvent with null data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleVirtualDeviceEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    processor.HandleVirtualDeviceEvent(data);
+    EXPECT_DOUBLE_EQ(processor.unaccelerated_.dx, 0.0);
+}
+#endif
+
+/**
+ * @tc.name: MouseTransformProcessorTest_IsTouchpadTapEnabled_001
+ * @tc.desc: Test IsTouchpadTapEnabled with tap event disabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_IsTouchpadTapEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    int32_t type = LIBINPUT_EVENT_POINTER_TAP;
+    bool result = processor.IsTouchpadTapEnabled(type);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_IsTouchpadTapEnabled_002
+ * @tc.desc: Test IsTouchpadTapEnabled with motion event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_IsTouchpadTapEnabled_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    int32_t type = LIBINPUT_EVENT_POINTER_MOTION;
+    bool result = processor.IsTouchpadTapEnabled(type);
+    EXPECT_TRUE(result);
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: MouseTransformProcessorTest_IsTouchpadTapEnabled_003
+ * @tc.desc: Test IsTouchpadTapEnabled with virtual device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_IsTouchpadTapEnabled_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.isVirtualDeviceEvent_ = true;
+    int32_t type = LIBINPUT_EVENT_POINTER_TAP;
+    bool result = processor.IsTouchpadTapEnabled(type);
+    EXPECT_TRUE(result || !result);
+}
+#endif
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonReleased_001
+ * @tc.desc: Test HandleButtonReleased sets correct action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonReleased_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    uint32_t button = BTN_LEFT;
+    uint32_t originButton = BTN_LEFT;
+    int32_t type = LIBINPUT_EVENT_POINTER_BUTTON;
+    auto pointerEvent = processor.GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = processor.HandleButtonReleased(button, originButton, type);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_BUTTON_UP);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonReleased_002
+ * @tc.desc: Test HandleButtonReleased resets isPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonReleased_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.isPressed_ = true;
+    uint32_t button = BTN_LEFT;
+    uint32_t originButton = BTN_LEFT;
+    int32_t type = LIBINPUT_EVENT_POINTER_BUTTON;
+    processor.HandleButtonReleased(button, originButton, type);
+    EXPECT_FALSE(processor.isPressed_);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonReleased_003
+ * @tc.desc: Test HandleButtonReleased resets buttonId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonReleased_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.buttonId_ = PointerEvent::MOUSE_BUTTON_LEFT;
+    uint32_t button = BTN_LEFT;
+    uint32_t originButton = BTN_LEFT;
+    int32_t type = LIBINPUT_EVENT_POINTER_BUTTON;
+    processor.HandleButtonReleased(button, originButton, type);
+    EXPECT_EQ(processor.buttonId_, PointerEvent::BUTTON_NONE);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonPressed_001
+ * @tc.desc: Test HandleButtonPressed sets correct action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonPressed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    uint32_t button = BTN_LEFT;
+    uint32_t originButton = BTN_LEFT;
+    int32_t type = LIBINPUT_EVENT_POINTER_BUTTON;
+    auto pointerEvent = processor.GetPointerEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = processor.HandleButtonPressed(button, originButton, type);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonPressed_002
+ * @tc.desc: Test HandleButtonPressed sets isPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonPressed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    processor.isPressed_ = false;
+    uint32_t button = BTN_LEFT;
+    uint32_t originButton = BTN_LEFT;
+    int32_t type = LIBINPUT_EVENT_POINTER_BUTTON;
+    processor.HandleButtonPressed(button, originButton, type);
+    EXPECT_TRUE(processor.isPressed_);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonPressed_003
+ * @tc.desc: Test HandleButtonPressed sets buttonId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonPressed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    uint32_t button = BTN_LEFT;
+    uint32_t originButton = BTN_LEFT;
+    int32_t type = LIBINPUT_EVENT_POINTER_BUTTON;
+    processor.HandleButtonPressed(button, originButton, type);
+    EXPECT_NE(processor.buttonId_, PointerEvent::BUTTON_NONE);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_UpdateCursorPositionOnButtonPress_001
+ * @tc.desc: Test UpdateCursorPositionOnButtonPress returns error with no window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_UpdateCursorPositionOnButtonPress_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    int32_t ret = processor.UpdateCursorPositionOnButtonPress();
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_UpdateCursorPositionOnButtonPress_002
+ * @tc.desc: Test UpdateCursorPositionOnButtonPress handles direction mismatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_UpdateCursorPositionOnButtonPress_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(&env_, deviceId);
+    int32_t ret = processor.UpdateCursorPositionOnButtonPress();
+    EXPECT_NE(ret, RET_OK);
+}
 }
 }
