@@ -13,3 +13,4 @@
 
 input.pointer.device = input:input:0755
 persist.input.switch = input:input:0755
+const.system.input.keyboard_non_through_control = input:input:0755
