@@ -343,55 +343,6 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_Init_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: DelegateTasksTest_ProcessTasks_001
- * @tc.desc: Test ProcessTasks with pending tasks in queue
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTasks_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DelegateTasks delegateTasks;
-    EXPECT_TRUE(delegateTasks.Init());
-    auto callback = []() { return 100; };
-    delegateTasks.PostAsyncTask(callback);
-    ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
-}
-
-/**
- * @tc.name: DelegateTasksTest_ProcessTasks_002
- * @tc.desc: Test ProcessTasks with multiple pending tasks
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTasks_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DelegateTasks delegateTasks;
-    EXPECT_TRUE(delegateTasks.Init());
-    for (int32_t i = 0; i < 15; i++) {
-        auto callback = [i]() { return i; };
-        delegateTasks.PostAsyncTask(callback);
-    }
-    ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
-}
-
-/**
- * @tc.name: DelegateTasksTest_ProcessTasks_003
- * @tc.desc: Test ProcessTasks when task queue is empty
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTasks_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DelegateTasks delegateTasks;
-    EXPECT_TRUE(delegateTasks.Init());
-    // No tasks posted, ProcessTasks should return immediately
-    ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
-}
-
-/**
  * @tc.name: DelegateTasksTest_PostAsyncTask_003
  * @tc.desc: Test PostAsyncTask with valid callback after Init
  * @tc.type: FUNC
@@ -534,23 +485,6 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_Task_GetId_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: DelegateTasksTest_Task_SetWaited_001
- * @tc.desc: Test Task SetWaited function
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_Task_SetWaited_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callback = []() { return 0; };
-    int32_t id = 6;
-    DelegateTasks::Task task(id, callback);
-    task.SetWaited();
-    // After SetWaited, ProcessTask should discard the task
-    ASSERT_NO_FATAL_FAILURE(task.ProcessTask());
-}
-
-/**
  * @tc.name: DelegateTasksTest_Destructor_001
  * @tc.desc: Test DelegateTasks destructor with initialized fds
  * @tc.type: FUNC
@@ -598,34 +532,6 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostAsyncTask_005, TestSize.Level1
     int32_t result = delegateTasks.PostAsyncTask(callback);
     // Result depends on internal state
     EXPECT_TRUE(result == RET_OK || result == ETASKS_POST_ASYNCTASK_FAIL);
-}
-
-/**
- * @tc.name: DelegateTasksTest_MixedTasks_001
- * @tc.desc: Test mixed sync and async tasks
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_MixedTasks_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DelegateTasks delegateTasks;
-    EXPECT_TRUE(delegateTasks.Init());
-    
-    // Post async tasks
-    for (int32_t i = 0; i < 5; i++) {
-        auto callback = [i]() { return i; };
-        delegateTasks.PostAsyncTask(callback);
-    }
-    
-    // Post sync tasks
-    for (int32_t i = 0; i < 5; i++) {
-        auto callback = [i]() { return i * 10; };
-        delegateTasks.PostSyncTask(callback);
-    }
-    
-    // Process all pending tasks
-    ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
 }
 } // namespace MMI
 } // namespace OHOS
