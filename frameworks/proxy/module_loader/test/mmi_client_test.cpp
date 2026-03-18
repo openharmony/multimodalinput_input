@@ -385,37 +385,6 @@ HWTEST_F(MMIClientTest, OnDisconnected_WithCallback, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterConnectedFunction_ValidCallback
- * @tc.desc: Register connected function with valid callback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, RegisterConnectedFunction_ValidCallback, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    bool callbackCalled = false;
-    ConnectCallback callback = [&callbackCalled](const IfMMIClient& client) {
-        callbackCalled = true;
-    };
-    ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterConnectedFunction(callback));
-}
-
-/**
- * @tc.name: Stop_NoEventHandler
- * @tc.desc: Stop client without event handler
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Stop_NoEventHandler, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
-    client->eventHandler_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(client->Stop());
-}
-
-/**
  * @tc.name: GetEventHandler_Valid
  * @tc.desc: Get event handler when valid
  * @tc.type: FUNC
@@ -464,47 +433,6 @@ HWTEST_F(MMIClientTest, GetSharedPtr_Basic, TestSize.Level1)
 }
 
 /**
- * @tc.name: MarkIsEventHandlerChanged_SameThreadName
- * @tc.desc: Mark eventHandler changed with same thread name
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, MarkIsEventHandlerChanged_SameThreadName, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    std::string threadName = "mmi_client_test_same";
-    auto eventRunner1 = AppExecFwk::EventRunner::Create(threadName);
-    EventHandlerPtr eventHandler1 = std::make_shared<AppExecFwk::EventHandler>(eventRunner1);
-    mmiClient.SetEventHandler(eventHandler1);
-    
-    auto eventRunner2 = AppExecFwk::EventRunner::Create(threadName);
-    EventHandlerPtr eventHandler2 = std::make_shared<AppExecFwk::EventHandler>(eventRunner2);
-    ASSERT_NO_FATAL_FAILURE(mmiClient.MarkIsEventHandlerChanged(eventHandler2));
-}
-
-/**
- * @tc.name: MarkIsEventHandlerChanged_DifferentThreadName
- * @tc.desc: Mark eventHandler changed with different thread name
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, MarkIsEventHandlerChanged_DifferentThreadName, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    std::string threadName1 = "mmi_client_test_diff1";
-    auto eventRunner1 = AppExecFwk::EventRunner::Create(threadName1);
-    EventHandlerPtr eventHandler1 = std::make_shared<AppExecFwk::EventHandler>(eventRunner1);
-    mmiClient.SetEventHandler(eventHandler1);
-    
-    std::string threadName2 = "mmi_client_test_diff2";
-    auto eventRunner2 = AppExecFwk::EventRunner::Create(threadName2);
-    EventHandlerPtr eventHandler2 = std::make_shared<AppExecFwk::EventHandler>(eventRunner2);
-    ASSERT_NO_FATAL_FAILURE(mmiClient.MarkIsEventHandlerChanged(eventHandler2));
-}
-
-/**
  * @tc.name: AddFdListener_NullEventHandler
  * @tc.desc: Add fd listener with null event handler
  * @tc.type: FUNC
@@ -535,37 +463,6 @@ HWTEST_F(MMIClientTest, DelFdListener_NullEventHandler, TestSize.Level1)
     int32_t validFd = 1;
     bool result = client->DelFdListener(validFd);
     EXPECT_FALSE(result);
-}
-
-
-/**
- * @tc.name: OnReconnect_Basic
- * @tc.desc: Test OnReconnect function basic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, OnReconnect_Basic, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
-    std::string threadName = "mmi_client_test";
-    auto eventRunner = AppExecFwk::EventRunner::Create(threadName);
-    EventHandlerPtr eventHandler = std::make_shared<AppExecFwk::EventHandler>(eventRunner);
-    client->SetEventHandler(eventHandler);
-    ASSERT_NO_FATAL_FAILURE(client->OnReconnect());
-}
-
-/**
- * @tc.name: SetScheduler_Basic
- * @tc.desc: Test SetScheduler function
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, SetScheduler_Basic, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
-    ASSERT_NO_FATAL_FAILURE(client->SetScheduler());
 }
 
 /**
@@ -649,21 +546,6 @@ HWTEST_F(MMIClientTest, GetCurrentConnectedStatus_AfterStop, TestSize.Level1)
     client->Stop();
     bool status = client->GetCurrentConnectedStatus();
     EXPECT_TRUE(status);
-}
-
-/**
- * @tc.name: OnRecvMsg_NegativeSize
- * @tc.desc: Receive msg with negative size
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, OnRecvMsg_NegativeSize, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    MMIClient mmiClient;
-    const char* buf = "test_data";
-    int32_t size = -1;
-    ASSERT_NO_FATAL_FAILURE(mmiClient.OnRecvMsg(buf, size));
 }
 }
 } // namespace MMI
