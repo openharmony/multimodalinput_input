@@ -311,7 +311,7 @@ bool TouchpadSettingsObserver::GetCommonEventStatus()
     return isCommonEventReady_.load();
 }
 
-void TouchpadSettingsObserver::SetDatashareUri(std::string& datashareUri)
+void TouchpadSettingsObserver::SetDatashareUri(const std::string& datashareUri)
 {
     std::unique_lock<std::shared_mutex> lock(datashareUriMtx_);
     datashareUri_ = datashareUri;
