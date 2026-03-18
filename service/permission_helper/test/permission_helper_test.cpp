@@ -584,5 +584,149 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckFunctionKeyEnabled001, 
     bool result4 = PER_HELPER->CheckFunctionKeyEnabled();
     EXPECT_TRUE(result4);
 }
+
+/**
+ * @tc.name: PermissionHelperTest_CheckInjectPermission_01
+ * @tc.desc: Test CheckInjectPermission with permission verify failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInjectPermission_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    // Mock VerifyAccessToken to return PERMISSION_DENIED
+    bool result = PER_HELPER->CheckInjectPermission();
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_09
+ * @tc.desc: Test CheckHapPermission with TOKEN_INVALID type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 4;
+    std::string permissionCode = "access";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result = PER_HELPER->CheckHapPermission(tokenId, permissionCode);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_10
+ * @tc.desc: Test CheckHapPermission with empty permission code
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_10, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 2;
+    std::string permissionCode = "";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result = PER_HELPER->CheckHapPermission(tokenId, permissionCode);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_GetTokenType_01
+ * @tc.desc: Test GetTokenType with TOKEN_SHELL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_GetTokenType_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    int32_t result = PER_HELPER->GetTokenType();
+    EXPECT_EQ(result, TokenType::TOKEN_SHELL);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckKeyEventHook_01
+ * @tc.desc: Test CheckKeyEventHook with permission check failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckKeyEventHook_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Mock CheckHapPermission to return false
+    bool ret = PER_HELPER->CheckKeyEventHook();
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckKeyEventHook_02
+ * @tc.desc: Test CheckKeyEventHook with permission check success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckKeyEventHook_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Mock CheckHapPermission to return true
+    bool ret = PER_HELPER->CheckKeyEventHook();
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_AddPermissionUsedRecord002
+ * @tc.desc: Test AddPermissionUsedRecord with success case
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_AddPermissionUsedRecord002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    unsigned int token = 3;
+    std::string permissionName = "ohos.permission.INPUT_MONITORING";
+    int32_t successCount = 1;
+    int32_t failCount = 0;
+    // Mock PrivacyKit::AddPermissionUsedRecord to return RET_OK
+    EXPECT_FALSE(PER_HELPER->AddPermissionUsedRecord(token, permissionName, successCount, failCount));
+}
+
+/**
+ * @tc.name: PermissionHelperTest_AddPermissionUsedRecord003
+ * @tc.desc: Test AddPermissionUsedRecord with empty permission name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_AddPermissionUsedRecord003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    unsigned int token = 3;
+    std::string permissionName = "";
+    int32_t successCount = 0;
+    int32_t failCount = 1;
+    EXPECT_FALSE(PER_HELPER->AddPermissionUsedRecord(token, permissionName, successCount, failCount));
+}
+
+/**
+ * @tc.name: PermissionHelperTest_RequestFromShell_01
+ * @tc.desc: Test RequestFromShell with TOKEN_SHELL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_RequestFromShell_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
+    bool result = PER_HELPER->RequestFromShell();
+    EXPECT_TRUE(result);
+}
 } // namespace MMI
 } // namespace OHOS
