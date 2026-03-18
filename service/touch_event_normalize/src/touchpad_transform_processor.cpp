@@ -854,6 +854,10 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
             SetMultiFingersTapHdrDefault();
             return RET_OK;
         } else {
+            if (tapTrends_ == TapTrends::BEGIN && multiFingersState_ != MulFingersTap::NO_TAP) {
+                MMI_HILOGD("Clear residual multiFingersState_ before new tap sequence");
+                multiFingersState_ = MulFingersTap::NO_TAP;
+            }
             downCnt++;
             tapTrends_ = TapTrends::DOWNING;
         }
