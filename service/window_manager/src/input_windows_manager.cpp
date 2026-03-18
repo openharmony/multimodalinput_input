@@ -213,6 +213,7 @@ void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::strin
         bindInfo_.AddInputDevice(deviceId, name, sysUid);
     } else {
         bindInfo_.RemoveInputDevice(deviceId);
+        dispatchEventCache_.ClearDeviceEvents(deviceId);
     }
 }
 
@@ -5993,7 +5994,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOG_DISPATCHD("Clear extra data");
         pointerEvent->ClearBuffer();
-        lastTouchEvent_ = nullptr;
+        dispatchEventCache_.ClearTouch();
         LastTouch touch{
             .deviceId_ = pointerEvent->GetDeviceId(), .pointerId_ = pointerEvent->GetPointerId()};
         LastTouchInfo lastInfo = GetLastTouchInfo(pointerEvent);
@@ -6411,21 +6412,28 @@ void InputWindowsManager::UpdateStashTouchEventInfo(int32_t logicalX, int32_t lo
     lastInfo.lastTouchLogicY = logicalY;
     lastInfo.lastTouchWindowInfo = *touchWindow;
     LastTouchInfos_[touch] = lastInfo;
-    lastTouchEvent_ = pointerEvent;
+    dispatchEventCache_.Update(pointerEvent);
 }
 
 void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
 {
     CALL_INFO_TRACE;
-    CHKPV(udsServer_);
-    CHKPV(lastTouchEvent_);
+    if (udsServer_ == nullptr) {
+        MMI_HILOGE("udsServer_ is nullptr");
+        return;
+    }
+    auto dispatchTouchEvent = dispatchEventCache_.GetForDispatch(pointerAction);
+    if (dispatchTouchEvent == nullptr) {
+        MMI_HILOGE("dispatchTouchEvent is nullptr, pointerAction:%{public}d", pointerAction);
+        return;
+    }
     PointerEvent::PointerItem lastPointerItem;
-    int32_t lastPointerId = lastTouchEvent_->GetPointerId();
-    if (!lastTouchEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
+    int32_t lastPointerId = dispatchTouchEvent->GetPointerId();
+    if (!dispatchTouchEvent->GetPointerItem(lastPointerId, lastPointerItem)) {
         MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
         return;
     }
-    LastTouchInfo lastInfo = GetLastTouchInfo(lastTouchEvent_);
+    LastTouchInfo lastInfo = GetLastTouchInfo(dispatchTouchEvent);
     if (pointerAction == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
         pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW) {
         WindowInfo touchWindow;
@@ -6463,9 +6471,12 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
         }
     }
     auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("Create pointerEvent failed");
+        return;
+    }
     PointerEvent::PointerItem currentPointerItem;
-    bool isOneHand = lastTouchEvent_->GetFixedMode() == PointerEvent::FixedMode::AUTO;
+    bool isOneHand = dispatchTouchEvent->GetFixedMode() == PointerEvent::FixedMode::AUTO;
     double windowX = isOneHand ? lastWinX_ : (lastInfo.lastTouchLogicX - lastInfo.lastTouchWindowInfo.area.x);
     double windowY = isOneHand ? lastWinY_ : (lastInfo.lastTouchLogicY - lastInfo.lastTouchWindowInfo.area.y);
     if (isOneHand) {
@@ -6503,7 +6514,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
 
     pointerEvent->UpdateId();
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    pointerEvent->SetTargetDisplayId(lastTouchEvent_->GetTargetDisplayId());
+    pointerEvent->SetTargetDisplayId(dispatchTouchEvent->GetTargetDisplayId());
     SetPrivacyModeFlag(lastInfo.lastTouchWindowInfo.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(lastInfo.lastTouchWindowInfo.id);
     pointerEvent->SetAgentWindowId(lastInfo.lastTouchWindowInfo.agentWindowId);
@@ -6512,11 +6523,11 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetBuffer(extraData_.buffer);
     pointerEvent->SetPullId(extraData_.pullId);
-    pointerEvent->SetSourceType(lastTouchEvent_->GetSourceType());
+    pointerEvent->SetSourceType(dispatchTouchEvent->GetSourceType());
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
-    pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
+    pointerEvent->SetDeviceId(dispatchTouchEvent->GetDeviceId());
     UpdateWindowInfoFlag(lastInfo.lastTouchWindowInfo.flags, pointerEvent);
     if (pointerAction == PointerEvent::POINTER_ACTION_LEVITATE_OUT_WINDOW) {
         SetPrivacyModeFlag(lastLevitateInWindowInfo_.privacyMode, pointerEvent);
@@ -6524,7 +6535,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction, int32_t groupId)
         pointerEvent->SetAgentWindowId(lastLevitateInWindowInfo_.agentWindowId);
         UpdateWindowInfoFlag(lastLevitateInWindowInfo_.flags, pointerEvent);
     }
-    if (lastTouchEvent_->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
+    if (dispatchTouchEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     }
 
@@ -8166,13 +8177,17 @@ int32_t InputWindowsManager::ShiftAppMousePointerEvent(const ShiftWindowInfo &sh
 
 int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindowInfo &shiftWindowInfo)
 {
-    CHKPR(lastTouchEvent_, RET_ERR);
+    auto touchEvent = dispatchEventCache_.GetTouchEvent();
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("touchEvent is nullptr");
+        return RET_ERR;
+    }
     const WindowInfo &sourceWindowInfo = shiftWindowInfo.sourceWindowInfo;
     const WindowInfo &targetWindowInfo = shiftWindowInfo.targetWindowInfo;
-    LastTouchInfo lastInfo = GetLastTouchInfo(lastTouchEvent_);
+    LastTouchInfo lastInfo = GetLastTouchInfo(touchEvent);
     PointerEvent::PointerItem item;
-    if (!lastTouchEvent_->GetPointerItem(shiftWindowInfo.fingerId, item) &&
-        !lastTouchEvent_->GetOriginPointerItem(shiftWindowInfo.fingerId, item)) {
+    if (!touchEvent->GetPointerItem(shiftWindowInfo.fingerId, item) &&
+        !touchEvent->GetOriginPointerItem(shiftWindowInfo.fingerId, item)) {
         MMI_HILOGE("Get pointer item failed");
         return RET_ERR;
     }
@@ -8187,18 +8202,21 @@ int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindow
     item.SetPressed(false);
     item.SetTargetWindowId(sourceWindowInfo.id);
     item.SetPointerId(shiftWindowInfo.fingerId);
-    lastTouchEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    lastTouchEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);
-    lastTouchEvent_->SetTargetDisplayId(sourceWindowInfo.displayId);
-    lastTouchEvent_->SetTargetWindowId(sourceWindowInfo.id);
-    lastTouchEvent_->SetAgentWindowId(sourceWindowInfo.agentWindowId);
-    lastTouchEvent_->UpdateId();
-    ClearTargetWindowId(shiftWindowInfo.fingerId, lastTouchEvent_->GetDeviceId());
-    lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
+    touchEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    touchEvent->SetPointerId(shiftWindowInfo.fingerId);
+    touchEvent->SetTargetDisplayId(sourceWindowInfo.displayId);
+    touchEvent->SetTargetWindowId(sourceWindowInfo.id);
+    touchEvent->SetAgentWindowId(sourceWindowInfo.agentWindowId);
+    touchEvent->UpdateId();
+    ClearTargetWindowId(shiftWindowInfo.fingerId, touchEvent->GetDeviceId());
+    touchEvent->UpdatePointerItem(shiftWindowInfo.fingerId, item);
     auto filter = InputHandler->GetFilterHandler();
-    CHKPR(filter, RET_ERR);
-    filter->HandlePointerEvent(lastTouchEvent_);
+    if (filter == nullptr) {
+        MMI_HILOGE("filter is nullptr");
+        return RET_ERR;
+    }
+    filter->HandlePointerEvent(touchEvent);
     item.SetWindowX(shiftWindowInfo.x);
     item.SetWindowY(shiftWindowInfo.y);
     item.SetWindowXPos(shiftWindowInfo.x);
@@ -8212,14 +8230,14 @@ int32_t InputWindowsManager::ShiftAppSimulateTouchPointerEvent(const ShiftWindow
     item.SetPressed(true);
     item.SetTargetWindowId(targetWindowInfo.id);
     item.SetPointerId(shiftWindowInfo.fingerId);
-    lastTouchEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    lastTouchEvent_->SetTargetDisplayId(targetWindowInfo.displayId);
-    lastTouchEvent_->SetPointerId(shiftWindowInfo.fingerId);
-    lastTouchEvent_->SetTargetWindowId(targetWindowInfo.id);
-    lastTouchEvent_->SetAgentWindowId(targetWindowInfo.agentWindowId);
-    lastTouchEvent_->UpdatePointerItem(shiftWindowInfo.fingerId, item);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    touchEvent->SetTargetDisplayId(targetWindowInfo.displayId);
+    touchEvent->SetPointerId(shiftWindowInfo.fingerId);
+    touchEvent->SetTargetWindowId(targetWindowInfo.id);
+    touchEvent->SetAgentWindowId(targetWindowInfo.agentWindowId);
+    touchEvent->UpdatePointerItem(shiftWindowInfo.fingerId, item);
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift touch event dispatch down event");
-    filter->HandlePointerEvent(lastTouchEvent_);
+    filter->HandlePointerEvent(touchEvent);
     return RET_OK;
 }
 
@@ -8234,7 +8252,12 @@ int32_t InputWindowsManager::ShiftAppTouchPointerEvent(const ShiftWindowInfo &sh
         return RET_ERR;
     }
     WindowInfoEX windowInfoEX;
-    int32_t deviceId = lastTouchEvent_->GetDeviceId();
+    auto touchEvent = dispatchEventCache_.GetTouchEvent();
+    if (touchEvent == nullptr) {
+        MMI_HILOGE("touchEvent is nullptr");
+        return RET_ERR;
+    }
+    int32_t deviceId = touchEvent->GetDeviceId();
     if (touchItemDownInfos_.find(deviceId) == touchItemDownInfos_.end()) {
         MMI_HILOGI("touch event deviceId not found deviceId:%{public}d", deviceId);
         touchItemDownInfos_[deviceId] = {};
