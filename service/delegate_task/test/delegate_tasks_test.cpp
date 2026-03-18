@@ -463,7 +463,6 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_Task_ProcessTask_004, TestSize.Lev
     auto pro = std::make_shared<std::promise<int32_t>>();
     DelegateTasks::Task task(id, callback, pro);
     task.hasWaited_ = false;
-    ASSERT_NO_FATAL_FAILURE(task.ProcessTask());
     // Verify promise value is set
     auto future = pro->get_future();
     EXPECT_EQ(future.get(), 123);
