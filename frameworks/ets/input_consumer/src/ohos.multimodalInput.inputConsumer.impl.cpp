@@ -556,10 +556,6 @@ int32_t GetHotkeyEventInfo(HotkeyOptions const& hotkeyOptions,
     CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
     CHKPR(keyOption, RET_ERR);
-    if (hotkeyOptions.preKeys.empty()) {
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "PreKeys not found");
-        return RET_ERR;
-    }
     std::set<int32_t> preKeys;
     std::vector<int32_t> etsPreKeys(hotkeyOptions.preKeys.begin(), hotkeyOptions.preKeys.end());
     if (GetPreKeys(etsPreKeys, preKeys) != RET_OK) {
@@ -802,10 +798,6 @@ int32_t GetEventInfoAPI9(KeyOptions const& keyOptions, std::shared_ptr<KeyEventM
     CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
     CHKPR(keyOption, RET_ERR);
-    if (keyOptions.preKeys.empty()) {
-        taihe::set_business_error(COMMON_PARAMETER_ERROR, "preKeys not found");
-        return RET_ERR;
-    }
     std::set<int32_t> preKeys;
     std::vector<int32_t> etsPreKeys(keyOptions.preKeys.begin(), keyOptions.preKeys.end());
     if (GetPreKeys(etsPreKeys, preKeys) != RET_OK) {
