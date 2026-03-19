@@ -18,6 +18,7 @@
 
 #include <gmock/gmock.h>
 #include <cstdint>
+#include "i_delegate_interface.h"
 
 namespace OHOS {
 namespace MMI {
@@ -47,6 +48,8 @@ public:
     void NotifyTouchUp(struct TouchType *rawTouch);
     bool SkipKnuckleDetect();
     void SaveTouchInfo(float pointX, float pointY, int32_t toolType);
+    void SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy);
+    std::shared_ptr<IDelegateInterface> GetDelegateProxy();
 };
 } // namespace MMI
 } // namespace OHOS

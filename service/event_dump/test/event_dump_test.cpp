@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -557,6 +557,107 @@ HWTEST_F(EventDumpTest, EventDumpTest_DumpEventHelp_001, TestSize.Level1)
     }
     EXPECT_NE(content.find("Usage:"), std::string::npos);
     unlink(tmpFile);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_010
+ * @tc.desc: Verify ParseCommand with '-K' option (knuckle)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-K"};
+    EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_011
+ * @tc.desc: Verify ParseCommand with '--knuckle' long option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"--knuckle"};
+    EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
+}
+
+/**
+ * @tc.name: EventDumpTest_CheckCount_005
+ * @tc.desc: Verify CheckCount with '-K' option
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_CheckCount_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::string> args = {"-K"};
+    MMIEventDump->CheckCount(fd_, args, count);
+    EXPECT_EQ(count, 1);
+}
+
+/**
+ * @tc.name: EventDumpTest_DumpHelp_002
+ * @tc.desc: Verify DumpHelp contains knuckle help information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_DumpHelp_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *tmpFile = "/data/tmp_dumphelp_knuckle.log";
+    int fd = open(tmpFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+    ASSERT_GE(fd, 0);
+    ASSERT_NE(MMIEventDump, nullptr);
+    MMIEventDump->DumpHelp(fd);
+    close(fd);
+    std::string content;
+    {
+        int fdRead = open(tmpFile, O_RDONLY);
+        ASSERT_GE(fdRead, 0);
+        char buf[2048] = {};
+        ssize_t bytes = read(fdRead, buf, sizeof(buf) - 1);
+        ASSERT_GT(bytes, 0);
+        if (bytes < static_cast<ssize_t>(sizeof(buf))) {
+            buf[bytes] = '\0';
+        } else {
+            buf[sizeof(buf) - 1] = '\0';
+        }
+        content = buf;
+        close(fdRead);
+    }
+    EXPECT_NE(content.find("-K, --knuckle"), std::string::npos);
+    unlink(tmpFile);
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_012
+ * @tc.desc: Verify ParseCommand with mixed options including '-K'
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-h", "-K", "-e"};
+    EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
+}
+
+/**
+ * @tc.name: EventDumpTest_ParseCommand_013
+ * @tc.desc: Verify ParseCommand with combined short options including 'K'
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDumpTest, EventDumpTest_ParseCommand_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<std::string> args = {"-hKe"};
+    EXPECT_NO_FATAL_FAILURE(MMIEventDump->ParseCommand(fd_, args));
 }
 } // namespace MMI
 } // namespace OHOS

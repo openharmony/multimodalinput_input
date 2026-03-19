@@ -17,7 +17,8 @@
 #define KNUCKLE_HANDLER_COMPONENT_H
 
 #include "i_knuckle_handler.h"
-
+#include <mutex>
+#include "i_delegate_interface.h"
 namespace OHOS {
 namespace MMI {
 class KnuckleHandlerComponent {
@@ -41,6 +42,8 @@ public:
     int32_t SetKnuckleSwitch(int32_t uid, bool knuckleSwitch);
     int32_t GetKnuckleSwitch(int32_t uid, bool &knuckleSwitch);
     void Dump(int32_t fd);
+    void SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy);
+    std::shared_ptr<IDelegateInterface> GetDelegateProxy();
 private:
     DISALLOW_COPY_AND_MOVE(KnuckleHandlerComponent);
     KnuckleHandlerComponent() = default;
@@ -58,6 +61,8 @@ private:
     GetKnuckleHandlerFunc create_ { nullptr };
     DestroyKnuckleHandlerFunc destroy_ { nullptr };
     IKnuckleHandler *impl_ { nullptr };
+    std::mutex proxyMutex_;
+    std::shared_ptr<IDelegateInterface> delegateProxy_ { nullptr };
 };
 
 class KnuckleContextImpl : public IKnuckleContext {
@@ -88,6 +93,8 @@ public:
     void LaunchAbility(const Ability &ability, int64_t delay) override;
     int32_t SyncKnuckleStatus(bool isKnuckleEnable) override;
     bool UpdateDisplayId(int32_t &displayId) override;
+    int32_t OnPostSyncTask(std::function<int32_t()> cb) override;
+    int32_t OnPostAsyncTask(std::function<int32_t()> cb) override;
 };
 } // namespace MMI
 } // namespace OHOS

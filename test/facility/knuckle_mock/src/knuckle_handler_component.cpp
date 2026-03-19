@@ -46,5 +46,15 @@ void KnuckleHandlerComponent::SaveTouchInfo(float pointX, float pointY, int32_t 
     (void)pointY;
     (void)toolType;
 }
+
+void KnuckleHandlerComponent::SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy)
+{
+    (void)proxy;
+}
+
+std::shared_ptr<IDelegateInterface> KnuckleHandlerComponent::GetDelegateProxy()
+{
+    return nullptr;
+}
 } // namespace MMI
 } // namespace OHOS
