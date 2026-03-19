@@ -17,6 +17,7 @@
 
 #include <dlfcn.h>
 #include <atomic>
+#include <shared_mutex>
 #include "setting_observer.h"
 
 namespace OHOS {
@@ -34,6 +35,8 @@ static std::shared_ptr<TouchpadSettingsObserver> GetInstance();
     bool GetCommonEventStatus();
     bool SupportSwipeInward();
     void SetSupportSwipeInward(int32_t value);
+    void SetDatashareUri(const std::string& datashareUri);
+    std::string GetDatashareUri();
 private:
     bool UnregisterSingleObserver(sptr<SettingObserver>& observer, const std::string& observerName);
     sptr<SettingObserver> RegisterSwipeInwardObserver();
@@ -52,6 +55,7 @@ private:
     sptr<SettingObserver> vibrationObserver_ {nullptr};
     sptr<SettingObserver> knuckleSwitchesObserver_ {nullptr};
     sptr<SettingObserver> swipeInwardSwitchesObserver_ {nullptr};
+    std::shared_mutex datashareUriMtx_;
     std::string datashareUri_ = "";
 };
 #define TOUCHPAD_MGR ::OHOS::MMI::TouchpadSettingsObserver::GetInstance()

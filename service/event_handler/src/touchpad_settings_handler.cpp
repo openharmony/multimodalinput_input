@@ -79,7 +79,7 @@ std::shared_ptr<TouchpadSettingsObserver> TouchpadSettingsObserver::GetInstance(
 void TouchpadSettingsObserver::RegisterUpdateFunc()
 {
     updateFunc_ = nullptr;
-    const std::string datashareUri = datashareUri_;
+    const std::string datashareUri = GetDatashareUri();
     const std::string libthpPath = g_libthpPath;
     const std::map<std::string, int> keyToCmd = g_keyToCmd;
     const std::map<std::string, std::string> defaultValue = g_defaultValue;
@@ -134,7 +134,7 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterDatashareObserver(
     const std::string key, SettingObserver::UpdateFunc onUpdate)
 {
     ErrCode ret = 0;
-    if (key.empty() || datashareUri_.empty() || onUpdate == nullptr) {
+    if (key.empty() || GetDatashareUri().empty() || onUpdate == nullptr) {
         MMI_HILOGE("Invalid input parameter");
         return nullptr;
     }
@@ -146,7 +146,7 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterDatashareObserver(
         return nullptr;
     }
 
-    ret = settingHelper.RegisterObserver(settingObserver, datashareUri_);
+    ret = settingHelper.RegisterObserver(settingObserver, GetDatashareUri());
     if (ret != ERR_OK) {
         MMI_HILOGE("RegisterObserver failed, ret:%{public}d", ret);
         return nullptr;
@@ -166,7 +166,7 @@ void TouchpadSettingsObserver::SetSupportSwipeInward(int32_t value)
 
 sptr<SettingObserver> TouchpadSettingsObserver::RegisterSwipeInwardObserver()
 {
-    const std::string datashareUri = datashareUri_;
+    const std::string datashareUri = GetDatashareUri();
     SettingObserver::UpdateFunc updateFunc = [this, datashareUri](const std::string& key) {
         std::string value = DEFAULT_SWIPE_INWARD_SWITCH_VALUE;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetStringValue(key, value, datashareUri);
@@ -195,7 +195,7 @@ sptr<SettingObserver> TouchpadSettingsObserver::RegisterSwipeInwardObserver()
         return nullptr;
     }
 
-    int32_t ret = settingHelper.RegisterObserver(settingObserver, datashareUri_);
+    int32_t ret = settingHelper.RegisterObserver(settingObserver, GetDatashareUri());
     if (ret != ERR_OK) {
         MMI_HILOGE("RegisterObserver failed, ret:%{public}d", ret);
         return nullptr;
@@ -210,7 +210,7 @@ bool TouchpadSettingsObserver::RegisterTpObserver(const int32_t accountId)
     currentAccountId_ = accountId;
     TP_CHECK_FALSE_RETURN(currentAccountId_ >= 0, false, "Get account info fail");
 
-    datashareUri_ = g_datashareBaseUri + std::to_string(currentAccountId_) + "?Proxy=true";
+    SetDatashareUri(g_datashareBaseUri + std::to_string(currentAccountId_) + "?Proxy=true");
     RegisterUpdateFunc();
     TP_CHECK_FALSE_RETURN(updateFunc_ != nullptr, false, "Update function is null");
 
@@ -247,7 +247,7 @@ bool TouchpadSettingsObserver::UnregisterSingleObserver(
 {
     if (observer != nullptr) {
         auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-        if (settingHelper.UnregisterObserver(observer, datashareUri_) != 0) {
+        if (settingHelper.UnregisterObserver(observer, GetDatashareUri()) != 0) {
             MMI_HILOGE("Unregister %{public}s fail", observerName.c_str());
             return false;
         }
@@ -309,6 +309,18 @@ void TouchpadSettingsObserver::SetCommonEventReady()
 bool TouchpadSettingsObserver::GetCommonEventStatus()
 {
     return isCommonEventReady_.load();
+}
+
+void TouchpadSettingsObserver::SetDatashareUri(const std::string& datashareUri)
+{
+    std::unique_lock<std::shared_mutex> lock(datashareUriMtx_);
+    datashareUri_ = datashareUri;
+}
+
+std::string TouchpadSettingsObserver::GetDatashareUri()
+{
+    std::shared_lock<std::shared_mutex> lock(datashareUriMtx_);
+    return datashareUri_;
 }
 } // namespace MMI
 } // namespace OHOS
