@@ -19,6 +19,7 @@
 #include "key_command_types.h"
 #include "knuckle_handler_component.h"
 #include "mmi_log.h"
+#include "i_delegate_interface.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleHandlerComponentTest"
@@ -58,6 +59,19 @@ public:
     MOCK_METHOD2(SetKnuckleSwitch, int32_t(int32_t, bool));
     MOCK_METHOD2(GetKnuckleSwitch, int32_t(int32_t, bool&));
     MOCK_METHOD1(Dump, void(int32_t));
+};
+
+
+class MockDelegateInterface : public IDelegateInterface {
+public:
+    MockDelegateInterface() = default;
+    ~MockDelegateInterface() override = default;
+
+    MOCK_METHOD(int32_t, OnPostSyncTask, (DTaskCallback), (const));
+    MOCK_METHOD(int32_t, OnPostAsyncTask, (DTaskCallback), (const));
+    MOCK_METHOD(int32_t, AddHandler, (InputHandlerType, const HandlerSummary&));
+    MOCK_METHOD(void, RemoveHandler, (InputHandlerType, const std::string&));
+    MOCK_METHOD(bool, HasHandler, (const std::string&), (const));
 };
 
 /**
@@ -827,6 +841,126 @@ HWTEST_F(KnuckleHandlerComponentTest, KnuckleContextImpl_UpdateDisplayId, TestSi
     std::shared_ptr<KnuckleContextImpl> ctx = std::make_shared<KnuckleContextImpl>();
     int32_t displayId = 0;
     ASSERT_NO_FATAL_FAILURE(ctx->UpdateDisplayId(displayId));
+}
+
+/**
+ * @tc.name: KnuckleHandlerComponentTest_SetDelegateProxy
+ * @tc.desc: Test SetDelegateProxy function
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleHandlerComponentTest_SetDelegateProxy, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mockProxy = std::make_shared<MockDelegateInterface>();
+    ASSERT_NE(mockProxy, nullptr);
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(mockProxy);
+    auto proxy = KnuckleHandlerComponent::GetInstance().GetDelegateProxy();
+    EXPECT_EQ(proxy, mockProxy);
+}
+
+/**
+ * @tc.name: KnuckleHandlerComponentTest_GetDelegateProxy_Null
+ * @tc.desc: Test GetDelegateProxy returns null when no proxy is set
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleHandlerComponentTest_GetDelegateProxy_Null, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(nullptr);
+    auto proxy = KnuckleHandlerComponent::GetInstance().GetDelegateProxy();
+    EXPECT_EQ(proxy, nullptr);
+}
+
+/**
+ * @tc.name: KnuckleContextImpl_OnPostSyncTask_NullProxy
+ * @tc.desc: Test OnPostSyncTask returns error when delegate proxy is null
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleContextImpl_OnPostSyncTask_NullProxy, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(nullptr);
+    std::shared_ptr<KnuckleContextImpl> ctx = std::make_shared<KnuckleContextImpl>();
+    ASSERT_NE(ctx, nullptr);
+    auto ret = ctx->OnPostSyncTask([]() { return RET_OK; });
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: KnuckleContextImpl_OnPostSyncTask_Success
+ * @tc.desc: Test OnPostSyncTask success
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleContextImpl_OnPostSyncTask_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mockProxy = std::make_shared<MockDelegateInterface>();
+    ASSERT_NE(mockProxy, nullptr);
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(mockProxy);
+
+    std::shared_ptr<KnuckleContextImpl> ctx = std::make_shared<KnuckleContextImpl>();
+    ASSERT_NE(ctx, nullptr);
+
+    bool isCalled = false;
+    EXPECT_CALL(*mockProxy, OnPostSyncTask(_)).WillOnce(
+        [&isCalled](DTaskCallback cb) -> int32_t {
+            (void)cb;
+            isCalled = true;
+            return RET_OK;
+        });
+
+    auto ret = ctx->OnPostSyncTask([]() { return RET_OK; });
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(isCalled);
+}
+
+/**
+ * @tc.name: KnuckleContextImpl_OnPostAsyncTask_NullProxy
+ * @tc.desc: Test OnPostAsyncTask returns error when delegate proxy is null
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleContextImpl_OnPostAsyncTask_NullProxy, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(nullptr);
+    std::shared_ptr<KnuckleContextImpl> ctx = std::make_shared<KnuckleContextImpl>();
+    ASSERT_NE(ctx, nullptr);
+    auto ret = ctx->OnPostAsyncTask([]() { return RET_OK; });
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: KnuckleContextImpl_OnPostAsyncTask_Success
+ * @tc.desc: Test OnPostAsyncTask success
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleHandlerComponentTest, KnuckleContextImpl_OnPostAsyncTask_Success, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mockProxy = std::make_shared<MockDelegateInterface>();
+    ASSERT_NE(mockProxy, nullptr);
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(mockProxy);
+
+    std::shared_ptr<KnuckleContextImpl> ctx = std::make_shared<KnuckleContextImpl>();
+    ASSERT_NE(ctx, nullptr);
+
+    bool isCalled = false;
+    EXPECT_CALL(*mockProxy, OnPostAsyncTask(_)).WillOnce(
+        [&isCalled](DTaskCallback cb) -> int32_t {
+            (void)cb;
+            isCalled = true;
+            return RET_OK;
+        });
+
+    auto ret = ctx->OnPostAsyncTask([]() { return RET_OK; });
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_TRUE(isCalled);
 }
 } // namespace OHOS
 } // namespace MMI

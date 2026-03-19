@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -879,10 +879,8 @@ void KeyCommandHandler::PrintGestureInfo(int32_t fd)
         "TapBundleName: %s | TapAbilityName: %s"
         "| TapAction: %s \t", context_.threeFingersTap_.ability.bundleName.c_str(),
         context_.threeFingersTap_.ability.abilityName.c_str(), context_.threeFingersTap_.ability.action.c_str());
-#ifdef OHOS_BUILD_KNUCKLE
-    KnuckleHandlerComponent::GetInstance().Dump(fd);
-#endif // OHOS_BUILD_KNUCKLE
 }
+
 std::string KeyCommandHandler::ConvertKeyActionToString(int32_t keyAction)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = {

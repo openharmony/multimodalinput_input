@@ -75,6 +75,8 @@ public:
     virtual void LaunchAbility(const Ability &ability, int64_t delay) = 0;
     virtual int32_t SyncKnuckleStatus(bool isKnuckleEnable) = 0;
     virtual bool UpdateDisplayId(int32_t &displayId) = 0;
+    virtual int32_t OnPostSyncTask(std::function<int32_t()> cb) = 0;
+    virtual int32_t OnPostAsyncTask(std::function<int32_t()> cb) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
