@@ -35,6 +35,7 @@ struct AccelerateCurve {
     std::vector<double> diffNums;
 };
 class MouseTransformProcessor final : public std::enable_shared_from_this<MouseTransformProcessor> {
+private:
     struct Movement {
         double dx;
         double dy;

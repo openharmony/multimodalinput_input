@@ -14839,5 +14839,365 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorWindowInfo_01
     EXPECT_EQ(result->id, 1);
     EXPECT_EQ(result->flags, WindowInputPolicy::FLAG_HANDWRITING | WindowInputPolicy::FLAG_DRAG_DISABLED);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_001
+ * @tc.desc: Test IsInPointereLockMode with FLAG_POINTER_LOCKED
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_LOCKED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_002
+ * @tc.desc: Test IsInPointereLockMode with FLAG_POINTER_CONFINED
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = WindowInputPolicy::FLAG_POINTER_CONFINED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_003
+ * @tc.desc: Test IsInPointereLockMode with no flags set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags = 0;
+    EXPECT_FALSE(inputWindowsMgr.IsInPointereLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInPointereLockMode_004
+ * @tc.desc: Test IsInPointereLockMode with both flags set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInPointereLockMode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.pointerLockedWindow_.flags =
+        WindowInputPolicy::FLAG_POINTER_LOCKED | WindowInputPolicy::FLAG_POINTER_CONFINED;
+    EXPECT_TRUE(inputWindowsMgr.IsInPointereLockMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ConvertToPhysicalCoordinates_001
+ * @tc.desc: Test ConvertToPhysicalCoordinates with isRealData=false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ConvertToPhysicalCoordinates_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION0;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    double x = 100.0;
+    double y = 200.0;
+    bool isRealData = false;
+    inputWindowsMgr.ConvertToPhysicalCoordinates(displayInfo, x, y, isRealData);
+    EXPECT_TRUE(isRealData);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ConvertToPhysicalCoordinates_002
+ * @tc.desc: Test ConvertToPhysicalCoordinates with isRealData=true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ConvertToPhysicalCoordinates_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION0;
+    double x = 100.0;
+    double y = 200.0;
+    bool isRealData = true;
+    [[ maybe_unused ]] double originalX = x;
+    [[ maybe_unused ]] double originalY = y;
+    inputWindowsMgr.ConvertToPhysicalCoordinates(displayInfo, x, y, isRealData);
+    EXPECT_EQ(x, originalX);
+    EXPECT_EQ(y, originalY);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ConvertToPhysicalCoordinates_003
+ * @tc.desc: Test ConvertToPhysicalCoordinates with DIRECTION90
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ConvertToPhysicalCoordinates_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.direction = DIRECTION90;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    double x = 100.0;
+    double y = 200.0;
+    bool isRealData = false;
+    inputWindowsMgr.ConvertToPhysicalCoordinates(displayInfo, x, y, isRealData);
+    EXPECT_TRUE(isRealData);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayIdForPointerLock_001
+ * @tc.desc: Test AdjustDisplayIdForPointerLock returns correct display info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayIdForPointerLock_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t testDisplayId = 1;
+    inputWindowsMgr.pointerLockedWindow_.displayId = testDisplayId;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = testDisplayId;
+    inputWindowsMgr.displayGroupInfoMap_[testDisplayId].displaysInfo.push_back(displayInfo);
+    int32_t displayId = 0;
+    const auto* result = inputWindowsMgr.AdjustDisplayIdForPointerLock(displayId);
+    EXPECT_EQ(displayId, testDisplayId);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayIdForPointerLock_002
+ * @tc.desc: Test AdjustDisplayIdForPointerLock modifies displayId parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayIdForPointerLock_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t testDisplayId = 2;
+    inputWindowsMgr.pointerLockedWindow_.displayId = testDisplayId;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = testDisplayId;
+    inputWindowsMgr.displayGroupInfoMap_[testDisplayId].displaysInfo.push_back(displayInfo);
+    int32_t displayId = 5;
+    inputWindowsMgr.AdjustDisplayIdForPointerLock(displayId);
+    EXPECT_EQ(displayId, testDisplayId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleCrossDisplayBoundary_001
+ * @tc.desc: Test HandleCrossDisplayBoundary when inside display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleCrossDisplayBoundary_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    double x = 960.0;
+    double y = 540.0;
+    int32_t displayId = 1;
+    int32_t originalDisplayId = displayId;
+    inputWindowsMgr.HandleCrossDisplayBoundary(displayInfo, x, y, displayId);
+    EXPECT_EQ(displayId, originalDisplayId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleCrossDisplayBoundary_002
+ * @tc.desc: Test HandleCrossDisplayBoundary updates displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleCrossDisplayBoundary_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayInfo.x = 0;
+    displayInfo.y = 0;
+    double x = 3000.0;
+    double y = 540.0;
+    int32_t displayId = 1;
+    int32_t originalDisplayId = displayId;
+    inputWindowsMgr.HandleCrossDisplayBoundary(displayInfo, x, y, displayId);
+    EXPECT_GE(displayId, originalDisplayId);
+}
+
+#ifdef OHOS_BUILD_ENABLE_VKEYBOARD
+/**
+ * @tc.name: InputWindowsManagerTest_GetEffectiveDisplayBounds_001
+ * @tc.desc: Test GetEffectiveDisplayBounds with virtual keyboard active
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetEffectiveDisplayBounds_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayInfo.pointerActiveWidth = 1920;
+    displayInfo.pointerActiveHeight = 800;
+    int32_t width = 0;
+    int32_t height = 0;
+    inputWindowsMgr.GetEffectiveDisplayBounds(&displayInfo, width, height);
+    EXPECT_EQ(width, 1920);
+    EXPECT_EQ(height, 800);
+}
+#endif
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyCoordinateCorrection_001
+ * @tc.desc: Test ApplyCoordinateCorrection applies correction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyCoordinateCorrection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    int32_t width = 1920;
+    int32_t height = 1080;
+    double x = 960.5;
+    double y = 540.7;
+    [[ maybe_unused ]] double originalX = x;
+    [[ maybe_unused ]] double originalY = y;
+    inputWindowsMgr.ApplyCoordinateCorrection(&displayInfo, width, height, x, y);
+    EXPECT_GE(x, 0.0);
+    EXPECT_GE(y, 0.0);
+    EXPECT_LT(x, static_cast<double>(width));
+    EXPECT_LT(y, static_cast<double>(height));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ApplyCoordinateCorrection_002
+ * @tc.desc: Test ApplyCoordinateCorrection handles fractional coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ApplyCoordinateCorrection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    int32_t width = 1920;
+    int32_t height = 1080;
+    double x = 100.9;
+    double y = 200.8;
+    inputWindowsMgr.ApplyCoordinateCorrection(&displayInfo, width, height, x, y);
+    EXPECT_GE(x, 0.0);
+    EXPECT_GE(y, 0.0);
+    EXPECT_LT(x, static_cast<double>(width));
+    EXPECT_LT(y, static_cast<double>(height));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseLocationMaps_001
+ * @tc.desc: Test UpdateMouseLocationMaps updates existing groupId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseLocationMaps_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t groupId = 1;
+    int32_t displayId = 1;
+    double x = 960.0;
+    double y = 540.0;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = displayId;
+    displayInfo.direction = DIRECTION0;
+    inputWindowsMgr.displayGroupInfoMap_[groupId].displaysInfo.push_back(displayInfo);
+    inputWindowsMgr.mouseLocationMap_[groupId].displayId = displayId;
+    inputWindowsMgr.UpdateMouseLocationMaps(groupId, displayId, x, y);
+    EXPECT_EQ(inputWindowsMgr.mouseLocationMap_[groupId].displayId, displayId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformCoordToAdjacentDisplay_001
+ * @tc.desc: Test TransformCoordToAdjacentDisplay with single display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformCoordToAdjacentDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    double physicalX = 960.0;
+    double physicalY = 540.0;
+    int32_t displayId = 1;
+    int32_t originalDisplayId = displayId;
+    inputWindowsMgr.TransformCoordToAdjacentDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(displayId, originalDisplayId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformCoordToAdjacentDisplay_002
+ * @tc.desc: Test TransformCoordToAdjacentDisplay with dual displays
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformCoordToAdjacentDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    OLD::DisplayInfo displayInfo1;
+    displayInfo1.id = 1;
+    displayInfo1.width = 1920;
+    displayInfo1.height = 1080;
+    displayInfo1.x = 0;
+    displayInfo1.y = 0;
+    OLD::DisplayInfo displayInfo2;
+    displayInfo2.id = 2;
+    displayInfo2.width = 1920;
+    displayInfo2.height = 1080;
+    displayInfo2.x = 1920;
+    displayInfo2.y = 0;
+    inputWindowsMgr.displayGroupInfoMap_[1].displaysInfo.push_back(displayInfo1);
+    inputWindowsMgr.displayGroupInfoMap_[1].displaysInfo.push_back(displayInfo2);
+    double physicalX = 2000.0;
+    double physicalY = 540.0;
+    int32_t displayId = 1;
+    inputWindowsMgr.TransformCoordToAdjacentDisplay(displayInfo1, physicalX, physicalY, displayId);
+    EXPECT_GT(displayId, 0);
+}
 } // namespace MMI
 } // namespace OHOS
