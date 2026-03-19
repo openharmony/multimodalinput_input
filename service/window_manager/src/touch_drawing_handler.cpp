@@ -166,8 +166,8 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
             isChangedMode_ = true;
         }
     }
-    isChangedMode_ = isChangedMode_ ||
-        (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight);
+    isChangedMode_ = isChangedMode_ || (!isChangedRotation_ &&
+        (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight));
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
