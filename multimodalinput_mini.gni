@@ -177,6 +177,7 @@ declare_args() {
     "permission_helper/src/permission_helper.cpp",
     "subscriber/src/input_active_subscriber_handler.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
+    "window_manager/src/pointer_dispatch_event_cache.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
 

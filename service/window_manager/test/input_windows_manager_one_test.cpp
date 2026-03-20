@@ -1132,7 +1132,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
@@ -1838,7 +1838,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppTouchPoi
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     ShiftWindowInfo shiftWindowInfo;
     shiftWindowInfo.fingerId = -1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppTouchPointerEvent(shiftWindowInfo));
@@ -2437,7 +2437,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
+    auto touchEvent = inputWindowsManager->dispatchEventCache_.GetTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
     auto pointerId = 1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetGlobalX(DBL_MAX);
@@ -2451,11 +2453,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_DispatchTouch_00
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->lastTouchEvent_->SetPointerId(pointerId);
+    touchEvent->SetPointerId(pointerId);
     pointerItem.SetPointerId(pointerId);
-    inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
+    touchEvent->pointers_.push_back(pointerItem);
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
-    inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
+    touchEvent->SetFixedMode(fixedMode);
     pointerEvent->SetDeviceId(5);
     LastTouch touch{.deviceId_ = 5, .pointerId_ = pointerId};
     LastTouchInfo lastInfo;
@@ -2498,7 +2500,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ChangeWindowArea
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
+    auto touchEvent = inputWindowsManager->dispatchEventCache_.GetTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
     auto pointerId = 1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetGlobalX(DBL_MAX);
@@ -2514,11 +2518,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ChangeWindowArea
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->lastTouchEvent_->SetPointerId(pointerId);
+    touchEvent->SetPointerId(pointerId);
     pointerItem.SetPointerId(pointerId);
-    inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
+    touchEvent->pointers_.push_back(pointerItem);
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
-    inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
+    touchEvent->SetFixedMode(fixedMode);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ChangeWindowArea(x, y, windowInfo));
 }
 
@@ -2547,7 +2551,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPo
     windowInfo.windowInputType = WindowInputType::NORMAL;
     windowInfo.isSkipSelfWhenShowOnVirtualScreen = true;
     std::shared_ptr<InputWindowsManager> inputWindowsManager = std::make_shared<InputWindowsManager>();
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
@@ -2565,11 +2569,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_SendBackCenterPo
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEvent(currentPos));
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEvent(currentPos));
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendBackCenterPointerEvent(currentPos));
 }
 
@@ -2617,7 +2621,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_HandleWindowPosi
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
     pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleWindowPositionChange(displayGroupInfo));
 }
 
@@ -2636,7 +2640,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintZorderInfo,
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
+    auto touchEvent = inputWindowsManager->dispatchEventCache_.GetTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
     auto pointerId = 1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetGlobalX(DBL_MAX);
@@ -2650,11 +2656,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintZorderInfo,
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->lastTouchEvent_->SetPointerId(pointerId);
+    touchEvent->SetPointerId(pointerId);
     pointerItem.SetPointerId(pointerId);
-    inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
+    touchEvent->pointers_.push_back(pointerItem);
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
-    inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
+    touchEvent->SetFixedMode(fixedMode);
     std::string windowPrint;
     windowPrint += StringPrintf("highZorder");
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PrintZorderInfo(windowInfo, windowPrint));
@@ -2674,7 +2680,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintWindowGroup
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
+    auto touchEvent = inputWindowsManager->dispatchEventCache_.GetTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
     auto pointerId = 1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetGlobalX(DBL_MAX);
@@ -2688,11 +2696,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintWindowGroup
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->lastTouchEvent_->SetPointerId(pointerId);
+    touchEvent->SetPointerId(pointerId);
     pointerItem.SetPointerId(pointerId);
-    inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
+    touchEvent->pointers_.push_back(pointerItem);
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
-    inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
+    touchEvent->SetFixedMode(fixedMode);
     WindowGroupInfo windowGroupInfo;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PrintWindowGroupInfo(windowGroupInfo));
@@ -2742,7 +2750,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_PrintDisplayGrou
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
     pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->PrintDisplayGroupInfo(displayGroupInfo));
 }
 
@@ -2760,7 +2768,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_Dump, TestSize.L
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     WindowInfo windowInfo;
     windowInfo.id = 1;
     windowInfo.flags = WindowInputPolicy::FLAG_MOUSE_LEFT_BUTTON_LOCK |
@@ -2839,7 +2847,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_GetWindowInfoByI
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     int32_t focusWindowId = 1;
     WindowInfo windowInfo;
     windowInfo.id = 1;
@@ -2879,7 +2887,9 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_NeedTouchTrackin
     ASSERT_NE(pointerEvent, nullptr);
     UDSServer udsServer;
     inputWindowsManager->udsServer_ = &udsServer;
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
+    auto touchEvent = inputWindowsManager->dispatchEventCache_.GetTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
     auto pointerId = 1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetGlobalX(DBL_MAX);
@@ -2894,11 +2904,11 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_NeedTouchTrackin
     if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
         it->second.windowsInfo.push_back(windowInfo);
     }
-    inputWindowsManager->lastTouchEvent_->SetPointerId(pointerId);
+    touchEvent->SetPointerId(pointerId);
     pointerItem.SetPointerId(pointerId);
-    inputWindowsManager->lastTouchEvent_->pointers_.push_back(pointerItem);
+    touchEvent->pointers_.push_back(pointerItem);
     auto fixedMode = PointerEvent::FixedMode::NORMAL;
-    inputWindowsManager->lastTouchEvent_->SetFixedMode(fixedMode);
+    touchEvent->SetFixedMode(fixedMode);
     PointerEvent event(InputEvent::EVENT_TYPE_POINTER);
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager->NeedTouchTracking(event));
 
@@ -2932,7 +2942,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTrac
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, windowInfo));
     pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_ACCESSIBILITY);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, windowInfo));
     int32_t windowId = 1;
     pointerEvent->SetTargetWindowId(windowId);
@@ -2961,7 +2971,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ProcessTouchTrac
     windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
     pointerEvent->AddFlag(OHOS::MMI::InputEvent::EVENT_FLAG_ACCESSIBILITY);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     int32_t windowId = 2;
     pointerEvent->SetTargetWindowId(windowId);
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager->ProcessTouchTracking(pointerEvent, windowInfo));
@@ -3038,7 +3048,7 @@ HWTEST_F(InputWindowsManagerOneTest, InputWindowsManagerOneTest_ShiftAppSimulate
     item.SetPointerId(pointerId);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsManager->lastTouchEvent_ = pointerEvent;
+    inputWindowsManager->dispatchEventCache_.Update(pointerEvent);
     pointerEvent->pointers_.push_back(item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->ShiftAppSimulateTouchPointerEvent(shiftWindowInfo));
     shiftWindowInfo.fingerId = 0;

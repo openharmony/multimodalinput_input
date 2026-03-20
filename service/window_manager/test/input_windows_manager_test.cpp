@@ -7038,20 +7038,23 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PullEnterLeaveEvent, T
     UDSServer udsServer;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
-    inputWindowsMgr.lastTouchEvent_ = PointerEvent::Create();
-    ASSERT_NE(inputWindowsMgr.lastTouchEvent_, nullptr);
+    auto cacheEvent = PointerEvent::Create();
+    ASSERT_NE(cacheEvent, nullptr);
+    inputWindowsMgr.dispatchEventCache_.Update(cacheEvent);
+    auto touchEvent = inputWindowsMgr.dispatchEventCache_.GetTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
     PointerEvent::PointerItem lastPointerItem;
     touchWindow.id = 200;
     inputWindowsMgr.udsServer_ = &udsServer;
-    inputWindowsMgr.lastTouchEvent_->SetPointerId(10);
+    touchEvent->SetPointerId(10);
     lastPointerItem.SetPointerId(10);
-    inputWindowsMgr.lastTouchEvent_->SetDeviceId(5);
+    touchEvent->SetDeviceId(5);
     LastTouch touch{.deviceId_ = 5, .pointerId_ = 10};
     LastTouchInfo lastInfo;
     touchWindow.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
     lastInfo.lastTouchWindowInfo.id = 100;
     inputWindowsMgr.LastTouchInfos_[touch] = lastInfo;
-    inputWindowsMgr.lastTouchEvent_->AddPointerItem(lastPointerItem);
+    touchEvent->AddPointerItem(lastPointerItem);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 }
 
@@ -9075,7 +9078,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastTouchEvent_ = nullptr;
+    inputWindowsManager.dispatchEventCache_.ClearTouch();
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     ShiftWindowParam param;
@@ -9106,7 +9109,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastTouchEvent_ = nullptr;
+    inputWindowsManager.dispatchEventCache_.ClearTouch();
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     int32_t fingerId = -1;
@@ -9117,7 +9120,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     param.fingerId = fingerId;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
-    inputWindowsManager.lastTouchEvent_ = pointerEvent;
+    inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
     bool autoGenDown = true;
     int32_t displayId = 0;
     WindowGroupInfo windowGroupInfo;
@@ -9142,7 +9145,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastTouchEvent_ = nullptr;
+    inputWindowsManager.dispatchEventCache_.ClearTouch();
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     int32_t fingerId = 1;
@@ -9153,7 +9156,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     param.fingerId = fingerId;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
-    inputWindowsManager.lastTouchEvent_ = pointerEvent;
+    inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
     bool autoGenDown = true;
     int32_t displayId = 0;
     WindowGroupInfo windowGroupInfo;
@@ -9178,7 +9181,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.lastTouchEvent_ = nullptr;
+    inputWindowsManager.dispatchEventCache_.ClearTouch();
     int32_t sourceWindowId = 50;
     int32_t targetWindowId = 51;
     int32_t fingerId = 0;
@@ -9203,7 +9206,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ShiftAppPointerEvent_0
     windowInfo.id = targetWindowId;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
-    inputWindowsManager.lastTouchEvent_ = pointerEvent;
+    inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
     int32_t ret = inputWindowsManager.ShiftAppPointerEvent(param, autoGenDown);
     EXPECT_NE(ret, RET_OK);
 }
@@ -10981,6 +10984,61 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_00
 
     devStatus = "test";
     ASSERT_NO_FATAL_FAILURE(inputWindowsManager->DeviceStatusChanged(deviceId, name, sysUid, devStatus));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeviceStatusChanged_ClearTouchCache
+ * @tc.desc: DeviceStatusChanged clears cached touch event for removed device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_ClearTouchCache, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 5;
+    std::string name = "mouse";
+    std::string sysUid = "";
+    std::string devStatus = "remove";
+    InputWindowsManager inputWindowsManager;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetDeviceId(deviceId);
+    inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
+
+    ASSERT_NE(inputWindowsManager.dispatchEventCache_.GetTouchEvent(), nullptr);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.DeviceStatusChanged(deviceId, name, sysUid, devStatus));
+    ASSERT_EQ(inputWindowsManager.dispatchEventCache_.GetTouchEvent(), nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeviceStatusChanged_ClearStylusCache
+ * @tc.desc: DeviceStatusChanged clears cached stylus event for removed device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DeviceStatusChanged_ClearStylusCache, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 7;
+    std::string name = "pen";
+    std::string sysUid = "";
+    std::string devStatus = "remove";
+    InputWindowsManager inputWindowsManager;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(1);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetDeviceId(deviceId);
+    inputWindowsManager.dispatchEventCache_.Update(pointerEvent);
+
+    ASSERT_NE(inputWindowsManager.dispatchEventCache_.GetForDispatch(
+        PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
+    ASSERT_NO_FATAL_FAILURE(inputWindowsManager.DeviceStatusChanged(deviceId, name, sysUid, devStatus));
+    ASSERT_EQ(inputWindowsManager.dispatchEventCache_.GetForDispatch(
+        PointerEvent::POINTER_ACTION_LEVITATE_IN_WINDOW), nullptr);
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
