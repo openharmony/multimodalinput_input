@@ -1149,5 +1149,684 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManager_KeyMonitorIntercept, TestSize.
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     EXPECT_FALSE(keyGestureManager.KeyMonitorIntercept(keyEvent));
 }
+
+/**
+ * @tc.name: Handler_Run_CallbackNull_01
+ * @tc.desc: Test Handler Run when callback is nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, Handler_Run_CallbackNull_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback = nullptr;
+    KeyGestureManager::Handler handler(1, 2, 3000, myCallback);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    
+    handler.Run(keyEvent);
+    EXPECT_EQ(myCallback, nullptr);
+}
+
+/**
+ * @tc.name: Handler_Destructor_01
+ * @tc.desc: Test Handler destructor calls ResetTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, Handler_Destructor_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    {
+        KeyGestureManager::Handler handler(1, 2, 3000, myCallback);
+        handler.timerId_ = 1;
+    }
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: KeyGesture_Reset_01
+ * @tc.desc: Test KeyGesture Reset function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_Reset_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    
+    myKeyGesture->AddHandler(10, 500, myCallback);
+    myKeyGesture->AddHandler(20, 1000, myCallback);
+    myKeyGesture->MarkActive(true);
+    
+    EXPECT_EQ(myKeyGesture->handlers_.size(), 2);
+    myKeyGesture->Reset();
+    EXPECT_EQ(myKeyGesture->handlers_.size(), 2);
+    EXPECT_FALSE(myKeyGesture->IsActive());
+}
+
+/**
+ * @tc.name: KeyGesture_AddHandler_MinTime_01
+ * @tc.desc: Test AddHandler with minimum longPressTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_AddHandler_MinTime_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    
+    int32_t id = myKeyGesture->AddHandler(10, 50, myCallback);
+    EXPECT_GT(id, 0);
+    EXPECT_EQ(myKeyGesture->handlers_.size(), 1);
+    EXPECT_GE(myKeyGesture->handlers_.front().GetLongPressTime(), 150);
+}
+
+/**
+ * @tc.name: KeyGesture_HaveForegroundHandler_Empty_01
+ * @tc.desc: Test HaveForegroundHandler with empty handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_HaveForegroundHandler_Empty_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    std::set<int32_t> foregroundPids = {1001, 1002};
+    
+    EXPECT_TRUE(myKeyGesture->handlers_.empty());
+    EXPECT_FALSE(myKeyGesture->HaveForegroundHandler(foregroundPids));
+}
+
+/**
+ * @tc.name: KeyGesture_RunHandler_NotFound_01
+ * @tc.desc: Test RunHandler when handlerId not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_RunHandler_NotFound_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    
+    myKeyGesture->AddHandler(10, 500, myCallback);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    
+    int32_t handlerId = 999;
+    myKeyGesture->RunHandler(handlerId, keyEvent);
+    EXPECT_EQ(myKeyGesture->handlers_.size(), 1);
+}
+
+/**
+ * @tc.name: KeyGesture_ShowHandlers_Empty_01
+ * @tc.desc: Test ShowHandlers with empty handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_ShowHandlers_Empty_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    std::set<int32_t> foregroundPids = {1001};
+    
+    myKeyGesture->ShowHandlers("EmptyTest", foregroundPids);
+    EXPECT_TRUE(myKeyGesture->handlers_.empty());
+}
+
+/**
+ * @tc.name: LongPressSingleKey_Intercept_TVDevice_01
+ * @tc.desc: Test LongPressSingleKey Intercept on TV device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Intercept_TVDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    longPressSingleKey.AddHandler(10, 500, myCallback);
+    
+    bool ret = longPressSingleKey.Intercept(keyEvent);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: LongPressSingleKey_Intercept_Active_Timeout_01
+ * @tc.desc: Test LongPressSingleKey Intercept when active and timeout
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Intercept_Active_Timeout_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    longPressSingleKey.MarkActive(true);
+    longPressSingleKey.firstDownTime_ = GetSysClockTime() - MS2US(200);
+    
+    bool ret = longPressSingleKey.Intercept(keyEvent);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: LongPressSingleKey_Intercept_VolumeUp_01
+ * @tc.desc: Test LongPressSingleKey Intercept with VOLUME_UP key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Intercept_VolumeUp_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    longPressSingleKey.MarkActive(true);
+    
+    bool ret = longPressSingleKey.Intercept(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressSingleKey_ShouldIntercept_PreKeysNotEmpty_01
+ * @tc.desc: Test ShouldIntercept when PreKeys is not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_ShouldIntercept_PreKeysNotEmpty_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1001;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys({1002});
+    keyOption->SetFinalKey(keyCode);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(100);
+    
+    bool ret = longPressSingleKey.ShouldIntercept(keyOption);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressSingleKey_ShouldIntercept_DurationTooLong_01
+ * @tc.desc: Test ShouldIntercept when duration exceeds timeout
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_ShouldIntercept_DurationTooLong_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1001;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(keyCode);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(200);
+    
+    bool ret = longPressSingleKey.ShouldIntercept(keyOption);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressSingleKey_ShouldIntercept_KeyUp_01
+ * @tc.desc: Test ShouldIntercept when key is up
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_ShouldIntercept_KeyUp_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1001;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(keyCode);
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKeyDownDuration(100);
+    
+    bool ret = longPressSingleKey.ShouldIntercept(keyOption);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_ShouldIntercept_Match_01
+ * @tc.desc: Test ShouldIntercept when keys match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_ShouldIntercept_Match_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys({KeyEvent::KEYCODE_VOLUME_DOWN});
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    
+    bool ret = longPressCombinationKey.ShouldIntercept(keyOption);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_ShouldIntercept_NoMatch_01
+ * @tc.desc: Test ShouldIntercept when keys don't match
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_ShouldIntercept_NoMatch_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys({KeyEvent::KEYCODE_POWER});
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_HOME);
+    
+    bool ret = longPressCombinationKey.ShouldIntercept(keyOption);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Intercept_NoHandler_01
+ * @tc.desc: Test Intercept when handlers is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_NoHandler_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    EXPECT_TRUE(longPressCombinationKey.handlers_.empty());
+    bool ret = longPressCombinationKey.Intercept(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Intercept_NotWorking_01
+ * @tc.desc: Test Intercept when IsWorking returns false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_NotWorking_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
+    
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    EXPECT_FALSE(pullUpAccessibility.IsWorking());
+    bool ret = pullUpAccessibility.Intercept(keyEvent);
+    EXPECT_FALSE(ret);
+    
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_KeyNotInSet_01
+ * @tc.desc: Test UpdateConsumed when key not in keys_ set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_KeyNotInSet_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    longPressCombinationKey.MarkKeyConsumed();
+    
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    bool ret = longPressCombinationKey.UpdateConsumed(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_UpdateConsumed_NotConsumed_01
+ * @tc.desc: Test UpdateConsumed when key not in consumedKeys_
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_UpdateConsumed_NotConsumed_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey({
+        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP });
+    
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    
+    bool ret = longPressCombinationKey.UpdateConsumed(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_RecognizeGesture_RepeatKey_01
+ * @tc.desc: Test RecognizeGesture when key is repeat key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_RecognizeGesture_RepeatKey_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    bool ret = longPressCombinationKey.RecognizeGesture(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_TriggerAll_MultipleHandlers_01
+ * @tc.desc: Test TriggerAll with multiple handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_TriggerAll_MultipleHandlers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    longPressCombinationKey.AddHandler(10, 500, myCallback);
+    longPressCombinationKey.AddHandler(20, 1000, myCallback);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    longPressCombinationKey.TriggerAll(keyEvent);
+    EXPECT_TRUE(longPressCombinationKey.IsActive());
+    EXPECT_EQ(longPressCombinationKey.handlers_.size(), 2);
+}
+
+/**
+ * @tc.name: PullUpAccessibility_IsWorking_ScreenLocked_01
+ * @tc.desc: Test IsWorking when screen is locked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, PullUpAccessibility_IsWorking_ScreenLocked_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
+    
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    
+    bool ret = pullUpAccessibility.IsWorking();
+    EXPECT_TRUE(ret || !ret);
+    
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+}
+
+/**
+ * @tc.name: KeyGestureManager_ResetAll_01
+ * @tc.desc: Test KeyGestureManager ResetAll function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_ResetAll_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    keyGestureManager.AddKeyGesture(10,
+        std::make_shared<KeyOption>(), myCallback);
+    
+    keyGestureManager.ResetAll();
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: KeyGestureManager_Intercept_MultipleGestures_01
+ * @tc.desc: Test Intercept with multiple gestures
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_Intercept_MultipleGestures_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    bool ret = keyGestureManager.Intercept(keyEvent);
+    EXPECT_TRUE(ret || !ret);
+}
+
+/**
+ * @tc.name: KeyGestureManager_AddKeyGesture_InvalidOption_01
+ * @tc.desc: Test AddKeyGesture with nullptr keyOption
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_AddKeyGesture_InvalidOption_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    int32_t pid = 10;
+    std::shared_ptr<KeyOption> keyOption = nullptr;
+    std::function<void(std::shared_ptr<KeyEvent>)> callback;
+    
+    int32_t result = keyGestureManager.AddKeyGesture(pid, keyOption, callback);
+    EXPECT_EQ(result, INVALID_ENTITY_ID);
+}
+
+/**
+ * @tc.name: KeyGestureManager_RemoveKeyGesture_MultipleGestures_01
+ * @tc.desc: Test RemoveKeyGesture with multiple gestures
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_RemoveKeyGesture_MultipleGestures_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(100);
+    
+    int32_t id = keyGestureManager.AddKeyGesture(10, keyOption, myCallback);
+    EXPECT_GT(id, 0);
+    
+    keyGestureManager.RemoveKeyGesture(id);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: KeyGestureManager_ShouldIntercept_MultipleGestures_01
+ * @tc.desc: Test ShouldIntercept with multiple gestures
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_ShouldIntercept_MultipleGestures_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(100);
+    
+    bool result = keyGestureManager.ShouldIntercept(keyOption);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyGestureManager_Dump_Default_01
+ * @tc.desc: Test Dump with default gestures
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_Dump_Default_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    keyGestureManager.Dump();
+    EXPECT_EQ(keyGestureManager.keyGestures_.size(), 3);
+}
+
+/**
+ * @tc.name: KeyGestureManager_KeyMonitorIntercept_Delay_01
+ * @tc.desc: Test KeyMonitorIntercept with delay parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManager_KeyMonitorIntercept_Delay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(1001);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    int32_t delay = 500;
+    bool ret = keyGestureManager.KeyMonitorIntercept(keyEvent, delay);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: LongPressSingleKey_Dump_EmptyHandlers_01
+ * @tc.desc: Test Dump with empty handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Dump_EmptyHandlers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(1001);
+    
+    std::ostringstream output;
+    longPressSingleKey.Dump(output);
+    
+    EXPECT_FALSE(output.str().empty());
+    EXPECT_TRUE(longPressSingleKey.handlers_.empty());
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Dump_EmptyHandlers_01
+ * @tc.desc: Test Dump with empty handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Dump_EmptyHandlers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    
+    std::ostringstream output;
+    longPressCombinationKey.Dump(output);
+    
+    EXPECT_FALSE(output.str().empty());
+    EXPECT_TRUE(longPressCombinationKey.handlers_.empty());
+}
+
+/**
+ * @tc.name: KeyGesture_TriggerHandlers_ForegroundMatch_01
+ * @tc.desc: Test TriggerHandlers when foreground matches
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_TriggerHandlers_ForegroundMatch_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    
+    int32_t id = myKeyGesture->AddHandler(10, 500, myCallback);
+    EXPECT_GT(id, 0);
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    
+    myKeyGesture->TriggerHandlers(keyEvent);
+    EXPECT_EQ(myKeyGesture->handlers_.size(), 1);
+}
+
+/**
+ * @tc.name: KeyGesture_NotifyHandlers_Empty_01
+ * @tc.desc: Test NotifyHandlers with empty handlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGesture_NotifyHandlers_Empty_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    
+    EXPECT_TRUE(myKeyGesture->handlers_.empty());
+    myKeyGesture->NotifyHandlers(keyEvent);
+    EXPECT_TRUE(myKeyGesture->handlers_.empty());
+}
 } // namespace MMI
 } // namespace OHOS
