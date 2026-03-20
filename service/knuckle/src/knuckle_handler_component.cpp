@@ -205,6 +205,18 @@ void KnuckleHandlerComponent::Dump(int32_t fd)
     impl->Dump(fd);
 }
 
+void KnuckleHandlerComponent::SetDelegateProxy(std::shared_ptr<IDelegateInterface> proxy)
+{
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    delegateProxy_ = proxy;
+}
+
+std::shared_ptr<IDelegateInterface> KnuckleHandlerComponent::GetDelegateProxy()
+{
+    std::lock_guard<std::mutex> lock(proxyMutex_);
+    return delegateProxy_;
+}
+
 IKnuckleHandler *KnuckleHandlerComponent::Load()
 {
     if (impl_ != nullptr) {
@@ -392,6 +404,26 @@ int32_t KnuckleContextImpl::SyncKnuckleStatus(bool isKnuckleEnable)
 bool KnuckleContextImpl::UpdateDisplayId(int32_t &displayId)
 {
     return WIN_MGR->UpdateDisplayId(displayId);
+}
+
+int32_t KnuckleContextImpl::OnPostSyncTask(std::function<int32_t()> cb)
+{
+    auto proxy = KnuckleHandlerComponent::GetInstance().GetDelegateProxy();
+    if (proxy == nullptr) {
+        MMI_HILOGE("DelegateInterface is null");
+        return RET_ERR;
+    }
+    return proxy->OnPostSyncTask(cb);
+}
+
+int32_t KnuckleContextImpl::OnPostAsyncTask(std::function<int32_t()> cb)
+{
+    auto proxy = KnuckleHandlerComponent::GetInstance().GetDelegateProxy();
+    if (proxy == nullptr) {
+        MMI_HILOGE("DelegateInterface is null");
+        return RET_ERR;
+    }
+    return proxy->OnPostAsyncTask(cb);
 }
 } // namespace MMI
 } // namespace OHOS

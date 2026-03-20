@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,9 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -43,6 +46,9 @@ void DelegateInterface::Init()
     POINTER_DEV_MGR.SetDelegateProxy(shared_from_this());
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     PropReader->SetDelegateProxy(shared_from_this());
+#ifdef OHOS_BUILD_KNUCKLE
+    KnuckleHandlerComponent::GetInstance().SetDelegateProxy(shared_from_this());
+#endif // OHOS_BUILD_KNUCKLE
 }
 
 int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,9 @@
 #endif // OHOS_BUILD_ENABLE_KEY_HOOK
 #include "key_subscriber_handler.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_KNUCKLE
+#include "knuckle_handler_component.h"
+#endif // OHOS_BUILD_KNUCKLE
 #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
 #include "touch_drawing_manager.h"
 #endif // #ifdef OHOS_BUILD_ENABLE_TOUCH_DRAWING
@@ -97,6 +100,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "mouse", no_argument, 0, 'm' },
         { "cursor", no_argument, 0, 'c' },
         { "keycommand", no_argument, 0, 'k' },
+        { "knuckle", no_argument, 0, 'K' },
         { "event", no_argument, 0, 'e' },
         { "lidstate", no_argument, 0, 't' },
         { "tabletStandState", no_argument, 0, 'b' },
@@ -127,7 +131,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmcketb", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmckKetb", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -247,6 +251,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
                 break;
             }
+            case 'K': {
+#ifdef OHOS_BUILD_KNUCKLE
+                KnuckleHandlerComponent::GetInstance().Dump(fd);
+#else // OHOS_BUILD_KNUCKLE
+                mprintf(fd, "knuckle does not support");
+#endif // OHOS_BUILD_KNUCKLE
+                break;
+            }
             case 'e': {
                 EventStatistic::Dump(fd, args);
                 break;
@@ -311,6 +323,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
     mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
     mprintf(fd, "      -k, --keycommand: dump the key command information\t");
+    mprintf(fd, "      -K, --knuckle: dump the knuckle information\t");
     mprintf(fd, "      -e, --event: dump the libinput event information\t");
     mprintf(fd, "      -t, --lidstate: dump the status of the laptop cover\t");
     mprintf(fd, "      -b, --tabletStandState: dump the status of the tablet stand\t");
