@@ -22,6 +22,7 @@
 
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
+#include "pointer_dispatch_event_cache.h"
 
 namespace OHOS {
 namespace MMI {
@@ -582,7 +583,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::map<LastTouch, LastTouchInfo> LastTouchInfos_;
-    std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
+    PointerDispatchEventCache dispatchEventCache_;
     std::shared_ptr<PointerEvent> lastTouchEventOnBackGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
