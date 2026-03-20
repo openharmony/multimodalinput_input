@@ -77,6 +77,7 @@ ohos_unittest("JoystickLayoutMapTest") {
     "${mmi_path}/test/facility/interceptor_mock:event_interceptor_mock",
     "${mmi_path}/test/facility/key_command_mock:key_command_mock",
     "${mmi_path}/test/facility/key_event_normalize_mock:key_event_normalize_mock",
+    "${mmi_path}/test/facility/knuckle_mock:knuckle_mock",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/test/facility/monitor_mock:event_monitor_mock",
     "${mmi_path}/test/facility/subscriber_mock:subscriber_mock",
