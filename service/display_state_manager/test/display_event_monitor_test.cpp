@@ -85,44 +85,51 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 
 /**
  * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_001
- * @tc.desc: Test the function InitCommonEventSubscriber
+ * @tc.desc: Test InitCommonEventSubscriber when hasInit_ is true (compare_exchange_strong fails)
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DISPLAY_MONITOR->hasInit_ = true;
-    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->InitCommonEventSubscriber());
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.hasInit_ = true;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
 }
 
 /**
  * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_002
- * @tc.desc: Test the function InitCommonEventSubscriber
+ * @tc.desc: Test InitCommonEventSubscriber when hasInit_ is false (first call succeeds)
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DISPLAY_MONITOR->hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->InitCommonEventSubscriber());
-    ASSERT_TRUE(DISPLAY_MONITOR->hasInit_);
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
 }
 
 /**
- * @tc.name: DisplayEventMonitorTest_IsCommonEventSubscriberInit_001
- * @tc.desc: Test the function IsCommonEventSubscriberInit
+ * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_003
+ * @tc.desc: Test InitCommonEventSubscriber multiple calls (compare_exchange_strong atomic behavior)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_IsCommonEventSubscriberInit_001, TestSize.Level1)
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DISPLAY_MONITOR->hasInit_ = true;
-    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->IsCommonEventSubscriberInit());
-    DISPLAY_MONITOR->hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->IsCommonEventSubscriberInit());
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.hasInit_ = false;
+    displayEventMonitor.InitCommonEventSubscriber();
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
+    displayEventMonitor.InitCommonEventSubscriber();
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
+    displayEventMonitor.InitCommonEventSubscriber();
+    ASSERT_TRUE(displayEventMonitor.hasInit_);
 }
 
 /**
@@ -161,19 +168,6 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
     CALL_TEST_DEBUG;
     DISPLAY_MONITOR->shieldModeBeforeSreenOff_ = SHIELD_MODE::UNSET_MODE;
     EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff());
-}
-/**
- * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_003
- * @tc.desc: Test InitCommonEventSubscriber when subscribe failed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    DISPLAY_MONITOR->hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(DISPLAY_MONITOR->InitCommonEventSubscriber());
 }
 
 /**

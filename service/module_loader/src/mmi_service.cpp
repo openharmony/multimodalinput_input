@@ -499,17 +499,12 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif // OHOS_RSS_CLIENT
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID start");
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add SA listener COMMON_EVENT_SERVICE_ID success");
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_KNUCKLE) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
+#ifdef OHOS_BUILD_KNUCKLE
     MMI_HILOGI("Start enable fingersense");
     KnuckleHandlerComponent::GetInstance().EnableFingersense();
-#endif // OHOS_BUILD_KNUCKLE && OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_KNUCKLE
-    KnuckleHandlerComponent::GetInstance().Init();
 #endif // OHOS_BUILD_KNUCKLE
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
@@ -559,9 +554,7 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif // OHOS_RSS_CLIENT
-#ifdef OHOS_BUILD_KNUCKLE
     RemoveSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
-#endif // OHOS_BUILD_KNUCKLE
     RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
@@ -2441,11 +2434,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #endif // OHOS_BUILD_ENABLE_TOUCH_DRAWING
     }
 #endif // OHOS_RSS_CLIENT
-#ifdef OHOS_BUILD_KNUCKLE
-    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
-        isCesStart_ = true;
-    }
-#endif // OHOS_BUILD_KNUCKLE
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
         APP_OBSERVER_MGR->InitAppStateObserver();
     }
@@ -3151,11 +3139,6 @@ void MMIService::OnThread()
     PreEventLoop();
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-#if defined(OHOS_BUILD_KNUCKLE) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
-        if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
-            DISPLAY_MONITOR->InitCommonEventSubscriber();
-        }
-#endif // OHOS_BUILD_KNUCKLE && OHOS_BUILD_ENABLE_KEYBOARD
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         if (libinputAdapter_.HasPendingEvents()) {
