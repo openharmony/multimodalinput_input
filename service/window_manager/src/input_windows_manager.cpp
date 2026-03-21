@@ -1122,7 +1122,8 @@ void InputWindowsManager::ClearDisplayMap(const UserScreenInfo &userScreenInfo)
     std::string groupIdsStr;
     for (const auto &group : userScreenInfo.displayGroups) {
         groupIds.insert(group.id);
-        groupIdsStr += std::to_string(group.id) + "|";
+        groupIdsStr += std::to_string(group.id);
+        groupIdsStr += "|";
     }
     if (!groupIdsStr.empty()) {
         groupIdsStr.pop_back();

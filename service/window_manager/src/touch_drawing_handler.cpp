@@ -488,12 +488,16 @@ void TouchDrawingHandler::DrawPointerPositionHandler()
 void TouchDrawingHandler::Snapshot()
 {
     CHKPV(labelsCanvasNode_);
-    std::string viewP = "P: 0 / " + std::to_string(maxPointerCount_);
+    std::string viewP = "P: 0 / ";
+    viewP += std::to_string(maxPointerCount_);
     auto dx = currentPt_.GetX() - firstPt_.GetX();
     auto dy = currentPt_.GetY() - firstPt_.GetY();
-    std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
-    std::string viewDy = "dY: " + FormatNumber(dy, ONE_PRECISION);
-    std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
+    std::string viewDx = "dX: ";
+    viewDx += FormatNumber(dx, ONE_PRECISION);
+    std::string viewDy = "dY: ";
+    viewDy += FormatNumber(dy, ONE_PRECISION);
+    std::string viewXv = "Xv: ";
+    viewXv += FormatNumber(xVelocity_, THREE_PRECISION);
     std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
@@ -607,9 +611,14 @@ void TouchDrawingHandler::DrawLabels()
 {
     CALL_DEBUG_ENTER;
     CHKPV(labelsCanvasNode_);
-    std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
-    std::string viewX = "X: " + FormatNumber(currentPt_.GetX(), ONE_PRECISION);
-    std::string viewY = "Y: " + FormatNumber(currentPt_.GetY(), ONE_PRECISION);
+    std::string viewP = "P: ";
+    viewP += std::to_string(currentPointerCount_);
+    viewP += " / ";
+    viewP += std::to_string(maxPointerCount_);
+    std::string viewX = "X: ";
+    viewX += FormatNumber(currentPt_.GetX(), ONE_PRECISION);
+    std::string viewY = "Y: ";
+    viewY += FormatNumber(currentPt_.GetY(), ONE_PRECISION);
     auto dx = currentPt_.GetX() - firstPt_.GetX();
     auto dy = currentPt_.GetY() - firstPt_.GetY();
     std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);

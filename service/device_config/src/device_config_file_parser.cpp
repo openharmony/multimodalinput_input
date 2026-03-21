@@ -59,8 +59,13 @@ std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *d
     uint32_t version = libinput_device_get_id_version(device);
     const char *name = libinput_device_get_name(device);
     CHKPS(name);
-    std::string fileName =
-        std::to_string(vendor) + "_" + std::to_string(product) + "_" + std::to_string(version) + "_" + name;
+    std::string fileName = std::to_string(vendor);
+    fileName += "_";
+    fileName += std::to_string(product);
+    fileName += "_";
+    fileName += std::to_string(version);
+    fileName += "_";
+    fileName += name;
     RemoveSpace(fileName);
     return fileName;
 }

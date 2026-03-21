@@ -174,7 +174,8 @@ std::string IdsListToString(const std::vector<int32_t> &list, const std::string 
 {
     std::string str;
     for (const auto &it : list) {
-        str += std::to_string(it) + sep;
+        str += std::to_string(it);
+        str += sep;
     }
     if (str.size() > 0) {
         str.resize(str.size() - sep.size());

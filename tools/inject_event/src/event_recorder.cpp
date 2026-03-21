@@ -217,7 +217,10 @@ std::string EventRecorder::GetEventTypeString(uint16_t type)
     if (it != EVENT_TYPE_MAP.end()) {
         return it->second;
     }
-    return "UNKNOWN_TYPE(" + std::to_string(type) + ")";
+    std::string result = "UNKNOWN_TYPE(";
+    result += std::to_string(type);
+    result += ")";
+    return result;
 }
 
 std::string EventRecorder::GetSecondaryEventCodeString(uint16_t type, uint16_t code)
@@ -301,7 +304,10 @@ std::string EventRecorder::GetEventCodeString(uint16_t type, uint16_t code)
     if (!secondaryResult.empty()) {
         return secondaryResult;
     }
-    return "CODE(" + std::to_string(code) + ")";
+    std::string result = "CODE(";
+    result += std::to_string(code);
+    result += ")";
+    return result;
 }
 } // namespace MMI
 } // namespace OHOS
