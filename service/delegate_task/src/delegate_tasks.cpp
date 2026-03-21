@@ -96,8 +96,8 @@ void DelegateTasks::ProcessTasks()
         return;
     }
     for (const auto &it : tasks) {
-        std::string msg = "DelegateTasks::ProcessTasks, taskId is: "
-            + std::to_string(static_cast<uint32_t>(it->GetId()));
+        std::string msg = "DelegateTasks::ProcessTasks, taskId is: ";
+        msg += std::to_string(static_cast<uint32_t>(it->GetId()));
         BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
         it->ProcessTask();
         BytraceAdapter::MMIServiceTraceStop();

@@ -178,7 +178,8 @@ PluginResult InputPluginManager::ProcessEvent(
     PluginEventType event, std::shared_ptr<IPluginContext> iplugin, std::shared_ptr<IPluginData> data)
 {
     int64_t beginTime = GetSysClockTime();
-    std::string msg = "PluginManager::ProcessEvent, plugin Name is: " + iplugin->GetName();
+    std::string msg = "PluginManager::ProcessEvent, plugin Name is: ";
+    msg += iplugin->GetName();
     BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
     PluginResult result = std::visit(
         overloaded{

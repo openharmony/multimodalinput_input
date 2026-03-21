@@ -745,20 +745,31 @@ void PointerEvent::Reset()
 std::string PointerEvent::ToString()
 {
     std::string eventStr = InputEvent::ToString();
-    eventStr += ",pointerId:" + std::to_string(pointerId_);
-    eventStr += ",pointerAction:" + std::to_string(pointerAction_);
-    eventStr += ",buttonId:" + std::to_string(buttonId_);
+    eventStr += ",pointerId:";
+    eventStr += std::to_string(pointerId_);
+    eventStr += ",pointerAction:";
+    eventStr += std::to_string(pointerAction_);
+    eventStr += ",buttonId:";
+    eventStr += std::to_string(buttonId_);
     eventStr += ",pointers:[";
     size_t pointerSize = 0;
     for (auto it = pointers_.begin(); it != pointers_.end(); it++) {
         pointerSize++;
-        eventStr += "{displayX:" + std::to_string((*it).GetDisplayX());
-        eventStr += ",displayY:" + std::to_string((*it).GetDisplayY());
-        eventStr += ",windowX:" + std::to_string((*it).GetWindowX());
-        eventStr += ",windowY:" + std::to_string((*it).GetWindowY());
-        eventStr += ",targetWindowId:" + std::to_string((*it).GetTargetWindowId());
-        eventStr += ",longAxis:" + std::to_string((*it).GetLongAxis());
-        eventStr += ",shortAxis:" + std::to_string((*it).GetShortAxis()) + "}";
+        eventStr += "{displayX:";
+        eventStr += std::to_string((*it).GetDisplayX());
+        eventStr += ",displayY:";
+        eventStr += std::to_string((*it).GetDisplayY());
+        eventStr += ",windowX:";
+        eventStr += std::to_string((*it).GetWindowX());
+        eventStr += ",windowY:";
+        eventStr += std::to_string((*it).GetWindowY());
+        eventStr += ",targetWindowId:";
+        eventStr += std::to_string((*it).GetTargetWindowId());
+        eventStr += ",longAxis:";
+        eventStr += std::to_string((*it).GetLongAxis());
+        eventStr += ",shortAxis:";
+        eventStr += std::to_string((*it).GetShortAxis());
+        eventStr += "}";
         if (pointerSize != pointers_.size()) {
             eventStr += ",";
         }

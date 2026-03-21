@@ -72,11 +72,16 @@ void InputEvent::Reset()
 
 std::string InputEvent::ToString()
 {
-    std::string eventStr = "Id:" + std::to_string(id_);
-    eventStr += "eventType:" + std::to_string(eventType_);
-    eventStr += ",actionTime:" + std::to_string(actionTime_);
-    eventStr += ",deviceId:" + std::to_string(deviceId_);
-    eventStr += ",sourceType:" + std::to_string(sourceType_);
+    std::string eventStr = "Id:";
+    eventStr += std::to_string(id_);
+    eventStr += "eventType:";
+    eventStr += std::to_string(eventType_);
+    eventStr += ",actionTime:";
+    eventStr += std::to_string(actionTime_);
+    eventStr += ",deviceId:";
+    eventStr += std::to_string(deviceId_);
+    eventStr += ",sourceType:";
+    eventStr += std::to_string(sourceType_);
     return eventStr;
 }
 

@@ -136,8 +136,8 @@ void HotplugDetector::OnEvent() const
     for (int32_t pos = 0; res > EVSIZE;) {
         std::copy_n(event_buf + pos, sizeof(event), reinterpret_cast<std::byte*>(&event));
         if (event.len != 0) {
-            std::string msg = "HotplugDetector: "
-                + (event.mask & IN_CREATE ? std::string("add") : std::string("remove"));
+            std::string msg = "HotplugDetector: ";
+            msg += (event.mask & IN_CREATE ? "add" : "remove");
             BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
             auto path = INPUT_DEVICES_PATH + std::string{reinterpret_cast<char*>(event_buf + pos + sizeof(event))};
             if (event.mask & IN_CREATE) {

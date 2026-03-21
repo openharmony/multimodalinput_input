@@ -106,8 +106,10 @@ std::string EventStatistic::ConvertInputEventToStr(const std::shared_ptr<InputEv
     eventStr += handleTime;
     eventStr += ",eventType:";
     eventStr += ConvertEventTypeToString(eventPtr->GetEventType());
-    eventStr += ",actionTime:" + std::to_string(eventPtr->GetActionTime());
-    eventStr += ",deviceId:" + std::to_string(eventPtr->GetDeviceId());
+    eventStr += ",actionTime:";
+    eventStr += std::to_string(eventPtr->GetActionTime());
+    eventStr += ",deviceId:";
+    eventStr += std::to_string(eventPtr->GetDeviceId());
     eventStr += ",sourceType:";
     eventStr += ConvertSourceTypeToString(eventPtr->GetSourceType());
     return eventStr;
@@ -140,10 +142,13 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
         return;
     }
     std::string eventStr = ConvertInputEventToStr(eventPtr);
-    eventStr += ",pointerId:" + std::to_string(eventPtr->GetPointerId());
+    eventStr += ",pointerId:";
+    eventStr += std::to_string(eventPtr->GetPointerId());
     eventStr += ",pointerAction:";
     eventStr += ConvertPointerActionToString(eventPtr);
-    eventStr += ",buttonId:" + std::to_string(eventPtr->GetButtonId()) + ",pointers:[";
+    eventStr += ",buttonId:";
+    eventStr += std::to_string(eventPtr->GetButtonId());
+    eventStr += ",pointers:[";
     size_t pointerSize = 0;
     std::list<PointerEvent::PointerItem> pointerItems = eventPtr->GetAllPointerItems();
     for (auto it = pointerItems.begin(); it != pointerItems.end(); it++) {
@@ -155,9 +160,12 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
             displayY = std::to_string((*it).GetDisplayY());
         }
         eventStr += "{";
-        eventStr += "displayX:" + displayX;
-        eventStr += ",displayY:" + displayY;
-        eventStr += ",pressure:" + std::to_string((*it).GetPressure());
+        eventStr += "displayX:";
+        eventStr += displayX;
+        eventStr += ",displayY:";
+        eventStr += displayY;
+        eventStr += ",pressure:";
+        eventStr += std::to_string((*it).GetPressure());
         eventStr += "}";
         if (pointerSize != pointerItems.size()) {
             eventStr += ",";
@@ -197,11 +205,17 @@ void EventStatistic::PushKeyEvent(std::shared_ptr<KeyEvent> eventPtr)
         if (!eventPtr->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             keyItemCode = std::to_string(keyItems[i].GetKeyCode());
         }
-        eventStr += "{pressed:" + std::to_string(pressed);
-        eventStr += ",deviceId:" + std::to_string(keyItems[i].GetDeviceId());
-        eventStr += ",keyCode:" + keyItemCode;
-        eventStr += ",downTime:" + std::to_string(keyItems[i].GetDownTime());
-        eventStr += ",unicode:" + std::to_string(keyItems[i].GetUnicode()) + "}";
+        eventStr += "{pressed:";
+        eventStr += std::to_string(pressed);
+        eventStr += ",deviceId:";
+        eventStr += std::to_string(keyItems[i].GetDeviceId());
+        eventStr += ",keyCode:";
+        eventStr += keyItemCode;
+        eventStr += ",downTime:";
+        eventStr += std::to_string(keyItems[i].GetDownTime());
+        eventStr += ",unicode:";
+        eventStr += std::to_string(keyItems[i].GetUnicode());
+        eventStr += "}";
         if (i != keyItems.size() - 1) {
             eventStr += ",";
         }
@@ -215,7 +229,8 @@ void EventStatistic::PushSwitchEvent(std::shared_ptr<SwitchEvent> eventPtr)
 {
     CHKPV(eventPtr);
     std::string eventStr = ConvertInputEventToStr(eventPtr);
-    eventStr += ",switchValue:" + std::to_string(eventPtr->GetSwitchValue());
+    eventStr += ",switchValue:";
+    eventStr += std::to_string(eventPtr->GetSwitchValue());
     eventStr += ",switchType:";
     eventStr += ConvertSwitchTypeToString(eventPtr->GetSwitchType());
     eventStr += "}";

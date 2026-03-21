@@ -577,7 +577,8 @@ void CooperateClient::DumpPerformanceInfo()
         performanceInfo_.minDuration, performanceInfo_.failBeforeSuccess, performanceInfo_.firstSuccessDuration);
     std::string durationStr;
     for (auto duration : performanceInfo_.durationList) {
-        durationStr += std::to_string(duration) + ", ";
+        durationStr += std::to_string(duration);
+        durationStr += ", ";
     }
     FI_HILOGI("[PERF] Duration:%{public}s", durationStr.c_str());
     performanceInfo_ = PerformanceInfo();

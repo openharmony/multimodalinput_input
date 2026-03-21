@@ -247,7 +247,8 @@ void TimerManager::ProcessTimersInternal()
             break;
         }
         auto curTimer = std::move(*it);
-        std::string msg = "StartTimer, Name is: " + curTimer->name;
+        std::string msg = "StartTimer, Name is: ";
+        msg += curTimer->name;
         BytraceAdapter::MMIServiceTraceStart(BytraceAdapter::MMI_THREAD_LOOP_DEPTH_THREE, msg);
         CrashObjDumper dumper((curTimer->name).c_str());
         timers_.erase(it);
