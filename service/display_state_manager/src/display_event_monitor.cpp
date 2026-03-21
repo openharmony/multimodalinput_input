@@ -170,7 +170,8 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
 void DisplayEventMonitor::InitCommonEventSubscriber()
 {
     CALL_DEBUG_ENTER;
-    if (hasInit_) {
+    bool expected = false;
+    if (!hasInit_.compare_exchange_strong(expected, true)) {
         MMI_HILOGE("Current common event has subscribered");
         return;
     }
@@ -183,11 +184,6 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplayChangedReceiver>(commonEventSubscribeInfo));
-}
-
-bool DisplayEventMonitor::IsCommonEventSubscriberInit()
-{
-    return hasInit_;
 }
 
 void DisplayEventMonitor::SendCancelEventWhenLock()
