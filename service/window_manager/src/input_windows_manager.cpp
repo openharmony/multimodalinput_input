@@ -5961,8 +5961,33 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         }
-        PointerStyle pointerStyle;
+
+        PointerStyle pointerStyle {};
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+        if (isUiExtension_ && (uiExtensionWindowId_ == touchWindow->id)) {
+            MMI_HILOGD("updatemouse target in uiextension");
+            GetPointerStyle(uiExtensionPid_, uiExtensionWindowId_, pointerStyle, isUiExtension_);
+            dragPointerStyle_ = pointerStyle;
+        } else {
+            GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+        }
+        if (!isDragBorder_ && !isUiExtension_) {
+            GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+            dragPointerStyle_ = pointerStyle;
+        }
+        if (!dragFlag_) {
+            isDragBorder_ = SelectPointerChangeArea(*touchWindow, pointerStyle,
+                static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY));
+            dragPointerStyle_ = pointerStyle;
+            MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{private}.2f,"
+                "logicalY is :%{private}.2f", pointerStyle.id, touchWindow->id, logicalX, logicalY);
+        }
+        if (extraData_.drawCursor) {
+            MMI_HILOGD("Cursor must be default, pointerStyle:%{public}d globalStyle:%{public}d",
+                dragPointerStyle_.id, globalStyle_.id);
+            dragPointerStyle_ = globalStyle_;
+        }
+
         CursorDrawingComponent::GetInstance().UpdateDisplayInfo(*physicDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         CursorDrawingComponent::GetInstance().OnWindowInfo(info);
@@ -5973,8 +5998,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         ReverseRotateDisplayScreen(*displayInfo,  pointerItem.GetDisplayXPos(), pointerItem.GetDisplayYPos(),
             cursorPos);
         UpdateAndAdjustMouseLocation(displayId, cursorPos.x, cursorPos.y);
-        CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId, static_cast<int32_t>(cursorPos.x),
-            static_cast<int32_t>(cursorPos.y), pointerStyle, displayDir);
+        if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+            CursorDrawingComponent::GetInstance().DrawPointer(physicDisplayInfo->rsId,
+                static_cast<int32_t>(cursorPos.x), static_cast<int32_t>(cursorPos.y), dragPointerStyle_, displayDir);
+        }
     } else if (POINTER_DEV_MGR.mouseDisplayState) {
         if ((!checkExtraData) && (!(extraData_.appended &&
             extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {

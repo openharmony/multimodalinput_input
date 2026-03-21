@@ -35,8 +35,18 @@ constexpr int32_t UDS_PID = 100;
 constexpr int32_t CAST_INPUT_DEVICEID { 0xAAAAAAFF };
 constexpr int32_t CAST_SCREEN_DEVICEID { 0xAAAAAAFE };
 constexpr double HALF_RATIO { 0.5 };
-constexpr int32_t TEST_DEVICE_ID { 1 };
-constexpr int32_t TEST_DEVICE_ID_2 { 2 };
+constexpr int32_t TEST_DEFAULT_DISPLAY_ID { 0 };
+constexpr int32_t TEST_WINDOW_ID { 1 };
+constexpr int32_t TEST_WINDOW_PID { 100 };
+constexpr int32_t TEST_POINTER_ID { 0 };
+constexpr int32_t TEST_DISPLAY_X { 500 };
+constexpr int32_t TEST_DISPLAY_Y { 500 };
+constexpr int32_t TEST_RECT_X { 0 };
+constexpr int32_t TEST_RECT_Y { 0 };
+constexpr int32_t TEST_RECT_WIDTH { 1000 };
+constexpr int32_t TEST_RECT_HEIGHT { 1000 };
+constexpr int32_t TEST_INVALID_WINDOW_ID { -1 };
+constexpr int32_t TEST_INVALID_PID { -1 };
 } // namespace
 
 class InputWindowsManagerTest : public testing::Test {
@@ -6026,5 +6036,426 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_EnterMouseCaptureMode_
     EXPECT_NE(cursorIt->second.cursorPos.x, focusWindow.area.x + focusWindow.area.width / 2);
     EXPECT_NE(cursorIt->second.cursorPos.y, focusWindow.area.y + focusWindow.area.height / 2);
 }
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_001
+ * @tc.desc: Test UpdateTouchScreenTarget with UIExtension window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    inputWindowsManager->isUiExtension_ = true;
+    inputWindowsManager->uiExtensionWindowId_ = TEST_WINDOW_ID;
+    inputWindowsManager->uiExtensionPid_ = TEST_WINDOW_PID;
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->uiExtensionWindowId_ = TEST_INVALID_WINDOW_ID;
+    inputWindowsManager->uiExtensionPid_ = TEST_INVALID_PID;
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_002
+ * @tc.desc: Test UpdateTouchScreenTarget with drag border and non-UIExtension
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isDragBorder_ = false;
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+    inputWindowsManager->isDragBorder_ = false;
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_003
+ * @tc.desc: Test UpdateTouchScreenTarget with dragFlag_ false to trigger SelectPointerChangeArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    inputWindowsManager->dragFlag_ = false;
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+    inputWindowsManager->dragFlag_ = false;
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_004
+ * @tc.desc: Test UpdateTouchScreenTarget with drawCursor flag set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    inputWindowsManager->extraData_.drawCursor = true;
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+    inputWindowsManager->extraData_.drawCursor = false;
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_005
+ * @tc.desc: Test UpdateTouchScreenTarget without accessibility flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_006
+ * @tc.desc: Test UpdateTouchScreenTarget with accessibility flag set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_007
+ * @tc.desc: Test UpdateTouchScreenTarget with UIExtension and dragFlag combination
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    inputWindowsManager->isUiExtension_ = true;
+    inputWindowsManager->uiExtensionWindowId_ = TEST_WINDOW_ID;
+    inputWindowsManager->uiExtensionPid_ = TEST_WINDOW_PID;
+    inputWindowsManager->dragFlag_ = false;
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->uiExtensionWindowId_ = TEST_INVALID_WINDOW_ID;
+    inputWindowsManager->uiExtensionPid_ = TEST_INVALID_PID;
+    inputWindowsManager->dragFlag_ = false;
+}
+
+/**
+ * @tc.name: UpdateTouchScreenTarget_PointerStyle_008
+ * @tc.desc: Test UpdateTouchScreenTarget with all flags combination
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, UpdateTouchScreenTarget_PointerStyle_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    OLD::DisplayInfo displayInfo;
+    displayInfo.id = TEST_DEFAULT_DISPLAY_ID;
+    displayInfo.displayDirection = DIRECTION0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.displaysInfo.push_back(displayInfo);
+    }
+
+    WindowInfo windowInfo;
+    windowInfo.id = TEST_WINDOW_ID;
+    windowInfo.pid = TEST_WINDOW_PID;
+    Rect rect = {TEST_RECT_X, TEST_RECT_Y, TEST_RECT_WIDTH, TEST_RECT_HEIGHT};
+    windowInfo.pointerHotAreas.push_back(rect);
+    it->second.windowsInfo.push_back(windowInfo);
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(TEST_POINTER_ID);
+    item.SetDisplayX(TEST_DISPLAY_X);
+    item.SetDisplayY(TEST_DISPLAY_Y);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(TEST_POINTER_ID);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    inputWindowsManager->isUiExtension_ = false;
+    inputWindowsManager->isDragBorder_ = false;
+    inputWindowsManager->dragFlag_ = false;
+    inputWindowsManager->extraData_.drawCursor = true;
+
+    auto result = inputWindowsManager->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+
+    it->second.displaysInfo.clear();
+    it->second.windowsInfo.clear();
+    inputWindowsManager->isDragBorder_ = false;
+    inputWindowsManager->dragFlag_ = false;
+    inputWindowsManager->extraData_.drawCursor = false;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 } // namespace MMI
 } // namespace OHOS
