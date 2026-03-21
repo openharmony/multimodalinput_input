@@ -828,11 +828,9 @@ bool TabletToolTransformProcessor::CalculateScreenCoordinateWithCalibration(
     double rawX = libinput_event_tablet_tool_get_x_transformed(tabletEvent, static_cast<uint32_t>(tabletWidth));
     double rawY = libinput_event_tablet_tool_get_y_transformed(tabletEvent, static_cast<uint32_t>(tabletHeight));
     MMI_HILOGD("Raw hardware coordinates: (%.1f, %.1f)", rawX, rawY);
+    rawX = std::clamp(rawX, calibration_->calibratedMinX, calibration_->calibratedMaxX);
+    rawY = std::clamp(rawY, calibration_->calibratedMinY, calibration_->calibratedMaxY);
 
-    if ((rawX < calibration_->calibratedMinX) || (rawX >= calibration_->calibratedMaxX) ||
-        (rawY < calibration_->calibratedMinY) || (rawY >= calibration_->calibratedMaxY)) {
-        return false;
-    }
     double calibratedWidth = calibration_->calibratedMaxX - calibration_->calibratedMinX;
     double calibratedHeight = calibration_->calibratedMaxY - calibration_->calibratedMinY;
     if ((calibratedWidth < DEFAULT_PRECISION) || (calibratedHeight < DEFAULT_PRECISION)) {
