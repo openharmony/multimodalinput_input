@@ -3211,6 +3211,45 @@ public:
      * @since 24
      */
     static const int32_t KEYCODE_XKEY;
+
+    // ==================== 扩展功能键定义开始 ====================
+    /**
+     * Extended function key mask (third byte)
+     * Used to identify extended function keys by checking bits 16-23
+     * @internal
+     * @since 25
+     */
+    static const uint32_t EXTENDED_FUNCTION_KEY_MASK;
+
+    /**
+     * Extended function key flag (third byte = 0x01)
+     * @internal
+     * @since 25
+     */
+    static const uint32_t EXTENDED_FUNCTION_KEY_FLAG;
+
+    /**
+     * Extended function key base
+     * Base extended function key for internal system use
+     * Reserved range: 65536 - 65635 (0x00010000 - 0x000100FF)
+     *
+     * Extended function keys will skip interceptors, filters, and subscribers.
+     * They are only dispatched to windows and not exposed to applications.
+     *
+     * @internal
+     * @since 25
+     */
+    static const int32_t KEYCODE_EXT_FN_BASE;
+
+    /**
+     * Extended function key maximum value
+     * Defines the upper bound of the reserved extended function key range
+     * @internal
+     * @since 25
+     */
+    static const int32_t KEYCODE_EXT_FN_MAX;
+    // ==================== 扩展功能键定义结束 ====================
+
 public:
     class KeyItem {
     public:
@@ -3545,6 +3584,23 @@ public:
     bool IsKeyPressed(int32_t keyCode) const;
 
     bool HasKeyItem(int32_t keyCode) const;
+
+    /**
+     * @brief Check if the key code is an extended function key
+     * @param keyCode Indicates the key code to check
+     * @return Returns true if it's an extended function key; returns false otherwise
+     * @internal
+     * @since 25
+     */
+    static bool IsExtendedFunctionKeyCode(int32_t keyCode);
+
+    /**
+     * @brief Check if this key event is an extended function key
+     * @return Returns true if this event is an extended function key; returns false otherwise
+     * @internal
+     * @since 25
+     */
+    bool IsExtendedFunctionKey() const;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
