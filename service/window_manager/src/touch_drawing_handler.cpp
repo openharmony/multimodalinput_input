@@ -178,7 +178,7 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
         }
-        isChangedMode_ |= isScreenAreaChanged;
+        isChangedMode_ = isChangedMode_ || isScreenAreaChanged;
     } else {
         if (displayInfo_.direction == DIRECTION90 && PRODUCT_TYPE != PRODUCT_TYPE_PC) {
             rectTopPosition_ = PHONE_RECT_TOP;
