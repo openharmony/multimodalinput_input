@@ -198,7 +198,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         case PointerEvent::POINTER_ACTION_MOVE: {
             twoFingerGestureHandler_->HandlePointerActionMoveEvent(touchEvent);
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
             if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureMoveEvent(touchEvent);
             }
@@ -231,9 +233,11 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
 #ifdef OHOS_BUILD_KNUCKLE
         case PointerEvent::TOOL_TYPE_FINGER: {
             twoFingerGestureHandler_->HandleFingerGestureDownEvent(touchEvent);
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
             if (CheckBundleName(touchEvent)) {
                 LONG_PRESS_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
             if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureDownEvent(touchEvent);
             }
@@ -259,7 +263,9 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
 #ifdef OHOS_BUILD_KNUCKLE
         case PointerEvent::TOOL_TYPE_FINGER: {
             twoFingerGestureHandler_->HandleFingerGestureUpEvent(touchEvent);
+#ifdef OHOS_BUILD_UNIVERSAL_DRAG
             LONG_PRESS_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
+#endif // OHOS_BUILD_UNIVERSAL_DRAG
             if (SYS_PRODUCT_TYPE == DEVICE_TYPE_FOLD_PC) {
                 PULL_THROW_EVENT_HANDLER->HandleFingerGestureUpEvent(touchEvent);
             }
