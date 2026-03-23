@@ -34,7 +34,7 @@ namespace {
 const char* FOUNDATION { "foundation" };
 constexpr int32_t MAX_TIMER_COUNT { 50 };
 constexpr int32_t TIME_CONVERT_RATIO { 1000 };
-static float inputUITimeoutRatio = 0.0;
+static float g_inputUITimeoutRatio = 0.0;
 constexpr float FLOAT_EPSILON = 0.01;
 constexpr int32_t MAX_RATIO_SIZE = 6;
 } // namespace
@@ -55,8 +55,8 @@ void ANRManager::Init(UDSServer &udsServer)
 
 float ANRManager::getRatioValue()
 {
-    if (inputUITimeoutRatio > FLOAT_EPSILON) {
-        return inputUITimeoutRatio;
+    if (g_inputUITimeoutRatio > FLOAT_EPSILON) {
+        return g_inputUITimeoutRatio;
     }
  
     std::string ratioStr = OHOS::system::GetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1000");
@@ -64,20 +64,20 @@ float ANRManager::getRatioValue()
         uint64_t ratioVal = 0;
         auto [ptr, ec] = std::from_chars(ratioStr.data(), ratioStr.data() + ratioStr.size(), ratioVal);
         if (ec == std::errc()) {
-            inputUITimeoutRatio = (ratioVal * 1.0) / 1000;
+            g_inputUITimeoutRatio = (ratioVal * 1.0) / TIME_CONVERT_RATIO;
         } else {
-            inputUITimeoutRatio = 1.0;
+            g_inputUITimeoutRatio = 1.0;
             MMI_HILOGE("Failed to convert or invalid ratioStr value");
         }
     } else {
-        inputUITimeoutRatio = 1.0;
+        g_inputUITimeoutRatio = 1.0;
     }
  
-    if (inputUITimeoutRatio <= 0) {
-        inputUITimeoutRatio = 1.0;
+    if (g_inputUITimeoutRatio <= 0) {
+        g_inputUITimeoutRatio = 1.0;
         MMI_HILOGE("const.sys.dfx.appfreeze.timeout_unit_time_ratio read failed.");
     }
-    return inputUITimeoutRatio;
+    return g_inputUITimeoutRatio;
 }
 
 int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)
