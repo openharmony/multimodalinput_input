@@ -166,8 +166,8 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
             isChangedMode_ = true;
         }
     }
-    isChangedMode_ = isChangedMode_ || (!isChangedRotation_ &&
-        (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight));
+    bool isScreenAreaChanged = !isChangedRotation_ &&
+        (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight);
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
@@ -178,6 +178,7 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
         }
+        isChangedMode_ |= isScreenAreaChanged;
     } else {
         if (displayInfo_.direction == DIRECTION90 && PRODUCT_TYPE != PRODUCT_TYPE_PC) {
             rectTopPosition_ = PHONE_RECT_TOP;
