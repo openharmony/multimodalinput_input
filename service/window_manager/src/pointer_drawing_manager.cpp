@@ -1772,6 +1772,7 @@ int32_t PointerDrawingManager::CreatePointerWindowForNoScreenPointer(int32_t phy
     SetSurfaceNode(Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType));
     auto surfaceNodePtr = GetSurfaceNode();
     CHKPR(surfaceNodePtr, RET_ERR);
+    surfaceNodePtr->SetSnapshotSkipLayer(true);
     surfaceNodePtr->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNodePtr->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNodePtr->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
