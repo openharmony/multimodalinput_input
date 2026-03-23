@@ -842,6 +842,25 @@ const int32_t KeyEvent::KEYCODE_DIV = 3220;
 const int32_t KeyEvent::KEYCODE_KEY_PEN_MODE_SWITCH = 3221;
 const int32_t KeyEvent::KEYCODE_MMX_TOUCH = 3222;
 const int32_t KeyEvent::KEYCODE_XKEY = 3232;
+
+// ==================== 扩展功能键常量定义 ====================
+// 第三字节掩码方案：使用bits 16-23作为扩展功能键标识
+// 预留区间: 65536 - 65635 (0x00010000 - 0x000100FF)
+// 扩展功能键将跳过拦截器、过滤器和订阅器，直接派发
+const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0x00FF0000;
+const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x00010000;
+
+// 当前使用的扩展功能键
+const int32_t KeyEvent::KEYCODE_EXT_FN_BASE = 65536;
+
+// 预留区间最大值
+const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 65635;
+
+// 未来如需新的扩展功能键，按以下方式添加:
+// const int32_t KeyEvent::KEYCODE_EXT_FN_2 = 65537;
+// const int32_t KeyEvent::KEYCODE_EXT_FN_3 = 65538;
+// ==================== 扩展功能键常量定义结束 ====================
+
 const int32_t KeyEvent::KEYCODE_REMOTE_POWER = 4000;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_DOWN = 10002;
@@ -1548,5 +1567,19 @@ std::vector<uint8_t> KeyEvent::GetEnhanceData() const
     // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+bool KeyEvent::IsExtendedFunctionKeyCode(int32_t keyCode)
+{
+    CALL_DEBUG_ENTER;
+    // 检查第三个字节(bits 16-23)是否为 0x01
+    return (keyCode & EXTENDED_FUNCTION_KEY_MASK) == EXTENDED_FUNCTION_KEY_FLAG;
+}
+
+bool KeyEvent::IsExtendedFunctionKey() const
+{
+    CALL_DEBUG_ENTER;
+    return IsExtendedFunctionKeyCode(keyCode_);
+}
+
 } // namespace MMI
 } // namespace OHOS

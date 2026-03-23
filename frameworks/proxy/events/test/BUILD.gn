@@ -88,3 +88,21 @@ group("FrameworkEventTests") {
     deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerInterceptorTest" ]
   }
 }
+
+ohos_unittest("KeyEventExtendedFunctionTest") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  sources = [ "key_event_extended_function_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/interfaces/native/innerkits/event:mmi_event",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
