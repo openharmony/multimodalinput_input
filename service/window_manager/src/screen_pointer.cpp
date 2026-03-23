@@ -282,6 +282,7 @@ bool ScreenPointer::InitSurface(bool needDrawPointer)
     surface->SetQueueSize(DEFAULT_BUFFER_SIZE);
 
     surfaceNode_->SetVisible(true);
+    surfaceNode_->SetSnapshotSkipLayer(true);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::TOP_LEFT);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     if (needDrawPointer) {
