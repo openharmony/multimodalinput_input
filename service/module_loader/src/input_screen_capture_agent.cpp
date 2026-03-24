@@ -55,6 +55,7 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
         return RET_ERR;
     }
     handle_.handle = dlopen(libRealPath, RTLD_LAZY);
+    MMI_HILOGI("load screen_capture");
     if (handle_.handle == nullptr) {
         MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return RET_ERR;
@@ -69,6 +70,13 @@ int32_t InputScreenCaptureAgent::LoadLibrary()
         dlsym(handle_.handle, "RegisterListener"));
     if (handle_.registerListener == nullptr) {
         MMI_HILOGE("dlsym registerListener failed: error:%{public}s", dlerror());
+        handle_.Free();
+        return RET_ERR;
+    }
+    handle_.cleanUpResources = reinterpret_cast<void (*)()>(
+        dlsym(handle_.handle, "CleanUpScreenCaptureResources"));
+    if (handle_.cleanUpResources == nullptr) {
+        MMI_HILOGE("dlsym cleanUpResources failed: error:%{public}s", dlerror());
         handle_.Free();
         return RET_ERR;
     }
@@ -134,6 +142,7 @@ int32_t InputScreenCaptureAgent::LoadAudioLibrary()
         return RET_ERR;
     }
     handle_.handle = dlopen(libRealPath, RTLD_LAZY);
+    MMI_HILOGI("LoadAudioLibrary");
     if (handle_.handle == nullptr) {
         MMI_HILOGE("dlopen failed, reason:%{public}s", dlerror());
         return RET_ERR;
@@ -144,8 +153,30 @@ int32_t InputScreenCaptureAgent::LoadAudioLibrary()
         handle_.Free();
         return RET_ERR;
     }
+    handle_.cleanUpResources = reinterpret_cast<void (*)()>(
+        dlsym(handle_.handle, "CleanUpScreenCaptureResources"));
+    if (handle_.cleanUpResources == nullptr) {
+        MMI_HILOGE("dlsym CleanUpScreenCaptureResources failed: error:%{public}s", dlerror());
+        handle_.Free();
+        return RET_ERR;
+    }
     return RET_OK;
     // LCOV_EXCL_STOP
+}
+
+void InputScreenCaptureAgent::UnloadLibrary()
+{
+    std::lock_guard<std::mutex> guard(agentMutex_);
+    if (handle_.handle == nullptr) {
+        MMI_HILOGD("The library has not been loaded");
+        return;
+    }
+    MMI_HILOGI("Unload screen_capture");
+    if (handle_.cleanUpResources != nullptr) {
+        MMI_HILOGI("cleanUpResources");
+        handle_.cleanUpResources();
+    }
+    handle_.Free();
 }
 }
 }
