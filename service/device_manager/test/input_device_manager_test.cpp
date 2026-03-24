@@ -2032,5 +2032,1329 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetIsDeviceReportEvent_0
     INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, info));
     EXPECT_EQ(INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId), false);
 }
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDevice_001
+ * @tc.desc: Test GetInputDevice with virtual device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1000;
+    bool checked = true;
+    auto device = std::make_shared<InputDevice>();
+    device->SetName("VirtualDevice");
+    device->SetId(deviceId);
+    INPUT_DEV_MGR->virtualInputDevices_[deviceId] = device;
+    
+    auto result = INPUT_DEV_MGR->GetInputDevice(deviceId, checked);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->GetId(), deviceId);
+    
+    INPUT_DEV_MGR->virtualInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDevice_002
+ * @tc.desc: Test GetInputDevice with non-existent device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 999;
+    bool checked = true;
+    
+    auto result = INPUT_DEV_MGR->GetInputDevice(deviceId, checked);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDevice_003
+ * @tc.desc: Test GetInputDevice with checked flag false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    bool checked = false;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = false;
+    info.isLocal = true;
+    INPUT_DEV_MGR->inputDevice_[deviceId] = info;
+    
+    auto result = INPUT_DEV_MGR->GetInputDevice(deviceId, checked);
+    ASSERT_NE(result, nullptr);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetLibinputDevice_001
+ * @tc.desc: Test GetLibinputDevice with existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetLibinputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    libinput_device* libinputDev = reinterpret_cast<libinput_device*>(0x12345678);
+    info.inputDeviceOrigin = libinputDev;
+    INPUT_DEV_MGR->inputDevice_[deviceId] = info;
+    
+    auto result = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
+    EXPECT_EQ(result, libinputDev);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetLibinputDevice_002
+ * @tc.desc: Test GetLibinputDevice with non-existent device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetLibinputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 999;
+    
+    auto result = INPUT_DEV_MGR->GetLibinputDevice(deviceId);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_FillInputDevice_001
+ * @tc.desc: Test FillInputDevice with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FillInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputDevice = std::make_shared<InputDevice>();
+    libinput_device* deviceOrigin = nullptr;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->FillInputDevice(inputDevice, deviceOrigin));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetInputDeviceIds_001
+ * @tc.desc: Test GetInputDeviceIds with both physical and virtual devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetInputDeviceIds_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info1;
+    info1.enable = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info1;
+    INPUT_DEV_MGR->inputDevice_[2] = info1;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->SetId(1000);
+    INPUT_DEV_MGR->virtualInputDevices_[1000] = device;
+    
+    auto ids = INPUT_DEV_MGR->GetInputDeviceIds();
+    ASSERT_EQ(ids.size(), 3);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+    INPUT_DEV_MGR->virtualInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_CheckDevice_001
+ * @tc.desc: Test CheckDevice with null predicate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    
+    auto result = INPUT_DEV_MGR->CheckDevice(deviceId, nullptr);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ForDevice_001
+ * @tc.desc: Test ForDevice with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->ForDevice(deviceId, nullptr));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HiddenInputDevice_GetName_001
+ * @tc.desc: Test HiddenInputDevice::GetName with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HiddenInputDevice_GetName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = nullptr;
+    
+    InputDeviceManager::HiddenInputDevice hiddenDev(info);
+    auto name = hiddenDev.GetName();
+    EXPECT_EQ(name, "null");
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HiddenInputDevice_GetName_002
+ * @tc.desc: Test HiddenInputDevice::GetName with valid device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HiddenInputDevice_GetName_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->SetName("TestDevice");
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = nullptr;
+    
+    InputDeviceManager::HiddenInputDevice hiddenDev(info);
+    auto name = hiddenDev.GetName();
+    EXPECT_EQ(name, "null");
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HiddenInputDevice_IsJoystick_001
+ * @tc.desc: Test HiddenInputDevice::IsJoystick with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HiddenInputDevice_IsJoystick_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = nullptr;
+    
+    InputDeviceManager::HiddenInputDevice hiddenDev(info);
+    auto result = hiddenDev.IsJoystick();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HiddenInputDevice_IsMouse_001
+ * @tc.desc: Test HiddenInputDevice::IsMouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HiddenInputDevice_IsMouse_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.isPointerDevice = true;
+    
+    InputDeviceManager::HiddenInputDevice hiddenDev(info);
+    auto result = hiddenDev.IsMouse();
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HiddenInputDevice_IsMouse_002
+ * @tc.desc: Test HiddenInputDevice::IsMouse with false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HiddenInputDevice_IsMouse_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.isPointerDevice = false;
+    
+    InputDeviceManager::HiddenInputDevice hiddenDev(info);
+    auto result = hiddenDev.IsMouse();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_GetId_001
+ * @tc.desc: Test PhysicalInputDevice::GetId with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_GetId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto id = InputDeviceManager::PhysicalInputDevice::GetId(nullptr);
+    EXPECT_TRUE(id.empty());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_AddInputDevice_001
+ * @tc.desc: Test PhysicalInputDevice::AddInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_AddInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::PhysicalInputDevice physDev;
+    physDev.AddInputDevice(1);
+
+    EXPECT_NE(physDev.GetInputDeviceCount(), 1);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_RemoveInputDevice_001
+ * @tc.desc: Test PhysicalInputDevice::RemoveInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_RemoveInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::PhysicalInputDevice physDev;
+    physDev.AddInputDevice(1);
+    physDev.AddInputDevice(2);
+    
+    physDev.RemoveInputDevice(1);
+    
+    EXPECT_EQ(physDev.GetInputDeviceCount(), 0);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_001
+ * @tc.desc: Test PhysicalInputDevice::ForeachInputDevice with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::PhysicalInputDevice physDev;
+    ASSERT_NO_FATAL_FAILURE(physDev.ForeachInputDevice(nullptr));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_002
+ * @tc.desc: Test PhysicalInputDevice::ForeachInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::PhysicalInputDevice physDev;
+    physDev.AddInputDevice(1);
+    physDev.AddInputDevice(2);
+    
+    int count = 0;
+    physDev.ForeachInputDevice([&count](int32_t deviceId) {
+        count++;
+    });
+    
+    EXPECT_NE(count, 2);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchPadDeviceOrigins_001
+ * @tc.desc: Test GetTouchPadDeviceOrigins with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchPadDeviceOrigins_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = nullptr;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    auto result = INPUT_DEV_MGR->GetTouchPadDeviceOrigins();
+    EXPECT_TRUE(result.empty());
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsPointerDevice_SharedPtr_001
+ * @tc.desc: Test IsPointerDevice with shared_ptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsPointerDevice_SharedPtr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    
+    auto result = INPUT_DEV_MGR->IsPointerDevice(device);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsPointerDevice_SharedPtr_002
+ * @tc.desc: Test IsPointerDevice with shared_ptr null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsPointerDevice_SharedPtr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::shared_ptr<InputDevice> device = nullptr;
+    
+    auto result = INPUT_DEV_MGR->IsPointerDevice(device);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsPointerDevice_SharedPtr_003
+ * @tc.desc: Test IsPointerDevice with non-pointer device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsPointerDevice_SharedPtr_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    
+    auto result = INPUT_DEV_MGR->IsPointerDevice(device);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsTouchableDevice_SharedPtr_001
+ * @tc.desc: Test IsTouchableDevice with shared_ptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsTouchableDevice_SharedPtr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    
+    auto result = INPUT_DEV_MGR->IsTouchableDevice(device);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsTouchableDevice_SharedPtr_002
+ * @tc.desc: Test IsTouchableDevice with shared_ptr null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsTouchableDevice_SharedPtr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::shared_ptr<InputDevice> device = nullptr;
+    
+    auto result = INPUT_DEV_MGR->IsTouchableDevice(device);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsKeyboardDevice_SharedPtr_001
+ * @tc.desc: Test IsKeyboardDevice with shared_ptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsKeyboardDevice_SharedPtr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    
+    auto result = INPUT_DEV_MGR->IsKeyboardDevice(device);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsKeyboardDevice_SharedPtr_002
+ * @tc.desc: Test IsKeyboardDevice with shared_ptr null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsKeyboardDevice_SharedPtr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::shared_ptr<InputDevice> device = nullptr;
+    
+    auto result = INPUT_DEV_MGR->IsKeyboardDevice(device);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_NotifyInputdeviceMessage_001
+ * @tc.desc: Test NotifyInputdeviceMessage with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyInputdeviceMessage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    int32_t result = INPUT_DEV_MGR->NotifyInputdeviceMessage(nullptr, 1, 1);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetInputDeviceEnabled_001
+ * @tc.desc: Test SetInputDeviceEnabled with invalid deviceId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetInputDeviceEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(true));
+    
+    int32_t result = INPUT_DEV_MGR->SetInputDeviceEnabled(999, true, 1, pid, mockSession);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetInputDeviceEnabled_002
+ * @tc.desc: Test SetInputDeviceEnabled with enable false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetInputDeviceEnabled_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(true));
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    int32_t result = INPUT_DEV_MGR->SetInputDeviceEnabled(1, false, 1, pid, mockSession);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(INPUT_DEV_MGR->inputDevice_[1].enable, false);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_RecoverInputDeviceEnabled_001
+ * @tc.desc: Test RecoverInputDeviceEnabled with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RecoverInputDeviceEnabled_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RecoverInputDeviceEnabled(nullptr));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_RecoverInputDeviceEnabled_002
+ * @tc.desc: Test RecoverInputDeviceEnabled
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RecoverInputDeviceEnabled_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = false;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    INPUT_DEV_MGR->recoverList_[1] = pid;
+    
+    INPUT_DEV_MGR->RecoverInputDeviceEnabled(mockSession);
+    
+    EXPECT_EQ(INPUT_DEV_MGR->inputDevice_[1].enable, true);
+    EXPECT_TRUE(INPUT_DEV_MGR->recoverList_.empty());
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetMultiKeyboardDevice_001
+ * @tc.desc: Test GetMultiKeyboardDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetMultiKeyboardDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::vector<libinput_device*> keyboards;
+    INPUT_DEV_MGR->GetMultiKeyboardDevice(keyboards);
+    
+    EXPECT_TRUE(keyboards.empty());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_Attach_001
+ * @tc.desc: Test Attach
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_Attach_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    class MockObserver : public IDeviceObserver {
+    public:
+        MOCK_METHOD1(OnDeviceAdded, void(int32_t));
+        MOCK_METHOD1(OnDeviceRemoved, void(int32_t));
+        MOCK_METHOD1(OnDeviceFirstReportEvent, void(int32_t));
+        MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
+    };
+    
+    auto observer = std::make_shared<MockObserver>();
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->Attach(observer));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_Detach_001
+ * @tc.desc: Test Detach
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_Detach_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    class MockObserver : public IDeviceObserver {
+    public:
+        MOCK_METHOD1(OnDeviceAdded, void(int32_t));
+        MOCK_METHOD1(OnDeviceRemoved, void(int32_t));
+        MOCK_METHOD1(OnDeviceFirstReportEvent, void(int32_t));
+        MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
+    };
+    
+    auto observer = std::make_shared<MockObserver>();
+    INPUT_DEV_MGR->Attach(observer);
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->Detach(observer));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_NotifyPointerDevice_001
+ * @tc.desc: Test NotifyPointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyPointerDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    class MockObserver : public IDeviceObserver {
+    public:
+        MOCK_METHOD1(OnDeviceAdded, void(int32_t));
+        MOCK_METHOD1(OnDeviceRemoved, void(int32_t));
+        MOCK_METHOD1(OnDeviceFirstReportEvent, void(int32_t));
+        MOCK_METHOD3(UpdatePointerDevice, void(bool, bool, bool));
+    };
+    
+    auto observer = std::make_shared<MockObserver>();
+    EXPECT_CALL(*observer, UpdatePointerDevice(true, true, true));
+    
+    INPUT_DEV_MGR->Attach(observer);
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->NotifyPointerDevice(true, true, true));
+    INPUT_DEV_MGR->Detach(observer);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_FindInputDeviceId_001
+ * @tc.desc: Test FindInputDeviceId with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FindInputDeviceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(nullptr);
+    EXPECT_EQ(deviceId, -1);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_FindInputDeviceId_002
+ * @tc.desc: Test FindInputDeviceId with non-existent device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FindInputDeviceId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    libinput_device* device = reinterpret_cast<libinput_device*>(0x12345678);
+    
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+    EXPECT_EQ(deviceId, -1);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_FindInputDeviceId_003
+ * @tc.desc: Test FindInputDeviceId with existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_FindInputDeviceId_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    int32_t expectedId = 1;
+    libinput_device* device = reinterpret_cast<libinput_device*>(0x12345678);
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = device;
+    INPUT_DEV_MGR->inputDevice_[expectedId] = info;
+    
+    auto deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+    EXPECT_EQ(deviceId, expectedId);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetPhysicalInputDevice_001
+ * @tc.desc: Test GetPhysicalInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetPhysicalInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    std::string physicalId = "test_physical_id";
+    auto physDev = INPUT_DEV_MGR->GetPhysicalInputDevice(physicalId);
+    EXPECT_EQ(physDev, nullptr);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_UpdatePhysicalInputDevice_001
+ * @tc.desc: Test UpdatePhysicalInputDevice with empty physicalId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_UpdatePhysicalInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.physicalId.clear();
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->UpdatePhysicalInputDevice(1, info));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_UpdatePhysicalInputDevice_002
+ * @tc.desc: Test UpdatePhysicalInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_UpdatePhysicalInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.physicalId = "test_physical_id";
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->UpdatePhysicalInputDevice(1, info));
+    
+    auto physDev = INPUT_DEV_MGR->GetPhysicalInputDevice("test_physical_id");
+    ASSERT_NE(physDev, nullptr);
+    
+    INPUT_DEV_MGR->physicalInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_RemoveInputDeviceFromPhysicalDevice_001
+ * @tc.desc: Test RemoveInputDeviceFromPhysicalDevice with empty physicalId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemoveInputDeviceFromPhysicalDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.physicalId.clear();
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RemoveInputDeviceFromPhysicalDevice(1, ""));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_RemoveInputDeviceFromPhysicalDevice_002
+ * @tc.desc: Test RemoveInputDeviceFromPhysicalDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemoveInputDeviceFromPhysicalDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.physicalId = "test_physical_id";
+    INPUT_DEV_MGR->UpdatePhysicalInputDevice(1, info);
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RemoveInputDeviceFromPhysicalDevice(1, "test_physical_id"));
+    
+    auto physDev = INPUT_DEV_MGR->GetPhysicalInputDevice("test_physical_id");
+    EXPECT_EQ(physDev, nullptr);
+    
+    INPUT_DEV_MGR->physicalInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_UpdateInputDeviceCaps_001
+ * @tc.desc: Test UpdateInputDeviceCaps with non-existent device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_UpdateInputDeviceCaps_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->UpdateInputDeviceCaps(999));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_CheckInputDeviceCaps_001
+ * @tc.desc: Test CheckInputDeviceCaps with non-existent device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckInputDeviceCaps_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->CheckInputDeviceCaps(999));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasEnabledPhysicalPointerDevice_001
+ * @tc.desc: Test HasEnabledPhysicalPointerDevice with no devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledPhysicalPointerDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto result = INPUT_DEV_MGR->HasEnabledPhysicalPointerDevice();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasEnabledPhysicalPointerDevice_002
+ * @tc.desc: Test HasEnabledPhysicalPointerDevice with pointer device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledPhysicalPointerDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.isPointerDevice = true;
+    info.isRemote = false;
+    info.isDeviceReportEvent = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    auto result = INPUT_DEV_MGR->HasEnabledPhysicalPointerDevice();
+    EXPECT_TRUE(result);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasEnabledNoEventReportedPhysicalPointerDevice_001
+ * @tc.desc: Test HasEnabledNoEventReportedPhysicalPointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledNoEventReportedPhysicalPointerDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto result = INPUT_DEV_MGR->HasEnabledNoEventReportedPhysicalPointerDevice();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_MakeVirtualDeviceInfo_001
+ * @tc.desc: Test MakeVirtualDeviceInfo with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_MakeVirtualDeviceInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    std::shared_ptr<InputDevice> device = nullptr;
+    
+    auto result = INPUT_DEV_MGR->MakeVirtualDeviceInfo(device, deviceInfo);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_MakeVirtualDeviceInfo_002
+ * @tc.desc: Test MakeVirtualDeviceInfo with pointer device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_MakeVirtualDeviceInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    
+    auto result = INPUT_DEV_MGR->MakeVirtualDeviceInfo(device, deviceInfo);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_TRUE(deviceInfo.isPointerDevice);
+    EXPECT_FALSE(deviceInfo.isTouchableDevice);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_MakeVirtualDeviceInfo_003
+ * @tc.desc: Test MakeVirtualDeviceInfo with touch device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_MakeVirtualDeviceInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+    
+    auto result = INPUT_DEV_MGR->MakeVirtualDeviceInfo(device, deviceInfo);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_TRUE(deviceInfo.isTouchableDevice);
+    EXPECT_FALSE(deviceInfo.isPointerDevice);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetSpecialVirtualDevice_001
+ * @tc.desc: Test SetSpecialVirtualDevice with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->SetSpecialVirtualDevice(nullptr));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_SetSpecialVirtualDevice_002
+ * @tc.desc: Test SetSpecialVirtualDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_SetSpecialVirtualDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->SetName("VirtualKeyboard");
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->SetSpecialVirtualDevice(device));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDeviceInner_001
+ * @tc.desc: Test AddVirtualInputDeviceInner with keyboard device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDeviceInner_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    INPUT_DEV_MGR->virtualKeyboardEverConnected_ = false;
+    
+    int32_t deviceId = 1;
+    auto device = std::make_shared<InputDevice>();
+    device->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->AddVirtualInputDeviceInner(deviceId, device));
+    EXPECT_EQ(INPUT_DEV_MGR->virtualKeyboardEverConnected_, true);
+    
+    INPUT_DEV_MGR->virtualInputDevices_.clear();
+    INPUT_DEV_MGR->virtualKeyboardEverConnected_ = false;
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddPhysicalInputDeviceInner_001
+ * @tc.desc: Test AddPhysicalInputDeviceInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddPhysicalInputDeviceInner_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.physicalId = "test_physical_id";
+    info.enable = true;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->AddPhysicalInputDeviceInner(1, info));
+    
+    auto physDev = INPUT_DEV_MGR->GetPhysicalInputDevice("test_physical_id");
+    ASSERT_NE(physDev, nullptr);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+    INPUT_DEV_MGR->physicalInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_CheckDuplicateInputDevice_Libinput_002
+ * @tc.desc: Test CheckDuplicateInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckDuplicateInputDevice_Libinput_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    libinput_device* device = reinterpret_cast<libinput_device*>(0x12345678);
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.inputDeviceOrigin = device;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    auto result = INPUT_DEV_MGR->CheckDuplicateInputDevice(device);
+    EXPECT_TRUE(result);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_RemovePhysicalInputDeviceInner_001
+ * @tc.desc: Test RemovePhysicalInputDeviceInner with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemovePhysicalInputDeviceInner_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    int32_t deviceId = -1;
+    bool enable = false;
+    bool isDeviceReportEvent = false;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RemovePhysicalInputDeviceInner(nullptr, deviceId, enable, isDeviceReportEvent));
+    EXPECT_EQ(deviceId, -1);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasLocalMouseDevice_001
+ * @tc.desc: Test HasLocalMouseDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasLocalMouseDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto result = INPUT_DEV_MGR->HasLocalMouseDevice();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasTouchDevice_001
+ * @tc.desc: Test HasTouchDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasTouchDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    auto result = INPUT_DEV_MGR->HasTouchDevice();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasTouchDevice_002
+ * @tc.desc: Test HasTouchDevice with touch device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasTouchDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.isTouchableDevice = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    auto result = INPUT_DEV_MGR->HasTouchDevice();
+    EXPECT_TRUE(result);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasPointerDevice_002
+ * @tc.desc: Test HasPointerDevice with pointer device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasPointerDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.isPointerDevice = true;
+    info.isRemote = false;
+    info.isDeviceReportEvent = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    auto result = INPUT_DEV_MGR->HasPointerDevice();
+    EXPECT_TRUE(result);
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_HasPointerDevice_003
+ * @tc.desc: Test HasPointerDevice with remote pointer device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasPointerDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.isPointerDevice = true;
+    info.isRemote = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    
+    auto result = INPUT_DEV_MGR->HasPointerDevice();
+    EXPECT_TRUE(result);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_CheckDevice_002
+ * @tc.desc: Test CheckDevice with physical device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    INPUT_DEV_MGR->inputDevice_[deviceId] = info;
+    
+    auto result = INPUT_DEV_MGR->CheckDevice(deviceId, 
+        [](const IInputDeviceManager::IInputDevice& dev) { return true; });
+    EXPECT_TRUE(result);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_CheckDevice_003
+ * @tc.desc: Test CheckDevice with virtual device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1000;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->SetId(deviceId);
+    INPUT_DEV_MGR->virtualInputDevices_[deviceId] = device;
+    
+    auto result = INPUT_DEV_MGR->CheckDevice(deviceId, 
+        [](const IInputDeviceManager::IInputDevice& dev) { return true; });
+    EXPECT_TRUE(result);
+    
+    INPUT_DEV_MGR->virtualInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ForEachDevice_002
+ * @tc.desc: Test ForEachDevice with devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForEachDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    INPUT_DEV_MGR->inputDevice_[2] = info;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->SetId(1000);
+    INPUT_DEV_MGR->virtualInputDevices_[1000] = device;
+    
+    int count = 0;
+    INPUT_DEV_MGR->ForEachDevice([&count](int32_t id, const IInputDeviceManager::IInputDevice& dev) {
+        count++;
+    });
+    
+    EXPECT_EQ(count, 3);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+    INPUT_DEV_MGR->virtualInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ForDevice_002
+ * @tc.desc: Test ForDevice with physical device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    info.enable = true;
+    INPUT_DEV_MGR->inputDevice_[deviceId] = info;
+    
+    bool called = false;
+    INPUT_DEV_MGR->ForDevice(deviceId, [&called](const IInputDeviceManager::IInputDevice& dev) {
+        called = true;
+    });
+    
+    EXPECT_TRUE(called);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ForDevice_003
+ * @tc.desc: Test ForDevice with virtual device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1000;
+    
+    auto device = std::make_shared<InputDevice>();
+    device->SetId(deviceId);
+    INPUT_DEV_MGR->virtualInputDevices_[deviceId] = device;
+    
+    bool called = false;
+    INPUT_DEV_MGR->ForDevice(deviceId, [&called](const IInputDeviceManager::IInputDevice& dev) {
+        called = true;
+    });
+    
+    EXPECT_TRUE(called);
+    
+    INPUT_DEV_MGR->virtualInputDevices_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ForOneDevice_001
+ * @tc.desc: Test ForOneDevice with null predicates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForOneDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->ForOneDevice(nullptr, nullptr));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->ForOneDevice(
+        [](int32_t id, const IInputDeviceManager::IInputDevice& dev) { return true; }, nullptr));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ForOneDevice_002
+ * @tc.desc: Test ForOneDevice with matching device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ForOneDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    
+    InputDeviceManager::InputDeviceInfo info;
+    INPUT_DEV_MGR->inputDevice_[1] = info;
+    INPUT_DEV_MGR->inputDevice_[2] = info;
+    
+    int foundId = -1;
+    INPUT_DEV_MGR->ForOneDevice(
+        [&foundId](int32_t id, const IInputDeviceManager::IInputDevice& dev) { return id == 1; },
+        [&foundId](int32_t id, const IInputDeviceManager::IInputDevice& dev) { foundId = id; });
+    
+    EXPECT_EQ(foundId, 1);
+    
+    INPUT_DEV_MGR->inputDevice_.clear();
+}
 } // namespace MMI
 } // namespace OHOS
