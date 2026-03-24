@@ -3244,6 +3244,8 @@ public:
     /**
      * Extended function key maximum value
      * Defines the upper bound of the reserved extended function key range
+     * Reserved range: 65536 - 131071 (0x00010000 - 0x0001FFFF)
+     * Total available keys: 65536
      * @internal
      * @since 25
      */
