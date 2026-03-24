@@ -845,7 +845,8 @@ const int32_t KeyEvent::KEYCODE_XKEY = 3232;
 
 // ==================== 扩展功能键常量定义 ====================
 // 第三字节掩码方案：使用bits 16-23作为扩展功能键标识
-// 预留区间: 65536 - 65635 (0x00010000 - 0x000100FF)
+// 预留区间: 65536 - 131071 (0x00010000 - 0x0001FFFF)
+// 可用键数量: 65536个
 // 扩展功能键将跳过拦截器、过滤器和订阅器，直接派发
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0x00FF0000;
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x00010000;
@@ -853,8 +854,8 @@ const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x00010000;
 // 当前使用的扩展功能键
 const int32_t KeyEvent::KEYCODE_EXT_FN_BASE = 65536;
 
-// 预留区间最大值
-const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 65635;
+// 预留区间最大值（使用全部低16位）
+const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 131071;
 
 // 未来如需新的扩展功能键，按以下方式添加:
 // const int32_t KeyEvent::KEYCODE_EXT_FN_2 = 65537;
