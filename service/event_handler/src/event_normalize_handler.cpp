@@ -548,14 +548,24 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         MMI_HILOGI("Currently in factory mode, events are only dispatched");
-        dispatchKeyEvent(keyEvent);
-    } else if (keyEvent->IsExtendedFunctionKey()) {
-        MMI_HILOGI("Extended function key only dispatches events");
-        dispatchKeyEvent(keyEvent);
-    } else {
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        if (eventDispatchHandler != nullptr) {
+            eventDispatchHandler->HandleKeyEvent(keyEvent);
+        }
+        return;
     }
+
+    if (keyEvent->IsExtendedFunctionKey()) {
+        MMI_HILOGI("Extended function key, skip all handlers and process only in KeyCommandHandler");
+        auto keyCommandHandler = InputHandler->GetKeyCommandHandler();
+        if (keyCommandHandler != nullptr) {
+            keyCommandHandler->HandleKeyEvent(keyEvent);
+        }
+        return;
+    }
+
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
