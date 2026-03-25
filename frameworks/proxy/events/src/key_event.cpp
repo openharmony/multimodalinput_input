@@ -895,19 +895,10 @@ const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
 const int32_t maxKeysSize = 1000;
 
-// ==================== 扩展功能键常量定义 ====================
-// 第四字节掩码方案：使用bits 24-31作为扩展功能键标识
-// 预留区间: 16777216 - 33554431 (0x01000000 - 0x01FFFFFF)
-// 扩展功能键将跳过拦截器、过滤器和订阅器，直接派发
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0xFF000000;
 const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x01000000;
-
-// 当前使用的扩展功能键
 const int32_t KeyEvent::KEYCODE_EXT_FN_MIN = 16777216;  // 0x01000000
-
-// 预留区间最大值
 const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 33554431;  // 0x01FFFFFF
-// ==================== 扩展功能键常量定义结束 ====================
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
