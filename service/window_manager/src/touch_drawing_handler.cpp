@@ -166,6 +166,7 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
             isChangedMode_ = true;
         }
     }
+    //  Rotation not changed and validWidth/validHeight changed means Screen valid Area changed.
     bool isScreenAreaChanged = !isChangedRotation_ &&
         (displayInfo_.validWidth != displayInfo.validWidth || displayInfo_.validHeight != displayInfo.validHeight);
     displayInfo_ = displayInfo;
@@ -178,6 +179,7 @@ void TouchDrawingHandler::UpdateDisplayInfo(const OLD::DisplayInfo& displayInfo)
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
         }
+        // If is Window Rotation policy, it's need reset rsnode when Screen valid Area changed.
         isChangedMode_ = isChangedMode_ || isScreenAreaChanged;
     } else {
         if (displayInfo_.direction == DIRECTION90 && PRODUCT_TYPE != PRODUCT_TYPE_PC) {
