@@ -1557,7 +1557,6 @@ std::vector<uint8_t> KeyEvent::GetEnhanceData() const
 bool KeyEvent::IsExtendedFunctionKeyCode(int32_t keyCode)
 {
     CALL_DEBUG_ENTER;
-    // 检查第三个字节(bits 16-23)是否为 0x01
     return (keyCode & EXTENDED_FUNCTION_KEY_MASK) == EXTENDED_FUNCTION_KEY_FLAG;
 }
 
