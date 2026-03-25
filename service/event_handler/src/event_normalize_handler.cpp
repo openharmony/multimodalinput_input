@@ -538,13 +538,6 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
 
-    auto dispatchKeyEvent = [this](const std::shared_ptr<KeyEvent>& event) {
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        if (eventDispatchHandler != nullptr) {
-            eventDispatchHandler->HandleKeyEvent(event);
-        }
-    };
-
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         MMI_HILOGI("Currently in factory mode, events are only dispatched");
