@@ -71,12 +71,12 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode002, TestSize.
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode003, TestSize.Level1)
 {
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN));  // 65536
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX));    // 131071
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN));  // 16777216
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX));    // 33554431
 
     // Test near boundaries
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(65535));    // Just before range
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(131072));   // Just after range
+    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(16777215));   // Just before range
+    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(33554432));   // Just after range
 }
 
 /**
@@ -131,8 +131,8 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyMask001, TestSize.
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyValues001, TestSize.Level1)
 {
-    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MIN, 65536);
-    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MAX, 131071);
+    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MIN, 16777216);
+    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MAX, 33554431);
 }
 
 /**
@@ -165,12 +165,12 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyBitOperation001, T
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeySafetyBuffer001, TestSize.Level1)
 {
-    // Test keys in the safety buffer (10013 - 65535)
+    // Test keys in the safety buffer (10013 - 16777215)
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(10013));
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(20000));
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(32768));
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(50000));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(65535));
+    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(16777215));
 }
 
 /**
@@ -182,30 +182,30 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeySafetyBuffer001, T
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyFullRange001, TestSize.Level1)
 {
     // Test start, middle, and end of reserved range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(65536));    // Start (KEYCODE_EXT_FN_MIN)
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(98304));    // Middle
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(131071));   // End (KEYCODE_EXT_FN_MAX)
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(16777216));  // Start (KEYCODE_EXT_FN_MIN)
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(25165823));  // Middle
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(33554431));  // End (KEYCODE_EXT_FN_MAX)
 
     // Verify sample keys in reserved range are identified
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(70000));
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(100000));
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(130000));
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(20000000));
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(25000000));
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(30000000));
 }
 
 /**
- * @tc.name: TestExtendedFunctionKeyThirdByte001
- * @tc.desc: Test that third byte (bits 16-23) is correctly identified
+ * @tc.name: TestExtendedFunctionKeyFourthByte001
+ * @tc.desc: Test that fourth byte (bits 24-31) is correctly identified
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyThirdByte001, TestSize.Level1)
+HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyFourthByte001, TestSize.Level1)
 {
-    // Test keys with different third byte values
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(0x00010000));  // Third byte = 0x01
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(0x000100FF));  // Third byte = 0x01
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0x00020000)); // Third byte = 0x02
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0x00030000)); // Third byte = 0x03
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0x00FF0000)); // Third byte = 0xFF
+    // Test keys with different fourth byte values
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(0x01000000));  // Fourth byte = 0x01
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(0x01FFFFFF));  // Fourth byte = 0x01
+    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0x02000000)); // Fourth byte = 0x02
+    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0x03000000)); // Fourth byte = 0x03
+    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0xFF000000)); // Fourth byte = 0xFF
 }
 
 /**
@@ -218,7 +218,7 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyReservedRange001, 
 {
     // Verify the reserved range is properly defined
     EXPECT_LT(KeyEvent::KEYCODE_EXT_FN_MIN, KeyEvent::KEYCODE_EXT_FN_MAX);
-    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MAX - KeyEvent::KEYCODE_EXT_FN_MIN, 65535);
+    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MAX - KeyEvent::KEYCODE_EXT_FN_MIN, 16777215);
 
     // Test that keys outside reserved range are not identified
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN - 1));
@@ -227,18 +227,18 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyReservedRange001, 
 
 /**
  * @tc.name: TestExtendedFunctionKeyExpandedCapacity001
- * @tc.desc: Test expanded capacity of extended function keys (65536 keys)
+ * @tc.desc: Test expanded capacity of extended function keys (16777216 keys)
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyExpandedCapacity001, TestSize.Level1)
 {
-    // Verify the expanded capacity: 65536 keys (65536 to 131071)
-    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MAX - KeyEvent::KEYCODE_EXT_FN_MIN, 65535);
+    // Verify the expanded capacity: 16777216 keys (16777216 to 33554431)
+    EXPECT_EQ(KeyEvent::KEYCODE_EXT_FN_MAX - KeyEvent::KEYCODE_EXT_FN_MIN, 16777215);
 
     // Test keys at various positions in the expanded range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(70000));   // Low-mid range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(100000));  // Mid range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(130000));  // High-mid range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(131071));  // Maximum value
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(20000000));  // Low-mid range
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(25000000));  // Mid range
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(30000000));  // High-mid range
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(33554431));  // Maximum value
 }
