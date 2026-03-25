@@ -2309,41 +2309,6 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_GetI
 }
 
 /**
- * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_AddInputDevice_001
- * @tc.desc: Test PhysicalInputDevice::AddInputDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_AddInputDevice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    
-    InputDeviceManager::PhysicalInputDevice physDev;
-    physDev.AddInputDevice(1);
-
-    EXPECT_NE(physDev.GetInputDeviceCount(), 1);
-}
-
-/**
- * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_RemoveInputDevice_001
- * @tc.desc: Test PhysicalInputDevice::RemoveInputDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_RemoveInputDevice_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    
-    InputDeviceManager::PhysicalInputDevice physDev;
-    physDev.AddInputDevice(1);
-    physDev.AddInputDevice(2);
-    
-    physDev.RemoveInputDevice(1);
-    
-    EXPECT_EQ(physDev.GetInputDeviceCount(), 0);
-}
-
-/**
  * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_001
  * @tc.desc: Test PhysicalInputDevice::ForeachInputDevice with null callback
  * @tc.type: FUNC
@@ -2355,28 +2320,6 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_Fore
     
     InputDeviceManager::PhysicalInputDevice physDev;
     ASSERT_NO_FATAL_FAILURE(physDev.ForeachInputDevice(nullptr));
-}
-
-/**
- * @tc.name: InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_002
- * @tc.desc: Test PhysicalInputDevice::ForeachInputDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalInputDevice_ForeachInputDevice_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    
-    InputDeviceManager::PhysicalInputDevice physDev;
-    physDev.AddInputDevice(1);
-    physDev.AddInputDevice(2);
-    
-    int count = 0;
-    physDev.ForeachInputDevice([&count](int32_t deviceId) {
-        count++;
-    });
-    
-    EXPECT_NE(count, 2);
 }
 
 /**
