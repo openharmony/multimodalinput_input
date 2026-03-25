@@ -842,26 +842,6 @@ const int32_t KeyEvent::KEYCODE_DIV = 3220;
 const int32_t KeyEvent::KEYCODE_KEY_PEN_MODE_SWITCH = 3221;
 const int32_t KeyEvent::KEYCODE_MMX_TOUCH = 3222;
 const int32_t KeyEvent::KEYCODE_XKEY = 3232;
-
-// ==================== 扩展功能键常量定义 ====================
-// 第三字节掩码方案：使用bits 16-23作为扩展功能键标识
-// 预留区间: 65536 - 131071 (0x00010000 - 0x0001FFFF)
-// 可用键数量: 65536个
-// 扩展功能键将跳过拦截器、过滤器和订阅器，直接派发
-const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0x00FF0000;
-const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x00010000;
-
-// 当前使用的扩展功能键
-const int32_t KeyEvent::KEYCODE_EXT_FN_BASE = 65536;
-
-// 预留区间最大值（使用全部低16位）
-const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 131071;
-
-// 未来如需新的扩展功能键，按以下方式添加:
-// const int32_t KeyEvent::KEYCODE_EXT_FN_2 = 65537;
-// const int32_t KeyEvent::KEYCODE_EXT_FN_3 = 65538;
-// ==================== 扩展功能键常量定义结束 ====================
-
 const int32_t KeyEvent::KEYCODE_REMOTE_POWER = 4000;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_DOWN = 10002;
@@ -914,6 +894,11 @@ const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
 const int32_t maxKeysSize = 1000;
+
+const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0x00FF0000;
+const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x00010000;
+const int32_t KeyEvent::KEYCODE_EXT_FN_MIN = 65536;
+const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 131071;
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };

@@ -3212,7 +3212,6 @@ public:
      */
     static const int32_t KEYCODE_XKEY;
 
-    // ==================== 扩展功能键定义开始 ====================
     /**
      * Extended function key mask (third byte)
      * Used to identify extended function keys by checking bits 16-23
@@ -3239,7 +3238,7 @@ public:
      * @internal
      * @since 25
      */
-    static const int32_t KEYCODE_EXT_FN_BASE;
+    static const int32_t KEYCODE_EXT_FN_MIN;
 
     /**
      * Extended function key maximum value
@@ -3250,7 +3249,6 @@ public:
      * @since 25
      */
     static const int32_t KEYCODE_EXT_FN_MAX;
-    // ==================== 扩展功能键定义结束 ====================
 
 public:
     class KeyItem {

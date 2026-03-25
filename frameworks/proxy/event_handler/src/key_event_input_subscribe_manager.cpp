@@ -378,12 +378,6 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
 
-    // 扩展功能键不触发订阅回调，直接返回成功
-    if (event->IsExtendedFunctionKey()) {
-        MMI_HILOGD("Extended function key %{public}d skip subscribe callback", event->GetKeyCode());
-        return RET_OK;
-    }
-
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     std::shared_ptr<const KeyEventInputSubscribeManager::SubscribeKeyEventInfo> info =
         GetSubscribeKeyEvent(subscribeId);

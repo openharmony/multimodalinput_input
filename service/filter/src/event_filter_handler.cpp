@@ -158,13 +158,6 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
-
-    // 扩展功能键不经过过滤处理，直接返回false
-    if (event->IsExtendedFunctionKey()) {
-        MMI_HILOGD("Extended function key %{public}d skip filter", event->GetKeyCode());
-        return false;
-    }
-
     std::lock_guard<std::mutex> guard(lockFilter_);
     if (filters_.empty()) {
         return false;

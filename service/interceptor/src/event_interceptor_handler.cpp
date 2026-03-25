@@ -43,15 +43,6 @@ constexpr int32_t ACCESSIBILITY_UID { 1103 };
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-
-    // 扩展功能键不经过拦截处理，直接返回
-    if (keyEvent->IsExtendedFunctionKey()) {
-        MMI_HILOGD("Extended function key %{public}d skip interceptor", keyEvent->GetKeyCode());
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
-        return;
-    }
-
     if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
         return;
     }
