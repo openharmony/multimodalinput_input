@@ -537,12 +537,21 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     CHKPV(keyEvent);
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
+
+    auto dispatchKeyEvent = [this](const std::shared_ptr<KeyEvent>& event) {
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        if (eventDispatchHandler != nullptr) {
+            eventDispatchHandler->HandleKeyEvent(event);
+        }
+    };
+
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         MMI_HILOGI("Currently in factory mode, events are only dispatched");
-        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        CHKPV(eventDispatchHandler);
-        eventDispatchHandler->HandleKeyEvent(keyEvent);
+        dispatchKeyEvent(keyEvent);
+    } else if (keyEvent->IsExtendedFunctionKey()) {
+        MMI_HILOGI("Extended function key only dispatches events");
+        dispatchKeyEvent(keyEvent);
     } else {
         CHKPV(nextHandler_);
         nextHandler_->HandleKeyEvent(keyEvent);
