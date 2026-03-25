@@ -71,15 +71,15 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode002, TestSize.
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode003, TestSize.Level1)
 {
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN));  // 0x01000000, Fourth byte mask identifier
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX));    // 0x01FFFFFF, Maximum value in reserved range
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN));  // 0x01000000
+    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX));  // 0x01FFFFFF
 
     // Test near boundaries
-    // 16777215 = 0x00FFFFFF, Just before KEYCODE_EXT_FN_MIN (fourth byte is 0x00, not 0x01)
-    int32_t keyJustBelowExtFnMin = 16777215;  // 0x00FFFFFF, Just before KEYCODE_EXT_FN_MIN (fourth byte is 0x00, not 0x01)
+    // 16777215 = 0x00FFFFFF, Just before KEYCODE_EXT_FN_MIN
+    int32_t keyJustBelowExtFnMin = 16777215;
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyJustBelowExtFnMin));
-    // 33554432 = 0x02000000, Just after KEYCODE_EXT_FN_MAX (fourth byte is 0x02, not 0x01)
-    int32_t keyJustAboveExtFnMax = 33554432;  // 0x02000000, Just after KEYCODE_EXT_FN_MAX (fourth byte is 0x02, not 0x01)
+    // 33554432 = 0x02000000, Just after KEYCODE_EXT_FN_MAX
+    int32_t keyJustAboveExtFnMax = 33554432;
     EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyJustAboveExtFnMax));
 }
 
