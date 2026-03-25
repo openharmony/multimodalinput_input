@@ -3231,7 +3231,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckDevice_003, TestSiz
     device->SetId(deviceId);
     INPUT_DEV_MGR->virtualInputDevices_[deviceId] = device;
     
-    auto result = INPUT_DEV_MGR->CheckDevice(deviceId, 
+    auto result = INPUT_DEV_MGR->CheckDevice(deviceId,
         [](const IInputDeviceManager::IInputDevice& dev) { return true; });
     EXPECT_TRUE(result);
     
