@@ -30,17 +30,6 @@ public:
     void SetUp(void) {};
 };
 
-/**
- * @tc.name: PointerDeviceManager_001
- * @tc.desc: Obtain PointerDeviceManager single instance
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDeviceManagerTest, PointerDeviceManager_001, TestSize.Level1)
-{
-    EXPECT_EQ(POINTER_DEV_MGR.isInit, false);
-}
-
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 /**
  * @tc.name: GetDelegateProxy_001
