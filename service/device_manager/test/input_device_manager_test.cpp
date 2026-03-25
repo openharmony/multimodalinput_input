@@ -2919,12 +2919,12 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledPhysicalPointe
 }
 
 /**
- * @tc.name: InputDeviceManagerTest_HasEnabledNoEventReportedPhysicalPointerDevice_001
+ * @tc.name: InputDeviceManagerTest_PhysicalPointerDevice_001
  * @tc.desc: Test HasEnabledNoEventReportedPhysicalPointerDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_HasEnabledNoEventReportedPhysicalPointerDevice_001, TestSize.Level1)
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_PhysicalPointerDevice_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     
@@ -3100,7 +3100,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_RemovePhysicalInputDevic
     bool enable = false;
     bool isDeviceReportEvent = false;
     
-    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->RemovePhysicalInputDeviceInner(nullptr, deviceId, enable, isDeviceReportEvent));
+    INPUT_DEV_MGR->RemovePhysicalInputDeviceInner(nullptr, deviceId, enable, isDeviceReportEvent);
     EXPECT_EQ(deviceId, -1);
 }
 
@@ -3209,7 +3209,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_CheckDevice_002, TestSiz
     info.enable = true;
     INPUT_DEV_MGR->inputDevice_[deviceId] = info;
     
-    auto result = INPUT_DEV_MGR->CheckDevice(deviceId, 
+    auto result = INPUT_DEV_MGR->CheckDevice(deviceId,
         [](const IInputDeviceManager::IInputDevice& dev) { return true; });
     EXPECT_TRUE(result);
     
