@@ -4147,7 +4147,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 firstBtnDownWindowInfo = {-1, -1};
             }
         }
-    } else {
+    } else if (action != PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
         if (axisBeginWindowInfo_ &&
             (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE || action == PointerEvent::POINTER_ACTION_AXIS_END)) {
             firstBtnDownWindowInfo = {axisBeginWindowInfo_->id, axisBeginWindowInfo_->displayId};
