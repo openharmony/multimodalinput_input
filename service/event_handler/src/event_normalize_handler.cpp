@@ -549,9 +549,8 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         MMI_HILOGI("Currently in factory mode, events are only dispatched");
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
-        if (eventDispatchHandler != nullptr) {
-            eventDispatchHandler->HandleKeyEvent(keyEvent);
-        }
+        CHKPV(eventDispatchHandler);
+        eventDispatchHandler->HandleKeyEvent(keyEvent);
         return;
     }
 
