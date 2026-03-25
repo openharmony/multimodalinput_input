@@ -15257,5 +15257,261 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformCoordToAdjace
     inputWindowsMgr.TransformCoordToAdjacentDisplay(displayInfo1, physicalX, physicalY, displayId);
     EXPECT_GT(displayId, 0);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_TouchpadActive_001
+ * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_TOUCHPAD_ACTIVE, firstBtnDownWindowInfo_ should not be modified
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_TouchpadActive_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 10;
+    windowInfo.displayId = 1;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back({50, 50, 200, 200});
+
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 5;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = 1;
+    auto originalValue = inputWindowsManager.firstBtnDownWindowInfo_;
+
+    auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
+
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, originalValue.first);
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, originalValue.second);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_TouchpadActive_002
+ * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_TOUCHPAD_ACTIVE when firstBtnDownWindowInfo_ is -1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_TouchpadActive_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 20;
+    windowInfo.displayId = 1;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back({50, 50, 200, 200});
+
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    inputWindowsManager.firstBtnDownWindowInfo_.first = -1;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = -1;
+
+    auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
+
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, -1);
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_ButtonDown_001
+ * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_BUTTON_DOWN, firstBtnDownWindowInfo_ should be modified
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_ButtonDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->pressedButtons_.insert(PointerEvent::MOUSE_BUTTON_LEFT);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 30;
+    windowInfo.displayId = 1;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back({50, 50, 200, 200});
+
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    inputWindowsManager.firstBtnDownWindowInfo_.first = -1;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = -1;
+
+    auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
+
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, 30);
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_TouchpadActive_WithRedispatchFlag
+ * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_TOUCHPAD_ACTIVE and EVENT_FLAG_REDISPATCH
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_TouchpadActive_WithRedispatchFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_REDISPATCH;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 40;
+    windowInfo.displayId = 1;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back({50, 50, 200, 200});
+
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 5;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = 1;
+    auto originalValue = inputWindowsManager.firstBtnDownWindowInfo_;
+
+    auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
+
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, originalValue.first);
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, originalValue.second);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_ButtonDown_WithRedispatchFlag
+ * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_BUTTON_DOWN and EVENT_FLAG_REDISPATCH,
+ *           firstBtnDownWindowInfo_ should not be modified (dispatchEventFlag == true branch)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_ButtonDown_WithRedispatchFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->pressedButtons_.insert(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_REDISPATCH;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 50;
+    windowInfo.displayId = 1;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back({50, 50, 200, 200});
+
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 5;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = 1;
+    auto originalValue = inputWindowsManager.firstBtnDownWindowInfo_;
+
+    auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
+
+    // When dispatchEventFlag is true and action is BUTTON_DOWN (not AXIS_UPDATE/AXIS_END),
+    // firstBtnDownWindowInfo_ should not be modified
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, originalValue.first);
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, originalValue.second);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_AxisUpdate_WithRedispatchFlag
+ * @tc.desc: Test SelectWindowInfo with POINTER_ACTION_AXIS_UPDATE and EVENT_FLAG_REDISPATCH,
+ *           axisBeginWindowInfoMap_ branch (dispatchEventFlag == true && action == AXIS_UPDATE)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_AxisUpdate_WithRedispatchFlag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 100;
+    int32_t logicalY = 100;
+
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_REDISPATCH;
+    pointerEvent->SetZOrder(0);
+
+    WindowInfo windowInfo;
+    windowInfo.id = 60;
+    windowInfo.displayId = 1;
+    windowInfo.flags = 0;
+    windowInfo.pointerHotAreas.push_back({50, 50, 200, 200});
+
+    auto it = inputWindowsManager.displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager.displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+    }
+
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 5;
+    inputWindowsManager.firstBtnDownWindowInfo_.second = 1;
+    auto originalValue = inputWindowsManager.firstBtnDownWindowInfo_;
+
+    // Set axisBeginWindowInfoMap_ with a window info
+    WindowInfo axisWindowInfo;
+    axisWindowInfo.id = 60;
+    axisWindowInfo.displayId = 1;
+    inputWindowsManager.axisBeginWindowInfoMap_[0] = axisWindowInfo;
+
+    auto result = inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent);
+
+    // When dispatchEventFlag is true and action is AXIS_UPDATE, firstBtnDownWindowInfo_ should not be modified
+    // because the assignment only happens in the else-if branch
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.first, originalValue.first);
+    EXPECT_EQ(inputWindowsManager.firstBtnDownWindowInfo_.second, originalValue.second);
+}
 } // namespace MMI
 } // namespace OHOS
