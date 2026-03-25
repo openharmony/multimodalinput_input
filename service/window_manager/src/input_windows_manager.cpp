@@ -4465,6 +4465,10 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow)
 {
     CHKPV(pointerEvent);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE) {
+        MMI_HILOGI("Skip refresh lastPointerEvent_ for TOUCHPAD_ACTIVE");
+        return;
+    }
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_REDISPATCH)) {
         {
             std::lock_guard<std::mutex> guard(mtx_);
