@@ -3213,15 +3213,15 @@ public:
     static const int32_t KEYCODE_XKEY;
 
     /**
-     * Extended function key mask (third byte)
-     * Used to identify extended function keys by checking bits 16-23
+     * Extended function key mask (fourth byte)
+     * Used to identify extended function keys by checking bits 24-31
      * @internal
      * @since 25
      */
     static const uint32_t EXTENDED_FUNCTION_KEY_MASK;
 
     /**
-     * Extended function key flag (third byte = 0x01)
+     * Extended function key flag (fourth byte = 0x01)
      * @internal
      * @since 25
      */
@@ -3230,7 +3230,7 @@ public:
     /**
      * Extended function key base
      * Base extended function key for internal system use
-     * Reserved range: 65536 - 65635 (0x00010000 - 0x000100FF)
+     * Reserved range: 16777216 - 33554431 (0x01000000 - 0x01FFFFFF)
      *
      * Extended function keys will skip interceptors, filters, and subscribers.
      * They are only dispatched to windows and not exposed to applications.
@@ -3243,8 +3243,8 @@ public:
     /**
      * Extended function key maximum value
      * Defines the upper bound of the reserved extended function key range
-     * Reserved range: 65536 - 131071 (0x00010000 - 0x0001FFFF)
-     * Total available keys: 65536
+     * Reserved range: 16777216 - 33554431 (0x01000000 - 0x01FFFFFF)
+     * Total available keys: 16777216
      * @internal
      * @since 25
      */

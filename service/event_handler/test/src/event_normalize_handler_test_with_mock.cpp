@@ -155,7 +155,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN); // 65536
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN); // 16777216
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -184,7 +184,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX); // 131071
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX); // 33554431
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -210,8 +210,8 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    // Use a value in the middle: (65536 + 131071) / 2 = 98303
-    keyEvent->SetKeyCode(98303);
+    // Use a value in the middle: (16777216 + 33554431) / 2 = 25165823
+    keyEvent->SetKeyCode(25165823);
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -268,7 +268,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN - 1); // 65535, just below the range
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN - 1); // 16777215, just below the range
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -298,7 +298,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX + 1); // 131072, just above the range
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX + 1); // 33554432, just above the range
 
     EventNormalizeHandler eventHandler;
     auto nextHandler = std::make_shared<InputEventHandlerMock>();
@@ -368,11 +368,11 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
 {
     CALL_TEST_DEBUG;
     std::vector<int32_t> extendedKeyCodes = {
-        KeyEvent::KEYCODE_EXT_FN_MIN,           // 65536
-        KeyEvent::KEYCODE_EXT_FN_MIN + 100,     // 65636
-        KeyEvent::KEYCODE_EXT_FN_MIN + 1000,    // 66536
-        KeyEvent::KEYCODE_EXT_FN_MAX - 1000,    // 130071
-        KeyEvent::KEYCODE_EXT_FN_MAX            // 131071
+        KeyEvent::KEYCODE_EXT_FN_MIN,            // 16777216
+        KeyEvent::KEYCODE_EXT_FN_MIN + 100,      // 16778316
+        KeyEvent::KEYCODE_EXT_FN_MIN + 1000,     // 16778216
+        KeyEvent::KEYCODE_EXT_FN_MAX - 1000,     // 33553431
+        KeyEvent::KEYCODE_EXT_FN_MAX             // 33554431
     };
 
     for (auto keyCode : extendedKeyCodes) {
