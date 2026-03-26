@@ -5248,7 +5248,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_010, TestS
     int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
     bool bNeedResetPointerId = true;
     int32_t diffPointerId = 10000;
-    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, useCoordinate, bNeedResetPointerId, diffPointerId);
+    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap,
+        useCoordinate, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 }
 
@@ -5524,7 +5525,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ScreenFactor_002, TestSize.L
 
 /**
  * @tc.name: ServerMsgHandlerTest_DealGesturePointers_003
- * @tc.desc: Test the function DealGesturePointers with ACCESSIBILITY flag
+ * @tc.desc: Test the function DealGesturePointers
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5567,7 +5568,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_011, TestS
 
 /**
  * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_012
- * @tc.desc: Test the function FixTargetWindowId with accessibility flag
+ * @tc.desc: Test the function FixTargetWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5642,7 +5643,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_010, Test
 
 /**
  * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_011
- * @tc.desc: Test the function SaveTargetWindowId with accessibility flag
+ * @tc.desc: Test the function SaveTargetWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5692,7 +5693,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_012, Test
 
 /**
  * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_013
- * @tc.desc: Test the function SaveTargetWindowId with accessibility flag and HOVER_EXIT
+ * @tc.desc: Test the function SaveTargetWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -5816,7 +5817,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_006, Te
     int32_t userId = 100;
     int32_t pid = 1234;
     bool isNativeInject = true;
-    int32_t result = msgHandler.OnInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
+    int32_t result = msgHandler.OnInjectPointerEvent(userId, pointerEvent, pid,
+        isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
     EXPECT_EQ(result, ERROR_NULL_POINTER);
 }
 
