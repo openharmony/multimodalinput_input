@@ -1560,11 +1560,5 @@ bool KeyEvent::IsExtendedFunctionKeyCode(int32_t keyCode)
     return (keyCode & EXTENDED_FUNCTION_KEY_MASK) == EXTENDED_FUNCTION_KEY_FLAG;
 }
 
-bool KeyEvent::IsExtendedFunctionKey() const
-{
-    CALL_DEBUG_ENTER;
-    return IsExtendedFunctionKeyCode(keyCode_);
-}
-
 } // namespace MMI
 } // namespace OHOS
