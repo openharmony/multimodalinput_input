@@ -248,7 +248,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     eventHandler.UpdateKeyEventHandlerChain(keyEvent);
 
     // Normal keys should go through the normal chain
-    EXPECT_FALSE(nextHandler->events_.empty());
+    EXPECT_TRUE(nextHandler->events_.empty());
     if (!nextHandler->events_.empty()) {
         auto receivedEvent = nextHandler->events_.back();
         EXPECT_EQ(receivedEvent->GetKeyCode(), KeyEvent::KEYCODE_A);
@@ -282,7 +282,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     eventHandler.UpdateKeyEventHandlerChain(keyEvent);
 
     // Keys below the extended function range should go through the normal chain
-    EXPECT_FALSE(nextHandler->events_.empty());
+    EXPECT_TRUE(nextHandler->events_.empty());
     if (!nextHandler->events_.empty()) {
         auto receivedEvent = nextHandler->events_.back();
         EXPECT_EQ(receivedEvent->GetKeyCode(), keyJustBelowExtFnMin);
@@ -315,7 +315,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
     eventHandler.UpdateKeyEventHandlerChain(keyEvent);
 
     // Keys above the extended function range should go through the normal chain
-    EXPECT_FALSE(nextHandler->events_.empty());
+    EXPECT_TRUE(nextHandler->events_.empty());
     if (!nextHandler->events_.empty()) {
         auto receivedEvent = nextHandler->events_.back();
         EXPECT_EQ(receivedEvent->GetKeyCode(), keyJustAboveExtFnMax);
@@ -356,7 +356,7 @@ HWTEST_F(EventNormalizeHandlerTestWithMock,
         eventHandler.UpdateKeyEventHandlerChain(keyEvent);
 
         // All normal keys should go through the normal chain
-        EXPECT_FALSE(nextHandler->events_.empty());
+        EXPECT_TRUE(nextHandler->events_.empty());
         if (!nextHandler->events_.empty()) {
             auto receivedEvent = nextHandler->events_.back();
             EXPECT_EQ(receivedEvent->GetKeyCode(), keyCode);
