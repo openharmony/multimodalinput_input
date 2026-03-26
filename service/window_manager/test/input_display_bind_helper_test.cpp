@@ -1260,5 +1260,929 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayBindIn
     bindInfo.displayName_ = "hp 223";
     ASSERT_NO_FATAL_FAILURE(idh.GetDisplayBindInfo(infos));
 }
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_Getters_01
+ * @tc.desc: Test BindInfo getter methods with valid data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Getters_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputNodeName_ = "input0";
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    
+    EXPECT_EQ(bindInfo.GetInputDeviceId(), 1);
+    EXPECT_EQ(bindInfo.GetInputNodeName(), "input0");
+    EXPECT_EQ(bindInfo.GetInputDeviceName(), "mouse");
+    EXPECT_EQ(bindInfo.GetDisplayId(), 0);
+    EXPECT_EQ(bindInfo.GetDisplayName(), "hp 223");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_IsUnbind_01
+ * @tc.desc: Test BindInfo IsUnbind with different states
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_IsUnbind_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceId_ = -1;
+    bindInfo1.displayId_ = 0;
+    EXPECT_TRUE(bindInfo1.IsUnbind());
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceId_ = 1;
+    bindInfo2.displayId_ = -1;
+    EXPECT_TRUE(bindInfo2.IsUnbind());
+    
+    BindInfo bindInfo3;
+    bindInfo3.inputDeviceId_ = 1;
+    bindInfo3.displayId_ = 0;
+    EXPECT_FALSE(bindInfo3.IsUnbind());
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_InputDeviceNotBind_01
+ * @tc.desc: Test BindInfo InputDeviceNotBind method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_InputDeviceNotBind_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceId_ = -1;
+    EXPECT_TRUE(bindInfo1.InputDeviceNotBind());
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceId_ = 1;
+    EXPECT_FALSE(bindInfo2.InputDeviceNotBind());
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_DisplayNotBind_01
+ * @tc.desc: Test BindInfo DisplayNotBind method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_DisplayNotBind_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo1;
+    bindInfo1.displayId_ = -1;
+    EXPECT_TRUE(bindInfo1.DisplayNotBind());
+    
+    BindInfo bindInfo2;
+    bindInfo2.displayId_ = 0;
+    EXPECT_FALSE(bindInfo2.DisplayNotBind());
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_RemoveInputDevice_01
+ * @tc.desc: Test BindInfo RemoveInputDevice method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_RemoveInputDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputNodeName_ = "input0";
+    bindInfo.inputDeviceName_ = "mouse";
+    
+    bindInfo.RemoveInputDevice();
+    
+    EXPECT_EQ(bindInfo.GetInputDeviceId(), -1);
+    EXPECT_EQ(bindInfo.GetInputDeviceName(), "");
+    EXPECT_EQ(bindInfo.GetInputNodeName(), "input0");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_RemoveDisplay_01
+ * @tc.desc: Test BindInfo RemoveDisplay method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_RemoveDisplay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    
+    bindInfo.RemoveDisplay();
+    
+    EXPECT_EQ(bindInfo.GetDisplayId(), -1);
+    EXPECT_EQ(bindInfo.GetDisplayName(), "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_AddInputDevice_Fail_01
+ * @tc.desc: Test BindInfo AddInputDevice fail when already set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddInputDevice_Fail_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    
+    bool ret = bindInfo.AddInputDevice(2, "input1", "keyboard");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_AddInputDevice_Fail_02
+ * @tc.desc: Test BindInfo AddInputDevice fail when nodeName not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddInputDevice_Fail_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputNodeName_ = "input0";
+    
+    bool ret = bindInfo.AddInputDevice(1, "input1", "mouse");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_AddInputDevice_Fail_03
+ * @tc.desc: Test BindInfo AddInputDevice fail when deviceName not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddInputDevice_Fail_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    
+    bool ret = bindInfo.AddInputDevice(1, "input0", "mouse");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_AddDisplay_Fail_01
+ * @tc.desc: Test BindInfo AddDisplay fail when already set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddDisplay_Fail_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = 0;
+    
+    bool ret = bindInfo.AddDisplay(1, "hp 224");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_AddDisplay_Fail_02
+ * @tc.desc: Test BindInfo AddDisplay fail when displayName not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_AddDisplay_Fail_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayName_ = "hp 223";
+    
+    bool ret = bindInfo.AddDisplay(0, "hp 224");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_Operator_Less_01
+ * @tc.desc: Test BindInfo operator < with different inputDeviceId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Operator_Less_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceId_ = 1;
+    bindInfo1.displayId_ = 0;
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceId_ = 2;
+    bindInfo2.displayId_ = 0;
+    
+    EXPECT_TRUE(bindInfo1 < bindInfo2);
+    EXPECT_FALSE(bindInfo2 < bindInfo1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_Operator_Less_02
+ * @tc.desc: Test BindInfo operator < with same inputDeviceId different displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Operator_Less_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceId_ = 1;
+    bindInfo1.displayId_ = 0;
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceId_ = 1;
+    bindInfo2.displayId_ = 1;
+    
+    EXPECT_TRUE(bindInfo1 < bindInfo2);
+    EXPECT_FALSE(bindInfo2 < bindInfo1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_Operator_Stream_Out_01
+ * @tc.desc: Test BindInfo operator << output format
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Operator_Stream_Out_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayName_ = "hp 223";
+    
+    std::ostringstream oss;
+    oss << bindInfo;
+    
+    EXPECT_EQ(oss.str(), "mouse<=>hp 223\n");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_Operator_Stream_In_01
+ * @tc.desc: Test BindInfo operator >> with valid format
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Operator_Stream_In_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::istringstream iss("mouse<=>hp 223\n");
+    BindInfo bindInfo;
+    
+    iss >> bindInfo;
+    
+    EXPECT_EQ(bindInfo.inputDeviceName_, "mouse");
+    EXPECT_EQ(bindInfo.displayName_, "hp 223");
+    EXPECT_EQ(bindInfo.inputDeviceId_, 0);
+    EXPECT_EQ(bindInfo.displayId_, 0);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfo_Operator_Stream_In_02
+ * @tc.desc: Test BindInfo operator >> with invalid format
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfo_Operator_Stream_In_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::istringstream iss("invalid format\n");
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "original";
+    bindInfo.displayName_ = "original";
+    
+    iss >> bindInfo;
+    
+    EXPECT_EQ(bindInfo.inputDeviceName_, "original");
+    EXPECT_EQ(bindInfo.displayName_, "original");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetDesc_01
+ * @tc.desc: Test BindInfos GetDesc with multiple items
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetDesc_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceId_ = 1;
+    bindInfo1.inputDeviceName_ = "mouse";
+    bindInfo1.displayId_ = 0;
+    bindInfo1.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo1);
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceId_ = 2;
+    bindInfo2.inputDeviceName_ = "keyboard";
+    bindInfo2.displayId_ = 1;
+    bindInfo2.displayName_ = "think 123";
+    bindInfos.infos_.push_back(bindInfo2);
+    
+    std::string desc = bindInfos.GetDesc();
+    EXPECT_NE(desc.find("index:0"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetInfos_01
+ * @tc.desc: Test BindInfos GetInfos method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetInfos_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    const auto &infos = bindInfos.GetInfos();
+    EXPECT_EQ(infos.size(), 1);
+    EXPECT_EQ(infos.front().GetInputDeviceId(), 1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetBindDisplayIdByInputDevice_01
+ * @tc.desc: Test BindInfos GetBindDisplayIdByInputDevice with unbind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetBindDisplayIdByInputDevice_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.displayId_ = -1;
+    bindInfos.infos_.push_back(bindInfo);
+    
+    int32_t ret = bindInfos.GetBindDisplayIdByInputDevice(1);
+    EXPECT_EQ(ret, -1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetBindDisplayIdByInputDevice_02
+ * @tc.desc: Test BindInfos GetBindDisplayIdByInputDevice not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetBindDisplayIdByInputDevice_02,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.displayId_ = 0;
+    bindInfos.infos_.push_back(bindInfo);
+    
+    int32_t ret = bindInfos.GetBindDisplayIdByInputDevice(999);
+    EXPECT_EQ(ret, -1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetBindDisplayNameByInputDevice_01
+ * @tc.desc: Test BindInfos GetBindDisplayNameByInputDevice with unbind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetBindDisplayNameByInputDevice_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    std::string ret = bindInfos.GetBindDisplayNameByInputDevice(1);
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetDisplayNameByInputDevice_01
+ * @tc.desc: Test BindInfos GetDisplayNameByInputDevice method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetDisplayNameByInputDevice_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    std::string ret = bindInfos.GetDisplayNameByInputDevice("mouse");
+    EXPECT_EQ(ret, "hp 223");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetDisplayNameByInputDevice_02
+ * @tc.desc: Test BindInfos GetDisplayNameByInputDevice not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetDisplayNameByInputDevice_02,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    std::string ret = bindInfos.GetDisplayNameByInputDevice("keyboard");
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetInputDeviceByDisplayName_01
+ * @tc.desc: Test BindInfos GetInputDeviceByDisplayName method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetInputDeviceByDisplayName_01,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    std::string ret = bindInfos.GetInputDeviceByDisplayName("hp 223");
+    EXPECT_EQ(ret, "mouse");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetInputDeviceByDisplayName_02
+ * @tc.desc: Test BindInfos GetInputDeviceByDisplayName not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetInputDeviceByDisplayName_02,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    std::string ret = bindInfos.GetInputDeviceByDisplayName("think 123");
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_Add_01
+ * @tc.desc: Test BindInfos Add method with sorted insert
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_Add_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceId_ = 2;
+    bindInfos.infos_.push_back(bindInfo1);
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceId_ = 1;
+    bindInfos.Add(bindInfo2);
+    
+    EXPECT_EQ(bindInfos.infos_.front().GetInputDeviceId(), 1);
+    EXPECT_EQ(bindInfos.infos_.back().GetInputDeviceId(), 2);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_UnbindInputDevice_01
+ * @tc.desc: Test BindInfos UnbindInputDevice not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_UnbindInputDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfos.infos_.push_back(bindInfo);
+    
+    bindInfos.UnbindInputDevice(999);
+    EXPECT_EQ(bindInfos.infos_.size(), 1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_UnbindDisplay_01
+ * @tc.desc: Test BindInfos UnbindDisplay not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_UnbindDisplay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = 0;
+    bindInfos.infos_.push_back(bindInfo);
+    
+    bindInfos.UnbindDisplay(999);
+    EXPECT_EQ(bindInfos.infos_.size(), 1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindInputDevice_01
+ * @tc.desc: Test BindInfos GetUnbindInputDevice not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnbindInputDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.displayName_ = "hp 223";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    BindInfo ret = bindInfos.GetUnbindInputDevice("hp 223");
+    EXPECT_EQ(ret.GetInputDeviceId(), -1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_01
+ * @tc.desc: Test BindInfos GetUnbindDisplay not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = 0;
+    bindInfos.infos_.push_back(bindInfo);
+    
+    BindInfo ret = bindInfos.GetUnbindDisplay();
+    EXPECT_EQ(ret.GetDisplayId(), -1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_02
+ * @tc.desc: Test BindInfos GetUnbindDisplay with inputDeviceName not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_GetUnbindDisplay_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = -1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfos.infos_.push_back(bindInfo);
+    
+    BindInfo ret = bindInfos.GetUnbindDisplay("keyboard");
+    EXPECT_EQ(ret.GetInputDeviceName(), "mouse");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_Operator_Stream_Out_01
+ * @tc.desc: Test BindInfos operator << with unbind items
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_Operator_Stream_Out_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfos bindInfos;
+    BindInfo bindInfo1;
+    bindInfo1.inputDeviceName_ = "mouse";
+    bindInfo1.displayName_ = "hp 223";
+    bindInfo1.inputDeviceId_ = 1;
+    bindInfo1.displayId_ = 0;
+    bindInfos.infos_.push_back(bindInfo1);
+    
+    BindInfo bindInfo2;
+    bindInfo2.inputDeviceName_ = "keyboard";
+    bindInfo2.displayName_ = "think 123";
+    bindInfo2.inputDeviceId_ = -1;
+    bindInfo2.displayId_ = 1;
+    bindInfos.infos_.push_back(bindInfo2);
+    
+    std::ostringstream oss;
+    oss << bindInfos;
+    
+    EXPECT_NE(oss.str().find("mouse<=>hp 223"), std::string::npos);
+    EXPECT_EQ(oss.str().find("keyboard<=>think 123"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_BindInfos_Operator_Stream_In_01
+ * @tc.desc: Test BindInfos operator >> with multiple lines
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_BindInfos_Operator_Stream_In_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::istringstream iss("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    BindInfos bindInfos;
+    
+    iss >> bindInfos;
+    
+    EXPECT_EQ(bindInfos.infos_.size(), 2);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetContent_01
+ * @tc.desc: Test InputDisplayBindHelper GetContent with invalid path
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetContent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    
+    std::string content = idh.GetContent("/invalid/path/file.txt");
+    EXPECT_EQ(content, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetContent_02
+ * @tc.desc: Test InputDisplayBindHelper GetContent with empty file
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetContent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    
+    std::string content = idh.GetContent(InputDisplayBindHelperTest::GetCfgFileName());
+    EXPECT_EQ(content, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetContent_03
+ * @tc.desc: Test InputDisplayBindHelper GetContent with multi-line file
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetContent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("line1\nline2\nline3\n");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    
+    std::string content = idh.GetContent(InputDisplayBindHelperTest::GetCfgFileName());
+    EXPECT_NE(content.find("line1"), std::string::npos);
+    EXPECT_NE(content.find("line2"), std::string::npos);
+    EXPECT_NE(content.find("line3"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_Load_01
+ * @tc.desc: Test InputDisplayBindHelper Load with invalid path
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Load_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/invalid/path/config.cfg");
+    
+    idh.Load();
+    std::string dumps = idh.Dumps();
+    EXPECT_EQ(dumps, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_Store_03
+ * @tc.desc: Test InputDisplayBindHelper Store with invalid path
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Store_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/invalid/path/config.cfg");
+    idh.Load();
+    idh.AddInputDevice(1, "input0", "mouse");
+    
+    idh.Store();
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_Dumps_01
+ * @tc.desc: Test InputDisplayBindHelper Dumps with empty infos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Dumps_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    
+    std::string dumps = idh.Dumps();
+    EXPECT_EQ(dumps, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_Dumps_02
+ * @tc.desc: Test InputDisplayBindHelper Dumps with unbind items
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Dumps_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    
+    idh.AddInputDevice(1, "input0", "mouse");
+    idh.RemoveInputDevice(1);
+    
+    std::string dumps = idh.Dumps();
+    EXPECT_EQ(dumps, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetInputNodeNameByCfg_05
+ * @tc.desc: Test InputDisplayBindHelper GetInputNodeNameByCfg with non-digit displayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeNameByCfg_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("abc<=>wrapper\n");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    
+    std::string ret = idh.GetInputNodeNameByCfg(0);
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetInputNode_03
+ * @tc.desc: Test InputDisplayBindHelper GetInputNode with non-existent directory
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNode_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    
+    std::string ret = idh.GetInputNode("nonexistent");
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_AddLocalDisplay_04
+ * @tc.desc: Test InputDisplayBindHelper AddLocalDisplay with no unbind devices
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    
+    idh.AddInputDevice(1, "input0", "mouse");
+    idh.AddDisplay(0, "hp 223");
+    
+    idh.AddLocalDisplay(1, "localDisplay");
+    
+    std::string dumps = idh.Dumps();
+    EXPECT_NE(dumps.find("mouse<=>hp 223"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_SetDisplayBind_14
+ * @tc.desc: Test InputDisplayBindHelper SetDisplayBind with same binding
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_14, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    
+    idh.AddInputDevice(1, "input0", "mouse");
+    idh.AddDisplay(0, "hp 223");
+    
+    std::string msg;
+    int32_t ret = idh.SetDisplayBind(1, 0, msg);
+    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(msg.find("alread bind"), std::string::npos);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetDisplayBindInfo_01
+ * @tc.desc: Test InputDisplayBindHelper GetDisplayBindInfo with empty infos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayBindInfo_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    
+    DisplayBindInfos infos;
+    int32_t ret = idh.GetDisplayBindInfo(infos);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(infos.size(), 0);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetDisplayBindInfo_03
+ * @tc.desc: Test InputDisplayBindHelper GetDisplayBindInfo with multiple bindings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayBindInfo_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("");
+    InputDisplayBindHelper idh(InputDisplayBindHelperTest::GetCfgFileName());
+    idh.Load();
+    
+    idh.AddInputDevice(1, "input0", "mouse");
+    idh.AddInputDevice(2, "input1", "keyboard");
+    idh.AddDisplay(0, "hp 223");
+    idh.AddDisplay(1, "think 123");
+    
+    DisplayBindInfos infos;
+    int32_t ret = idh.GetDisplayBindInfo(infos);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(infos.size(), 2);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_IsDisplayAdd_01
+ * @tc.desc: Test InputDisplayBindHelper IsDisplayAdd with null infos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    idh.infos_ = nullptr;
+    
+    bool ret = idh.IsDisplayAdd(0, "hp 223");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_InputDisplayBindHelper_GetDisplayIdNames_02
+ * @tc.desc: Test InputDisplayBindHelper GetDisplayIdNames with null infos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdNames_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    idh.infos_ = nullptr;
+    
+    auto ret = idh.GetDisplayIdNames();
+    EXPECT_EQ(ret.size(), 0);
+}
 } // namespace MMI
 } // namespace OHOS
