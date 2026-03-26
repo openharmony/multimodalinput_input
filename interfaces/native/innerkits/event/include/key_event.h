@@ -3586,15 +3586,6 @@ public:
     bool HasKeyItem(int32_t keyCode) const;
 
     /**
-     * @brief Check if the key code is an extended function key
-     * @param keyCode Indicates the key code to check
-     * @return Returns true if it's an extended function key; returns false otherwise
-     * @internal
-     * @since 26.0.0
-     */
-    static bool IsExtendedFunctionKeyCode(int32_t keyCode);
-
-    /**
      * @brief Check if this key event is an extended function key
      * @return Returns true if this event is an extended function key; returns false otherwise
      * @internal

@@ -33,34 +33,48 @@ void KeyEventExtendedFunctionTest::TearDown() {}
 
 /**
  * @tc.name: TestExtendedFunctionKeyCode001
- * @tc.desc: Test IsExtendedFunctionKeyCode with KEYCODE_EXT_FN_MIN
+ * @tc.desc: Test IsExtendedFunctionKey with KEYCODE_EXT_FN_MIN
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode001, TestSize.Level1)
 {
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
  * @tc.name: TestExtendedFunctionKeyCode002
- * @tc.desc: Test IsExtendedFunctionKeyCode with regular key codes
+ * @tc.desc: Test IsExtendedFunctionKey with regular key codes
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode002, TestSize.Level1)
 {
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
     // Test common keys
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_A));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_0));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_F1));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_ENTER));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_UNKNOWN));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_0);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_F1);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_ENTER);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 
     // Test special keys
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_HOME));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_BACK));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_POWER));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -71,16 +85,28 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode002, TestSize.
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode003, TestSize.Level1)
 {
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN));  // 0x01000000
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX));  // 0x01FFFFFF
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());  // 0x01000000
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());  // 0x01FFFFFF
 
     // Test near boundaries
     // 16777215 = 0x00FFFFFF, Just before KEYCODE_EXT_FN_MIN
     int32_t keyJustBelowExtFnMin = 16777215;
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyJustBelowExtFnMin));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyJustBelowExtFnMin);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 33554432 = 0x02000000, Just after KEYCODE_EXT_FN_MAX
     int32_t keyJustAboveExtFnMax = 33554432;
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyJustAboveExtFnMax));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyJustAboveExtFnMax);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -91,10 +117,22 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode003, TestSize.
  */
 HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyCode004, TestSize.Level1)
 {
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(INT32_MIN));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(INT32_MAX));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(0));
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(-1));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(INT32_MIN);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(INT32_MAX);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(0);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(-1);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -177,19 +215,34 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeySafetyBuffer001, T
     // All have fourth byte = 0x00, so they are not extended function keys
     // 10013 = 0x0000271D, First key in safety buffer, below extended range
     int32_t keyInBuffer1 = 10013;  // 0x0000271D, Below extended range
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyInBuffer1));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyInBuffer1);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 20000 = 0x00004E20, In safety buffer, below extended range
     int32_t keyInBuffer2 = 20000;  // 0x00004E20, Below extended range
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyInBuffer2));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyInBuffer2);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 32768 = 0x00008000, In safety buffer, below extended range
     int32_t keyInBuffer3 = 32768;  // 0x00008000, Below extended range
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyInBuffer3));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyInBuffer3);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 50000 = 0x0000C350, In safety buffer, below extended range
     int32_t keyInBuffer4 = 50000;  // 0x0000C350, Below extended range
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyInBuffer4));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyInBuffer4);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 16777215 = 0x00FFFFFF, Last key in safety buffer, just before extended range
     int32_t keyJustBeforeExtFnMin = 16777215;  // 0x00FFFFFF, Just before extended range
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyJustBeforeExtFnMin));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyJustBeforeExtFnMin);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -204,24 +257,42 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyFullRange001, Test
     // All have fourth byte = 0x01, so they are extended function keys
     // 16777216 = 0x01000000, Start of extended function range (KEYCODE_EXT_FN_MIN)
     int32_t extFnMinKey = 16777216;  // 0x01000000, Start (KEYCODE_EXT_FN_MIN)
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(extFnMinKey));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(extFnMinKey);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 25165823 = 0x01802007, Middle of range
     int32_t extFnMidKey = 25165823;  // 0x01802007, Middle of range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(extFnMidKey));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(extFnMidKey);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 33554431 = 0x01FFFFFF, End of extended function range (KEYCODE_EXT_FN_MAX)
     int32_t extFnMaxKey = 33554431;  // 0x01FFFFFF, End (KEYCODE_EXT_FN_MAX)
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(extFnMaxKey));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(extFnMaxKey);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
 
     // Verify sample keys in reserved range are identified
     // 20000000 = 0x01312D00, In range
     int32_t extFnSampleKey1 = 20000000;  // 0x01312D00, In range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(extFnSampleKey1));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(extFnSampleKey1);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 25000000 = 0x017D7840, In range
     int32_t extFnSampleKey2 = 25000000;  // 0x017D7840, In range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(extFnSampleKey2));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(extFnSampleKey2);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 30000000 = 0x01C9C340, In range
     int32_t extFnSampleKey3 = 30000000;  // 0x01C9C340, In range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(extFnSampleKey3));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(extFnSampleKey3);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -236,19 +307,34 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyFourthByte001, Tes
     // Extended function keys are identified by fourth byte = 0x01 (mask: 0xFF000000, flag: 0x01000000)
     // 0x01000000 = 16777216, Fourth byte = 0x01, matches flag
     int32_t fourthByte01_min = 0x01000000;  // Fourth byte = 0x01, matches flag
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(fourthByte01_min));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(fourthByte01_min);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 0x01FFFFFF = 33554431, Fourth byte = 0x01, matches flag
     int32_t fourthByte01_max = 0x01FFFFFF;  // Fourth byte = 0x01, matches flag
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(fourthByte01_max));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(fourthByte01_max);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 0x02000000 = 33554432, Fourth byte = 0x02, doesn't match flag
     int32_t fourthByte02 = 0x02000000;  // Fourth byte = 0x02, doesn't match flag
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(fourthByte02));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(fourthByte02);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 0x03000000 = 50331648, Fourth byte = 0x03, doesn't match flag
     int32_t fourthByte03 = 0x03000000;  // Fourth byte = 0x03, doesn't match flag
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(fourthByte03));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(fourthByte03);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 0xFF000000 = -16777216, Fourth byte = 0xFF, doesn't match flag
     int32_t fourthByteFF = 0xFF000000;  // Fourth byte = 0xFF, doesn't match flag
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(fourthByteFF));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(fourthByteFF);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -270,10 +356,16 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyReservedRange001, 
     // Test that keys outside reserved range are not identified
     // 16777215 = 0x00FFFFFF, Just before KEYCODE_EXT_FN_MIN
     int32_t keyBelowExtFnMin = KeyEvent::KEYCODE_EXT_FN_MIN - 1;  // 0x00FFFFFF, Just before MIN
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyBelowExtFnMin));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyBelowExtFnMin);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
     // 33554432 = 0x02000000, Just after KEYCODE_EXT_FN_MAX
     int32_t keyAboveExtFnMax = KeyEvent::KEYCODE_EXT_FN_MAX + 1;  // 0x02000000, Just after MAX
-    EXPECT_FALSE(KeyEvent::IsExtendedFunctionKeyCode(keyAboveExtFnMax));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyAboveExtFnMax);
+    EXPECT_FALSE(keyEvent->IsExtendedFunctionKey());
 }
 
 /**
@@ -295,14 +387,26 @@ HWTEST_F(KeyEventExtendedFunctionTest, TestExtendedFunctionKeyExpandedCapacity00
     // Test keys at various positions in the expanded range
     // 20000000 = 0x01312D00, Low-mid range
     int32_t expandedRangeLowMid = 20000000;  // 0x01312D00, Low-mid range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(expandedRangeLowMid));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(expandedRangeLowMid);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 25000000 = 0x017D7840, Mid range
     int32_t expandedRangeMid = 25000000;  // 0x017D7840, Mid range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(expandedRangeMid));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(expandedRangeMid);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 30000000 = 0x01C9C340, High-mid range
     int32_t expandedRangeHighMid = 30000000;  // 0x01C9C340, High-mid range
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(expandedRangeHighMid));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(expandedRangeHighMid);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
     // 33554431 = 0x01FFFFFF, Maximum value (KEYCODE_EXT_FN_MAX)
     int32_t expandedRangeMax = 33554431;  // 0x01FFFFFF, Maximum value (KEYCODE_EXT_FN_MAX)
-    EXPECT_TRUE(KeyEvent::IsExtendedFunctionKeyCode(expandedRangeMax));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(expandedRangeMax);
+    EXPECT_TRUE(keyEvent->IsExtendedFunctionKey());
 }

@@ -1554,16 +1554,10 @@ std::vector<uint8_t> KeyEvent::GetEnhanceData() const
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
-bool KeyEvent::IsExtendedFunctionKeyCode(int32_t keyCode)
-{
-    CALL_DEBUG_ENTER;
-    return (keyCode & EXTENDED_FUNCTION_KEY_MASK) == EXTENDED_FUNCTION_KEY_FLAG;
-}
-
 bool KeyEvent::IsExtendedFunctionKey() const
 {
     CALL_DEBUG_ENTER;
-    return IsExtendedFunctionKeyCode(keyCode_);
+    return (keyCode_ & EXTENDED_FUNCTION_KEY_MASK) == EXTENDED_FUNCTION_KEY_FLAG;
 }
 
 } // namespace MMI
