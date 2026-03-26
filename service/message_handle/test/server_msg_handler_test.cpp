@@ -4686,5 +4686,1332 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateOthersTouchEvent_globa
     EXPECT_EQ(1000, item1.GetWindowX());
     EXPECT_EQ(1500, item1.GetWindowY());
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_IsCastInject_001
+ * @tc.desc: Test the function IsCastInject
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsCastInject_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    EXPECT_TRUE(handler.IsCastInject(CAST_INPUT_DEVICEID));
+    EXPECT_TRUE(handler.IsCastInject(0xAAAAAAFE));
+    EXPECT_FALSE(handler.IsCastInject(0));
+    EXPECT_FALSE(handler.IsCastInject(-1));
+    EXPECT_FALSE(handler.IsCastInject(100));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_001
+ * @tc.desc: Test the function OnAuthorize with isAuthorize true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    int32_t result = handler.OnAuthorize(true);
+    EXPECT_EQ(result, ERR_OK);
+    result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_002
+ * @tc.desc: Test the function OnAuthorize with isAuthorize false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    int32_t result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_001
+ * @tc.desc: Test the function OnCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    int32_t callPid = 1234;
+    int32_t result = handler.OnCancelInjection(callPid);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_002
+ * @tc.desc: Test the function OnCancelInjection with STATE_AUTHORIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int32_t callPid = 1234;
+    int32_t result = handler.OnCancelInjection(callPid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_003
+ * @tc.desc: Test the function OnCancelInjection with STATE_SELECTION_AUTHORIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    int32_t callPid = 1234;
+    int32_t result = handler.OnCancelInjection(callPid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_IsPC_001
+ * @tc.desc: Test the function IsPC
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_IsPC_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    bool result = handler.IsPC();
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_GetRequestInjectionCallbackReqId_001
+ * @tc.desc: Test the function GetRequestInjectionCallbackReqId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_GetRequestInjectionCallbackReqId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t reqId1 = handler.GetRequestInjectionCallbackReqId();
+    int32_t reqId2 = handler.GetRequestInjectionCallbackReqId();
+    EXPECT_NE(reqId1, reqId2);
+    EXPECT_GT(reqId2, reqId1);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CheckForRequestInjectionFrequentAccess_001
+ * @tc.desc: Test the function CheckForRequestInjectionFrequentAccess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CheckForRequestInjectionFrequentAccess_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t callingPid = 1234;
+    int64_t interval = 3000;
+    bool result = handler.CheckForRequestInjectionFrequentAccess(callingPid, interval);
+    EXPECT_FALSE(result);
+    result = handler.CheckForRequestInjectionFrequentAccess(callingPid, interval);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CheckForRequestInjectionFrequentAccess_002
+ * @tc.desc: Test the function CheckForRequestInjectionFrequentAccess with expired entry
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CheckForRequestInjectionFrequentAccess_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t callingPid = 5678;
+    int64_t interval = 0;
+    bool result = handler.CheckForRequestInjectionFrequentAccess(callingPid, interval);
+    EXPECT_FALSE(result);
+    result = handler.CheckForRequestInjectionFrequentAccess(callingPid, interval);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateOtherTouchForDisplayCoordinate_001
+ * @tc.desc: Test the function UpdateOtherTouchForDisplayCoordinate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateOtherTouchForDisplayCoordinate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetDisplayX(100);
+    pointerItem.SetDisplayY(200);
+    int32_t displayId = 0;
+    bool result = handler.UpdateOtherTouchForDisplayCoordinate(pointerItem, displayId);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateOtherTouchForGlobalCoordinate_001
+ * @tc.desc: Test the function UpdateOtherTouchForGlobalCoordinate with invalid coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateOtherTouchForGlobalCoordinate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetGlobalX(DBL_MAX);
+    pointerItem.SetGlobalY(DBL_MAX);
+    bool result = handler.UpdateOtherTouchForGlobalCoordinate(pointerItem);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateOtherTouchForGlobalCoordinate_002
+ * @tc.desc: Test the function UpdateOtherTouchForGlobalCoordinate with valid coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateOtherTouchForGlobalCoordinate_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winMgr = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(winMgr, nullptr);
+    OLD::DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayInfo displaysInfo = {.id = 0, .direction = Direction::DIRECTION0,
+        .x = 0, .y = 0, .width = 2000, .height = 2000};
+    displayGroupInfo.displaysInfo.push_back(displaysInfo);
+    winMgr->displayGroupInfoMap_[0] = displayGroupInfo;
+    ServerMsgHandler handler;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetGlobalX(100);
+    pointerItem.SetGlobalY(100);
+    bool result = handler.UpdateOtherTouchForGlobalCoordinate(pointerItem);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateOthersTouchEvent_001
+ * @tc.desc: Test the function UpdateOthersTouchEvent with invalid useCoordinate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateOthersTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    std::map<InjectionTouch, int32_t> targetWindowIdMap;
+    int32_t displayId = 0;
+    int32_t useCoordinate = 999;
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateOthersTouchEvent(pointerEvent, displayId, targetWindowIdMap, useCoordinate));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectTouchPadEvent_001
+ * @tc.desc: Test the function OnInjectTouchPadEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectTouchPadEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int32_t userId = 100;
+    int32_t pid = 1234;
+    TouchpadCDG touchpadCDG;
+    bool isNativeInject = true;
+    bool isShell = false;
+    int32_t result = handler.OnInjectTouchPadEvent(userId, pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectTouchPadEvent_002
+ * @tc.desc: Test the function OnInjectTouchPadEvent with valid pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectTouchPadEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t userId = 100;
+    int32_t pid = 0;
+    TouchpadCDG touchpadCDG;
+    bool isNativeInject = true;
+    bool isShell = false;
+    pointerEvent->SetId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    handler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
+    int32_t result = handler.OnInjectTouchPadEvent(userId, pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectTouchPadEvent_003
+ * @tc.desc: Test the function OnInjectTouchPadEvent with isNativeInject false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectTouchPadEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t userId = 100;
+    int32_t pid = 1234;
+    TouchpadCDG touchpadCDG;
+    bool isNativeInject = false;
+    bool isShell = false;
+    pointerEvent->SetId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    int32_t result = handler.OnInjectTouchPadEvent(userId, pointerEvent, pid, touchpadCDG, isNativeInject, isShell);
+    EXPECT_NE(result, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AccelerateMotion_007
+ * @tc.desc: Test the function AccelerateMotion with PULL_MOVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AccelerateMotion_009
+ * @tc.desc: Test the function AccelerateMotion with BUTTON_DOWN action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AccelerateMotion_010
+ * @tc.desc: Test the function AccelerateMotion with TOUCHPAD_POINTER and VIRTUAL_TOUCHPAD_POINTER flags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_VIRTUAL_TOUCHPAD_POINTER);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    item.SetRawDx(10);
+    item.SetRawDy(10);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_008
+ * @tc.desc: Test the function OnInjectKeyEvent with null keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    int32_t pid = 1234;
+    bool isNativeInject = true;
+    int32_t result = handler.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_009
+ * @tc.desc: Test the function SaveTargetWindowId with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int32_t result = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEventExt_003
+ * @tc.desc: Test the function OnInjectPointerEventExt with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int32_t userId = 100;
+    int32_t result = handler.OnInjectPointerEventExt(userId, pointerEvent, false, PointerEvent::DISPLAY_COORDINATE);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectTouchPadEventExt_001
+ * @tc.desc: Test the function OnInjectTouchPadEventExt with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectTouchPadEventExt_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    TouchpadCDG touchpadCDG;
+    int32_t result = handler.OnInjectTouchPadEventExt(100, pointerEvent, touchpadCDG, false);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AccelerateMotionTouchpad_002
+ * @tc.desc: Test the function AccelerateMotionTouchpad with valid pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotionTouchpad_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    item.SetRawDx(10);
+    item.SetRawDy(10);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    TouchpadCDG touchpadCDG;
+    touchpadCDG.size = 100;
+    touchpadCDG.ppi = 100;
+    touchpadCDG.speed = 5;
+    touchpadCDG.frequency = 60;
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotionTouchpad(userId, pointerEvent, touchpadCDG);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_002
+ * @tc.desc: Test the function CalculateOffset with all directions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    Offset offset;
+    offset.dx = 100.0;
+    offset.dy = 50.0;
+    Direction direction = DIRECTION0;
+    ASSERT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+    EXPECT_EQ(offset.dx, 100.0);
+    EXPECT_EQ(offset.dy, 50.0);
+    direction = DIRECTION90;
+    offset.dx = 100.0;
+    offset.dy = 50.0;
+    ASSERT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+    direction = DIRECTION180;
+    offset.dx = 100.0;
+    offset.dy = 50.0;
+    ASSERT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+    direction = DIRECTION270;
+    offset.dx = 100.0;
+    offset.dy = 50.0;
+    ASSERT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdatePointerEvent_005
+ * @tc.desc: Test the function UpdatePointerEvent with TOUCHPAD_ACTIVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdatePointerEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TOUCHPAD_ACTIVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    ASSERT_NO_FATAL_FAILURE(handler.UpdatePointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_010
+ * @tc.desc: Test the function FixTargetWindowId with bNeedResetPointerId true and diffPointerId valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(0);
+    std::map<InjectionTouch, int32_t> targetWindowIdMap;
+    int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
+    bool bNeedResetPointerId = true;
+    int32_t diffPointerId = 10000;
+    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, useCoordinate, bNeedResetPointerId, diffPointerId);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUiExtentionWindowInfo_002
+ * @tc.desc: Test the function OnUiExtentionWindowInfo with zero num
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUiExtentionWindowInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_LISTENER);
+    WindowInfo info;
+    pkt << 0;
+    int32_t ret = handler.OnUiExtentionWindowInfo(pkt, info);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnUiExtentionWindowInfo_003
+ * @tc.desc: Test the function OnUiExtentionWindowInfo with MAX size
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnUiExtentionWindowInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_LISTENER);
+    WindowInfo info;
+    uint32_t num = MAX_UI_EXTENSION_SIZE + 1;
+    pkt << num;
+    int32_t ret = handler.OnUiExtentionWindowInfo(pkt, info);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_RequestInjection_001
+ * @tc.desc: Test the function RequestInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RequestInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t callingPid = 1234;
+    int32_t status = 0;
+    int32_t reqId = 0;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int32_t result = handler.RequestInjection(callingPid, status, reqId);
+    EXPECT_EQ(result, ERROR_DEVICE_NOT_SUPPORTED);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_QueryAuthorizedStatus_002
+ * @tc.desc: Test the function QueryAuthorizedStatus with different states
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_QueryAuthorizedStatus_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t callingPid = 1234;
+    int32_t status = 0;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int32_t result = handler.QueryAuthorizedStatus(callingPid, status);
+    EXPECT_EQ(result, ERR_OK);
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    result = handler.QueryAuthorizedStatus(callingPid, status);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_NativeInjectCheck_004
+ * @tc.desc: Test the function NativeInjectCheck with STATE_SELECTION_AUTHORIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = 1234;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+    int32_t result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_NativeInjectCheck_005
+ * @tc.desc: Test the function NativeInjectCheck with STATE_AUTHORIZE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_NativeInjectCheck_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t pid = 1234;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int32_t result = handler.NativeInjectCheck(pid);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnDisplayInfo_010
+ * @tc.desc: Test the function OnDisplayInfo with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    NetPacket pkt(MmiMessageId::DISPLAY_INFO);
+    int32_t result = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnWindowGroupInfo_006
+ * @tc.desc: Test the function OnWindowGroupInfo with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowGroupInfo_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    NetPacket pkt(MmiMessageId::INVALID);
+    int32_t result = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_RegisterWindowStateErrorCallback_002
+ * @tc.desc: Test the function RegisterWindowStateErrorCallback with non-sceneboard program
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_RegisterWindowStateErrorCallback_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    MmiMessageId idMsg = MmiMessageId::ADD_INPUT_DEVICE_LISTENER;
+    NetPacket pkt(idMsg);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    sess->programName_ = "other.program";
+    int32_t ret = handler.RegisterWindowStateErrorCallback(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ReadDisplaysInfo_003
+ * @tc.desc: Test the function ReadDisplaysInfo with read error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadDisplaysInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    DisplayGroupInfo displayGroupInfo;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    uint32_t num = 1;
+    pkt << num;
+    int32_t ret = handler.ReadDisplaysInfo(pkt, displayGroupInfo);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddGestureMonitor_002
+ * @tc.desc: Test the function OnAddGestureMonitor with NONE handler type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddGestureMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto udsSe = std::make_shared<UDSSession>("mytest", 2, 3, 4, 5);
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    uint32_t eventType = HANDLE_EVENT_TYPE_KEY;
+    uint32_t gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    uint32_t fingers = 3;
+    int32_t ret = handler.OnAddGestureMonitor(udsSe, handlerType, eventType, gestureType, fingers);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveGestureMonitor_002
+ * @tc.desc: Test the function OnRemoveGestureMonitor with NONE handler type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveGestureMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto udsSe = std::make_shared<UDSSession>("mytest", 2, 3, 4, 5);
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    uint32_t eventType = HANDLE_EVENT_TYPE_KEY;
+    uint32_t gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    uint32_t fingers = 3;
+    int32_t ret = handler.OnRemoveGestureMonitor(udsSe, handlerType, eventType, gestureType, fingers);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveGestureMonitor_003
+ * @tc.desc: Test the function OnRemoveGestureMonitor with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveGestureMonitor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    uint32_t eventType = HANDLE_EVENT_TYPE_KEY;
+    uint32_t gestureType = TOUCH_GESTURE_TYPE_PINCH;
+    uint32_t fingers = 3;
+    int32_t ret = handler.OnRemoveGestureMonitor(sess, handlerType, eventType, gestureType, fingers);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMarkConsumed_003
+ * @tc.desc: Test the function OnMarkConsumed with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    int32_t eventId = 100;
+    int32_t ret = handler.OnMarkConsumed(sess, eventId);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ScreenFactor_002
+ * @tc.desc: Test the function ScreenFactor with boundary values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ScreenFactor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    EXPECT_EQ(handler.ScreenFactor(-1), FACTOR_0);
+    EXPECT_EQ(handler.ScreenFactor(0), FACTOR_0);
+    EXPECT_EQ(handler.ScreenFactor(7), FACTOR_8);
+    EXPECT_EQ(handler.ScreenFactor(8), FACTOR_18);
+    EXPECT_EQ(handler.ScreenFactor(17), FACTOR_18);
+    EXPECT_EQ(handler.ScreenFactor(18), FACTOR_27);
+    EXPECT_EQ(handler.ScreenFactor(26), FACTOR_27);
+    EXPECT_EQ(handler.ScreenFactor(27), FACTOR_55);
+    EXPECT_EQ(handler.ScreenFactor(54), FACTOR_55);
+    EXPECT_EQ(handler.ScreenFactor(55), FACTOR_MAX);
+    EXPECT_EQ(handler.ScreenFactor(100), FACTOR_MAX);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_DealGesturePointers_003
+ * @tc.desc: Test the function DealGesturePointers with ACCESSIBILITY flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_DealGesturePointers_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    ASSERT_NO_FATAL_FAILURE(handler.DealGesturePointers(pointerEvent));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_011
+ * @tc.desc: Test the function FixTargetWindowId with different conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
+    pointerEvent->SetZOrder(1);
+    handler.castTargetWindowIds_.clear();
+    bool result = handler.FixTargetWindowId(pointerEvent, action, false, PointerEvent::DISPLAY_COORDINATE);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_012
+ * @tc.desc: Test the function FixTargetWindowId with accessibility flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    handler.accessTargetWindowIds_.clear();
+    bool result = handler.FixTargetWindowId(pointerEvent, action, false, PointerEvent::DISPLAY_COORDINATE);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_013
+ * @tc.desc: Test the function FixTargetWindowId with native target window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetDeviceId(0);
+    pointerEvent->SetZOrder(0);
+    handler.nativeTargetWindowIds_.clear();
+    bool result = handler.FixTargetWindowId(pointerEvent, action, false, PointerEvent::DISPLAY_COORDINATE);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_010
+ * @tc.desc: Test the function SaveTargetWindowId with cast inject and zOrder > 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
+    pointerEvent->SetZOrder(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    handler.castTargetWindowIds_.clear();
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_011
+ * @tc.desc: Test the function SaveTargetWindowId with accessibility flag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    handler.accessTargetWindowIds_.clear();
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_012
+ * @tc.desc: Test the function SaveTargetWindowId with HOVER_EXIT action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->SetDeviceId(CAST_INPUT_DEVICEID);
+    pointerEvent->SetZOrder(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_013
+ * @tc.desc: Test the function SaveTargetWindowId with accessibility flag and HOVER_EXIT
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_EXIT);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetTargetDisplayId(0);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateTouchEvent_005
+ * @tc.desc: Test the function UpdateTouchEvent with empty pointerIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateTouchEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_MOVE;
+    int32_t targetWindowId = 10;
+    bool result = handler.UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_UpdateTouchEvent_006
+ * @tc.desc: Test the function UpdateTouchEvent with valid pointerIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_UpdateTouchEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    int32_t action = PointerEvent::POINTER_ACTION_MOVE;
+    int32_t targetWindowId = 10;
+    bool result = handler.UpdateTouchEvent(pointerEvent, action, targetWindowId);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSetFunctionKeyState_004
+ * @tc.desc: Test the function OnSetFunctionKeyState with checkState equal to enable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t funcKey = CAPS_LOCK_FUNCTION_KEY;
+    int32_t pid = 15;
+    bool enable = false;
+    ASSERT_NO_FATAL_FAILURE(handler.OnSetFunctionKeyState(pid, funcKey, enable));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnGetFunctionKeyState_004
+ * @tc.desc: Test the function OnGetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnGetFunctionKeyState_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t funcKey = SCROLL_LOCK_FUNCTION_KEY;
+    bool state = false;
+    int32_t ret = handler.OnGetFunctionKeyState(funcKey, state);
+    EXPECT_EQ(ret, ERR_DEVICE_NOT_EXIST);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMsgHandler_005
+ * @tc.desc: Test the function OnMsgHandler with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    ASSERT_NO_FATAL_FAILURE(msgHandler.OnMsgHandler(sess, pkt));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_006
+ * @tc.desc: Test the function OnInjectPointerEvent with null pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int32_t userId = 100;
+    int32_t pid = 1234;
+    bool isNativeInject = true;
+    int32_t result = msgHandler.OnInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
+    EXPECT_EQ(result, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AccelerateMotion_011
+ * @tc.desc: Test the function AccelerateMotion with non-mouse source type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AccelerateMotion_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    int32_t pointerId = 0;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(0);
+    int32_t userId = 100;
+    int32_t ret = handler.AccelerateMotion(userId, pointerEvent);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnEnhanceConfig_005
+ * @tc.desc: Test the function OnEnhanceConfig with ACCESS_TOKEN_SERVICE_ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnEnhanceConfig_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    MmiMessageId idMsg = MmiMessageId::ADD_INPUT_DEVICE_LISTENER;
+    NetPacket pkt(idMsg);
+    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    pkt << 1 << 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, 3020, g_pid);
+    int32_t ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnEnhanceConfig_006
+ * @tc.desc: Test the function OnEnhanceConfig with null session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnEnhanceConfig_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::ADD_INPUT_DEVICE_LISTENER;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ReadWindowsInfo_004
+ * @tc.desc: Test the function ReadWindowsInfo with valid data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ReadWindowsInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    DisplayGroupInfo displayGroupInfo;
+    OLD::DisplayGroupInfo oldDisplayGroupInfo;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    uint32_t num = 0;
+    pkt << num;
+    int32_t ret = handler.ReadWindowsInfo(pkt, displayGroupInfo, oldDisplayGroupInfo);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ChangeToOld_008
+ * @tc.desc: Test the function ChangeToOld with empty displayGroups
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ChangeToOld_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    userScreenInfo.displayGroups.clear();
+    handler.oldDisplayGroupInfos_.clear();
+    EXPECT_TRUE(handler.ChangeToOld(userScreenInfo));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ChangeToOld_009
+ * @tc.desc: Test the function ChangeToOld with matching sizes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ChangeToOld_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    DisplayGroupInfo group;
+    group.id = 0;
+    group.type = GroupType::GROUP_DEFAULT;
+    group.mainDisplayId = 0;
+    group.focusWindowId = GLOBAL_WINDOW_ID;
+    userScreenInfo.displayGroups.push_back(group);
+    OLD::DisplayGroupInfo oldInfo;
+    handler.oldDisplayGroupInfos_.push_back(oldInfo);
+    EXPECT_TRUE(handler.ChangeToOld(userScreenInfo));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_Printf_002
+ * @tc.desc: Test the function Printf with empty data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_Printf_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    UserScreenInfo userScreenInfo;
+    userScreenInfo.userId = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.Printf(userScreenInfo));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ChangeToOld_010
+ * @tc.desc: Test the function ChangeToOld with DIRECTION180
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ChangeToOld_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    size_t num = 0;
+    std::vector<DisplayInfo> displaysInfos;
+    DisplayInfo display;
+    display.width = 1920;
+    display.height = 1080;
+    display.direction = DIRECTION180;
+    display.screenArea.id = 1;
+    display.screenArea.area.width = 100;
+    display.screenArea.area.height = 100;
+    displaysInfos.push_back(display);
+    std::vector<ScreenInfo> screens;
+    ScreenInfo screenInfo;
+    screenInfo.id = 1;
+    screens.push_back(screenInfo);
+    ServerMsgHandler handler;
+    OLD::DisplayGroupInfo oldInfo;
+    handler.oldDisplayGroupInfos_.push_back(oldInfo);
+    ASSERT_NO_FATAL_FAILURE(handler.ChangeToOld(num, displaysInfos, screens));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_ChangeToOld_011
+ * @tc.desc: Test the function ChangeToOld with DIRECTION270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_ChangeToOld_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    size_t num = 0;
+    std::vector<DisplayInfo> displaysInfos;
+    DisplayInfo display;
+    display.width = 1920;
+    display.height = 1080;
+    display.direction = DIRECTION270;
+    display.screenArea.id = 1;
+    display.screenArea.area.width = 100;
+    display.screenArea.area.height = 100;
+    displaysInfos.push_back(display);
+    std::vector<ScreenInfo> screens;
+    ScreenInfo screenInfo;
+    screenInfo.id = 1;
+    screens.push_back(screenInfo);
+    ServerMsgHandler handler;
+    OLD::DisplayGroupInfo oldInfo;
+    handler.oldDisplayGroupInfos_.push_back(oldInfo);
+    ASSERT_NO_FATAL_FAILURE(handler.ChangeToOld(num, displaysInfos, screens));
+}
 } // namespace MMI
 } // namespace OHOS
