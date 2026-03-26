@@ -73,7 +73,7 @@ float ANRManager::getRatioValue()
         g_inputUITimeoutRatio = 1.0f;
     }
  
-    if (g_inputUITimeoutRatio <= 0) {
+    if (g_inputUITimeoutRatio < FLOAT_EPSILON) {
         g_inputUITimeoutRatio = 1.0f;
         MMI_HILOGW("const.sys.dfx.appfreeze.timeout_unit_time_ratio read failed.");
     }
