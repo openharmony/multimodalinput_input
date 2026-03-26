@@ -67,7 +67,7 @@ float ANRManager::getRatioValue()
             g_inputUITimeoutRatio = (ratioVal * 1.0) / TIME_CONVERT_RATIO;
         } else {
             g_inputUITimeoutRatio = 1.0f;
-            MMI_HILOGE("Failed to convert or invalid ratioStr value");
+            MMI_HILOGW("Failed to convert or invalid ratioStr value");
         }
     } else {
         g_inputUITimeoutRatio = 1.0f;
@@ -75,7 +75,7 @@ float ANRManager::getRatioValue()
  
     if (g_inputUITimeoutRatio <= 0) {
         g_inputUITimeoutRatio = 1.0f;
-        MMI_HILOGE("const.sys.dfx.appfreeze.timeout_unit_time_ratio read failed.");
+        MMI_HILOGW("const.sys.dfx.appfreeze.timeout_unit_time_ratio read failed.");
     }
     return g_inputUITimeoutRatio;
 }
