@@ -3600,10 +3600,7 @@ public:
      * @internal
      * @since 26.0.0
      */
-    bool IsExtendedFunctionKey() const
-    {
-        return IsExtendedFunctionKeyCode(keyCode_);
-    }
+    bool IsExtendedFunctionKey() const;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.
