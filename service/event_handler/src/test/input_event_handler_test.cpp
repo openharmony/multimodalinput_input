@@ -540,5 +540,513 @@ HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadPointerMotionMistouc
     inputEventHandler->touchpadEventDownAbsX_ = InputEventHandler::TOUCHPAD_EDGE_WIDTH + 1;
     EXPECT_FALSE(inputEventHandler->IsTouchpadPointerMotionMistouch(&event));
 }
+
+/**
+ * @tc.name: InputEventHandler_OnEvent_002
+ * @tc.desc: Test the function OnEvent with valid event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_NONE));
+    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(nullptr));
+    void *lpEvent = &event;
+    int64_t frameTime = 100;
+    inputEventHandler->OnEvent(lpEvent, frameTime);
+}
+
+/**
+ * @tc.name: InputEventHandler_OnEvent_003
+ * @tc.desc: Test the function OnEvent with idSeed overflow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_OnEvent_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    inputEventHandler->idSeed_ = std::numeric_limits<uint64_t>::max() - 1;
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_NONE));
+    void *lpEvent = &event;
+    int64_t frameTime = 100;
+    inputEventHandler->OnEvent(lpEvent, frameTime);
+    EXPECT_EQ(inputEventHandler->idSeed_, 1);
+}
+
+/**
+ * @tc.name: InputEventHandler_Init_001
+ * @tc.desc: Test the function Init
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_Init_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    UDSServer udsServer;
+    inputEventHandler->Init(udsServer);
+    EXPECT_NE(inputEventHandler->GetUDSServer(), nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsModifierKey_001
+ * @tc.desc: Test the function IsModifierKey with modifier key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsModifierKey_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    EXPECT_TRUE(inputEventHandler->IsModifierKey(KEY_LEFTCTRL));
+    EXPECT_TRUE(inputEventHandler->IsModifierKey(KEY_RIGHTCTRL));
+    EXPECT_TRUE(inputEventHandler->IsModifierKey(KEY_LEFTALT));
+    EXPECT_TRUE(inputEventHandler->IsModifierKey(KEY_RIGHTALT));
+    EXPECT_TRUE(inputEventHandler->IsModifierKey(KEY_LEFTSHIFT));
+    EXPECT_TRUE(inputEventHandler->IsModifierKey(KEY_RIGHTSHIFT));
+}
+
+/**
+ * @tc.name: InputEventHandler_IsModifierKey_002
+ * @tc.desc: Test the function IsModifierKey with non-modifier key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsModifierKey_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    EXPECT_FALSE(inputEventHandler->IsModifierKey(KEY_ESC));
+    EXPECT_FALSE(inputEventHandler->IsModifierKey(0));
+    EXPECT_FALSE(inputEventHandler->IsModifierKey(1000));
+}
+
+/**
+ * @tc.name: InputEventHandler_RefreshDwtActingState_001
+ * @tc.desc: Test the function RefreshDwtActingState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_RefreshDwtActingState_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = false;
+    inputEventHandler->isDwtEdgeAreaForTouchpadButtonActing_ = false;
+    inputEventHandler->isDwtEdgeAreaForTouchpadTapActing_ = false;
+    inputEventHandler->RefreshDwtActingState();
+    EXPECT_TRUE(inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_);
+    EXPECT_TRUE(inputEventHandler->isDwtEdgeAreaForTouchpadButtonActing_);
+    EXPECT_TRUE(inputEventHandler->isDwtEdgeAreaForTouchpadTapActing_);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsStandaloneFunctionKey_003
+ * @tc.desc: Test the function IsStandaloneFunctionKey with F1 key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsStandaloneFunctionKey_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    EXPECT_TRUE(inputEventHandler->IsStandaloneFunctionKey(KEY_F1));
+    EXPECT_TRUE(inputEventHandler->IsStandaloneFunctionKey(KEY_F1 + 1));
+    EXPECT_TRUE(inputEventHandler->IsStandaloneFunctionKey(KEY_KPASTERISK));
+}
+
+/**
+ * @tc.name: InputEventHandler_IsStandaloneFunctionKey_004
+ * @tc.desc: Test the function IsStandaloneFunctionKey with modifier key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsStandaloneFunctionKey_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    EXPECT_FALSE(inputEventHandler->IsStandaloneFunctionKey(KEY_LEFTCTRL));
+    EXPECT_FALSE(inputEventHandler->IsStandaloneFunctionKey(KEY_LEFTALT));
+    EXPECT_FALSE(inputEventHandler->IsStandaloneFunctionKey(KEY_LEFTSHIFT));
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_004
+ * @tc.desc: Test the function UpdateDwtKeyboardRecord with standalone function key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_keyboard keyboardEvent;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKey).WillOnce(Return(KEY_ESC));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState).Times(0);
+    inputEventHandler->UpdateDwtKeyboardRecord(&event);
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_005
+ * @tc.desc: Test the function UpdateDwtKeyboardRecord with non-modifier key release
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event_keyboard keyboardEvent;
+    libinput_event event;
+    uint32_t key = KEY_F1;
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillRepeatedly(Return(&keyboardEvent));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKey).WillRepeatedly(Return(key));
+    EXPECT_CALL(libinputMock, LibinputEventKeyboardGetKeyState)
+        .WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED));
+    inputEventHandler->isKeyPressedWithAnyModifiers_[key] = true;
+    inputEventHandler->UpdateDwtKeyboardRecord(&event);
+    EXPECT_FALSE(inputEventHandler->isKeyPressedWithAnyModifiers_[key]);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadMistouch_002
+ * @tc.desc: Test the function IsTouchpadMistouch with palm tool type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMistouch_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    libinput_event_touch touchpadEvent;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, TouchpadGetTool).WillOnce(Return(MT_TOOL_PALM));
+    EXPECT_CALL(libinputMock, TouchpadGetPressure).WillOnce(Return(0.5));
+    bool result = inputEventHandler->IsTouchpadMistouch(&event);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadMistouch_003
+ * @tc.desc: Test the function IsTouchpadMistouch with settings sync pressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMistouch_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    libinput_event_touch touchpadEvent;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, TouchpadGetTool).WillOnce(Return(MT_TOOL_PEN));
+    EXPECT_CALL(libinputMock, TouchpadGetPressure).WillOnce(Return(SYNC_TOUCHPAD_SETTINGS));
+    bool result = inputEventHandler->IsTouchpadMistouch(&event);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadButtonMistouch_002
+ * @tc.desc: Test the function IsTouchpadButtonMistouch with device size get failure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadButtonMistouch_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    libinput_device touchpadDevice;
+    libinput_event_pointer touchpadButtonEvent;
+    touchpadButtonEvent.buttonState = LIBINPUT_BUTTON_STATE_PRESSED;
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(&touchpadButtonEvent));
+    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(&touchpadDevice));
+    EXPECT_CALL(libinputMock, DeviceGetSize).WillOnce(Return(1));
+    g_mockLibinputDeviceGetSizeRetrunIntValue = 1;
+    inputEventHandler->isDwtEdgeAreaForTouchpadButtonActing_ = true;
+    bool result = inputEventHandler->IsTouchpadButtonMistouch(&event);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadTapMistouch_002
+ * @tc.desc: Test the function IsTouchpadTapMistouch with pointer event null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadTapMistouch_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(nullptr));
+    bool result = inputEventHandler->IsTouchpadTapMistouch(&event);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadMotionMistouch_002
+ * @tc.desc: Test the function IsTouchpadMotionMistouch with touchpad event null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadMotionMistouch_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = true;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(nullptr));
+    bool result = inputEventHandler->IsTouchpadMotionMistouch(&event);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputEventHandler_IsTouchpadPointerMotionMistouch_002
+ * @tc.desc: Test the function IsTouchpadPointerMotionMistouch with pointer event null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_IsTouchpadPointerMotionMistouch_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    inputEventHandler->isDwtEdgeAreaForTouchpadMotionActing_ = true;
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillOnce(Return(nullptr));
+    bool result = inputEventHandler->IsTouchpadPointerMotionMistouch(&event);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputEventHandler_BuildInputHandlerChain_001
+ * @tc.desc: Test the function BuildInputHandlerChain
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_BuildInputHandlerChain_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    int32_t result = inputEventHandler->BuildInputHandlerChain();
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_NE(inputEventHandler->GetEventNormalizeHandler(), nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetIntervalSinceLastInput_001
+ * @tc.desc: Test the function GetIntervalSinceLastInput
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetIntervalSinceLastInput_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    int64_t timeInterval = 0;
+    int32_t result = inputEventHandler->GetIntervalSinceLastInput(timeInterval);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, 0);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetUDSServer_001
+ * @tc.desc: Test the function GetUDSServer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetUDSServer_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    UDSServer udsServer;
+    inputEventHandler->Init(udsServer);
+    UDSServer* server = inputEventHandler->GetUDSServer();
+    EXPECT_NE(server, nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetEventNormalizeHandler_001
+ * @tc.desc: Test the function GetEventNormalizeHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetEventNormalizeHandler_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->BuildInputHandlerChain();
+    auto handler = inputEventHandler->GetEventNormalizeHandler();
+    EXPECT_NE(handler, nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetFilterHandler_001
+ * @tc.desc: Test the function GetFilterHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetFilterHandler_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->BuildInputHandlerChain();
+    auto handler = inputEventHandler->GetFilterHandler();
+    EXPECT_NE(handler, nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetEventDispatchHandler_001
+ * @tc.desc: Test the function GetEventDispatchHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetEventDispatchHandler_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->BuildInputHandlerChain();
+    auto handler = inputEventHandler->GetEventDispatchHandler();
+    EXPECT_NE(handler, nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_SetMoveEventFilters_001
+ * @tc.desc: Test the function SetMoveEventFilters with unsupported
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_SetMoveEventFilters_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    int32_t result = inputEventHandler->SetMoveEventFilters(true);
+#ifndef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    EXPECT_EQ(result, ERROR_UNSUPPORT);
+#endif
+}
+
+/**
+ * @tc.name: InputEventHandler_SetMoveEventFilters_002
+ * @tc.desc: Test the function SetMoveEventFilters with null handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_SetMoveEventFilters_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t result = inputEventHandler->SetMoveEventFilters(true);
+    EXPECT_EQ(result, INVALID_HANDLER_ID);
+#endif
+}
+
+/**
+ * @tc.name: InputEventHandler_GetInputActiveSubscriberHandler_001
+ * @tc.desc: Test the function GetInputActiveSubscriberHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetInputActiveSubscriberHandler_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->BuildInputHandlerChain();
+    auto handler = inputEventHandler->GetInputActiveSubscriberHandler();
+    EXPECT_NE(handler, nullptr);
+}
+
+/**
+ * @tc.name: InputEventHandler_GetInputEventHook_001
+ * @tc.desc: Test the function GetInputEventHook
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_GetInputEventHook_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    inputEventHandler->BuildInputHandlerChain();
+    auto hook = inputEventHandler->GetInputEventHook();
+#ifdef OHOS_BUILD_ENABLE_INPUT_EVENT_HOOK
+    EXPECT_NE(hook, nullptr);
+#endif
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_005
+ * @tc.desc: Test the function UpdateDwtTouchpadRecord with touchpad event null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(nullptr));
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
+    inputEventHandler->UpdateDwtTouchpadRecord(&event);
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtTouchpadRecord_006
+ * @tc.desc: Test the function UpdateDwtTouchpadRecord with device null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtTouchpadRecord_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    libinput_event_touch touchpadEvent;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillOnce(Return(&touchpadEvent));
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
+    EXPECT_CALL(libinputMock, GetDevice).WillOnce(Return(nullptr));
+    inputEventHandler->UpdateDwtTouchpadRecord(&event);
+}
+
+/**
+ * @tc.name: InputEventHandler_UpdateDwtKeyboardRecord_006
+ * @tc.desc: Test the function UpdateDwtKeyboardRecord with keyboard event null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputEventHandlerTest, InputEventHandler_UpdateDwtKeyboardRecord_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<InputEventHandler> inputEventHandler = std::make_shared<InputEventHandler>();
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_event event;
+    EXPECT_CALL(libinputMock, LibinputEventGetKeyboardEvent).WillOnce(Return(nullptr));
+    inputEventHandler->UpdateDwtKeyboardRecord(&event);
+}
 } // namespace MMI
 } // namespace OHOS
