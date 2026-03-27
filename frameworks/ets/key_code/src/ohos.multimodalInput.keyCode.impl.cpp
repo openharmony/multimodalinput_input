@@ -311,6 +311,7 @@ const static std::map<int32_t, keyCode::KeyCode> KEY_CODE_TRANSFORMATION = {
     { KEYCODE_KBDINPUTASSIST_CANCEL_ETS,     keyCode::KeyCode::key_t::KEYCODE_KBDINPUTASSIST_CANCEL },
     { KEYCODE_MOUSE_ASSISTANT_ETS,           keyCode::KeyCode::key_t::KEYCODE_MOUSE_ASSISTANT },
     { KEYCODE_MOUSE_INTELLIGENCE_SELECTION_ETS,       keyCode::KeyCode::key_t::KEYCODE_MOUSE_INTELLIGENCE_SELECTION },
+    { KEYCODE_AOD_SINGLE_CLICK_ETS,          keyCode::KeyCode::key_t::KEYCODE_AOD_SINGLE_CLICK },
     { KEYCODE_FRONT_ETS,                     keyCode::KeyCode::key_t::KEYCODE_FRONT },
     { KEYCODE_SETUP_ETS,                     keyCode::KeyCode::key_t::KEYCODE_SETUP },
     { KEYCODE_WAKEUP_ETS,                    keyCode::KeyCode::key_t::KEYCODE_WAKEUP },

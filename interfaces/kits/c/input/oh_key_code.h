@@ -1092,6 +1092,11 @@ typedef enum {
      */
     KEYCODE_MOUSE_INTELLIGENCE_SELECTION = 2733,
     /**
+     * Aod Single Click
+     * @since 24
+     */
+    KEYCODE_AOD_SINGLE_CLICK = 2740,
+    /**
      * Front key, which is used to launch the windshield defogger
      * @since 22
      */
