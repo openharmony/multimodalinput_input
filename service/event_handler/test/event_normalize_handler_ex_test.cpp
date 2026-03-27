@@ -44,6 +44,21 @@ struct libinput_event {
     struct libinput_device *device;
 };
 
+struct libinput_event_touch {
+    struct libinput_event base;
+    int32_t seatSlot;
+    int32_t longAxis;
+    int32_t shortAxis;
+    int32_t toolType;
+    double x;
+    double y;
+    double pressure;
+    double toolX;
+    double toolY;
+    double toolWidth;
+    double toolHeight;
+};
+
 extern "C" {
 unsigned int libinput_device_get_id_version(struct libinput_device *device)
 {
@@ -83,6 +98,18 @@ const char *libinput_device_get_name(struct libinput_device *device)
 {
     const char* pName = device->name;
     return pName;
+}
+
+libinput_event_touch* g_touchpad_event = nullptr;
+struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_event *event)
+{
+    return (event != nullptr ? g_touchpad_event : nullptr);
+}
+
+double g_touchpad_pressure = 0.0;
+double libinput_event_touchpad_get_pressure(struct libinput_event_touch *event)
+{
+    return (event != nullptr ? g_touchpad_pressure : 0.0);
 }
 }
 
@@ -388,6 +415,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetRightButt
     EXPECT_EQ(rightButtonSource, PointerEvent::RightButtonSource::INVALID);
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCHPAD
 /**
  * @tc.name: EventNormalizeHandlerEXTest_HandleTouchpadSyncEvent_001
  * @tc.desc: Test the function HandleTouchpadSyncEvent with nullptr event
@@ -426,5 +454,38 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchpad
     ret = handler.HandleTouchpadSyncEvent(&event);
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_TouchPadKnuckleDoubleClickHandle_001
+ * @tc.desc: Test the function TouchPadKnuckleDoubleClickHandle with sync event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TouchPadKnuckleDoubleClickHandle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event;
+    event.type = LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    struct libinput_device libDev {
+        .udevDev { 3 },
+        .busType = 3,
+        .version = 1,
+        .product = 1,
+        .vendor = 1,
+        .name = "test",
+    };
+    event.device = &libDev;
+    handler.nextHandler_ = std::make_shared<EventTestHandler>();
+    libinput_event_touch touchpadEvent;
+    g_touchpad_event = &touchpadEvent;
+    auto ret = handler.TouchPadKnuckleDoubleClickHandle(&event);
+    EXPECT_FALSE(ret);
+    g_touchpad_pressure = SYNC_TOUCHPAD_SETTINGS;
+    ret = handler.TouchPadKnuckleDoubleClickHandle(&event);
+    EXPECT_TRUE(ret);
+    g_touchpad_event = nullptr;
+}
+#endif OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace MMI
 } // namespace OHOS
