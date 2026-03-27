@@ -1859,6 +1859,66 @@ ohos_unittest("InputWindowsManagerEXTest") {
   }
 }
 
+ohos_unittest("PointerDispatchEventCacheStandaloneTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "window_manager/test",
+    "${mmi_path}/service/window_manager/include",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  sources = [
+    "window_manager/src/pointer_dispatch_event_cache.cpp",
+    "window_manager/test/pointer_dispatch_event_cache_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+ohos_unittest("InputDisplayBindHelperBranchStandaloneTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/window_manager/include",
+    "window_manager/test",
+  ]
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "window_manager/src/input_display_bind_helper.cpp",
+    "window_manager/test/input_display_bind_helper_branch_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+  ]
+}
+
 ohos_unittest("AccountManagerTest") {
   module_out_path = module_output_path
 
