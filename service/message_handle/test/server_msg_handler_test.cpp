@@ -6225,7 +6225,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_007, Te
     pointerEvent->SetId(1);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    int32_t result = msgHandler.OnInjectPointerEvent(userId, pointerEvent, pid, isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
+    int32_t result = msgHandler.OnInjectPointerEvent(userId, pointerEvent, pid,
+        isNativeInject, false, PointerEvent::DISPLAY_COORDINATE);
     EXPECT_NE(result, RET_OK);
 }
 
@@ -6538,7 +6539,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_016, Test
 
 /**
  * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_017
- * @tc.desc: Test the function SaveTargetWindowId with UP action and accessibility flag
+ * @tc.desc: Test the function SaveTargetWindowId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -6656,7 +6657,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_017, TestS
     int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
     bool bNeedResetPointerId = false;
     int32_t diffPointerId = 10000;
-    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, useCoordinate, bNeedResetPointerId, diffPointerId);
+    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap,
+        useCoordinate, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 }
 
