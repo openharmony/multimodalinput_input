@@ -537,16 +537,27 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     CHKPV(keyEvent);
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     currentHandleKeyCode_ = keyEvent->GetKeyCode();
+
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
         MMI_HILOGI("Currently in factory mode, events are only dispatched");
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
         eventDispatchHandler->HandleKeyEvent(keyEvent);
-    } else {
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
+        return;
     }
+
+    if (keyEvent->IsExtendedFunctionKey()) {
+        MMI_HILOGI("Extended function key, skip all handlers and process only in KeyCommandHandler");
+        auto keyCommandHandler = InputHandler->GetKeyCommandHandler();
+        if (keyCommandHandler != nullptr) {
+            keyCommandHandler->HandleKeyEvent(keyEvent);
+        }
+        return;
+    }
+
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
