@@ -1316,7 +1316,7 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     if (HandleTouchpadSyncEvent(event)) {
         MMI_HILOGI("Sync touchpad settings");
     }
-    if (std::fabs(SYNC_TOUCHPAD_SETTIN - value) <= std::numeric_limits<double>::epsilon()) {
+    if (std::fabs(SYNC_TOUCHPAD_SETTINGS - value) <= std::numeric_limits<double>::epsilon()) {
         MMI_HILOGI("Register touchpad settings observer");
         TOUCHPAD_MGR->SyncTouchpadSettingsData();
         return true;
