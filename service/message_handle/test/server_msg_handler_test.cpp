@@ -6632,7 +6632,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_016, TestS
     int32_t useCoordinate = PointerEvent::DISPLAY_COORDINATE;
     bool bNeedResetPointerId = true;
     int32_t diffPointerId = -100;
-    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap, useCoordinate, bNeedResetPointerId, diffPointerId);
+    int32_t result = handler.FixTargetWindowId(pointerEvent, targetWindowIdMap,
+        useCoordinate, bNeedResetPointerId, diffPointerId);
     EXPECT_EQ(result, RET_ERR);
 }
 
