@@ -1671,7 +1671,7 @@ ohos_unittest("InputWindowsManagerCoverageTest") {
 
 ohos_unittest("InputWindowsManagerOneTest") {
   module_out_path = module_output_path
-
+  use_exceptions = true
   configs = [
     "${mmi_path}:coverage_flags",
     "${mmi_path}/service/filter:mmi_event_filter_config",
