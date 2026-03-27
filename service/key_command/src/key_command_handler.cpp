@@ -134,6 +134,16 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
     }
+
+    if (keyEvent->IsExtendedFunctionKey()) {
+        MMI_HILOGI("Extended function key not consumed by KeyCommandHandler, dispatch directly");
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        if (eventDispatchHandler != nullptr) {
+            eventDispatchHandler->HandleKeyEvent(keyEvent);
+        }
+        return;
+    }
+
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }

@@ -140,6 +140,357 @@ HWTEST_F(EventNormalizeHandlerTestWithMock, HandleJoystickAxisEvent_001, TestSiz
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_ExtendedFunctionKey_001
+ * @tc.desc: Test UpdateKeyEventHandlerChain with KEYCODE_EXT_FN_MIN
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_ExtendedFunctionKey_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN); // 16777216
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    // Extended function key should bypass the chain and go directly to dispatch
+    // So nextHandler should NOT receive the event
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Verify that the nextHandler did NOT receive the event
+    // (extended function keys bypass the interceptor/filter/monitor chain)
+    EXPECT_TRUE(nextHandler->events_.empty());
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_ExtendedFunctionKey_002
+ * @tc.desc: Test UpdateKeyEventHandlerChain with KEYCODE_EXT_FN_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_ExtendedFunctionKey_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX); // 33554431
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Verify that the nextHandler did NOT receive the event
+    EXPECT_TRUE(nextHandler->events_.empty());
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_ExtendedFunctionKey_003
+ * @tc.desc: Test UpdateKeyEventHandlerChain with a value in the middle of extended function range
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_ExtendedFunctionKey_003,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    // Use a value in the middle: (16777216 + 33554431) / 2 = 25165823
+    // 25165823 = 0x01802007, Middle of extended function range
+    int32_t midExtendedKeyCode = 25165823;  // 0x01802007, Middle of extended function range
+    keyEvent->SetKeyCode(midExtendedKeyCode);
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Verify that the nextHandler did NOT receive the event
+    EXPECT_TRUE(nextHandler->events_.empty());
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_NormalKey_001
+ * @tc.desc: Test UpdateKeyEventHandlerChain with normal key (KEYCODE_A)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_NormalKey_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A); // Normal key, outside extended function range
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Normal keys should go through the normal chain
+    EXPECT_TRUE(nextHandler->events_.empty());
+    if (!nextHandler->events_.empty()) {
+        auto receivedEvent = nextHandler->events_.back();
+        EXPECT_EQ(receivedEvent->GetKeyCode(), KeyEvent::KEYCODE_A);
+        EXPECT_EQ(receivedEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+    }
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_Boundary_001
+ * @tc.desc: Test UpdateKeyEventHandlerChain with key just below KEYCODE_EXT_FN_MIN
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_Boundary_001,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    // 16777215 = 0x00FFFFFF, just before extended function range (fourth byte = 0x00)
+    // KeyEvent::KEYCODE_EXT_FN_MIN - 1 = 16777215, Just before extended function range
+    int32_t keyJustBelowExtFnMin = KeyEvent::KEYCODE_EXT_FN_MIN - 1;  // 0x00FFFFFF, Just before extended function range
+    keyEvent->SetKeyCode(keyJustBelowExtFnMin);
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Keys below the extended function range should go through the normal chain
+    EXPECT_TRUE(nextHandler->events_.empty());
+    if (!nextHandler->events_.empty()) {
+        auto receivedEvent = nextHandler->events_.back();
+        EXPECT_EQ(receivedEvent->GetKeyCode(), keyJustBelowExtFnMin);
+    }
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_Boundary_002
+ * @tc.desc: Test UpdateKeyEventHandlerChain with key just above KEYCODE_EXT_FN_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_Boundary_002,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    // 33554432 = 0x02000000, just after extended function range (fourth byte = 0x02)
+    // KeyEvent::KEYCODE_EXT_FN_MAX + 1 = 33554432, Just after extended function range
+    int32_t keyJustAboveExtFnMax = KeyEvent::KEYCODE_EXT_FN_MAX + 1;  // 0x02000000, Just after extended function range
+    keyEvent->SetKeyCode(keyJustAboveExtFnMax);
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Keys above the extended function range should go through the normal chain
+    EXPECT_TRUE(nextHandler->events_.empty());
+    if (!nextHandler->events_.empty()) {
+        auto receivedEvent = nextHandler->events_.back();
+        EXPECT_EQ(receivedEvent->GetKeyCode(), keyJustAboveExtFnMax);
+    }
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_NormalKey_Variety
+ * @tc.desc: Test UpdateKeyEventHandlerChain with various normal keys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_NormalKey_Variety,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> normalKeyCodes = {
+        KeyEvent::KEYCODE_0,
+        KeyEvent::KEYCODE_9,
+        KeyEvent::KEYCODE_F1,
+        KeyEvent::KEYCODE_F12,
+        KeyEvent::KEYCODE_ESCAPE,
+        KeyEvent::KEYCODE_SPACE,
+        KeyEvent::KEYCODE_ENTER
+    };
+
+    for (auto keyCode : normalKeyCodes) {
+        auto keyEvent = KeyEvent::Create();
+        ASSERT_NE(keyEvent, nullptr);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+        keyEvent->SetKeyCode(keyCode);
+
+        EventNormalizeHandler eventHandler;
+        auto nextHandler = std::make_shared<InputEventHandlerMock>();
+        eventHandler.SetNext(nextHandler);
+
+        eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+        // All normal keys should go through the normal chain
+        EXPECT_TRUE(nextHandler->events_.empty());
+        if (!nextHandler->events_.empty()) {
+            auto receivedEvent = nextHandler->events_.back();
+            EXPECT_EQ(receivedEvent->GetKeyCode(), keyCode);
+        }
+    }
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_ExtendedFunctionKey_Multiple
+ * @tc.desc: Test UpdateKeyEventHandlerChain with multiple extended function keys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_ExtendedFunctionKey_Multiple,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    // Define test keys at various positions in extended function range
+    // KeyEvent::KEYCODE_EXT_FN_MIN = 16777216 (0x01000000), Start of range
+    int32_t extFnMinKey = KeyEvent::KEYCODE_EXT_FN_MIN;  // 0x01000000, Start of range
+    // KeyEvent::KEYCODE_EXT_FN_MIN + 100 = 16778316 (0x01000064), 100 keys above MIN
+    int32_t extFnMinPlus100 = KeyEvent::KEYCODE_EXT_FN_MIN + 100;  // 0x01000064, 100 keys above MIN
+    // KeyEvent::KEYCODE_EXT_FN_MIN + 1000 = 16778216 (0x010003E8), 1000 keys above MIN
+    int32_t extFnMinPlus1000 = KeyEvent::KEYCODE_EXT_FN_MIN + 1000;  // 0x010003E8, 1000 keys above MIN
+    // KeyEvent::KEYCODE_EXT_FN_MAX - 1000 = 33553431 (0x01FFFC18), 1000 keys below MAX
+    int32_t extFnMaxMinus1000 = KeyEvent::KEYCODE_EXT_FN_MAX - 1000;  // 0x01FFFC18, 1000 keys below MAX
+    // KeyEvent::KEYCODE_EXT_FN_MAX = 33554431 (0x01FFFFFF), End of range
+    int32_t extFnMaxKey = KeyEvent::KEYCODE_EXT_FN_MAX;  // 0x01FFFFFF, End of range
+
+    std::vector<int32_t> extendedKeyCodes = {
+        extFnMinKey,
+        extFnMinPlus100,
+        extFnMinPlus1000,
+        extFnMaxMinus1000,
+        extFnMaxKey
+    };
+
+    for (auto keyCode : extendedKeyCodes) {
+        auto keyEvent = KeyEvent::Create();
+        ASSERT_NE(keyEvent, nullptr);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+        keyEvent->SetKeyCode(keyCode);
+
+        EventNormalizeHandler eventHandler;
+        auto nextHandler = std::make_shared<InputEventHandlerMock>();
+        eventHandler.SetNext(nextHandler);
+
+        eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+        // All extended function keys should bypass the chain
+        EXPECT_TRUE(nextHandler->events_.empty());
+    }
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_NullKeyEvent
+ * @tc.desc: Test UpdateKeyEventHandlerChain with null KeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_NullKeyEvent,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    // Should handle null event gracefully
+    ASSERT_NO_FATAL_FAILURE(eventHandler.UpdateKeyEventHandlerChain(keyEvent));
+
+    // No event should be passed to nextHandler
+    EXPECT_TRUE(nextHandler->events_.empty());
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_ExtendedFunctionKey_UpAction
+ * @tc.desc: Test UpdateKeyEventHandlerChain with extended function key KEY_ACTION_UP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_ExtendedFunctionKey_UpAction,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN);
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Extended function keys should bypass the chain regardless of action
+    EXPECT_TRUE(nextHandler->events_.empty());
+}
+
+/**
+ * @tc.name: UpdateKeyEventHandlerChain_ExtendedFunctionKey_CancelAction
+ * @tc.desc: Test UpdateKeyEventHandlerChain with extended function key KEY_ACTION_CANCEL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTestWithMock,
+    UpdateKeyEventHandlerChain_ExtendedFunctionKey_CancelAction,
+    TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    // KeyEvent::KEYCODE_EXT_FN_MIN + 5000 = 16782216 (0x01001388), 5000 keys above MIN
+    int32_t extFnMinPlus5000 = KeyEvent::KEYCODE_EXT_FN_MIN + 5000;  // 0x01001388, 5000 keys above MIN
+    keyEvent->SetKeyCode(extFnMinPlus5000);
+
+    EventNormalizeHandler eventHandler;
+    auto nextHandler = std::make_shared<InputEventHandlerMock>();
+    eventHandler.SetNext(nextHandler);
+
+    eventHandler.UpdateKeyEventHandlerChain(keyEvent);
+
+    // Extended function keys should bypass the chain regardless of action
+    EXPECT_TRUE(nextHandler->events_.empty());
+}
+
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 } // namespace MMI
 } // namespace OHOS

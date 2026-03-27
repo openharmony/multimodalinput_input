@@ -3211,6 +3211,45 @@ public:
      * @since 24
      */
     static const int32_t KEYCODE_XKEY;
+
+    /**
+     * Extended function key mask (fourth byte)
+     * Used to identify extended function keys by checking bits 24-31
+     * @internal
+     * @since 26.0.0
+     */
+    static const uint32_t EXTENDED_FUNCTION_KEY_MASK;
+
+    /**
+     * Extended function key flag (fourth byte = 0x01)
+     * @internal
+     * @since 26.0.0
+     */
+    static const uint32_t EXTENDED_FUNCTION_KEY_FLAG;
+
+    /**
+     * Extended function key base
+     * Base extended function key for internal system use
+     * Reserved range: 16777216 - 33554431 (0x01000000 - 0x01FFFFFF)
+     *
+     * Extended function keys will skip interceptors, filters, and subscribers.
+     * They are only dispatched to windows and not exposed to applications.
+     *
+     * @internal
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_EXT_FN_MIN;
+
+    /**
+     * Extended function key maximum value
+     * Defines the upper bound of the reserved extended function key range
+     * Reserved range: 16777216 - 33554431 (0x01000000 - 0x01FFFFFF)
+     * Total available keys: 16777216
+     * @internal
+     * @since 26.0.0
+     */
+    static const int32_t KEYCODE_EXT_FN_MAX;
+
 public:
     class KeyItem {
     public:
@@ -3545,6 +3584,14 @@ public:
     bool IsKeyPressed(int32_t keyCode) const;
 
     bool HasKeyItem(int32_t keyCode) const;
+
+    /**
+     * @brief Check if this key event is an extended function key
+     * @return Returns true if this event is an extended function key; returns false otherwise
+     * @internal
+     * @since 26.0.0
+     */
+    bool IsExtendedFunctionKey() const;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Set the enhance data.

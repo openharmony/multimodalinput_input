@@ -895,6 +895,11 @@ const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
 const int32_t maxKeysSize = 1000;
 
+const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_MASK = 0xFF000000;
+const uint32_t KeyEvent::EXTENDED_FUNCTION_KEY_FLAG = 0x01000000;
+const int32_t KeyEvent::KEYCODE_EXT_FN_MIN = 16777216;  // 0x01000000
+const int32_t KeyEvent::KEYCODE_EXT_FN_MAX = 33554431;  // 0x01FFFFFF
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1548,5 +1553,12 @@ std::vector<uint8_t> KeyEvent::GetEnhanceData() const
     // LCOV_EXCL_STOP
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+bool KeyEvent::IsExtendedFunctionKey() const
+{
+    CALL_DEBUG_ENTER;
+    return (keyCode_ & EXTENDED_FUNCTION_KEY_MASK) == EXTENDED_FUNCTION_KEY_FLAG;
+}
+
 } // namespace MMI
 } // namespace OHOS

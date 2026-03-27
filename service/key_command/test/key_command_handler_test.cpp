@@ -1714,7 +1714,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPreventi
     handler.UnregisterMistouchPrevention();
     EXPECT_FALSE(handler.hasRegisteredSensor_);
 }
- 
+
 /**
  * @tc.name  : KeyCommandHandlerTest_UnregisterMistouchPrevention002
  * @tc.number: UnregisterMistouchPreventionTest_002
@@ -1728,7 +1728,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPreventi
     handler.timerId_ = 1;
     ASSERT_NO_FATAL_FAILURE(handler.UnregisterMistouchPrevention());
 }
- 
+
 /**
  * @tc.name  : KeyCommandHandlerTest_UnregisterMistouchPrevention003
  * @tc.number: UnregisterMistouchPreventionTest_002
@@ -1743,5 +1743,100 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UnregisterMistouchPreventi
     ASSERT_NO_FATAL_FAILURE(handler.UnregisterMistouchPrevention());
 }
 #endif // OHOS_BUILD_ENABLE_MISTOUCH_PREVENTION
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ExtendedFunctionKey_001
+ * @tc.desc: Test HandleKeyEvent with extended function key that is not consumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ExtendedFunctionKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MIN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ExtendedFunctionKey_002
+ * @tc.desc: Test HandleKeyEvent with extended function key in middle of range
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ExtendedFunctionKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    keyEvent->SetKeyCode(25165823);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ExtendedFunctionKey_003
+ * @tc.desc: Test HandleKeyEvent with extended function key at max value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ExtendedFunctionKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_EXT_FN_MAX);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ExtendedFunctionKey_004
+ * @tc.desc: Test HandleKeyEvent with normal key to ensure normal flow still works
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ExtendedFunctionKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+    handler.SetNext(handler.nextHandler_);
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ExtendedFunctionKey_NullEvent
+ * @tc.desc: Test HandleKeyEvent with null extended function key event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ExtendedFunctionKey_NullEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
 } // namespace MMI
 } // namespace OHOS
