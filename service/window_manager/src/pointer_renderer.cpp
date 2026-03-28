@@ -42,6 +42,7 @@ constexpr uint32_t MAX_POINTER_SIZE {7};
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 constexpr int32_t BLUR_NUM { 3 };
 constexpr int32_t BGRA_ALPHA_INDEX { 3 };
+constexpr int32_t DIRECTION_NUM { 4 };
 constexpr float DEFAULT_OFFSET[] = {0.4f, 0.6f, 0.8f};
 constexpr float DEFAULT_BLUR[] = {0.4f, 0.3f, 0.1f};
 
@@ -150,8 +151,8 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
         return RET_OK;
     }
     if (cfg.isHard && cfg.isBlur) {
-        MMI_HILOGD("default render");
-        return DefaultRender(addr, addrSize, width, height, cfg);
+        MMI_HILOGD("Blur Render");
+        return BlurRender(addr, addrSize, width, height, cfg);
     }
     SetPointerCfg(cfg);
     // construct bitmap
@@ -190,11 +191,11 @@ int32_t PointerRenderer::Render(uint8_t *addr, uint32_t width, uint32_t height, 
     return RET_OK;
 }
 
-int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
+int32_t PointerRenderer::BlurRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
     const RenderConfig &cfg)
 {
     if (!cfg.isBlur) {
-        MMI_HILOGD("default render without blur");
+        MMI_HILOGD("Blur Render without blur");
         return RET_ERR;
     }
     if (!defaultInit_) {
@@ -206,7 +207,7 @@ int32_t PointerRenderer::DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_
         SetPointerCfg(cfg);
         defaultCanvas_.Save();
         defaultInit_ = true;
-        MMI_HILOGI("default render init success");
+        MMI_HILOGI("Blur Render init success");
     }
     if (!HasPointerCfg(cfg)) {
         MMI_HILOGI("cfg change, render cfg:%{private}s", cfg.ToString().c_str());
@@ -256,26 +257,57 @@ void PointerRenderer::DrawBlurPointer(uint32_t width, uint32_t height, const Ren
         MMI_HILOGE("The number of blur images is less than %{public}d", BLUR_NUM);
         return;
     }
+    int32_t dx = lastCfg.x - cfg.x;
+    int32_t dy = lastCfg.y - cfg.y;
+    AdjustDeltaForDirection(dx, dy, cfg.direction, cfg.displayDirection);
+    const int32_t offsetX = cfg.GetOffsetX();
+    const int32_t offsetY = cfg.GetOffsetY() ;
+    const int32_t imageSize = cfg.GetImageSize();
     for (int32_t i = 1; i <= BLUR_NUM; i++) {
         if (!images[i]) {
             MMI_HILOGE("Blur pointer image %{public}d is null", i);
             continue;
         }
-        int32_t localX = cfg.GetOffsetX() + (lastCfg.x - cfg.x) * DEFAULT_OFFSET[i - 1];
-        int32_t localY = cfg.GetOffsetY() + (lastCfg.y - cfg.y) * DEFAULT_OFFSET[i - 1];
-        int32_t imageSize = cfg.GetImageSize();
-        int32_t left = localX - imageSize / 2;
-        int32_t right = localX + imageSize / 2;
-        int32_t top = localY + imageSize / 2;
-        int32_t bottom = localY - imageSize / 2;
-        int32_t scale = imageSize / 4;
-        if (left < -scale || right > static_cast<int32_t>(width) + scale ||
-            bottom < -scale || top > static_cast<int32_t>(height) + scale) {
+        int32_t localX = offsetX + dx * DEFAULT_OFFSET[i - 1];
+        int32_t localY = offsetY + dy * DEFAULT_OFFSET[i - 1];
+        if (IsPositionOutCanvas(localX, localY, imageSize, width, height)) {
             MMI_HILOGD("The blur image is out of bounds, no need to draw");
             continue;
         }
         defaultCanvas_.DrawImage(*images[i], localX, localY, Rosen::Drawing::SamplingOptions());
     }
+}
+
+void PointerRenderer::AdjustDeltaForDirection(int32_t &dx, int32_t &dy, uint32_t direction, uint32_t displayDirection)
+{
+    Direction displayDir = static_cast<Direction>(displayDirection);
+    Direction dir = static_cast<Direction>(direction);
+    int32_t tempDx = dx;
+    int32_t tempDy = dy;
+    Direction angle = static_cast<Direction>((dir - displayDir + DIRECTION_NUM) % DIRECTION_NUM);
+    if (angle == DIRECTION90) {
+        dx = -tempDy;
+        dy = tempDx;
+    } else if (angle == DIRECTION180) {
+        dx = -tempDx;
+        dy = -tempDy;
+    } else if (angle == DIRECTION270) {
+        dx = tempDy;
+        dy = -tempDx;
+    }
+    MMI_HILOGD("direction:%{private}d, displayDirection:%{private}d, angle:%{private}d",
+        static_cast<int32_t>(direction), static_cast<int32_t>(displayDirection), static_cast<int32_t>(angle));
+}
+
+bool PointerRenderer::IsPositionOutCanvas(int32_t x, int32_t y, int32_t imageSize, uint32_t width, uint32_t height)
+{
+    int32_t left = x - imageSize / 2;
+    int32_t right = x + imageSize / 2;
+    int32_t top = y + imageSize / 2;
+    int32_t bottom = y - imageSize / 2;
+    int32_t scale = imageSize / 4;
+    return left < -scale || right > static_cast<int32_t>(width) + scale ||
+            bottom < -scale || top > static_cast<int32_t>(height) + scale;
 }
 
 bool PointerRenderer::HasPointerCfg(const RenderConfig &cfg)
@@ -353,8 +385,12 @@ void PointerRenderer::LoadDefaultPointerImage(const RenderConfig &cfg)
 void PointerRenderer::ApplyAlpha(uint8_t *pixel, const int32_t len, bool isPixelPremul,
     const float pecent)
 {
-    if (!pixel || !isPixelPremul) {
-        MMI_HILOGE("Invalid pixel or not premultiplied");
+    if (!pixel) {
+        MMI_HILOGE("Invalid pixel");
+        return;
+    }
+    if (!isPixelPremul) {
+        MMI_HILOGD("not premultiplied");
         return;
     }
     for (int32_t pixelIndex = 0; pixelIndex < len; pixelIndex++) {
