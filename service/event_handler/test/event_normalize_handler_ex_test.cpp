@@ -485,6 +485,7 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TouchPadKnuckl
     ret = handler.TouchPadKnuckleDoubleClickHandle(&event);
     EXPECT_TRUE(ret);
     g_touchpad_event = nullptr;
+    g_touchpad_pressure = 0.0;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace MMI
