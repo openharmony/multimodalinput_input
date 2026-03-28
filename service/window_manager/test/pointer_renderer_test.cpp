@@ -385,23 +385,23 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_AdjustDeltaForDirection_001, T
     uint32_t displayDirection = 0;
     renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
     EXPECT_EQ(dx, 10);
-    EXPECT_EQ(dx, 5);
+    EXPECT_EQ(dy, 5);
     direction = 1;
     renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
     EXPECT_EQ(dx, -5);
-    EXPECT_EQ(dx, 10);
+    EXPECT_EQ(dy, 10);
     direction = 2;
     dx = 10;
     dy = 5;
     renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
     EXPECT_EQ(dx, -10);
-    EXPECT_EQ(dx, -5);
+    EXPECT_EQ(dy, -5);
     direction = 3;
     dx = 10;
     dy = 5;
     renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
     EXPECT_EQ(dx, 5);
-    EXPECT_EQ(dx, -10);
+    EXPECT_EQ(dy, -10);
 }
 
 /**
