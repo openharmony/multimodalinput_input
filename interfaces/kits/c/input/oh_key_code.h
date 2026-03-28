@@ -1092,7 +1092,7 @@ typedef enum {
      */
     KEYCODE_MOUSE_INTELLIGENCE_SELECTION = 2733,
     /**
-     * Aod Single Click
+     * Single tapping the smart phone's touch screen event, which is used when the Always On Display is enabled
      * @since 24
      */
     KEYCODE_AOD_SINGLE_CLICK = 2740,
