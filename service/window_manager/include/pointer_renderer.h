@@ -33,6 +33,7 @@ public:
     uint32_t color { 0 };
     uint32_t size { 0 };
     uint32_t direction { 0 };
+    uint32_t displayDirection { 0 };
     float dpi { 0 };
     bool isHard { false };
     int32_t rotationAngle { 0 };
@@ -76,10 +77,12 @@ public:
     image_ptr_t UserIconScale(uint32_t width, uint32_t height, const RenderConfig &cfg);
     void LoadPointerToCache(const std::map<MOUSE_ICON, IconStyle> &mouseIcons);
 private:
-    int32_t DefaultRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
+    int32_t BlurRender(uint8_t *addr, uint32_t addrSize, uint32_t width, uint32_t height,
         const RenderConfig &cfg);
     void DrawDefaultPointer(const RenderConfig &cfg);
     void DrawBlurPointer(uint32_t width, uint32_t height, const RenderConfig &lastCfg, const RenderConfig &cfg);
+    void AdjustDeltaForDirection(int32_t &dx, int32_t &dy, uint32_t direction, uint32_t displayDirection);
+    bool IsPositionOutCanvas(int32_t x, int32_t y, int32_t imageSize, uint32_t width, uint32_t height);
     bool HasPointerCfg(const RenderConfig &cfg);
     void SetPointerCfg(const RenderConfig &cfg);
     const RenderConfig& GetPointerCfg(const RenderConfig &defaultCfg);
