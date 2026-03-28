@@ -44,7 +44,7 @@ constexpr int32_t BLUR_NUM { 3 };
 constexpr int32_t BGRA_ALPHA_INDEX { 3 };
 constexpr int32_t DIRECTION_NUM { 4 };
 constexpr float DEFAULT_OFFSET[] = {0.4f, 0.6f, 0.8f};
-constexpr float DEFAULT_BLUR[] = {0.4f, 0.3f, 0.1f};
+constexpr float DEFAULT_BLUR[] = {0.4f, 0.4f, 0.4f};
 
 namespace OHOS::MMI {
 
