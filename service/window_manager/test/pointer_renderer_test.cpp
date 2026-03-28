@@ -379,7 +379,7 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_AdjustDeltaForDirection_001, T
 {
     CALL_TEST_DEBUG;
     PointerRenderer renderer;
-    int32_t dx = 20;
+    int32_t dx = 10;
     int32_t dy = 5;
     uint32_t direction = 0;
     uint32_t displayDirection = 0;
