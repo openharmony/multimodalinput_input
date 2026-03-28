@@ -486,6 +486,6 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TouchPadKnuckl
     EXPECT_TRUE(ret);
     g_touchpad_event = nullptr;
 }
-#endif OHOS_BUILD_ENABLE_TOUCHPAD
+#endif // OHOS_BUILD_ENABLE_TOUCHPAD
 } // namespace MMI
 } // namespace OHOS
