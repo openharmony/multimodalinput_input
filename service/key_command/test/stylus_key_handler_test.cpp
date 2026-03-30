@@ -242,8 +242,9 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_KeyCodes_001
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
 
-    // Test with different keyCode
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_FORWARD);
+    // Test with different keyCode (using a valid keycode)
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_SCREEN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
 }
