@@ -2422,5 +2422,278 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_004, TestSize.Level
     eventdispatchhandler.HandleKeyEvent(keyEvent);
     EXPECT_FALSE(result);
 }
+
+/**
+ * @tc.name: EventDispatchTest_NotifyPointerEventToRS_Actions_001
+ * @tc.desc: Test NotifyPointerEventToRS with different pointer actions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_Actions_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    std::vector<int32_t> actions = {
+        PointerEvent::POINTER_ACTION_DOWN,
+        PointerEvent::POINTER_ACTION_UP,
+        PointerEvent::POINTER_ACTION_MOVE,
+        PointerEvent::POINTER_ACTION_CANCEL,
+        PointerEvent::POINTER_ACTION_AXIS_UPDATE
+    };
+
+    for (auto action : actions) {
+        EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(
+            action, "testProgram", 1000, 1, PointerEvent::SOURCE_TYPE_TOUCHSCREEN));
+    }
+}
+
+/**
+ * @tc.name: EventDispatchTest_NotifyPointerEventToRS_SourceType_001
+ * @tc.desc: Test NotifyPointerEventToRS with different source types
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_SourceType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    std::vector<int32_t> sourceTypes = {
+        PointerEvent::SOURCE_TYPE_MOUSE,
+        PointerEvent::SOURCE_TYPE_TOUCHSCREEN,
+        PointerEvent::SOURCE_TYPE_TOUCHPAD
+    };
+
+    for (auto sourceType : sourceTypes) {
+        EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(
+            PointerEvent::POINTER_ACTION_DOWN, "testProgram", 1000, 1, sourceType));
+    }
+}
+
+/**
+ * @tc.name: EventDispatchTest_NotifyPointerEventToRS_Count_001
+ * @tc.desc: Test NotifyPointerEventToRS with different pointer counts
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_Count_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    std::vector<int32_t> pointerCounts = { 1, 2, 3, 5 };
+
+    for (auto count : pointerCounts) {
+        EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(
+            PointerEvent::POINTER_ACTION_DOWN, "testProgram", 1000, count,
+            PointerEvent::SOURCE_TYPE_TOUCHSCREEN));
+    }
+}
+
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark_Move_001
+ * @tc.desc: Test AcquireEnableMark with MOVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_Move_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetId(100);
+
+    // First call should enable mark (after interval)
+    bool result1 = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result1);
+
+    // Immediate second call should potentially disable mark (within interval)
+    bool result2 = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result2); // Should still return true for MOVE
+}
+
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark_PullMove_001
+ * @tc.desc: Test AcquireEnableMark with PULL_MOVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_PullMove_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    pointerEvent->SetId(101);
+
+    bool result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark_TimeBoundary_001
+ * @tc.desc: Test AcquireEnableMark with time boundary conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_TimeBoundary_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetId(102);
+
+    // Test non-MOVE action always returns true
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: EventDispatchTest_SendWindowStateError_Normal_001
+ * @tc.desc: Test SendWindowStateError with valid parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_Normal_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    int32_t userId = 0;
+    int32_t pid = 1000;
+    int32_t windowId = 10;
+
+    // Test with valid parameters
+    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(userId, pid, windowId));
+}
+
+/**
+ * @tc.name: EventDispatchTest_SendWindowStateError_Fail_001
+ * @tc.desc: Test SendWindowStateError when session is null or invalid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_Fail_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    int32_t userId = 999;
+    int32_t pid = 9999;
+    int32_t windowId = 999;
+
+    // Test with invalid userId that results in null session
+    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(userId, pid, windowId));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandlePointerEvent_Flow_001
+ * @tc.desc: Test HandlePointerEvent complete flow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEvent_Flow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(0);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(100);
+    item.SetDisplayY(200);
+    item.SetTargetWindowId(1);
+    pointerEvent->AddPointerItem(item);
+
+    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.HandlePointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleTouchEvent_DelayLevitate_001
+ * @tc.desc: Test HandleTouchEvent with delay levitate event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleTouchEvent_DelayLevitate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(0);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(150);
+    item.SetDisplayY(250);
+    item.SetTargetWindowId(1);
+    pointerEvent->AddPointerItem(item);
+
+    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.HandleTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventDispatchTest_EnsureMouseEventCycle_001
+ * @tc.desc: Test EnsureMouseEventCycle method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_EnsureMouseEventCycle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetTargetWindowId(1);
+    pointerEvent->AddPointerItem(item);
+
+    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.EnsureMouseEventCycle(pointerEvent));
+}
+
+/**
+ * @tc.name: EventDispatchTest_CleanMouseEventCycle_001
+ * @tc.desc: Test CleanMouseEventCycle method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_CleanMouseEventCycle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetTargetWindowId(1);
+    pointerEvent->AddPointerItem(item);
+
+    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.CleanMouseEventCycle(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
