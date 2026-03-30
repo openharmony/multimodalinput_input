@@ -232,14 +232,169 @@ HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_NapProcess_001, 
 {
     CALL_TEST_DEBUG;
     LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
-    
+
     Ability ability;
     ability.bundleName = "testBundle";
     ability.deviceId = "deviceId";
     ability.abilityName = "abilityName";
     int64_t delay = 100;
-    
+
     ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability, delay));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchAbility_Sos_Success_001
+ * @tc.desc: Test LaunchAbility when bundleName matches SOS bundle and launch succeeds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_Sos_Success_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    Ability ability;
+    ability.abilityType = "normalAbility";
+    ability.bundleName = "SOS_BUNDLE_NAME";
+    ability.deviceId = "deviceId";
+    ability.abilityName = "abilityName";
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchAbility_EmptyDeviceId_001
+ * @tc.desc: Test LaunchAbility with empty deviceId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_EmptyDeviceId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    Ability ability;
+    ability.abilityType = "normalAbility";
+    ability.bundleName = "testBundle";
+    ability.deviceId = "";
+    ability.abilityName = "abilityName";
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchAbility_EmptyAbilityName_001
+ * @tc.desc: Test LaunchAbility with empty abilityName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_EmptyAbilityName_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    Ability ability;
+    ability.abilityType = "normalAbility";
+    ability.bundleName = "testBundle";
+    ability.deviceId = "deviceId";
+    ability.abilityName = "";
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchAbility_NapProcess_002
+ * @tc.desc: Test LaunchAbility with delay testing various NapProcess states
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_NapProcess_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    Ability ability;
+    ability.bundleName = "testBundle";
+    ability.deviceId = "deviceId";
+    ability.abilityName = "abilityName";
+    ability.action = "testAction";
+    ability.uri = "testUri";
+    ability.entities.push_back("entity1");
+    ability.params.insert(std::make_pair("key1", "value1"));
+    int64_t delay = 100;
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability, delay));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchRepeatKey_NoLaunch_001
+ * @tc.desc: Test LaunchRepeatKeyAbility when volume_down + camera bundle but retValue is 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchRepeatKey_NoLaunch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = "com.test.camera";
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchRepeatKeyAbility(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchRepeatKey_NormalVolumeUp_001
+ * @tc.desc: Test LaunchRepeatKeyAbility with normal volume_up key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchRepeatKey_NormalVolumeUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    RepeatKey repeatKey;
+    repeatKey.ability.bundleName = "com.test.volume";
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+
+    auto keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchRepeatKeyAbility(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: AbilityLauncherTest_LaunchAbility_WithAllParameters_001
+ * @tc.desc: Test LaunchAbility with all parameters set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_WithAllParameters_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
+
+    Ability ability;
+    ability.abilityType = "normalAbility";
+    ability.deviceId = "testDeviceId";
+    ability.bundleName = "testBundleName";
+    ability.abilityName = "testAbilityName";
+    ability.uri = "testUri";
+    ability.type = "testType";
+    ability.action = "testAction";
+    ability.entities.push_back("entity1");
+    ability.entities.push_back("entity2");
+    ability.params.insert(std::make_pair("param1", "value1"));
+    ability.params.insert(std::make_pair("param2", "value2"));
+
+    ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability));
 }
 } // namespace MMI
 } // namespace OHOS

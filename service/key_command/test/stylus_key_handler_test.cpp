@@ -221,5 +221,201 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_CreateStatusConfigObserver_0
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
 }
+
+/**
+ * @tc.name: StylusKeyHandlerTest_HandleStylusKey_KeyCodes_001
+ * @tc.desc: Test HandleStylusKey with various keyCodes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_KeyCodes_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    // Test with KEYCODE_STYLUS_SCREEN
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_SCREEN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->SetLastEventState(false);
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+
+    // Test with different keyCode
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_FORWARD);
+    result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_HandleStylusKey_StateTransition_001
+ * @tc.desc: Test HandleStylusKey with state transitions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StateTransition_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_SCREEN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    // Test state transition from false to true
+    STYLUS_HANDLER->SetLastEventState(false);
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
+    STYLUS_HANDLER->shortHandTarget_.statusConfigValue = true;
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_TRUE(result);
+
+    // Test state remains true
+    STYLUS_HANDLER->SetLastEventState(true);
+    result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_HandleStylusKey_StatusConfig_001
+ * @tc.desc: Test HandleStylusKey with different statusConfig values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StatusConfig_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_SCREEN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    // Test with statusConfigValue = false for both
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = false;
+    STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
+    STYLUS_HANDLER->SetLastEventState(true);
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+
+    // Test with mixed statusConfig values
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
+    STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
+    result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_SetLastEventState_Edge_001
+ * @tc.desc: Test SetLastEventState with edge cases
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_SetLastEventState_Edge_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Test setting to false multiple times
+    STYLUS_HANDLER->SetLastEventState(false);
+    STYLUS_HANDLER->SetLastEventState(false);
+    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
+
+    // Test setting to true multiple times
+    STYLUS_HANDLER->SetLastEventState(true);
+    STYLUS_HANDLER->SetLastEventState(true);
+    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
+
+    // Test rapid state changes
+    for (int i = 0; i < 10; i++) {
+        STYLUS_HANDLER->SetLastEventState(i % 2 == 0);
+    }
+    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_NullScenarios_001
+ * @tc.desc: Test various null pointer and invalid scenarios
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_NullScenarios_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Test with null keyEvent
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+
+    // Test with invalid keyEvent attributes
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(-1);
+    keyEvent->SetKeyAction(-1);
+    result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+
+    // Test with extreme key code values
+    keyEvent->SetKeyCode(INT32_MAX);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_IsLaunchAbility_MoreStates_001
+ * @tc.desc: Test IsLaunchAbility with more state combinations
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_IsLaunchAbility_MoreStates_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    // Test all combinations of lastEventState and statusConfig values
+    for (int lastState = 0; lastState <= 1; lastState++) {
+        for (int stylusConfig = 0; stylusConfig <= 1; stylusConfig++) {
+            for (int targetConfig = 0; targetConfig <= 1; targetConfig++) {
+                STYLUS_HANDLER->SetLastEventState(lastState != 0);
+                STYLUS_HANDLER->stylusKey_.statusConfigValue = (stylusConfig != 0);
+                STYLUS_HANDLER->shortHandTarget_.statusConfigValue = (targetConfig != 0);
+                ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_AbilityLogic_001
+ * @tc.desc: Test ability-related logic in StylusKeyHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_AbilityLogic_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_STYLUS_SCREEN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    // Set up ability with various properties
+    STYLUS_HANDLER->stylusKey_.ability.bundleName = "test.stylus.bundle";
+    STYLUS_HANDLER->stylusKey_.ability.abilityName = "TestAbility";
+    STYLUS_HANDLER->stylusKey_.ability.deviceId = "testDevice";
+
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
+    STYLUS_HANDLER->SetLastEventState(true);
+
+    auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_TRUE(result);
+
+    // Test with empty bundle name
+    STYLUS_HANDLER->stylusKey_.ability.bundleName = "";
+    result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    ASSERT_TRUE(result);
+}
 } // namespace MMI
 } // namespace OHOS
