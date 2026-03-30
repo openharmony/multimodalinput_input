@@ -672,6 +672,128 @@ HWTEST_F(RepeatKeyHandlerTest, IsCallScene_Abnormal_Branch_003, TestSize.Level1)
     DEVICE_MONITOR->SetVoipCallState(data, callState);
     EXPECT_FALSE(handler_->IsCallScene());
 }
+
+/**
+ * @tc.name: RepeatKeyHandlerTest_IsCallScene_Combinations_001
+ * @tc.desc: Test IsCallScene with various callState and voipCallState combinations
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_IsCallScene_Combinations_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFwk::Want want;
+
+    // Test various callState combinations
+    std::vector<int32_t> callStates = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for (auto state : callStates) {
+        want.SetParam("state", state);
+        EventFwk::CommonEventData data;
+        data.SetWant(want);
+        DEVICE_MONITOR->SetCallState(data, state);
+        EXPECT_FALSE(handler_->IsCallScene());
+    }
+
+    // Test various voipCallState combinations
+    for (auto state : callStates) {
+        want.SetParam("state", state);
+        EventFwk::CommonEventData data;
+        data.SetWant(want);
+        DEVICE_MONITOR->SetVoipCallState(data, state);
+        EXPECT_FALSE(handler_->IsCallScene());
+    }
+}
+
+/**
+ * @tc.name: RepeatKeyHandlerTest_Time_Boundaries_001
+ * @tc.desc: Test time-related boundary conditions in HandleRepeatKeyCount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_Time_Boundaries_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    RepeatKey repeatKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    // Test with minimum action time
+    repeatKey.keyCode = 2017;
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(INT64_MIN);
+    context_.repeatKey_.keyCode = 2018;
+    ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
+
+    // Test with maximum action time
+    keyEvent->SetActionTime(INT64_MAX);
+    ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
+
+    // Test with zero interval
+    context_.intervalTime_ = 0;
+    keyEvent->SetActionTime(0);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
+
+    // Test with negative interval
+    context_.intervalTime_ = -100;
+    ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
+}
+
+/**
+ * @tc.name: RepeatKeyHandlerTest_ScreenState_Combinations_001
+ * @tc.desc: Test CheckSpecialRepeatKey with various screen state combinations
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_ScreenState_Combinations_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+
+    RepeatKey repeatKey;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    repeatKey.ability.bundleName = ".camera";
+
+    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
+    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
+        it->second.windowsInfo.push_back(windowInfo);
+        it->second.focusWindowId = 0;
+    }
+
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
+    SessionPtr sessionPtr = std::make_shared<UDSSession>("RepeatKeyHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_[1] = sessionPtr;
+    inputWindowsManager->udsServer_ = &udsServer;
+    IInputWindowsManager::instance_ = inputWindowsManager;
+
+    // Test with screen off and locked
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
+
+    // Test with screen on and unlocked
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
+
+    // Test with screen on and locked
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    DISPLAY_MONITOR->SetScreenLocked(true);
+    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
+
+    // Test with screen off and unlocked
+    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    DISPLAY_MONITOR->SetScreenLocked(false);
+    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
+}
 } // namespace MMI
 } // namespace OHOS
 
