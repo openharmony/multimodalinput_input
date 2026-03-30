@@ -4968,5 +4968,1168 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetMouseEventCursorInfo
     ret = OH_Input_GetMouseEventCursorInfo(&mouseEvent, &cursorInfo);
     ASSERT_EQ(ret, INPUT_SUCCESS);
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyState_002
+ * @tc.desc: Test OH_Input_GetKeyState with valid keyCode in query range
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyState keyState;
+    keyState.keyCode = KEYCODE_CAPS_LOCK;
+    Input_Result ret = OH_Input_GetKeyState(&keyState);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    keyState.keyCode = KEYCODE_NUM_LOCK;
+    ret = OH_Input_GetKeyState(&keyState);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    keyState.keyCode = KEYCODE_SCROLL_LOCK;
+    ret = OH_Input_GetKeyState(&keyState);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyState_003
+ * @tc.desc: Test OH_Input_GetKeyState with null parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyState_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_GetKeyState(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyKeyState_001
+ * @tc.desc: Test OH_Input_DestroyKeyState with null parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyKeyState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyKeyState(nullptr));
+    Input_KeyState* keyState = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyKeyState(&keyState));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetKeyCode_001
+ * @tc.desc: Test OH_Input_SetKeyCode with various keyCode values
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyState keyState;
+    keyState.keyCode = KEYCODE_F1;
+    OH_Input_SetKeyCode(&keyState, -1);
+    OH_Input_SetKeyCode(&keyState, 100);
+    EXPECT_EQ(keyState.keyCode, 100);
+    EXPECT_NO_FATAL_FAILURE(OH_Input_SetKeyCode(nullptr, 100));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectKeyEvent_001
+ * @tc.desc: Test OH_Input_InjectKeyEvent with KEY_ACTION_CANCEL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyEvent keyEvent;
+    keyEvent.keyCode = KEYCODE_A;
+    keyEvent.actionTime = 100;
+    keyEvent.action = KEY_ACTION_CANCEL;
+    EXPECT_EQ(OH_Input_InjectKeyEvent(&keyEvent), INPUT_SUCCESS);
+    keyEvent.action = KEY_ACTION_DOWN;
+    EXPECT_EQ(OH_Input_InjectKeyEvent(&keyEvent), INPUT_SUCCESS);
+    keyEvent.action = KEY_ACTION_UP;
+    EXPECT_EQ(OH_Input_InjectKeyEvent(&keyEvent), INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyKeyEvent_001
+ * @tc.desc: Test OH_Input_DestroyKeyEvent with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyKeyEvent(nullptr));
+    Input_KeyEvent* keyEvent = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyKeyEvent(&keyEvent));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent_001
+ * @tc.desc: Test OH_Input_InjectMouseEvent with displayId > 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.displayId = 1;
+    mouseEvent.action = MOUSE_ACTION_MOVE;
+    mouseEvent.button = MOUSE_BUTTON_LEFT;
+    int32_t ret = OH_Input_InjectMouseEvent(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+    mouseEvent.displayId = -1;
+    ret = OH_Input_InjectMouseEvent(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+    mouseEvent.displayId = 0;
+    ret = OH_Input_InjectMouseEvent(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent_002
+ * @tc.desc: Test OH_Input_InjectMouseEvent with null parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = OH_Input_InjectMouseEvent(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyMouseEvent_001
+ * @tc.desc: Test OH_Input_DestroyMouseEvent with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyMouseEvent(nullptr));
+    Input_MouseEvent* mouseEvent = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyMouseEvent(&mouseEvent));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_011
+ * @tc.desc: Test OH_Input_InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_011, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = -1;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.action = TOUCH_ACTION_DOWN;
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&touchEvent), INPUT_SUCCESS);
+    touchEvent.action = TOUCH_ACTION_MOVE;
+    EXPECT_EQ(OH_Input_InjectTouchEvent(&touchEvent), INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_012
+ * @tc.desc: Test OH_Input_InjectTouchEvent with null parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_EQ(OH_Input_InjectTouchEvent(nullptr), INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyTouchEvent_001
+ * @tc.desc: Test OH_Input_DestroyTouchEvent with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyTouchEvent(nullptr));
+    Input_TouchEvent* touchEvent = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyTouchEvent(&touchEvent));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyAxisEvent_002
+ * @tc.desc: Test OH_Input_DestroyAxisEvent with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAxisEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_AxisEvent* axisEvent = nullptr;
+    Input_Result ret = OH_Input_DestroyAxisEvent(&axisEvent);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_DestroyAxisEvent(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetAxisEventAxisValue_001
+ * @tc.desc: Test OH_Input_SetAxisEventAxisValue with null parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetAxisEventAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_SetAxisEventAxisValue(nullptr, AXIS_TYPE_PINCH, 1.0);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetAxisEventAxisValue_001
+ * @tc.desc: Test OH_Input_GetAxisEventAxisValue with invalid axisType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetAxisEventAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto event = OH_Input_CreateAxisEvent();
+    ASSERT_NE(event, nullptr);
+    OH_Input_SetAxisEventAxisValue(event, AXIS_TYPE_PINCH, 1.0);
+    double axisValue = 0;
+    Input_Result ret = OH_Input_GetAxisEventAxisValue(event, static_cast<InputEvent_AxisType>(999), &axisValue);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyAxisEvent(&event);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDeviceName_005
+ * @tc.desc: Test OH_Input_GetDeviceName with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceName_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char* name = nullptr;
+    Input_Result ret = OH_Input_GetDeviceName(nullptr, &name);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
+    ret = OH_Input_GetDeviceName(deviceInfo, &name);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDeviceAddress_005
+ * @tc.desc: Test OH_Input_GetDeviceAddress with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceAddress_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char* address = nullptr;
+    Input_Result ret = OH_Input_GetDeviceAddress(nullptr, &address);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
+    ret = OH_Input_GetDeviceAddress(deviceInfo, &address);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyDeviceInfo_005
+ * @tc.desc: Test OH_Input_DestroyDeviceInfo with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyDeviceInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyDeviceInfo(nullptr));
+    Input_DeviceInfo* deviceInfo = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyDeviceInfo(&deviceInfo));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyHotkey_001
+ * @tc.desc: Test OH_Input_DestroyHotkey with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyHotkey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyHotkey(nullptr));
+    Input_Hotkey* hotkey = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyHotkey(&hotkey));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPreKeys_005
+ * @tc.desc: Test OH_Input_SetPreKeys with null hotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPreKeys_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t preKeys[] = {KEYCODE_CTRL_LEFT};
+    EXPECT_NO_FATAL_FAILURE(OH_Input_SetPreKeys(nullptr, preKeys, 1));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetPreKeys_006
+ * @tc.desc: Test OH_Input_SetPreKeys with null preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetPreKeys_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    EXPECT_NO_FATAL_FAILURE(OH_Input_SetPreKeys(hotkey, nullptr, 1));
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetFinalKey_001
+ * @tc.desc: Test OH_Input_SetFinalKey with null hotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetFinalKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_SetFinalKey(nullptr, KEYCODE_A));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetRepeat_001
+ * @tc.desc: Test OH_Input_SetRepeat with null hotkey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetRepeat_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_SetRepeat(nullptr, true));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_UnregisterDeviceListeners_001
+ * @tc.desc: Test OH_Input_UnregisterDeviceListeners when list is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListeners_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_Input_UnregisterDeviceListeners();
+    Input_Result ret = OH_Input_UnregisterDeviceListeners();
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetFunctionKeyState_005
+ * @tc.desc: Test OH_Input_GetFunctionKeyState with null state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetFunctionKeyState_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_GetFunctionKeyState(OHOS::MMI::FunctionKey::FUNCTION_KEY_CAPSLOCK, nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_QueryMaxTouchPoints_001
+ * @tc.desc: Test OH_Input_QueryMaxTouchPoints with null parameter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_QueryMaxTouchPoints_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_QueryMaxTouchPoints(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetPointerLocation_001
+ * @tc.desc: Test OH_Input_GetPointerLocation with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPointerLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 0;
+    double displayX = 0;
+    double displayY = 0;
+    Input_Result ret = OH_Input_GetPointerLocation(nullptr, &displayX, &displayY);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_GetPointerLocation(&displayId, nullptr, &displayY);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_GetPointerLocation(&displayId, &displayX, nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyEventId_002
+ * @tc.desc: Test OH_Input_GetKeyEventId with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyEventId_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_KeyEvent keyEvent;
+    int32_t eventId = 0;
+    Input_Result ret = OH_Input_GetKeyEventId(nullptr, &eventId);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    ret = OH_Input_GetKeyEventId(&keyEvent, nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_Destroy_001
+ * @tc.desc: Test OH_Input_CustomCursor_Destroy with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_Destroy_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CustomCursor_Destroy(nullptr));
+    Input_CustomCursor* customCursor = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CustomCursor_Destroy(&customCursor));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_GetPixelMap_001
+ * @tc.desc: Test OH_Input_CustomCursor_GetPixelMap with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_GetPixelMap_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative* pixelMap = nullptr;
+    Input_Result ret = OH_Input_CustomCursor_GetPixelMap(nullptr, &pixelMap);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CustomCursor_GetAnchor_001
+ * @tc.desc: Test OH_Input_CustomCursor_GetAnchor with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CustomCursor_GetAnchor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t anchorX = 0;
+    int32_t anchorY = 0;
+    Input_Result ret = OH_Input_CustomCursor_GetAnchor(nullptr, &anchorX, &anchorY);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorConfig_Destroy_001
+ * @tc.desc: Test OH_Input_CursorConfig_Destroy with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorConfig_Destroy_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CursorConfig_Destroy(nullptr));
+    Input_CursorConfig* cursorConfig = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_Input_CursorConfig_Destroy(&cursorConfig));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_CursorConfig_IsFollowSystem_001
+ * @tc.desc: Test OH_Input_CursorConfig_IsFollowSystem with null parameters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_CursorConfig_IsFollowSystem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool followSystem = false;
+    Input_Result ret = OH_Input_CursorConfig_IsFollowSystem(nullptr, &followSystem);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetCustomCursor_003
+ * @tc.desc: Test OH_Input_SetCustomCursor with null customCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isfollowSystem = true;
+    Input_CursorConfig* cursorConfig = OH_Input_CursorConfig_Create(isfollowSystem);
+    EXPECT_NE(cursorConfig, nullptr);
+    Input_Result ret = OH_Input_SetCustomCursor(0, nullptr, cursorConfig);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_SetCustomCursor_004
+ * @tc.desc: Test OH_Input_SetCustomCursor with null cursorConfig
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetCustomCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative* pixelmap = nullptr;
+    OH_Pixelmap_InitializationOptions* options = nullptr;
+    OH_PixelmapInitializationOptions_Create(&options);
+    OH_PixelmapInitializationOptions_SetWidth(options, 1);
+    OH_PixelmapInitializationOptions_SetHeight(options, 1);
+    OH_PixelmapNative_CreateEmptyPixelmap(options, &pixelmap);
+    Input_CustomCursor* customCursor = OH_Input_CustomCursor_Create(pixelmap, 0, 0);
+    ASSERT_NE(customCursor, nullptr);
+    Input_Result ret = OH_Input_SetCustomCursor(0, customCursor, nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+    OH_Input_CustomCursor_Destroy(&customCursor);
+    OH_PixelmapInitializationOptions_Release(options);
+    OH_PixelmapNative_Release(pixelmap);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetCursorInfo_001
+ * @tc.desc: Test OH_Input_GetCursorInfo with null cursorInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetCursorInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OH_PixelmapNative* pixelmap = nullptr;
+    Input_Result ret = OH_Input_GetCursorInfo(nullptr, &pixelmap);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_RemoveAxisEventMonitor_001
+ * @tc.desc: Test OH_Input_RemoveAxisEventMonitor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveAxisEventMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputEvent_AxisEventType type = InputEvent_AxisEventType::AXIS_EVENT_TYPE_PINCH;
+    Input_Result ret = OH_Input_RemoveAxisEventMonitor(type, nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_RemoveAxisEventMonitor_002
+ * @tc.desc: Test OH_Input_RemoveAxisEventMonitor with unregistered callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RemoveAxisEventMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputEvent_AxisEventType type = InputEvent_AxisEventType::AXIS_EVENT_TYPE_PINCH;
+    auto callback = [](const Input_AxisEvent* event) {};
+    Input_Result ret = OH_Input_RemoveAxisEventMonitor(type, callback);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddMouseEventMonitor_001
+ * @tc.desc: Test OH_Input_AddMouseEventMonitor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddMouseEventMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddMouseEventMonitor(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddTouchEventMonitor_005
+ * @tc.desc: Test OH_Input_AddTouchEventMonitor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddTouchEventMonitor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddTouchEventMonitor(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventMonitor_005
+ * @tc.desc: Test OH_Input_AddKeyEventMonitor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventMonitor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_AddKeyEventMonitor(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddAxisEventMonitor_001
+ * @tc.desc: Test OH_Input_AddAxisEventMonitor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddAxisEventMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputEvent_AxisEventType type = InputEvent_AxisEventType::AXIS_EVENT_TYPE_PINCH;
+    Input_Result ret = OH_Input_AddAxisEventMonitor(type, nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddInputEventInterceptor_005
+ * @tc.desc: Test OH_Input_AddInputEventInterceptor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddInputEventInterceptor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_InterceptorOptions* option = nullptr;
+    Input_Result ret = OH_Input_AddInputEventInterceptor(nullptr, option);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddKeyEventInterceptor_005
+ * @tc.desc: Test OH_Input_AddKeyEventInterceptor with null callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddKeyEventInterceptor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_InterceptorOptions* option = nullptr;
+    Input_Result ret = OH_Input_AddKeyEventInterceptor(nullptr, option);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener_001
+ * @tc.desc: Test OH_Input_RegisterDeviceListener with null listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_RegisterDeviceListener(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_UnregisterDeviceListener_001
+ * @tc.desc: Test OH_Input_UnregisterDeviceListener with null listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Result ret = OH_Input_UnregisterDeviceListener(nullptr);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddHotkeyMonitor_004
+ * @tc.desc: Test OH_Input_AddHotkeyMonitor with invalid preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t invalidPreKeys[] = {KEYCODE_A};
+    OH_Input_SetPreKeys(hotkey, invalidPreKeys, 1);
+    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
+    OH_Input_SetRepeat(hotkey, false);
+    Input_Result result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddHotkeyMonitor_005
+ * @tc.desc: Test OH_Input_AddHotkeyMonitor with finalKey in preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t preKeys[] = {KEYCODE_CTRL_LEFT};
+    OH_Input_SetPreKeys(hotkey, preKeys, 1);
+    OH_Input_SetFinalKey(hotkey, KEYCODE_CTRL_RIGHT);
+    OH_Input_SetRepeat(hotkey, false);
+    Input_Result result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddHotkeyMonitor_006
+ * @tc.desc: Test OH_Input_AddHotkeyMonitor with empty preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
+    OH_Input_SetRepeat(hotkey, false);
+    Input_Result result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddHotkeyMonitor_007
+ * @tc.desc: Test OH_Input_AddHotkeyMonitor with negative finalKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t preKeys[] = {KEYCODE_CTRL_LEFT};
+    OH_Input_SetPreKeys(hotkey, preKeys, 1);
+    OH_Input_SetFinalKey(hotkey, -1);
+    OH_Input_SetRepeat(hotkey, false);
+    Input_Result result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_AddHotkeyMonitor_008
+ * @tc.desc: Test OH_Input_AddHotkeyMonitor with too many preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t preKeys[] = {KEYCODE_CTRL_LEFT, KEYCODE_ALT_LEFT,
+        KEYCODE_SHIFT_LEFT, KEYCODE_CTRL_RIGHT, KEYCODE_ALT_RIGHT};
+    OH_Input_SetPreKeys(hotkey, preKeys, 5);
+    OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
+    OH_Input_SetRepeat(hotkey, false);
+    Input_Result result = OH_Input_AddHotkeyMonitor(hotkey, &HotkeyCallback);
+    EXPECT_EQ(result, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_DestroyAllSystemHotkeys_001
+ * @tc.desc: Test OH_Input_DestroyAllSystemHotkeys with unregistered hotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_DestroyAllSystemHotkeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey** hotkeys = new Input_Hotkey*[3];
+    for (int i = 0; i < 3; ++i) {
+        hotkeys[i] = OH_Input_CreateHotkey();
+    }
+    EXPECT_NO_FATAL_FAILURE(OH_Input_DestroyAllSystemHotkeys(hotkeys, 3));
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetPreKeys_007
+ * @tc.desc: Test OH_Input_GetPreKeys with valid preKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetPreKeys_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_Hotkey* hotkey = OH_Input_CreateHotkey();
+    ASSERT_NE(hotkey, nullptr);
+    int32_t preKeys[] = {KEYCODE_CTRL_LEFT, KEYCODE_ALT_LEFT};
+    OH_Input_SetPreKeys(hotkey, preKeys, 2);
+    int32_t key0 = 0;
+    int32_t key1 = 0;
+    int32_t* pressedKeys[2] = {&key0, &key1};
+    int32_t pressedKeyNum = 0;
+    Input_Result result = OH_Input_GetPreKeys(hotkey, pressedKeys, &pressedKeyNum);
+    EXPECT_EQ(result, INPUT_SUCCESS);
+    EXPECT_EQ(pressedKeyNum, 2);
+    OH_Input_DestroyHotkey(&hotkey);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEvent_Button_001
+ * @tc.desc: Test OH_Input_InjectMouseEvent with MOUSE_BUTTON_NONE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEvent_Button_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.action = MOUSE_ACTION_MOVE;
+    mouseEvent.button = MOUSE_BUTTON_NONE;
+    int32_t ret = OH_Input_InjectMouseEvent(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button002
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_BUTTON_RIGHT
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_BUTTON_UP;
+    mouseEvent.button = MOUSE_BUTTON_RIGHT;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button003
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_BUTTON_FORWARD
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_BUTTON_DOWN;
+    mouseEvent.button = MOUSE_BUTTON_FORWARD;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button004
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_BUTTON_BACK
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Button004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_BUTTON_UP;
+    mouseEvent.button = MOUSE_BUTTON_BACK;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action001
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_ACTION_MOVE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_MOVE;
+    mouseEvent.button = MOUSE_BUTTON_LEFT;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action002
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_ACTION_CANCEL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Action002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_CANCEL;
+    mouseEvent.button = MOUSE_BUTTON_NONE;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType001
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_AXIS_SCROLL_VERTICAL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_AXIS_BEGIN;
+    mouseEvent.axisType = MOUSE_AXIS_SCROLL_VERTICAL;
+    mouseEvent.axisValue = 10.0f;
+    mouseEvent.button = MOUSE_BUTTON_NONE;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType002
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with MOUSE_AXIS_SCROLL_HORIZONTAL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_AxisType002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = 100;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_AXIS_UPDATE;
+    mouseEvent.axisType = MOUSE_AXIS_SCROLL_HORIZONTAL;
+    mouseEvent.axisValue = 5.0f;
+    mouseEvent.button = MOUSE_BUTTON_NONE;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Time001
+ * @tc.desc: Test OH_Input_InjectMouseEventGlobal with actionTime < 0
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectMouseEventGlobal_Time001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_MouseEvent mouseEvent;
+    mouseEvent.actionTime = -1;
+    mouseEvent.displayX = 100;
+    mouseEvent.displayY = 100;
+    mouseEvent.globalX = 100;
+    mouseEvent.globalY = 100;
+    mouseEvent.action = MOUSE_ACTION_MOVE;
+    mouseEvent.button = MOUSE_BUTTON_LEFT;
+    int32_t ret = OH_Input_InjectMouseEventGlobal(&mouseEvent);
+    EXPECT_EQ(ret, INPUT_PERMISSION_DENIED);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_Action001
+ * @tc.desc: Test OH_Input_InjectTouchEvent with TOUCH_ACTION_DOWN
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_Action001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.action = TOUCH_ACTION_DOWN;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_Action002
+ * @tc.desc: Test OH_Input_InjectTouchEvent with TOUCH_ACTION_MOVE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_Action002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.action = TOUCH_ACTION_MOVE;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_Action003
+ * @tc.desc: Test OH_Input_InjectTouchEvent with TOUCH_ACTION_UP
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_Action003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.action = TOUCH_ACTION_UP;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_Action004
+ * @tc.desc: Test OH_Input_InjectTouchEvent with TOUCH_ACTION_CANCEL
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_Action004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.action = TOUCH_ACTION_CANCEL;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_GlobalXY001
+ * @tc.desc: Test OH_Input_InjectTouchEvent with globalX and globalY set
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_GlobalXY001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.globalX = 200;
+    touchEvent.globalY = 200;
+    touchEvent.action = TOUCH_ACTION_DOWN;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_GlobalXY002
+ * @tc.desc: Test OH_Input_InjectTouchEvent with globalX INT32_MAX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_GlobalXY002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.globalX = INT32_MAX;
+    touchEvent.globalY = 200;
+    touchEvent.action = TOUCH_ACTION_DOWN;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_InjectTouchEvent_Pressure001
+ * @tc.desc: Test OH_Input_InjectTouchEvent with valid pressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_InjectTouchEvent_Pressure001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Input_TouchEvent touchEvent;
+    touchEvent.actionTime = 100;
+    touchEvent.displayX = 100;
+    touchEvent.displayY = 100;
+    touchEvent.pressure = 0.5;
+    touchEvent.action = TOUCH_ACTION_DOWN;
+    touchEvent.id = 0;
+    int32_t ret = OH_Input_InjectTouchEvent(&touchEvent);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+}
 } // namespace MMI
 } // namespace OHOS
