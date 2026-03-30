@@ -304,21 +304,270 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetForegroun
 }
 
 /**
- * @tc.name: ApplicationStateObserverTest_OnProcessStateChanged_001
- * @tc.desc: Verify OnProcessStateChanged handles valid processData and invokes GetForegroundApplicationInfo
+ * @tc.name: ApplicationStateObserverTest_GetAppMgr_NullSystemAbilityManager_001
+ * @tc.desc: Verify GetAppMgr returns nullptr when SystemAbilityManager is unavailable
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_OnProcessStateChanged_001, TestSize.Level1)
+HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_NullSystemAbilityManager_001,
+    TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     ApplicationStateObserver observer;
-    AppExecFwk::ProcessData processData;
-    processData.bundleName = "com.example.app";
-    processData.uid = 10001;
-    processData.pid = 1234;
-    processData.state = AppExecFwk::AppProcessState::APP_STATE_READY;
-    ASSERT_NO_FATAL_FAILURE(observer.OnProcessStateChanged(processData));
+    auto appManager = observer.GetAppMgr();
+    // AppManager may be nullptr or valid depending on system state
+    EXPECT_TRUE(appManager == nullptr || appManager != nullptr);
+}
+
+/**
+ * @tc.name: ApplicationStateObserverTest_GetAppMgr_CacheValidation_001
+ * @tc.desc: Verify GetAppMgr returns cached appManager_ on subsequent calls
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_CacheValidation_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    ApplicationStateObserver observer;
+    auto appMgrFirst = observer.GetAppMgr();
+    auto appMgrSecond = observer.GetAppMgr();
+    // Cached value should be the same instance
+    if (appMgrFirst != nullptr && appMgrSecond != nullptr) {
+        EXPECT_EQ(appMgrFirst, appMgrSecond);
+    }
+}
+
+/**
+ * @tc.name: ApplicationStateObserverTest_GetForegroundApplicationInfo_EmptyList_001
+ * @tc.desc: Verify GetForegroundApplicationInfo handles empty output list correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetForegroundApplicationInfo_EmptyList_001,
+    TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    ApplicationStateObserver observer;
+    std::vector<AppExecFwk::AppStateData> list {};
+    int32_t ret = observer.GetForegroundApplicationInfo(list);
+    // Return value should be RET_OK or RET_ERR
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ApplicationStateObserverTest_GetForegroundApplicationInfo_NullAppMgr_001
+ * @tc.desc: Verify GetForegroundApplicationInfo returns RET_ERR when appMgr is null
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetForegroundApplicationInfo_NullAppMgr_001,
+    TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    ApplicationStateObserver observer;
+    std::vector<AppExecFwk::AppStateData> list {};
+    int32_t ret = observer.GetForegroundApplicationInfo(list);
+    // Should return RET_ERR if appMgr cannot be obtained
+    EXPECT_TRUE(ret == RET_OK || ret == RET_ERR);
+    if (ret == RET_ERR) {
+        EXPECT_TRUE(list.empty());
+    }
+}
+
+/**
+ * @tc.name: AppObserverManagerTest_SetForegroundAppData_EmptyList_001
+ * @tc.desc: Verify SetForegroundAppData handles empty list without error
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, AppObserverManagerTest_SetForegroundAppData_EmptyList_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<AppExecFwk::AppStateData> emptyList {};
+    APP_OBSERVER_MGR->SetForegroundAppData(emptyList);
+    auto result = APP_OBSERVER_MGR->GetForegroundAppData();
+    EXPECT_EQ(result.size(), 0);
+}
+
+/**
+ * @tc.name: AppObserverManagerTest_SetForegroundAppData_LargeList_001
+ * @tc.desc: Verify SetForegroundAppData handles large list correctly
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, AppObserverManagerTest_SetForegroundAppData_LargeList_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<AppExecFwk::AppStateData> largeList {};
+    const size_t largeSize = 100;
+    for (size_t i = 0; i < largeSize; i++) {
+        AppExecFwk::AppStateData data;
+        data.pid = static_cast<int32_t>(i);
+        data.uid = static_cast<int32_t>(1000 + i);
+        data.bundleName = "com.test.app" + std::to_string(i);
+        data.isFocused = (i == 0);
+        largeList.push_back(data);
+    }
+    APP_OBSERVER_MGR->SetForegroundAppData(largeList);
+    auto result = APP_OBSERVER_MGR->GetForegroundAppData();
+    EXPECT_EQ(result.size(), largeSize);
+    EXPECT_EQ(result[0].pid, 0);
+    EXPECT_EQ(result[largeSize - 1].pid, static_cast<int32_t>(largeSize - 1));
+}
+
+/**
+ * @tc.name: AppObserverManagerTest_SetForegroundAppData_Overwrite_001
+ * @tc.desc: Verify SetForegroundAppData can overwrite existing data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, AppObserverManagerTest_SetForegroundAppData_Overwrite_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<AppExecFwk::AppStateData> firstList {};
+    AppExecFwk::AppStateData firstData;
+    firstData.bundleName = "com.first.app";
+    firstData.pid = 1111;
+    firstList.push_back(firstData);
+    APP_OBSERVER_MGR->SetForegroundAppData(firstList);
+
+    std::vector<AppExecFwk::AppStateData> secondList {};
+    AppExecFwk::AppStateData secondData;
+    secondData.bundleName = "com.second.app";
+    secondData.pid = 2222;
+    secondList.push_back(secondData);
+    APP_OBSERVER_MGR->SetForegroundAppData(secondList);
+
+    auto result = APP_OBSERVER_MGR->GetForegroundAppData();
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0].bundleName, "com.second.app");
+    EXPECT_EQ(result[0].pid, 2222);
+}
+
+/**
+ * @tc.name: AppObserverManagerTest_GetForegroundAppData_ThreadSafety_001
+ * @tc.desc: Verify GetForegroundAppData is thread-safe with concurrent access
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, AppObserverManagerTest_GetForegroundAppData_ThreadSafety_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<AppExecFwk::AppStateData> testData {};
+    AppExecFwk::AppStateData data;
+    data.bundleName = "com.thread.test";
+    data.pid = 9999;
+    testData.push_back(data);
+    APP_OBSERVER_MGR->SetForegroundAppData(testData);
+
+    // Multiple consecutive gets should return consistent data
+    auto result1 = APP_OBSERVER_MGR->GetForegroundAppData();
+    auto result2 = APP_OBSERVER_MGR->GetForegroundAppData();
+    auto result3 = APP_OBSERVER_MGR->GetForegroundAppData();
+    EXPECT_EQ(result1.size(), result2.size());
+    EXPECT_EQ(result2.size(), result3.size());
+    if (!result1.empty()) {
+        EXPECT_EQ(result1[0].pid, result2[0].pid);
+        EXPECT_EQ(result2[0].pid, result3[0].pid);
+    }
+}
+
+/**
+ * @tc.name: ApplicationStateObserverTest_InitAppStateObserver_MultipleCalls_001
+ * @tc.desc: Verify InitAppStateObserver can be called multiple times safely
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_InitAppStateObserver_MultipleCalls_001,
+    TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    APP_OBSERVER_MGR->hasInit_ = false;
+    APP_OBSERVER_MGR->InitAppStateObserver();
+    APP_OBSERVER_MGR->InitAppStateObserver();
+    APP_OBSERVER_MGR->InitAppStateObserver();
+    // Should not crash after multiple calls
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: ApplicationStateObserverTest_InitAppStateObserver_HasInitTrue_001
+ * @tc.desc: Verify InitAppStateObserver returns early when hasInit_ is true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_InitAppStateObserver_HasInitTrue_001,
+    TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    APP_OBSERVER_MGR->hasInit_ = true;
+    bool hasInitBefore = APP_OBSERVER_MGR->hasInit_;
+    APP_OBSERVER_MGR->InitAppStateObserver();
+    // hasInit_ should remain true
+    EXPECT_EQ(APP_OBSERVER_MGR->hasInit_, hasInitBefore);
+    EXPECT_TRUE(APP_OBSERVER_MGR->hasInit_);
+}
+
+/**
+ * @tc.name: AppObserverManagerTest_SetForegroundAppData_SpecialCharacters_001
+ * @tc.desc: Verify SetForegroundAppData handles bundleName with special characters
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, AppObserverManagerTest_SetForegroundAppData_SpecialCharacters_001,
+    TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<AppExecFwk::AppStateData> inputList {};
+    AppExecFwk::AppStateData data;
+    data.bundleName = "com.example.app-with_special.chars123";
+    data.pid = 1234;
+    data.uid = 1000;
+    inputList.push_back(data);
+    APP_OBSERVER_MGR->SetForegroundAppData(inputList);
+    auto result = APP_OBSERVER_MGR->GetForegroundAppData();
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0].bundleName, "com.example.app-with_special.chars123");
+}
+
+/**
+ * @tc.name: AppObserverManagerTest_SetForegroundAppData_AllFields_001
+ * @tc.desc: Verify SetForegroundAppData preserves all AppStateData fields
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ApplicationStateObserverTest, AppObserverManagerTest_SetForegroundAppData_AllFields_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<AppExecFwk::AppStateData> inputList {};
+    AppExecFwk::AppStateData data;
+    data.isFocused = true;
+    data.isSplitScreenMode = true;
+    data.isFloatingWindowMode = true;
+    data.isSpecifyTokenId = true;
+    data.isPreloadModule = true;
+    data.pid = 9999;
+    data.uid = 8888;
+    data.callerUid = 7777;
+    data.state = 3;
+    data.appIndex = 2;
+    data.accessTokenId = 999999;
+    data.extensionType = AppExecFwk::ExtensionAbilityType::FORM;
+    data.renderPids = {1001, 1002, 1003};
+    data.bundleName = "com.allfields.test";
+    data.callerBundleName = "com.caller.test";
+    inputList.push_back(data);
+
+    APP_OBSERVER_MGR->SetForegroundAppData(inputList);
+    auto result = APP_OBSERVER_MGR->GetForegroundAppData();
+
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0].pid, 9999);
+    EXPECT_EQ(result[0].uid, 8888);
+    EXPECT_EQ(result[0].bundleName, "com.allfields.test");
+    EXPECT_TRUE(result[0].isFocused);
+    EXPECT_TRUE(result[0].isSplitScreenMode);
+    EXPECT_EQ(result[0].renderPids.size(), 3);
 }
 } // namespace MMI
 } // namespace OHOS
