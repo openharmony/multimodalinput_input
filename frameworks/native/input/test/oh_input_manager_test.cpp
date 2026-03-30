@@ -5754,7 +5754,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_AddHotkeyMonitor_008, T
     CALL_TEST_DEBUG;
     Input_Hotkey* hotkey = OH_Input_CreateHotkey();
     ASSERT_NE(hotkey, nullptr);
-    int32_t preKeys[] = {KEYCODE_CTRL_LEFT, KEYCODE_ALT_LEFT, KEYCODE_SHIFT_LEFT, KEYCODE_CTRL_RIGHT, KEYCODE_ALT_RIGHT};
+    int32_t preKeys[] = {KEYCODE_CTRL_LEFT, KEYCODE_ALT_LEFT,
+        KEYCODE_SHIFT_LEFT, KEYCODE_CTRL_RIGHT, KEYCODE_ALT_RIGHT};
     OH_Input_SetPreKeys(hotkey, preKeys, 5);
     OH_Input_SetFinalKey(hotkey, KEYCODE_TAB);
     OH_Input_SetRepeat(hotkey, false);
