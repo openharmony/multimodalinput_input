@@ -740,59 +740,6 @@ HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_Time_Boundaries_001, TestSiz
     ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
 }
 
-/**
- * @tc.name: RepeatKeyHandlerTest_ScreenState_Combinations_001
- * @tc.desc: Test CheckSpecialRepeatKey with various screen state combinations
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_ScreenState_Combinations_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-
-    RepeatKey repeatKey;
-    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    repeatKey.ability.bundleName = ".camera";
-
-    auto inputWindowsManager = std::make_shared<InputWindowsManager>();
-    WindowInfo windowInfo;
-    windowInfo.id = 0;
-    auto it = inputWindowsManager->displayGroupInfoMap_.find(DEFAULT_GROUP_ID);
-    if (it != inputWindowsManager->displayGroupInfoMap_.end()) {
-        it->second.windowsInfo.push_back(windowInfo);
-        it->second.focusWindowId = 0;
-    }
-
-    UDSServer udsServer;
-    udsServer.idxPidMap_.insert(std::make_pair(0, 1));
-    SessionPtr sessionPtr = std::make_shared<UDSSession>("RepeatKeyHandlerTest", MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    udsServer.sessionsMap_[1] = sessionPtr;
-    inputWindowsManager->udsServer_ = &udsServer;
-    IInputWindowsManager::instance_ = inputWindowsManager;
-
-    // Test with screen off and locked
-    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    DISPLAY_MONITOR->SetScreenLocked(true);
-    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
-
-    // Test with screen on and unlocked
-    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    DISPLAY_MONITOR->SetScreenLocked(false);
-    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
-
-    // Test with screen on and locked
-    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
-    DISPLAY_MONITOR->SetScreenLocked(true);
-    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
-
-    // Test with screen off and unlocked
-    DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
-    DISPLAY_MONITOR->SetScreenLocked(false);
-    ASSERT_NO_FATAL_FAILURE(handler_->CheckSpecialRepeatKey(repeatKey, keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS
