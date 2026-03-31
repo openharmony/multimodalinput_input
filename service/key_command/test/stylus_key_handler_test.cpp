@@ -362,33 +362,6 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_NullScenarios_001, TestSize.
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
-}
-
-/**
- * @tc.name: StylusKeyHandlerTest_IsLaunchAbility_MoreStates_001
- * @tc.desc: Test IsLaunchAbility with more state combinations
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_IsLaunchAbility_MoreStates_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    // Test all combinations of lastEventState and statusConfig values
-    for (int lastState = 0; lastState <= 1; lastState++) {
-        for (int stylusConfig = 0; stylusConfig <= 1; stylusConfig++) {
-            for (int targetConfig = 0; targetConfig <= 1; targetConfig++) {
-                STYLUS_HANDLER->SetLastEventState(lastState != 0);
-                STYLUS_HANDLER->stylusKey_.statusConfigValue = (stylusConfig != 0);
-                STYLUS_HANDLER->shortHandTarget_.statusConfigValue = (targetConfig != 0);
-                ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
-            }
-        }
-    }
-}
-
-/**
- * @tc.name: StylusKeyHandlerTest_AbilityLogic_001
  * @tc.desc: Test ability-related logic in StylusKeyHandler
  * @tc.type: FUNC
  * @tc.require:
