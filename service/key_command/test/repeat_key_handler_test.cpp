@@ -739,8 +739,7 @@ HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_Time_Boundaries_001, TestSiz
     context_.intervalTime_ = -100;
     ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
 }
-
-}
 } // namespace MMI
 } // namespace OHOS
+
 
