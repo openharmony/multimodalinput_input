@@ -736,7 +736,7 @@ HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_Time_Boundaries_001, TestSiz
     ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
 
     // Test with negative interval
-    context_.intervalTime_ = -100;
+    context_.intervalTime = -100;
     ASSERT_TRUE(handler_->HandleRepeatKeyCount(repeatKey, keyEvent));
 }
 } // namespace MMI

@@ -336,6 +336,9 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_NullScenarios_001, TestSize.
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
 }
+
+/**
+ * @tc.name: StylusKeyHandlerTest_AbilityLogic_001
  * @tc.desc: Test ability-related logic in StylusKeyHandler
  * @tc.type: FUNC
  * @tc.require:
