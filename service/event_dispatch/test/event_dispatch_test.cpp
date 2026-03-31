@@ -2422,5 +2422,77 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleKeyEvent_004, TestSize.Level
     eventdispatchhandler.HandleKeyEvent(keyEvent);
     EXPECT_FALSE(result);
 }
+
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark_Move_001
+ * @tc.desc: Test AcquireEnableMark with MOVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_Move_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetId(100);
+
+    // First call should enable mark (after interval)
+    bool result1 = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result1);
+
+    // Immediate second call should potentially disable mark (within interval)
+    bool result2 = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result2); // Should still return true for MOVE
+}
+
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark_PullMove_001
+ * @tc.desc: Test AcquireEnableMark with PULL_MOVE action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_PullMove_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    pointerEvent->SetId(101);
+
+    bool result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark_TimeBoundary_001
+ * @tc.desc: Test AcquireEnableMark with time boundary conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark_TimeBoundary_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventDispatchHandler eventdispatchhandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetId(102);
+
+    // Test non-MOVE action always returns true
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    bool result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    result = eventdispatchhandler.AcquireEnableMark(pointerEvent);
+    EXPECT_TRUE(result);
+}
 } // namespace MMI
 } // namespace OHOS

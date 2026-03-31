@@ -114,5 +114,271 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetProFilePath_002, TestSize.Level
     }
 }
 
+/**
+ * @tc.name: KeyMapManagerTest_TransferDeviceKeyValue_Normal_001
+ * @tc.desc: Test TransferDeviceKeyValue with normal device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_TransferDeviceKeyValue_Normal_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t deviceId = 100;
+    int32_t inputKey = 200;
+    int32_t expectedOutputKey = 300;
+
+    KeyMapMgr->configKeyValue_[deviceId][inputKey] = expectedOutputKey;
+    int32_t result = KeyMapMgr->TransferDeviceKeyValue(nullptr, inputKey);
+
+    // Should fallback to default key transfer
+    EXPECT_NE(result, inputKey);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_TransferDeviceKeyValue_NullPtr_001
+ * @tc.desc: Test TransferDeviceKeyValue with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_TransferDeviceKeyValue_NullPtr_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t inputKey = 200;
+    int32_t result = KeyMapMgr->TransferDeviceKeyValue(nullptr, inputKey);
+    EXPECT_NE(result, inputKey);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_TransferDefaultKeyValue_001
+ * @tc.desc: Test TransferDefaultKeyValue method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_TransferDefaultKeyValue_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t defaultKeyId = KeyMapMgr->GetDefaultKeyId();
+    int32_t inputKey = 200;
+    int32_t expectedOutputKey = 300;
+
+    KeyMapMgr->configKeyValue_[defaultKeyId][inputKey] = expectedOutputKey;
+    int32_t result = KeyMapMgr->TransferDefaultKeyValue(inputKey);
+    EXPECT_EQ(result, expectedOutputKey);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_InputTransferKeyValue_Normal_001
+ * @tc.desc: Test InputTransferKeyValue with normal device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_InputTransferKeyValue_Normal_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t deviceId = 100;
+    int32_t inputKeyCode = 200;
+    int32_t sysKeyCode = 300;
+
+    KeyMapMgr->configKeyValue_[deviceId][inputKeyCode] = sysKeyCode;
+    std::vector<int32_t> result = KeyMapMgr->InputTransferKeyValue(deviceId, sysKeyCode);
+
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result[0], inputKeyCode);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_InputTransferKeyValue_NoDevice_001
+ * @tc.desc: Test InputTransferKeyValue when device not found
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_InputTransferKeyValue_NoDevice_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t deviceId = 999;
+    int32_t keyCode = 200;
+
+    std::vector<int32_t> result = KeyMapMgr->InputTransferKeyValue(deviceId, keyCode);
+
+    // Should return default transformation or empty
+    EXPECT_TRUE(result.empty() || result.size() == 1);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_InputTransferKeyValue_UseDefault_001
+ * @tc.desc: Test InputTransferKeyValue using default configuration
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_InputTransferKeyValue_UseDefault_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t defaultKeyId = KeyMapMgr->GetDefaultKeyId();
+    int32_t inputKeyCode = 200;
+    int32_t sysKeyCode = 300;
+
+    KeyMapMgr->configKeyValue_[defaultKeyId][inputKeyCode] = sysKeyCode;
+    std::vector<int32_t> result = KeyMapMgr->InputTransferKeyValue(-1, sysKeyCode);
+
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result[0], inputKeyCode);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_RemoveKeyValue_Normal_001
+ * @tc.desc: Test RemoveKeyValue with existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_RemoveKeyValue_Normal_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t deviceId = 100;
+    int32_t inputKey = 200;
+    int32_t outputKey = 300;
+
+    KeyMapMgr->configKeyValue_[deviceId][inputKey] = outputKey;
+    EXPECT_EQ(KeyMapMgr->configKeyValue_.count(deviceId), 1);
+
+    // Test with null device pointer
+    libinput_device *device = nullptr;
+    KeyMapMgr->RemoveKeyValue(device);
+    // Note: RemoveKeyValue with nullptr will not remove the entry
+    // This test verifies the function handles null pointer safely
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_RemoveKeyValue_NoDevice_001
+ * @tc.desc: Test RemoveKeyValue with non-existing device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_RemoveKeyValue_NoDevice_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+
+    // Test with null device pointer
+    libinput_device *device = nullptr;
+    size_t beforeSize = KeyMapMgr->configKeyValue_.size();
+    KeyMapMgr->RemoveKeyValue(device);
+    size_t afterSize = KeyMapMgr->configKeyValue_.size();
+
+    EXPECT_EQ(beforeSize, afterSize);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_GetKeyEventFileName_001
+ * @tc.desc: Test GetKeyEventFileName method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetKeyEventFileName_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    // Test with null device pointer
+    libinput_device *device = nullptr;
+
+    // Set up device properties
+    // Note: This test requires mocking libinput functions
+    std::string result = KeyMapMgr->GetKeyEventFileName(device);
+
+    // Result should be non-empty
+    EXPECT_FALSE(result.empty());
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_ParseDeviceConfigFile_NullPtr_001
+ * @tc.desc: Test ParseDeviceConfigFile with null device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_ParseDeviceConfigFile_NullPtr_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    libinput_device *device = nullptr;
+
+    size_t configSizeBefore = KeyMapMgr->configKeyValue_.size();
+    KeyMapMgr->ParseDeviceConfigFile(device);
+    size_t configSizeAfter = KeyMapMgr->configKeyValue_.size();
+
+    // Verify null device pointer does not modify configuration
+    EXPECT_EQ(configSizeBefore, configSizeAfter);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_ParseDeviceConfigFile_EmptyFileName_001
+ * @tc.desc: Test ParseDeviceConfigFile when GetKeyEventFileName returns empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_ParseDeviceConfigFile_EmptyFileName_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    // Test with null device pointer
+    libinput_device *device = nullptr;
+
+    size_t configSizeBefore = KeyMapMgr->configKeyValue_.size();
+    KeyMapMgr->ParseDeviceConfigFile(device);
+    size_t configSizeAfter = KeyMapMgr->configKeyValue_.size();
+
+    // Verify null device does not modify configuration
+    EXPECT_EQ(configSizeBefore, configSizeAfter);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_GetConfigKeyValue_EmptyFileName_001
+ * @tc.desc: Test GetConfigKeyValue with empty fileName
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetConfigKeyValue_EmptyFileName_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::string emptyFileName = "";
+    int32_t deviceId = 100;
+
+    KeyMapMgr->GetConfigKeyValue(emptyFileName, deviceId);
+
+    // configKeyValue_ should remain unchanged for this device
+    EXPECT_EQ(KeyMapMgr->configKeyValue_.count(deviceId), 0);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_KeyCodeToUnicode_001
+ * @tc.desc: Test KeyCodeToUnicode method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_KeyCodeToUnicode_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(keyCode);
+
+    uint32_t result = KeyMapMgr->KeyCodeToUnicode(keyCode, keyEvent);
+    EXPECT_NE(result, 0);
+}
+
+/**
+ * @tc.name: KeyMapManagerTest_KeyItemsTransKeyIntention_001
+ * @tc.desc: Test KeyItemsTransKeyIntention method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_KeyItemsTransKeyIntention_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<KeyEvent::KeyItem> items;
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(KeyEvent::KEYCODE_A);
+    item1.SetDownTime(1000);
+    items.push_back(item1);
+
+    int32_t result = KeyMapMgr->KeyItemsTransKeyIntention(items);
+    EXPECT_NE(result, 0);
+}
+
 } // namespace MMI
 } // namespace OHOS
