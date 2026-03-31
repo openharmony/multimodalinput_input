@@ -256,7 +256,6 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_RemoveKeyValue_Normal_001, TestSiz
 HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_RemoveKeyValue_NoDevice_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    int32_t deviceId = 999;
 
     // Test with null device pointer
     libinput_device *device = nullptr;
