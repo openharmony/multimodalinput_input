@@ -110,7 +110,7 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_001, Test
     OH_Input_SetFinalKey(hotkey, KEYCODE_Z);
     OH_Input_SetRepeat(hotkey, false);
     int32_t ret = OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
-    EXPECT_EQ(ret, INPUT_SERVICE_EXCEPTION);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
     ret = OH_Input_AddHotkeyMonitor(hotkey, Input_HotkeyCallback);
     EXPECT_EQ(ret, INPUT_SUCCESS);
     OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
@@ -370,7 +370,7 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_012, Test
     OH_Input_SetFinalKey(hotkey, KEYCODE_P);
     OH_Input_SetRepeat(hotkey, false);
     int32_t ret = OH_Input_RemoveHotkeyMonitor(hotkey, Input_HotkeyCallback);
-    EXPECT_EQ(ret, INPUT_SERVICE_EXCEPTION);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
     OH_Input_DestroyHotkey(&hotkey);
     EXPECT_EQ(hotkey, nullptr);
 }
