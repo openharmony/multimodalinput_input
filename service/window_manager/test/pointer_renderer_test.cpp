@@ -239,12 +239,12 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_Render_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: PointerRendererTest_DefaultRender_001
- * @tc.desc: Test DefaultRender
+ * @tc.name: PointerRendererTest_BlurRender_001
+ * @tc.desc: Test BlurRender
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Level1)
+HWTEST_F(PointerRendererTest, PointerRendererTest_BlurRender_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     RenderConfig config;
@@ -256,26 +256,26 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_001, TestSize.Le
     uint32_t addrSize = width * height * renderStride;
     config.style_ = MOUSE_ICON::DEFAULT;
     config.isBlur = false;
-    int32_t ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    int32_t ret = renderer.BlurRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_ERR);
     config.isBlur = true;
     renderer.defaultInit_ = false;
-    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    ret = renderer.BlurRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
     EXPECT_EQ(ret, RET_OK);
     renderer.defaultInit_ = true;
-    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    ret = renderer.BlurRender(addr, addrSize, width, height, config);
     EXPECT_EQ(renderer.defaultInit_, true);
     EXPECT_EQ(ret, RET_OK);
 }
 
 /**
- * @tc.name: PointerRendererTest_DefaultRender_002
- * @tc.desc: Test DefaultRender
+ * @tc.name: PointerRendererTest_BlurRender_002
+ * @tc.desc: Test BlurRender
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_002, TestSize.Level1)
+HWTEST_F(PointerRendererTest, PointerRendererTest_BlurRender_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     RenderConfig config;
@@ -287,22 +287,22 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DefaultRender_002, TestSize.Le
     constexpr uint32_t renderStride = 4;
     uint32_t addrSize = width * height * renderStride;
     config.style_ = MOUSE_ICON::TRANSPARENT_ICON;
-    int32_t ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    int32_t ret = renderer.BlurRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_OK);
     config.style_ = MOUSE_ICON::AECH_DEVELOPER_DEFINED_ICON;
-    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    ret = renderer.BlurRender(addr, addrSize, width, height, config);
     config.direction = 5;
     EXPECT_EQ(ret, RET_OK);
     config.direction = 0;
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    ret = renderer.BlurRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_OK);
     width = 0;
     height = 0;
     config.direction = 0;
     addrSize = width * height * renderStride;
     config.style_ = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ret = renderer.DefaultRender(addr, addrSize, width, height, config);
+    ret = renderer.BlurRender(addr, addrSize, width, height, config);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -367,6 +367,78 @@ HWTEST_F(PointerRendererTest, PointerRendererTest_DrawBlurPointer_001, TestSize.
     };
     renderer.DrawBlurPointer(width, height, lastConfig, config);
     EXPECT_EQ(renderer.screenImages_[0][0], img);
+}
+
+/**
+ * @tc.name: PointerRendererTest_AdjustDeltaForDirection_001
+ * @tc.desc: Test AdjustDeltaForDirection
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_AdjustDeltaForDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    int32_t dx = 10;
+    int32_t dy = 5;
+    uint32_t direction = 0;
+    uint32_t displayDirection = 0;
+    renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
+    EXPECT_EQ(dx, 10);
+    EXPECT_EQ(dy, 5);
+    direction = 1;
+    renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
+    EXPECT_EQ(dx, -5);
+    EXPECT_EQ(dy, 10);
+    direction = 2;
+    dx = 10;
+    dy = 5;
+    renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
+    EXPECT_EQ(dx, -10);
+    EXPECT_EQ(dy, -5);
+    direction = 3;
+    dx = 10;
+    dy = 5;
+    renderer.AdjustDeltaForDirection(dx, dy, direction, displayDirection);
+    EXPECT_EQ(dx, 5);
+    EXPECT_EQ(dy, -10);
+}
+
+/**
+ * @tc.name: PointerRendererTest_IsPositionOutCanvas_001
+ * @tc.desc: Test IsPositionOutCanvas
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerRendererTest, PointerRendererTest_IsPositionOutCanvas_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerRenderer renderer;
+    int32_t imageSize = 20;
+    uint32_t width = 200;
+    uint32_t height = 200;
+    int32_t x = 100;
+    int32_t y = 100;
+    bool ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, false);
+    x = -100;
+    ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, true);
+    y = -100;
+    ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, true);
+    x = 100;
+    ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, true);
+    y = 300;
+    ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, true);
+    x = 300;
+    ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, true);
+    y = 100;
+    ret = renderer.IsPositionOutCanvas(x, y, imageSize, width, height);
+    EXPECT_EQ(ret, true);
 }
 
 /**
