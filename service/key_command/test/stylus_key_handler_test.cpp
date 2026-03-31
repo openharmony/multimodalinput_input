@@ -304,6 +304,14 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StatusConfig
     STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_NullScenarios_001
+ * @tc.desc: Test various null pointer and invalid scenarios
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_NullScenarios_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -327,6 +335,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_NullScenarios_001, TestSize.
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
+}
  * @tc.desc: Test ability-related logic in StylusKeyHandler
  * @tc.type: FUNC
  * @tc.require:
