@@ -3199,7 +3199,7 @@ public:
     static const int32_t KEYCODE_MOUSE_INTELLIGENCE_SELECTION;
 
     /**
-     * Aod Single Click
+     * Single tapping the smart phone's touch screen event, which is used when the Always On Display is enabled
      *
      * @since 24
      */
