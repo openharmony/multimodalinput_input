@@ -62,7 +62,9 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_RemoveDeviceConfig, TestSize.L
     EXPECT_CALL(*messageParcelMock_, FindInputDeviceId(_)).WillRepeatedly(Return(deviceId));
     KeyAutoRepeat keyAutoRepeat;
     libinput_device device {};
-    EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.RemoveDeviceConfig(&device));
+    keyAutoRepeat.RemoveDeviceConfig(&device);
+    // Verify device config does not exist (as expected for non-existent device)
+    EXPECT_EQ(keyAutoRepeat.deviceConfig_.find(deviceId), keyAutoRepeat.deviceConfig_.end());
 }
 
 /**
@@ -80,7 +82,10 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_RemoveDeviceConfig_001, TestSi
     libinput_device device {};
     DeviceConfig deviceConfig;
     keyAutoRepeat.deviceConfig_.insert(std::make_pair(deviceId, deviceConfig));
-    EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.RemoveDeviceConfig(&device));
+    EXPECT_EQ(keyAutoRepeat.deviceConfig_.count(deviceId), 1);
+    keyAutoRepeat.RemoveDeviceConfig(&device);
+    // Verify device config was removed
+    EXPECT_EQ(keyAutoRepeat.deviceConfig_.count(deviceId), 0);
 }
 
 /**
@@ -98,7 +103,10 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_AddDeviceConfig_Success_001, T
     libinput_device device {};
     DeviceConfig deviceConfig;
     keyAutoRepeat.deviceConfig_[deviceId] = deviceConfig;
-    EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.RemoveDeviceConfig(&device));
+    EXPECT_EQ(keyAutoRepeat.deviceConfig_.count(deviceId), 1);
+    keyAutoRepeat.RemoveDeviceConfig(&device);
+    // Verify device config was removed
+    EXPECT_EQ(keyAutoRepeat.deviceConfig_.count(deviceId), 0);
 }
 
 /**
@@ -136,7 +144,9 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_SelectAutoRepeat_KeyDown_001, 
     deviceConfig.autoSwitch = 1;
     keyAutoRepeat.deviceConfig_[1] = deviceConfig;
 
-    EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.SelectAutoRepeat(keyEvent));
+    keyAutoRepeat.SelectAutoRepeat(keyEvent);
+    // Verify timer was set for key down action
+    EXPECT_GE(keyAutoRepeat.timerId_, 0);
 }
 
 /**
@@ -161,7 +171,9 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_SelectAutoRepeat_KeyUp_001, Te
     keyAutoRepeat.repeatKeyCode_ = KeyEvent::KEYCODE_A;
     keyAutoRepeat.timerId_ = 100;
 
-    EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.SelectAutoRepeat(keyEvent));
+    keyAutoRepeat.SelectAutoRepeat(keyEvent);
+    // Verify timer and repeat keycode were cleared
+    EXPECT_EQ(keyAutoRepeat.repeatKeyCode_, 0);
 }
 
 /**
@@ -186,7 +198,9 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_SelectAutoRepeat_KeyCancel_001
     keyAutoRepeat.repeatKeyCode_ = KeyEvent::KEYCODE_A;
     keyAutoRepeat.timerId_ = 100;
 
-    EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.SelectAutoRepeat(keyEvent));
+    keyAutoRepeat.SelectAutoRepeat(keyEvent);
+    // Verify timer and repeat keycode were cleared
+    EXPECT_EQ(keyAutoRepeat.repeatKeyCode_, 0);
 }
 
 /**
