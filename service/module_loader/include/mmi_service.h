@@ -368,7 +368,6 @@ private:
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
-    std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
     std::thread eventMonitorThread_;

@@ -32,10 +32,6 @@ public:
     void UpdateShieldStatusOnScreenOn() {}
     void UpdateShieldStatusOnScreenOff() {}
     void InitCommonEventSubscriber() {}
-    bool IsCommonEventSubscriberInit()
-    {
-        return false;
-    }
     void SetScreenStatus(const std::string &screenStatus)
     {
         screenStatus_ = screenStatus;
