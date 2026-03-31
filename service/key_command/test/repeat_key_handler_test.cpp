@@ -741,5 +741,3 @@ HWTEST_F(RepeatKeyHandlerTest, RepeatKeyHandlerTest_Time_Boundaries_001, TestSiz
 }
 } // namespace MMI
 } // namespace OHOS
-
-
