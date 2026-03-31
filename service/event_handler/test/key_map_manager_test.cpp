@@ -297,10 +297,12 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_ParseDeviceConfigFile_NullPtr_001,
     CALL_DEBUG_ENTER;
     libinput_device *device = nullptr;
 
-    // Test handling of null device pointer (function returns void)
+    size_t configSizeBefore = KeyMapMgr->configKeyValue_.size();
     KeyMapMgr->ParseDeviceConfigFile(device);
-    // If device is null, function should handle it gracefully without crash
-    SUCCEED();
+    size_t configSizeAfter = KeyMapMgr->configKeyValue_.size();
+
+    // Verify null device pointer does not modify configuration
+    EXPECT_EQ(configSizeBefore, configSizeAfter);
 }
 
 /**
@@ -315,10 +317,12 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_ParseDeviceConfigFile_EmptyFileNam
     // Test with null device pointer
     libinput_device *device = nullptr;
 
-    // This test requires mocking to return empty fileName (function returns void)
+    size_t configSizeBefore = KeyMapMgr->configKeyValue_.size();
     KeyMapMgr->ParseDeviceConfigFile(device);
-    // Verify function handles null device without crash
-    SUCCEED();
+    size_t configSizeAfter = KeyMapMgr->configKeyValue_.size();
+
+    // Verify null device does not modify configuration
+    EXPECT_EQ(configSizeBefore, configSizeAfter);
 }
 
 /**
