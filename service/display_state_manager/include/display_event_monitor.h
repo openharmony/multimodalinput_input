@@ -42,7 +42,6 @@ public:
     void UpdateShieldStatusOnScreenOn();
     void UpdateShieldStatusOnScreenOff();
     void InitCommonEventSubscriber();
-    bool IsCommonEventSubscriberInit();
     void SetScreenStatus(const std::string &screenStatus)
     {
         MMI_HILOGD("SetScreenStatus: %{public}s", screenStatus.c_str());
