@@ -137,6 +137,7 @@ float g_hardwareCanvasSize = { 512.0f };
 float g_focalPoint = { 256.0f };
 std::atomic<bool> g_isRsRestart { false };
 constexpr int32_t INVALID_USER { -1 };
+constexpr int32_t DIRECTION_NUM { 4 };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -3226,6 +3227,9 @@ void PointerDrawingManager::CreateRenderConfig(RenderConfig& cfg, std::shared_pt
     cfg.dpi = sp->GetDPI() * scale;
     Direction direction = CalculateRenderDirection(isHard);
     cfg.direction = sp->IsMirror() ? DIRECTION0 : direction;
+    Direction displayDirection = sp->GetDisplayDirection();
+    cfg.displayDirection = sp->IsMirror() ?
+        (displayDirection - direction + DIRECTION_NUM) % DIRECTION_NUM : displayDirection;
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseIcon by userIcon_");
         cfg.userIconPixelMap = GetUserIconCopy();
@@ -3881,7 +3885,7 @@ uint64_t PointerDrawingManager::GetResampleTimestamp(uint64_t timestamp)
     constexpr uint64_t NS_IN_S = 1000000000;
     constexpr uint64_t NS_IN_MS = 1000000;
     constexpr int64_t VSYNC_PEROID_NS = 16666667; // 60Hz
-    uint64_t recvTime = ts.tv_sec * NS_IN_S + ts.tv_nsec;
+    uint64_t recvTime = static_cast<uint64_t>(ts.tv_sec) * NS_IN_S + static_cast<uint64_t>(ts.tv_nsec);
     auto compensation = timestamp > recvTime ? timestamp - recvTime : 0;
     int64_t period = 0;
     if (!receiver_ || receiver_->GetVSyncPeriod(period) != RET_OK) {
@@ -3984,7 +3988,7 @@ ResampleAlgorithm::Point ResampleAlgorithm::GetAvgPoint(const std::deque<Point>&
     int32_t avgX = 0;
     int32_t avgY = 0;
     uint64_t avgTimestamp = 0;
-    uint64_t count = 0;
+    int32_t count = 0;
     uint64_t lastTime = 0;
     uint64_t displayId = 0;
     for (const auto& event : events) {
@@ -4000,7 +4004,7 @@ ResampleAlgorithm::Point ResampleAlgorithm::GetAvgPoint(const std::deque<Point>&
     if (count > 0) {
         avgX /= count;
         avgY /= count;
-        avgTimestamp /= count;
+        avgTimestamp /= static_cast<uint64_t>(count);
     }
     return Point{avgX, avgY, displayId, avgTimestamp};
 }
@@ -4009,7 +4013,6 @@ ResampleAlgorithm::Point ResampleAlgorithm::LinearInterpolation(const Point& his
     const Point& current, uint64_t timestamp)
 {
     constexpr uint64_t TIME_THRESHOLD = 100 * 1000000; // 100ms
-    constexpr int32_t NS_IN_S = 1000000000;
     if (timestamp == history.timestamp || timestamp == current.timestamp || current.timestamp <= history.timestamp
         || current.timestamp - history.timestamp > TIME_THRESHOLD || timestamp < history.timestamp) {
         MMI_HILOGD("Timestamps are not suitable for interpolation, skip resampling");
