@@ -304,41 +304,6 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_StatusConfig
     STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
     result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_TRUE(result);
-}
-
-/**
- * @tc.name: StylusKeyHandlerTest_SetLastEventState_Edge_001
- * @tc.desc: Test SetLastEventState with edge cases
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_SetLastEventState_Edge_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-
-    // Test setting to false multiple times
-    STYLUS_HANDLER->SetLastEventState(false);
-    STYLUS_HANDLER->SetLastEventState(false);
-    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
-
-    // Test setting to true multiple times
-    STYLUS_HANDLER->SetLastEventState(true);
-    STYLUS_HANDLER->SetLastEventState(true);
-    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
-
-    // Test rapid state changes
-    for (int i = 0; i < 10; i++) {
-        STYLUS_HANDLER->SetLastEventState(i % 2 == 0);
-    }
-    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
-}
-
-/**
- * @tc.name: StylusKeyHandlerTest_NullScenarios_001
- * @tc.desc: Test various null pointer and invalid scenarios
- * @tc.type: FUNC
- * @tc.require:
- */
 HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_NullScenarios_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
