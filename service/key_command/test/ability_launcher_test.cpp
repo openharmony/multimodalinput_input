@@ -232,15 +232,14 @@ HWTEST_F(AbilityLauncherTest, AbilityLauncherTest_LaunchAbility_NapProcess_001, 
 {
     CALL_TEST_DEBUG;
     LAUNCHER_ABILITY->SetKeyCommandService(nullptr);
-
+    
     Ability ability;
     ability.bundleName = "testBundle";
     ability.deviceId = "deviceId";
     ability.abilityName = "abilityName";
     int64_t delay = 100;
-
+    
     ASSERT_NO_FATAL_FAILURE(LAUNCHER_ABILITY->LaunchAbility(ability, delay));
 }
-
 } // namespace MMI
 } // namespace OHOS
