@@ -297,7 +297,10 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_ParseDeviceConfigFile_NullPtr_001,
     CALL_DEBUG_ENTER;
     libinput_device *device = nullptr;
 
-    EXPECT_NO_FATAL_FAILURE(KeyMapMgr->ParseDeviceConfigFile(device));
+    // Test handling of null device pointer (function returns void)
+    KeyMapMgr->ParseDeviceConfigFile(device);
+    // If device is null, function should handle it gracefully without crash
+    SUCCEED();
 }
 
 /**
@@ -312,8 +315,10 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_ParseDeviceConfigFile_EmptyFileNam
     // Test with null device pointer
     libinput_device *device = nullptr;
 
-    // This test requires mocking to return empty fileName
-    EXPECT_NO_FATAL_FAILURE(KeyMapMgr->ParseDeviceConfigFile(device));
+    // This test requires mocking to return empty fileName (function returns void)
+    KeyMapMgr->ParseDeviceConfigFile(device);
+    // Verify function handles null device without crash
+    SUCCEED();
 }
 
 /**
@@ -328,7 +333,7 @@ HWTEST_F(KeyMapManagerTest, KeyMapManagerTest_GetConfigKeyValue_EmptyFileName_00
     std::string emptyFileName = "";
     int32_t deviceId = 100;
 
-    EXPECT_NO_FATAL_FAILURE(KeyMapMgr->GetConfigKeyValue(emptyFileName, deviceId));
+    KeyMapMgr->GetConfigKeyValue(emptyFileName, deviceId);
 
     // configKeyValue_ should remain unchanged for this device
     EXPECT_EQ(KeyMapMgr->configKeyValue_.count(deviceId), 0);

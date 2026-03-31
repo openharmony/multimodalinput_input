@@ -2442,9 +2442,11 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_Actions_001
     };
 
     for (auto action : actions) {
-        EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(
-            action, "testProgram", 1000, 1, PointerEvent::SOURCE_TYPE_TOUCHSCREEN));
+        // Test that NotifyPointerEventToRS handles different actions without crash
+        eventdispatchhandler.NotifyPointerEventToRS(
+            action, "testProgram", 1000, 1, PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     }
+    SUCCEED();
 }
 
 /**
@@ -2464,9 +2466,11 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_SourceType_
     };
 
     for (auto sourceType : sourceTypes) {
-        EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(
-            PointerEvent::POINTER_ACTION_DOWN, "testProgram", 1000, 1, sourceType));
+        // Test that NotifyPointerEventToRS handles different source types without crash
+        eventdispatchhandler.NotifyPointerEventToRS(
+            PointerEvent::POINTER_ACTION_DOWN, "testProgram", 1000, 1, sourceType);
     }
+    SUCCEED();
 }
 
 /**
@@ -2482,10 +2486,12 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_Count_001, 
     std::vector<int32_t> pointerCounts = { 1, 2, 3, 5 };
 
     for (auto count : pointerCounts) {
-        EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(
+        // Test that NotifyPointerEventToRS handles different pointer counts without crash
+        eventdispatchhandler.NotifyPointerEventToRS(
             PointerEvent::POINTER_ACTION_DOWN, "testProgram", 1000, count,
-            PointerEvent::SOURCE_TYPE_TOUCHSCREEN));
+            PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     }
+    SUCCEED();
 }
 
 /**
@@ -2574,8 +2580,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_Normal_001, T
     int32_t pid = 1000;
     int32_t windowId = 10;
 
-    // Test with valid parameters
-    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(userId, pid, windowId));
+    // Test with valid parameters (function returns void)
+    eventdispatchhandler.SendWindowStateError(userId, pid, windowId);
+    // Verify function handles valid parameters without crash
+    SUCCEED();
 }
 
 /**
@@ -2592,8 +2600,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_SendWindowStateError_Fail_001, Tes
     int32_t pid = 9999;
     int32_t windowId = 999;
 
-    // Test with invalid userId that results in null session
-    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.SendWindowStateError(userId, pid, windowId));
+    // Test with invalid userId that results in null session (function returns void)
+    eventdispatchhandler.SendWindowStateError(userId, pid, windowId);
+    // Verify function handles invalid parameters without crash
+    SUCCEED();
 }
 
 /**
@@ -2620,7 +2630,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEvent_Flow_001, TestS
     item.SetTargetWindowId(1);
     pointerEvent->AddPointerItem(item);
 
-    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.HandlePointerEvent(pointerEvent));
+    // Test HandlePointerEvent complete flow (function returns void)
+    eventdispatchhandler.HandlePointerEvent(pointerEvent);
+    // Verify event was handled without crash
+    SUCCEED();
 }
 
 /**
@@ -2647,7 +2660,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleTouchEvent_DelayLevitate_001
     item.SetTargetWindowId(1);
     pointerEvent->AddPointerItem(item);
 
-    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.HandleTouchEvent(pointerEvent));
+    // Test HandleTouchEvent with delay levitate event (function returns void)
+    eventdispatchhandler.HandleTouchEvent(pointerEvent);
+    // Verify event was handled without crash
+    SUCCEED();
 }
 
 /**
@@ -2670,7 +2686,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_EnsureMouseEventCycle_001, TestSiz
     item.SetTargetWindowId(1);
     pointerEvent->AddPointerItem(item);
 
-    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.EnsureMouseEventCycle(pointerEvent));
+    // Test EnsureMouseEventCycle (function returns void)
+    eventdispatchhandler.EnsureMouseEventCycle(pointerEvent);
+    // Verify mouse event cycle was handled without crash
+    SUCCEED();
 }
 
 /**
@@ -2693,7 +2712,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_CleanMouseEventCycle_001, TestSize
     item.SetTargetWindowId(1);
     pointerEvent->AddPointerItem(item);
 
-    EXPECT_NO_FATAL_FAILURE(eventdispatchhandler.CleanMouseEventCycle(pointerEvent));
+    // Test CleanMouseEventCycle (function returns void)
+    eventdispatchhandler.CleanMouseEventCycle(pointerEvent);
+    // Verify mouse event cycle was cleaned without crash
+    SUCCEED();
 }
 } // namespace MMI
 } // namespace OHOS
