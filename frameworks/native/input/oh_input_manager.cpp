@@ -2755,8 +2755,8 @@ int32_t DelEventCallback(Input_HotkeyInfo* hotkeyInfo, int32_t &subscribeId)
     CALL_DEBUG_ENTER;
     CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
     if (g_callbacks.count(hotkeyInfo->hotkeyId) <= 0) {
-        MMI_HILOGE("Callback doesn't exists");
-        return INPUT_PARAMETER_ERROR;
+        MMI_HILOGE("Callback does not exist, no need to delete");
+        return INPUT_SUCCESS;
     }
     auto &info = g_callbacks[hotkeyInfo->hotkeyId];
     MMI_HILOGD("HotkeyId is :%{private}s, Input_HotkeyInfo:%{public}zu", hotkeyInfo->hotkeyId.c_str(), info.size());
@@ -2785,7 +2785,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         delete hotkeyInfo;
         hotkeyInfo = nullptr;
         MMI_HILOGE("DelEventCallback failed");
-        return INPUT_SERVICE_EXCEPTION;
+        return INPUT_PARAMETER_ERROR;
     }
     MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
     if (subscribeId >= 0) {
