@@ -22,6 +22,7 @@
 #include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
+#include "parameters.h"
 #include "proto.h"
 #include "timer_manager.h"
 #include "window_manager.h"
@@ -37,6 +38,7 @@ constexpr int32_t UDS_UID { 100 };
 constexpr int32_t UDS_PID { 100 };
 constexpr int64_t INPUT_UI_TIMEOUT_TIME { 8 * 1000000 };
 constexpr int32_t TIME_CONVERT_RATIO { 1000 };
+constexpr float FLOAT_EPSILON = 0.01f;
 } // namespace
 
 class AnrManagerTest : public testing::Test {
@@ -381,6 +383,68 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_002, TestSize.Level1)
     type = ANR_DISPATCH;
     status = false;
     EXPECT_FALSE(ANRMgr->TriggerANR(type, time, session));
+}
+
+/**
+ * @tc.name: AnrManagerTest_getRatioValue_001
+ * @tc.desc: Test getRatioValue
+ * @tc.type: FUNC
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_getRatioValue_001, TestSize.Level1)
+{
+    float result = ANRMgr->getRatioValue();
+    EXPECT_TRUE(std::abs(result - 1.0f) < FLOAT_EPSILON);
+    OHOS::system::SetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "");
+    result = ANRMgr->getRatioValue();
+    EXPECT_TRUE(std::abs(result - 1.0f) < FLOAT_EPSILON);
+}
+ 
+/**
+ * @tc.name: AnrManagerTest_getRatioValue_002
+ * @tc.desc: Test getRatioValue
+ * @tc.type: FUNC
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_getRatioValue_002, TestSize.Level1)
+{
+    OHOS::system::SetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1500");
+    float result = ANRMgr->getRatioValue();
+    EXPECT_TRUE(std::abs(result - 1.5f) < FLOAT_EPSILON);
+}
+ 
+/**
+ * @tc.name: AnrManagerTest_getRatioValue_003
+ * @tc.desc: Test getRatioValue
+ * @tc.type: FUNC
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_getRatioValue_003, TestSize.Level1)
+{
+    OHOS::system::SetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1");
+    float result = ANRMgr->getRatioValue();
+    EXPECT_TRUE(std::abs(result - 1.0f) < FLOAT_EPSILON);
+}
+ 
+/**
+ * @tc.name: AnrManagerTest_getRatioValue_004
+ * @tc.desc: Test getRatioValue
+ * @tc.type: FUNC
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_getRatioValue_004, TestSize.Level1)
+{
+    OHOS::system::SetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1a2");
+    float result = ANRMgr->getRatioValue();
+    EXPECT_TRUE(std::abs(result - 1.0f) < FLOAT_EPSILON);
+}
+ 
+/**
+ * @tc.name: AnrManagerTest_getRatioValue_005
+ * @tc.desc: Test getRatioValue
+ * @tc.type: FUNC
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_getRatioValue_005, TestSize.Level1)
+{
+    OHOS::system::SetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "123456");
+    float result = ANRMgr->getRatioValue();
+    EXPECT_TRUE(std::abs(result - 1.0f) < FLOAT_EPSILON);
 }
 
 /**
