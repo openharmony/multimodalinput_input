@@ -155,38 +155,33 @@ void IInputWindowsManager::DestroyInstance()
     instance_.reset();
 }
 
+void InputWindowsManager::InitWindowInfo(WindowInfo& info)
+{
+    info = {
+        .id = -1,
+        .pid = -1,
+        .uid = -1,
+        .agentWindowId = -1,
+        .area = { 0, 0, 0, 0 },
+        .flags = 0,
+        .windowType = 0,
+        .windowNameType = 0
+    };
+}
+
 InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 {
     MMI_HILOGI("Bind cfg file name:%{private}s", BIND_CFG_FILE_NAME.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    lastWindowInfo_.id = -1;
-    lastWindowInfo_.pid = -1;
-    lastWindowInfo_.uid = -1;
-    lastWindowInfo_.agentWindowId = -1;
-    lastWindowInfo_.area = { 0, 0, 0, 0 };
-    lastWindowInfo_.flags = 0;
-    lastWindowInfo_.windowType = 0;
-    lastWindowInfo_.windowNameType = 0;
-    mouseDownInfo_.id = -1;
-    mouseDownInfo_.pid = -1;
-    mouseDownInfo_.uid = -1;
-    mouseDownInfo_.agentWindowId = -1;
-    mouseDownInfo_.area = { 0, 0, 0, 0 };
-    mouseDownInfo_.flags = 0;
-    mouseDownInfo_.windowType = 0;
-    mouseDownInfo_.windowNameType = 0;
-    pointerLockedWindow_.id = -1;
-    pointerLockedWindow_.pid = -1;
-    pointerLockedWindow_.uid = -1;
-    pointerLockedWindow_.agentWindowId = -1;
-    pointerLockedWindow_.area = { 0, 0, 0, 0 };
-    pointerLockedWindow_.flags = 0;
-    pointerLockedWindow_.windowType = 0;
-    pointerLockedWindow_.windowNameType = 0;
+    InitWindowInfo(lastWindowInfo_);
+    InitWindowInfo(mouseDownInfo_);
+    InitWindowInfo(pointerLockedWindow_);
+    InitWindowInfo(lastLevitateInWindowInfo_);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     displayGroupInfo_.groupId = MAIN_GROUPID;
     displayGroupInfo_.type = GroupType::GROUP_DEFAULT;
     displayGroupInfo_.focusWindowId = -1;
+    InitWindowInfo(lockWindowInfo_);
     displayGroupInfoMap_[MAIN_GROUPID] = displayGroupInfo_;
     displayGroupInfoMapTmp_[MAIN_GROUPID] = displayGroupInfo_;
     captureModeInfoMap_[MAIN_GROUPID] = captureModeInfo_;

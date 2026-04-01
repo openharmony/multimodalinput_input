@@ -398,6 +398,7 @@ private:
     bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
     void UpdatePointerChangeAreas(const OLD::DisplayGroupInfo &displayGroupInfo);
+    void InitWindowInfo(WindowInfo& info);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void AdjustDisplayRotation(int32_t groupId = DEFAULT_GROUP_ID);
     void SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent);
