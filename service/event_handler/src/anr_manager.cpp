@@ -13,12 +13,15 @@
  * limitations under the License.
  */
 
+#include <charconv>
 #include "anr_manager.h"
 
 #include "dfx_hisysevent.h"
 #include "i_input_windows_manager.h"
+#include "parameters.h"
 #include "timer_manager.h"
 #include "uds_session.h"
+#include "util.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_ANRDETECT
@@ -31,6 +34,9 @@ namespace {
 const char* FOUNDATION { "foundation" };
 constexpr int32_t MAX_TIMER_COUNT { 50 };
 constexpr int32_t TIME_CONVERT_RATIO { 1000 };
+static float g_inputUITimeoutRatio = 0.0f;
+constexpr float FLOAT_EPSILON = 0.01f;
+constexpr int32_t MAX_RATIO_SIZE = 4;
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -45,6 +51,38 @@ void ANRManager::Init(UDSServer &udsServer)
         return this->OnSessionLost(session);
     }
     );
+}
+
+float ANRManager::getRatioValue()
+{
+    float defaultRatio = 1.0f;
+    if (g_inputUITimeoutRatio > FLOAT_EPSILON) {
+        return g_inputUITimeoutRatio;
+    }
+ 
+    std::string ratioStr = OHOS::system::GetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1000");
+    if (ratioStr.empty() || !IsNumeric(ratioStr)) {
+        g_inputUITimeoutRatio = defaultRatio;
+        return defaultRatio;
+    }
+
+    if (ratioStr.size() > MAX_RATIO_SIZE) {
+        g_inputUITimeoutRatio = defaultRatio;
+        return defaultRatio;
+    }
+
+    uint64_t ratioVal = 0;
+    auto [ptr, ec] = std::from_chars(ratioStr.data(), ratioStr.data() + ratioStr.size(), ratioVal);
+    if (ec != std::errc()) {
+        g_inputUITimeoutRatio = defaultRatio;
+        return defaultRatio;
+    }
+
+    g_inputUITimeoutRatio = (ratioVal * 1.0) / TIME_CONVERT_RATIO;
+    if (g_inputUITimeoutRatio < FLOAT_EPSILON) {
+        g_inputUITimeoutRatio = defaultRatio;
+    }
+    return g_inputUITimeoutRatio;
 }
 
 int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)
@@ -126,7 +164,8 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         MMI_HILOGD("Add timer failed, timer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
         return;
     }
-    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
+    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME * getRatioValue() / TIME_CONVERT_RATIO, 1,
+        [this, id, type, sess]() {
         CHKPV(sess);
         if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
@@ -199,7 +238,7 @@ void ANRManager::HandleAnrState(SessionPtr sess, int32_t type, int64_t currentTi
     std::vector<UDSSession::EventTime> timeoutEvents;
     MMI_HILOGD("Event list size. Type:%{public}d, Count:%{public}zu", type, events.size());
 
-    const int64_t timeoutThreshold = INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO;
+    const int64_t timeoutThreshold = INPUT_UI_TIMEOUT_TIME * getRatioValue() / TIME_CONVERT_RATIO;
     for (const auto &event : events) {
         const int64_t elapsedTime = currentTime - event.eventTime;
         if (elapsedTime > timeoutThreshold) {
