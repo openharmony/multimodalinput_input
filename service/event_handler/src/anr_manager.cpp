@@ -36,7 +36,7 @@ constexpr int32_t MAX_TIMER_COUNT { 50 };
 constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 static float g_inputUITimeoutRatio = 0.0f;
 constexpr float FLOAT_EPSILON = 0.01f;
-constexpr int32_t MAX_RATIO_SIZE = 6;
+constexpr int32_t MAX_RATIO_SIZE = 4;
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -55,29 +55,34 @@ void ANRManager::Init(UDSServer &udsServer)
 
 float ANRManager::getRatioValue()
 {
+    float defaultRatio = 1.0f;
     if (g_inputUITimeoutRatio > FLOAT_EPSILON) {
         return g_inputUITimeoutRatio;
     }
  
     std::string ratioStr = OHOS::system::GetParameter("const.sys.dfx.appfreeze.timeout_unit_time_ratio", "1000");
-    if (ratioStr.size() <= MAX_RATIO_SIZE && IsNumeric(ratioStr)) {
-        uint64_t ratioVal = 0;
-        auto [ptr, ec] = std::from_chars(ratioStr.data(), ratioStr.data() + ratioStr.size(), ratioVal);
-        if (ec == std::errc()) {
-            g_inputUITimeoutRatio = (ratioVal * 1.0) / TIME_CONVERT_RATIO;
-        } else {
-            g_inputUITimeoutRatio = 1.0f;
-            MMI_HILOGW("Failed to convert or invalid ratioStr value");
-        }
-    } else {
-        g_inputUITimeoutRatio = 1.0f;
+    if (ratioStr.empty() || !IsNumeric(ratioStr)) {
+        g_inputUITimeoutRatio = defaultRatio;
+        return defaultRatio;
     }
- 
+
+    if (ratioStr.size() > MAX_RATIO_SIZE) {
+        g_inputUITimeoutRatio = defaultRatio;
+        return defaultRatio;
+    }
+
+    uint64_t ratioVal = 0;
+    auto [ptr, ec] = std::from_chars(ratioStr.data(), ratioStr.data() + ratioStr.size(), ratioVal);
+    if (ec != std::errc()) {
+        g_inputUITimeoutRatio = defaultRatio;
+        return defaultRatio;
+    }
+
+    g_inputUITimeoutRatio = (ratioVal * 1.0) / TIME_CONVERT_RATIO;
     if (g_inputUITimeoutRatio < FLOAT_EPSILON) {
-        g_inputUITimeoutRatio = 1.0f;
-        MMI_HILOGW("const.sys.dfx.appfreeze.timeout_unit_time_ratio read failed.");
+        g_inputUITimeoutRatio = defaultRatio;
     }
-    return g_inputUITimeoutRatio;
+     return g_inputUITimeoutRatio;
 }
 
 int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)
