@@ -41,6 +41,7 @@ private:
     int32_t anrTimerCount_ { 0 };
     int32_t pid_ { -1 };
     int32_t anrEventId_ { -1 };
+    float getRatioValue();
 };
 
 #define ANRMgr ::OHOS::DelayedSingleton<ANRManager>::GetInstance()
