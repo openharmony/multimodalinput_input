@@ -2661,8 +2661,8 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     auto windowXY = TransformWindowXY(lastWindowInfo_, lastLogicX_, lastLogicY_);
     currentPointerItem.SetWindowX(static_cast<int32_t>(windowXY.first));
     currentPointerItem.SetWindowY(static_cast<int32_t>(windowXY.second));
-    currentPointerItem.SetWindowXPos(static_cast<int32_t>(windowXY.first));
-    currentPointerItem.SetWindowYPos(static_cast<int32_t>(windowXY.second));
+    currentPointerItem.SetWindowXPos(windowXY.first);
+    currentPointerItem.SetWindowYPos(windowXY.second);
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW && windowId > 0) {
         auto displayGroupInfo = GetDefaultDisplayGroupInfo();
         int32_t displayId = 0;
