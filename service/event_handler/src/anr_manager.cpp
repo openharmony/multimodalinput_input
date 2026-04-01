@@ -82,7 +82,7 @@ float ANRManager::getRatioValue()
     if (g_inputUITimeoutRatio < FLOAT_EPSILON) {
         g_inputUITimeoutRatio = defaultRatio;
     }
-     return g_inputUITimeoutRatio;
+    return g_inputUITimeoutRatio;
 }
 
 int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)
