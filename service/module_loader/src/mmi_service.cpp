@@ -2389,6 +2389,42 @@ ErrCode MMIService::InjectTouchPadEvent(const PointerEvent& pointerEvent,
     return RET_OK;
 }
 
+ErrCode MMIService::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    // Check CONTROL_DEVICE permission
+    if (!PER_HELPER->CheckControlDevice()) {
+        MMI_HILOGE("Check CONTROL_DEVICE permission failed");
+        return ERROR_NO_PERMISSION;
+    }
+
+    MMI_HILOGI("CreateMouseController permission check passed");
+    return RET_OK;
+}
+
+ErrCode MMIService::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    // Check CONTROL_DEVICE permission
+    if (!PER_HELPER->CheckControlDevice()) {
+        MMI_HILOGE("Check CONTROL_DEVICE permission failed");
+        return ERROR_NO_PERMISSION;
+    }
+
+    MMI_HILOGI("CreateKeyboardController permission check passed");
+    return RET_OK;
+}
+
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {

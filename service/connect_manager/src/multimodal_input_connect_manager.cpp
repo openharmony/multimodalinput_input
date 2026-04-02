@@ -574,6 +574,14 @@ int32_t MultimodalInputConnectManager::InjectTouchPadEvent(std::shared_ptr<Point
     return multimodalInputConnectService_->InjectTouchPadEvent(*pointerEvent.get(), touchpadCDG, isNativeInject);
 }
 
+int32_t MultimodalInputConnectManager::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CreateMouseController();
+}
+
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
     // LCOV_EXCL_START

@@ -50,6 +50,7 @@ public:
     bool CheckKeyEventHook();
     bool CheckInputDeviceController();
     bool CheckFunctionKeyEnabled();
+    bool CheckControlDevice();
 
 private:
     PermissionHelper() {}
