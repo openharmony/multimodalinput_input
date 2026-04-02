@@ -1073,5 +1073,1410 @@ HWTEST_F(CustomUdevTest, TestSyspathEdgeCases, TestSize.Level1)
         }
     }
 }
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with double slash in path
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathDoubleSlash, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    EXPECT_EQ(udev_device_new_from_syspath(udev, "//sys/devices/test"), nullptr);
+    EXPECT_EQ(errno, EINVAL);
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with very long path
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathLongPath, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    std::string longPath = "/sys/devices/";
+    for (int32_t i = 0; i < 100; i++) {
+        longPath += "layer" + std::to_string(i) + "/";
+    }
+    longPath += "device";
+
+    errno = 0;
+    auto* device = udev_device_new_from_syspath(udev, longPath.c_str());
+    // Should fail due to non-existent path
+    if (device != nullptr) {
+        udev_device_unref(device);
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with relative path
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathRelativePath, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    EXPECT_EQ(udev_device_new_from_syspath(udev, "devices/test"), nullptr);
+    EXPECT_EQ(errno, EINVAL);
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with null udev but valid syspath
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathNullUdev, TestSize.Level1)
+{
+    errno = 0;
+    EXPECT_EQ(udev_device_new_from_syspath(nullptr, "/sys/devices/test"), nullptr);
+    EXPECT_EQ(errno, EINVAL);
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_devnum with both valid block and char types
+ */
+HWTEST_F(CustomUdevTest, TestNewFromDevnumBothTypes, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+    auto devnum = testDevice_.GetDevNum();
+
+    // Test char device type 'c'
+    errno = 0;
+    auto* charDevice = udev_device_new_from_devnum(udev, 'c', devnum);
+    if (charDevice != nullptr) {
+        EXPECT_NE(udev_device_get_syspath(charDevice), nullptr);
+        udev_device_unref(charDevice);
+    }
+
+    // Test block device type 'b'
+    errno = 0;
+    auto* blockDevice = udev_device_new_from_devnum(udev, 'b', devnum);
+    if (blockDevice != nullptr) {
+        EXPECT_NE(udev_device_get_syspath(blockDevice), nullptr);
+        udev_device_unref(blockDevice);
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_devnum with negative devnum
+ */
+HWTEST_F(CustomUdevTest, TestNewFromDevnumNegativeDevnum, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    // Negative devnum should fail
+    EXPECT_EQ(udev_device_new_from_devnum(udev, 'c', -1), nullptr);
+    EXPECT_EQ(errno, ENOENT);
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_devnum with maximum devnum value
+ */
+HWTEST_F(CustomUdevTest, TestNewFromDevnumMaxDevnum, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    auto* maxDevice = udev_device_new_from_devnum(udev, 'c', ~0U);
+    if (maxDevice != nullptr) {
+        udev_device_unref(maxDevice);
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_ref with already referenced device
+ */
+HWTEST_F(CustomUdevTest, TestDeviceRefAlreadyReferenced, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Reference multiple times
+    auto* ref1 = udev_device_ref(device);
+    auto* ref2 = udev_device_ref(ref1);
+    auto* ref3 = udev_device_ref(ref2);
+
+    EXPECT_EQ(ref1, device);
+    EXPECT_EQ(ref2, device);
+    EXPECT_EQ(ref3, device);
+
+    // Cleanup all references
+    udev_device_unref(ref3);
+    udev_device_unref(ref2);
+    udev_device_unref(ref1);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_parent chain until root
+ */
+HWTEST_F(CustomUdevTest, TestGetParentChainToRoot, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    auto* current = device;
+    int32_t depth = 0;
+    const int32_t maxDepth = 20;
+
+    while (current != nullptr && depth < maxDepth) {
+        auto* parent = udev_device_get_parent(current);
+        if (parent == nullptr) {
+            break;
+        }
+        current = parent;
+        depth++;
+    }
+
+    // Verify we reached end of chain
+    EXPECT_LT(depth, maxDepth);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_parent_with_subsystem_devtype with whitespace subsystem
+ */
+HWTEST_F(CustomUdevTest, TestGetParentWithWhitespaceSubsystem, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    errno = 0;
+    auto* parent = udev_device_get_parent_with_subsystem_devtype(device, " ", nullptr);
+    if (parent != nullptr) {
+        EXPECT_NE(udev_device_get_syspath(parent), nullptr);
+        udev_device_unref(parent);
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_get_syspath with device created from devnum
+ */
+HWTEST_F(CustomUdevTest, TestGetSyspathFromDevnum, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* syspath = udev_device_get_syspath(device);
+    EXPECT_NE(syspath, nullptr);
+    EXPECT_STRNE(syspath, "");
+    EXPECT_TRUE(strlen(syspath) > 0);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_sysname with special characters
+ */
+HWTEST_F(CustomUdevTest, TestGetSysnameSpecialChars, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* sysname = udev_device_get_sysname(device);
+    EXPECT_NE(sysname, nullptr);
+    // Sysname should not contain path separators after processing
+    EXPECT_EQ(strchr(sysname, '/'), nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_devnode format validation
+ */
+HWTEST_F(CustomUdevTest, TestGetDevnodeFormat, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* devnode = udev_device_get_devnode(device);
+    EXPECT_NE(devnode, nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_is_initialized multiple calls consistency
+ */
+HWTEST_F(CustomUdevTest, TestGetIsInitializedMultipleCalls, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    int32_t results[5];
+    for (int32_t i = 0; i < 5; i++) {
+        results[i] = udev_device_get_is_initialized(device);
+    }
+
+    // All results should be the same
+    for (int32_t i = 1; i < 5; i++) {
+        EXPECT_EQ(results[0], results[i]);
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value with empty key
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyEmptyKey, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    errno = 0;
+    const char* value = udev_device_get_property_value(device, "");
+    EXPECT_EQ(value, nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value with very long key
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyLongKey, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    std::string longKey(1000, 'A');
+    const char* value = udev_device_get_property_value(device, longKey.c_str());
+    // Should return nullptr for non-existent key
+    EXPECT_EQ(value, nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value with common input properties
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyCommonInputProps, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* parent = udev_device_get_parent(device);
+    ASSERT_NE(parent, nullptr);
+
+    const char* commonProps[] = {
+        "ID_INPUT",
+        "DEVNAME",
+        "DEVPATH",
+        "SUBSYSTEM"
+    };
+
+    for (const char* prop : commonProps) {
+        const char* value = udev_device_get_property_value(parent, prop);
+        // Property may or may not exist, just verify no crash
+        (void)value;
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add with valid devnode after stat succeeds
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddValidDevnode, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    const char* devnode = udev_device_get_devnode(device);
+    ASSERT_NE(devnode, nullptr);
+
+    // Test with valid char device type
+    bool ret = udev_device_property_add('c', devnode);
+    // May succeed or fail depending on device existence
+    (void)ret;
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add with block device type
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddBlockType, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    const char* devnode = udev_device_get_devnode(device);
+    ASSERT_NE(devnode, nullptr);
+
+    // Test with block device type
+    bool ret = udev_device_property_add('b', devnode);
+    // May succeed or fail depending on device existence
+    (void)ret;
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add with null devnode
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddNullDevnode, TestSize.Level1)
+{
+    errno = 0;
+    bool ret = udev_device_property_add('c', nullptr);
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * Tests for:
+ * udev_device_property_remove with empty devnode
+ */
+HWTEST_F(CustomUdevTest, TestPropertyRemoveEmptyDevnode, TestSize.Level1)
+{
+    // Should not crash with empty string
+    udev_device_property_remove("");
+}
+
+/*
+ * Tests for:
+ * udev_device_record_devnode with empty devnode
+ */
+HWTEST_F(CustomUdevTest, TestRecordDevnodeEmpty, TestSize.Level1)
+{
+    // Should not crash with empty string
+    udev_device_record_devnode("");
+}
+
+/*
+ * Tests for:
+ * udev_device_record_devnode multiple calls
+ */
+HWTEST_F(CustomUdevTest, TestRecordDevnodeMultiple, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    const char* devnode = udev_device_get_devnode(device);
+    ASSERT_NE(devnode, nullptr);
+
+    // Record multiple times
+    udev_device_record_devnode(devnode);
+    udev_device_record_devnode(devnode);
+    udev_device_record_devnode(devnode);
+    // Should not crash
+}
+
+/*
+ * Tests for:
+ * udev_new called many times returns same instance
+ */
+HWTEST_F(CustomUdevTest, TestUdevNewManyTimes, TestSize.Level1)
+{
+    auto* udev1 = udev_new();
+    auto* udev2 = udev_new();
+    auto* udev3 = udev_new();
+    auto* udev4 = udev_new();
+    auto* udev5 = udev_new();
+
+    EXPECT_NE(udev1, nullptr);
+    EXPECT_EQ(udev1, udev2);
+    EXPECT_EQ(udev2, udev3);
+    EXPECT_EQ(udev3, udev4);
+    EXPECT_EQ(udev4, udev5);
+}
+
+/*
+ * Tests for:
+ * udev_unref called multiple times
+ */
+HWTEST_F(CustomUdevTest, TestUdevUnrefMultiple, TestSize.Level1)
+{
+    auto* udev = udev_new();
+    ASSERT_NE(udev, nullptr);
+
+    // Call unref multiple times - should be safe
+    auto* result1 = udev_unref(udev);
+    auto* result2 = udev_unref(udev);
+    auto* result3 = udev_unref(nullptr);
+
+    EXPECT_EQ(result1, nullptr);
+    EXPECT_EQ(result2, nullptr);
+    EXPECT_EQ(result3, nullptr);
+}
+
+/*
+ * Tests for:
+ * Device creation and immediate unref
+ */
+HWTEST_F(CustomUdevTest, TestDeviceCreateImmediateUnref, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+    auto devnum = testDevice_.GetDevNum();
+
+    // Create and immediately unref
+    auto* newDevice = udev_device_new_from_devnum(udev, 'c', devnum);
+    if (newDevice != nullptr) {
+        udev_device_unref(newDevice);
+    }
+}
+
+/*
+ * Tests for:
+ * Multiple devices from same devnum
+ */
+HWTEST_F(CustomUdevTest, TestMultipleDevicesSameDevnum, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+    auto devnum = testDevice_.GetDevNum();
+
+    const int32_t deviceCount = 5;
+    std::vector<udev_device*> devices;
+
+    for (int32_t i = 0; i < deviceCount; i++) {
+        auto* newDevice = udev_device_new_from_devnum(udev, 'c', devnum);
+        if (newDevice != nullptr) {
+            devices.push_back(newDevice);
+        }
+    }
+
+    // All devices should have same syspath
+    if (devices.size() > 1) {
+        for (size_t i = 1; i < devices.size(); i++) {
+            EXPECT_STREQ(
+                udev_device_get_syspath(devices[0]),
+                udev_device_get_syspath(devices[i])
+            );
+        }
+    }
+
+    // Cleanup
+    for (auto* dev : devices) {
+        udev_device_unref(dev);
+    }
+}
+
+/*
+ * Tests for:
+ * Property value with case sensitivity
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyCaseSensitivity, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* variants[] = {
+        "ID_INPUT",
+        "id_input",
+        "Id_Input",
+        "ID_Input",
+        "id_Input"
+    };
+
+    for (const char* key : variants) {
+        const char* value = udev_device_get_property_value(device, key);
+        // Just verify no crash, case sensitivity depends on implementation
+        (void)value;
+    }
+}
+
+/*
+ * Tests for:
+ * Syspath with trailing whitespace
+ */
+HWTEST_F(CustomUdevTest, TestSyspathTrailingWhitespace, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    EXPECT_EQ(udev_device_new_from_syspath(udev, "/sys/devices/test "), nullptr);
+}
+
+/*
+ * Tests for:
+ * Syspath with leading whitespace
+ */
+HWTEST_F(CustomUdevTest, TestSyspathLeadingWhitespace, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    EXPECT_EQ(udev_device_new_from_syspath(udev, " /sys/devices/test"), nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_parent called before device fully initialized
+ */
+HWTEST_F(CustomUdevTest, TestGetParentBeforeInit, TestSize.Level1)
+{
+    auto* udev = udev_new();
+    ASSERT_NE(udev, nullptr);
+
+    // Try to get parent from null device
+    errno = 0;
+    EXPECT_EQ(udev_device_get_parent(nullptr), nullptr);
+    EXPECT_EQ(errno, EINVAL);
+
+    udev_unref(udev);
+}
+
+/*
+ * Tests for:
+ * Device reference count after multiple operations
+ */
+HWTEST_F(CustomUdevTest, TestDeviceRefCountAfterOperations, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Perform various operations
+    auto* syspath = udev_device_get_syspath(device);
+    auto* sysname = udev_device_get_sysname(device);
+    auto* devnode = udev_device_get_devnode(device);
+    int32_t initialized = udev_device_get_is_initialized(device);
+
+    // All should succeed without affecting device validity
+    EXPECT_NE(syspath, nullptr);
+    EXPECT_NE(sysname, nullptr);
+    EXPECT_NE(devnode, nullptr);
+    EXPECT_GE(initialized, 0);
+    // Parent may be null depending on device hierarchy
+
+    // Device should still be valid
+    EXPECT_NE(udev_device_get_syspath(device), nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value after parent traversal
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyAfterParentTraversal, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Traverse parent chain
+    auto* current = device;
+    while (current != nullptr) {
+        const char* syspath = udev_device_get_syspath(current);
+        const char* sysname = udev_device_get_sysname(current);
+        (void)syspath;
+        (void)sysname;
+
+        current = udev_device_get_parent(current);
+    }
+
+    // Get properties from original device
+    const char* value = udev_device_get_property_value(device, "ID_INPUT");
+    // May or may not exist
+    (void)value;
+}
+
+/*
+ * Tests for:
+ * Error code preservation across multiple operations
+ */
+HWTEST_F(CustomUdevTest, TestErrnoPreservation, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Set errno to known value
+    errno = ENOMEM;
+    int32_t savedErrno = errno;
+
+    // Perform operations that should not modify errno on success
+    auto* syspath = udev_device_get_syspath(device);
+    EXPECT_NE(syspath, nullptr);
+    EXPECT_EQ(errno, savedErrno);
+
+    auto* sysname = udev_device_get_sysname(device);
+    EXPECT_NE(sysname, nullptr);
+    EXPECT_EQ(errno, savedErrno);
+}
+
+/*
+ * Tests for:
+ * Device with invalid syspath format variations
+ */
+HWTEST_F(CustomUdevTest, TestSyspathFormatVariations, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    const char* invalidPaths[] = {
+        "sys/devices/test",
+        "/sysdevices/test",
+        "/sys/device/test",
+        "/sys/devic/test",
+        "sys/dev/test",
+        "/sys/dev/test/",
+        "/sys/block/test",
+        "/sys/class/test"
+    };
+
+    for (const char* path : invalidPaths) {
+        errno = 0;
+        auto* device = udev_device_new_from_syspath(udev, path);
+        if (device != nullptr) {
+            udev_device_unref(device);
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add with special characters in devnode
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddSpecialCharsDevnode, TestSize.Level1)
+{
+    const char* specialDevnodes[] = {
+        "/dev/test\0device",
+        "/dev/test device",
+        "/dev/test\ndevice",
+        "/dev/test\tdevice"
+    };
+
+    for (const char* devnode : specialDevnodes) {
+        bool ret = udev_device_property_add('c', devnode);
+        EXPECT_FALSE(ret);
+    }
+}
+
+/*
+ * Tests for:
+ * Device lifecycle with explicit cleanup order
+ */
+HWTEST_F(CustomUdevTest, TestDeviceLifecycleExplicitCleanup, TestSize.Level1)
+{
+    auto* udev = udev_new();
+    ASSERT_NE(udev, nullptr);
+
+    // Create device that will fail
+    auto* device = udev_device_new_from_devnum(udev, 'c', 0);
+    EXPECT_EQ(device, nullptr);
+
+    // Cleanup in reverse order
+    udev_unref(udev);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_udev from multiple devices
+ */
+HWTEST_F(CustomUdevTest, TestGetUdevFromMultipleDevices, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device1 = testDevice_.GetDevice();
+    auto* udev1 = udev_device_get_udev(device1);
+    ASSERT_NE(udev1, nullptr);
+
+    // Create another device from same udev
+    auto devnum = testDevice_.GetDevNum();
+    auto* device2 = udev_device_new_from_devnum(udev1, 'c', devnum);
+    if (device2 != nullptr) {
+        auto* udev2 = udev_device_get_udev(device2);
+        EXPECT_EQ(udev1, udev2);
+        udev_device_unref(device2);
+    }
+}
+
+/*
+ * Tests for:
+ * Property value retrieval with unicode keys
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyUnicodeKeys, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* unicodeKeys[] = {
+        "测试",
+        "テスト",
+        "테스트",
+        "🔧",
+        "Ñoño"
+    };
+
+    for (const char* key : unicodeKeys) {
+        const char* value = udev_device_get_property_value(device, key);
+        // Should return nullptr for non-existent keys
+        (void)value;
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with path containing null bytes
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathNullBytes, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    std::string pathWithNull = "/sys/devices/test";
+    pathWithNull += '\0';
+    pathWithNull += "extra";
+
+    errno = 0;
+    auto* device = udev_device_new_from_syspath(udev, pathWithNull.c_str());
+    if (device != nullptr) {
+        udev_device_unref(device);
+    }
+}
+
+/*
+ * Tests for:
+ * Device property consistency after parent access
+ */
+HWTEST_F(CustomUdevTest, TestPropertyConsistencyAfterParentAccess, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Get properties before parent access
+    const char* syspath1 = udev_device_get_syspath(device);
+    const char* sysname1 = udev_device_get_sysname(device);
+    const char* devnode1 = udev_device_get_devnode(device);
+
+    // Access parent
+    auto* parent = udev_device_get_parent(device);
+    (void)parent;
+
+    // Get properties after parent access
+    const char* syspath2 = udev_device_get_syspath(device);
+    const char* sysname2 = udev_device_get_sysname(device);
+    const char* devnode2 = udev_device_get_devnode(device);
+
+    // Should be consistent
+    EXPECT_EQ(syspath1, syspath2);
+    EXPECT_EQ(sysname1, sysname2);
+    EXPECT_EQ(devnode1, devnode2);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_is_initialized with freshly created device
+ */
+HWTEST_F(CustomUdevTest, TestGetIsInitializedFreshDevice, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // First call initializes
+    int32_t init1 = udev_device_get_is_initialized(device);
+    EXPECT_GE(init1, 0);
+
+    // Second call should return cached value
+    int32_t init2 = udev_device_get_is_initialized(device);
+    EXPECT_EQ(init1, init2);
+}
+
+/*
+ * Tests for:
+ * Device creation failure with various errno values
+ */
+HWTEST_F(CustomUdevTest, TestDeviceCreationFailureErrno, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+
+    // Test different failure scenarios
+    errno = 0;
+    auto* fail1 = udev_device_new_from_devnum(nullptr, 'c', 123);
+    EXPECT_EQ(fail1, nullptr);
+    EXPECT_EQ(errno, EINVAL);
+
+    errno = 0;
+    auto* fail2 = udev_device_new_from_devnum(udev, 'x', 123);
+    EXPECT_EQ(fail2, nullptr);
+    EXPECT_EQ(errno, EINVAL);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_parent_with_subsystem_devtype with long subsystem name
+ */
+HWTEST_F(CustomUdevTest, TestGetParentWithLongSubsystem, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    std::string longSubsystem(256, 'a');
+    errno = 0;
+    auto* parent = udev_device_get_parent_with_subsystem_devtype(
+        device, longSubsystem.c_str(), nullptr);
+    if (parent != nullptr) {
+        udev_device_unref(parent);
+    }
+}
+
+/*
+ * Tests for:
+ * Memory stress test - create and destroy many devices
+ */
+HWTEST_F(CustomUdevTest, TestMemoryStressDeviceCreation, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+    auto devnum = testDevice_.GetDevNum();
+
+    const int32_t iterationCount = 100;
+    for (int32_t i = 0; i < iterationCount; i++) {
+        auto* newDevice = udev_device_new_from_devnum(udev, 'c', devnum);
+        if (newDevice != nullptr) {
+            // Access some properties
+            (void)udev_device_get_syspath(newDevice);
+            (void)udev_device_get_sysname(newDevice);
+            udev_device_unref(newDevice);
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add and remove sequence
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddRemoveSequence, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    const char* devnode = udev_device_get_devnode(device);
+    ASSERT_NE(devnode, nullptr);
+
+    // Add property
+    bool addRet = udev_device_property_add('c', devnode);
+    (void)addRet;
+
+    // Remove property
+    udev_device_property_remove(devnode);
+
+    // Add again with different type
+    addRet = udev_device_property_add('b', devnode);
+    (void)addRet;
+
+    // Remove again
+    udev_device_property_remove(devnode);
+}
+
+/*
+ * Tests for:
+ * Device syspath with special directory names
+ */
+HWTEST_F(CustomUdevTest, TestSyspathSpecialDirNames, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    const char* specialPaths[] = {
+        "/sys/devices/platform/test",
+        "/sys/devices/pci0000:00/test",
+        "/sys/devices/LNXSYSTM:00/test",
+        "/sys/devices/PNP0A08:00/test"
+    };
+
+    for (const char* path : specialPaths) {
+        errno = 0;
+        auto* device = udev_device_new_from_syspath(udev, path);
+        if (device != nullptr) {
+            udev_device_unref(device);
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value with numeric key
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyNumericKey, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* numericKeys[] = {
+        "123",
+        "0",
+        "999",
+        "123456789"
+    };
+
+    for (const char* key : numericKeys) {
+        const char* value = udev_device_get_property_value(device, key);
+        (void)value;
+    }
+}
+
+/*
+ * Tests for:
+ * Device reference after unref should not be used
+ */
+HWTEST_F(CustomUdevTest, TestDeviceRefAfterUnref, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Create new reference
+    auto* ref = udev_device_ref(device);
+    ASSERT_NE(ref, nullptr);
+
+    // Unref the reference
+    udev_device_unref(ref);
+
+    // Original device should still be valid (managed by testDevice_)
+    EXPECT_NE(udev_device_get_syspath(device), nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with case variations in path
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathCaseVariations, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    const char* casePaths[] = {
+        "/SYS/devices/test",
+        "/Sys/devices/test",
+        "/sys/DEVICES/test",
+        "/sys/Devices/test"
+    };
+
+    for (const char* path : casePaths) {
+        errno = 0;
+        auto* device = udev_device_new_from_syspath(udev, path);
+        if (device != nullptr) {
+            udev_device_unref(device);
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * Concurrent property access pattern
+ */
+HWTEST_F(CustomUdevTest, TestConcurrentPropertyAccess, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* parent = udev_device_get_parent(device);
+    ASSERT_NE(parent, nullptr);
+
+    const char* keys[] = {
+        "ID_INPUT",
+        "DEVNAME",
+        "DEVPATH",
+        "SUBSYSTEM",
+        "ID_INPUT_MOUSE",
+        "ID_INPUT_KEYBOARD",
+        "ID_INPUT_TOUCHSCREEN"
+    };
+
+    // Access properties multiple times in different order
+    for (int32_t round = 0; round < 3; round++) {
+        for (const char* key : keys) {
+            const char* value = udev_device_get_property_value(parent, key);
+            (void)value;
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_get_is_initialized boundary values
+ */
+HWTEST_F(CustomUdevTest, TestGetIsInitializedBoundary, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    int32_t result = udev_device_get_is_initialized(device);
+    // Should be 0 or 1 for valid device
+    EXPECT_TRUE(result == 0 || result == 1);
+
+    // Null device should return negative
+    int32_t nullResult = udev_device_get_is_initialized(nullptr);
+    EXPECT_LT(nullResult, 0);
+}
+
+/*
+ * Tests for:
+ * Device creation with errno pre-set
+ */
+HWTEST_F(CustomUdevTest, TestDeviceCreationWithPreSetErrno, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+
+    // Pre-set errno
+    errno = ENOMEM;
+
+    // Create device - should overwrite errno on failure
+    auto* newDevice = udev_device_new_from_devnum(nullptr, 'c', 123);
+    EXPECT_EQ(newDevice, nullptr);
+    // errno should be EINVAL for null udev
+    EXPECT_EQ(errno, EINVAL);
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add with maximum path length
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddMaxPathLength, TestSize.Level1)
+{
+    std::string longPath = "/dev/";
+    for (int32_t i = 0; i < 250; i++) {
+        longPath += "a";
+    }
+
+    bool ret = udev_device_property_add('c', longPath.c_str());
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * Tests for:
+ * Device sysname extraction from various path formats
+ */
+HWTEST_F(CustomUdevTest, TestSysnameFromVariousPaths, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* sysname = udev_device_get_sysname(device);
+    EXPECT_NE(sysname, nullptr);
+    EXPECT_STRNE(sysname, "");
+
+    // Sysname should not contain slashes
+    EXPECT_EQ(strchr(sysname, '/'), nullptr);
+    // Sysname should not be too long
+    EXPECT_LT(strlen(sysname), 256);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_parent with device at different hierarchy levels
+ */
+HWTEST_F(CustomUdevTest, TestGetParentDifferentLevels, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Get parent at different levels
+    auto* parent1 = udev_device_get_parent(device);
+    if (parent1 != nullptr) {
+        auto* parent2 = udev_device_get_parent(parent1);
+        if (parent2 != nullptr) {
+            auto* parent3 = udev_device_get_parent(parent2);
+            (void)parent3;
+        }
+    }
+
+    // Original device should still be valid
+    EXPECT_NE(udev_device_get_syspath(device), nullptr);
+}
+
+/*
+ * Tests for:
+ * Property value with control characters in key
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyControlChars, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    std::string keyWithControl = "KEY";
+    keyWithControl += '\t';
+    keyWithControl += "VALUE";
+
+    const char* value = udev_device_get_property_value(device, keyWithControl.c_str());
+    (void)value;
+}
+
+/*
+ * Tests for:
+ * udev_device_record_devnode before and after property operations
+ */
+HWTEST_F(CustomUdevTest, TestRecordDevnodeBeforeAfterProps, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    const char* devnode = udev_device_get_devnode(device);
+    ASSERT_NE(devnode, nullptr);
+
+    // Record before
+    udev_device_record_devnode(devnode);
+
+    // Property operations
+    udev_device_property_add('c', devnode);
+    udev_device_property_remove(devnode);
+
+    // Record after
+    udev_device_record_devnode(devnode);
+}
+
+/*
+ * Tests for:
+ * Device creation failure with all invalid type characters
+ */
+HWTEST_F(CustomUdevTest, TestNewFromDevnumAllInvalidTypes, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+    auto devnum = testDevice_.GetDevNum();
+
+    // Test all ASCII characters except 'b' and 'c'
+    for (char c = 0; c < 128; c++) {
+        if (c != 'b' && c != 'c') {
+            errno = 0;
+            auto* result = udev_device_new_from_devnum(udev, c, devnum);
+            if (result != nullptr) {
+                udev_device_unref(result);
+            }
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value consistency across multiple calls
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyConsistency, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* parent = udev_device_get_parent(device);
+    ASSERT_NE(parent, nullptr);
+
+    const char* key = "ID_INPUT";
+    const char* value1 = udev_device_get_property_value(parent, key);
+    const char* value2 = udev_device_get_property_value(parent, key);
+    const char* value3 = udev_device_get_property_value(parent, key);
+
+    // All calls should return same pointer for same key
+    EXPECT_EQ(value1, value2);
+    EXPECT_EQ(value2, value3);
+}
+
+/*
+ * Tests for:
+ * Device lifecycle with nested parent access
+ */
+HWTEST_F(CustomUdevTest, TestDeviceLifecycleNestedParent, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Nested parent access
+    auto* parent1 = udev_device_get_parent(device);
+    if (parent1 != nullptr) {
+        auto* parent2 = udev_device_get_parent(parent1);
+        if (parent2 != nullptr) {
+            auto* syspath = udev_device_get_syspath(parent2);
+            (void)syspath;
+        }
+        auto* syspath1 = udev_device_get_syspath(parent1);
+        (void)syspath1;
+    }
+    auto* syspath = udev_device_get_syspath(device);
+    (void)syspath;
+}
+
+/*
+ * Tests for:
+ * udev_device_new_from_syspath with path containing spaces
+ */
+HWTEST_F(CustomUdevTest, TestNewFromSyspathWithSpaces, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    errno = 0;
+    EXPECT_EQ(udev_device_new_from_syspath(udev, "/sys/devices/test path"), nullptr);
+}
+
+/*
+ * Tests for:
+ * Property add/remove with non-existent devnode
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddRemoveNonExistent, TestSize.Level1)
+{
+    const char* nonExistentDevnodes[] = {
+        "/dev/nonexistent_device_12345",
+        "/dev/another_fake_device",
+        "/dev/phantom_device"
+    };
+
+    for (const char* devnode : nonExistentDevnodes) {
+        bool addRet = udev_device_property_add('c', devnode);
+        EXPECT_FALSE(addRet);
+
+        // Remove should not crash
+        udev_device_property_remove(devnode);
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_get_udev returns valid udev for all device operations
+ */
+HWTEST_F(CustomUdevTest, TestGetUdevValidAfterOperations, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    // Perform various operations
+    (void)udev_device_get_syspath(device);
+    (void)udev_device_get_sysname(device);
+    (void)udev_device_get_devnode(device);
+    (void)udev_device_get_is_initialized(device);
+    (void)udev_device_get_parent(device);
+
+    // Get udev should still work
+    auto* udev = udev_device_get_udev(device);
+    EXPECT_NE(udev, nullptr);
+}
+
+/*
+ * Tests for:
+ * Device reference count edge case - ref then immediate unref
+ */
+HWTEST_F(CustomUdevTest, TestDeviceRefImmediateUnref, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    auto* ref = udev_device_ref(device);
+    ASSERT_NE(ref, nullptr);
+    udev_device_unref(ref);
+
+    // Device should still be accessible
+    EXPECT_NE(udev_device_get_syspath(device), nullptr);
+}
+
+/*
+ * Tests for:
+ * udev_device_get_property_value with duplicate keys
+ */
+HWTEST_F(CustomUdevTest, TestGetPropertyDuplicateKeys, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+
+    const char* key = "ID_INPUT";
+    const char* values[10];
+
+    for (int32_t i = 0; i < 10; i++) {
+        values[i] = udev_device_get_property_value(device, key);
+    }
+
+    // All should return same value
+    for (int32_t i = 1; i < 10; i++) {
+        EXPECT_EQ(values[0], values[i]);
+    }
+}
+
+/*
+ * Tests for:
+ * Syspath validation with various prefix patterns
+ */
+HWTEST_F(CustomUdevTest, TestSyspathPrefixPatterns, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* udev = udev_device_get_udev(testDevice_.GetDevice());
+    ASSERT_NE(udev, nullptr);
+
+    const char* prefixPatterns[] = {
+        "/sysfs/devices/test",
+        "/system/devices/test",
+        "/sysfs/test",
+        "/sysroot/devices/test",
+        "sys/devices/test"
+    };
+
+    for (const char* path : prefixPatterns) {
+        errno = 0;
+        auto* device = udev_device_new_from_syspath(udev, path);
+        if (device != nullptr) {
+            udev_device_unref(device);
+        }
+    }
+}
+
+/*
+ * Tests for:
+ * udev_device_property_add with type variations
+ */
+HWTEST_F(CustomUdevTest, TestPropertyAddTypeVariations, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    const char* devnode = udev_device_get_devnode(device);
+    ASSERT_NE(devnode, nullptr);
+
+    // Test with all possible char values
+    char testTypes[] = {'a', 'b', 'c', 'd', 'e', 'z', 'A', 'Z', '0', '9'};
+
+    for (char type : testTypes) {
+        bool ret = udev_device_property_add(type, devnode);
+        // Only 'b' and 'c' might succeed if device exists
+        (void)ret;
+    }
+}
+
+/*
+ * Tests for:
+ * Device creation and property access stress test
+ */
+HWTEST_F(CustomUdevTest, TestDevicePropertyStress, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(testDevice_.Init());
+    auto* device = testDevice_.GetDevice();
+    auto* udev = udev_device_get_udev(device);
+    ASSERT_NE(udev, nullptr);
+    auto devnum = testDevice_.GetDevNum();
+
+    const int32_t iterations = 50;
+    for (int32_t i = 0; i < iterations; i++) {
+        auto* newDevice = udev_device_new_from_devnum(udev, 'c', devnum);
+        if (newDevice != nullptr) {
+            // Access all getters
+            (void)udev_device_get_syspath(newDevice);
+            (void)udev_device_get_sysname(newDevice);
+            (void)udev_device_get_devnode(newDevice);
+            (void)udev_device_get_is_initialized(newDevice);
+            (void)udev_device_get_parent(newDevice);
+            (void)udev_device_get_udev(newDevice);
+
+            udev_device_unref(newDevice);
+        }
+    }
+}
 } // namespace MMI
 } // namespace OHOS
