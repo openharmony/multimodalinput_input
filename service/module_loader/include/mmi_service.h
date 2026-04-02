@@ -127,6 +127,8 @@ public:
     ErrCode InjectPointerEvent(const PointerEvent& pointerEvent, bool isNativeInject, int32_t useCoordinate) override;
     ErrCode InjectTouchPadEvent(const PointerEvent& pointerEvent, const TouchpadCDG& touchpadCDG,
         bool isNativeInject) override;
+    ErrCode CreateMouseController() override;
+    ErrCode CreateKeyboardController() override;
     ErrCode SetAnrObserver() override;
     ErrCode GetDisplayBindInfo(std::vector<DisplayBindInfo>& infos) override;
     ErrCode GetAllMmiSubscribedEvents(MmiEventMap& mmiEventMap) override;

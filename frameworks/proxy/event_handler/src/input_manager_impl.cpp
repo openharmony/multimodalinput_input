@@ -1412,6 +1412,26 @@ void InputManagerImpl::SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+int32_t InputManagerImpl::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateMouseController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("CreateMouseController failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CreateKeyboardController();
+    if (ret != RET_OK) {
+        MMI_HILOGE("CreateKeyboardController failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t InputManagerImpl::SetMouseScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;

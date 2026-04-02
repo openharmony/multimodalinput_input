@@ -354,6 +354,18 @@ void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEv
     // LCOV_EXCL_STOP
 }
 
+int32_t InputManager::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateMouseController();
+}
+
+int32_t InputManager::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateKeyboardController();
+}
+
 bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     // LCOV_EXCL_START

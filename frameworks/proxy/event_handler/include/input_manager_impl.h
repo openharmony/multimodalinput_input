@@ -132,6 +132,8 @@ public:
     void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void SimulateTouchPadInputEvent(std::shared_ptr<PointerEvent> pointerEvent,
         const TouchpadCDG &touchpadCDG);
+    int32_t CreateMouseController();
+    int32_t CreateKeyboardController();
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
