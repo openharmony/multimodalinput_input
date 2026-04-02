@@ -1385,7 +1385,9 @@ bool EventNormalizeHandler::HandleTouchPadEdgeSwipe(libinput_event* event)
     }
     MMI_HILOGI("Touchpad edge swipe{%{public}f}", pressure);
     keyDownEvent->SetKeyCode(keyCode);
+    keyDownEvent->UpdateId();
     keyUpEvent->SetKeyCode(keyCode);
+    keyUpEvent->UpdateId();
     itemDown.SetKeyCode(keyCode);
     itemUp.SetKeyCode(keyCode);
     itemDown.SetPressed(isKeyPressed);
