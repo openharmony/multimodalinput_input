@@ -18,12 +18,15 @@
 #include <cstdint>
 #include <linux/input.h>
 
+#include "device_state_manager.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
 #include "i_preference_manager.h"
+#include "input_event_handler.h"
 #include "mouse_event_interface.h"
 #include "i_setting_manager.h"
+
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
@@ -105,7 +108,6 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *e
     RemoveSurplusPointerItem();
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-
     return RET_OK;
 }
 
@@ -176,14 +178,13 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *eve
     }
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+        MMI_HILOGE("Can't find pointer item data, seatSlot:%{public}d, errCode:%{public}d",
                    seatSlot, PARAM_INPUT_FAIL);
         return RET_ERR;
     }
     item.SetPressed(false);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-
     return RET_OK;
 }
 
@@ -296,7 +297,6 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
             std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
     }
-
     return pointerEvent_;
 }
 
@@ -628,8 +628,10 @@ int32_t TouchPadTransformProcessor::GetPinchGestureType(int32_t type, double ang
                 PointerEvent::POINTER_ACTION_AXIS_UPDATE;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            return isRotateGesture_ ? PointerEvent::POINTER_ACTION_ROTATE_END :
-                PointerEvent::POINTER_ACTION_AXIS_END;
+            auto action = isRotateGesture_ ? PointerEvent::POINTER_ACTION_ROTATE_END :
+                    PointerEvent::POINTER_ACTION_AXIS_END;
+            isRotateGesture_ = false;
+            return action;
         }
         default:
             break;
@@ -943,6 +945,83 @@ int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(int32_t use
 {
     GetConfigDataFromDatabase(userId, TOUCHPAD_KEY_SETTING, FIELD_TOUCHPAD_THREE_FINGERTAP_SWITCH, switchFlag);
     return RET_OK;
+}
+
+void TouchPadTransformProcessor::OnDeviceEnabled()
+{
+    MMI_HILOGI("TouchPad[%{public}d] received enable notification", deviceId_);
+}
+
+void TouchPadTransformProcessor::OnDeviceDisabled()
+{
+    MMI_HILOGI("TouchPad[%{public}d] received disable notification", deviceId_);
+    RecordActiveOperations();
+    CancelAllGestures();
+
+    MMI_HILOGI("TouchPad[%{public}d] disabled, reset state data", deviceId_);
+    isRotateGesture_ = false;
+    rotateAngle_ = 0.0;
+    pointerEvent_ = nullptr;
+}
+
+void TouchPadTransformProcessor::RecordActiveOperations()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    std::set<int32_t> touches;
+    auto items = pointerEvent_->GetAllPointerItems();
+    std::for_each(items.cbegin(), items.cend(),
+        [&touches](const auto &item) {
+            if (item.IsPressed()) {
+                touches.emplace(item.GetPointerId());
+            }
+        });
+
+    DEVICE_STATE_MGR->AddTouches(deviceId_, touches);
+}
+
+void TouchPadTransformProcessor::CancelAllGestures()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    auto action = pointerEvent_->GetPointerAction();
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_SWIPE_UPDATE:
+        case PointerEvent::POINTER_ACTION_SWIPE_BEGIN: {
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+            MMI_HILOGI("TouchPad[%{public}d] cancelled swipe gesture", deviceId_);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+            pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, 1.0);
+            MMI_HILOGI("TouchPad[%{public}d] cancelled pinch gesture", deviceId_);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_ROTATE_UPDATE:
+        case PointerEvent::POINTER_ACTION_ROTATE_BEGIN: {
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_END);
+            MMI_HILOGI("TouchPad[%{public}d] cancelled rotate gesture", deviceId_);
+            break;
+        }
+        default: {
+            return;
+        }
+    }
+
+    pointerEvent_->UpdateId();
+    MMI_HILOGI("TouchPad[%{public}d] has active gesture, sending gesture end", deviceId_);
+
+    auto inputChannel = InputHandler->GetEventNormalizeHandler();
+    if (inputChannel != nullptr) {
+        LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+        inputChannel->HandlePointerEvent(pointerEvent_);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

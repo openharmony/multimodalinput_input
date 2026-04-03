@@ -3091,6 +3091,17 @@ int32_t InputManagerImpl::SetInputDeviceEnabled(int32_t deviceId, bool enable, s
     return INPUT_DEVICE_IMPL.RegisterInputdevice(deviceId, enable, callback);
 }
 
+int32_t InputManagerImpl::DisableInputEventDispatch(bool disabled)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return MULTIMODAL_INPUT_CONNECT_MGR->DisableInputEventDispatch(disabled);
+}
+
 int32_t InputManagerImpl::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     CALL_INFO_TRACE;

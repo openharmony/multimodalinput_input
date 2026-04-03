@@ -114,6 +114,8 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
     void OnDeviceRemoved() override;
+    void OnDeviceEnabled() override;
+    void OnDeviceDisabled() override;
     static int32_t SetTouchpadThreeFingersTapSwitch(int32_t userId, bool switchFlag);
     static int32_t GetTouchpadThreeFingersTapSwitch(int32_t userId, bool &switchFlag);
     static int32_t SetTouchpadPinchSwitch(int32_t userId, bool switchFlag);
@@ -161,6 +163,9 @@ private:
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
     void RemoveSurplusPointerItem();
+    void RecordActiveOperations();
+    void CancelAllGestures();
+
 private:
     const int32_t deviceId_ { -1 };
     bool isRotateGesture_ { false };

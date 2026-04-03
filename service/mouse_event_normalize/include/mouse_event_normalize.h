@@ -31,6 +31,8 @@ public:
     DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
     void OnDeviceAdded(int32_t deviceId) override;
     void OnDeviceRemoved(int32_t deviceId) override;
+    void OnDeviceEnabled(int32_t deviceId) override;
+    void OnDeviceDisabled(int32_t deviceId) override;
     bool HasMouse() override;
     int32_t OnEvent(struct libinput_event *event) override;
 

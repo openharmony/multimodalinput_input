@@ -1327,6 +1327,7 @@ ohos_unittest("TouchpadTransformProcessorEXTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }

@@ -15,6 +15,7 @@
 
 #include "mouse_transform_processor.h"
 #include "cursor_drawing_component.h"
+#include "device_state_manager.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
@@ -709,7 +710,11 @@ int32_t MouseTransformProcessor::HandleButtonPressed(uint32_t button, uint32_t o
 
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);
     pointerEvent_->SetButtonPressed(buttonId);
-    buttonMapping_[originButton] = buttonId;
+    buttonMapping_[originButton] = ButtonMappingData {
+        .eventType_ = type,
+        .buttonCode_ = button,
+        .buttonId_ = buttonId,
+    };
 
     isPressed_ = true;
     buttonId_ = pointerEvent_->GetButtonId();
@@ -748,6 +753,9 @@ void MouseTransformProcessor::HandleTouchPadButton(enum libinput_button_state st
     if (type != LIBINPUT_EVENT_POINTER_TAP && type != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         return;
     }
+
+    isTouchpad_ = true;
+
     CHKPV(pointerEvent_);
     auto pressedButtons = pointerEvent_->GetPressedButtons();
     if (pressedButtons.empty()) {
@@ -780,7 +788,7 @@ void MouseTransformProcessor::DeletePressedButton(uint32_t originButton)
 {
     auto iter = buttonMapping_.find(originButton);
     if (iter != buttonMapping_.end()) {
-        pointerEvent_->DeleteReleaseButton(iter->second);
+        pointerEvent_->DeleteReleaseButton(iter->second.buttonId_);
         buttonMapping_.erase(iter);
     }
 }
@@ -964,6 +972,7 @@ void MouseTransformProcessor::OnAxisScrollTimer()
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Timer:%{public}d", timerId_);
     timerId_ = -1;
+    isAxisBegin_ = false;
     auto pointerEvent = GetPointerEvent();
     CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
@@ -1003,6 +1012,7 @@ int32_t MouseTransformProcessor::BeginAxisScrollEvent()
 {
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
     pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+    isAxisBegin_ = true;
     MMI_HILOGI("Axis begin");
     return UpdateCursorLocationIfNeeded();
 }
@@ -1090,10 +1100,13 @@ int32_t MouseTransformProcessor::HandleScrollFingerInner(struct libinput_event *
     if (libinput_event_get_type(event) == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_BEGIN) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+        isTouchpad_ = true;
+        isAxisBegin_ = true;
         MMI_HILOGD("Axis begin");
     } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_POINTER_SCROLL_FINGER_END) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
         pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+        isAxisBegin_ = false;
         MMI_HILOGD("Axis end");
     } else {
         MMI_HILOGE("Axis is invalid");
@@ -1846,6 +1859,126 @@ int32_t MouseTransformProcessor::GetVirtualTouchpadPrimaryButton()
     MMI_HILOGI("VTrackpad always sets left button as primary button.");
     return LEFT_BUTTON;
 }
+
 #endif // OHOS_BUILD_ENABLE_VKEYBOARD
+
+void MouseTransformProcessor::OnDeviceEnabled()
+{
+    MMI_HILOGI("Mouse[%{public}d] received enable notification", deviceId_);
+}
+
+void MouseTransformProcessor::OnDeviceDisabled()
+{
+    MMI_HILOGI("Mouse[%{public}d] received disable notification", deviceId_);
+    if (timerId_ >= 0) {
+        auto timerMgr = GetTimerManager();
+        if (timerMgr != nullptr) {
+            timerMgr->RemoveTimer(timerId_);
+        }
+        timerId_ = -1;
+        MMI_HILOGI("Mouse[%{public}d] removed axis scroll timer on disable", deviceId_);
+    }
+
+    RecordActiveOperations();
+    SendButtonUpEvents();
+    SendAxisEndEvent();
+
+    MMI_HILOGI("Mouse[%{public}d] disabled, reset state data", deviceId_);
+    if (pointerEvent_ != nullptr) {
+        pointerEvent_->Reset();
+    }
+    isPressed_ = false;
+    isAxisBegin_ = false;
+    buttonId_ = PointerEvent::BUTTON_NONE;
+    buttonMapping_.clear();
+}
+
+void MouseTransformProcessor::RecordActiveOperations()
+{
+    if (!isTouchpad_) {
+        std::set<int32_t> pressedButtons;
+
+        std::for_each(buttonMapping_.cbegin(), buttonMapping_.cend(),
+            [&pressedButtons](const auto &item) {
+                pressedButtons.emplace(item.first);
+            });
+        MMI_HILOGI("Record %{public}zu pressed buttons of mouse[%{public}d]", pressedButtons.size(), deviceId_);
+        DEVICE_STATE_MGR->AddPressedButtons(deviceId_, pressedButtons);
+    }
+}
+
+void MouseTransformProcessor::SendButtonUpEvents()
+{
+    CALL_DEBUG_ENTER;
+    if (pointerEvent_ == nullptr) {
+        MMI_HILOGI("Mouse[%{public}d] has no event", deviceId_);
+        return;
+    }
+
+    auto pressedButtons = pointerEvent_->GetPressedButtons();
+    if (pressedButtons.empty()) {
+        return;
+    }
+    MMI_HILOGI("Mouse[%{public}d] has pressed buttons, sending BUTTON_UP", deviceId_);
+
+    auto inputChannel = GetEventNormalizeHandler();
+    if (inputChannel == nullptr) {
+        MMI_HILOGE("EventNormalizeHandler is null");
+        return;
+    }
+
+    for (int32_t buttonId : pressedButtons) {
+        auto iter = buttonMapping_.cbegin();
+        for (; iter != buttonMapping_.cend(); ++iter) {
+            if (iter->second.buttonId_ == buttonId) {
+                break;
+            }
+        }
+        if (iter == buttonMapping_.cend()) {
+            continue;
+        }
+
+        HandleButtonReleased(iter->second.buttonCode_, iter->first, iter->second.eventType_);
+        pointerEvent_->SetButtonId(iter->second.buttonId_);
+        pointerEvent_->UpdateId();
+
+        LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+        inputChannel->HandlePointerEvent(pointerEvent_);
+        MMI_HILOGD("Sent BUTTON_UP for button[%{public}d], pressedButtons size=%{public}zu",
+            buttonId, pointerEvent_->GetPressedButtons().size());
+    }
+}
+
+void MouseTransformProcessor::SendAxisEndEvent()
+{
+    CALL_DEBUG_ENTER;
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    if (!isAxisBegin_) {
+        MMI_HILOGD("No active axis scroll, skipping AXIS_END");
+        return;
+    }
+
+    MMI_HILOGI("Mouse[%{public}d] has active axis scroll, sending AXIS_END", deviceId_);
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0.0);
+    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0.0);
+    pointerEvent_->UpdateId();
+
+    auto inputChannel = GetEventNormalizeHandler();
+    if (inputChannel == nullptr) {
+        MMI_HILOGE("EventNormalizeHandler is null");
+        return;
+    }
+
+    LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+    inputChannel->HandlePointerEvent(pointerEvent_);
+
+    isAxisBegin_ = false;
+    MMI_HILOGI("Sent AXIS_END for mouse[%{public}d]", deviceId_);
+}
 } // namespace MMI
 } // namespace OHOS

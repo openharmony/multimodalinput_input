@@ -30,6 +30,7 @@ ohos_source_set("device_manager_mock") {
   include_dirs = [ "include" ]
 
   sources = [
+    "src/device_state_manager.cpp",
     "src/input_device_manager.cpp",
     "src/pointer_device_manager.cpp",
   ]

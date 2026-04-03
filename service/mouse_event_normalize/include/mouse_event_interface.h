@@ -41,6 +41,8 @@ private:
         void OnDeviceAdded(int32_t deviceId) override;
         void OnDeviceRemoved(int32_t deviceId) override;
         void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) override {}
+        void OnDeviceEnabled(int32_t deviceId) override;
+        void OnDeviceDisabled(int32_t deviceId) override;
 
     private:
         std::weak_ptr<MouseEventInterface> parent_;
@@ -106,6 +108,8 @@ public:
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
 private:
+    void OnDeviceEnabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId);
+    void OnDeviceDisabled(std::shared_ptr<MouseEventInterface> self, int32_t deviceId);
     std::shared_ptr<IInputServiceContext> GetEnv() const;
     ComponentManager::Handle<IMouseEventNormalize> GetMouse() const;
     void SetUpDeviceObserver(std::shared_ptr<MouseEventInterface> self);
