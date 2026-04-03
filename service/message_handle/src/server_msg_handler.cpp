@@ -135,6 +135,10 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
+    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
+        MMI_HILOGW("Edu input is disabled, rejecting event injection for pid=%{public}d", getpid());
+        return ERROR_EDU_INPUT_DISABLED;
+    }
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
@@ -243,6 +247,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(int32_t userId, const std::shared
     int32_t pid, bool isNativeInject, bool isShell, int32_t useCoordinate)
 {
     CALL_DEBUG_ENTER;
+    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
+        MMI_HILOGW("Edu input is disabled, rejecting event injection for pid=%{public}d", getpid());
+        return ERROR_EDU_INPUT_DISABLED;
+    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
@@ -258,6 +266,10 @@ int32_t ServerMsgHandler::OnInjectTouchPadEvent(int32_t userId, const std::share
     int32_t pid, const TouchpadCDG& touchpadCDG, bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
+    if (INPUT_DEV_MGR->IsEduInputDisabled()) {
+        MMI_HILOGW("Edu input is disabled, rejecting touchpad event injection for pid=%{public}d", getpid());
+        return ERROR_EDU_INPUT_DISABLED;
+    }
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {

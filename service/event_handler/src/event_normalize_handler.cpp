@@ -19,6 +19,7 @@
 
 #include "bytrace_adapter.h"
 #include "crown_transform_processor.h"
+#include "device_state_manager.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -157,6 +158,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         auto enable = INPUT_DEV_MGR->IsInputDeviceEnable(deviceId);
         if (!enable) {
             MMI_HILOGE("The current device has been disabled");
+            DEVICE_STATE_MGR->HandleEvent(event);
             return;
         }
         if (!INPUT_DEV_MGR->GetIsDeviceReportEvent(deviceId)) {
