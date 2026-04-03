@@ -70,6 +70,7 @@ declare_args() {
   input_feature_touchpad = true
   input_feature_pen = true
   input_feature_touch_gesture = true
+  input_feature_universal_drag_enable = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.msdp_device_status)) {
@@ -432,6 +433,10 @@ if (security_component_enable) {
 
 if (input_feature_move_event_filters) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS" ]
+}
+
+if (input_feature_universal_drag_enable) {
+  input_default_defines += [ "OHOS_BUILD_UNIVERSAL_DRAG" ]
 }
 
 if (input_ext_feature_anco) {
