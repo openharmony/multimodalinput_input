@@ -582,6 +582,14 @@ int32_t MultimodalInputConnectManager::CreateMouseController()
     return multimodalInputConnectService_->CreateMouseController();
 }
 
+int32_t MultimodalInputConnectManager::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->CreateKeyboardController();
+}
+
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
     // LCOV_EXCL_START
@@ -1134,6 +1142,14 @@ int32_t MultimodalInputConnectManager::SetInputDeviceEnabled(int32_t deviceId, b
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetInputDeviceEnabled(deviceId, enable, index);
+}
+
+int32_t MultimodalInputConnectManager::DisableInputEventDispatch(bool disabled)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->DisableInputEventDispatch(disabled);
 }
 
 int32_t MultimodalInputConnectManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)

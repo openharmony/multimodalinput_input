@@ -16,51 +16,50 @@
 #ifndef JS_MOUSE_CONTROLLER_H
 #define JS_MOUSE_CONTROLLER_H
 
-#include <map>
 #include <memory>
 
-#include "pointer_event.h"
+#include "mouse_controller_impl.h"
 
 namespace OHOS {
 namespace MMI {
 
 /**
- * @brief Mouse controller for simulating mouse operations
+ * @brief NAPI wrapper for MouseControllerImpl
  *
- * This class maintains client-side state for mouse button presses,
- * axis events, and cursor position. Each instance is independent.
+ * This class is a thin adapter layer that converts JS parameters to C++ calls.
+ * All core logic is delegated to MouseControllerImpl.
  */
 class JsMouseController {
 public:
     JsMouseController();
-    ~JsMouseController();
+    ~JsMouseController() = default;
 
     /**
      * @brief Move mouse cursor to specified position
      * @param displayId Display ID
-     * @param x X coordinate (will be clamped to >= 0)
-     * @param y Y coordinate (will be clamped to >= 0)
+     * @param x X coordinate
+     * @param y Y coordinate
      * @return RET_OK on success, error code otherwise
      */
     int32_t MoveTo(int32_t displayId, int32_t x, int32_t y);
 
     /**
      * @brief Press mouse button
-     * @param button Button ID
+     * @param button Button ID (JS enum value)
      * @return RET_OK on success, error code otherwise
      */
     int32_t PressButton(int32_t button);
 
     /**
      * @brief Release mouse button
-     * @param button Button ID
+     * @param button Button ID (JS enum value)
      * @return RET_OK on success, error code otherwise
      */
     int32_t ReleaseButton(int32_t button);
 
     /**
      * @brief Begin axis event (e.g., scroll wheel)
-     * @param axis Axis type
+     * @param axis Axis type (JS enum value)
      * @param value Axis value
      * @return RET_OK on success, error code otherwise
      */
@@ -68,7 +67,7 @@ public:
 
     /**
      * @brief Update ongoing axis event
-     * @param axis Axis type
+     * @param axis Axis type (JS enum value)
      * @param value Axis value
      * @return RET_OK on success, error code otherwise
      */
@@ -76,63 +75,28 @@ public:
 
     /**
      * @brief End axis event
-     * @param axis Axis type
+     * @param axis Axis type (JS enum value)
      * @return RET_OK on success, error code otherwise
      */
     int32_t EndAxis(int32_t axis);
 
 private:
     /**
-     * @brief Create a PointerEvent with specified action
-     * @param action Pointer action type
-     * @return Shared pointer to PointerEvent
+     * @brief Convert JS button enum to native button ID
+     * @param jsButton JS button enum value
+     * @return Native button ID
      */
-    std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t action);
+    int32_t ConvertJsButtonToNative(int32_t jsButton);
 
     /**
-     * @brief Inject pointer event to system
-     * @param event Pointer event to inject
-     * @return RET_OK on success, error code otherwise
+     * @brief Convert JS axis enum to native axis type
+     * @param jsAxis JS axis enum value
+     * @return Native axis type
      */
-    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> event);
+    int32_t ConvertJsAxisToNative(int32_t jsAxis);
 
-    /**
-     * @brief Validate and clamp coordinates
-     * @param x X coordinate (will be modified)
-     * @param y Y coordinate (will be modified)
-     * @param displayId Display ID
-     * @return true if valid, false otherwise
-     */
-    bool ValidateCoordinates(int32_t& x, int32_t& y, int32_t displayId);
-
-    /**
-     * @brief Create a PointerItem with current cursor position
-     * @return PointerItem with cursor position set
-     */
-    PointerEvent::PointerItem CreatePointerItem();
-
-    // Button states: button ID -> pressed state
-    std::map<int32_t, bool> buttonStates_;
-
-    // Record the down time for each pressed button
-    std::map<int32_t, int64_t> buttonDownTimes_;
-
-    // Axis event state
-    struct AxisState {
-        bool inProgress = false;
-        int32_t axisType = -1;
-        int32_t lastValue = 0;
-    } axisState_;
-
-    // Current cursor position
-    struct CursorPosition {
-        int32_t displayId = 0;
-        int32_t x = 0;
-        int32_t y = 0;
-    } cursorPos_;
-
-    // Mutex to protect state (for thread safety)
-    mutable std::mutex mutex_;
+    // Core implementation instance
+    std::shared_ptr<MouseControllerImpl> impl_;
 };
 
 } // namespace MMI

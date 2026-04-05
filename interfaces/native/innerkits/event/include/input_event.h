@@ -119,6 +119,15 @@ public:
      */
     static constexpr uint32_t EVENT_FLAG_SIMULATE_NAVIGATION = 0x00000200;
 
+    /**
+     * The multimodal input event requires position calibration.
+     * When this flag is set, the server will replace the event's coordinates
+     * with the current system cursor position.
+     *
+     * @since 25
+     */
+    static constexpr uint32_t EVENT_FLAG_CALIBRATE_POSITION = 0x00000800;
+
     static constexpr uint32_t EVENT_FLAG_GENERATE_FROM_REAL = 0x00000400;
     
     static constexpr uint32_t EVENT_FLAG_SHOW_CUSOR_WITH_TOUCH = 0x00000600;

@@ -390,17 +390,31 @@ public:
     /**
      * @brief Creates a mouse controller for simulating mouse operations.
      * Requires system app and INPUT_DEVICE_CONTROLLER permission.
-     * @return Returns <b>RET_OK</b> if permission check passed; returns error code otherwise.
+     * @return Shared pointer to MouseControllerImpl, nullptr on failure
      * @since 26
      */
-    int32_t CreateMouseController();
+    std::shared_ptr<class MouseControllerImpl> CreateMouseController();
 
     /**
      * @brief Create keyboard controller
-     * @return Returns RET_OK on success, error code otherwise
+     * @return Shared pointer to KeyboardControllerImpl, nullptr on failure
      * @since 26
      */
-    int32_t CreateKeyboardController();
+    std::shared_ptr<class KeyboardControllerImpl> CreateKeyboardController();
+
+    /**
+     * @brief Check permission for creating mouse controller (for NAPI layer)
+     * @return RET_OK on success, error code otherwise
+     * @since 26
+     */
+    int32_t CheckMouseControllerPermission();
+
+    /**
+     * @brief Check permission for creating keyboard controller (for NAPI layer)
+     * @return RET_OK on success, error code otherwise
+     * @since 26
+     */
+    int32_t CheckKeyboardControllerPermission();
 
     /**
      * @brief Convert mouse events to touch events.
@@ -1152,6 +1166,15 @@ public:
      * @since 14
      */
     int32_t SetInputDeviceEnabled(int32_t deviceId, bool enable, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief Enables or disables input event dispatch.
+     * @param disabled true to disable input event dispatch, false to enable.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @permission ohos.permission.MANAGE_EDM_POLICY (system_core)
+     * @since 15
+     */
+    int32_t DisableInputEventDispatch(bool disabled);
 
     /**
      * @brief shift AppPointerEvent from source window to target window

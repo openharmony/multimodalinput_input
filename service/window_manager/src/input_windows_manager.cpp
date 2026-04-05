@@ -7300,6 +7300,7 @@ void InputWindowsManager::ClearExtraData()
     extraData_.pullId = -1;
     extraData_.eventId = -1;
     extraData_.drawCursor = false;
+    activeDragToolType_ = -1;
 }
 
 ExtraData InputWindowsManager::GetExtraData() const
@@ -7331,26 +7332,56 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
     return false;
 }
 
+bool InputWindowsManager::ShouldTransformAction(int32_t sourceType, int32_t toolType)
+{
+    if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        activeDragToolType_ != -1 && toolType != activeDragToolType_) {
+        MMI_HILOG_WINDOWW("ToolType:%{public}d, activeDragToolType:%{public}d", toolType, activeDragToolType_);
+        return false;
+    }
+    return true;
+}
+
 void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    if (pointerEvent == nullptr) {
+        MMI_HILOGE("pointerEvent is null");
+        return;
+    }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerId, item)) {
+        MMI_HILOG_WINDOWE("Invalid pointer:%{public}d", pointerId);
+        return;
+    }
+    int32_t sourceType = pointerEvent->GetSourceType();
+    int32_t toolType = item.GetToolType();
+    if (!ShouldTransformAction(sourceType, toolType)) {
+        MMI_HILOG_DISPATCHI("Action no need change");
+        return;
+    }
     int32_t action = pointerEvent->GetPointerAction();
     switch (action) {
         case PointerEvent::POINTER_ACTION_MOVE: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+            activeDragToolType_ = toolType;
             break;
         }
         case PointerEvent::POINTER_ACTION_BUTTON_UP:
         case PointerEvent::POINTER_ACTION_UP: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+            activeDragToolType_ = -1;
             break;
         }
         case PointerEvent::POINTER_ACTION_ENTER_WINDOW: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW);
+            activeDragToolType_ = toolType;
             break;
         }
         case PointerEvent::POINTER_ACTION_LEAVE_WINDOW: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+            activeDragToolType_ = toolType;
             break;
         }
         default: {

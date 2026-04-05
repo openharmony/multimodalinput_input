@@ -354,18 +354,6 @@ void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEv
     // LCOV_EXCL_STOP
 }
 
-int32_t InputManager::CreateMouseController()
-{
-    CALL_DEBUG_ENTER;
-    return InputMgrImpl.CreateMouseController();
-}
-
-int32_t InputManager::CreateKeyboardController()
-{
-    CALL_DEBUG_ENTER;
-    return InputMgrImpl.CreateKeyboardController();
-}
-
 bool InputManager::TransformMouseEventToTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     // LCOV_EXCL_START
@@ -973,6 +961,11 @@ int32_t InputManager::SetInputDeviceEnabled(int32_t deviceId, bool enable, std::
     return InputMgrImpl.SetInputDeviceEnabled(deviceId, enable, callback);
 }
 
+int32_t InputManager::DisableInputEventDispatch(bool disabled)
+{
+    return InputMgrImpl.DisableInputEventDispatch(disabled);
+}
+
 int32_t InputManager::ShiftAppPointerEvent(const ShiftWindowParam &param, bool autoGenDown)
 {
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "shift pointer event entry");
@@ -1105,6 +1098,30 @@ int32_t InputManager::DeliverNonce(const std::string &nonce)
 int32_t InputManager::RedispatchInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     return InputMgrImpl.RedispatchInputEvent(pointerEvent);
+}
+
+std::shared_ptr<MouseControllerImpl> InputManager::CreateMouseController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateMouseController();
+}
+
+std::shared_ptr<KeyboardControllerImpl> InputManager::CreateKeyboardController()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CreateKeyboardController();
+}
+
+int32_t InputManager::CheckMouseControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CheckMouseControllerPermission();
+}
+
+int32_t InputManager::CheckKeyboardControllerPermission()
+{
+    CALL_DEBUG_ENTER;
+    return InputMgrImpl.CheckKeyboardControllerPermission();
 }
 } // namespace MMI
 } // namespace OHOS

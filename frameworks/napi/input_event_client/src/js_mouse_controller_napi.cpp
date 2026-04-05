@@ -60,9 +60,9 @@ napi_value CreateMouseController(napi_env env, napi_callback_info info)
     MMI_HILOGD("CreateMouseController called");
 
     // Call service to check permission
-    int32_t ret = InputManager::GetInstance()->CreateMouseController();
+    int32_t ret = InputManager::GetInstance()->CheckMouseControllerPermission();
     if (ret != RET_OK) {
-        MMI_HILOGE("CreateMouseController permission check failed, ret=%{public}d", ret);
+        MMI_HILOGE("CheckMouseControllerPermission failed, ret=%{public}d", ret);
         THROWERR_CUSTOM(env, ret, "Permission check failed");
         return nullptr;
     }

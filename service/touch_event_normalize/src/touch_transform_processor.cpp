@@ -18,6 +18,7 @@
 #include <linux/input.h>
 
 #include "bytrace_adapter.h"
+#include "device_state_manager.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #ifdef OHOS_BUILD_KNUCKLE
@@ -390,6 +391,21 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
 void TouchTransformProcessor::OnDeviceRemoved()
 {}
 
+void TouchTransformProcessor::OnDeviceEnabled()
+{
+    MMI_HILOGI("TouchScreen[%{public}d] received enable notification", deviceId_);
+}
+
+void TouchTransformProcessor::OnDeviceDisabled()
+{
+    MMI_HILOGI("TouchScreen[%{public}d] received disable notification", deviceId_);
+    RecordActiveOperations();
+    CancelAllTouches();
+
+    MMI_HILOGI("Reset event for TouchScreen[%{public}d]", deviceId_);
+    pointerEvent_ = nullptr;
+}
+
 int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *data,
     struct libinput_device *device)
 {
@@ -471,5 +487,56 @@ void TouchTransformProcessor::RemoveInvalidAreaDownedEvent(int32_t seatSlot)
     }
 }
 #endif // OHOS_BUILD_EXTERNAL_SCREEN
+
+void TouchTransformProcessor::RecordActiveOperations()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    std::set<int32_t> touches;
+    auto items = pointerEvent_->GetAllPointerItems();
+    for (const auto& item : items) {
+        if (item.IsPressed()) {
+            touches.insert(item.GetPointerId());
+        }
+    }
+    DEVICE_STATE_MGR->AddTouches(deviceId_, touches);
+}
+
+void TouchTransformProcessor::CancelAllTouches()
+{
+    if (pointerEvent_ == nullptr) {
+        return;
+    }
+
+    auto inputChannel = InputHandler->GetEventNormalizeHandler();
+    if (inputChannel == nullptr) {
+        MMI_HILOGE("EventNormalizeHandler is null");
+        return;
+    }
+
+    for (auto &item : pointerEvent_->GetAllPointerItems()) {
+        if (!item.IsPressed()) {
+            continue;
+        }
+
+        item.SetPressed(false);
+        pointerEvent_->UpdatePointerItem(item.GetPointerId(), item);
+
+        auto now = GetSysClockTime();
+        pointerEvent_->SetActionTime(now);
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+        pointerEvent_->SetPointerId(item.GetPointerId());
+        pointerEvent_->UpdateId();
+
+        WIN_MGR->UpdateTargetPointer(pointerEvent_);
+
+        MMI_HILOGI("Send TOUCH_UP of touch[%{public}d] for TouchScreen[%{public}d]",
+            pointerEvent_->GetPointerId(), deviceId_);
+        LogTracer lt(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+        inputChannel->HandleTouchEvent(pointerEvent_);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
